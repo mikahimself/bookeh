@@ -1,0 +1,40 @@
+services:
+  payload:
+    image: node:22-alpine
+    ports:
+      - '3000:3000'
+    volumes:
+      - .:/home/node/app
+      - node_modules:/home/node/app/node_modules
+    working_dir: /home/node/app/
+    command: sh -c "npm install && npm run dev"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment:
+      # Overrides the host-oriented value in .env: inside the compose network
+      # Postgres is reachable as 'postgres', not 'localhost'.
+      DATABASE_URL: postgres://bookeh:bookeh@postgres:5432/bookeh
+
+  postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: bookeh
+      POSTGRES_PASSWORD: bookeh
+      POSTGRES_DB: bookeh
+    ports:
+      - '5432:5432'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U bookeh -d bookeh']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  pgdata:
+  node_modules:
