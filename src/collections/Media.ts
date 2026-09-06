@@ -5,11 +5,15 @@ export const Media: CollectionConfig = {
   access: {
     read: () => true,
   },
+  admin: {
+    group: 'Catalogue',
+  },
   fields: [
     {
+      // Optional: covers are fetched automatically during the scan flow, and
+      // requiring alt text there would cost more than it buys in a private app.
       name: 'alt',
       type: 'text',
-      required: true,
     },
   ],
   upload: true,
