@@ -1,0 +1,88 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>bookeh typefaces</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Open+Sans:wght@300;400;600&family=Source+Sans+3:wght@300;400;600&family=IBM+Plex+Sans:wght@300;400;600&family=Work+Sans:wght@300;400;600&family=Source+Serif+4:opsz,wght@8..60,300;8..60,400&display=swap">
+<style>
+.L{--bg:#FFFFFF;--ink:#1F2933;--mu:#5F6B78;--ln:#DDE2E7;--co:#FF7B6B}
+.D{--bg:#14181D;--ink:#E3E8EE;--mu:#94A0AD;--ln:#2C343D;--co:#FF8E7F}
+*{box-sizing:border-box}
+body{margin:0;font:14px/1.45 system-ui,-apple-system,sans-serif;color:#222;background:#e4e4e4}
+main{max-width:1400px;margin:0 auto;padding:24px 16px 96px}
+main>h1{font-size:22px;margin:0 0 4px}
+h2{font:600 18px system-ui,sans-serif;margin:44px 0 2px}
+.note{color:#555;max-width:86ch;margin:2px 0 10px}
+.pair{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:12px;font-size:14px}
+.pn{background:var(--bg);color:var(--ink);padding:18px 24px 20px;min-width:0;overflow:hidden;--dim:color-mix(in srgb,var(--mu) 45%,var(--bg))}
+.hd{display:flex;gap:24px;font-size:44px;font-weight:300;letter-spacing:-.015em;line-height:1.1;color:var(--dim);white-space:nowrap;margin-bottom:14px}
+.hd .on{color:var(--ink)}
+.r{display:flex;align-items:center;gap:16px;padding:8px 0}
+.r i{flex:none;width:32px;height:48px}
+.tx{flex:1;min-width:0;display:flex;flex-direction:column}
+.tx b{font-family:var(--tf);font-weight:400;font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tx span,.mu{font-size:13px;color:var(--mu)}
+.ch{font-size:13px;color:var(--mu)}
+.dt{font-family:var(--tf);font-size:26px;font-weight:300;line-height:1.15}
+.by{font-size:17px}
+.gh{font-size:20px;font-weight:300;color:var(--mu);margin:16px 0 2px}
+.kv{display:flex;justify-content:space-between;gap:12px}.kv span+span{color:var(--mu)}
+.bts{display:flex;gap:8px;margin-top:16px}.bts span{border:2px solid var(--ink);padding:4px 14px}.bts span:first-child{border-color:var(--co)}
+</style></head><body><main>
+<h1>bookeh typefaces</h1>
+<p class="note">The type-led direction rests on its typeface, so here is the same screen in seven. Each row shows the collection in light mode, a book's details, and the collection in dark mode. All of these are free to use and can be served from your own server. This page loads them from Google Fonts, so it needs an internet connection to show them correctly.</p>
+<section><h2>T1. System fonts</h2><p class="note">Whatever the device ships: San Francisco on Apple, Segoe UI on Windows, Roboto on Android. Nothing to download, but the app looks different on each device.</p>
+<div class="pair" style="font-family:system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;--tf:inherit">
+<div class="pn L"><div class="hd"><span class="on">collection</span><span>loans</span><span>wishlists</span></div><div class="r"><i style="background:#7A8B99"></i><span class="tx"><b>Tuntematon sotilas</b><span>Väinö Linna · 1954 · WSOY</span></span><span class="ch">tampere</span></div><div class="r"><i style="background:#B5651D"></i><span class="tx"><b>Täällä Pohjantähden alla 1</b><span>Väinö Linna · 1959 · WSOY</span></span><span class="ch">mökki</span></div><div class="r"><i style="background:#9AA77B"></i><span class="tx"><b>Kätilö</b><span>Katja Kettu · 2011 · WSOY</span></span><span class="ch">helsinki</span></div></div>
+<div class="pn L"><div class="dt">Täällä Pohjantähden alla 1</div><div class="by">Väinö Linna</div><div class="mu">WSOY · 1959 · 476 pages · Finnish</div>
+<div class="gh">your copies</div><div class="kv"><span>Mökki</span><span>Lent to Antti since 12 Sep</span></div>
+<div class="gh">letters and numbers</div><div>Åland, öljy, ääni, yö, Šostakovitš, Žižek</div><div>978-951-0-41234-5 · 0123456789</div>
+<div class="bts"><span>lend</span><span>move</span><span>edit</span></div></div>
+<div class="pn D"><div class="hd"><span class="on">collection</span><span>loans</span></div><div class="r"><i style="background:#7A8B99"></i><span class="tx"><b>Tuntematon sotilas</b><span>Väinö Linna · 1954 · WSOY</span></span><span class="ch">tampere</span></div><div class="r"><i style="background:#B5651D"></i><span class="tx"><b>Täällä Pohjantähden alla 1</b><span>Väinö Linna · 1959 · WSOY</span></span><span class="ch">mökki</span></div><div class="r"><i style="background:#9AA77B"></i><span class="tx"><b>Kätilö</b><span>Katja Kettu · 2011 · WSOY</span></span><span class="ch">helsinki</span></div></div>
+</div></section><section><h2>T2. Inter</h2><p class="note">Neutral and even. Built for screens, very legible at small sizes.</p>
+<div class="pair" style="font-family:'Inter',sans-serif;--tf:inherit">
+<div class="pn L"><div class="hd"><span class="on">collection</span><span>loans</span><span>wishlists</span></div><div class="r"><i style="background:#7A8B99"></i><span class="tx"><b>Tuntematon sotilas</b><span>Väinö Linna · 1954 · WSOY</span></span><span class="ch">tampere</span></div><div class="r"><i style="background:#B5651D"></i><span class="tx"><b>Täällä Pohjantähden alla 1</b><span>Väinö Linna · 1959 · WSOY</span></span><span class="ch">mökki</span></div><div class="r"><i style="background:#9AA77B"></i><span class="tx"><b>Kätilö</b><span>Katja Kettu · 2011 · WSOY</span></span><span class="ch">helsinki</span></div></div>
+<div class="pn L"><div class="dt">Täällä Pohjantähden alla 1</div><div class="by">Väinö Linna</div><div class="mu">WSOY · 1959 · 476 pages · Finnish</div>
+<div class="gh">your copies</div><div class="kv"><span>Mökki</span><span>Lent to Antti since 12 Sep</span></div>
+<div class="gh">letters and numbers</div><div>Åland, öljy, ääni, yö, Šostakovitš, Žižek</div><div>978-951-0-41234-5 · 0123456789</div>
+<div class="bts"><span>lend</span><span>move</span><span>edit</span></div></div>
+<div class="pn D"><div class="hd"><span class="on">collection</span><span>loans</span></div><div class="r"><i style="background:#7A8B99"></i><span class="tx"><b>Tuntematon sotilas</b><span>Väinö Linna · 1954 · WSOY</span></span><span class="ch">tampere</span></div><div class="r"><i style="background:#B5651D"></i><span class="tx"><b>Täällä Pohjantähden alla 1</b><span>Väinö Linna · 1959 · WSOY</span></span><span class="ch">mökki</span></div><div class="r"><i style="background:#9AA77B"></i><span class="tx"><b>Kätilö</b><span>Katja Kettu · 2011 · WSOY</span></span><span class="ch">helsinki</span></div></div>
+</div></section><section><h2>T3. Open Sans</h2><p class="note">Round and open. The closest of these to Segoe UI, the Metro typeface.</p>
+<div class="pair" style="font-family:'Open Sans',sans-serif;--tf:inherit">
+<div class="pn L"><div class="hd"><span class="on">collection</span><span>loans</span><span>wishlists</span></div><div class="r"><i style="background:#7A8B99"></i><span class="tx"><b>Tuntematon sotilas</b><span>Väinö Linna · 1954 · WSOY</span></span><span class="ch">tampere</span></div><div class="r"><i style="background:#B5651D"></i><span class="tx"><b>Täällä Pohjantähden alla 1</b><span>Väinö Linna · 1959 · WSOY</span></span><span class="ch">mökki</span></div><div class="r"><i style="background:#9AA77B"></i><span class="tx"><b>Kätilö</b><span>Katja Kettu · 2011 · WSOY</span></span><span class="ch">helsinki</span></div></div>
+<div class="pn L"><div class="dt">Täällä Pohjantähden alla 1</div><div class="by">Väinö Linna</div><div class="mu">WSOY · 1959 · 476 pages · Finnish</div>
+<div class="gh">your copies</div><div class="kv"><span>Mökki</span><span>Lent to Antti since 12 Sep</span></div>
+<div class="gh">letters and numbers</div><div>Åland, öljy, ääni, yö, Šostakovitš, Žižek</div><div>978-951-0-41234-5 · 0123456789</div>
+<div class="bts"><span>lend</span><span>move</span><span>edit</span></div></div>
+<div class="pn D"><div class="hd"><span class="on">collection</span><span>loans</span></div><div class="r"><i style="background:#7A8B99"></i><span class="tx"><b>Tuntematon sotilas</b><span>Väinö Linna · 1954 · WSOY</span></span><span class="ch">tampere</span></div><div class="r"><i style="background:#B5651D"></i><span class="tx"><b>Täällä Pohjantähden alla 1</b><span>Väinö Linna · 1959 · WSOY</span></span><span class="ch">mökki</span></div><div class="r"><i style="background:#9AA77B"></i><span class="tx"><b>Kätilö</b><span>Katja Kettu · 2011 · WSOY</span></span><span class="ch">helsinki</span></div></div>
+</div></section><section><h2>T4. Source Sans 3</h2><p class="note">Slightly narrower, so more text fits on a row. A little more bookish than the others.</p>
+<div class="pair" style="font-family:'Source Sans 3',sans-serif;--tf:inherit">
+<div class="pn L"><div class="hd"><span class="on">collection</span><span>loans</span><span>wishlists</span></div><div class="r"><i style="background:#7A8B99"></i><span class="tx"><b>Tuntematon sotilas</b><span>Väinö Linna · 1954 · WSOY</span></span><span class="ch">tampere</span></div><div class="r"><i style="background:#B5651D"></i><span class="tx"><b>Täällä Pohjantähden alla 1</b><span>Väinö Linna · 1959 · WSOY</span></span><span class="ch">mökki</span></div><div class="r"><i style="background:#9AA77B"></i><span class="tx"><b>Kätilö</b><span>Katja Kettu · 2011 · WSOY</span></span><span class="ch">helsinki</span></div></div>
+<div class="pn L"><div class="dt">Täällä Pohjantähden alla 1</div><div class="by">Väinö Linna</div><div class="mu">WSOY · 1959 · 476 pages · Finnish</div>
+<div class="gh">your copies</div><div class="kv"><span>Mökki</span><span>Lent to Antti since 12 Sep</span></div>
+<div class="gh">letters and numbers</div><div>Åland, öljy, ääni, yö, Šostakovitš, Žižek</div><div>978-951-0-41234-5 · 0123456789</div>
+<div class="bts"><span>lend</span><span>move</span><span>edit</span></div></div>
+<div class="pn D"><div class="hd"><span class="on">collection</span><span>loans</span></div><div class="r"><i style="background:#7A8B99"></i><span class="tx"><b>Tuntematon sotilas</b><span>Väinö Linna · 1954 · WSOY</span></span><span class="ch">tampere</span></div><div class="r"><i style="background:#B5651D"></i><span class="tx"><b>Täällä Pohjantähden alla 1</b><span>Väinö Linna · 1959 · WSOY</span></span><span class="ch">mökki</span></div><div class="r"><i style="background:#9AA77B"></i><span class="tx"><b>Kätilö</b><span>Katja Kettu · 2011 · WSOY</span></span><span class="ch">helsinki</span></div></div>
+</div></section><section><h2>T5. IBM Plex Sans</h2><p class="note">More angular and technical, with distinctive letter shapes.</p>
+<div class="pair" style="font-family:'IBM Plex Sans',sans-serif;--tf:inherit">
+<div class="pn L"><div class="hd"><span class="on">collection</span><span>loans</span><span>wishlists</span></div><div class="r"><i style="background:#7A8B99"></i><span class="tx"><b>Tuntematon sotilas</b><span>Väinö Linna · 1954 · WSOY</span></span><span class="ch">tampere</span></div><div class="r"><i style="background:#B5651D"></i><span class="tx"><b>Täällä Pohjantähden alla 1</b><span>Väinö Linna · 1959 · WSOY</span></span><span class="ch">mökki</span></div><div class="r"><i style="background:#9AA77B"></i><span class="tx"><b>Kätilö</b><span>Katja Kettu · 2011 · WSOY</span></span><span class="ch">helsinki</span></div></div>
+<div class="pn L"><div class="dt">Täällä Pohjantähden alla 1</div><div class="by">Väinö Linna</div><div class="mu">WSOY · 1959 · 476 pages · Finnish</div>
+<div class="gh">your copies</div><div class="kv"><span>Mökki</span><span>Lent to Antti since 12 Sep</span></div>
+<div class="gh">letters and numbers</div><div>Åland, öljy, ääni, yö, Šostakovitš, Žižek</div><div>978-951-0-41234-5 · 0123456789</div>
+<div class="bts"><span>lend</span><span>move</span><span>edit</span></div></div>
+<div class="pn D"><div class="hd"><span class="on">collection</span><span>loans</span></div><div class="r"><i style="background:#7A8B99"></i><span class="tx"><b>Tuntematon sotilas</b><span>Väinö Linna · 1954 · WSOY</span></span><span class="ch">tampere</span></div><div class="r"><i style="background:#B5651D"></i><span class="tx"><b>Täällä Pohjantähden alla 1</b><span>Väinö Linna · 1959 · WSOY</span></span><span class="ch">mökki</span></div><div class="r"><i style="background:#9AA77B"></i><span class="tx"><b>Kätilö</b><span>Katja Kettu · 2011 · WSOY</span></span><span class="ch">helsinki</span></div></div>
+</div></section><section><h2>T6. Work Sans</h2><p class="note">Wide and airy. The light weight is very thin at large sizes.</p>
+<div class="pair" style="font-family:'Work Sans',sans-serif;--tf:inherit">
+<div class="pn L"><div class="hd"><span class="on">collection</span><span>loans</span><span>wishlists</span></div><div class="r"><i style="background:#7A8B99"></i><span class="tx"><b>Tuntematon sotilas</b><span>Väinö Linna · 1954 · WSOY</span></span><span class="ch">tampere</span></div><div class="r"><i style="background:#B5651D"></i><span class="tx"><b>Täällä Pohjantähden alla 1</b><span>Väinö Linna · 1959 · WSOY</span></span><span class="ch">mökki</span></div><div class="r"><i style="background:#9AA77B"></i><span class="tx"><b>Kätilö</b><span>Katja Kettu · 2011 · WSOY</span></span><span class="ch">helsinki</span></div></div>
+<div class="pn L"><div class="dt">Täällä Pohjantähden alla 1</div><div class="by">Väinö Linna</div><div class="mu">WSOY · 1959 · 476 pages · Finnish</div>
+<div class="gh">your copies</div><div class="kv"><span>Mökki</span><span>Lent to Antti since 12 Sep</span></div>
+<div class="gh">letters and numbers</div><div>Åland, öljy, ääni, yö, Šostakovitš, Žižek</div><div>978-951-0-41234-5 · 0123456789</div>
+<div class="bts"><span>lend</span><span>move</span><span>edit</span></div></div>
+<div class="pn D"><div class="hd"><span class="on">collection</span><span>loans</span></div><div class="r"><i style="background:#7A8B99"></i><span class="tx"><b>Tuntematon sotilas</b><span>Väinö Linna · 1954 · WSOY</span></span><span class="ch">tampere</span></div><div class="r"><i style="background:#B5651D"></i><span class="tx"><b>Täällä Pohjantähden alla 1</b><span>Väinö Linna · 1959 · WSOY</span></span><span class="ch">mökki</span></div><div class="r"><i style="background:#9AA77B"></i><span class="tx"><b>Kätilö</b><span>Katja Kettu · 2011 · WSOY</span></span><span class="ch">helsinki</span></div></div>
+</div></section><section><h2>T7. Source Sans 3 with serif book titles</h2><p class="note">As T4, but book titles are set in a serif (Source Serif 4), so titles read as books and everything else as interface.</p>
+<div class="pair" style="font-family:'Source Sans 3',sans-serif;--tf:'Source Serif 4',serif">
+<div class="pn L"><div class="hd"><span class="on">collection</span><span>loans</span><span>wishlists</span></div><div class="r"><i style="background:#7A8B99"></i><span class="tx"><b>Tuntematon sotilas</b><span>Väinö Linna · 1954 · WSOY</span></span><span class="ch">tampere</span></div><div class="r"><i style="background:#B5651D"></i><span class="tx"><b>Täällä Pohjantähden alla 1</b><span>Väinö Linna · 1959 · WSOY</span></span><span class="ch">mökki</span></div><div class="r"><i style="background:#9AA77B"></i><span class="tx"><b>Kätilö</b><span>Katja Kettu · 2011 · WSOY</span></span><span class="ch">helsinki</span></div></div>
+<div class="pn L"><div class="dt">Täällä Pohjantähden alla 1</div><div class="by">Väinö Linna</div><div class="mu">WSOY · 1959 · 476 pages · Finnish</div>
+<div class="gh">your copies</div><div class="kv"><span>Mökki</span><span>Lent to Antti since 12 Sep</span></div>
+<div class="gh">letters and numbers</div><div>Åland, öljy, ääni, yö, Šostakovitš, Žižek</div><div>978-951-0-41234-5 · 0123456789</div>
+<div class="bts"><span>lend</span><span>move</span><span>edit</span></div></div>
+<div class="pn D"><div class="hd"><span class="on">collection</span><span>loans</span></div><div class="r"><i style="background:#7A8B99"></i><span class="tx"><b>Tuntematon sotilas</b><span>Väinö Linna · 1954 · WSOY</span></span><span class="ch">tampere</span></div><div class="r"><i style="background:#B5651D"></i><span class="tx"><b>Täällä Pohjantähden alla 1</b><span>Väinö Linna · 1959 · WSOY</span></span><span class="ch">mökki</span></div><div class="r"><i style="background:#9AA77B"></i><span class="tx"><b>Kätilö</b><span>Katja Kettu · 2011 · WSOY</span></span><span class="ch">helsinki</span></div></div>
+</div></section>
+</main></body></html>

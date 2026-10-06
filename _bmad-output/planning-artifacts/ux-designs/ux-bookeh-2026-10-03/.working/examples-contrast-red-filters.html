@@ -1,0 +1,112 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>bookeh examples: contrast, error red, filter panel</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400&display=swap">
+<style>
+.L{--bg:#FFFFFF;--ink:#1F2933;--mu:#5F6B78;--ln:#DDE2E7;--co:#F0604F;--dim:#87919C}
+.D{--bg:#14181D;--ink:#E3E8EE;--mu:#94A0AD;--ln:#2C343D;--co:#FF8E7F;--dim:#626B76}
+.old.L{--co:#FF7B6B;--dim:#B7BCC2}.old.D{--dim:#4E555E}
+*{box-sizing:border-box}
+body{margin:0;font:14px/1.45 system-ui,-apple-system,sans-serif;color:#222;background:#e4e4e4}
+main{max-width:1320px;margin:0 auto;padding:24px 16px 96px}
+main>h1{font-size:22px;margin:0 0 4px}
+main h2.s{font:600 18px system-ui,sans-serif;margin:52px 0 2px}
+h3.k{font:600 14px system-ui,sans-serif;margin:22px 0 6px;color:#333}h3.k code{font:12px ui-monospace,Menlo,monospace}
+.note{color:#555;max-width:86ch;margin:2px 0 10px}
+.two{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:12px}
+.sm,.desk{background:var(--bg);color:var(--ink);font-family:'Open Sans',"Segoe UI","Helvetica Neue",sans-serif;overflow:hidden}
+.sm{padding:16px 24px 18px}
+.lab{font:11px system-ui,sans-serif;text-transform:uppercase;letter-spacing:.06em;color:var(--mu);margin:0 0 6px}
+.sm .hd{display:flex;gap:24px;font-size:40px;font-weight:300;letter-spacing:-.015em;line-height:1.1;color:var(--dim);white-space:nowrap;margin-bottom:12px}
+.sm .hd .on{color:var(--ink)}
+.row2{display:flex;gap:22px;align-items:center;margin-bottom:10px;flex-wrap:wrap}
+.pv{display:flex;gap:14px;font-size:17px;text-transform:lowercase;color:var(--dim)}.pv em{font-style:normal;color:var(--ink)}
+.bt{border:2px solid var(--ink);padding:6px 16px;font-size:15px;text-transform:lowercase;white-space:nowrap}
+.bt.pr{border-color:var(--co)}.bt.rd{border-color:var(--rd)}
+u{text-decoration-color:var(--co);text-decoration-thickness:2px;text-underline-offset:3px}
+.r{display:flex;align-items:center;gap:16px;padding:8px 0}
+.desk .r{padding:8px 28px}
+.r.sel{box-shadow:inset 4px 0 0 var(--co)}.sm .r.sel{padding-left:14px}
+.r i{flex:none;width:32px;height:48px}
+.tx{flex:1;min-width:0;display:flex;flex-direction:column}
+.tx b{font-weight:400;font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tx span,.mu{font-size:13px;color:var(--mu)}
+.ch{font-size:13px;color:var(--mu);flex:none}.ch.no{color:var(--ink)}
+.ch.no::before{content:"";display:inline-block;width:8px;height:8px;background:var(--co);margin-right:7px}
+.err{margin:6px 0 12px}.err::before{content:"";display:inline-block;width:8px;height:8px;background:var(--rd);margin-right:7px}
+.fld label{display:block;font-size:12px;color:var(--mu)}
+.in{border-bottom:2px solid var(--ink);padding:2px 0 3px;font-size:15px;max-width:260px}.in.bad{border-bottom-color:var(--rd)}
+.hint{font-size:13px;margin:4px 0 0;color:var(--mu)}
+.desk{height:560px;display:flex;flex-direction:column;border:1px solid #c8c8c8;margin-top:8px}
+.desk .hd{display:flex;align-items:baseline;gap:28px;padding:18px 28px 0}
+.pt,.nv span{font-size:44px;font-weight:300;letter-spacing:-.015em;line-height:1.1;text-transform:lowercase;margin:0}
+.nv{display:flex;gap:28px;color:var(--dim);min-width:0;overflow:hidden}
+.desk .hd .bt{margin-left:auto;align-self:center}
+.tools{display:flex;gap:28px;align-items:baseline;padding:10px 28px 6px}
+.se{flex:1;border-bottom:2px solid var(--ink);padding:4px 0;color:var(--mu)}
+.lnk{font-size:17px;text-transform:lowercase}
+.act{margin:0;padding:0 28px 8px;font-size:13px;color:var(--mu)}
+.split{flex:1;display:flex;min-height:0}
+.rows{flex:1;min-width:0;overflow:hidden}
+.dp{flex:0 0 340px;overflow:hidden;padding:8px 28px 0 20px}
+.dh{display:flex;gap:14px}.dh i{flex:none;width:64px;height:96px}
+.dp h2{font-size:24px;font-weight:300;line-height:1.15;margin:0}.dp p{margin:0}.by{font-size:17px}
+.dp h3,.fg h3{font-size:20px;font-weight:300;text-transform:lowercase;color:var(--mu);margin:18px 0 4px}
+.kv{display:flex;justify-content:space-between;gap:12px;padding:3px 0}.kv span+span{color:var(--mu)}
+.ac{display:flex;gap:8px;margin-top:20px!important}
+.fp{flex:0 0 230px;overflow:hidden;padding:0 12px 0 28px}
+.fp.right{flex-basis:340px;padding:0 28px 0 20px}
+.fg h3{margin:14px 0 2px;font-size:18px}.fg:first-child h3{margin-top:4px}
+.fg span{display:block;color:var(--mu);padding:1px 0}.fg span.on{color:var(--ink)}
+.fg span.on::before{content:"";display:inline-block;width:8px;height:8px;background:var(--co);margin-right:7px}
+.band{display:flex;gap:36px;flex-wrap:wrap;padding:0 28px 14px}.band .fg h3{margin-top:4px}
+</style></head><body><main>
+<h1>bookeh examples: contrast, error red, filter panel</h1>
+<p class="note">Type-led style in Open Sans. This page loads the font from Google Fonts.</p>
+
+<h2 class="s">1. Strengthened contrast</h2>
+<p class="note">What "strengthen both" does. Inactive headings and switch options go from a pale grey to a mid grey. The coral gets a little deeper in light mode only. Everything from here down uses the strengthened values.</p>
+<div class="two"><div class="sm L old" style=""><p class="lab">Light, as mocked: coral #FF7B6B, inactive #B7BCC2</p><div class="hd"><span class="on">collection</span><span>loans</span><span>wishlists</span></div>
+<div class="row2"><span class="pv"><em>rows</em><span>covers</span></span><span class="bt pr">scan book</span><span><u>Change filters</u></span></div>
+<div class="r sel"><i style="background:#B5651D"></i><span class="tx"><b>Täällä Pohjantähden alla 1</b><span>Väinö Linna · 1959 · WSOY</span></span><span class="ch no">Lent · Antti</span></div></div><div class="sm L" style=""><p class="lab">Light, strengthened: coral #F0604F, inactive #87919C</p><div class="hd"><span class="on">collection</span><span>loans</span><span>wishlists</span></div>
+<div class="row2"><span class="pv"><em>rows</em><span>covers</span></span><span class="bt pr">scan book</span><span><u>Change filters</u></span></div>
+<div class="r sel"><i style="background:#B5651D"></i><span class="tx"><b>Täällä Pohjantähden alla 1</b><span>Väinö Linna · 1959 · WSOY</span></span><span class="ch no">Lent · Antti</span></div></div></div>
+<div class="two" style="margin-top:12px"><div class="sm D old" style=""><p class="lab">Dark, as mocked: coral #FF8E7F, inactive #4E555E</p><div class="hd"><span class="on">collection</span><span>loans</span><span>wishlists</span></div>
+<div class="row2"><span class="pv"><em>rows</em><span>covers</span></span><span class="bt pr">scan book</span><span><u>Change filters</u></span></div>
+<div class="r sel"><i style="background:#B5651D"></i><span class="tx"><b>Täällä Pohjantähden alla 1</b><span>Väinö Linna · 1959 · WSOY</span></span><span class="ch no">Lent · Antti</span></div></div><div class="sm D" style=""><p class="lab">Dark, strengthened: coral unchanged, inactive #626B76</p><div class="hd"><span class="on">collection</span><span>loans</span><span>wishlists</span></div>
+<div class="row2"><span class="pv"><em>rows</em><span>covers</span></span><span class="bt pr">scan book</span><span><u>Change filters</u></span></div>
+<div class="r sel"><i style="background:#B5651D"></i><span class="tx"><b>Täällä Pohjantähden alla 1</b><span>Väinö Linna · 1959 · WSOY</span></span><span class="ch no">Lent · Antti</span></div></div></div>
+
+<h2 class="s">2. The error red</h2>
+<p class="note">Three reds, each beside the coral so you can judge whether they can be told apart. Each shows a destructive button next to a primary one, an error message, and a field with a mistake in it.</p>
+<div class="ro"><h3 class="k">E1. Crimson <code>#C62828</code> light, <code>#E5484D</code> dark</h3><div class="two"><div class="sm L" style="--rd:#C62828"><div class="row2"><span class="bt pr">Add to library</span><span class="bt rd">Remove from library</span></div>
+<p class="err">Couldn't save. Try again.</p><div class="fld"><label>ISBN</label><div class="in bad">978-951-0-4123</div><p class="hint">Not an ISBN. Thirteen digits, or ten.</p></div></div><div class="sm D" style="--rd:#E5484D"><div class="row2"><span class="bt pr">Add to library</span><span class="bt rd">Remove from library</span></div>
+<p class="err">Couldn't save. Try again.</p><div class="fld"><label>ISBN</label><div class="in bad">978-951-0-4123</div><p class="hint">Not an ISBN. Thirteen digits, or ten.</p></div></div></div></div>
+<div class="ro"><h3 class="k">E2. Raspberry <code>#C2185B</code> light, <code>#F06292</code> dark</h3><div class="two"><div class="sm L" style="--rd:#C2185B"><div class="row2"><span class="bt pr">Add to library</span><span class="bt rd">Remove from library</span></div>
+<p class="err">Couldn't save. Try again.</p><div class="fld"><label>ISBN</label><div class="in bad">978-951-0-4123</div><p class="hint">Not an ISBN. Thirteen digits, or ten.</p></div></div><div class="sm D" style="--rd:#F06292"><div class="row2"><span class="bt pr">Add to library</span><span class="bt rd">Remove from library</span></div>
+<p class="err">Couldn't save. Try again.</p><div class="fld"><label>ISBN</label><div class="in bad">978-951-0-4123</div><p class="hint">Not an ISBN. Thirteen digits, or ten.</p></div></div></div></div>
+<div class="ro"><h3 class="k">E3. Wine <code>#9B1C31</code> light, <code>#E0566F</code> dark</h3><div class="two"><div class="sm L" style="--rd:#9B1C31"><div class="row2"><span class="bt pr">Add to library</span><span class="bt rd">Remove from library</span></div>
+<p class="err">Couldn't save. Try again.</p><div class="fld"><label>ISBN</label><div class="in bad">978-951-0-4123</div><p class="hint">Not an ISBN. Thirteen digits, or ten.</p></div></div><div class="sm D" style="--rd:#E0566F"><div class="row2"><span class="bt pr">Add to library</span><span class="bt rd">Remove from library</span></div>
+<p class="err">Couldn't save. Try again.</p><div class="fld"><label>ISBN</label><div class="in bad">978-951-0-4123</div><p class="hint">Not an ISBN. Thirteen digits, or ten.</p></div></div></div></div>
+
+<h2 class="s">3. Where the filter panel opens on a wide screen</h2>
+<p class="note">The same filters in three places. In each, "Tampere" and "unread" are switched on, and the line under the search says so.</p>
+<h3 class="k">F1. Left of the list</h3>
+<p class="note">Filters, list and book detail can all be open at once. The list is at its narrowest.</p>
+<div class="desk L f1"><header class="hd"><h1 class="pt">Collection</h1><nav class="nv"><span>Loans</span><span>Wishlists</span><span>Settings</span></nav><span class="bt pr">Scan book</span></header>
+<div class="tools"><span class="se">Search your books</span><span class="lnk"><u>Hide filters</u></span><span class="pv"><em>Rows</em><span>Covers</span></span><span class="pv"><span>S</span><em>M</em><span>L</span></span></div>
+<p class="act">Tampere, unread · 14 books · <u>clear</u></p><div class="split"><div class="fp"><div class="fg"><h3>Location</h3><span class="on">Tampere</span><span class="">Helsinki</span><span class="">Mökki</span></div><div class="fg"><h3>Status</h3><span class="">Owned</span><span class="">Ordered</span></div><div class="fg"><h3>Read</h3><span class="">Read</span><span class="on">Unread</span></div><div class="fg"><h3>Genre</h3><span class="">Fiction</span><span class="">Historical</span><span class="">Children's</span><span class="">Non-fiction</span></div><div class="fg"><h3>Tag</h3><span class="">klassikot</span><span class="">isän kirjat</span></div><div class="fg"><h3>Year</h3><span class="">from … to …</span></div><div class="fg"><h3>Sort by</h3><span class="on">Author</span><span class="">Title</span><span class="">Year</span><span class="">Added</span></div></div><div class="rows"><div class="r"><i style="background:#7A8B99"></i><span class="tx"><b>Tuntematon sotilas</b><span>Väinö Linna · 1954 · WSOY</span></span><span class="ch">Tampere</span></div><div class="r sel"><i style="background:#B5651D"></i><span class="tx"><b>Täällä Pohjantähden alla 1</b><span>Väinö Linna · 1959 · WSOY</span></span><span class="ch">Mökki</span></div><div class="r"><i style="background:#8C4A5A"></i><span class="tx"><b>Seitsemän veljestä</b><span>Aleksis Kivi · 1870 · SKS</span></span><span class="ch">Helsinki</span></div><div class="r"><i style="background:#C9B458"></i><span class="tx"><b>Sinuhe egyptiläinen</b><span>Mika Waltari · 1945 · WSOY</span></span><span class="ch">Helsinki</span></div><div class="r"><i style="background:#3D5A4C"></i><span class="tx"><b>Taikatalvi</b><span>Tove Jansson · 1957 · WSOY</span></span><span class="ch no">Lent · Antti</span></div><div class="r"><i style="background:#2E3F5C"></i><span class="tx"><b>Muumipappa ja meri</b><span>Tove Jansson · 1965 · WSOY</span></span><span class="ch">Tampere</span></div><div class="r"><i style="background:#D9D2C0"></i><span class="tx"><b>Kesäkirja</b><span>Tove Jansson · 1972 · WSOY</span></span><span class="ch">Mökki</span></div><div class="r"><i style="background:#6B4E3D"></i><span class="tx"><b>Puhdistus</b><span>Sofi Oksanen · 2008 · WSOY</span></span><span class="ch">Tampere</span></div><div class="r"><i style="background:#9AA77B"></i><span class="tx"><b>Kätilö</b><span>Katja Kettu · 2011 · WSOY</span></span><span class="ch">Tampere</span></div></div><aside class="dp"><div class="dh"><i style="background:#B5651D"></i><div><h2>Täällä Pohjantähden alla 1</h2><p class="by">Väinö Linna</p><p class="mu">WSOY · 1959 · 476 pages</p></div></div>
+<h3>Your copies</h3><div class="kv"><span>Tampere</span><span>Owned</span></div><div class="kv"><span>Mökki</span><span>Lent to Antti</span></div>
+<h3>Genres and tags</h3><p><u>Fiction</u> · <u>Historical</u> · <u>klassikot</u></p><p class="ac"><span class="bt pr">Lend</span><span class="bt">Move</span><span class="bt">Edit</span></p></aside></div></div>
+<h3 class="k">F2. Right, one panel at a time</h3>
+<p class="note">The filters use the book detail's place. Opening a book closes the filters, and the other way round.</p>
+<div class="desk L f2"><header class="hd"><h1 class="pt">Collection</h1><nav class="nv"><span>Loans</span><span>Wishlists</span><span>Settings</span></nav><span class="bt pr">Scan book</span></header>
+<div class="tools"><span class="se">Search your books</span><span class="lnk"><u>Hide filters</u></span><span class="pv"><em>Rows</em><span>Covers</span></span><span class="pv"><span>S</span><em>M</em><span>L</span></span></div>
+<p class="act">Tampere, unread · 14 books · <u>clear</u></p><div class="split"><div class="rows"><div class="r"><i style="background:#7A8B99"></i><span class="tx"><b>Tuntematon sotilas</b><span>Väinö Linna · 1954 · WSOY</span></span><span class="ch">Tampere</span></div><div class="r"><i style="background:#B5651D"></i><span class="tx"><b>Täällä Pohjantähden alla 1</b><span>Väinö Linna · 1959 · WSOY</span></span><span class="ch">Mökki</span></div><div class="r"><i style="background:#8C4A5A"></i><span class="tx"><b>Seitsemän veljestä</b><span>Aleksis Kivi · 1870 · SKS</span></span><span class="ch">Helsinki</span></div><div class="r"><i style="background:#C9B458"></i><span class="tx"><b>Sinuhe egyptiläinen</b><span>Mika Waltari · 1945 · WSOY</span></span><span class="ch">Helsinki</span></div><div class="r"><i style="background:#3D5A4C"></i><span class="tx"><b>Taikatalvi</b><span>Tove Jansson · 1957 · WSOY</span></span><span class="ch no">Lent · Antti</span></div><div class="r"><i style="background:#2E3F5C"></i><span class="tx"><b>Muumipappa ja meri</b><span>Tove Jansson · 1965 · WSOY</span></span><span class="ch">Tampere</span></div><div class="r"><i style="background:#D9D2C0"></i><span class="tx"><b>Kesäkirja</b><span>Tove Jansson · 1972 · WSOY</span></span><span class="ch">Mökki</span></div><div class="r"><i style="background:#6B4E3D"></i><span class="tx"><b>Puhdistus</b><span>Sofi Oksanen · 2008 · WSOY</span></span><span class="ch">Tampere</span></div><div class="r"><i style="background:#9AA77B"></i><span class="tx"><b>Kätilö</b><span>Katja Kettu · 2011 · WSOY</span></span><span class="ch">Tampere</span></div></div><div class="fp right"><div class="fg"><h3>Location</h3><span class="on">Tampere</span><span class="">Helsinki</span><span class="">Mökki</span></div><div class="fg"><h3>Status</h3><span class="">Owned</span><span class="">Ordered</span></div><div class="fg"><h3>Read</h3><span class="">Read</span><span class="on">Unread</span></div><div class="fg"><h3>Genre</h3><span class="">Fiction</span><span class="">Historical</span><span class="">Children's</span><span class="">Non-fiction</span></div><div class="fg"><h3>Tag</h3><span class="">klassikot</span><span class="">isän kirjat</span></div><div class="fg"><h3>Year</h3><span class="">from … to …</span></div><div class="fg"><h3>Sort by</h3><span class="on">Author</span><span class="">Title</span><span class="">Year</span><span class="">Added</span></div></div></div></div>
+<h3 class="k">F3. Under the search</h3>
+<p class="note">The filters unfold between the search and the list and push the list down. The book detail can stay open.</p>
+<div class="desk L f3"><header class="hd"><h1 class="pt">Collection</h1><nav class="nv"><span>Loans</span><span>Wishlists</span><span>Settings</span></nav><span class="bt pr">Scan book</span></header>
+<div class="tools"><span class="se">Search your books</span><span class="lnk"><u>Hide filters</u></span><span class="pv"><em>Rows</em><span>Covers</span></span><span class="pv"><span>S</span><em>M</em><span>L</span></span></div>
+<p class="act">Tampere, unread · 14 books · <u>clear</u></p><div class="band"><div class="fg"><h3>Location</h3><span class="on">Tampere</span><span class="">Helsinki</span><span class="">Mökki</span></div><div class="fg"><h3>Status</h3><span class="">Owned</span><span class="">Ordered</span></div><div class="fg"><h3>Read</h3><span class="">Read</span><span class="on">Unread</span></div><div class="fg"><h3>Genre</h3><span class="">Fiction</span><span class="">Historical</span><span class="">Children's</span><span class="">Non-fiction</span></div><div class="fg"><h3>Tag</h3><span class="">klassikot</span><span class="">isän kirjat</span></div><div class="fg"><h3>Year</h3><span class="">from … to …</span></div><div class="fg"><h3>Sort by</h3><span class="on">Author</span><span class="">Title</span><span class="">Year</span><span class="">Added</span></div></div><div class="split"><div class="rows"><div class="r"><i style="background:#7A8B99"></i><span class="tx"><b>Tuntematon sotilas</b><span>Väinö Linna · 1954 · WSOY</span></span><span class="ch">Tampere</span></div><div class="r sel"><i style="background:#B5651D"></i><span class="tx"><b>Täällä Pohjantähden alla 1</b><span>Väinö Linna · 1959 · WSOY</span></span><span class="ch">Mökki</span></div><div class="r"><i style="background:#8C4A5A"></i><span class="tx"><b>Seitsemän veljestä</b><span>Aleksis Kivi · 1870 · SKS</span></span><span class="ch">Helsinki</span></div><div class="r"><i style="background:#C9B458"></i><span class="tx"><b>Sinuhe egyptiläinen</b><span>Mika Waltari · 1945 · WSOY</span></span><span class="ch">Helsinki</span></div><div class="r"><i style="background:#3D5A4C"></i><span class="tx"><b>Taikatalvi</b><span>Tove Jansson · 1957 · WSOY</span></span><span class="ch no">Lent · Antti</span></div></div><aside class="dp"><div class="dh"><i style="background:#B5651D"></i><div><h2>Täällä Pohjantähden alla 1</h2><p class="by">Väinö Linna</p><p class="mu">WSOY · 1959 · 476 pages</p></div></div>
+<h3>Your copies</h3><div class="kv"><span>Tampere</span><span>Owned</span></div><div class="kv"><span>Mökki</span><span>Lent to Antti</span></div>
+<h3>Genres and tags</h3><p><u>Fiction</u> · <u>Historical</u> · <u>klassikot</u></p><p class="ac"><span class="bt pr">Lend</span><span class="bt">Move</span><span class="bt">Edit</span></p></aside></div></div>
+</main></body></html>

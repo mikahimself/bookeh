@@ -1,0 +1,112 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>bookeh key screen: collection, wide</title><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400&display=swap">
+<style>
+/* Governed by: DESIGN.md Colors, Typography, Layout & Spacing, Elevation & Depth, Components; EXPERIENCE.md Information Architecture, Collection controls, Select mode and bulk actions. The spines win on conflict.
+   Open Sans is loaded from Google Fonts; offline the mock falls back to Segoe UI or Helvetica Neue. */
+
+.L{--bg:#FFFFFF;--ink:#1F2933;--mu:#5F6B78;--dim:#87919C;--ln:#DDE2E7;--co:#F0604F;--rd:#9B1C31;--sh:#1F293324;--scrim:#00000033}
+.D{--bg:#14181D;--ink:#E3E8EE;--mu:#94A0AD;--dim:#626B76;--ln:#2C343D;--co:#FF8E7F;--rd:#E0566F;--sh:#00000073;--scrim:#00000066}
+*{box-sizing:border-box}
+body{margin:0;font:14px/1.45 system-ui,-apple-system,sans-serif;color:#222;background:#e4e4e4}
+main{max-width:1500px;margin:0 auto;padding:24px 16px 96px}
+main>h1{font:600 22px system-ui,sans-serif;margin:0 0 4px}
+h2.s{font:600 16px system-ui,sans-serif;margin:40px 0 2px}
+.note{color:#555;max-width:90ch;margin:2px 0 10px}
+.cap{font-size:12px;color:#555;margin:6px 2px 0;max-width:320px}
+.set{display:flex;gap:28px;flex-wrap:wrap;align-items:flex-start}
+.desk,.ph{background:var(--bg);color:var(--ink);font:14px/1.45 'Open Sans',"Segoe UI","Helvetica Neue",sans-serif;overflow:hidden;display:flex;flex-direction:column;position:relative}
+.desk{height:680px;border:1px solid #c8c8c8}
+.ph{width:320px;height:660px;border:2px solid #222;border-radius:30px;flex:none}
+.hd{display:flex;align-items:baseline;gap:28px;padding:18px 28px 0}
+.ph .hd{padding:22px 20px 0}
+.hs{display:flex;gap:28px;min-width:0;overflow:hidden;white-space:nowrap;font-size:44px;font-weight:300;letter-spacing:-.015em;line-height:1.1;text-transform:lowercase;color:var(--dim)}
+.ph .hs{font-size:38px;gap:22px}
+.hs .on{color:var(--ink)}
+h1.sc{font-size:38px;font-weight:300;letter-spacing:-.015em;line-height:1.1;text-transform:lowercase;margin:0}
+.bt{border:2px solid var(--ink);padding:6px 16px;font-size:15px;line-height:1.3;text-transform:lowercase;white-space:nowrap;text-align:center}
+.bt.pr{border-color:var(--co)}.bt.rd{border-color:var(--rd)}
+.hd .bt{margin-left:auto;align-self:center}
+u{text-decoration-color:var(--co);text-decoration-thickness:2px;text-underline-offset:3px}
+.tools{display:flex;gap:26px;align-items:baseline;padding:10px 28px 6px}
+.ph .tools{padding:10px 20px 4px;gap:16px}
+.sf{flex:1;min-width:0;border-bottom:2px solid var(--ink);padding:4px 0;color:var(--mu);white-space:nowrap;overflow:hidden}
+.lk{font-size:15px}
+.sw{display:flex;gap:14px;font-size:17px;text-transform:lowercase;color:var(--dim)}.sw em{font-style:normal;color:var(--ink)}
+.sw.n{text-transform:none}
+.act{margin:0;padding:2px 28px 8px;font-size:13px;color:var(--mu)}.ph .act{padding:2px 20px 6px}
+.split{flex:1;display:flex;min-height:0}
+.rows{flex:1;min-width:0;overflow:hidden}
+.r{display:flex;align-items:center;gap:16px;padding:8px 28px}.ph .r{padding:8px 20px;gap:12px}
+.r.sel{box-shadow:inset 4px 0 0 var(--co)}
+.r i{flex:none;width:32px;height:48px}
+.tx{flex:1;min-width:0;display:flex;flex-direction:column}
+.tx b{font-weight:400;font-size:17px;line-height:1.3;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tx span,.mu{font-size:13px;color:var(--mu)}.tx span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ch{font-size:13px;color:var(--mu);flex:none}.ch.no{color:var(--ink)}
+.ch.no::before,.lent::before,.fg span.on::before,.mk::before{content:"";display:inline-block;width:8px;height:8px;background:var(--co);margin-right:7px}
+.cb{flex:none;width:20px;height:20px;border:2px solid var(--ink);position:relative}
+.cb.on::after{content:"";position:absolute;left:5px;top:1px;width:5px;height:10px;border:solid var(--ink);border-width:0 2px 2px 0;transform:rotate(45deg)}
+.grid{flex:1;overflow:hidden;display:grid;grid-template-columns:repeat(3,1fr);gap:18px 14px;padding:6px 20px 0;align-content:start}
+.g{min-width:0}.g i{display:block;aspect-ratio:2/3;margin-bottom:5px}.g b,.g span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.g b{font-weight:400;font-size:13px}.g span{font-size:12px;color:var(--mu)}
+.fp{flex:0 0 220px;overflow:hidden;padding:0 12px 0 28px}
+.fg h3,.dp h3{font-size:20px;font-weight:300;line-height:1.3;text-transform:lowercase;color:var(--mu);margin:16px 0 4px}
+.fg:first-child h3{margin-top:4px}
+.fg span{display:block;color:var(--mu);padding:1px 0}.fg span.on{color:var(--ink)}
+.dp{padding:14px 24px 0}
+.desk .dp{flex:0 0 360px;border-left:1px solid var(--ln);box-shadow:-10px 0 24px -14px var(--sh);position:relative}
+.dh{display:flex;gap:14px}.dh i{flex:none;width:72px;height:108px}
+.dp h2{font-size:26px;font-weight:300;line-height:1.15;margin:0}.dp p{margin:0}.by{font-size:17px}
+.kv{display:flex;justify-content:space-between;gap:12px;padding:3px 0}.kv span+span{color:var(--mu)}
+.ac{display:flex;gap:8px;margin-top:20px!important}
+.rr{align-items:center;margin-top:12px}.st{display:flex;gap:4px}
+.cp{padding:2px 0 8px}.nt{color:var(--mu);font-size:13px}.ops{display:flex;gap:16px;font-size:13px;margin-top:3px!important}.ops u.d{text-decoration-color:var(--rd)}
+.x{position:absolute;top:18px;right:20px;width:22px;height:22px}
+.x::before,.x::after{content:"";position:absolute;left:10px;top:-3px;width:2px;height:28px;background:var(--ink)}
+.x::before{transform:rotate(45deg)}.x::after{transform:rotate(-45deg)}
+.desk .dp .x{top:14px;right:18px;width:18px;height:18px}.desk .dp .x::before,.desk .dp .x::after{left:8px;height:22px}
+.desk .dp .dh{padding-right:26px}
+.foot{padding:12px 20px 18px;display:flex;flex-direction:column;gap:8px;background:var(--bg)}
+.bar{display:flex;align-items:center;gap:10px;padding:12px 28px;border-top:2px solid var(--ink);background:var(--bg)}
+.bar .n{margin-right:auto;font-size:15px}
+.scrim{position:absolute;inset:0;background:var(--scrim)}
+.sheet{position:absolute;left:0;right:0;bottom:0;background:var(--bg);border-top:2px solid var(--ink);overflow:hidden}
+.sheet .dp{padding:6px 20px 0}
+.sheet .x{top:16px;right:18px;width:18px;height:18px}.sheet .x::before,.sheet .x::after{left:8px;height:22px}
+.grab{width:44px;height:0;border-top:2px solid var(--ink);margin:10px auto 8px}
+.sheet .dh{padding-right:30px}.sheet .dp h2{font-size:22px}
+.body{flex:1;min-height:0;overflow:hidden;padding:0 20px}
+.cam{height:230px;border:2px solid var(--ink);margin:16px 0 18px;display:flex;align-items:flex-end;justify-content:center;color:var(--mu);font-size:13px;padding-bottom:14px;background:linear-gradient(var(--co),var(--co)) center/72% 2px no-repeat}
+.fld{margin:0 0 14px}.fld label{display:block;font-size:12px;color:var(--mu)}
+.in{border-bottom:2px solid var(--ink);padding:2px 0 4px;font-size:15px;min-height:28px}
+.in.e{border-bottom-color:var(--ln);color:var(--dim)}.in.bad{border-bottom-color:var(--rd)}
+.hint{font-size:13px;margin:4px 0 0;color:var(--mu)}
+.bk{display:flex;gap:12px;margin:16px 0 8px}.bk i{flex:none;width:64px;height:96px}
+.bk b{display:block;font-weight:400;font-size:20px;line-height:1.2}.bk span{display:block}.bk .mu{margin-top:2px}
+.mk{margin:6px 0 0}.pl{margin:6px 0 0}
+.toast{margin:0 20px 16px;border:2px solid var(--ink);padding:9px 12px;display:flex;gap:16px;font-size:13px;background:var(--bg)}
+.toast span:first-child{margin-right:auto}
+</style></head><body><main><h1>Key screen: collection on a wide screen</h1>
+<p class="note">Final colours, type and panel treatment. Rows at size m.</p>
+<h2 class="s">Filters open on the left, a book open on the right (light)</h2>
+<p class="note">Two filters are on and the line under the search says so. One row is one copy, so the book with two copies has two rows. The open row carries the coral bar. The book detail panel has the dim border and light shadow; the filter panel has neither. Each copy has its own actions; author, locations, genres and tags are filter chips.</p>
+<div class="desk L"><header class="hd"><nav class="hs"><span class="on">Collection</span><span class="">Loans</span><span class="">Wishlists</span><span class="">Settings</span></nav><span class="bt pr">Scan book</span></header>
+<div class="tools"><span class="sf">Search your books</span><span class="lk"><u>Filter</u></span><span class="lk"><u>Select</u></span><span class="sw"><em>Rows</em><span>Covers</span></span><span class="sw"><span>S</span><em>M</em><span>L</span></span></div><p class="act">Tampere, unread · 14 books · <u>Clear</u></p><div class="split"><div class="fp"><div class="fg"><h3>Location</h3><span class="on">Tampere</span><span class="">Helsinki</span><span class="">Mökki</span></div><div class="fg"><h3>Status</h3><span class="">Owned</span><span class="">Ordered</span></div><div class="fg"><h3>Read</h3><span class="">Read</span><span class="on">Unread</span></div><div class="fg"><h3>Genre</h3><span class="">Fiction</span><span class="">Historical</span><span class="">Children's</span><span class="">Non-fiction</span></div><div class="fg"><h3>Tag</h3><span class="">klassikot</span><span class="">isän kirjat</span></div><div class="fg"><h3>Sort by</h3><span class="on">Author</span><span class="">Title</span><span class="">Year</span><span class="">Added</span></div></div><div class="rows"><div class="r"><i style="background:#7A8B99"></i><span class="tx"><b>Tuntematon sotilas</b><span>Väinö Linna · 1954 · WSOY</span></span><span class="ch">Tampere</span></div><div class="r sel"><i style="background:#B5651D"></i><span class="tx"><b>Täällä Pohjantähden alla 1</b><span>Väinö Linna · 1959 · WSOY</span></span><span class="ch">Tampere</span></div><div class="r"><i style="background:#B5651D"></i><span class="tx"><b>Täällä Pohjantähden alla 1</b><span>Väinö Linna · 1959 · WSOY</span></span><span class="ch no">Lent · Antti</span></div><div class="r"><i style="background:#8C4A5A"></i><span class="tx"><b>Seitsemän veljestä</b><span>Aleksis Kivi · 1870 · SKS</span></span><span class="ch">Tampere</span></div><div class="r"><i style="background:#C9B458"></i><span class="tx"><b>Sinuhe egyptiläinen</b><span>Mika Waltari · 1945 · WSOY</span></span><span class="ch">Tampere</span></div><div class="r"><i style="background:#3D5A4C"></i><span class="tx"><b>Taikatalvi</b><span>Tove Jansson · 1957 · WSOY</span></span><span class="ch no">Lent · Antti</span></div><div class="r"><i style="background:#2E3F5C"></i><span class="tx"><b>Muumipappa ja meri</b><span>Tove Jansson · 1965 · WSOY</span></span><span class="ch">Tampere</span></div><div class="r"><i style="background:#D9D2C0"></i><span class="tx"><b>Kesäkirja</b><span>Tove Jansson · 1972 · WSOY</span></span><span class="ch">Tampere</span></div><div class="r"><i style="background:#6B4E3D"></i><span class="tx"><b>Puhdistus</b><span>Sofi Oksanen · 2008 · WSOY</span></span><span class="ch">Tampere</span></div><div class="r"><i style="background:#9AA77B"></i><span class="tx"><b>Kätilö</b><span>Katja Kettu · 2011 · WSOY</span></span><span class="ch">Tampere</span></div><div class="r"><i style="background:#4F6D7A"></i><span class="tx"><b>Hytti nro 6</b><span>Rosa Liksom · 2011 · WSOY</span></span><span class="ch">Tampere</span></div><div class="r"><i style="background:#A67C52"></i><span class="tx"><b>Jäniksen vuosi</b><span>Arto Paasilinna · 1975 · Weilin+Göös</span></span><span class="ch">Tampere</span></div></div><aside class="dp"><span class="x"></span><div class="dh"><i style="background:#B5651D"></i><div><h2>Täällä Pohjantähden alla 1</h2><p class="by"><u>Väinö Linna</u></p><p class="mu">WSOY · 1959 · 476 pages · Finnish</p></div></div>
+<div class="kv rr"><span class="sw"><em>Read</em><span>Unread</span></span><span class="st"><svg viewBox="0 0 24 24" width="22" height="22"><path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.4l-5.8 3.1 1.1-6.5L2.6 9.4l6.5-.9z" fill="none" stroke="var(--ink)" stroke-width="2"/></svg><svg viewBox="0 0 24 24" width="22" height="22"><path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.4l-5.8 3.1 1.1-6.5L2.6 9.4l6.5-.9z" fill="none" stroke="var(--ink)" stroke-width="2"/></svg><svg viewBox="0 0 24 24" width="22" height="22"><path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.4l-5.8 3.1 1.1-6.5L2.6 9.4l6.5-.9z" fill="none" stroke="var(--ink)" stroke-width="2"/></svg><svg viewBox="0 0 24 24" width="22" height="22"><path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.4l-5.8 3.1 1.1-6.5L2.6 9.4l6.5-.9z" fill="none" stroke="var(--ink)" stroke-width="2"/></svg><svg viewBox="0 0 24 24" width="22" height="22"><path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.4l-5.8 3.1 1.1-6.5L2.6 9.4l6.5-.9z" fill="none" stroke="var(--dim)" stroke-width="1.6"/></svg></span></div>
+<h3>Your copies</h3>
+<div class="cp"><div class="kv"><span><u>Tampere</u></span><span>Owned</span></div><p class="nt">Grandfather's copy. The spine is fragile.</p><p class="ops"><u>Lend</u><u>Move</u><u class="d">Remove</u></p></div>
+<div class="cp"><div class="kv"><span><u>Mökki</u></span><span class="lent">Lent to Antti since 12 Sep</span></div><p class="ops"><u>Returned</u></p></div><h3>Genres and tags</h3><p><u>Fiction</u> · <u>Historical</u> · <u>klassikot</u> · <u>Add tag</u></p>
+<p class="ac"><span class="bt">Edit</span><span class="bt">Add to wishlist</span></p></aside></div></div>
+<h2 class="s">The same in dark, filters closed</h2>
+<div class="desk D"><header class="hd"><nav class="hs"><span class="on">Collection</span><span class="">Loans</span><span class="">Wishlists</span><span class="">Settings</span></nav><span class="bt pr">Scan book</span></header>
+<div class="tools"><span class="sf">Search your books</span><span class="lk"><u>Filter</u></span><span class="lk"><u>Select</u></span><span class="sw"><em>Rows</em><span>Covers</span></span><span class="sw"><span>S</span><em>M</em><span>L</span></span></div><p class="act">37 books</p><div class="split"><div class="rows"><div class="r"><i style="background:#7A8B99"></i><span class="tx"><b>Tuntematon sotilas</b><span>Väinö Linna · 1954 · WSOY</span></span><span class="ch">Tampere</span></div><div class="r sel"><i style="background:#B5651D"></i><span class="tx"><b>Täällä Pohjantähden alla 1</b><span>Väinö Linna · 1959 · WSOY</span></span><span class="ch">Tampere</span></div><div class="r"><i style="background:#B5651D"></i><span class="tx"><b>Täällä Pohjantähden alla 1</b><span>Väinö Linna · 1959 · WSOY</span></span><span class="ch no">Lent · Antti</span></div><div class="r"><i style="background:#8C4A5A"></i><span class="tx"><b>Seitsemän veljestä</b><span>Aleksis Kivi · 1870 · SKS</span></span><span class="ch">Tampere</span></div><div class="r"><i style="background:#C9B458"></i><span class="tx"><b>Sinuhe egyptiläinen</b><span>Mika Waltari · 1945 · WSOY</span></span><span class="ch">Tampere</span></div><div class="r"><i style="background:#3D5A4C"></i><span class="tx"><b>Taikatalvi</b><span>Tove Jansson · 1957 · WSOY</span></span><span class="ch no">Lent · Antti</span></div><div class="r"><i style="background:#2E3F5C"></i><span class="tx"><b>Muumipappa ja meri</b><span>Tove Jansson · 1965 · WSOY</span></span><span class="ch">Tampere</span></div><div class="r"><i style="background:#D9D2C0"></i><span class="tx"><b>Kesäkirja</b><span>Tove Jansson · 1972 · WSOY</span></span><span class="ch">Tampere</span></div><div class="r"><i style="background:#6B4E3D"></i><span class="tx"><b>Puhdistus</b><span>Sofi Oksanen · 2008 · WSOY</span></span><span class="ch">Tampere</span></div><div class="r"><i style="background:#9AA77B"></i><span class="tx"><b>Kätilö</b><span>Katja Kettu · 2011 · WSOY</span></span><span class="ch">Tampere</span></div><div class="r"><i style="background:#4F6D7A"></i><span class="tx"><b>Hytti nro 6</b><span>Rosa Liksom · 2011 · WSOY</span></span><span class="ch">Tampere</span></div><div class="r"><i style="background:#A67C52"></i><span class="tx"><b>Jäniksen vuosi</b><span>Arto Paasilinna · 1975 · Weilin+Göös</span></span><span class="ch">Tampere</span></div></div><aside class="dp"><span class="x"></span><div class="dh"><i style="background:#B5651D"></i><div><h2>Täällä Pohjantähden alla 1</h2><p class="by"><u>Väinö Linna</u></p><p class="mu">WSOY · 1959 · 476 pages · Finnish</p></div></div>
+<div class="kv rr"><span class="sw"><em>Read</em><span>Unread</span></span><span class="st"><svg viewBox="0 0 24 24" width="22" height="22"><path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.4l-5.8 3.1 1.1-6.5L2.6 9.4l6.5-.9z" fill="none" stroke="var(--ink)" stroke-width="2"/></svg><svg viewBox="0 0 24 24" width="22" height="22"><path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.4l-5.8 3.1 1.1-6.5L2.6 9.4l6.5-.9z" fill="none" stroke="var(--ink)" stroke-width="2"/></svg><svg viewBox="0 0 24 24" width="22" height="22"><path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.4l-5.8 3.1 1.1-6.5L2.6 9.4l6.5-.9z" fill="none" stroke="var(--ink)" stroke-width="2"/></svg><svg viewBox="0 0 24 24" width="22" height="22"><path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.4l-5.8 3.1 1.1-6.5L2.6 9.4l6.5-.9z" fill="none" stroke="var(--ink)" stroke-width="2"/></svg><svg viewBox="0 0 24 24" width="22" height="22"><path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.4l-5.8 3.1 1.1-6.5L2.6 9.4l6.5-.9z" fill="none" stroke="var(--dim)" stroke-width="1.6"/></svg></span></div>
+<h3>Your copies</h3>
+<div class="cp"><div class="kv"><span><u>Tampere</u></span><span>Owned</span></div><p class="nt">Grandfather's copy. The spine is fragile.</p><p class="ops"><u>Lend</u><u>Move</u><u class="d">Remove</u></p></div>
+<div class="cp"><div class="kv"><span><u>Mökki</u></span><span class="lent">Lent to Antti since 12 Sep</span></div><p class="ops"><u>Returned</u></p></div><h3>Genres and tags</h3><p><u>Fiction</u> · <u>Historical</u> · <u>klassikot</u> · <u>Add tag</u></p>
+<p class="ac"><span class="bt">Edit</span><span class="bt">Add to wishlist</span></p></aside></div></div>
+<h2 class="s">Select mode (light)</h2>
+<p class="note">Every row has a tick box and tapping a row ticks it. The actions sit in a bar along the bottom. Remove is the destructive button.</p>
+<div class="desk L"><header class="hd"><nav class="hs"><span class="on">Collection</span><span class="">Loans</span><span class="">Wishlists</span><span class="">Settings</span></nav><span class="bt pr">Scan book</span></header>
+<div class="tools"><span class="sf">Search your books</span><span class="lk"><u>Filter</u></span><span class="sw"><em>Rows</em><span>Covers</span></span><span class="sw"><span>S</span><em>M</em><span>L</span></span></div><p class="act">Tampere · 31 books · <u>Clear</u></p><div class="split"><div class="rows"><div class="r"><span class="cb"></span><i style="background:#7A8B99"></i><span class="tx"><b>Tuntematon sotilas</b><span>Väinö Linna · 1954 · WSOY</span></span><span class="ch">Tampere</span></div><div class="r"><span class="cb"></span><i style="background:#B5651D"></i><span class="tx"><b>Täällä Pohjantähden alla 1</b><span>Väinö Linna · 1959 · WSOY</span></span><span class="ch">Tampere</span></div><div class="r"><span class="cb on"></span><i style="background:#B5651D"></i><span class="tx"><b>Täällä Pohjantähden alla 1</b><span>Väinö Linna · 1959 · WSOY</span></span><span class="ch no">Lent · Antti</span></div><div class="r"><span class="cb on"></span><i style="background:#8C4A5A"></i><span class="tx"><b>Seitsemän veljestä</b><span>Aleksis Kivi · 1870 · SKS</span></span><span class="ch">Tampere</span></div><div class="r"><span class="cb"></span><i style="background:#C9B458"></i><span class="tx"><b>Sinuhe egyptiläinen</b><span>Mika Waltari · 1945 · WSOY</span></span><span class="ch">Tampere</span></div><div class="r"><span class="cb on"></span><i style="background:#3D5A4C"></i><span class="tx"><b>Taikatalvi</b><span>Tove Jansson · 1957 · WSOY</span></span><span class="ch no">Lent · Antti</span></div><div class="r"><span class="cb"></span><i style="background:#2E3F5C"></i><span class="tx"><b>Muumipappa ja meri</b><span>Tove Jansson · 1965 · WSOY</span></span><span class="ch">Tampere</span></div><div class="r"><span class="cb"></span><i style="background:#D9D2C0"></i><span class="tx"><b>Kesäkirja</b><span>Tove Jansson · 1972 · WSOY</span></span><span class="ch">Tampere</span></div><div class="r"><span class="cb"></span><i style="background:#6B4E3D"></i><span class="tx"><b>Puhdistus</b><span>Sofi Oksanen · 2008 · WSOY</span></span><span class="ch">Tampere</span></div><div class="r"><span class="cb"></span><i style="background:#9AA77B"></i><span class="tx"><b>Kätilö</b><span>Katja Kettu · 2011 · WSOY</span></span><span class="ch">Tampere</span></div><div class="r"><span class="cb"></span><i style="background:#4F6D7A"></i><span class="tx"><b>Hytti nro 6</b><span>Rosa Liksom · 2011 · WSOY</span></span><span class="ch">Tampere</span></div><div class="r"><span class="cb"></span><i style="background:#A67C52"></i><span class="tx"><b>Jäniksen vuosi</b><span>Arto Paasilinna · 1975 · Weilin+Göös</span></span><span class="ch">Tampere</span></div></div></div><div class="bar"><span class="n">3 selected</span><span class="bt">Move</span><span class="bt">Tag</span><span class="bt">Read</span><span class="bt rd">Remove</span><span class="bt pr">Done</span></div></div>
+</main></body></html>

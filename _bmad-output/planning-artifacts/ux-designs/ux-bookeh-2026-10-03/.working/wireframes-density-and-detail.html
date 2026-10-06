@@ -1,0 +1,452 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>bookeh wireframes: density and book detail</title><style>
+:root{--ink:#222;--mid:#777;--line:#cfcfcf;--paper:#fff;--bg:#f3f3f3}
+*{box-sizing:border-box}
+body{margin:0;font:14px/1.45 system-ui,-apple-system,sans-serif;color:var(--ink);background:var(--bg)}
+main{max-width:1180px;margin:0 auto;padding:24px 16px 96px}
+h1{font-size:22px;margin:0 0 4px}
+h2{font-size:18px;margin:56px 0 4px;padding-top:16px;border-top:1px solid var(--line)}
+h3{font-size:15px;margin:32px 0 2px}
+h4{font-size:12px;margin:16px 0 4px;color:var(--mid);text-transform:uppercase;letter-spacing:.04em}
+p{margin:4px 0 8px}
+.note,.mu{color:var(--mid)}
+.note{max-width:76ch}
+input.t{position:absolute;opacity:0;pointer-events:none}
+.ctl{display:flex;flex-wrap:wrap;gap:8px 12px;align-items:center;margin:10px 0;font-size:12px;color:var(--mid)}
+.seg{display:inline-flex;border:1px solid var(--ink);border-radius:4px;overflow:hidden;color:var(--ink);background:var(--paper)}
+.seg label{padding:4px 12px;cursor:pointer;border-left:1px solid var(--ink)}
+.seg label:first-child{border-left:0}
+.demo:has(.l1:checked) label.l1,.demo:has(.l2:checked) label.l2,.demo:has(.l3:checked) label.l3,
+.demo:has(.w1:checked) label.w1,.demo:has(.w2:checked) label.w2{background:var(--ink);color:var(--paper)}
+.frame{background:var(--paper);border:1px solid var(--line);border-radius:8px;overflow:hidden;container-type:inline-size;transition:max-width .2s}
+.demo:has(.w2:checked) .frame{max-width:390px}
+.bar{display:flex;gap:12px;align-items:center;padding:8px 12px;border-bottom:1px solid var(--line)}
+.search{flex:1;min-width:0;border:1px solid var(--line);border-radius:4px;padding:5px 8px;color:var(--mid);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.list{height:440px;overflow:auto}
+.it{color:inherit}
+.cv{display:block;flex:none;background:hsl(0 0% var(--g,78%));aspect-ratio:2/3;border-radius:2px}
+.ti{font-weight:600}
+.au,.me,.lo{color:var(--mid)}
+.ti,.au,.me{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* cover grid */
+:is(.d-grid,.d-mix:has(.l1:checked)){
+  .list{display:grid;grid-template-columns:repeat(auto-fill,minmax(var(--cw,116px),1fr));gap:var(--gap,18px);padding:16px;align-content:start}
+  .it{display:block;min-width:0;font-size:var(--fs,13px)}
+  .cv{width:100%;margin-bottom:6px}
+  .tx,.ti,.au{display:block}
+  .me,.lo{display:none}
+}
+.d-grid:has(.l1:checked){--cw:160px;--gap:24px;--fs:14px}
+.d-grid:has(.l3:checked){--cw:76px;--gap:10px;--fs:11px}
+
+/* rows */
+:is(.d-rows,.d-mix:has(.l2:checked),.phone,.desk){
+  .it{display:flex;align-items:center;gap:12px;padding:var(--py,6px) 12px;border-bottom:1px solid var(--line);min-width:0}
+  .cv{width:var(--cw,30px)}
+  .tx{flex:1;min-width:0;display:flex;flex-wrap:wrap;column-gap:8px}
+  .ti{flex:0 0 100%}
+  .lo{flex:none;font-size:12px;border:1px solid var(--line);border-radius:999px;padding:1px 8px}
+}
+.d-rows:has(.l1:checked){--cw:44px;--py:10px;
+  .tx{flex-direction:column;flex-wrap:nowrap}
+  .ti{flex:none;font-size:15px}
+}
+.d-rows:has(.l3:checked){--cw:16px;--py:3px;font-size:13px;
+  .tx{flex-wrap:nowrap}
+  .ti{flex:0 1 auto}
+  .au{flex:0 1 auto}
+  .me{flex:0 2 auto}
+  .lo{border:0;padding:0}
+}
+
+/* text lines */
+.d-mix:has(.l3:checked){
+  .it{display:grid;grid-template-columns:minmax(0,3fr) minmax(0,2fr) minmax(0,2fr) 96px;gap:12px;padding:4px 12px;border-bottom:1px solid var(--line);font-size:13px}
+  .cv{display:none}
+  .tx{display:contents}
+}
+@container (max-width:520px){
+  .d-mix:has(.l3:checked) .it{grid-template-columns:minmax(0,3fr) minmax(0,2fr) 84px}
+  .d-mix:has(.l3:checked) .me{display:none}
+  .d-rows:has(.l3:checked) .me{display:none}
+}
+
+/* book detail */
+.opts{display:flex;gap:28px;flex-wrap:wrap;align-items:flex-end;margin-top:12px}
+.opt{flex:0 0 300px}
+.opt p{color:var(--mid);font-size:13px}
+.phone{position:relative;width:300px;height:600px;border:2px solid var(--ink);border-radius:28px;overflow:hidden;background:var(--paper)}
+.top{display:flex;justify-content:space-between;align-items:baseline;padding:12px 14px 10px;border-bottom:1px solid var(--line);font-weight:600}
+.top .mu{font-weight:400;font-size:12px}
+.phone .list{height:auto;overflow:hidden}
+label.it{cursor:pointer}
+label.it:hover{background:#f6f6f6}
+.panel{position:absolute;background:var(--paper);overflow:auto;z-index:2}
+.ph{display:flex;align-items:center;gap:8px;padding:10px 12px;border-bottom:1px solid var(--line)}
+.ph label,.acts span{cursor:pointer;padding:3px 10px;border:1px solid var(--ink);border-radius:4px;font-size:13px}
+.pb{padding:14px}
+.hd{display:flex;gap:12px}
+.hd .cv{width:64px;align-self:flex-start}
+.dt{font-size:16px;display:block}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+.chips span{border:1px solid var(--line);border-radius:999px;padding:1px 9px;font-size:12px}
+.row{display:flex;justify-content:space-between;gap:12px;padding:6px 0;border-bottom:1px solid var(--line)}
+.acts{display:flex;gap:8px;margin-top:18px}
+
+.p1 .panel{inset:0;display:none}
+.p1:has(.o:checked) .panel{display:block}
+.p2 .panel{inset:0;transform:translateX(100%);transition:transform .28s ease}
+.p2:has(.o:checked) .panel{transform:none}
+.p3 .panel{left:0;right:0;bottom:0;height:56%;transform:translateY(100%);transition:transform .28s ease,height .28s ease;border-top:2px solid var(--ink);border-radius:16px 16px 0 0}
+.p3:has(.o:checked) .panel{transform:none}
+.p3:has(.x:checked) .panel{transform:none;height:94%}
+.scrim{position:absolute;inset:0;background:#0003;opacity:0;pointer-events:none;transition:opacity .28s;z-index:1}
+.p3:has(:is(.o,.x):checked) .scrim{opacity:1;pointer-events:auto}
+.grab{display:block;text-align:center;font-size:11px;color:var(--mid);padding:6px 0 2px;cursor:pointer}
+.grab::before{content:"";display:block;width:44px;height:5px;border-radius:3px;background:var(--line);margin:0 auto 4px}
+.p3:has(.x:checked) .grab span{display:none}
+
+.desk{position:relative;height:440px;display:flex;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:var(--paper);margin-top:8px}
+.desk .list{flex:1;min-width:0;height:auto}
+.desk .in{width:380px}
+.d1 .panel{top:0;right:0;bottom:0;width:380px;transform:translateX(100%);transition:transform .28s ease;border-left:1px solid var(--ink)}
+.d1:has(.o:checked) .panel{transform:none}
+.d2 .panel{position:static;flex:none;width:0;overflow-x:hidden;transition:width .28s ease}
+.d2:has(.o:checked) .panel{width:380px;border-left:1px solid var(--ink)}
+@media (prefers-reduced-motion:reduce){.panel,.scrim,.frame{transition:none}}
+</style></head><body><main>
+<h1>bookeh wireframes: density and book detail</h1>
+<p class="note">Layout and behaviour only. The greys, the font and the borders are placeholders; colour and type are decided separately. Everything here is clickable: the density and width switches work, and tapping a row opens the book.</p>
+
+<h2>1. Density in the collection view</h2>
+<p class="note">Three ways to give you three levels. Each list is cut to the same height, so what you see is what fits on one screen. Try each at phone width too.</p>
+
+<h3>A. Rows, three sizes</h3>
+<p class="note">One layout. The levels change the cover size, the row height and how many lines of text each book gets.</p>
+<div class="demo d-rows"><input class="t l1" type="radio" name="a-l" id="a-l1"><input class="t l2" type="radio" name="a-l" id="a-l2" checked><input class="t l3" type="radio" name="a-l" id="a-l3"><input class="t w1" type="radio" name="a-w" id="a-w1" checked><input class="t w2" type="radio" name="a-w" id="a-w2">
+<div class="ctl"><span>Density</span><span class="seg"><label class="l1" for="a-l1">Roomy</label><label class="l2" for="a-l2">Regular</label><label class="l3" for="a-l3">Compact</label></span><span>Width</span><span class="seg"><label class="w1" for="a-w1">Desktop</label><label class="w2" for="a-w2">Phone</label></span></div>
+<div class="frame"><div class="bar"><span class="search">Search title, author, series, ISBN</span><span class="mu">37 books</span></div>
+<div class="list">
+<div class="it"><span class="cv" style="--g:72%"></span><span class="tx"><b class="ti">Tuntematon sotilas</b><span class="au">Väinö Linna</span><span class="me">1954 · WSOY</span></span><span class="lo">Tampere</span></div>
+<div class="it"><span class="cv" style="--g:80%"></span><span class="tx"><b class="ti">Täällä Pohjantähden alla 1</b><span class="au">Väinö Linna</span><span class="me">1959 · WSOY</span></span><span class="lo">Tampere</span></div>
+<div class="it"><span class="cv" style="--g:66%"></span><span class="tx"><b class="ti">Seitsemän veljestä</b><span class="au">Aleksis Kivi</span><span class="me">1870 · SKS</span></span><span class="lo">Helsinki</span></div>
+<div class="it"><span class="cv" style="--g:76%"></span><span class="tx"><b class="ti">Sinuhe egyptiläinen</b><span class="au">Mika Waltari</span><span class="me">1945 · WSOY</span></span><span class="lo">Mökki</span></div>
+<div class="it"><span class="cv" style="--g:84%"></span><span class="tx"><b class="ti">Komisario Palmun erehdys</b><span class="au">Mika Waltari</span><span class="me">1940 · Otava</span></span><span class="lo">Tampere</span></div>
+<div class="it"><span class="cv" style="--g:70%"></span><span class="tx"><b class="ti">Taikatalvi</b><span class="au">Tove Jansson</span><span class="me">1957 · WSOY</span></span><span class="lo">Lent · Antti</span></div>
+<div class="it"><span class="cv" style="--g:78%"></span><span class="tx"><b class="ti">Muumipappa ja meri</b><span class="au">Tove Jansson</span><span class="me">1965 · WSOY</span></span><span class="lo">Tampere</span></div>
+<div class="it"><span class="cv" style="--g:72%"></span><span class="tx"><b class="ti">Kesäkirja</b><span class="au">Tove Jansson</span><span class="me">1972 · WSOY</span></span><span class="lo">Tampere</span></div>
+<div class="it"><span class="cv" style="--g:80%"></span><span class="tx"><b class="ti">Puhdistus</b><span class="au">Sofi Oksanen</span><span class="me">2008 · WSOY</span></span><span class="lo">Helsinki</span></div>
+<div class="it"><span class="cv" style="--g:66%"></span><span class="tx"><b class="ti">Kun kyyhkyset katosivat</b><span class="au">Sofi Oksanen</span><span class="me">2012 · Like</span></span><span class="lo">Mökki</span></div>
+<div class="it"><span class="cv" style="--g:76%"></span><span class="tx"><b class="ti">Kätilö</b><span class="au">Katja Kettu</span><span class="me">2011 · WSOY</span></span><span class="lo">Tampere</span></div>
+<div class="it"><span class="cv" style="--g:84%"></span><span class="tx"><b class="ti">Hytti nro 6</b><span class="au">Rosa Liksom</span><span class="me">2011 · WSOY</span></span><span class="lo">Lent · Antti</span></div>
+<div class="it"><span class="cv" style="--g:70%"></span><span class="tx"><b class="ti">Jäniksen vuosi</b><span class="au">Arto Paasilinna</span><span class="me">1975 · Weilin+Göös</span></span><span class="lo">Tampere</span></div>
+<div class="it"><span class="cv" style="--g:78%"></span><span class="tx"><b class="ti">Ulvova mylläri</b><span class="au">Arto Paasilinna</span><span class="me">1981 · WSOY</span></span><span class="lo">Tampere</span></div>
+<div class="it"><span class="cv" style="--g:72%"></span><span class="tx"><b class="ti">Hurmaava joukkoitsemurha</b><span class="au">Arto Paasilinna</span><span class="me">1990 · WSOY</span></span><span class="lo">Helsinki</span></div>
+<div class="it"><span class="cv" style="--g:80%"></span><span class="tx"><b class="ti">Oneiron</b><span class="au">Laura Lindstedt</span><span class="me">2015 · Teos</span></span><span class="lo">Mökki</span></div>
+<div class="it"><span class="cv" style="--g:66%"></span><span class="tx"><b class="ti">Juoksuhaudantie</b><span class="au">Kari Hotakainen</span><span class="me">2002 · WSOY</span></span><span class="lo">Tampere</span></div>
+<div class="it"><span class="cv" style="--g:76%"></span><span class="tx"><b class="ti">Ihmisen osa</b><span class="au">Kari Hotakainen</span><span class="me">2009 · Siltala</span></span><span class="lo">Lent · Antti</span></div>
+<div class="it"><span class="cv" style="--g:84%"></span><span class="tx"><b class="ti">Nälkävuosi</b><span class="au">Aki Ollikainen</span><span class="me">2012 · Siltala</span></span><span class="lo">Tampere</span></div>
+<div class="it"><span class="cv" style="--g:70%"></span><span class="tx"><b class="ti">Kalevala</b><span class="au">Elias Lönnrot</span><span class="me">1849 · SKS</span></span><span class="lo">Tampere</span></div>
+<div class="it"><span class="cv" style="--g:78%"></span><span class="tx"><b class="ti">Kultarinta</b><span class="au">Anni Kytömäki</span><span class="me">2014 · Gummerus</span></span><span class="lo">Helsinki</span></div>
+<div class="it"><span class="cv" style="--g:72%"></span><span class="tx"><b class="ti">Margarita</b><span class="au">Anni Kytömäki</span><span class="me">2020 · Gummerus</span></span><span class="lo">Mökki</span></div>
+<div class="it"><span class="cv" style="--g:80%"></span><span class="tx"><b class="ti">Bolla</b><span class="au">Pajtim Statovci</span><span class="me">2019 · Otava</span></span><span class="lo">Tampere</span></div>
+<div class="it"><span class="cv" style="--g:66%"></span><span class="tx"><b class="ti">Kissani Jugoslavia</b><span class="au">Pajtim Statovci</span><span class="me">2014 · Otava</span></span><span class="lo">Lent · Antti</span></div>
+<div class="it"><span class="cv" style="--g:76%"></span><span class="tx"><b class="ti">Missä kuljimme kerran</b><span class="au">Kjell Westö</span><span class="me">2006 · Otava</span></span><span class="lo">Tampere</span></div>
+<div class="it"><span class="cv" style="--g:84%"></span><span class="tx"><b class="ti">Kangastus 38</b><span class="au">Kjell Westö</span><span class="me">2013 · Otava</span></span><span class="lo">Tampere</span></div>
+<div class="it"><span class="cv" style="--g:70%"></span><span class="tx"><b class="ti">Manillaköysi</b><span class="au">Veijo Meri</span><span class="me">1957 · Otava</span></span><span class="lo">Helsinki</span></div>
+<div class="it"><span class="cv" style="--g:78%"></span><span class="tx"><b class="ti">Alastalon salissa</b><span class="au">Volter Kilpi</span><span class="me">1933 · Otava</span></span><span class="lo">Mökki</span></div>
+<div class="it"><span class="cv" style="--g:72%"></span><span class="tx"><b class="ti">Putkinotko</b><span class="au">Joel Lehtonen</span><span class="me">1920 · Otava</span></span><span class="lo">Tampere</span></div>
+<div class="it"><span class="cv" style="--g:80%"></span><span class="tx"><b class="ti">Rautatie</b><span class="au">Juhani Aho</span><span class="me">1884 · WSOY</span></span><span class="lo">Lent · Antti</span></div>
+<div class="it"><span class="cv" style="--g:66%"></span><span class="tx"><b class="ti">Punainen viiva</b><span class="au">Ilmari Kianto</span><span class="me">1909 · Otava</span></span><span class="lo">Tampere</span></div>
+<div class="it"><span class="cv" style="--g:76%"></span><span class="tx"><b class="ti">Taivaslaulu</b><span class="au">Pauliina Rauhala</span><span class="me">2013 · Gummerus</span></span><span class="lo">Tampere</span></div>
+<div class="it"><span class="cv" style="--g:84%"></span><span class="tx"><b class="ti">Neljäntienristeys</b><span class="au">Tommi Kinnunen</span><span class="me">2014 · WSOY</span></span><span class="lo">Helsinki</span></div>
+<div class="it"><span class="cv" style="--g:70%"></span><span class="tx"><b class="ti">Akvarelleja Engelin kaupungista</b><span class="au">Jukka Viikilä</span><span class="me">2016 · Gummerus</span></span><span class="lo">Mökki</span></div>
+<div class="it"><span class="cv" style="--g:78%"></span><span class="tx"><b class="ti">Linnunradan käsikirja liftareille</b><span class="au">Douglas Adams</span><span class="me">1981 · WSOY</span></span><span class="lo">Tampere</span></div>
+<div class="it"><span class="cv" style="--g:72%"></span><span class="tx"><b class="ti">Sormusten herra</b><span class="au">J. R. R. Tolkien</span><span class="me">1973 · WSOY</span></span><span class="lo">Lent · Antti</span></div>
+<div class="it"><span class="cv" style="--g:80%"></span><span class="tx"><b class="ti">Hobitti eli sinne ja takaisin</b><span class="au">J. R. R. Tolkien</span><span class="me">1985 · WSOY</span></span><span class="lo">Tampere</span></div>
+</div></div></div>
+
+<h3>B. Cover grid, three sizes</h3>
+<p class="note">One layout. The levels change the cover size and the spacing. Location, year and publisher do not fit under a cover at any level.</p>
+<div class="demo d-grid"><input class="t l1" type="radio" name="b-l" id="b-l1"><input class="t l2" type="radio" name="b-l" id="b-l2" checked><input class="t l3" type="radio" name="b-l" id="b-l3"><input class="t w1" type="radio" name="b-w" id="b-w1" checked><input class="t w2" type="radio" name="b-w" id="b-w2">
+<div class="ctl"><span>Density</span><span class="seg"><label class="l1" for="b-l1">Roomy</label><label class="l2" for="b-l2">Regular</label><label class="l3" for="b-l3">Compact</label></span><span>Width</span><span class="seg"><label class="w1" for="b-w1">Desktop</label><label class="w2" for="b-w2">Phone</label></span></div>
+<div class="frame"><div class="bar"><span class="search">Search title, author, series, ISBN</span><span class="mu">37 books</span></div>
+<div class="list">
+<div class="it"><span class="cv" style="--g:72%"></span><span class="tx"><b class="ti">Tuntematon sotilas</b><span class="au">Väinö Linna</span><span class="me">1954 · WSOY</span></span><span class="lo">Tampere</span></div>
+<div class="it"><span class="cv" style="--g:80%"></span><span class="tx"><b class="ti">Täällä Pohjantähden alla 1</b><span class="au">Väinö Linna</span><span class="me">1959 · WSOY</span></span><span class="lo">Tampere</span></div>
+<div class="it"><span class="cv" style="--g:66%"></span><span class="tx"><b class="ti">Seitsemän veljestä</b><span class="au">Aleksis Kivi</span><span class="me">1870 · SKS</span></span><span class="lo">Helsinki</span></div>
+<div class="it"><span class="cv" style="--g:76%"></span><span class="tx"><b class="ti">Sinuhe egyptiläinen</b><span class="au">Mika Waltari</span><span class="me">1945 · WSOY</span></span><span class="lo">Mökki</span></div>
+<div class="it"><span class="cv" style="--g:84%"></span><span class="tx"><b class="ti">Komisario Palmun erehdys</b><span class="au">Mika Waltari</span><span class="me">1940 · Otava</span></span><span class="lo">Tampere</span></div>
+<div class="it"><span class="cv" style="--g:70%"></span><span class="tx"><b class="ti">Taikatalvi</b><span class="au">Tove Jansson</span><span class="me">1957 · WSOY</span></span><span class="lo">Lent · Antti</span></div>
+<div class="it"><span class="cv" style="--g:78%"></span><span class="tx"><b class="ti">Muumipappa ja meri</b><span class="au">Tove Jansson</span><span class="me">1965 · WSOY</span></span><span class="lo">Tampere</span></div>
+<div class="it"><span class="cv" style="--g:72%"></span><span class="tx"><b class="ti">Kesäkirja</b><span class="au">Tove Jansson</span><span class="me">1972 · WSOY</span></span><span class="lo">Tampere</span></div>
+<div class="it"><span class="cv" style="--g:80%"></span><span class="tx"><b class="ti">Puhdistus</b><span class="au">Sofi Oksanen</span><span class="me">2008 · WSOY</span></span><span class="lo">Helsinki</span></div>
+<div class="it"><span class="cv" style="--g:66%"></span><span class="tx"><b class="ti">Kun kyyhkyset katosivat</b><span class="au">Sofi Oksanen</span><span class="me">2012 · Like</span></span><span class="lo">Mökki</span></div>
+<div class="it"><span class="cv" style="--g:76%"></span><span class="tx"><b class="ti">Kätilö</b><span class="au">Katja Kettu</span><span class="me">2011 · WSOY</span></span><span class="lo">Tampere</span></div>
+<div class="it"><span class="cv" style="--g:84%"></span><span class="tx"><b class="ti">Hytti nro 6</b><span class="au">Rosa Liksom</span><span class="me">2011 · WSOY</span></span><span class="lo">Lent · Antti</span></div>
+<div class="it"><span class="cv" style="--g:70%"></span><span class="tx"><b class="ti">Jäniksen vuosi</b><span class="au">Arto Paasilinna</span><span class="me">1975 · Weilin+Göös</span></span><span class="lo">Tampere</span></div>
+<div class="it"><span class="cv" style="--g:78%"></span><span class="tx"><b class="ti">Ulvova mylläri</b><span class="au">Arto Paasilinna</span><span class="me">1981 · WSOY</span></span><span class="lo">Tampere</span></div>
+<div class="it"><span class="cv" style="--g:72%"></span><span class="tx"><b class="ti">Hurmaava joukkoitsemurha</b><span class="au">Arto Paasilinna</span><span class="me">1990 · WSOY</span></span><span class="lo">Helsinki</span></div>
+<div class="it"><span class="cv" style="--g:80%"></span><span class="tx"><b class="ti">Oneiron</b><span class="au">Laura Lindstedt</span><span class="me">2015 · Teos</span></span><span class="lo">Mökki</span></div>
+<div class="it"><span class="cv" style="--g:66%"></span><span class="tx"><b class="ti">Juoksuhaudantie</b><span class="au">Kari Hotakainen</span><span class="me">2002 · WSOY</span></span><span class="lo">Tampere</span></div>
+<div class="it"><span class="cv" style="--g:76%"></span><span class="tx"><b class="ti">Ihmisen osa</b><span class="au">Kari Hotakainen</span><span class="me">2009 · Siltala</span></span><span class="lo">Lent · Antti</span></div>
+<div class="it"><span class="cv" style="--g:84%"></span><span class="tx"><b class="ti">Nälkävuosi</b><span class="au">Aki Ollikainen</span><span class="me">2012 · Siltala</span></span><span class="lo">Tampere</span></div>
+<div class="it"><span class="cv" style="--g:70%"></span><span class="tx"><b class="ti">Kalevala</b><span class="au">Elias Lönnrot</span><span class="me">1849 · SKS</span></span><span class="lo">Tampere</span></div>
+<div class="it"><span class="cv" style="--g:78%"></span><span class="tx"><b class="ti">Kultarinta</b><span class="au">Anni Kytömäki</span><span class="me">2014 · Gummerus</span></span><span class="lo">Helsinki</span></div>
+<div class="it"><span class="cv" style="--g:72%"></span><span class="tx"><b class="ti">Margarita</b><span class="au">Anni Kytömäki</span><span class="me">2020 · Gummerus</span></span><span class="lo">Mökki</span></div>
+<div class="it"><span class="cv" style="--g:80%"></span><span class="tx"><b class="ti">Bolla</b><span class="au">Pajtim Statovci</span><span class="me">2019 · Otava</span></span><span class="lo">Tampere</span></div>
+<div class="it"><span class="cv" style="--g:66%"></span><span class="tx"><b class="ti">Kissani Jugoslavia</b><span class="au">Pajtim Statovci</span><span class="me">2014 · Otava</span></span><span class="lo">Lent · Antti</span></div>
+<div class="it"><span class="cv" style="--g:76%"></span><span class="tx"><b class="ti">Missä kuljimme kerran</b><span class="au">Kjell Westö</span><span class="me">2006 · Otava</span></span><span class="lo">Tampere</span></div>
+<div class="it"><span class="cv" style="--g:84%"></span><span class="tx"><b class="ti">Kangastus 38</b><span class="au">Kjell Westö</span><span class="me">2013 · Otava</span></span><span class="lo">Tampere</span></div>
+<div class="it"><span class="cv" style="--g:70%"></span><span class="tx"><b class="ti">Manillaköysi</b><span class="au">Veijo Meri</span><span class="me">1957 · Otava</span></span><span class="lo">Helsinki</span></div>
+<div class="it"><span class="cv" style="--g:78%"></span><span class="tx"><b class="ti">Alastalon salissa</b><span class="au">Volter Kilpi</span><span class="me">1933 · Otava</span></span><span class="lo">Mökki</span></div>
+<div class="it"><span class="cv" style="--g:72%"></span><span class="tx"><b class="ti">Putkinotko</b><span class="au">Joel Lehtonen</span><span class="me">1920 · Otava</span></span><span class="lo">Tampere</span></div>
+<div class="it"><span class="cv" style="--g:80%"></span><span class="tx"><b class="ti">Rautatie</b><span class="au">Juhani Aho</span><span class="me">1884 · WSOY</span></span><span class="lo">Lent · Antti</span></div>
+<div class="it"><span class="cv" style="--g:66%"></span><span class="tx"><b class="ti">Punainen viiva</b><span class="au">Ilmari Kianto</span><span class="me">1909 · Otava</span></span><span class="lo">Tampere</span></div>
+<div class="it"><span class="cv" style="--g:76%"></span><span class="tx"><b class="ti">Taivaslaulu</b><span class="au">Pauliina Rauhala</span><span class="me">2013 · Gummerus</span></span><span class="lo">Tampere</span></div>
+<div class="it"><span class="cv" style="--g:84%"></span><span class="tx"><b class="ti">Neljäntienristeys</b><span class="au">Tommi Kinnunen</span><span class="me">2014 · WSOY</span></span><span class="lo">Helsinki</span></div>
+<div class="it"><span class="cv" style="--g:70%"></span><span class="tx"><b class="ti">Akvarelleja Engelin kaupungista</b><span class="au">Jukka Viikilä</span><span class="me">2016 · Gummerus</span></span><span class="lo">Mökki</span></div>
+<div class="it"><span class="cv" style="--g:78%"></span><span class="tx"><b class="ti">Linnunradan käsikirja liftareille</b><span class="au">Douglas Adams</span><span class="me">1981 · WSOY</span></span><span class="lo">Tampere</span></div>
+<div class="it"><span class="cv" style="--g:72%"></span><span class="tx"><b class="ti">Sormusten herra</b><span class="au">J. R. R. Tolkien</span><span class="me">1973 · WSOY</span></span><span class="lo">Lent · Antti</span></div>
+<div class="it"><span class="cv" style="--g:80%"></span><span class="tx"><b class="ti">Hobitti eli sinne ja takaisin</b><span class="au">J. R. R. Tolkien</span><span class="me">1985 · WSOY</span></span><span class="lo">Tampere</span></div>
+</div></div></div>
+
+<h3>C. Three different layouts</h3>
+<p class="note">Each level is its own layout: a cover grid, rows with a small cover, and text-only lines in columns.</p>
+<div class="demo d-mix"><input class="t l1" type="radio" name="c-l" id="c-l1"><input class="t l2" type="radio" name="c-l" id="c-l2" checked><input class="t l3" type="radio" name="c-l" id="c-l3"><input class="t w1" type="radio" name="c-w" id="c-w1" checked><input class="t w2" type="radio" name="c-w" id="c-w2">
+<div class="ctl"><span>Density</span><span class="seg"><label class="l1" for="c-l1">Covers</label><label class="l2" for="c-l2">Rows</label><label class="l3" for="c-l3">Lines</label></span><span>Width</span><span class="seg"><label class="w1" for="c-w1">Desktop</label><label class="w2" for="c-w2">Phone</label></span></div>
+<div class="frame"><div class="bar"><span class="search">Search title, author, series, ISBN</span><span class="mu">37 books</span></div>
+<div class="list">
+<div class="it"><span class="cv" style="--g:72%"></span><span class="tx"><b class="ti">Tuntematon sotilas</b><span class="au">Väinö Linna</span><span class="me">1954 · WSOY</span></span><span class="lo">Tampere</span></div>
+<div class="it"><span class="cv" style="--g:80%"></span><span class="tx"><b class="ti">Täällä Pohjantähden alla 1</b><span class="au">Väinö Linna</span><span class="me">1959 · WSOY</span></span><span class="lo">Tampere</span></div>
+<div class="it"><span class="cv" style="--g:66%"></span><span class="tx"><b class="ti">Seitsemän veljestä</b><span class="au">Aleksis Kivi</span><span class="me">1870 · SKS</span></span><span class="lo">Helsinki</span></div>
+<div class="it"><span class="cv" style="--g:76%"></span><span class="tx"><b class="ti">Sinuhe egyptiläinen</b><span class="au">Mika Waltari</span><span class="me">1945 · WSOY</span></span><span class="lo">Mökki</span></div>
+<div class="it"><span class="cv" style="--g:84%"></span><span class="tx"><b class="ti">Komisario Palmun erehdys</b><span class="au">Mika Waltari</span><span class="me">1940 · Otava</span></span><span class="lo">Tampere</span></div>
+<div class="it"><span class="cv" style="--g:70%"></span><span class="tx"><b class="ti">Taikatalvi</b><span class="au">Tove Jansson</span><span class="me">1957 · WSOY</span></span><span class="lo">Lent · Antti</span></div>
+<div class="it"><span class="cv" style="--g:78%"></span><span class="tx"><b class="ti">Muumipappa ja meri</b><span class="au">Tove Jansson</span><span class="me">1965 · WSOY</span></span><span class="lo">Tampere</span></div>
+<div class="it"><span class="cv" style="--g:72%"></span><span class="tx"><b class="ti">Kesäkirja</b><span class="au">Tove Jansson</span><span class="me">1972 · WSOY</span></span><span class="lo">Tampere</span></div>
+<div class="it"><span class="cv" style="--g:80%"></span><span class="tx"><b class="ti">Puhdistus</b><span class="au">Sofi Oksanen</span><span class="me">2008 · WSOY</span></span><span class="lo">Helsinki</span></div>
+<div class="it"><span class="cv" style="--g:66%"></span><span class="tx"><b class="ti">Kun kyyhkyset katosivat</b><span class="au">Sofi Oksanen</span><span class="me">2012 · Like</span></span><span class="lo">Mökki</span></div>
+<div class="it"><span class="cv" style="--g:76%"></span><span class="tx"><b class="ti">Kätilö</b><span class="au">Katja Kettu</span><span class="me">2011 · WSOY</span></span><span class="lo">Tampere</span></div>
+<div class="it"><span class="cv" style="--g:84%"></span><span class="tx"><b class="ti">Hytti nro 6</b><span class="au">Rosa Liksom</span><span class="me">2011 · WSOY</span></span><span class="lo">Lent · Antti</span></div>
+<div class="it"><span class="cv" style="--g:70%"></span><span class="tx"><b class="ti">Jäniksen vuosi</b><span class="au">Arto Paasilinna</span><span class="me">1975 · Weilin+Göös</span></span><span class="lo">Tampere</span></div>
+<div class="it"><span class="cv" style="--g:78%"></span><span class="tx"><b class="ti">Ulvova mylläri</b><span class="au">Arto Paasilinna</span><span class="me">1981 · WSOY</span></span><span class="lo">Tampere</span></div>
+<div class="it"><span class="cv" style="--g:72%"></span><span class="tx"><b class="ti">Hurmaava joukkoitsemurha</b><span class="au">Arto Paasilinna</span><span class="me">1990 · WSOY</span></span><span class="lo">Helsinki</span></div>
+<div class="it"><span class="cv" style="--g:80%"></span><span class="tx"><b class="ti">Oneiron</b><span class="au">Laura Lindstedt</span><span class="me">2015 · Teos</span></span><span class="lo">Mökki</span></div>
+<div class="it"><span class="cv" style="--g:66%"></span><span class="tx"><b class="ti">Juoksuhaudantie</b><span class="au">Kari Hotakainen</span><span class="me">2002 · WSOY</span></span><span class="lo">Tampere</span></div>
+<div class="it"><span class="cv" style="--g:76%"></span><span class="tx"><b class="ti">Ihmisen osa</b><span class="au">Kari Hotakainen</span><span class="me">2009 · Siltala</span></span><span class="lo">Lent · Antti</span></div>
+<div class="it"><span class="cv" style="--g:84%"></span><span class="tx"><b class="ti">Nälkävuosi</b><span class="au">Aki Ollikainen</span><span class="me">2012 · Siltala</span></span><span class="lo">Tampere</span></div>
+<div class="it"><span class="cv" style="--g:70%"></span><span class="tx"><b class="ti">Kalevala</b><span class="au">Elias Lönnrot</span><span class="me">1849 · SKS</span></span><span class="lo">Tampere</span></div>
+<div class="it"><span class="cv" style="--g:78%"></span><span class="tx"><b class="ti">Kultarinta</b><span class="au">Anni Kytömäki</span><span class="me">2014 · Gummerus</span></span><span class="lo">Helsinki</span></div>
+<div class="it"><span class="cv" style="--g:72%"></span><span class="tx"><b class="ti">Margarita</b><span class="au">Anni Kytömäki</span><span class="me">2020 · Gummerus</span></span><span class="lo">Mökki</span></div>
+<div class="it"><span class="cv" style="--g:80%"></span><span class="tx"><b class="ti">Bolla</b><span class="au">Pajtim Statovci</span><span class="me">2019 · Otava</span></span><span class="lo">Tampere</span></div>
+<div class="it"><span class="cv" style="--g:66%"></span><span class="tx"><b class="ti">Kissani Jugoslavia</b><span class="au">Pajtim Statovci</span><span class="me">2014 · Otava</span></span><span class="lo">Lent · Antti</span></div>
+<div class="it"><span class="cv" style="--g:76%"></span><span class="tx"><b class="ti">Missä kuljimme kerran</b><span class="au">Kjell Westö</span><span class="me">2006 · Otava</span></span><span class="lo">Tampere</span></div>
+<div class="it"><span class="cv" style="--g:84%"></span><span class="tx"><b class="ti">Kangastus 38</b><span class="au">Kjell Westö</span><span class="me">2013 · Otava</span></span><span class="lo">Tampere</span></div>
+<div class="it"><span class="cv" style="--g:70%"></span><span class="tx"><b class="ti">Manillaköysi</b><span class="au">Veijo Meri</span><span class="me">1957 · Otava</span></span><span class="lo">Helsinki</span></div>
+<div class="it"><span class="cv" style="--g:78%"></span><span class="tx"><b class="ti">Alastalon salissa</b><span class="au">Volter Kilpi</span><span class="me">1933 · Otava</span></span><span class="lo">Mökki</span></div>
+<div class="it"><span class="cv" style="--g:72%"></span><span class="tx"><b class="ti">Putkinotko</b><span class="au">Joel Lehtonen</span><span class="me">1920 · Otava</span></span><span class="lo">Tampere</span></div>
+<div class="it"><span class="cv" style="--g:80%"></span><span class="tx"><b class="ti">Rautatie</b><span class="au">Juhani Aho</span><span class="me">1884 · WSOY</span></span><span class="lo">Lent · Antti</span></div>
+<div class="it"><span class="cv" style="--g:66%"></span><span class="tx"><b class="ti">Punainen viiva</b><span class="au">Ilmari Kianto</span><span class="me">1909 · Otava</span></span><span class="lo">Tampere</span></div>
+<div class="it"><span class="cv" style="--g:76%"></span><span class="tx"><b class="ti">Taivaslaulu</b><span class="au">Pauliina Rauhala</span><span class="me">2013 · Gummerus</span></span><span class="lo">Tampere</span></div>
+<div class="it"><span class="cv" style="--g:84%"></span><span class="tx"><b class="ti">Neljäntienristeys</b><span class="au">Tommi Kinnunen</span><span class="me">2014 · WSOY</span></span><span class="lo">Helsinki</span></div>
+<div class="it"><span class="cv" style="--g:70%"></span><span class="tx"><b class="ti">Akvarelleja Engelin kaupungista</b><span class="au">Jukka Viikilä</span><span class="me">2016 · Gummerus</span></span><span class="lo">Mökki</span></div>
+<div class="it"><span class="cv" style="--g:78%"></span><span class="tx"><b class="ti">Linnunradan käsikirja liftareille</b><span class="au">Douglas Adams</span><span class="me">1981 · WSOY</span></span><span class="lo">Tampere</span></div>
+<div class="it"><span class="cv" style="--g:72%"></span><span class="tx"><b class="ti">Sormusten herra</b><span class="au">J. R. R. Tolkien</span><span class="me">1973 · WSOY</span></span><span class="lo">Lent · Antti</span></div>
+<div class="it"><span class="cv" style="--g:80%"></span><span class="tx"><b class="ti">Hobitti eli sinne ja takaisin</b><span class="au">J. R. R. Tolkien</span><span class="me">1985 · WSOY</span></span><span class="lo">Tampere</span></div>
+</div></div></div>
+
+<h2>2. Opening a book on a phone</h2>
+<p class="note">Tap any row. Every row opens the same sample book.</p>
+<div class="opts">
+<div class="opt"><h3>P1. Full-screen page</h3><p>The book replaces the list as its own screen. Back returns to the list.</p><div class="phone p1"><input class="t c" type="radio" name="p1" id="p1-c" checked><input class="t o" type="radio" name="p1" id="p1-o">
+<div class="top"><span>Collection</span><span class="mu">37 books</span></div>
+<div class="list">
+<label class="it" for="p1-o"><span class="cv" style="--g:72%"></span><span class="tx"><b class="ti">Tuntematon sotilas</b><span class="au">Väinö Linna</span><span class="me">1954 · WSOY</span></span><span class="lo">Tampere</span></label>
+<label class="it" for="p1-o"><span class="cv" style="--g:80%"></span><span class="tx"><b class="ti">Täällä Pohjantähden alla 1</b><span class="au">Väinö Linna</span><span class="me">1959 · WSOY</span></span><span class="lo">Tampere</span></label>
+<label class="it" for="p1-o"><span class="cv" style="--g:66%"></span><span class="tx"><b class="ti">Seitsemän veljestä</b><span class="au">Aleksis Kivi</span><span class="me">1870 · SKS</span></span><span class="lo">Helsinki</span></label>
+<label class="it" for="p1-o"><span class="cv" style="--g:76%"></span><span class="tx"><b class="ti">Sinuhe egyptiläinen</b><span class="au">Mika Waltari</span><span class="me">1945 · WSOY</span></span><span class="lo">Mökki</span></label>
+<label class="it" for="p1-o"><span class="cv" style="--g:84%"></span><span class="tx"><b class="ti">Komisario Palmun erehdys</b><span class="au">Mika Waltari</span><span class="me">1940 · Otava</span></span><span class="lo">Tampere</span></label>
+<label class="it" for="p1-o"><span class="cv" style="--g:70%"></span><span class="tx"><b class="ti">Taikatalvi</b><span class="au">Tove Jansson</span><span class="me">1957 · WSOY</span></span><span class="lo">Lent · Antti</span></label>
+<label class="it" for="p1-o"><span class="cv" style="--g:78%"></span><span class="tx"><b class="ti">Muumipappa ja meri</b><span class="au">Tove Jansson</span><span class="me">1965 · WSOY</span></span><span class="lo">Tampere</span></label>
+<label class="it" for="p1-o"><span class="cv" style="--g:72%"></span><span class="tx"><b class="ti">Kesäkirja</b><span class="au">Tove Jansson</span><span class="me">1972 · WSOY</span></span><span class="lo">Tampere</span></label>
+<label class="it" for="p1-o"><span class="cv" style="--g:80%"></span><span class="tx"><b class="ti">Puhdistus</b><span class="au">Sofi Oksanen</span><span class="me">2008 · WSOY</span></span><span class="lo">Helsinki</span></label>
+<label class="it" for="p1-o"><span class="cv" style="--g:66%"></span><span class="tx"><b class="ti">Kun kyyhkyset katosivat</b><span class="au">Sofi Oksanen</span><span class="me">2012 · Like</span></span><span class="lo">Mökki</span></label>
+<label class="it" for="p1-o"><span class="cv" style="--g:76%"></span><span class="tx"><b class="ti">Kätilö</b><span class="au">Katja Kettu</span><span class="me">2011 · WSOY</span></span><span class="lo">Tampere</span></label>
+</div>
+<div class="panel"><div class="ph"><label for="p1-c">‹ Collection</label></div><div class="pb">
+<div class="hd"><span class="cv" style="--g:70%"></span><div><b class="dt">Täällä Pohjantähden alla 1</b><div>Väinö Linna</div><div class="mu">WSOY · 1959 · 476 pages · Finnish</div><div class="chips"><span>Read</span><span>★★★★☆</span></div></div></div>
+<h4>Your copies</h4>
+<div class="row"><span>Tampere</span><span class="mu">Owned</span></div>
+<div class="row"><span>Mökki</span><span class="mu">Lent to Antti since 12 Sep</span></div>
+<h4>Genres and tags</h4>
+<div class="chips"><span>Fiction</span><span>Historical</span><span>klassikot</span></div>
+<h4>Notes</h4>
+<p>Grandfather's copy. The spine is fragile.</p>
+<div class="acts"><span>Lend</span><span>Move</span><span>Edit</span></div>
+</div></div></div></div>
+<div class="opt"><h3>P2. Panel covering the screen</h3><p>The panel slides in from the right over the list. The list stays underneath, where you left it.</p><div class="phone p2"><input class="t c" type="radio" name="p2" id="p2-c" checked><input class="t o" type="radio" name="p2" id="p2-o">
+<div class="top"><span>Collection</span><span class="mu">37 books</span></div>
+<div class="list">
+<label class="it" for="p2-o"><span class="cv" style="--g:72%"></span><span class="tx"><b class="ti">Tuntematon sotilas</b><span class="au">Väinö Linna</span><span class="me">1954 · WSOY</span></span><span class="lo">Tampere</span></label>
+<label class="it" for="p2-o"><span class="cv" style="--g:80%"></span><span class="tx"><b class="ti">Täällä Pohjantähden alla 1</b><span class="au">Väinö Linna</span><span class="me">1959 · WSOY</span></span><span class="lo">Tampere</span></label>
+<label class="it" for="p2-o"><span class="cv" style="--g:66%"></span><span class="tx"><b class="ti">Seitsemän veljestä</b><span class="au">Aleksis Kivi</span><span class="me">1870 · SKS</span></span><span class="lo">Helsinki</span></label>
+<label class="it" for="p2-o"><span class="cv" style="--g:76%"></span><span class="tx"><b class="ti">Sinuhe egyptiläinen</b><span class="au">Mika Waltari</span><span class="me">1945 · WSOY</span></span><span class="lo">Mökki</span></label>
+<label class="it" for="p2-o"><span class="cv" style="--g:84%"></span><span class="tx"><b class="ti">Komisario Palmun erehdys</b><span class="au">Mika Waltari</span><span class="me">1940 · Otava</span></span><span class="lo">Tampere</span></label>
+<label class="it" for="p2-o"><span class="cv" style="--g:70%"></span><span class="tx"><b class="ti">Taikatalvi</b><span class="au">Tove Jansson</span><span class="me">1957 · WSOY</span></span><span class="lo">Lent · Antti</span></label>
+<label class="it" for="p2-o"><span class="cv" style="--g:78%"></span><span class="tx"><b class="ti">Muumipappa ja meri</b><span class="au">Tove Jansson</span><span class="me">1965 · WSOY</span></span><span class="lo">Tampere</span></label>
+<label class="it" for="p2-o"><span class="cv" style="--g:72%"></span><span class="tx"><b class="ti">Kesäkirja</b><span class="au">Tove Jansson</span><span class="me">1972 · WSOY</span></span><span class="lo">Tampere</span></label>
+<label class="it" for="p2-o"><span class="cv" style="--g:80%"></span><span class="tx"><b class="ti">Puhdistus</b><span class="au">Sofi Oksanen</span><span class="me">2008 · WSOY</span></span><span class="lo">Helsinki</span></label>
+<label class="it" for="p2-o"><span class="cv" style="--g:66%"></span><span class="tx"><b class="ti">Kun kyyhkyset katosivat</b><span class="au">Sofi Oksanen</span><span class="me">2012 · Like</span></span><span class="lo">Mökki</span></label>
+<label class="it" for="p2-o"><span class="cv" style="--g:76%"></span><span class="tx"><b class="ti">Kätilö</b><span class="au">Katja Kettu</span><span class="me">2011 · WSOY</span></span><span class="lo">Tampere</span></label>
+</div>
+<div class="panel"><div class="ph"><label for="p2-c">‹ Collection</label></div><div class="pb">
+<div class="hd"><span class="cv" style="--g:70%"></span><div><b class="dt">Täällä Pohjantähden alla 1</b><div>Väinö Linna</div><div class="mu">WSOY · 1959 · 476 pages · Finnish</div><div class="chips"><span>Read</span><span>★★★★☆</span></div></div></div>
+<h4>Your copies</h4>
+<div class="row"><span>Tampere</span><span class="mu">Owned</span></div>
+<div class="row"><span>Mökki</span><span class="mu">Lent to Antti since 12 Sep</span></div>
+<h4>Genres and tags</h4>
+<div class="chips"><span>Fiction</span><span>Historical</span><span>klassikot</span></div>
+<h4>Notes</h4>
+<p>Grandfather's copy. The spine is fragile.</p>
+<div class="acts"><span>Lend</span><span>Move</span><span>Edit</span></div>
+</div></div></div></div>
+<div class="opt"><h3>P3. Bottom sheet</h3><p>A sheet slides up with the key details and the list stays visible above it. The sheet opens fully for the rest.</p><div class="phone p3"><input class="t c" type="radio" name="p3" id="p3-c" checked><input class="t o" type="radio" name="p3" id="p3-o"><input class="t x" type="radio" name="p3" id="p3-x">
+<div class="top"><span>Collection</span><span class="mu">37 books</span></div>
+<div class="list">
+<label class="it" for="p3-o"><span class="cv" style="--g:72%"></span><span class="tx"><b class="ti">Tuntematon sotilas</b><span class="au">Väinö Linna</span><span class="me">1954 · WSOY</span></span><span class="lo">Tampere</span></label>
+<label class="it" for="p3-o"><span class="cv" style="--g:80%"></span><span class="tx"><b class="ti">Täällä Pohjantähden alla 1</b><span class="au">Väinö Linna</span><span class="me">1959 · WSOY</span></span><span class="lo">Tampere</span></label>
+<label class="it" for="p3-o"><span class="cv" style="--g:66%"></span><span class="tx"><b class="ti">Seitsemän veljestä</b><span class="au">Aleksis Kivi</span><span class="me">1870 · SKS</span></span><span class="lo">Helsinki</span></label>
+<label class="it" for="p3-o"><span class="cv" style="--g:76%"></span><span class="tx"><b class="ti">Sinuhe egyptiläinen</b><span class="au">Mika Waltari</span><span class="me">1945 · WSOY</span></span><span class="lo">Mökki</span></label>
+<label class="it" for="p3-o"><span class="cv" style="--g:84%"></span><span class="tx"><b class="ti">Komisario Palmun erehdys</b><span class="au">Mika Waltari</span><span class="me">1940 · Otava</span></span><span class="lo">Tampere</span></label>
+<label class="it" for="p3-o"><span class="cv" style="--g:70%"></span><span class="tx"><b class="ti">Taikatalvi</b><span class="au">Tove Jansson</span><span class="me">1957 · WSOY</span></span><span class="lo">Lent · Antti</span></label>
+<label class="it" for="p3-o"><span class="cv" style="--g:78%"></span><span class="tx"><b class="ti">Muumipappa ja meri</b><span class="au">Tove Jansson</span><span class="me">1965 · WSOY</span></span><span class="lo">Tampere</span></label>
+<label class="it" for="p3-o"><span class="cv" style="--g:72%"></span><span class="tx"><b class="ti">Kesäkirja</b><span class="au">Tove Jansson</span><span class="me">1972 · WSOY</span></span><span class="lo">Tampere</span></label>
+<label class="it" for="p3-o"><span class="cv" style="--g:80%"></span><span class="tx"><b class="ti">Puhdistus</b><span class="au">Sofi Oksanen</span><span class="me">2008 · WSOY</span></span><span class="lo">Helsinki</span></label>
+<label class="it" for="p3-o"><span class="cv" style="--g:66%"></span><span class="tx"><b class="ti">Kun kyyhkyset katosivat</b><span class="au">Sofi Oksanen</span><span class="me">2012 · Like</span></span><span class="lo">Mökki</span></label>
+<label class="it" for="p3-o"><span class="cv" style="--g:76%"></span><span class="tx"><b class="ti">Kätilö</b><span class="au">Katja Kettu</span><span class="me">2011 · WSOY</span></span><span class="lo">Tampere</span></label>
+</div><label class="scrim" for="p3-c"></label>
+<div class="panel"><label class="grab" for="p3-x"><span>Tap to open fully</span></label><div class="ph"><label for="p3-c">Close</label></div><div class="pb">
+<div class="hd"><span class="cv" style="--g:70%"></span><div><b class="dt">Täällä Pohjantähden alla 1</b><div>Väinö Linna</div><div class="mu">WSOY · 1959 · 476 pages · Finnish</div><div class="chips"><span>Read</span><span>★★★★☆</span></div></div></div>
+<h4>Your copies</h4>
+<div class="row"><span>Tampere</span><span class="mu">Owned</span></div>
+<div class="row"><span>Mökki</span><span class="mu">Lent to Antti since 12 Sep</span></div>
+<h4>Genres and tags</h4>
+<div class="chips"><span>Fiction</span><span>Historical</span><span>klassikot</span></div>
+<h4>Notes</h4>
+<p>Grandfather's copy. The spine is fragile.</p>
+<div class="acts"><span>Lend</span><span>Move</span><span>Edit</span></div>
+</div></div></div></div>
+</div>
+
+<h2>3. Opening a book on a wide screen</h2>
+<p class="note">Your slide-out panel, in two forms. Click a row, then click other rows while the panel is open.</p>
+<h3>D1. Panel over the list</h3>
+<p class="note">The panel slides over the right edge of the list. The list keeps its width, so its right-hand side is hidden while the panel is open.</p>
+<div class="desk d1"><input class="t c" type="radio" name="d1" id="d1-c" checked><input class="t o" type="radio" name="d1" id="d1-o">
+<div class="list">
+<label class="it" for="d1-o"><span class="cv" style="--g:72%"></span><span class="tx"><b class="ti">Tuntematon sotilas</b><span class="au">Väinö Linna</span><span class="me">1954 · WSOY</span></span><span class="lo">Tampere</span></label>
+<label class="it" for="d1-o"><span class="cv" style="--g:80%"></span><span class="tx"><b class="ti">Täällä Pohjantähden alla 1</b><span class="au">Väinö Linna</span><span class="me">1959 · WSOY</span></span><span class="lo">Tampere</span></label>
+<label class="it" for="d1-o"><span class="cv" style="--g:66%"></span><span class="tx"><b class="ti">Seitsemän veljestä</b><span class="au">Aleksis Kivi</span><span class="me">1870 · SKS</span></span><span class="lo">Helsinki</span></label>
+<label class="it" for="d1-o"><span class="cv" style="--g:76%"></span><span class="tx"><b class="ti">Sinuhe egyptiläinen</b><span class="au">Mika Waltari</span><span class="me">1945 · WSOY</span></span><span class="lo">Mökki</span></label>
+<label class="it" for="d1-o"><span class="cv" style="--g:84%"></span><span class="tx"><b class="ti">Komisario Palmun erehdys</b><span class="au">Mika Waltari</span><span class="me">1940 · Otava</span></span><span class="lo">Tampere</span></label>
+<label class="it" for="d1-o"><span class="cv" style="--g:70%"></span><span class="tx"><b class="ti">Taikatalvi</b><span class="au">Tove Jansson</span><span class="me">1957 · WSOY</span></span><span class="lo">Lent · Antti</span></label>
+<label class="it" for="d1-o"><span class="cv" style="--g:78%"></span><span class="tx"><b class="ti">Muumipappa ja meri</b><span class="au">Tove Jansson</span><span class="me">1965 · WSOY</span></span><span class="lo">Tampere</span></label>
+<label class="it" for="d1-o"><span class="cv" style="--g:72%"></span><span class="tx"><b class="ti">Kesäkirja</b><span class="au">Tove Jansson</span><span class="me">1972 · WSOY</span></span><span class="lo">Tampere</span></label>
+<label class="it" for="d1-o"><span class="cv" style="--g:80%"></span><span class="tx"><b class="ti">Puhdistus</b><span class="au">Sofi Oksanen</span><span class="me">2008 · WSOY</span></span><span class="lo">Helsinki</span></label>
+<label class="it" for="d1-o"><span class="cv" style="--g:66%"></span><span class="tx"><b class="ti">Kun kyyhkyset katosivat</b><span class="au">Sofi Oksanen</span><span class="me">2012 · Like</span></span><span class="lo">Mökki</span></label>
+<label class="it" for="d1-o"><span class="cv" style="--g:76%"></span><span class="tx"><b class="ti">Kätilö</b><span class="au">Katja Kettu</span><span class="me">2011 · WSOY</span></span><span class="lo">Tampere</span></label>
+<label class="it" for="d1-o"><span class="cv" style="--g:84%"></span><span class="tx"><b class="ti">Hytti nro 6</b><span class="au">Rosa Liksom</span><span class="me">2011 · WSOY</span></span><span class="lo">Lent · Antti</span></label>
+<label class="it" for="d1-o"><span class="cv" style="--g:70%"></span><span class="tx"><b class="ti">Jäniksen vuosi</b><span class="au">Arto Paasilinna</span><span class="me">1975 · Weilin+Göös</span></span><span class="lo">Tampere</span></label>
+<label class="it" for="d1-o"><span class="cv" style="--g:78%"></span><span class="tx"><b class="ti">Ulvova mylläri</b><span class="au">Arto Paasilinna</span><span class="me">1981 · WSOY</span></span><span class="lo">Tampere</span></label>
+<label class="it" for="d1-o"><span class="cv" style="--g:72%"></span><span class="tx"><b class="ti">Hurmaava joukkoitsemurha</b><span class="au">Arto Paasilinna</span><span class="me">1990 · WSOY</span></span><span class="lo">Helsinki</span></label>
+<label class="it" for="d1-o"><span class="cv" style="--g:80%"></span><span class="tx"><b class="ti">Oneiron</b><span class="au">Laura Lindstedt</span><span class="me">2015 · Teos</span></span><span class="lo">Mökki</span></label>
+<label class="it" for="d1-o"><span class="cv" style="--g:66%"></span><span class="tx"><b class="ti">Juoksuhaudantie</b><span class="au">Kari Hotakainen</span><span class="me">2002 · WSOY</span></span><span class="lo">Tampere</span></label>
+<label class="it" for="d1-o"><span class="cv" style="--g:76%"></span><span class="tx"><b class="ti">Ihmisen osa</b><span class="au">Kari Hotakainen</span><span class="me">2009 · Siltala</span></span><span class="lo">Lent · Antti</span></label>
+<label class="it" for="d1-o"><span class="cv" style="--g:84%"></span><span class="tx"><b class="ti">Nälkävuosi</b><span class="au">Aki Ollikainen</span><span class="me">2012 · Siltala</span></span><span class="lo">Tampere</span></label>
+<label class="it" for="d1-o"><span class="cv" style="--g:70%"></span><span class="tx"><b class="ti">Kalevala</b><span class="au">Elias Lönnrot</span><span class="me">1849 · SKS</span></span><span class="lo">Tampere</span></label>
+<label class="it" for="d1-o"><span class="cv" style="--g:78%"></span><span class="tx"><b class="ti">Kultarinta</b><span class="au">Anni Kytömäki</span><span class="me">2014 · Gummerus</span></span><span class="lo">Helsinki</span></label>
+<label class="it" for="d1-o"><span class="cv" style="--g:72%"></span><span class="tx"><b class="ti">Margarita</b><span class="au">Anni Kytömäki</span><span class="me">2020 · Gummerus</span></span><span class="lo">Mökki</span></label>
+<label class="it" for="d1-o"><span class="cv" style="--g:80%"></span><span class="tx"><b class="ti">Bolla</b><span class="au">Pajtim Statovci</span><span class="me">2019 · Otava</span></span><span class="lo">Tampere</span></label>
+<label class="it" for="d1-o"><span class="cv" style="--g:66%"></span><span class="tx"><b class="ti">Kissani Jugoslavia</b><span class="au">Pajtim Statovci</span><span class="me">2014 · Otava</span></span><span class="lo">Lent · Antti</span></label>
+<label class="it" for="d1-o"><span class="cv" style="--g:76%"></span><span class="tx"><b class="ti">Missä kuljimme kerran</b><span class="au">Kjell Westö</span><span class="me">2006 · Otava</span></span><span class="lo">Tampere</span></label>
+<label class="it" for="d1-o"><span class="cv" style="--g:84%"></span><span class="tx"><b class="ti">Kangastus 38</b><span class="au">Kjell Westö</span><span class="me">2013 · Otava</span></span><span class="lo">Tampere</span></label>
+<label class="it" for="d1-o"><span class="cv" style="--g:70%"></span><span class="tx"><b class="ti">Manillaköysi</b><span class="au">Veijo Meri</span><span class="me">1957 · Otava</span></span><span class="lo">Helsinki</span></label>
+<label class="it" for="d1-o"><span class="cv" style="--g:78%"></span><span class="tx"><b class="ti">Alastalon salissa</b><span class="au">Volter Kilpi</span><span class="me">1933 · Otava</span></span><span class="lo">Mökki</span></label>
+<label class="it" for="d1-o"><span class="cv" style="--g:72%"></span><span class="tx"><b class="ti">Putkinotko</b><span class="au">Joel Lehtonen</span><span class="me">1920 · Otava</span></span><span class="lo">Tampere</span></label>
+<label class="it" for="d1-o"><span class="cv" style="--g:80%"></span><span class="tx"><b class="ti">Rautatie</b><span class="au">Juhani Aho</span><span class="me">1884 · WSOY</span></span><span class="lo">Lent · Antti</span></label>
+<label class="it" for="d1-o"><span class="cv" style="--g:66%"></span><span class="tx"><b class="ti">Punainen viiva</b><span class="au">Ilmari Kianto</span><span class="me">1909 · Otava</span></span><span class="lo">Tampere</span></label>
+<label class="it" for="d1-o"><span class="cv" style="--g:76%"></span><span class="tx"><b class="ti">Taivaslaulu</b><span class="au">Pauliina Rauhala</span><span class="me">2013 · Gummerus</span></span><span class="lo">Tampere</span></label>
+<label class="it" for="d1-o"><span class="cv" style="--g:84%"></span><span class="tx"><b class="ti">Neljäntienristeys</b><span class="au">Tommi Kinnunen</span><span class="me">2014 · WSOY</span></span><span class="lo">Helsinki</span></label>
+<label class="it" for="d1-o"><span class="cv" style="--g:70%"></span><span class="tx"><b class="ti">Akvarelleja Engelin kaupungista</b><span class="au">Jukka Viikilä</span><span class="me">2016 · Gummerus</span></span><span class="lo">Mökki</span></label>
+<label class="it" for="d1-o"><span class="cv" style="--g:78%"></span><span class="tx"><b class="ti">Linnunradan käsikirja liftareille</b><span class="au">Douglas Adams</span><span class="me">1981 · WSOY</span></span><span class="lo">Tampere</span></label>
+<label class="it" for="d1-o"><span class="cv" style="--g:72%"></span><span class="tx"><b class="ti">Sormusten herra</b><span class="au">J. R. R. Tolkien</span><span class="me">1973 · WSOY</span></span><span class="lo">Lent · Antti</span></label>
+<label class="it" for="d1-o"><span class="cv" style="--g:80%"></span><span class="tx"><b class="ti">Hobitti eli sinne ja takaisin</b><span class="au">J. R. R. Tolkien</span><span class="me">1985 · WSOY</span></span><span class="lo">Tampere</span></label>
+</div>
+<div class="panel"><div class="in"><div class="ph"><label for="d1-c">Close</label></div><div class="pb">
+<div class="hd"><span class="cv" style="--g:70%"></span><div><b class="dt">Täällä Pohjantähden alla 1</b><div>Väinö Linna</div><div class="mu">WSOY · 1959 · 476 pages · Finnish</div><div class="chips"><span>Read</span><span>★★★★☆</span></div></div></div>
+<h4>Your copies</h4>
+<div class="row"><span>Tampere</span><span class="mu">Owned</span></div>
+<div class="row"><span>Mökki</span><span class="mu">Lent to Antti since 12 Sep</span></div>
+<h4>Genres and tags</h4>
+<div class="chips"><span>Fiction</span><span>Historical</span><span>klassikot</span></div>
+<h4>Notes</h4>
+<p>Grandfather's copy. The spine is fragile.</p>
+<div class="acts"><span>Lend</span><span>Move</span><span>Edit</span></div>
+</div></div></div></div>
+<h3>D2. Panel beside the list</h3>
+<p class="note">The list narrows to make room. Nothing is hidden, but the rows reflow when the panel opens and closes.</p>
+<div class="desk d2"><input class="t c" type="radio" name="d2" id="d2-c" checked><input class="t o" type="radio" name="d2" id="d2-o">
+<div class="list">
+<label class="it" for="d2-o"><span class="cv" style="--g:72%"></span><span class="tx"><b class="ti">Tuntematon sotilas</b><span class="au">Väinö Linna</span><span class="me">1954 · WSOY</span></span><span class="lo">Tampere</span></label>
+<label class="it" for="d2-o"><span class="cv" style="--g:80%"></span><span class="tx"><b class="ti">Täällä Pohjantähden alla 1</b><span class="au">Väinö Linna</span><span class="me">1959 · WSOY</span></span><span class="lo">Tampere</span></label>
+<label class="it" for="d2-o"><span class="cv" style="--g:66%"></span><span class="tx"><b class="ti">Seitsemän veljestä</b><span class="au">Aleksis Kivi</span><span class="me">1870 · SKS</span></span><span class="lo">Helsinki</span></label>
+<label class="it" for="d2-o"><span class="cv" style="--g:76%"></span><span class="tx"><b class="ti">Sinuhe egyptiläinen</b><span class="au">Mika Waltari</span><span class="me">1945 · WSOY</span></span><span class="lo">Mökki</span></label>
+<label class="it" for="d2-o"><span class="cv" style="--g:84%"></span><span class="tx"><b class="ti">Komisario Palmun erehdys</b><span class="au">Mika Waltari</span><span class="me">1940 · Otava</span></span><span class="lo">Tampere</span></label>
+<label class="it" for="d2-o"><span class="cv" style="--g:70%"></span><span class="tx"><b class="ti">Taikatalvi</b><span class="au">Tove Jansson</span><span class="me">1957 · WSOY</span></span><span class="lo">Lent · Antti</span></label>
+<label class="it" for="d2-o"><span class="cv" style="--g:78%"></span><span class="tx"><b class="ti">Muumipappa ja meri</b><span class="au">Tove Jansson</span><span class="me">1965 · WSOY</span></span><span class="lo">Tampere</span></label>
+<label class="it" for="d2-o"><span class="cv" style="--g:72%"></span><span class="tx"><b class="ti">Kesäkirja</b><span class="au">Tove Jansson</span><span class="me">1972 · WSOY</span></span><span class="lo">Tampere</span></label>
+<label class="it" for="d2-o"><span class="cv" style="--g:80%"></span><span class="tx"><b class="ti">Puhdistus</b><span class="au">Sofi Oksanen</span><span class="me">2008 · WSOY</span></span><span class="lo">Helsinki</span></label>
+<label class="it" for="d2-o"><span class="cv" style="--g:66%"></span><span class="tx"><b class="ti">Kun kyyhkyset katosivat</b><span class="au">Sofi Oksanen</span><span class="me">2012 · Like</span></span><span class="lo">Mökki</span></label>
+<label class="it" for="d2-o"><span class="cv" style="--g:76%"></span><span class="tx"><b class="ti">Kätilö</b><span class="au">Katja Kettu</span><span class="me">2011 · WSOY</span></span><span class="lo">Tampere</span></label>
+<label class="it" for="d2-o"><span class="cv" style="--g:84%"></span><span class="tx"><b class="ti">Hytti nro 6</b><span class="au">Rosa Liksom</span><span class="me">2011 · WSOY</span></span><span class="lo">Lent · Antti</span></label>
+<label class="it" for="d2-o"><span class="cv" style="--g:70%"></span><span class="tx"><b class="ti">Jäniksen vuosi</b><span class="au">Arto Paasilinna</span><span class="me">1975 · Weilin+Göös</span></span><span class="lo">Tampere</span></label>
+<label class="it" for="d2-o"><span class="cv" style="--g:78%"></span><span class="tx"><b class="ti">Ulvova mylläri</b><span class="au">Arto Paasilinna</span><span class="me">1981 · WSOY</span></span><span class="lo">Tampere</span></label>
+<label class="it" for="d2-o"><span class="cv" style="--g:72%"></span><span class="tx"><b class="ti">Hurmaava joukkoitsemurha</b><span class="au">Arto Paasilinna</span><span class="me">1990 · WSOY</span></span><span class="lo">Helsinki</span></label>
+<label class="it" for="d2-o"><span class="cv" style="--g:80%"></span><span class="tx"><b class="ti">Oneiron</b><span class="au">Laura Lindstedt</span><span class="me">2015 · Teos</span></span><span class="lo">Mökki</span></label>
+<label class="it" for="d2-o"><span class="cv" style="--g:66%"></span><span class="tx"><b class="ti">Juoksuhaudantie</b><span class="au">Kari Hotakainen</span><span class="me">2002 · WSOY</span></span><span class="lo">Tampere</span></label>
+<label class="it" for="d2-o"><span class="cv" style="--g:76%"></span><span class="tx"><b class="ti">Ihmisen osa</b><span class="au">Kari Hotakainen</span><span class="me">2009 · Siltala</span></span><span class="lo">Lent · Antti</span></label>
+<label class="it" for="d2-o"><span class="cv" style="--g:84%"></span><span class="tx"><b class="ti">Nälkävuosi</b><span class="au">Aki Ollikainen</span><span class="me">2012 · Siltala</span></span><span class="lo">Tampere</span></label>
+<label class="it" for="d2-o"><span class="cv" style="--g:70%"></span><span class="tx"><b class="ti">Kalevala</b><span class="au">Elias Lönnrot</span><span class="me">1849 · SKS</span></span><span class="lo">Tampere</span></label>
+<label class="it" for="d2-o"><span class="cv" style="--g:78%"></span><span class="tx"><b class="ti">Kultarinta</b><span class="au">Anni Kytömäki</span><span class="me">2014 · Gummerus</span></span><span class="lo">Helsinki</span></label>
+<label class="it" for="d2-o"><span class="cv" style="--g:72%"></span><span class="tx"><b class="ti">Margarita</b><span class="au">Anni Kytömäki</span><span class="me">2020 · Gummerus</span></span><span class="lo">Mökki</span></label>
+<label class="it" for="d2-o"><span class="cv" style="--g:80%"></span><span class="tx"><b class="ti">Bolla</b><span class="au">Pajtim Statovci</span><span class="me">2019 · Otava</span></span><span class="lo">Tampere</span></label>
+<label class="it" for="d2-o"><span class="cv" style="--g:66%"></span><span class="tx"><b class="ti">Kissani Jugoslavia</b><span class="au">Pajtim Statovci</span><span class="me">2014 · Otava</span></span><span class="lo">Lent · Antti</span></label>
+<label class="it" for="d2-o"><span class="cv" style="--g:76%"></span><span class="tx"><b class="ti">Missä kuljimme kerran</b><span class="au">Kjell Westö</span><span class="me">2006 · Otava</span></span><span class="lo">Tampere</span></label>
+<label class="it" for="d2-o"><span class="cv" style="--g:84%"></span><span class="tx"><b class="ti">Kangastus 38</b><span class="au">Kjell Westö</span><span class="me">2013 · Otava</span></span><span class="lo">Tampere</span></label>
+<label class="it" for="d2-o"><span class="cv" style="--g:70%"></span><span class="tx"><b class="ti">Manillaköysi</b><span class="au">Veijo Meri</span><span class="me">1957 · Otava</span></span><span class="lo">Helsinki</span></label>
+<label class="it" for="d2-o"><span class="cv" style="--g:78%"></span><span class="tx"><b class="ti">Alastalon salissa</b><span class="au">Volter Kilpi</span><span class="me">1933 · Otava</span></span><span class="lo">Mökki</span></label>
+<label class="it" for="d2-o"><span class="cv" style="--g:72%"></span><span class="tx"><b class="ti">Putkinotko</b><span class="au">Joel Lehtonen</span><span class="me">1920 · Otava</span></span><span class="lo">Tampere</span></label>
+<label class="it" for="d2-o"><span class="cv" style="--g:80%"></span><span class="tx"><b class="ti">Rautatie</b><span class="au">Juhani Aho</span><span class="me">1884 · WSOY</span></span><span class="lo">Lent · Antti</span></label>
+<label class="it" for="d2-o"><span class="cv" style="--g:66%"></span><span class="tx"><b class="ti">Punainen viiva</b><span class="au">Ilmari Kianto</span><span class="me">1909 · Otava</span></span><span class="lo">Tampere</span></label>
+<label class="it" for="d2-o"><span class="cv" style="--g:76%"></span><span class="tx"><b class="ti">Taivaslaulu</b><span class="au">Pauliina Rauhala</span><span class="me">2013 · Gummerus</span></span><span class="lo">Tampere</span></label>
+<label class="it" for="d2-o"><span class="cv" style="--g:84%"></span><span class="tx"><b class="ti">Neljäntienristeys</b><span class="au">Tommi Kinnunen</span><span class="me">2014 · WSOY</span></span><span class="lo">Helsinki</span></label>
+<label class="it" for="d2-o"><span class="cv" style="--g:70%"></span><span class="tx"><b class="ti">Akvarelleja Engelin kaupungista</b><span class="au">Jukka Viikilä</span><span class="me">2016 · Gummerus</span></span><span class="lo">Mökki</span></label>
+<label class="it" for="d2-o"><span class="cv" style="--g:78%"></span><span class="tx"><b class="ti">Linnunradan käsikirja liftareille</b><span class="au">Douglas Adams</span><span class="me">1981 · WSOY</span></span><span class="lo">Tampere</span></label>
+<label class="it" for="d2-o"><span class="cv" style="--g:72%"></span><span class="tx"><b class="ti">Sormusten herra</b><span class="au">J. R. R. Tolkien</span><span class="me">1973 · WSOY</span></span><span class="lo">Lent · Antti</span></label>
+<label class="it" for="d2-o"><span class="cv" style="--g:80%"></span><span class="tx"><b class="ti">Hobitti eli sinne ja takaisin</b><span class="au">J. R. R. Tolkien</span><span class="me">1985 · WSOY</span></span><span class="lo">Tampere</span></label>
+</div>
+<div class="panel"><div class="in"><div class="ph"><label for="d2-c">Close</label></div><div class="pb">
+<div class="hd"><span class="cv" style="--g:70%"></span><div><b class="dt">Täällä Pohjantähden alla 1</b><div>Väinö Linna</div><div class="mu">WSOY · 1959 · 476 pages · Finnish</div><div class="chips"><span>Read</span><span>★★★★☆</span></div></div></div>
+<h4>Your copies</h4>
+<div class="row"><span>Tampere</span><span class="mu">Owned</span></div>
+<div class="row"><span>Mökki</span><span class="mu">Lent to Antti since 12 Sep</span></div>
+<h4>Genres and tags</h4>
+<div class="chips"><span>Fiction</span><span>Historical</span><span>klassikot</span></div>
+<h4>Notes</h4>
+<p>Grandfather's copy. The spine is fragile.</p>
+<div class="acts"><span>Lend</span><span>Move</span><span>Edit</span></div>
+</div></div></div></div>
+</main></body></html>

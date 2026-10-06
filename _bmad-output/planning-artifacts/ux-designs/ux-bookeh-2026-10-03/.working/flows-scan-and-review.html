@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>bookeh flows: after a scan, and the review screen</title><style>
+/* type-led tokens, light: background=#FFFFFF text=#1F2933 muted=#5F6B78 border=#DDE2E7 coral=#FF7B6B */
+:root{--bg:#FFFFFF;--ink:#1F2933;--mu:#5F6B78;--ln:#DDE2E7;--co:#FF7B6B;--dim:#B4BBC3}
+*{box-sizing:border-box}
+body{margin:0;font:14px/1.45 system-ui,-apple-system,sans-serif;color:#222;background:#e4e4e4}
+main{max-width:1280px;margin:0 auto;padding:24px 16px 96px}
+main>h1{font-size:22px;margin:0 0 4px}
+h2{font-size:18px;margin:52px 0 2px}
+h3{font-size:13px;margin:18px 0 6px;color:#555;font-weight:600}
+.note{color:#555;max-width:86ch;margin:2px 0 10px}
+.tally{margin:6px 0 0;padding:0;list-style:none;color:#333}
+.tally li{margin:2px 0}
+.seq{display:flex;align-items:flex-start;gap:6px;flex-wrap:wrap}
+.st{flex:0 0 220px}
+.cap{font-size:12px;color:#555;margin:6px 2px 0}
+.ar{flex:0 0 84px;align-self:center;text-align:center;font-size:12px;color:#555;display:flex;flex-direction:column;gap:2px}
+.ar b{font-size:20px;font-weight:400;color:#222}
+.mp{width:220px;height:440px;border:2px solid #222;border-radius:22px;overflow:hidden;background:var(--bg);color:var(--ink);
+  font:12px/1.4 "Segoe UI","Helvetica Neue",system-ui,sans-serif;display:flex;flex-direction:column;position:relative}
+.bd{flex:1;min-height:0;overflow:hidden;padding:16px 16px 0}
+.mp h1{font-size:28px;font-weight:300;letter-spacing:-.015em;line-height:1.1;margin:0 0 10px}
+.pv{display:flex;gap:12px;font-size:15px;color:var(--dim);margin:-4px 0 10px}
+.pv em{font-style:normal;color:var(--ink)}
+.pv.sm{font-size:14px;margin:0}
+.cam{height:150px;border:2px solid var(--ink);display:flex;align-items:center;justify-content:center;text-align:center;color:var(--mu);padding:0 20px;margin-bottom:14px;
+  background:linear-gradient(var(--co),var(--co)) center/70% 2px no-repeat}
+.cam{padding-top:54px}
+.fld{margin:0 0 10px}
+.fld label{display:block;font-size:11px;color:var(--mu)}
+.in{border-bottom:2px solid var(--ink);padding:2px 0 3px;font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.in.ph{color:var(--dim);border-bottom-color:var(--ln)}
+.lk{margin:10px 0 0;font-size:13px}
+.lk u,.toast u{text-decoration-color:var(--co);text-decoration-thickness:2px;text-underline-offset:3px}
+.bk{display:flex;gap:10px;margin:0 0 8px}
+.bk i{flex:none;width:52px;height:78px;background:#6B8E7B}
+.bk b{display:block;font-weight:400;font-size:16px;line-height:1.2}
+.bk span{display:block;color:var(--mu)}
+.bk span:first-of-type{color:var(--ink);font-size:13px}
+.mu{color:var(--mu);margin:0 0 12px}
+.mk{margin:4px 0;font-size:13px}
+.mk::before{content:"";display:inline-block;width:7px;height:7px;background:var(--co);margin-right:7px}
+.ft{display:flex;flex-direction:column;gap:6px;padding:10px 16px 14px;background:var(--bg)}
+.bt{display:block;text-align:center;border:2px solid var(--ink);padding:7px;font-size:13px}
+.bt.pr{border-color:var(--co)}
+.toast{display:flex;justify-content:space-between;margin:0 16px 14px;padding:8px 10px;border:2px solid var(--ink);font-size:13px}
+.mp.tall{height:auto;border-radius:22px}
+.mp.tall .bd{overflow:visible;padding-bottom:10px}
+.fold{position:absolute;left:0;right:0;top:436px;border-top:2px dashed #222;text-align:right;pointer-events:none}
+.fold span{position:absolute;right:0;top:-19px;font:11px system-ui,sans-serif;background:#222;color:#fff;padding:1px 6px}
+.revs{display:flex;gap:40px;flex-wrap:wrap;align-items:flex-start}
+</style></head><body><main>
+<h1>bookeh flows: after a scan, and the review screen</h1>
+<p class="note">Phone screens in the type-led style, light mode. These are static pictures of each step, read left to right. The wording on the screens is a placeholder; we settle the voice later. "Find by title or author" lives on the scan screen, as you chose.</p>
+
+<h2>S1. Always the answer first</h2>
+<p class="note">Every scan lands on the answer. Adding with details is one of the choices there.</p>
+<ul class="tally"><li><b>Shop check:</b> the answer appears with no taps, whether or not you have the book.</li><li><b>Cataloguing:</b> one tap per book if the fetched data is fine (add to library), two if you want the review screen (add with details, save).</li></ul>
+<div class="lane"><h3>In the shop</h3><div class="seq"><div class="st"><div class="mp"><div class="bd"><h1>scan</h1><div class="cam">point the camera at the barcode</div><div class="fld"><label>or type an isbn</label><div class="in">&nbsp;</div></div><p class="lk"><u>find by title or author</u></p></div></div></div><div class="ar"><span>barcode read</span><b>→</b></div><div class="st"><div class="mp"><div class="bd"><h1>not in library</h1><div class="bk"><i></i><div><b>Kultarinta</b><span>Anni Kytömäki</span><span>Gummerus · 2014 · 644 pages</span></div></div><p class="mu">from finna</p></div><div class="ft"><span class="bt">add to wishlist</span><span class="bt pr">add to library</span><span class="bt">add with details</span></div></div><p class="cap">The answer. Done, or one tap to wishlist it.</p></div></div></div>
+<div class="lane"><h3>Cataloguing at home</h3><div class="seq"><div class="st"><div class="mp"><div class="bd"><h1>scan</h1><div class="cam">point the camera at the barcode</div><div class="fld"><label>or type an isbn</label><div class="in">&nbsp;</div></div><p class="lk"><u>find by title or author</u></p></div></div></div><div class="ar"><span>barcode read</span><b>→</b></div><div class="st"><div class="mp"><div class="bd"><h1>not in library</h1><div class="bk"><i></i><div><b>Kultarinta</b><span>Anni Kytömäki</span><span>Gummerus · 2014 · 644 pages</span></div></div><p class="mu">from finna</p></div><div class="ft"><span class="bt">add to wishlist</span><span class="bt pr">add to library</span><span class="bt">add with details</span></div></div></div><div class="ar"><span>add with details</span><b>→</b></div><div class="st"><div class="mp"><div class="bd"><h1>add book</h1><div class="bk"><i></i><div><b>Kultarinta</b><span>Anni Kytömäki</span><span>Gummerus · 2014 · 644 pages</span></div></div><p class="mu">from finna · new author</p><div class="fld"><label>status</label><div class="pv sm"><em>owned</em><span>ordered</span><span>wishlist</span></div></div>
+<div class="fld"><label>location</label><div class="in">Tampere</div></div>
+<div class="fld"><label>tags</label><div class="in ph">add tags</div></div><p class="lk"><u>more details</u></p></div><div class="ft"><span class="bt pr">save</span></div></div></div><div class="ar"><span>save</span><b>→</b></div><div class="st"><div class="mp"><div class="bd"><h1>scan</h1><div class="cam">point the camera at the barcode</div><div class="fld"><label>or type an isbn</label><div class="in">&nbsp;</div></div><p class="lk"><u>find by title or author</u></p></div><div class="toast"><span>saved to tampere</span><u>undo</u></div></div><p class="cap">Back at the scanner, with Undo.</p></div></div></div>
+
+<h2>S2. A switch on the scanner</h2>
+<p class="note">The scanner has two modes. It stays in the mode you last chose.</p>
+<ul class="tally"><li><b>Shop check:</b> the answer appears with no taps, provided the switch is on check. If you left it on add, you land on the review screen instead.</li><li><b>Cataloguing:</b> one tap per book (save), after setting the switch once.</li></ul>
+<div class="lane"><h3>In the shop: check</h3><div class="seq"><div class="st"><div class="mp"><div class="bd"><h1>scan</h1><div class="pv"><em>check</em><span>add</span></div><div class="cam">point the camera at the barcode</div><div class="fld"><label>or type an isbn</label><div class="in">&nbsp;</div></div><p class="lk"><u>find by title or author</u></p></div></div></div><div class="ar"><span>barcode read</span><b>→</b></div><div class="st"><div class="mp"><div class="bd"><h1>not in library</h1><div class="bk"><i></i><div><b>Kultarinta</b><span>Anni Kytömäki</span><span>Gummerus · 2014 · 644 pages</span></div></div><p class="mu">from finna</p></div><div class="ft"><span class="bt">add to wishlist</span><span class="bt pr">add to library</span></div></div><p class="cap">The answer.</p></div></div></div>
+<div class="lane"><h3>Cataloguing at home: add</h3><div class="seq"><div class="st"><div class="mp"><div class="bd"><h1>scan</h1><div class="pv"><span>check</span><em>add</em></div><div class="cam">point the camera at the barcode</div><div class="fld"><label>or type an isbn</label><div class="in">&nbsp;</div></div><p class="lk"><u>find by title or author</u></p></div></div></div><div class="ar"><span>barcode read</span><b>→</b></div><div class="st"><div class="mp"><div class="bd"><h1>add book</h1><div class="bk"><i></i><div><b>Kultarinta</b><span>Anni Kytömäki</span><span>Gummerus · 2014 · 644 pages</span></div></div><p class="mu">from finna · new author</p><div class="fld"><label>status</label><div class="pv sm"><em>owned</em><span>ordered</span><span>wishlist</span></div></div>
+<div class="fld"><label>location</label><div class="in">Tampere</div></div>
+<div class="fld"><label>tags</label><div class="in ph">add tags</div></div><p class="lk"><u>more details</u></p></div><div class="ft"><span class="bt pr">save</span></div></div></div><div class="ar"><span>save</span><b>→</b></div><div class="st"><div class="mp"><div class="bd"><h1>scan</h1><div class="pv"><span>check</span><em>add</em></div><div class="cam">point the camera at the barcode</div><div class="fld"><label>or type an isbn</label><div class="in">&nbsp;</div></div><p class="lk"><u>find by title or author</u></p></div><div class="toast"><span>saved to tampere</span><u>undo</u></div></div><p class="cap">Still in add mode.</p></div></div></div>
+
+<h2>S3. Depends on the book</h2>
+<p class="note">No switch. The app decides from whether you already have the book.</p>
+<ul class="tally"><li><b>Shop check, a book you have:</b> the answer appears with no taps.</li><li><b>Shop check, a book you don't have:</b> you land on the review screen, with "not in library" as its heading. Wishlisting takes two taps (pick wishlist, save).</li><li><b>Cataloguing:</b> one tap per book (save).</li></ul>
+<div class="lane"><h3>A book you have</h3><div class="seq"><div class="st"><div class="mp"><div class="bd"><h1>scan</h1><div class="cam">point the camera at the barcode</div><div class="fld"><label>or type an isbn</label><div class="in">&nbsp;</div></div><p class="lk"><u>find by title or author</u></p></div></div></div><div class="ar"><span>barcode read</span><b>→</b></div><div class="st"><div class="mp"><div class="bd"><h1>in library</h1><div class="bk"><i style="background:#B5651D"></i><div><b>Täällä Pohjantähden alla 1</b><span>Väinö Linna</span><span>WSOY · 1959 · 476 pages</span></div></div><p class="mk">tampere · owned</p><p class="mk">mökki · lent to antti</p></div><div class="ft"><span class="bt">add another copy</span><span class="bt pr">scan next</span></div></div><p class="cap">The answer, with where each copy is.</p></div></div></div>
+<div class="lane"><h3>A book you don't have</h3><div class="seq"><div class="st"><div class="mp"><div class="bd"><h1>scan</h1><div class="cam">point the camera at the barcode</div><div class="fld"><label>or type an isbn</label><div class="in">&nbsp;</div></div><p class="lk"><u>find by title or author</u></p></div></div></div><div class="ar"><span>barcode read</span><b>→</b></div><div class="st"><div class="mp"><div class="bd"><h1>not in library</h1><div class="bk"><i></i><div><b>Kultarinta</b><span>Anni Kytömäki</span><span>Gummerus · 2014 · 644 pages</span></div></div><p class="mu">from finna · new author</p><div class="fld"><label>status</label><div class="pv sm"><em>owned</em><span>ordered</span><span>wishlist</span></div></div>
+<div class="fld"><label>location</label><div class="in">Tampere</div></div>
+<div class="fld"><label>tags</label><div class="in ph">add tags</div></div><p class="lk"><u>more details</u></p></div><div class="ft"><span class="bt pr">save</span></div></div><p class="cap">The review screen doubles as the answer.</p></div><div class="ar"><span>save</span><b>→</b></div><div class="st"><div class="mp"><div class="bd"><h1>scan</h1><div class="cam">point the camera at the barcode</div><div class="fld"><label>or type an isbn</label><div class="in">&nbsp;</div></div><p class="lk"><u>find by title or author</u></p></div><div class="toast"><span>saved to tampere</span><u>undo</u></div></div></div></div></div>
+
+<h2>The review screen</h2>
+<p class="note">Two shapes for the same fields. Both keep Save pinned at the bottom.</p>
+<div class="revs">
+<div><h3>R1. Summary first</h3><div class="st"><div class="mp"><div class="bd"><h1>add book</h1><div class="bk"><i></i><div><b>Kultarinta</b><span>Anni Kytömäki</span><span>Gummerus · 2014 · 644 pages</span></div></div><p class="mu">from finna · new author</p><div class="fld"><label>status</label><div class="pv sm"><em>owned</em><span>ordered</span><span>wishlist</span></div></div>
+<div class="fld"><label>location</label><div class="in">Tampere</div></div>
+<div class="fld"><label>tags</label><div class="in ph">add tags</div></div><p class="lk"><u>more details</u></p></div><div class="ft"><span class="bt pr">save</span></div></div><p class="cap">Status, location and tags are on the first screen. Everything else opens from “more details”.</p></div></div>
+<div><h3>R2. One long form</h3><div class="st"><div class="mp tall"><div class="bd"><h1>add book</h1><div class="bk"><i></i><div><b>Kultarinta</b><span>Anni Kytömäki</span><span>Gummerus · 2014 · 644 pages</span></div></div><p class="mu">from finna</p><div class="fld"><label>status</label><div class="pv sm"><em>owned</em><span>ordered</span><span>wishlist</span></div></div>
+<div class="fld"><label>location</label><div class="in">Tampere</div></div>
+<div class="fld"><label>tags</label><div class="in ph">add tags</div></div><div class="fld"><label>title</label><div class="in">Kultarinta</div></div><div class="fld"><label>subtitle</label><div class="in ph">&nbsp;</div></div><div class="fld"><label>authors</label><div class="in">Anni Kytömäki · new</div></div><div class="fld"><label>series</label><div class="in ph">&nbsp;</div></div><div class="fld"><label>number in series</label><div class="in ph">&nbsp;</div></div><div class="fld"><label>publisher</label><div class="in">Gummerus</div></div><div class="fld"><label>year</label><div class="in">2014</div></div><div class="fld"><label>language</label><div class="in">Finnish</div></div><div class="fld"><label>pages</label><div class="in">644</div></div><div class="fld"><label>genres</label><div class="in">Fiction · Historical</div></div><div class="fld"><label>description</label><div class="in">Suomi 1900-luvun alussa. Erik ja hänen tyttärensä Malla…</div></div></div><div class="fold"><span>first screen ends here</span></div><div class="ft"><span class="bt pr">save</span></div></div><p class="cap">Every field is on the page. The dashed line marks where the first screen ends; the rest is reached by scrolling.</p></div></div>
+</div>
+</main></body></html>
