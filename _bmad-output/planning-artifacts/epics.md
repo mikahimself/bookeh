@@ -148,7 +148,7 @@ From the architecture spine (AD-1 to AD-20, conventions, stack, deployment) and 
 - AD-2: authorisation only in collection access functions, explicit for all four operations, roles tested through named helpers in `src/access`; the frontend calls Payload only through the gateway with `overrideAccess: false`; every page starts with `requireUser()` (redirect to `/login?next=`, same-origin only), every action and route handler with `requireUserOrThrow()` inside `runAction()` / `runRoute()`.
 - AD-3: system privileges only in `lib/catalogue` (writes to books/authors/series/media, `isUnreferenced()`), `lib/shelf` (read-only Drizzle) and the first-user seed. Hooks and access functions query only through `asRequestUser(req)`; hooks never write to another collection.
 - AD-4: `books`, `authors`, `series` carry `visibility: shared | private` with `createdBy` on private; users read `shared OR createdBy = me`; at most one shared Book per ISBN-13 and one private per creator and ISBN-13; shared Books reference only shared authors/series; `authors.sortName` ("Family, Given") from source or derived; promotion flips the same row.
-- AD-5: users have no write access on catalogue collections; every user-initiated catalogue write goes through `lib/catalogue`; shared values come only from the server-held source response; edits only through `editBook()` with sparse `BookEdits` (superseded in part by D-8: an admin's edits change the shared Book); `findOrCreateByName()` is the only author/series matcher; ISBN auto-share of the user's own private Book happens only inside the save transaction; saves never create genres (superseded by D-2: saves now create them); `mapSubjectsToGenres()` is the only writer of shared `books.genres`; a shared Book's ISBN never changes.
+- AD-5: users have no write access on catalogue collections; every user-initiated catalogue write goes through `lib/catalogue`; shared values come only from the server-held source response; edits only through `editBook()` with sparse `BookEdits`, where an admin's edits change the shared Book (D-8); `findOrCreateByName()` is the only author/series matcher; ISBN auto-share of the user's own private Book happens inside the save transaction or in Look it up again (D-8); saves create missing system genres (D-2), and `mapSubjectsToGenres()` and the admin's edits are the only writers of shared `books.genres`; a shared Book's ISBN never changes.
 - AD-6: overrides are a sparse layer on `user-books` (one row per owner and Book, `overridden` field-name array, read, rating with `ratedAt`, tags); overridable field set declared once in `src/fields/bookFields.ts` (genres leave it, D-6); lazy row written only by `upsertUserBook()`; surface code sees only `EffectiveBook` and `UserBookState`.
 - AD-7: one shelf query module (`src/lib/shelf`, Drizzle, read-only) for list, filter, sort, search, built on `visibleCopies(viewer)`; effective values in SQL; AND across fields, OR within; offset paging with one page size, sorts end on copy id; `getShelfRows()` is the one hydrated read; one client list component that reloads rows 0..n after any change and keeps only row count and scroll position in `sessionStorage`; `parseShelfQuery()` / `shelfHref()` are the only readers/writers of the URL params; no code lists or searches books/authors/series on their own; `requireOwnBook()` guards every Book id from the client; `visibleEntries(viewer)` for Lookup's own-library results.
 - AD-8: `copies.status` is `ordered | owned` only, an ordered copy has no location; wishlist entries are their own rows, closed with `closedAt`, addressed by entry id; loans are rows pointing at copy and Person; read, rating and tags on `user-books`, notes on `copies`.
@@ -202,7 +202,7 @@ From the architecture spine (AD-1 to AD-20, conventions, stack, deployment) and 
 - Camera needs HTTPS: `tailscale serve` in production, `localhost` or `tailscale serve` to the dev machine for phone testing.
 - K2–K4 (image, prod compose, backups) should finish before real cataloguing so the 200 books go into the production database.
 
-**Planning decisions taken while writing the epics (Mika, 2026-10-06).** They change the spine, EXPERIENCE.md and SPEC.md, which still say otherwise until they are updated; these decisions win.
+**Planning decisions taken while writing the epics (Mika, 2026-10-06).** They change the spine, EXPERIENCE.md and SPEC.md, and were carried into those documents on 2026-10-06 (`b387e8a`); these decisions win.
 
 - **D-1 Profile and collection visibility in v1** (FR-4). `users.profileVisibility: public | hidden` (default `hidden`) and `users.collectionVisibility: open | closed` (default `closed`), written through `lib/account`, shown as Text switches in Settings. They have no effect with one user; F8 gives them meaning later. Replaces the spine's Deferred entry "Profile visibility and collection visibility".
 - **D-2 Genres come from Google Books categories, and saves create them** (FR-17; replaces spine Deferred "Genre curation", the open SPEC question, and AD-5's "saves never create genres").
@@ -223,7 +223,7 @@ From the architecture spine (AD-1 to AD-20, conventions, stack, deployment) and 
 - **D-3 Themes from Finna** (FR-17a). A new shared Book field `themes`: a list of Finna subject terms as given (no translation, trimmed and NFC). Written from the server-held source response on save and filled by admin re-fetch when empty; not in the overridable field set (AD-6), not in `BookEdits`. `EffectiveBook` gains `themes: string[]`. `ShelfQuery.filters` gains `theme: string[]` (a value matches by exact text, case-insensitive, no accent folding); theme values in use and suggestions come from the shelf module like publisher. The Finna adapter separates subjects into themes; whether Finna's own form/genre terms are useful is checked against recorded responses in the adapter story. These are the **system themes**; users add their own themes alongside them (D-6).
 - **D-6 System and user genres and themes** (Mika, party review 2026-10-06).
   - **System** genres and themes are shared: system genres from the seed, saves and admin edits (D-2); system themes from Finna (D-3). Users cannot change them on a shared Book; the admin can, on Edit book (D-8). `genres` leaves the overridable field set (AD-6 change); `BookEdits.genres` applies to private Books and to the admin's edits of shared Books.
-  - **User** genres and themes are private and work like personal tags: the `tags` collection gains `kind: tag | genre | theme`, with `nameKey` unique per owner and kind. One writer (`changeTags()` and the tag services in `lib/books`), one picker, one Settings pattern. A user adds them to a Book on Book detail, on Edit book and on a selection, with Undo, exactly like tags.
+  - **User** genres and themes are private and work like personal tags: the `tags` collection gains `kind: tag | genre | theme`, with `nameKey` unique per owner and kind. One writer (`changeTags()` and the tag services in `lib/tags`), one picker, one Settings pattern. A user adds them to a Book on Book detail, on Edit book and on a selection, with Undo, exactly like tags.
   - **Display and filter.** Book detail shows system genres, the user's genres, system themes, the user's themes and tags as Filter chips. The Filter panel's Genre field lists system genres in use and the user's own genres; the Theme field covers system and user themes; the Tag field covers tags. Each value stays distinct.
   - **Settings.** Tags, My genres and My themes are three List-row groups, each with Rename, Merge and Delete, like locations.
   - **No user names that clash with system ones.** Creating or renaming a user genre whose `nameKey` matches a system genre (English or Finnish name) fails with a field error (`SYSTEM_NAME`, "{name} is a system genre."). The same holds for a user theme matching a system theme on any Book the user holds, read through the shelf module's theme values. A system genre created later with the same name as an existing user genre leaves the user genre in place; that case is accepted.
@@ -282,7 +282,7 @@ From DESIGN.md (look) and EXPERIENCE.md (behaviour). Mock-ups under `ux-designs/
 - UX-DR24: Bottom sheet (phone: Book detail, wishlist entry, Filter panel [A], pickers) — full width, 2px `text` top edge, short handle line at top centre, scrim over the dimmed list; opens to a little over half the screen; drag up or tap the handle to open fully; tap the dimmed list, drag down, X or Back to close; list keeps its scroll position; modal with focus held inside and returned to the opener.
 - UX-DR25: Picker (Move location, Tag, Lend Person and date, Add to wishlist) — bottom sheet on the phone, dialog on wide screens; one choice, then it closes.
 - UX-DR26: Dialog (confirmations of removals and merges, "Discard changes?", New list) — outlined 2px `text` box, centred, at most 400px, scrim behind; title in `heading-group`; buttons right-aligned at the foot with the confirming button on the right [A]; `Esc` and tapping outside cancel; modal focus handling.
-- UX-DR27: Toast — outlined 2px `text` box above whatever is pinned to the bottom; message left in `meta`, actions as Links right, and a close (X) on every toast (Mika, 2026-10-06); Undo hidden once its receipt has expired (30 minutes); about 8 s, one at a time, a new one replacing the old; a toast raised on Scan goes when the next Answer opens (the save toast lives until then); an error toast starts with an 8px danger square, has no timer and stays until dismissed or replaced; "Undone" for a moment after a successful Undo, "Couldn't undo." on failure; announced to screen readers.
+- UX-DR27: Toast — outlined 2px `text` box above whatever is pinned to the bottom; message left in `meta`, actions as Links right, and a close (X) on every toast (Mika, 2026-10-06); Undo hidden once its receipt has expired (30 minutes); about 8 s, one at a time, a new one replacing the old; a toast raised on Scan has no timer and goes when the next Answer opens; an error toast starts with an 8px danger square, has no timer and stays until dismissed or replaced; "Undone" for a moment after a successful Undo, "Couldn't undo." on failure; announced to screen readers.
 - UX-DR28: Action bar (select mode) — full width on the bottom edge, 2px `text` top edge; count left, Move, Tag, Read, Remove (destructive) and Done (primary); on the phone it replaces the pinned Scan book button and is two rows (count and Done above, the four actions below) [A]; on wide screens Scan book stays in the header; actions other than Done are disabled while nothing is ticked.
 - UX-DR29: Checkbox — 20px square, 2px `text` outline, checked shows a drawn tick in `text`, not filled [A]; appears on every row or tile in select mode.
 - UX-DR30: Progress line — 2px accent line moving across the top edge while a lookup, save or next page is in flight [A]; nothing else blocks the screen; no skeletons [A].
@@ -304,8 +304,8 @@ From DESIGN.md (look) and EXPERIENCE.md (behaviour). Mock-ups under `ux-designs/
 - UX-DR43: Book detail (`?book=` on `/` and `/loans`; panel on wide, sheet on phone; same content) — changes save at once, no Save button. Header: cover, title, author, series and number, edition line (publisher · year · pages · language); author and series are Filter chips. Read/unread Text switch and Rating. Your copies: one line per copy with location (Filter chip) and status; Links by state: owned — Lend, Move, Remove; lent — lent marker with "Lent to {person} since {date}" and Returned; ordered — "Ordered" and Received; the copy's note under its line, edited in place. Lent before: closed loans newest first "{person} · {from} to {to}", absent when none. On wishlists: "{list} · for {person}", absent when none. System genres (in the user's language), the user's genres, system themes, the user's themes and personal tags as Filter chips, with "Add tag" opening the picker for tags, genres and themes; empty kinds are absent (D-2, D-3, D-6). Foot: Edit and Add to wishlist, no primary. The half-open sheet shows header, read and rating and the first copies.
 - UX-DR44: Scan (`/scan`, full screen) — camera starts on open and stays on across Scan, Answer and back until the task is closed; only EAN-13 starting 978/979 counts; reading pauses during a lookup and while an Answer shows; after an Answer closes the same ISBN is ignored until it leaves view; a read barcode goes straight to the Answer; ISBN field accepts ISBN-10/13 with hyphens or spaces, submitted with Go; "Find by title or author" Link; no camera or permission denied: "No camera. Type the ISBN." replaces the frame and the field takes focus (normal on desktop); "Not an ISBN. Thirteen digits, or ten." under the field in danger; "Too many lookups. Wait a moment." toast; Scan stays visible with the progress line while looking up.
 - UX-DR45: Lookup (`/scan/find`) — one field for title or author, search on Go; results in two groups, "In your library" (matching copies and open wishlist entries) then "Elsewhere" (outside sources); rows show cover, title, author, year, publisher; covers only where servable, else the placeholder; tapping a result opens its Answer and Back returns to the results; "Nothing found" with an "Add by hand" Link opening the Not found Answer with the typed text in the title field.
-- UX-DR46: Answer screens — the heading is the answer, first that applies: In library (Open book · Add another copy · **Back**); Ordered (Received · **Back**) [A]; On wishlist (**Add to library** · Back) [A]; Not in library (Add to wishlist · **Add to library** · Back); Not found (title and author fields, both required, then Add to wishlist · **Add to library** · Back); Couldn't look it up (**Try again** · Back, "Add by hand" Link that unfolds the Not found fields and buttons in place, naming which sources didn't answer, e.g. "Finna and Google Books didn't answer."). Every other applicable fact is a line under the Book: each copy with its location, "Ordered", "On {list}". Under the Book: "From {source}" and "New author" / "New series" / "New genre" for records the save would create (D-2). X leaves scanning altogether. Add to library / Add another copy save at once and return to Scan with "Saved to {location} · Edit · Undo" ("Saved" with no default location). Add to wishlist opens the wishlist picker every time, skipped with exactly one list [A], offering only "New list" with none. Open book leaves scanning and opens Book detail in the collection. Back saves nothing.
-- UX-DR47: Edit book (`/books/{bookId}/edit`, full screen on every width, centred column on wide) — first screen: cover, title, author, source, personal tags, and when opened from a save toast that copy's status (owned/ordered) and location with their saved values; Save pinned at the bottom; "More details" Link unfolds title, subtitle, authors, series, number in series, publisher, year, language, pages, genres, description, all editable; Save returns to where the user came from with the toast "Saved" (no Undo); overrides are not explained; X or Back with changes asks "Discard changes?" [A].
+- UX-DR46: Answer screens — the heading is the answer, first that applies: In library (Open book · Add another copy · **Back**); Ordered (**Back**; Received on each ordered copy's line) [A]; On wishlist (**Add to library** · Back) [A]; Not in library (Add to wishlist · **Add to library** · Back); Not found (title and author fields, both required, then Add to wishlist · **Add to library** · Back); Couldn't look it up (**Try again** · Back, "Add by hand" Link that unfolds the Not found fields and buttons in place, naming which sources didn't answer, e.g. "Finna and Google Books didn't answer."). Every other applicable fact is a line under the Book: each copy with its location, "Ordered", "On {list}". Under the Book: "From {source}" and "New author" / "New series" / "New genre" for records the save would create (D-2). X leaves scanning altogether. Add to library / Add another copy save at once and return to Scan with "Saved to {location} · Edit · Undo" ("Saved" with no default location). Add to wishlist opens the wishlist picker every time, skipped with exactly one list [A], offering only "New list" with none. Open book leaves scanning and opens Book detail in the collection. Back saves nothing.
+- UX-DR47: Edit book (`/books/{bookId}/edit`, full screen on every width, centred column on wide) — first screen: cover, title, author, source, personal tags, and when opened from a save toast that copy's status (owned/ordered) and location with their saved values; Save pinned at the bottom; "More details" Link unfolds title, subtitle, authors, series, number in series, publisher, year, language, pages, description; ISBN and system genres editable only on a private Book or by the admin, themes never; Save returns to where the user came from with the toast "Saved" (no Undo); overrides are not explained; X or Back with changes asks "Discard changes?" [A].
 - UX-DR47a: Cover upload and crop on Edit book (D-4) — on the first screen beside the cover: Links "Add cover" / "Replace cover" and a destructive "Remove cover"; absent for users who may not change that Book's cover. Choosing a file (camera offered on the phone) opens a full-screen straighten-and-crop step: the photo with four corner handles joined by a 2px `text` outline, the area outside dimmed by the scrim, and the hint "Shoot it straight on"; drag each handle onto a corner of the cover; on wide screens Tab moves between handles and the arrow keys move the focused one; Use (primary) and Cancel. The straightened 2:3 preview replaces the cover on Edit book until Save. Rejected file: the code's message under the cover ("Not an image." / "Image too large."). Not mocked; its story starts with a rendered mock-up choice.
 - UX-DR48: Loans (`/loans`) — Text switch by person / by date, remembered per device; by person: borrower name as group heading as typed, rows with the copy and "Since {date}"; by date: one list longest out first, rows "{person} · since {date}"; Returned Link on a row closes the loan today and moves it to the returned group; returned group below the open loans in both orders, rows "{person} · {from} to {to}" newest first; tapping a row opens Book detail; "Nothing lent" with one dry remark when empty, returned loans still shown.
 - UX-DR49: Wishlists (`/wishlists`, `/wishlists/{listId}`, `?entry=`) — list of lists as List rows with name and count; "New list" dialog asks for a name, a name in use is rejected under the field; "No wishlists" and "New list" when empty (also in the picker). One wishlist: Back link, heading is the list name as typed, Links Rename and Delete (destructive; removes the list and its entries) [A]; entry rows show cover, title, author and "For {person}" at the end; "Nothing on this list." when empty. Entry opened at `?entry=`: sheet or panel with the Book's header, "On {list}", and a "For" combobox of People settable, changeable or clearable at any time; Bought (primary), Ordered, Remove (destructive); closed or removed entries leave the list.
@@ -314,7 +314,7 @@ From DESIGN.md (look) and EXPERIENCE.md (behaviour). Mock-ups under `ux-designs/
 **States, copy, motion, accessibility**
 
 - UX-DR51: State patterns — first load: section heading at once, progress line until content, no skeletons [A]; first run: "No books yet", one dry remark, Scan book, nothing about locations; no matches: "No books match" and "Clear"; load failed: "Couldn't load. Try again." with a retry Link; Book no longer there (`?book=` the user holds nothing of): the section opens without detail and toasts "Not in library"; Book has left the list: the row goes, the detail stays open until closed; signed out: sign in, then back to the wanted address; action with no connection: "No connection." error toast, nothing queued; save failed: error toast with the code's message, screen and input unchanged; field rejected: the code's message under the field; no locations: location fields, location filter, Move and row ending absent everywhere.
-- UX-DR52: Undo toast wording per action — Add to library / Add another copy: "Saved to {location} · Edit · Undo"; Add to wishlist: "Added to {list} · Undo"; Move: "{n} moved to {location} · Undo"; Tag: "Tagged {n} · Undo"; Read: "Marked {n} read · Undo"; Lend: "Lent to {person} · Undo"; Returned: "Returned · Undo"; Bought / Ordered: "Saved to {location} · Undo"; Received: "Saved to {location} · Undo"; Edit book Save: "Saved", no Undo; Remove, Delete, Merge: no toast Undo, confirmed by a dialog first.
+- UX-DR52: Undo toast wording per action — Add to library / Add another copy: "Saved to {location} · Edit · Undo"; Add to wishlist: "Added to {list} · Undo"; Move: "{n} moved to {location} · Undo"; Tag: "Tagged {n} · Undo"; Read: "Marked {n} read · Undo"; Lend: "Lent to {person} · Undo"; Returned: "Returned · Undo"; Bought for me: "Saved to {location} · Undo"; Ordered: "Ordered · Undo"; Bought for a Person: "Bought · Undo"; Received: "Saved to {location} · Undo"; Edit book Save: "Saved", no Undo; Remove, Delete, Merge: no toast Undo, confirmed by a dialog first.
 - UX-DR53: Voice and tone — terse fragments, no pleasantries, exclamation marks or "successfully"; empty states may carry one dry remark, nothing else may; failure messages from `errors.<CODE>`; Finnish written natively, not word for word; a message containing a user-typed name puts it where it needs no inflection, e.g. "Tallennettu · Tampere" [A]; strings stored in sentence case.
 - UX-DR54: Motion — section change: headings row and content slide sideways together in the direction of travel; section opening: heading settles, then list items sweep in from the right (both enhancements, built only where they don't block input); sheet slides up while the list dims; panel slides out from the right while the list narrows; full-screen tasks slide in over the section and away on Back or X; toast slides up and fades out; about 200–300 ms [A], never blocking input; with reduce motion every slide and sweep is an immediate change. CSS transitions or view transitions only.
 - UX-DR55: Accessibility floor [A] — body text, labels and values 4.5:1 in both modes, meaningful lines 3:1 (accepted exception: inactive section headings and switch options at about 3.2:1); every control keyboard-operable on wide screens with the focus outline; sheet, pickers and dialogs modal with focus in, held and returned; detail panel not modal; toasts announced; section name announced on change; nothing depends on colour alone (lent marker has text, errors have messages, destructive controls name their action); page `lang` follows the interface language.
@@ -385,7 +385,7 @@ Nine epics, in build order. Each needs only the epics before it. Later epics add
 
 **In every story.** Interface text in English and Finnish (AD-15) in the voice of UX-DR53; the accessibility floor of UX-DR55; tokens only, no literals (Styling convention); a component is built by the first story that needs it and reused after. After the cataloguing gate, a story that changes schema is verified before merge by applying its migration to a restored copy of the latest production dump. The list sweep on section open (UX-DR54) is an enhancement and is not a story; it is built only if it never blocks input.
 
-**Precondition for sprint planning.** The PRD, the architecture spine with STORY-SLICING.md, EXPERIENCE.md and SPEC.md are updated for decisions D-1 to D-8, the smaller rulings and the new slice numbers before sprint planning, so no story is built to a superseded rule.
+**Precondition for sprint planning.** The PRD, the architecture spine with STORY-SLICING.md, EXPERIENCE.md and SPEC.md are updated for decisions D-1 to D-8, the smaller rulings and the new slice numbers before sprint planning, so no story is built to a superseded rule. Met on 2026-10-06 (`b387e8a`); the readiness fixes are in `sprint-change-proposal-2026-10-06-readiness.md`.
 
 **Cataloguing gate.** Until the gate, phone testing runs against dev (`tailscale serve` to the dev machine), never production. Real cataloguing of the ~200 books starts once Epics 1–3 are done, Edit book with the copy's status and location from Epic 4 (D21, D22) has landed, Epic 2 is deployed, and the default location is set. Cover upload is not part of the gate; covers can be added to catalogued books afterwards. From then on every book goes into the production database at a location and can be edited right away; earlier saves are test data. The gate closes with **one rehearsed restore** of the production backup holding the first real books and covers, written down (NFR-6).
 
@@ -407,19 +407,19 @@ Scan or type an ISBN, see what the book is ("From Finna", new author or series),
 2. **Real-book fixture capture**, before the adapters: raw Finna and Google Books responses for about 30 books from Mika's shelf (Finnish fiction, non-fiction, translations, old editions, at least one Google doesn't know) are recorded under `tests/fixtures/` and become the adapters' fixtures. The story also records the **genre coverage checkpoint**: what share has Google Books categories, and what Finna's own genre terms look like. Under half covered by Google, Epic 9 also maps Finna genre terms onto the genre list (D-2). The checkpoint informs Epic 9 only; it never changes the source contract or the adapters.
 
 **Two lanes.** After those two stories, Epic 3 runs as two lanes that join at C5, C6 and D1:
-- *Lookup lane* (no database access, only the ISBN helper): B1, C1–C4.
-- *Schema lane* (schema stories merge one at a time, AD-13): A11, A12, A18, A24, B2–B10, F1, U1.
+- *Lookup lane* (no database access): B1, C1, C2, C10, C3, A24, C4.
+- *Schema lane* (schema stories merge one at a time, AD-13): A11, A12, A18, B10, B11, B3, B4, B5, B2, B6, B7, F1, B8, B9, E26, U1, U2. It starts once B1 and A24 have merged, since both lanes use `isbnField`, `nameKeyField` and `processState`.
 
 A slip in the schema lane does not stall the adapters.
 
-**Slices:** D9, fixture capture, A11, A12, A18, A23, A24, A25, B1–B10, U1, U2, C1–C7, D1–D4, D6–D8, D10, D15–D18, D23, E26, F1, F2, I9, default location in Settings, a basic In library Answer, and the edition picker (C12, D-7).
+**Slices:** D9, C9 (fixture capture), A11, A12, A18, A20, A23, A24, A25, B1–B11, U1, U2, C1–C7, C10, C11, D1–D4, D6–D8, D10, D15–D18, D23, D25, D26, D32, E26, F1, F2, I9, K11 (default location in Settings), and the edition picker (C12, D-7).
 **Must hold:** the stored `RawMetadata` keeps each source's complete raw response and Google's categories per source (`subjects.google`) from the first save, so Epic 9 can derive genres, and Finna genre terms if the checkpoint calls for them, for Books saved before it; the Finna adapter keeps themes.
 **FRs covered:** FR-4 (default location), FR-10, FR-11, FR-12, FR-13 (Answer, without the genre note), FR-15 (save), FR-16, FR-17 (authors, series), FR-17a (stored), FR-18, FR-20 (basic), FR-21 (Add to library), FR-22 (library), FR-30, FR-31 (inline add).
 **NFRs covered:** NFR-1 (external lookup), NFR-2.
 
 ### Epic 4: Fix fetched data and add covers
 Edit book from the save toast or by address: the first screen, More details, Save, and "Discard changes?". As admin, Mika's edits to a shared Book change it for everyone (D-8); other users' edits are their overrides; edits to his private Book change it. Edit on the toast also shows the new copy's status and location, so it can be set to ordered or moved. The admin, or a private Book's creator, adds, replaces or removes a cover, straightened and cropped to 2:3 by dragging four corners.
-**Slices:** A20, E21, D5, D19, D20, D21, D22, D24, F6, then the new cover slices last (media visibility, upload service with sharp and the perspective warp, four-corner crop component, cover on Edit book). The cataloguing gate needs D21 and D22, not the covers.
+**Slices:** E21, D5, D19, D20, D24, F6, D21, D27, D22, K12, then the new cover slices last (media visibility, upload service with sharp and the perspective warp, four-corner crop component, cover on Edit book). The cataloguing gate needs D21 and D22, not the covers.
 **FRs covered:** FR-13 (Edit book), FR-14, FR-15 (Edit link), FR-27, FR-28 (set ordered), FR-47 (part, D-4).
 
 ### Epic 5: Browse, organise and move my collection
@@ -433,12 +433,12 @@ The collection at `/`: rows or covers in three sizes, endless scrolling, search,
 
 ### Epic 6: Lend books and see who has them
 People, Lend and Returned with Undo, the Loans section by person or by date with returned loans below, lent markers on rows, Lent before in Book detail, People managed in Settings.
-**Slices:** J1–J9.
+**Slices:** J1–J13.
 **FRs covered:** FR-26 (loans), FR-34, FR-35, FR-36, FR-37.
 
 ### Epic 7: Keep wishlists
 Named lists with counts, Add to wishlist from the Answer and Book detail with Undo, the entry sheet with For, Bought / Ordered / Remove, rename and delete lists, and a save closing matching open entries.
-**Slices:** H1–H3, H5–H12.
+**Slices:** H1–H3, H5–H17.
 **FRs covered:** FR-21 (Add to wishlist), FR-22 (wishlist), FR-26 (entries), FR-28 (bought, ordered), FR-38, FR-39.
 
 ### Epic 8: Shop check — "do I already have this?"
@@ -555,7 +555,7 @@ So that access never reads `roles` inline and never bypasses access silently (AD
 
 **Given** `src/access`
 **When** the story is done
-**Then** it exports `isAdmin(user)`, `canEditShared(user)`, `canManageAccounts(user)` and `asRequestUser(req)`, which returns Local API options with `req`, `user: req.user` and `overrideAccess: false`
+**Then** it exports `isAdmin(user)`, `canEditShared(user)` and `asRequestUser(req)`, which returns Local API options with `req`, `user: req.user` and `overrideAccess: false`
 **And** unit tests cover each helper for no user, a `user`, and an `admin`
 **And** no file outside `src/access` reads `user.roles`
 
@@ -704,7 +704,7 @@ So that I see what happened without leaving the screen (UX-DR27).
 
 **Given** one toast provider in the frontend root layout
 **When** an action returns an `ActionResult`
-**Then** success shows a toast for about 8 s and an error shows an error toast with the 8px danger square and the `errors.<CODE>` message, with no timer, until dismissed or replaced
+**Then** success shows a toast for about 8 s, unless the caller holds it until it is replaced (the save toast on Scan, Story 3.46), and an error shows an error toast with the 8px danger square and the `errors.<CODE>` message, with no timer, until dismissed or replaced
 **And** a new toast replaces the current one, and a toast survives client navigation
 **And** every toast has a close (X) that dismisses it at once
 **And** a server render raises a toast only through `flashToast()`, a short-lived cookie the provider reads and clears
@@ -739,7 +739,7 @@ So that I can move around bookeh and start a scan from anywhere (FR-23, UX-DR6, 
 **When** I open `/`, `/loans`, `/wishlists` or `/settings`
 **Then** the four section headings (collection, loans, wishlists, settings) sit side by side in `heading-section`, lowercase; the current one in `text` leads the row and the others follow in fixed order, wrapping round, in `text-dim`
 **And** tapping or clicking a heading goes to that section, and the section name is announced
-**And** on screens under 900px the row runs off the right edge and Scan book is a primary button pinned full width to the bottom, respecting safe areas; at 900px and up Scan book sits at the top right
+**And** on screens under 900px the row runs off the right edge and Scan book is a primary button pinned full width to the bottom, respecting safe areas; at 900px and up Scan book sits at the top right, and where the window is too narrow for all four headings the row clips at the right edge as on the phone
 **And** Scan book opens `/scan`, a full-screen task with an X that returns to the section; its content arrives in Epic 3
 **And** sections without content show their heading and nothing else, and the progress line runs while a section loads (UX-DR30)
 **And** this story builds the Link (accent underline, destructive variant, Back link) and the Close (X) per DESIGN.md (UX-DR12, UX-DR31)
@@ -757,7 +757,7 @@ So that moving around takes one thumb (UX-DR6, UX-DR54).
 **When** I swipe left or right
 **Then** the next or previous section opens, wrapping from the last to the first
 **And** a swipe that starts within 24px of a screen edge is ignored
-**And** swiping does nothing while a sheet, picker or full-screen task is open
+**And** swiping is suspended while anything registered through `useSuspendSwipe()` is open; the Scan task (Story 3.1) and the overlay wrappers (Stories 3.40, 3.41) register through it
 **And** where it doesn't block input, the headings row and content slide in the direction of travel in about 200–300 ms; with reduce motion set, the change is immediate
 
 ### Story 1.21: [K1] Installable PWA
@@ -773,6 +773,7 @@ So that it opens like an app (FR-50, UX-DR56).
 **Then** it is named "bookeh", has its icons, and opens standalone in the collection with no browser bars
 **And** there is no service worker
 **And** a desktop browser opens the same app
+**And** the icon and the theme colour are picked by Mika from rendered options and recorded in DESIGN.md
 
 ### Story 1.22: [K9] Profile service
 
@@ -803,7 +804,7 @@ So that bookeh is mine on every device (FR-4, UX-DR50).
 **And** changing the theme applies at once and is stored per device, not on the profile
 **And** a rejected display name shows its message under the field
 **And** there is no password change
-**And** Settings is laid out as in `mockups/key-settings.html`: on wide screens two columns, the profile, language, theme and Sign out in the first and the managed lists (added by later stories) in the second; one column on the phone
+**And** Settings is laid out as in `mockups/key-settings.html`, except that wide screens have two columns (ruling 2026-10-06; the mock-up's third column is superseded): the profile, language, theme and Sign out in the first and the managed lists (added by later stories) in the second; one column on the phone
 **And** this story builds the Text switch: chosen option in `text`, others in `text-dim`, switching at once with no confirm; lowercase except proper-name options such as the languages (UX-DR13)
 
 ### Story 1.24: [K10] Profile and collection visibility
@@ -817,12 +818,12 @@ So that friends can be added later without reworking accounts (FR-4, D-1).
 **Given** the `users` collection
 **When** the story is done
 **Then** it has `profileVisibility` (`public` | `hidden`, default `hidden`) and `collectionVisibility` (`open` | `closed`, default `closed`), written only through `lib/account`, with a committed migration
-**And** Settings shows a switch public / hidden and a switch open / closed that save at once
+**And** Settings shows, in the first column after Theme, a Profile switch public / hidden and a Collection switch open / closed that save at once
 **And** neither setting changes anything else in Phase 1
 
 ## Epic 2: My catalogue runs in production and is backed up
 
-bookeh runs on the LXC behind `tailscale serve`, reachable from the phone, with data on the NAS and nightly backups to it. The restore is rehearsed at the cataloguing gate, once real data exists (Story 4.11).
+bookeh runs on the LXC behind `tailscale serve`, reachable from the phone, with data on the NAS and nightly backups to it. The restore is rehearsed at the cataloguing gate, once real data exists (Story 4.10).
 
 ### Story 2.1: [K2] Production image
 
@@ -875,15 +876,15 @@ So that a dead disk doesn't take my catalogue with it (NFR-6).
 **And** a manual run produces a dump that `pg_restore --list` reads without error
 **And** the script refuses to dump, and logs an error, when the database has no `users` rows, so an empty database never overwrites good backups
 **And** each run writes `last-backup.json` (time, outcome, dump size) to a path the app container can read
-**And** the restore rehearsal itself is not part of this story; it happens at the cataloguing gate (Story 4.11)
+**And** the restore rehearsal itself is not part of this story; it happens at the cataloguing gate (Story 4.10)
 
 ## Epic 3: Scan a book and add it to my library
 
 Scan or type an ISBN, see what the book is, and add it to the library in one tap at the default location, with Undo. An owned edition answers "In library" with Add another copy. An unknown ISBN is entered by hand as a private Book, shared automatically once a source knows it. "Couldn't look it up" offers Try again.
 
-**Order.** Stories 3.1–3.2 open the epic. Then two lanes run side by side: the **lookup lane** (3.3–3.9, no database access) and the **schema lane** (3.10–3.26, schema stories merged one at a time with their migration, AD-13). The lanes join from 3.27. Within each lane, stories depend only on earlier stories.
+**Order.** Stories 3.1–3.2 open the epic. Then two lanes run side by side: the **lookup lane** (3.3–3.9, no database access) and the **schema lane** (3.10–3.26, schema stories merged one at a time with their migration, AD-13). The schema lane starts once 3.3 and 3.8 have merged, since both lanes use `isbnField`, `nameKeyField` and `processState`. The lanes join from 3.27. Within each lane, stories depend only on earlier stories.
 
-**Base UI.** Story 3.40 adds the `@base-ui/react` dependency and its import lint rule along with the combobox, menu and picker wrappers; Story 4.1 adds the dialog and sheet wrappers (slices A23 and A20 re-split, since the combobox is needed first).
+**Base UI.** Story 3.40 adds the `@base-ui/react` dependency, its import lint rule and the dialog and sheet wrappers; Story 3.41 adds the combobox, menu and picker wrappers on top of them (slices A20 and A23).
 
 ### Story 3.1: [D9] Scan screen
 
@@ -900,7 +901,7 @@ So that looking up a book starts in a second (FR-10, UX-DR44, UX-DR32).
 **And** a read barcode navigates to `/scan?isbn=<digits>` with no confirm tap
 **And** the ISBN field submits with the keyboard's Go key to `/scan?isbn=<text as typed>`; the browser does not normalise
 **And** with no camera or denied permission, the frame is replaced by "No camera. Type the ISBN." and the field takes focus (normal on desktop)
-**And** until the Answer exists (Story 3.44), `/scan?isbn=` shows the submitted text under the field
+**And** until the Answer exists (Story 3.45), `/scan?isbn=` shows the submitted text under the field
 **And** acceptance is on Mika's iPhone, in the installed PWA, over HTTPS (production or `tailscale serve` to the dev machine); the camera-permission behaviour in standalone mode is written in the story's notes
 
 ### Story 3.2: [C9] Real-book fixture capture
@@ -1100,28 +1101,11 @@ So that `books` and overrides in `user-books` cannot drift apart (AD-6).
 
 **Given** `src/fields/bookFields.ts`
 **When** the story is done
-**Then** it declares the Book fields (title, subtitle, authors, series, series index, publisher, year, language, pages, description, cover, themes) and marks which are overridable: all except ISBN-13, genres (D-6) and themes (D-3)
+**Then** it declares the Book fields (title, subtitle, authors, series, series index, publisher, year, language, pages, description, cover, genres, themes) and marks which are overridable: all except ISBN-13, cover (D-4: covers change only through `setCover`), genres (D-6) and themes (D-3)
 **And** a unit test asserts the overridable list
 **And** text fields carry maximum lengths: title and subtitle 500, description 10,000; names in every name-keyed collection 200 and copy notes 2,000 are set in their own stories; longer input fails with `VALIDATION`
 
-### Story 3.15: [B2] `books` collection
-
-As the developer,
-I want the shared and private Book in one collection,
-So that copies and entries always point at one kind of record (AD-4, AD-5, AD-19).
-
-**Acceptance Criteria:**
-
-**Given** the `books` collection built from `bookFields`
-**When** the story is done
-**Then** it has `isbn13`, `visibility` (`shared` | `private`), `createdBy` (set by hook from `req.user` for private, empty for shared), `source`, and admin-only `rawMetadata`
-**And** users have no create, update or delete access; users read `visibility = shared OR createdBy = me`; admin reads all
-**And** unique constraints exist from the first migration: `isbn13` among shared Books, `(createdBy, isbn13)` among private Books
-**And** after applying all migrations to an empty database, both partial constraints exist, and generating a migration afterwards produces no changes
-**And** an access test proves a user cannot read another user's private Book or any `rawMetadata`, and cannot write a Book
-**And** the migration is committed
-
-### Story 3.16: [B3] `authors` collection
+### Story 3.15: [B3] `authors` collection
 
 As the developer,
 I want authors shared or private with a sort name,
@@ -1131,11 +1115,11 @@ So that names match across Books and private names never leak (AD-4, AD-19).
 
 **Given** the `authors` collection
 **When** the story is done
-**Then** it has `name`, `nameKey`, `sortName`, `visibility` and `createdBy`, with the same read and write rules as `books`
+**Then** it has `name`, `nameKey`, `sortName`, `visibility` and `createdBy`; users read `visibility = shared OR createdBy = me`, admin reads all, and users never write (AD-4, AD-5)
 **And** `nameKey` is unique among shared authors and per `createdBy` among private ones, as database constraints
 **And** an access test covers another user's private author and a user write attempt
 
-### Story 3.17: [B4] `series` collection
+### Story 3.16: [B4] `series` collection
 
 As the developer,
 I want series with the same rules as authors,
@@ -1148,7 +1132,7 @@ So that series match by name and private ones stay private.
 **Then** it has `name`, `nameKey`, `visibility` and `createdBy`, with the rules and constraints of `authors` and no `sortName`
 **And** an access test covers another user's private series and a user write attempt
 
-### Story 3.18: [B5] `genres` collection
+### Story 3.17: [B5] `genres` collection
 
 As the developer,
 I want shared system genres with English and Finnish names,
@@ -1162,6 +1146,23 @@ So that genres can be seeded, created on save and translated later (D-2).
 **And** genres are shared only; users read them and cannot write them; admin can
 **And** `genreName(genre, locale)` returns `nameFi` in Finnish when present, else `name`; every place that shows a genre uses it
 **And** an access test covers a user write attempt
+
+### Story 3.18: [B2] `books` collection
+
+As the developer,
+I want the shared and private Book in one collection,
+So that copies and entries always point at one kind of record (AD-4, AD-5, AD-19).
+
+**Acceptance Criteria:**
+
+**Given** the `books` collection built from `bookFields`
+**When** the story is done
+**Then** it has `isbn13`, `visibility` (`shared` | `private`), `createdBy` (set by hook from `req.user` for private, empty for shared), `source`, admin-only `rawMetadata`, and `genres`, a has-many relation to `genres` written only by `mapSubjectsToGenres()` and admin edits
+**And** users have no create, update or delete access; users read `visibility = shared OR createdBy = me`; admin reads all
+**And** unique constraints exist from the first migration: `isbn13` among shared Books, `(createdBy, isbn13)` among private Books
+**And** after applying all migrations to an empty database, both partial constraints exist, and generating a migration afterwards produces no changes
+**And** an access test proves a user cannot read another user's private Book or any `rawMetadata`, and cannot write a Book
+**And** the migration is committed
 
 ### Story 3.19: [B6] `user-books` collection
 
@@ -1406,7 +1407,8 @@ So that a book is either saved completely or not at all (FR-21, AD-11).
 **Given** `saveCopy(ctx, SaveInput)` in `lib/catalogue`
 **When** it runs with an `{ isbn13 }` target and `save: { kind: 'copy' }`
 **Then** in one transaction it ensures the Book (cover downloaded first) and creates an owned copy at the default location, returning `SaveResult` with the location
-**And** the `{ bookId }` target is not accepted yet; it arrives with `requireOwnBook()` (Story 4.2)
+**And** an `{ isbn13 }` target resolves to the shared Book with that ISBN, else my own private Book with it (Story 3.38), else a shared Book ensured from the held outcome
+**And** the `{ bookId }` target is not accepted yet; it arrives with `requireOwnBook()` (Story 4.1)
 **And** a failure leaves no Book, copy, author, series or media row behind
 
 ### Story 3.36: [D32] A repeated save returns the first result
@@ -1436,7 +1438,7 @@ So that a wrong scan costs one tap (FR-15, AD-11).
 **When** its restore runs
 **Then** it deletes the copy, and deletes a Book, author, series or media row the save created only when `isUnreferenced()` finds no reference from any row of any user
 **And** it deletes a `user-books` row the save created only when the user has no other copy of the Book
-**And** if the copy has gained a loan since the save, the restore fails with `UNDO_FAILED` and changes nothing ("Couldn't undo.")
+**And** if the copy has gained a loan since the save, the restore fails with `UNDO_FAILED` and changes nothing ("Couldn't undo."); this case is tested in Story 6.5, once loans exist
 **And** an integration test saves, undoes, and proves the database is as before; a second test proves a Book another user also holds survives the undo
 
 ### Story 3.38: [D7] Private Book from manual entry
@@ -1464,12 +1466,31 @@ So that my manual entries don't stay second-class (FR-12, AD-5).
 
 **Given** my private Book with an ISBN, and a `found` source outcome held server-side for it
 **When** I save another copy of it
-**Then** inside the save transaction the row keeps its id, takes the source values, my differing values become my overrides, its authors and series are re-matched to shared records, `visibility` becomes shared and `createdBy` clears
-**And** if a shared Book with that ISBN already exists, my copies and `user-books` row move to it and my private Book is deleted
+**Then** inside the save transaction the row keeps its id, takes the values of the candidate the Answer picked (D-7), its authors and series are re-matched to shared records, `visibility` becomes shared and `createdBy` clears
+**And** as admin, my differing hand-entered values are dropped; as another user, they become my overrides (FR-12, D-8)
+**And** if a shared Book with that ISBN already exists, my copies and `user-books` row move to it and my private Book is deleted (my wishlist entries move too from Epic 7, Story 7.7)
 **And** the save never calls the sources itself, and other users' private Books are never touched
 **And** undoing the save removes the copy and leaves the Book shared
 
-### Story 3.40: [A23] Base UI and the combobox, menu and picker wrappers
+### Story 3.40: [A20] Dialog and sheet wrappers
+
+As the developer,
+I want the dialog and bottom sheet wrapped once,
+So that confirmations and sheets behave the same everywhere (UX-DR24, UX-DR26, UX-DR9).
+
+**Acceptance Criteria:**
+
+**Given** `@base-ui/react` 1.8.0 and `components/ui`
+**When** the story is done
+**Then** ESLint rejects importing `@base-ui/react` outside `components/ui`
+**And** the dialog is centred, at most 400px, outlined, over the scrim, with buttons right-aligned and the confirming one on the right; `Esc` and tapping outside cancel
+**And** the bottom sheet is full width with a 2px top edge, a handle, the scrim above; it opens a little over half the screen, drags up to full and down to close, and closes on tapping the dimmed area, X or Back
+**And** both are modal: focus moves in, is held, and returns to the opener on close
+**And** nothing opens on top of a picker or dialog opened from a sheet (one overlay deep)
+**And** the list under a sheet keeps its scroll position
+**And** the sheet slides up while the list dims; with reduce motion set, it appears at once (UX-DR54)
+
+### Story 3.41: [A23] Base UI and the combobox, menu and picker wrappers
 
 As the developer,
 I want the overlay primitives wrapped once,
@@ -1477,14 +1498,13 @@ So that every screen uses the same accessible combobox, menu and picker (UX-DR15
 
 **Acceptance Criteria:**
 
-**Given** `@base-ui/react` 1.8.0
+**Given** the Base UI dependency and the dialog and sheet wrappers (Story 3.40)
 **When** the story is done
 **Then** `components/ui` has combobox, menu and picker wrappers styled from the tokens: the combobox popup is an outlined box under the field with the selection bar on the highlighted option and the marker on the chosen one, and offers to create a value that doesn't exist
-**And** the picker is a bottom sheet under 900px and a dialog at 900px and up, and closes after one choice
-**And** ESLint rejects importing `@base-ui/react` outside `components/ui`
+**And** the picker is the bottom sheet under 900px and the dialog at 900px and up, and closes after one choice
 **And** Back closes an open picker inside its wrapper
 
-### Story 3.41: [K11] Default location in Settings
+### Story 3.42: [K11] Default location in Settings
 
 As Mika,
 I want to set my default location in Settings, adding it if it's new,
@@ -1498,7 +1518,7 @@ So that every book I add lands there (FR-4, UX-DR50).
 **And** the field can be cleared, leaving no default
 **And** with no locations yet, the combobox is empty and still accepts a new name
 
-### Story 3.42: [D10] Cover component and cover preview
+### Story 3.43: [D10] Cover component and cover preview
 
 As Mika,
 I want covers shown everywhere, including before I save,
@@ -1512,7 +1532,7 @@ So that I recognise the book at a glance (FR-13, AD-14, UX-DR19).
 **And** the route handler requires a signed-in user and streams the cover for an ISBN-13 from the source URL recorded server-side during a lookup; it never takes a URL from the client and returns 404 when none is recorded
 **And** it fetches only through the same host allowlist, size limit and timeout as the cover download
 
-### Story 3.43: [A25] Client helper for actions and data requests
+### Story 3.44: [A25] Client helper for actions and data requests
 
 As Mika,
 I want lost connections and expired sessions handled the same way everywhere,
@@ -1526,7 +1546,7 @@ So that an action never fails silently (UX-DR51).
 **And** an `UNAUTHENTICATED` result moves to `/login?next=<current address>`
 **And** a call to a server action that no longer exists after a deploy shows "bookeh was updated." with a Reload Link; each image build sets its own deployment id, configured after checking the bundled Next.js docs
 
-### Story 3.44: [D16] Answer: not in library
+### Story 3.45: [D16] Answer: not in library
 
 As Mika,
 I want to see what the scanned book is,
@@ -1535,7 +1555,7 @@ So that I can decide whether to add it (FR-13, FR-20, UX-DR46).
 **Acceptance Criteria:**
 
 **Given** `/scan?isbn=<text>` rendered on the server from `lookupBook`
-**When** the result is `source`
+**When** the result is `source`, or `existing` where I hold no copy and no entry (then without the source line and new-record notes)
 **Then** the full-screen Answer shows the heading "not in library", the cover preview, title, author, edition line, "From Finna" (or the first source that answered), and "New author" / "New series" for records the save would create
 **And** it never names another user
 **And** an invalid ISBN keeps Scan open with "Not an ISBN. Thirteen digits, or ten." under the field in danger
@@ -1544,7 +1564,7 @@ So that I can decide whether to add it (FR-13, FR-20, UX-DR46).
 **And** Back returns to Scan with nothing saved; X leaves scanning; each Answer replaces the previous one in history
 **And** on wide screens the Answer is a centred column no wider than a phone
 
-### Story 3.45: [D17] Add to library
+### Story 3.46: [D17] Add to library
 
 As Mika,
 I want one tap to add the book and get back to scanning,
@@ -1560,7 +1580,7 @@ So that cataloguing a stack takes seconds per book (FR-21, FR-15, NFR-2).
 **And** the save toast stays until the next Answer opens
 **And** scan to save takes under 20 s on the phone when no edits are needed
 
-### Story 3.46: [D18] Undo on the save toast
+### Story 3.47: [D18] Undo on the save toast
 
 As Mika,
 I want Undo on "Saved to Tampere",
@@ -1573,7 +1593,7 @@ So that a wrong book disappears with one tap (FR-15).
 **Then** the save is undone through `withUndo` and `undoAction`, and the toast becomes "Undone"
 **And** Undo is unavailable after an app restart
 
-### Story 3.47: [D25] Answer: in library
+### Story 3.48: [D25] Answer: in library
 
 As Mika,
 I want a scan of a book I own to say so, with where it is,
@@ -1581,13 +1601,13 @@ So that I don't buy or add it twice by mistake (FR-16, FR-20, FR-30).
 
 **Acceptance Criteria:**
 
-**Given** an `existing` lookup result where I own at least one copy
+**Given** an `existing` lookup result where I hold at least one copy
 **When** the Answer renders
 **Then** the heading is "in library", and each copy is a line with its location
-**And** Add another copy saves another owned copy at the default location with the same toast and Undo as Add to library, and Back is primary
+**And** Add another copy sends `{ isbn13 }` (Story 3.35) and saves another owned copy at the default location with the same toast and Undo as Add to library, and Back is primary
 **And** Open book arrives in Epic 5; until then it is absent
 
-### Story 3.48: [D26] Answer: not found, entered by hand
+### Story 3.49: [D26] Answer: not found, entered by hand
 
 As Mika,
 I want to type title and author when no source knows the book,
@@ -1603,7 +1623,7 @@ So that I can still add it (FR-12, FR-22).
 **And** Add to wishlist arrives in Epic 7
 **And** Scan has an "Add without ISBN" Link that opens `/scan?title=` (optionally with text): the same Answer with an empty title field and no ISBN, saving a private Book without an ISBN, so books with no barcode can be catalogued from the start
 
-### Story 3.49: [I9] Answer: couldn't look it up
+### Story 3.50: [I9] Answer: couldn't look it up
 
 As Mika,
 I want to know when the sources didn't answer,
@@ -1617,7 +1637,7 @@ So that an outage is never mistaken for "no such book" (AD-9).
 **And** Try again (primary) runs the lookup once more and Back returns to Scan
 **And** "Add by hand" unfolds the Not found fields and buttons in place
 
-### Story 3.50: [D23] Scan loop rules
+### Story 3.51: [D23] Scan loop rules
 
 As Mika,
 I want the scanner to behave in a stack of forty books,
@@ -1631,7 +1651,7 @@ So that it never rescans the book I just handled (UX-DR44, UX-DR8).
 **And** after an Answer closes, the ISBN just handled is ignored until it has left the camera's view
 **And** each Answer replaces the previous one in history, so Back from Scan returns to the section
 
-### Story 3.51: [D15] End-to-end: scan to save
+### Story 3.52: [D15] End-to-end: scan to save
 
 As the developer,
 I want a Playwright test of the main flow,
@@ -1643,8 +1663,9 @@ So that cataloguing can't silently break (Tests convention).
 **When** the Playwright test runs
 **Then** it signs in, opens Scan, enters the ISBN, sees "not in library" with "From" the fixture source, taps Add to library, sees "Saved to {location}", taps Undo, sees "Undone", and saves again
 **And** it makes no network call outside the app
+**And** the fixture source is enabled by `BOOKEH_SOURCES=fixture`, which the app refuses under `NODE_ENV=production`; it serves the `tests/fixtures/` responses, and its covers come from a local test route allowlisted only under that setting
 
-### Story 3.52: [C12] Pick the edition
+### Story 3.53: [C12] Pick the edition
 
 As Mika,
 I want to choose between editions when a lookup finds more than one,
@@ -1654,7 +1675,7 @@ So that my Book gets the paperback's or the hardcover's details, whichever I hol
 
 **Given** a `source` lookup result with more than one candidate
 **When** the Answer renders
-**Then** under the Book it says "{n} editions found", with the best candidate preselected and a picker listing each candidate's binding, year, publisher, pages and cover
+**Then** under the Book it says "{n} editions found" as a Link, with the best candidate preselected; the Link opens a picker listing each candidate's binding, year, publisher, pages and cover
 **And** picking one re-renders the Answer with `?pick=<n>` (replacing the history entry), including its cover preview and new-record notes
 **And** Add to library (and Add to wishlist, once Epic 7 adds it) sends `{ isbn13, pick }`; the server takes the values from its held candidates, re-running the lookup on a cache miss, and the Book keeps the scanned ISBN
 **And** a `pick` out of range falls back to the best candidate
@@ -1665,25 +1686,9 @@ So that my Book gets the paperback's or the hardcover's details, whichever I hol
 
 Edit book from the save toast or by address: the first screen, More details, Save. As admin, Mika's edits to a shared Book change it for everyone (D-8); other users' edits are their overrides; edits to his private Book change it. Edit on the toast also shows the new copy's status and location. The admin, or a private Book's creator, adds, replaces or removes a cover, straightened and cropped to 2:3 by dragging four corners.
 
-**Cataloguing gate.** Stories 4.1–4.10 plus Epics 1–3 open the gate; Story 4.11 rehearses the restore once real books are in. The cover stories (4.12–4.15) may land after real cataloguing has started.
+**Cataloguing gate.** Stories 4.1–4.9 plus Epics 1–3 open the gate; Story 4.10 rehearses the restore once real books are in. The cover stories (4.11–4.14) may land after real cataloguing has started.
 
-### Story 4.1: [A20] Dialog and sheet wrappers
-
-As the developer,
-I want the dialog and bottom sheet wrapped once,
-So that confirmations and sheets behave the same everywhere (UX-DR24, UX-DR26, UX-DR9).
-
-**Acceptance Criteria:**
-
-**Given** `components/ui`
-**When** the story is done
-**Then** the dialog is centred, at most 400px, outlined, over the scrim, with buttons right-aligned and the confirming one on the right; `Esc` and tapping outside cancel
-**And** the bottom sheet is full width with a 2px top edge, a handle, the scrim above; it opens a little over half the screen, drags up to full and down to close, and closes on tapping the dimmed area, X or Back
-**And** both are modal: focus moves in, is held, and returns to the opener on close
-**And** nothing opens on top of a picker or dialog opened from a sheet (one overlay deep)
-**And** the sheet slides up while the list dims; with reduce motion set, it appears at once (UX-DR54)
-
-### Story 4.2: [E21] Only my own Books by id
+### Story 4.1: [E21] Only my own Books by id
 
 As Mika,
 I want a Book reachable by id only when I hold it,
@@ -1697,7 +1702,7 @@ So that guessing an id never opens the shared catalogue (AD-7).
 **And** `saveCopy` now accepts a `{ bookId }` target guarded by it
 **And** a two-user test proves user B cannot pass it for user A's Book, shared or private
 
-### Story 4.3: [D5] Edit a shared Book
+### Story 4.2: [D5] Edit a shared Book
 
 As Mika,
 I want my fixes to a fetched Book to stick, for everyone when I fix them as admin,
@@ -1713,7 +1718,7 @@ So that wrong source data is corrected once (FR-14, AD-5, AD-6, D-8).
 **And** a two-user test proves an admin's edit is seen by another user, and a user's edit is not
 **And** `editBook` is not undoable
 
-### Story 4.4: [D19] Edit authors and series
+### Story 4.3: [D19] Edit authors and series
 
 As Mika,
 I want to fix an author or series name,
@@ -1727,7 +1732,7 @@ So that a misspelt or missing author doesn't stay wrong in my view (FR-13, FR-14
 **And** as a non-admin user, each name is matched with `findOrCreateByName()` (shared first, then my private ones), a name matching nothing becomes my private record, and the result is stored as my relationship override
 **And** integration tests prove another user sees the admin's change, and sees neither a user's override nor their new private author
 
-### Story 4.5: [D20] Edit my private Book
+### Story 4.4: [D20] Edit my private Book
 
 As Mika,
 I want my edits to a hand-entered Book to change the Book itself,
@@ -1742,7 +1747,7 @@ So that my own entries are simply correct (FR-14, AD-5).
 **And** system genres can be picked from the existing list (D-6)
 **And** editing another user's private Book fails with `NOT_FOUND`
 
-### Story 4.6: [D24] Copy status, note and removal
+### Story 4.5: [D24] Copy status, note and removal
 
 As the developer,
 I want the remaining copy writes in `lib/copies`,
@@ -1757,7 +1762,7 @@ So that status, notes and removal follow one rule set (AD-8, AD-18).
 **And** `removeCopies` takes a list of copy ids and removes all or none in one transaction (loans are removed with them from Epic 6)
 **And** integration tests cover each, and a foreign copy id fails with `NOT_FOUND`
 
-### Story 4.7: [F6] Move copies
+### Story 4.6: [F6] Move copies
 
 As Mika,
 I want to move copies to another location with Undo,
@@ -1771,7 +1776,7 @@ So that a box going to the cottage is one action (FR-33, AD-18, AD-20).
 **And** it returns a restore that puts each copy back where it was
 **And** an integration test moves two copies, undoes, and finds both at their old locations; an inline-created location stays after Undo
 
-### Story 4.8: [D21] Edit book screen
+### Story 4.7: [D21] Edit book screen
 
 As Mika,
 I want an edit screen for a Book,
@@ -1788,7 +1793,7 @@ So that I can fix what the source got wrong (FR-13, UX-DR47).
 **And** a rejected field shows its message under the field
 **And** a Book I don't hold shows the section without it and the toast "Not in library"
 
-### Story 4.9: [D27] More details on Edit book
+### Story 4.8: [D27] More details on Edit book
 
 As Mika,
 I want every field editable,
@@ -1799,10 +1804,10 @@ So that series numbers, years and descriptions can be fixed too (FR-13).
 **Given** Edit book
 **When** I tap "More details"
 **Then** title, subtitle, authors, series, number in series, publisher, year, language, pages and description unfold in place, pre-filled with my effective values
-**And** authors and series are comboboxes over my readable names, with new names allowed
+**And** authors and series are text fields, matched on Save through `findOrCreateByName()`; suggestions arrive with Story 5.9 (AD-7 forbids listing authors or series directly)
 **And** on my private Book, ISBN and system genres are editable too; on a shared Book, system genres are editable for the admin (D-8) and shown read-only to others; themes are always shown, not editable
 
-### Story 4.10: [D22] Edit from the save toast
+### Story 4.9: [D22] Edit from the save toast
 
 As Mika,
 I want Edit on the save toast to show the new copy too,
@@ -1816,8 +1821,9 @@ So that I can mark it ordered or put it elsewhere right after adding (FR-13, FR-
 **And** Save writes the Book edits, status and location in one transaction through `editBook`, `setStatus` and `moveCopies`
 **And** choosing ordered hides the location and clears it on Save
 **And** Save returns to Scan with the toast "Saved"
+**And** from here, a copy set to ordered shows on the In library Answer as a line "Ordered" (the Ordered heading arrives in Story 8.2)
 
-### Story 4.11: [K12] Rehearsed restore at the cataloguing gate
+### Story 4.10: [K12] Rehearsed restore at the cataloguing gate
 
 As Mika,
 I want proof that the backup brings my catalogue back,
@@ -1831,7 +1837,7 @@ So that I can trust it before two hundred books are in (NFR-6).
 **Then** sign-in works, the collection count matches production at the dump time, and covers load
 **And** the steps and the time taken are written in `deploy/README.md`
 
-### Story 4.12: [D28] Media visibility
+### Story 4.11: [D28] Media visibility
 
 As the developer,
 I want media rows to carry visibility,
@@ -1845,7 +1851,7 @@ So that a private Book's cover is visible only to its creator (D-4, AD-4).
 **And** source-downloaded covers are shared; the migration marks existing rows shared
 **And** an access test proves user B cannot load user A's private cover file
 
-### Story 4.13: [D29] Cover upload service
+### Story 4.12: [D29] Cover upload service
 
 As Mika,
 I want my photo of a cover turned into a straight 2:3 cover,
@@ -1860,13 +1866,13 @@ So that books without a cover, or with a wrong one, look right (FR-47 part, D-4)
 **And** `removeCover` clears the cover the same way
 **And** any other user, or a non-admin on a shared Book, fails with `NOT_FOUND`
 **And** unit tests check the warp maps the four corners to the rectangle's corners, and that EXIF and GPS data are gone from the output
-**And** the server also applies any EXIF orientation still present before the warp, as a guard; the browser has normally applied it already (Story 4.14)
+**And** the server also applies any EXIF orientation still present before the warp, as a guard; the browser has normally applied it already (Story 4.13)
 **And** the output is written under a temporary name and renamed into place only when complete; a failed write leaves nothing behind and fails with `COVER_FAILED` ("Couldn't save cover.")
 **And** corners that cross, fold in on themselves or put three points in a line fail with `INVALID_CORNERS`
 **And** admin re-fetch never replaces an uploaded cover
 **And** the file reaches the server in a server action as form data; `serverActions.bodySizeLimit` in `next.config.ts` is raised to about 5 MB (the default is 1 MB), after checking the bundled Next.js docs
 
-### Story 4.14: [D30] Four-corner crop
+### Story 4.13: [D30] Four-corner crop
 
 As Mika,
 I want to drag four corners onto the cover in my photo,
@@ -1884,7 +1890,7 @@ So that angle, skew and crop are fixed in one step (D-4, UX-DR47a).
 **And** Use is disabled while the four corners form an invalid shape (crossed, folded or three in a line)
 **And** no crop library is added
 
-### Story 4.15: [D31] Cover on Edit book
+### Story 4.14: [D31] Cover on Edit book
 
 As Mika,
 I want to add, replace or remove a cover on Edit book,
@@ -1894,7 +1900,7 @@ So that covers are fixed where the other fields are (D-4, UX-DR47a).
 
 **Given** Edit book for a Book whose cover I may change (admin on a shared Book; creator on a private Book)
 **When** the first screen renders
-**Then** beside the cover are "Add cover" (no cover) or "Replace cover", and a destructive "Remove cover"; for anyone else they are absent
+**Then** beside the cover are "Add cover" (no cover) or "Replace cover", and a destructive "Remove cover" with no dialog, since it takes effect on Save and "Discard changes?" can still cancel it; for anyone else they are absent
 **And** choosing a file (the camera is offered on the phone) opens the four-corner crop; Use shows the straightened preview in place of the cover until Save
 **And** the file input accepts any image (`image/*`); HEIC from an iPhone is decoded and re-encoded by the browser in the crop step, so only the shrunk JPEG is uploaded
 **And** Save uploads through `setCover` in the same save; Remove cover takes effect on Save; neither has Undo
@@ -2030,6 +2036,7 @@ So that I never pick a filter that shows nothing (FR-25, AD-7).
 **When** values are requested
 **Then** it returns locations, genres, languages and statuses in use on my copies, each with its copy count
 **And** `/data/suggest` (inside `runRoute`) returns author, series and publisher suggestions for typed text, distinct on `nameKey` and preferring the shared record's id
+**And** Edit book's author and series fields (Story 4.8) become comboboxes over these suggestions, new names allowed
 **And** a two-user test proves another user's values never appear
 
 ### Story 5.10: [E6] Collection screen
@@ -2044,7 +2051,7 @@ So that "where is it?" takes seconds (FR-23, FR-24, UX-DR40, UX-DR9, UX-DR36, UX
 **When** it renders
 **Then** it shows the tools row (search, Filter, rows / covers, s / m / l, Select), the count line ("{n} books", or the active values, count and "Clear"), and the first page of rows from `getShelfRows`, one row per copy, at size m
 **And** search filters as I type after a short pause and lives in the URL; `/` focuses the search on wide screens
-**And** with no copies it shows "No books yet", one dry remark and Scan book; with no matches, "No books match" and Clear; on a load failure, "Couldn't load. Try again." with a retry Link
+**And** with no copies it shows "No books yet", one dry remark and, on wide screens only, Scan book (on the phone the pinned Scan book is the one primary); with no matches, "No books match" and Clear; on a load failure, "Couldn't load. Try again." with a retry Link
 **And** a row ending shows "Ordered" for an ordered copy
 
 ### Story 5.11: [E19] Endless scrolling
@@ -2198,6 +2205,7 @@ So that "what else do I have by her?" is one tap (FR-25, UX-DR34).
 **When** I tap its author, series, genre or a copy's location
 **Then** that value is added to the current filters with `shelfHref` (a second value in the same field widens it), and on the phone the sheet closes
 **And** chips are styled as Links, with no outline or fill
+**And** a chip in Book detail opened from `/loans`, or in an opened wishlist entry, opens the collection with only that filter
 
 ### Story 5.22: [E24] Mark read
 
@@ -2226,6 +2234,7 @@ So that I keep track of what I've read and liked (FR-29, UX-DR22).
 **Then** it saves at once through `setRead` with the toast "Marked 1 read · Undo"
 **And** the five-star Rating sets a rating with a tap and changes it when I tap another star; a "Clear" Link beside the stars, shown only while a rating is set, clears it; tapping the current star does nothing; each change saves at once with `ratedAt`, without Undo (UX-DR22)
 **And** read and rating belong to me and the Book, not to a copy
+**And** the rating writes through `setRating(ctx, bookId, rating | null)` in `lib/books`, via `upsertUserBook`, with an integration test
 
 ### Story 5.24: [E12] Copy notes and removing a copy
 
@@ -2373,6 +2382,10 @@ So that empty fields fill in when a source improves (FR-19, AD-5).
 
 **Acceptance Criteria:**
 
+**Given** the story starts
+**When** work begins
+**Then** Mika picks where Re-fetch sits in Book detail and what it shows when it fills fields or finds nothing to fill from rendered mock-up options, and the pick is recorded in EXPERIENCE.md before the screen is built
+
 **Given** an opened shared Book and the admin role
 **When** I tap Re-fetch in Book detail
 **Then** `lib/catalogue` runs the sources and fills only empty shared fields (including themes and the cover), never overwriting a value and never touching any `user-books` row
@@ -2389,7 +2402,7 @@ So that once Finna or Google knows it, it gets their details and becomes a norma
 **Given** my own private Book with an ISBN
 **When** I tap "Look it up again" in Book detail, or on its In library Answer
 **Then** the sources are called through `lookupBook` (rate-limited, never cached as `unavailable`)
-**And** on `found`, with the edition picker when there are several candidates, the AD-5 auto-share runs in one transaction without creating a copy: source values replace the Book's, authors and series are re-matched to shared records, `visibility` becomes shared and `createdBy` clears, or my copies, entries and `user-books` row move to an existing shared Book and the private one is deleted; the toast reads "Shared · from {source}"
+**And** on `found`, with the edition picker when there are several candidates (opened over the Book detail sheet, one overlay deep), the AD-5 auto-share runs in one transaction without creating a copy: source values replace the Book's, authors and series are re-matched to shared records, `visibility` becomes shared and `createdBy` clears, or my copies and `user-books` row move to an existing shared Book and the private one is deleted (entries move too from Epic 7, Story 7.7); the toast reads "Shared · from {source}"
 **And** as admin, my differing hand-entered values are dropped; as another user, they become my overrides
 **And** on `none` the toast reads "Still not found."; on `unavailable` it names the sources that didn't answer; nothing changes
 **And** a private Book without an ISBN shows "Add the ISBN on Edit book to look it up." instead of the link
@@ -2500,6 +2513,7 @@ So that every screen lends and returns the same way (FR-35, FR-36, AD-20).
 **And** the default lending and return date is today in `Europe/Helsinki`; a lending date in the future, or a return date before the lending date, fails with a field error
 **And** returning sets `returnedOn` (today by default) and keeps the row as history
 **And** lend's restore deletes the loan; return's restore reopens it; integration tests undo both
+**And** undoing a save (Story 3.37) once its copy has a loan fails with `UNDO_FAILED` and changes nothing; an integration test covers it (AD-11)
 **And** an inline-created Person stays after Undo
 
 ### Story 6.6: [J10] Loans in holdings
@@ -2522,6 +2536,10 @@ I want to lend a book from its detail and mark it returned,
 So that Antti at the door takes ten seconds (FR-35, FR-36, UX-DR43, UX-DR16).
 
 **Acceptance Criteria:**
+
+**Given** the story starts
+**When** work begins
+**Then** Mika picks the Lend picker: Person, date and the confirm in one overlay from rendered mock-up options, and the pick is recorded in EXPERIENCE.md before the screen is built
 
 **Given** an owned copy's line in Book detail
 **When** I tap Lend
@@ -2555,6 +2573,7 @@ So that I know which loans to chase (FR-37, UX-DR48).
 **Then** open loans are one list, longest out first; each row shows the copy (cover, title, author) and "{person} · since {date}"
 **And** tapping a row opens Book detail at `?book=` on `/loans`
 **And** with nothing lent it shows "Nothing lent" and one dry remark
+**And** on a load failure it shows "Couldn't load. Try again." with a retry Link
 
 ### Story 6.10: [J12] Loans by person
 
@@ -2711,6 +2730,7 @@ So that I don't keep wishing for a book I have (FR-28, AD-18).
 **Then** before creating the copy, in the same transaction, it closes my open entries for that Book that have no recipient
 **And** entries for a Person stay open
 **And** the save's restore also reopens the entries it closed; an integration test undoes it
+**And** when a save (Story 3.39) or Look it up again (Story 5.35) merges my private Book into an existing shared Book, my entries for it move to the shared Book first; integration tests cover both paths
 
 ### Story 7.8: [H6] Bought and ordered
 
@@ -2752,6 +2772,7 @@ So that I can see what I'm collecting for (FR-39, UX-DR49).
 **Then** each list is a List row with its name and open-entry count; tapping opens it
 **And** "New list" opens a dialog asking for a name; a name in use is rejected under the field
 **And** with no lists it shows "No wishlists" and "New list"
+**And** on a load failure it shows "Couldn't load. Try again." with a retry Link
 
 ### Story 7.11: [H11] One wishlist
 
@@ -2767,6 +2788,7 @@ So that in a shop I know what to buy for whom (FR-38, FR-39, UX-DR49).
 **And** each open entry is a row with cover, title, author and "For {person}" at the end; closed entries are not listed
 **And** Rename edits the name in place; Delete is confirmed by a dialog saying its entries go too
 **And** an empty list shows "Nothing on this list."
+**And** on a load failure it shows "Couldn't load. Try again." with a retry Link
 
 ### Story 7.12: [H12] Opened entry
 
@@ -2803,6 +2825,10 @@ I want Add to wishlist on the Answer and in Book detail,
 So that a book I don't own yet is kept for later without rescanning (FR-21, FR-22, UX-DR46).
 
 **Acceptance Criteria:**
+
+**Given** the story starts
+**When** work begins
+**Then** Mika picks how a list is created when the picker has none, within one overlay from rendered mock-up options, and the pick is recorded in EXPERIENCE.md before the screen is built
 
 **Given** the Not in library or Not found Answer, or Book detail's foot
 **When** I tap Add to wishlist
@@ -2938,6 +2964,7 @@ So that I can check a web shop or a book without a barcode (FR-20, UX-DR45).
 **And** the progress line runs while searching
 **And** tapping a result opens its Answer (`?isbn=` or `?book=`), and Back from the Answer returns to the results
 **And** "Too many lookups. Wait a moment." shows when rate-limited
+**And** a lent copy in "In your library" shows the lent marker with the borrower (FR-37)
 
 ### Story 8.9: [I7] Add by hand from Lookup
 
@@ -2949,7 +2976,7 @@ So that a book nobody knows still gets in with what I typed (FR-12, FR-22).
 
 **Given** Lookup with no results
 **When** it shows "Nothing found" and I tap "Add by hand"
-**Then** `/scan?title=<text>` (built in Story 3.48) opens the Not found Answer with the typed text in the title field
+**Then** `/scan?title=<text>` (built in Story 3.49) opens the Not found Answer with the typed text in the title field
 **And** Add to library and Add to wishlist save a private Book without an ISBN
 
 ### Story 8.10: [I8] End-to-end: shop check
@@ -2992,10 +3019,10 @@ So that Book detail, Edit book and select mode tag the same way (AD-18, AD-20).
 
 **Acceptance Criteria:**
 
-**Given** `changeTags(ctx, target, { add: Ref[], remove: number[], kind })` in `lib/books`, where the target is copy ids or a Book id
+**Given** `changeTags(ctx, target, { add: Ref[], remove: number[], kind })` in `lib/tags`, where the target is copy ids or a Book id
 **When** it runs
 **Then** it applies to the distinct Books through `upsertUserBook` in one transaction; names resolve by `nameKey` within my tags of that kind, created when missing
-**And** a new user genre whose name matches a system genre (English or Finnish name), or a new user theme matching a system theme on a Book I hold, fails with the field error `SYSTEM_NAME` ("{name} is a system genre." / "… system theme.")
+**And** a new user genre whose name matches a system genre (English or Finnish name), or a new user theme matching a system theme on a Book I hold (read through `lib/shelf`), fails with the field error `SYSTEM_NAME` ("{name} is a system genre." / "… system theme.")
 **And** it returns a restore that puts back each Book's previous tags; an integration test undoes it; inline-created tags stay after Undo
 
 ### Story 9.3: [G8] Rename, merge and delete tags
@@ -3006,7 +3033,7 @@ So that "scifi" and "sci-fi" can become one (FR-17, AD-18).
 
 **Acceptance Criteria:**
 
-**Given** `lib/books`
+**Given** `lib/tags`
 **When** a tag is renamed onto an existing `nameKey` of the same kind
 **Then** it fails with `NAME_TAKEN` and `conflictId`; renaming a user genre or theme onto a system name fails with `SYSTEM_NAME`
 **And** a rename that only changes case is allowed
@@ -3064,6 +3091,10 @@ So that classifying a book is a tap or two (FR-13, FR-26, UX-DR47).
 
 **Acceptance Criteria:**
 
+**Given** the story starts
+**When** work begins
+**Then** Mika picks how a kind is chosen and how values are added and removed, in Book detail and on Edit book from rendered mock-up options, and the pick is recorded in EXPERIENCE.md before the screen is built
+
 **Given** "Add tag" in Book detail, or the tags field on Edit book's first screen
 **When** I open the picker
 **Then** it offers tag, genre and theme as kinds, with a combobox of my values of that kind that creates new ones; adding or removing saves at once in Book detail with "Tagged 1 · Undo"
@@ -3108,7 +3139,7 @@ So that books get sensible genres from day one (FR-17, D-2).
 **Given** a migration
 **When** it runs
 **Then** it seeds Google Books' top-level category vocabulary as system genres, each with `name` and `nameFi`; the list and its Finnish names are written in the story and reviewed by Mika
-**And** the seeded genres show in Finnish through `genreName()` (Story 3.19)
+**And** the seeded genres show in Finnish through `genreName()` (Story 3.17)
 **And** the migration is idempotent against genres already present
 
 ### Story 9.11: [G5] Genres from Google Books on save
@@ -3180,5 +3211,5 @@ So that "done" is a measurement, not a feeling (PRD Success Metrics).
 **When** the acceptance is run
 **Then** "where is it?" is timed on the phone for five books, from opening bookeh to seeing the location, each under 10 s
 **And** a SQL query counts Books with any override or edit after saving against all Books held, and the ratio is recorded; above 1 in 10, the counter-metric is flagged for a decision
-**And** the count of catalogued books with a location, the NFR-1 and NFR-2 measurements from Stories 3.45 and 8.2, and the restore rehearsal from Story 4.11 are listed
+**And** the count of catalogued books with a location, the NFR-1 and NFR-2 measurements from Stories 3.46 and 8.2, and the restore rehearsal from Story 4.10 are listed
 **And** the results are written in `docs/phase-1-acceptance.md`

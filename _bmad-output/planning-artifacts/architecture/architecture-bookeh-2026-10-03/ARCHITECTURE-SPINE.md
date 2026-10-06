@@ -57,7 +57,7 @@ Arrows are the only allowed import directions, and ESLint `no-restricted-imports
 
 - `src/lib` never imports from `src/app`. `src/collections` imports only from `src/access` and `src/fields`.
 - `lib/metadata` has no database access.
-- Between services, imports are one-way: `catalogue` may import `copies`, `wishlists`, `books` and `metadata`; `wishlists` and `loans` may import `copies` and `people`; `shelf` may import `books`; `copies`, `people`, `books` and `metadata` import no other service.
+- Between services, imports are one-way: `catalogue` may import `copies`, `wishlists`, `books` and `metadata`; `wishlists` and `loans` may import `copies` and `people`; `shelf` may import `books`; `tags` may import `books` and `shelf`; `copies`, `people`, `books` and `metadata` import no other service.
 - `account` imports no other service.
 - `lib/undo` imports only `lib/payload` and `lib/errors`. Any service may import it. `lib/errors.ts` and `lib/processState.ts` import nothing from the project, and any module under `src/lib` may import them.
 - `src/app/(frontend)` imports from `lib/payload` only `requireUser`, `requireUserOrThrow` and types. It never calls the gateway.
@@ -77,7 +77,7 @@ Arrows are the only allowed import directions, and ESLint `no-restricted-imports
 - **Prevents:** permission checks scattered through pages and services; silent bypass (the Local API defaults to `overrideAccess: true`); reliance on Payload's permissive defaults
 - **Rule:**
   - Every collection declares create, read, update and delete access explicitly. Read, update and delete return `where` constraints when the answer depends on the row; create returns a boolean.
-  - Access functions test roles only through named helpers in `src/access` (for example `canEditShared`, `canManageAccounts`), never by reading `roles` inline.
+  - Access functions test roles only through named helpers in `src/access` (for example `isAdmin`, `canEditShared`), never by reading `roles` inline.
   - `users`: a user reads and updates only their own document; admin reads all; create and delete are admin only; `roles` is writable only by admin.
   - Frontend-reachable code calls Payload only through the gateway in `src/lib/payload`, which always passes the context's user and `overrideAccess: false`.
   - Every page starts with `requireUser()`, which redirects to `/login?next=<path>`; sign-in returns to `next` only when it is a path on the same origin. Every server action and route handler starts with `requireUserOrThrow()`, inside `runAction()` or `runRoute()` (see Errors), and fails with `UNAUTHENTICATED` instead of redirecting. The sign-in page is the only exception in Phase 1.
@@ -126,7 +126,7 @@ Arrows are the only allowed import directions, and ESLint `no-restricted-imports
 - **Prevents:** copy-on-write forks; screens showing raw shared values; "cleared" and "not overridden" being confused; a friend's overrides leaking to a viewer later
 - **Rule:**
   - `user-books` has at most one row per owner and Book. It holds the override fields, `overridden` (a `json` field holding the array of overridden field names), read flag, rating with `ratedAt`, and the user's tags of every kind (AD-8).
-  - The overridable field set is declared once in `src/fields/bookFields.ts` and used by both collections. ISBN-13 is identity, and genres and themes are system data; none of the three is overridable.
+  - The overridable field set is declared once in `src/fields/bookFields.ts` and used by both collections. ISBN-13 is identity, the cover changes only through `setCover()` (AD-14), and genres and themes are system data; none of the four is overridable.
   - A field is overridden if and only if its name is in `overridden`; its stored value may then be empty, meaning cleared. Relationship overrides (`authors`, `series`) are relationship fields to the same collections. A typed author or series name that matches nothing becomes a private record (AD-5). A user classifies a shared Book for themselves with user genres and user themes, which are tags (AD-8), not overrides.
   - Overrides exist only on shared Books.
   - The override row is always the viewer's: `user-books` is joined on the requesting user, never on the owner of a copy or entry. A viewer with no row gets shared values.
@@ -192,7 +192,7 @@ Arrows are the only allowed import directions, and ESLint `no-restricted-imports
   - A save takes `SaveInput` and creates every needed document in one transaction (AD-16): ensure the Book, then either `closeEntriesForBook()` and `createCopy()` (AD-18) or the new entry. A copy saved this way is owned and at the default location. Status, location, tags, the recipient of an entry and Book values are changed afterwards through their own functions.
   - An Answer opened by ISBN sends `{ isbn13, pick? }`. A `{ bookId }` target must pass `requireOwnBook()` (AD-7).
   - `SaveInput` carries a client-generated `requestId`. A repeat of a recent `requestId` by the same user returns the first result.
-  - A save is undoable (AD-20). Its restore deletes the copy or entry and reopens closed entries. It deletes a created Book, author, series or media row only when `isUnreferenced()` (AD-3) finds no reference to it from any row of any user, and a created `user-books` row only when that user has no other copy or entry for the Book. After an auto-share (AD-5) it removes the copy and leaves the Book shared.
+  - A save is undoable (AD-20). Its restore deletes the copy or entry and reopens closed entries. It deletes a created Book, author, series or media row only when `isUnreferenced()` (AD-3) finds no reference to it from any row of any user, and a created `user-books` row only when that user has no other copy or entry for the Book. After an auto-share (AD-5) it removes the copy and leaves the Book shared. If the copy has gained a loan since the save, the restore fails with `UNDO_FAILED` and changes nothing.
 
 ### AD-12 — Exactly one app instance
 
@@ -246,9 +246,9 @@ Arrows are the only allowed import directions, and ESLint `no-restricted-imports
 - **Rule:**
   - `lib/copies` is the only writer of `copies`. `createCopy()` is its only insert; move, receive, set status, set note and remove are its other functions, and `editBook()` calls them. A `location` of `undefined` on an owned copy means the profile's default location; `null` means none; no hook sets a default. Setting a copy to ordered clears its location; Received makes it owned at the default location.
   - `lib/wishlists` is the only writer of `wishlist-entries`. `closeEntriesForBook()` closes the user's open entries for a Book that have no recipient; `saveCopy()` calls it before `createCopy()`, in the same transaction, and folds what it closed into the save's restore. `closeEntry()` marks an entry bought or ordered and calls `createCopy()` unless the entry is for a Person.
-  - `upsertUserBook()` in `lib/books` is the only writer of `user-books` (AD-6). `setRead()` and `changeTags()` in `lib/books` take either copy ids or a Book id, so they also work for a Book the user has only on a wishlist. `setRead()` takes a value or `toggle`, which the server resolves: unread when every Book is read, otherwise read.
+  - `upsertUserBook()` in `lib/books` is the only writer of `user-books` (AD-6). `setRead()` in `lib/books` and `changeTags()` in `lib/tags` take either copy ids or a Book id, so they also work for a Book the user has only on a wishlist. `setRead()` takes a value or `toggle`, which the server resolves: unread when every Book is read, otherwise read.
   - `findOrCreateByName()` in `lib/catalogue` is the only matcher for authors and series (AD-5).
-  - Each private name-keyed collection has one owning service that matches by `nameKey`, creates, renames and deletes its rows, and merges them where the interface offers a merge: locations in `lib/copies`, People in `lib/people`, tags of every kind in `lib/books`, wishlists in `lib/wishlists`. The profile, `profileVisibility` and `collectionVisibility` included, is read and updated only through `lib/account`. System genres are managed only through `lib/catalogue`, admin only. Screens never match names.
+  - Each private name-keyed collection has one owning service that matches by `nameKey`, creates, renames and deletes its rows, and merges them where the interface offers a merge: locations in `lib/copies`, People in `lib/people`, tags of every kind in `lib/tags` (which reads system genre names and, through `lib/shelf`, system theme names for `SYSTEM_NAME`), wishlists in `lib/wishlists`. The profile, `profileVisibility` and `collectionVisibility` included, is read and updated only through `lib/account`. System genres are managed only through `lib/catalogue`, admin only. Screens never match names.
   - An input that picks one of these rows or creates it inline is a `Ref`: an id, or a name to create. The owning service resolves it inside the action's transaction. Undo leaves a row created this way.
   - Renaming onto a `nameKey` that exists fails with `NAME_TAKEN` and the existing row's id as `conflictId`.
   - A merge is one function in the owning service, in one transaction: every reference to the source row moves to the target, then the source row is deleted.
@@ -308,7 +308,7 @@ Arrows are the only allowed import directions, and ESLint `no-restricted-imports
 | Types | Strict TypeScript. `any` only for `rawMetadata`, enforced as a lint error. Payload generated types are the document types. |
 | Framework APIs | Read the bundled guide in `node_modules/next/dist/docs` before using a Next.js API, and the current Payload docs before touching admin overrides. |
 | Story size | One concern per story: one collection, one service or one screen. About 300 hand-written changed lines. Generated files (`payload-types.ts`, migrations, lockfile, import map) do not count. |
-| Tests | Tests run against database `bookeh_test`, never the dev database. `tests/helpers/harness.ts` provides `createUser()` and `as(user)`; tests create their own rows and never truncate. A collection story ships a two-user access test; a service story ships integration tests; the shelf module runs the two-user test too. Pure functions get `*.unit.spec.ts`. No test reaches the network: adapters are tested against recorded responses in `tests/fixtures/<source>/`. A service function that records an Undo receipt ships a test that undoes it. Playwright covers only scan-to-save and shop check, with a fixture source and ISBNs entered by hand. |
+| Tests | Tests run against database `bookeh_test`, never the dev database. `tests/helpers/harness.ts` provides `createUser()` and `as(user)`; tests create their own rows and never truncate. A collection story ships a two-user access test; a service story ships integration tests; the shelf module runs the two-user test too. Pure functions get `*.unit.spec.ts`. No test reaches the network: adapters are tested against recorded responses in `tests/fixtures/<source>/`. A service function that records an Undo receipt ships a test that undoes it. Playwright covers only scan-to-save and shop check, with a fixture source and ISBNs entered by hand. The fixture source joins `sources/index.ts` only when `BOOKEH_SOURCES=fixture`, which the app refuses under `NODE_ENV=production`; its covers come from a local test route that is on the cover allowlist only under that setting. |
 | Commits | One conventional commit per story. |
 
 ## Stack
@@ -390,7 +390,7 @@ type SourceResult = {
   source: SourceId // first source in order that answered
   raw: Record<SourceId, unknown>
 }
-type SourcesOutcome = { kind: 'found'; candidates: SourceResult[]; raw: RawMetadata } | { kind: 'none' } | { kind: 'unavailable' } // candidates best first
+type SourcesOutcome = { kind: 'found'; candidates: SourceResult[]; raw: RawMetadata } | { kind: 'none' } | { kind: 'unavailable'; failed: SourceId[] } // candidates best first; failed names the sources that failed or timed out
 type SearchHit = Pick<SourceResult, 'isbn13' | 'title' | 'authors' | 'publisher' | 'year' | 'binding' | 'source'> & { hasCover: boolean }
 type RawMetadata = {
   v: 1
@@ -444,7 +444,7 @@ type LookupResult =
   | { kind: 'existing'; book: EffectiveBook; mine: Holdings }
   | { kind: 'source'; candidates: Draft[]; pick: number; matches: { authors: Match[]; series: Match | null; genres: Match[] } } // matches are for candidates[pick]
   | { kind: 'none' }
-  | { kind: 'unavailable' }
+  | { kind: 'unavailable'; failed: SourceId[] } // the Answer names these sources
 type LookupTarget = { isbn: string; pick?: number } | { bookId: number } // isbn as entered
 type BookEdits = Partial<{
   isbn13: string // private Books only
@@ -560,8 +560,9 @@ src/
     undo/              # receipt store, withUndo, undo
     metadata/          # source contract, sources/, merge, lookupSources, cache
     catalogue/         # lookupBook, searchBooks, saveCopy, saveEntry, editBook, findOrCreateByName, isUnreferenced, covers (download, upload and warp), re-fetch, lookupAgain, genre admin
-    books/             # EffectiveBook, getEffectiveBooks, getHoldings, requireOwnBook, upsertUserBook, setRead, changeTags and tags of every kind, coverUrl
+    books/             # EffectiveBook, getEffectiveBooks, getHoldings, requireOwnBook, upsertUserBook, setRead, setRating, coverUrl
     shelf/             # Drizzle query module, read-only: getShelfRows, values and suggestions; query.ts (pure): parseShelfQuery, shelfHref
+    tags/              # tags of every kind: changeTags, rename, merge, delete, tagUse; SYSTEM_NAME checks
     copies/            # createCopy, move, receive, status, note, remove; locations
     people/            # People: match, rename, merge, delete
     loans/  wishlists/

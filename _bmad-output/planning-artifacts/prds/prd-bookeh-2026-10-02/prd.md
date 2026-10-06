@@ -112,9 +112,9 @@ Mika is working through a stack of books at home. His default location is Tamper
 - **FR-14** Who gets the edits:
   - A shared Book keeps the source's values, and a user's edits are stored as their overrides [ASSUMPTION]. The admin's edits change the shared Book itself, for everyone. System genres and themes cannot be overridden (FR-17, FR-17a).
   - On a private Book, the creator's values are the Book's values.
-- **FR-15** Saving shows a toast with **Edit** and **Undo** and returns to the scanner. Undo removes the copy or wishlist entry, plus any Book, author or series that nothing else references. Undo is also offered after a move, a tag change, marking read, lending, Returned, Received, and marking a wishlist entry bought or ordered. Removals are confirmed first and have no Undo. A failed save shows an error toast and leaves the screen as it was.
+- **FR-15** Saving to the library shows a toast with **Edit** and **Undo** and returns to the scanner; saving to a wishlist shows **Undo**. Undo removes the copy or wishlist entry, plus any Book, author or series that nothing else references. Undo is also offered after a move, a tag change, marking read, lending, Returned, Received, and marking a wishlist entry bought or ordered. Removals are confirmed first and have no Undo. A failed save shows an error toast and leaves the screen as it was.
 - **FR-16** If the user already owns a copy of the same edition, the answer says so and lists the copies, but still allows adding another copy.
-- **FR-17** Authors and series are matched to existing shared records by name, ignoring case, and created if missing. Those created from a private Book stay private along with it. System genres come from Google Books categories: a save matches them by English name to the seeded genre list and creates the missing ones, without a Finnish name. The admin adds Finnish names, adds genres, and merges or deletes duplicates. System genres are shared and not overridable; each user can add their own user genres to a Book alongside them. Personal tags, user genres and user themes are matched within the user's own, and the user can rename, merge and delete them. A user genre or theme may not take a system genre's or theme's name.
+- **FR-17** Authors and series are matched to existing shared records by name, ignoring case, and created if missing. Those created from a private Book stay private along with it. System genres come from Google Books categories: a save matches them by English name to the seeded genre list and creates the missing ones, without a Finnish name. The admin adds Finnish names, adds genres, and merges or deletes duplicates. System genres are shared and not overridable; each user can add their own user genres to a Book alongside them. Personal tags, user genres and user themes are matched within the user's own, and the user can rename, merge and delete them. A user genre may not take a system genre's name, nor a user theme the name of a system theme on a Book the user holds.
 - **FR-17a** A shared Book stores Finna's subject terms as themes, as given. Themes are shown on the Book and are a filter. They are source data: not overridable, and filled by a re-fetch when empty (FR-19). Each user can add their own user themes alongside them.
 - **FR-18** The raw source response is stored with the Book, so the parser can be improved and re-run later. It is never shown to other users.
 - **FR-19** Only the admin can re-fetch metadata for a shared Book. A re-fetch fills empty fields only and never overwrites existing values.
@@ -141,7 +141,7 @@ Mika is working through a stack of books at home. His default location is Tamper
   Filters and sorting use the user's overrides where they exist. On an opened Book, its author, series, genres, themes, tags and location are shortcuts that add that value to the active filters.
 - **FR-26** Book detail shows the user's copies, wishlist entries, loans, read flag, rating, notes, genres, themes and personal tags. Read, rating, notes and tags are changed in place; the Book's own fields are changed on the edit screen (FR-13).
 - **FR-27** Overrides are visible only to the user who made them, everywhere the Book appears for that user. To change a shared value, the user suggests a fix (FR-45); the admin changes it directly on the edit screen (FR-14).
-- **FR-28** Status on a copy is **ordered** or **owned**.
+- **FR-28** Status on a copy is **ordered** or **owned**. Adding a Book to the library closes the user's own open wishlist entries for it; entries for a Person stay open.
   - Users set **Ordered** on the edit screen right after adding a book, or from a wishlist entry, for example after buying online.
   - **Received** turns an ordered copy into an owned one, defaulting to the default location.
   - Marking a wishlist entry bought or ordered closes the entry. If the entry is for the user, it creates a copy. If it's for another Person, it closes the entry without creating a copy [ASSUMPTION].
@@ -251,6 +251,8 @@ This replaces the M1–M5 milestones in CLAUDE.md. **Only Phase 1 is committed.*
 - System genres and themes from the sources, and the admin's genre management (FR-17, FR-17a)
 - Cover upload for the admin and for private Books (FR-47, Phase 1 part)
 - PWA, localisation and backups (FR-50, FR-51, NFR-6)
+
+Within Phase 1, the first shop check is the scan Answer of F2 (In library / Not in library). Title search across the sources and the Ordered and On wishlist Answers come after wishlists (Mika, 2026-10-06).
 
 Search is on the phone in this phase, because checks in webshops depend on it. Done when the Phase 1 success metrics are met.
 

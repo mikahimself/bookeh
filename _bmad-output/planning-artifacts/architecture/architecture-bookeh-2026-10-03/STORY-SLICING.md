@@ -48,7 +48,7 @@ flowchart LR
   A --> K["K Platform and operations"]
 ```
 
-Recommended sequence, as the epics order it: A with K1, K5, K9 and K10; K2 to K4; then D9, C9, B, U, C, D1 to D8, D10, D15 to D18, D23, D25, D26, D32, E26, F1, F2, I9, K11 and C12 for the first saved book; then A20, E21, D5, D19 to D22, D24, D27 and F6 for Edit book with the copy's status and location, which with K2 to K4 opens the cataloguing gate (K12 rehearses the restore once real books are in); then D28 to D31 (covers), E, F3 to F5, F7, F8, H13, D33, K6 and K14; then J, H, I, G, and K13 last. Edit book comes before the collection (D-5) so real cataloguing never produces a book without a location.
+Recommended sequence, as the epics order it: A with K1, K5, K9 and K10; K2 to K4; then D9, C9, B, U, C, D1 to D8, D10, D15 to D18, D23, D25, D26, D32, E26, F1, F2, I9, A20, A23, K11 and C12 for the first saved book; then E21, D5, D19 to D22, D24, D27 and F6 for Edit book with the copy's status and location, which with K2 to K4 opens the cataloguing gate (K12 rehearses the restore once real books are in); then D28 to D31 (covers), E, F3 to F5, F7, F8, H13, D33, K6 and K14; then J, H, I, G, and K13 last. Edit book comes before the collection (D-5) so real cataloguing never produces a book without a location.
 
 ## A — Foundation
 
@@ -93,11 +93,11 @@ Recommended sequence, as the epics order it: A with K1, K5, K9 and K10; K2 to K4
 | # | Slice | Kind | Depends on | Governed by |
 | --- | --- | --- | --- | --- |
 | B1 | `isbnField` with `normaliseIsbn`, and `nameKeyField`, with unit tests | Library | A4 | ISBN, Names |
-| B2 | `bookFields` and `books`: visibility, `createdBy`, source, admin-only `rawMetadata`, ISBN constraints; access test; first migration | Collection | A12, B1, B11 | AD-4, AD-5, AD-13, AD-19 |
-| B3 | `authors` with visibility, `nameKey` constraints and `sortName`; access test | Collection | B2, B10 | AD-4, AD-19 |
-| B4 | `series`, same rules without `sortName`; access test | Collection | B2 | AD-4, AD-19 |
+| B2 | `bookFields` and `books`: visibility, `createdBy`, source, admin-only `rawMetadata`, ISBN constraints, `genres` relation; access test | Collection | A12, B1, B3, B4, B5, B11 | AD-4, AD-5, AD-13, AD-19 |
+| B3 | `authors` with visibility, `nameKey` constraints and `sortName`; access test | Collection | B1, B10 | AD-4, AD-19 |
+| B4 | `series`, same rules without `sortName`; access test | Collection | B1 | AD-4, AD-19 |
 | B5 | `genres`: `name`, `nameFi`, `nameKey`; shared only, admin-managed; access test | Collection | B1 | AD-4, D-2 |
-| B6 | `user-books`: override fields, `overridden`, read, rating, `ratedAt`, unique per owner and Book; access test with a foreign id | Collection | B3, B4, B5 | AD-1, AD-6, AD-17, AD-19 |
+| B6 | `user-books`: override fields, `overridden`, read, rating, `ratedAt`, unique per owner and Book; access test with a foreign id | Collection | B2, B3, B4, B5 | AD-1, AD-6, AD-17, AD-19 |
 | B7 | `copies`: owner, Book, status, notes; access test with a foreign id | Collection | B2 | AD-1, AD-8, AD-17 |
 | B8 | `lib/books`: `EffectiveBook`, `UserBookState`, `getEffectiveBooks`, `coverUrl` | Service | B6 | AD-6, AD-10 |
 | B9 | `lib/books`: `upsertUserBook` | Service | B8, A11 | AD-6, AD-18 |
@@ -146,13 +146,13 @@ Recommended sequence, as the epics order it: A with K1, K5, K9 and K10; K2 to K4
 | D24 | `lib/copies`: set status, set note and remove; an ordered copy has no location | Service | D3 | AD-8, AD-18 |
 | D25 | Answer: in library, with Add another copy | Screen | D17, E26 | FR-16, FR-20 |
 | D26 | Answer: not found, entered by hand; "Add without ISBN" on Scan | Screen | D17, D7 | FR-12, FR-22 |
-| D27 | More details on Edit book | Screen | D21 | FR-13 |
+| D27 | More details on Edit book; author and series as text fields until E18 adds suggestions | Screen | D21 | FR-13 |
 | D28 | `media` visibility and `createdBy` | Collection | A18, B2 | AD-4, AD-14 |
 | D29 | `setCover` and `removeCover`: validation, four-corner warp with sharp, metadata stripped | Service | D28, D1 | AD-14, FR-47 |
 | D30 | Four-corner crop component, after a rendered mock-up choice | Screen | A20 | UX: Edit book |
 | D31 | Add, Replace and Remove cover on Edit book | Screen | D29, D30, D21 | AD-14, FR-47 |
 | D32 | `requestId`: a repeated save returns the first result | Service | D4, A24 | AD-11, AD-12 |
-| D33 | `lookupAgain`: Look it up again for a hand-entered Book | Service | D8, C6, E8 | AD-5, AD-9, D-8 |
+| D33 | `lookupAgain`: Look it up again for a hand-entered Book (copies and `user-books` move; entries from H7) | Service | D8, C6, E8 | AD-5, AD-9, D-8 |
 
 After D17, the first book can be catalogued from the phone.
 
@@ -167,14 +167,14 @@ After D17, the first book can be catalogued from the phone.
 | E6 | Collection screen at `/`: rows layout, search, count line, first page | Screen | E2, E17, D10, A22 | FR-23, FR-24, UX: Collection controls |
 | E7 | Filter panel: value lists | Screen | E3, E4, E6, E18 | FR-25, UX: Filter panel |
 | E8 | Book detail, display only: the sheet on the phone, opened by `?book=` | Screen | E21, E26, B8, D10, A20 | FR-26, UX: Book detail |
-| E11 | Read flag and rating in Book detail | Screen | E8, E24 | AD-8, FR-29 |
+| E11 | Read flag and rating in Book detail; `setRating` in `lib/books` | Screen | E8, E24 | AD-8, FR-29 |
 | E12 | Copy note editing and copy removal on a copy's line | Screen | E8, D24 | AD-18 |
 | E13 | Admin re-fetch: fill-empty service, themes and the cover included, and the admin-only action on Book detail | Service | E8, C4 | AD-5, FR-19 |
 | E14 | Shelf query timing test at 10,000 copies | Test | E2, E3, E4 | NFR-3 |
 | E15 | Shelf query: author sort on the first effective author's `sortName` | Service | E1, B3 | AD-4, AD-7 |
 | E16 | `lib/shelf/query.ts`: `ShelfQuery`, `parseShelfQuery` and `shelfHref` with the `book` param, unit-tested | Library | none | AD-7 |
 | E17 | `getShelfRows` by offset and limit: hydrated rows, total and filter labels | Service | E1, B8, E26 | AD-7 |
-| E18 | Shelf values in use with copy counts, and suggestions for author, series and publisher at `/data/suggest` | Service | E1, A13 | AD-7, AD-10 |
+| E18 | Shelf values in use with copy counts, and suggestions for author, series and publisher at `/data/suggest`, also feeding Edit book's author and series comboboxes | Service | E1, A13 | AD-7, AD-10 |
 | E19 | Endless scrolling: the `/data/shelf` handler, loading more, and the reload after a change | Screen | E6, A25 | AD-7, AD-10 |
 | E28 | Remembering the list's row count and scroll position across routes | Screen | E19 | AD-7 |
 | E20 | Covers layout and sizes s, m, l, remembered per device | Screen | E6, A21 | UX: Collection controls |
@@ -213,8 +213,8 @@ After D17, the first book can be catalogued from the phone.
 | G3 | Tag and user-genre filters in the shelf query and the Filter panel | Service | G1, E4 | FR-25 |
 | G4 | Seeded system genres with Finnish names (migration) | Setup | B5 | AD-5, D-2 |
 | G5 | `mapSubjectsToGenres`: Google categories on save, create missing, admin re-run | Service | G4, D1 | AD-5, D-2 |
-| G7 | `changeTags` in `lib/books`: any kind, `SYSTEM_NAME`, add or remove for copies or a Book, with Undo | Service | G1, U1 | AD-18, AD-20 |
-| G8 | Rename, merge and delete for each kind | Service | G1 | AD-18 |
+| G7 | `changeTags` in `lib/tags`: any kind, `SYSTEM_NAME` (system theme names through `lib/shelf`), add or remove for copies or a Book, with Undo | Service | G1, U1, E18 | AD-18, AD-20 |
+| G8 | Rename, merge, delete and `tagUse` for each kind, in `lib/tags` | Service | G1, E18 | AD-18 |
 | G9 | Settings: Tags, My genres and My themes | Screen | G8, K5 | UX: Settings |
 | G10 | Tag on a selection, with the tag picker | Screen | G7, E23, A23 | FR-33 |
 | G11 | Genre admin service: names, add, merge, delete, `genreUse` | Service | B5, D1 | AD-3, AD-5, D-2 |
@@ -232,7 +232,7 @@ After D17, the first book can be catalogued from the phone.
 | H3 | `saveEntry` in the save service, with its Undo receipt | Service | H2, D6 | AD-11, AD-20 |
 | H5 | Wishlists section: the list of lists with counts, New list | Screen | H2, A22 | FR-39, UX: Wishlists |
 | H6 | `closeEntry`: closes the entry, creates a copy unless it is for a Person; with Undo | Service | H2, D3, U1 | AD-18, AD-20, FR-28 |
-| H7 | `closeEntriesForBook`: `saveCopy` closes the user's open entries for the Book and folds them into its restore | Service | H2, D6 | AD-11, AD-18 |
+| H7 | `closeEntriesForBook`: `saveCopy` closes the user's open entries for the Book and folds them into its restore; moves the user's entries when a save or `lookupAgain` merges a private Book into a shared one | Service | H2, D6, D8, D33 | AD-11, AD-18 |
 | H8 | Bought, Ordered and Remove on an opened entry | Screen | H6, H12 | FR-28 |
 | H9 | Deleting a wishlist deletes its entries; rename | Service | H2 | AD-18 |
 | H10 | Add to wishlist on the Answer and in Book detail, with the wishlist picker | Screen | H3, D16, A23 | FR-21, UX: Answer screens |
@@ -255,7 +255,7 @@ After D17, the first book can be catalogued from the phone.
 | I6 | Lookup screen at `/scan/find`: two result groups, a result opens its Answer | Screen | I2, I10, I11 | AD-7, FR-20, UX: Lookup |
 | I7 | Add by hand from Lookup's "Nothing found" | Screen | I6, D26 | FR-12, FR-22 |
 | I8 | Playwright test: shop check | Test | I2, H10 | Tests |
-| I9 | Answer when the sources did not answer | Screen | I7, C4 | AD-9 |
+| I9 | Answer when the sources did not answer, naming them (`failed`) | Screen | D26, C4 | AD-9 |
 | I10 | `searchBooks` in `lib/catalogue`: merged hits, one per ISBN, shared rate limit | Service | I4, I5, C7 | AD-9 |
 | I11 | Shelf text search over copies and open wishlist entries, with `visibleEntries` | Service | E2, H2 | AD-7 |
 | I12 | `lookupBook` by Book id, for the user's own Books without an ISBN | Service | C6, E21 | AD-9 |
@@ -268,7 +268,7 @@ After I2, the first real shop check works.
 | --- | --- | --- | --- | --- |
 | J1 | `people` with `nameKey`; access test | Collection | A12 | AD-1 |
 | J2 | `loans` with the one-open-loan constraint; access test with foreign ids | Collection | J1, B7 | AD-1, AD-8, AD-17, AD-19 |
-| J3 | Lend and return services, with Undo | Service | J2, J7, U1 | AD-18, AD-20, FR-35, FR-36 |
+| J3 | Lend and return services, with Undo; tests the save-undo loan rule (AD-11) | Service | J2, J7, U1 | AD-18, AD-20, FR-35, FR-36 |
 | J4 | Lend and Returned on a copy's line in Book detail, with the Person picker and inline add | Screen | J3, E8, A23 | FR-35 |
 | J5 | Loans section by date | Screen | J3, E17, A22 | FR-37, UX: Loans |
 | J6 | Deleting a copy deletes its loans | Service | J2, D3 | AD-18 |

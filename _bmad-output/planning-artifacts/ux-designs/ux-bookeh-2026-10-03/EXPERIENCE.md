@@ -44,7 +44,7 @@ Four sections, plus full-screen tasks that sit outside them.
 | **Settings** (section) | `/settings` | Its section heading | Profile, language, theme, profile and collection visibility, default location; manage locations, People, tags, my genres and my themes; for the admin, genres and the last backup; sign out. |
 | Scan | `/scan` | "Scan book", present on every section | Full screen. Camera, ISBN entry, "Find by title or author" and "Add without ISBN". |
 | Lookup | `/scan/find` | "Find by title or author" on Scan | Search by title or author for a shop check without a barcode (FR-20). |
-| Answer | `/scan?isbn={isbn13}`, with `&pick={n}` for a chosen edition | A barcode read, an ISBN entered, or a Lookup result tapped | Full screen. Says whether the Book is in the library and offers the next step. |
+| Answer | `/scan?isbn={isbn13}`, with `&pick={n}` for a chosen edition; `/scan?title={text}` for entry without an ISBN; `/scan?book={bookId}` for a Book without an ISBN | A barcode read, an ISBN entered, or a Lookup result tapped | Full screen. Says whether the Book is in the library and offers the next step. |
 | Edit book | `/books/{bookId}/edit` | "Edit" on a save toast; "Edit" in Book detail | Full screen. Book fields, the user's tags, genres and themes, and the cover where the user may change it. The review screen of the PRD, now after the save. |
 | Pickers and dialogs | None | Lend, Move, Tag, Add to wishlist, confirmations | Short choices on top of a screen or a sheet. |
 
@@ -65,7 +65,7 @@ Mock-ups, in the final tokens. The spines win on any conflict with a mock-up.
 | [mockups/key-wishlists.html](mockups/key-wishlists.html) | The list of wishlists, one wishlist, an entry opened. |
 | [mockups/key-settings.html](mockups/key-settings.html) | Settings on wide and phone. |
 
-Not mocked, built from this spine alone: Sign in, Lookup, the Filter panel on the phone, pickers and dialogs, select mode on the phone, and sizes s and l. The Genres group in Settings and the Corner crop step are not mocked either; their stories start with a rendered mock-up choice.
+Not mocked, built from this spine alone: Sign in, Lookup, the Filter panel on the phone, pickers and dialogs, select mode on the phone, and sizes s and l. The Genres group in Settings and the Corner crop step are not mocked either; their stories start with a rendered mock-up choice. So do the tag picker, the Lend picker, creating a list from the wishlist picker when there is none, the admin's Re-fetch result, and the app icon and theme colour, which are not designed yet.
 
 ## Voice and Tone
 
@@ -97,7 +97,7 @@ Behaviour. Visual specs live in `DESIGN.md` → Components.
 | Text switch | Rows / covers; s / m / l; by person / by date; read / unread; status; language; theme | Exactly one option is chosen. Tapping another switches at once, with no confirm. |
 | Button, primary | One per layer: Scan book on a section; Add to library or Back on an Answer; Save on Edit book; Bought on a wishlist entry; Done on the action bar; the confirming button of a dialog | A layer is a section, a sheet or panel, a full-screen task, the action bar, or a dialog. Each has at most one primary button. |
 | Button, secondary | Every other button | Acts on tap. |
-| Button, destructive | Remove in the action bar and on a wishlist entry; the confirming button of a removal dialog | Always confirmed by a dialog before it acts. No Undo afterwards. |
+| Button, destructive | Remove in the action bar and on a wishlist entry; the confirming button of a removal dialog | Always confirmed by a dialog before it acts. No Undo afterwards. Exception: Remove cover on Edit book takes effect on Save, so "Discard changes?" is its confirmation. |
 | Link | "Find by title or author", "More details", "Clear", "Filter", "Select", "Returned", "Lend", "Move", toast actions | Acts on tap. Not used to move between sections. |
 | Link, destructive | Delete in settings; Remove on a copy's line; Delete on a wishlist | Always confirmed by a dialog. No Undo afterwards. |
 | Back link | An opened wishlist | Returns to the list of wishlists. |
@@ -115,7 +115,7 @@ Behaviour. Visual specs live in `DESIGN.md` → Components.
 | Bottom sheet | Book detail and a wishlist entry on the phone; the Filter panel on the phone [ASSUMPTION]; pickers on the phone | Slides up to a little over half the screen; the list stays visible above, dimmed. Dragging up or tapping the handle opens it fully. Tapping the dimmed list, dragging down, X or Back closes it. The list keeps its scroll position. Modal: focus is held inside. |
 | Picker | Location (Move), tags (Tag), Person and date (Lend), wishlist (Add to wishlist) | A bottom sheet on the phone; a dialog on wide screens. One choice, then it closes. |
 | Dialog | Confirmations of removals and merges; "Discard changes?"; New list | Centred, modal, with the screen behind dimmed. The confirming button is on the right. `Esc` and tapping outside cancel. |
-| Toast | After a save or a reversible action | Sits above whatever is pinned to the bottom. Shows the result and its actions as Links. About 8 seconds, then gone; one at a time, a new one replacing the old. A toast raised on Scan goes the moment the next Answer opens. An error toast has no timer and stays until dismissed or replaced. Every toast has a close (X). Undo is hidden once its receipt has expired (30 minutes). |
+| Toast | After a save or a reversible action | Sits above whatever is pinned to the bottom. Shows the result and its actions as Links. About 8 seconds, then gone; one at a time, a new one replacing the old. A toast raised on Scan has no timer: it stays until the next Answer opens, so Edit and Undo wait while the next book is lined up. An error toast has no timer and stays until dismissed or replaced. Every toast has a close (X). Undo is hidden once its receipt has expired (30 minutes). |
 | Action bar | Select mode | Pinned to the bottom. The count, then Move, Tag, Read, Remove, and Done. On the phone it takes the place of the pinned Scan book button and is two rows: the count and Done above, the four actions below. [ASSUMPTION] On wide screens Scan book stays in the header. Buttons other than Done are disabled while nothing is ticked. |
 | Checkbox | Select mode | Appears on every row or tile when select mode starts. |
 | Close (X) | Scan, Lookup, Answer, Edit book; the sheet and the panel | Closes the whole task or overlay in one tap and returns to the section underneath. |
@@ -136,7 +136,9 @@ Undo is offered where the action has a plain opposite. Removals are confirmed fi
 | Read (one or many) | "Marked {n} read · Undo" | Restores each Book's read flag. |
 | Lend | "Lent to {person} · Undo" | Removes the loan. |
 | Returned | "Returned · Undo" | Reopens the loan. |
-| Bought, Ordered (wishlist entry) | "Saved to {location} · Undo" | Removes the copy and reopens the entry. |
+| Bought (wishlist entry, for me) | "Saved to {location} · Undo" | Removes the copy and reopens the entry. |
+| Ordered (wishlist entry) | "Ordered · Undo" | Removes the ordered copy, if one was made, and reopens the entry. |
+| Bought (wishlist entry, for a Person) | "Bought · Undo" | Reopens the entry. No copy is made. |
 | Received | "Saved to {location} · Undo" | Sets the copy back to ordered. |
 | Save on Edit book | "Saved" | No Undo. |
 | Cover on Edit book | "Saved" | No Undo. |
@@ -241,7 +243,7 @@ The heading is the first of these that applies. Every other fact that applies is
 
 Under the Book, the Answer names the source ("From Finna") and any author, series or genre that this save would create ("New author") (FR-13).
 
-**Several editions.** When the sources hold several records for the ISBN, the Answer says "{n} editions found" under the Book, preselects the best and offers a picker listing each candidate's binding, year, publisher, pages and cover. Picking one re-renders the Answer with `?pick={n}`, replacing the history entry, with its cover and new-record notes; Add to library and Add to wishlist save the picked one, and the Book keeps the scanned ISBN. Nothing about editions is shown with one candidate or an existing shared Book.
+**Several editions.** When the sources hold several records for the ISBN, the Answer says "{n} editions found" under the Book as a Link, preselects the best, and the Link opens a picker listing each candidate's binding, year, publisher, pages and cover. Picking one re-renders the Answer with `?pick={n}`, replacing the history entry, with its cover and new-record notes; Add to library and Add to wishlist save the picked one, and the Book keeps the scanned ISBN. Nothing about editions is shown with one candidate or an existing shared Book.
 
 - **Add to library** and **Add another copy** save an owned copy as fetched, at the default location, and return to Scan with the save toast. There is no review step in between. With no default location the copy has no location and the toast reads "Saved".
 - **Edit** on the save toast opens Edit book for that Book, with the new copy's status and location on its first screen. This is also how a copy is marked ordered at the moment it is added.
@@ -297,7 +299,7 @@ Two columns on wide screens: profile, language, theme, visibility, default locat
 | Theme | Text switch: light, dark, system. Per device. |
 | Profile and collection visibility | Two Text switches: public / hidden and open / closed. Both on the profile, default hidden and closed; no effect until friends exist (FR-4). |
 | Default location | Combobox of the user's locations; may be empty. |
-| Locations, People, Tags, My genres, My themes | One List row each, with what uses it ("31 books", "2 loans"). Each row has Rename, Merge and Delete. On the phone these three sit on a second line. "Add location" and "Add person" add one; genres and themes are added from a Book. |
+| Locations, People, Tags, My genres, My themes | One List row each, with what uses it ("31 books", "2 loans"). Each row has Rename, Merge and Delete. On the phone these three sit on a second line. "Add location" and "Add person" add one: an empty name field opens in place at the top of the group, Enter or leaving the field saves it, an empty field is dropped, and a name in use is rejected under the field. Rename confirms the same way. Genres and themes are added from a Book. |
 | Rename | Edits the name in place. Renaming to a name that already exists offers to merge instead. A user genre or theme may not take a system genre's or theme's name. |
 | Merge | Picks another item of the same kind; everything that used this one moves to it. Confirmed by a dialog. |
 | Delete | Confirmed by a dialog that says what will lose its location or tag. A Person who has loans, open or returned, or wishlist entries cannot be deleted; the dialog says so and offers Merge (AD-18). |
@@ -310,10 +312,12 @@ Two columns on wide screens: profile, language, theme, visibility, default locat
 | State | Surface | Treatment |
 |---|---|---|
 | First load | Any section | The section heading appears at once; the progress line runs until the content arrives. No skeletons. [ASSUMPTION] |
-| First run | Collection | "No books yet", one dry remark, and Scan book. No locations exist yet, so nothing mentions them. |
+| First run | Collection | "No books yet", one dry remark, and, on wide screens, Scan book (on the phone the pinned Scan book is the one primary). No locations exist yet, so nothing mentions them. |
 | No matches | Collection with search or filters | "No books match" and the "Clear" Link. |
 | Loading more | Collection | Progress line; the list stays usable. |
 | Load failed | Any list | "Couldn't load. Try again." with a Link that retries. |
+| App updated | Any | Toast "bookeh was updated." with a Reload Link. |
+| Entry gone | A wishlist opened at `?entry=` for a closed or removed entry | The list opens without the entry and toasts "Not on this list". |
 | No camera or permission denied | Scan | A message replaces the camera frame and the ISBN field takes focus (see Scan). |
 | Not an ISBN | Scan, ISBN field | The field is marked in {colors.danger} with "Not an ISBN. Thirteen digits, or ten." |
 | Looking up | Between Scan and Answer | Scan stays visible with the progress line. NFR-1 sets the time. |

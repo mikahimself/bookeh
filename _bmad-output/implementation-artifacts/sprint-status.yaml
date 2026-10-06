@@ -1,0 +1,247 @@
+# STATUS DEFINITIONS:
+# ==================
+# Epic Status:
+#   - backlog: Epic not yet started
+#   - in-progress: Epic actively being worked on
+#   - done: All stories in epic completed
+
+# Story Status:
+#   - backlog: Story only exists in epic file
+#   - ready-for-dev: Story file created, ready for development
+#   - in-progress: Developer actively working on implementation
+#   - review: Implementation complete, ready for review
+#   - done: Story completed
+
+# Retrospective Status:
+#   - optional: Can be completed but not required
+#   - done: Retrospective has been completed
+
+# Action Item Status:
+#   - open: Committed during a retrospective, not yet addressed
+#   - in-progress: Actively being worked on
+#   - done: Completed
+
+# WORKFLOW NOTES:
+# ===============
+# - Epic transitions to 'in-progress' automatically when its first story starts (via build's sprint sync)
+# - Stories can be worked in parallel if team capacity allows
+# - Developer typically creates the next story after the previous one is 'done' to incorporate learnings
+# - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
+# - Retrospective appends its action items to action_items; the status view surfaces open ones
+generated: 10-06-2026 17:50
+last_updated: 10-06-2026 19:42
+project: bookeh
+project_key: NOKEY
+tracking_system: file-system
+story_location: _bmad-output/implementation-artifacts
+development_status:
+  epic-1: backlog
+  1-1-a1-bump-next-js-payload-and-node: backlog
+  1-2-a2-github-repository-and-ci-workflow: backlog
+  1-3-a3-postgres-with-finnish-icu-collation: backlog
+  1-4-a4-test-harness: backlog
+  1-5-a5-remove-the-old-collections-and-graphql: backlog
+  1-6-a6-layer-import-rules-and-strict-any: backlog
+  1-7-a7-role-helpers-and-asrequestuser: backlog
+  1-8-a8-users-collection: backlog
+  1-9-k7-ci-migration-check: backlog
+  1-10-a9-first-user-seed: backlog
+  1-11-a10-request-context-and-gateway-in-lib-payload: backlog
+  1-12-a13-errors-and-action-results: backlog
+  1-13-a14-tailwind-4-and-the-design-tokens: backlog
+  1-14-a15-interface-text-in-english-and-finnish: backlog
+  1-15-a19-open-sans: backlog
+  1-16-a16-sign-in-and-sign-out: backlog
+  1-17-a17-toasts: backlog
+  1-18-a21-device-preferences-and-theme: backlog
+  1-19-a22-section-shell: backlog
+  1-20-a26-swiping-between-sections: backlog
+  1-21-k1-installable-pwa: backlog
+  1-22-k9-profile-service: backlog
+  1-23-k5-settings: backlog
+  1-24-k10-profile-and-collection-visibility: backlog
+  epic-1-retrospective: optional
+
+  epic-2: backlog
+  2-1-k2-production-image: backlog
+  2-2-k3-production-on-the-lxc: backlog
+  2-3-k4-nightly-backups: backlog
+  epic-2-retrospective: optional
+
+  epic-3: backlog
+  3-1-d9-scan-screen: backlog
+  3-2-c9-real-book-fixture-capture: backlog
+  3-3-b1-isbn-and-name-key-fields: backlog
+  3-4-c1-source-contract-and-merge: backlog
+  3-5-c2-finna-adapter-core-fields: backlog
+  3-6-c10-finna-adapter-series-themes-and-author-sort-names: backlog
+  3-7-c3-google-books-adapter: backlog
+  3-8-a24-in-process-state-helper: backlog
+  3-9-c4-lookup-across-sources: backlog
+  3-10-a11-transactions-and-the-drizzle-helper: backlog
+  3-11-a12-owner-and-relation-fields: backlog
+  3-12-a18-media: backlog
+  3-13-b10-author-sort-names: backlog
+  3-14-b11-book-field-set: backlog
+  3-15-b3-authors-collection: backlog
+  3-16-b4-series-collection: backlog
+  3-17-b5-genres-collection: backlog
+  3-18-b2-books-collection: backlog
+  3-19-b6-user-books-collection: backlog
+  3-20-b7-copies-collection: backlog
+  3-21-f1-locations-and-the-default-location: backlog
+  3-22-b8-effective-book: backlog
+  3-23-b9-upsertuserbook: backlog
+  3-24-e26-holdings: backlog
+  3-25-u1-undo-receipts: backlog
+  3-26-u2-undo-on-the-toast: backlog
+  3-27-c5-name-matching-for-authors-and-series: backlog
+  3-28-c6-look-up-a-book-by-isbn: backlog
+  3-29-c11-new-authors-and-series-on-the-lookup-result: backlog
+  3-30-c7-lookup-rate-limit: backlog
+  3-31-d1-ensure-a-shared-book: backlog
+  3-32-d2-cover-download: backlog
+  3-33-d3-create-a-copy: backlog
+  3-34-f2-default-location-on-new-copies: backlog
+  3-35-d4-save-a-copy: backlog
+  3-36-d32-a-repeated-save-returns-the-first-result: backlog
+  3-37-d6-undo-a-save: backlog
+  3-38-d7-private-book-from-manual-entry: backlog
+  3-39-d8-share-my-private-book-when-a-source-knows-it: backlog
+  3-40-a20-dialog-and-sheet-wrappers: backlog
+  3-41-a23-base-ui-and-the-combobox-menu-and-picker-wrappers: backlog
+  3-42-k11-default-location-in-settings: backlog
+  3-43-d10-cover-component-and-cover-preview: backlog
+  3-44-a25-client-helper-for-actions-and-data-requests: backlog
+  3-45-d16-answer-not-in-library: backlog
+  3-46-d17-add-to-library: backlog
+  3-47-d18-undo-on-the-save-toast: backlog
+  3-48-d25-answer-in-library: backlog
+  3-49-d26-answer-not-found-entered-by-hand: backlog
+  3-50-i9-answer-couldn-t-look-it-up: backlog
+  3-51-d23-scan-loop-rules: backlog
+  3-52-d15-end-to-end-scan-to-save: backlog
+  3-53-c12-pick-the-edition: backlog
+  epic-3-retrospective: optional
+
+  epic-4: backlog
+  4-1-e21-only-my-own-books-by-id: backlog
+  4-2-d5-edit-a-shared-book: backlog
+  4-3-d19-edit-authors-and-series: backlog
+  4-4-d20-edit-my-private-book: backlog
+  4-5-d24-copy-status-note-and-removal: backlog
+  4-6-f6-move-copies: backlog
+  4-7-d21-edit-book-screen: backlog
+  4-8-d27-more-details-on-edit-book: backlog
+  4-9-d22-edit-from-the-save-toast: backlog
+  4-10-k12-rehearsed-restore-at-the-cataloguing-gate: backlog
+  4-11-d28-media-visibility: backlog
+  4-12-d29-cover-upload-service: backlog
+  4-13-d30-four-corner-crop: backlog
+  4-14-d31-cover-on-edit-book: backlog
+  epic-4-retrospective: optional
+
+  epic-5: backlog
+  5-1-e16-shelf-query-parameters: backlog
+  5-2-e1-shelf-query-my-copies-sorted: backlog
+  5-3-e2-shelf-query-text-search: backlog
+  5-4-e3-shelf-query-scalar-filters: backlog
+  5-5-e4-shelf-query-author-series-and-genre-filters: backlog
+  5-6-e15-author-sort: backlog
+  5-7-e14-shelf-timing-at-10-000-copies: backlog
+  5-8-e17-hydrated-shelf-rows: backlog
+  5-9-e18-filter-values-and-suggestions: backlog
+  5-10-e6-collection-screen: backlog
+  5-11-e19-endless-scrolling: backlog
+  5-12-e28-keep-my-place: backlog
+  5-13-e20-covers-layout-and-sizes: backlog
+  5-14-e7-filter-panel-value-lists: backlog
+  5-15-e31-filter-panel-author-series-and-publisher: backlog
+  5-16-e32-filter-panel-year-pages-and-rating: backlog
+  5-17-e33-sort: backlog
+  5-18-e8-book-detail: backlog
+  5-19-e29-book-detail-beside-the-list-on-wide-screens: backlog
+  5-20-e30-open-book-from-the-answer: backlog
+  5-21-e22-filter-chips-on-book-detail: backlog
+  5-22-e24-mark-read: backlog
+  5-23-e11-read-and-rating-in-book-detail: backlog
+  5-24-e12-copy-notes-and-removing-a-copy: backlog
+  5-25-h13-received: backlog
+  5-26-f3-locations-on-rows-lines-and-filters: backlog
+  5-27-e23-select-mode: backlog
+  5-28-e25-remove-a-selection: backlog
+  5-29-e27-mark-a-selection-read: backlog
+  5-30-f4-move-one-copy-or-a-selection: backlog
+  5-31-f5-delete-a-location: backlog
+  5-32-f7-rename-and-merge-locations: backlog
+  5-33-f8-locations-in-settings: backlog
+  5-34-e13-admin-re-fetch: backlog
+  5-35-d33-look-up-a-hand-entered-book-again: backlog
+  5-36-k6-back-office-tidy-up: backlog
+  5-37-k14-last-backup-in-settings: backlog
+  epic-5-retrospective: optional
+
+  epic-6: backlog
+  6-1-j1-people-collection: backlog
+  6-2-j2-loans-collection: backlog
+  6-3-j7-people-service: backlog
+  6-4-j6-removing-a-copy-removes-its-loans: backlog
+  6-5-j3-lend-and-return: backlog
+  6-6-j10-loans-in-holdings: backlog
+  6-7-j4-lend-and-returned-in-book-detail: backlog
+  6-8-j11-lent-marker-on-rows-and-the-answer: backlog
+  6-9-j5-loans-section-by-date: backlog
+  6-10-j12-loans-by-person: backlog
+  6-11-j13-returned-loans: backlog
+  6-12-j9-lent-before: backlog
+  6-13-j8-people-in-settings: backlog
+  epic-6-retrospective: optional
+
+  epic-7: backlog
+  7-1-h1-wishlists-collection: backlog
+  7-2-h2-wishlist-entries-collection: backlog
+  7-3-h14-entries-in-holdings-and-book-access: backlog
+  7-4-h15-people-with-wishlist-entries-can-t-be-deleted: backlog
+  7-5-h9-wishlist-service-create-rename-delete: backlog
+  7-6-h3-save-to-a-wishlist: backlog
+  7-7-h7-a-save-closes-matching-wishes: backlog
+  7-8-h6-bought-and-ordered: backlog
+  7-9-h16-entry-recipient-and-removal: backlog
+  7-10-h5-wishlists-section: backlog
+  7-11-h11-one-wishlist: backlog
+  7-12-h12-opened-entry: backlog
+  7-13-h8-bought-ordered-and-remove: backlog
+  7-14-h10-add-to-wishlist: backlog
+  7-15-h17-on-wishlists-in-book-detail: backlog
+  epic-7-retrospective: optional
+
+  epic-8: backlog
+  8-1-i1-answer-heading-and-fact-lines: backlog
+  8-2-i2-in-library-ordered-and-on-wishlist-answers: backlog
+  8-3-i4-finna-search: backlog
+  8-4-i5-google-books-search: backlog
+  8-5-i10-search-across-sources: backlog
+  8-6-i11-search-my-copies-and-wishes: backlog
+  8-7-i12-look-up-a-book-without-an-isbn: backlog
+  8-8-i6-lookup-by-title-or-author: backlog
+  8-9-i7-add-by-hand-from-lookup: backlog
+  8-10-i8-end-to-end-shop-check: backlog
+  epic-8-retrospective: optional
+
+  epic-9: backlog
+  9-1-g1-tags-collection-with-kinds: backlog
+  9-2-g7-change-tags: backlog
+  9-3-g8-rename-merge-and-delete-tags: backlog
+  9-4-g3-tag-and-user-genre-filters: backlog
+  9-5-g13-theme-filter: backlog
+  9-6-g14-genres-themes-and-tags-on-book-detail: backlog
+  9-7-g2-tag-picker-on-book-detail-and-edit-book: backlog
+  9-8-g10-tag-a-selection: backlog
+  9-9-g9-tags-my-genres-and-my-themes-in-settings: backlog
+  9-10-g4-seeded-system-genres: backlog
+  9-11-g5-genres-from-google-books-on-save: backlog
+  9-12-g15-new-genre-on-the-answer: backlog
+  9-13-g11-genre-admin-service: backlog
+  9-14-g12-genres-in-settings-admin-only: backlog
+  9-15-k13-phase-1-acceptance: backlog
+  epic-9-retrospective: optional
