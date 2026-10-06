@@ -352,10 +352,10 @@ Visual specs. Behaviour lives in `EXPERIENCE.md` → Component Patterns.
 | Lent marker | An 8px {colors.accent} square before the text "Lent · {person}" in {colors.text}. |
 | Detail panel | {spacing.panel-width} wide on the plain ground, with the left border and shadow described under Elevation & Depth. Cover 72 × 108px beside the {typography.heading-detail} title. Groups headed in {typography.heading-group}. Values in rows with the label left and the value right in {colors.text-muted}. Buttons at the foot. |
 | Bottom sheet | Full width, plain ground, {spacing.stroke-control} {colors.text} top edge, {colors.scrim} over the list above. A short {spacing.stroke-control} line at the top centre is the handle. |
-| Toast | An outlined box ({spacing.stroke-control} {colors.text}) above whatever is pinned to the bottom: message on the left, actions as Links on the right. An error toast starts with an 8px {colors.danger} square. |
+| Toast | An outlined box ({spacing.stroke-control} {colors.text}) above whatever is pinned to the bottom: message on the left, actions as Links and a Close (X) on the right. An error toast starts with an 8px {colors.danger} square. |
 | Action bar | Full width along the bottom edge on the plain ground, with a {spacing.stroke-control} {colors.text} top edge. The count on the left, buttons on the right; Remove is a destructive button and Done the primary. On the phone it is two rows. |
 | Checkbox | 20px square with a {spacing.stroke-control} {colors.text} outline. [ASSUMPTION: checked shows a tick drawn in {colors.text}; it is not filled.] |
-| Rating | Five 22px star outlines. Rated stars are stroked in {colors.text}, the rest in {colors.text-dim}. No star is filled. |
+| Rating | Five 22px star outlines. Rated stars are stroked in {colors.text}, the rest in {colors.text-dim}. No star is filled. A "Clear" Link in {typography.meta} sits beside the stars while a rating is set. |
 | Option list | The values of a filter field, one per line in {typography.body}. A value that is switched on is {colors.text} with the 8px {colors.accent} marker before it; the others are {colors.text-muted}. |
 | Combobox | A Text field. Its popup is an outlined box ({spacing.stroke-control} {colors.text}) directly under the field, as wide as the field. The highlighted option has the selection bar on its left; the chosen option has the 8px marker. [ASSUMPTION] |
 | Date field | A Text field holding the platform's date control. |
@@ -364,6 +364,7 @@ Visual specs. Behaviour lives in `EXPERIENCE.md` → Component Patterns.
 | Progress line | [ASSUMPTION: a {spacing.stroke-control} {colors.accent} line moving across the top edge of the screen while something loads.] |
 | Close (X) | Two {spacing.stroke-control} {colors.text} strokes forming an X, in the top right corner. No circle and no box around it. |
 | Camera frame | A {spacing.stroke-control} {colors.text} rectangle around the camera view with a horizontal {colors.accent} guide line. |
+| Corner crop | The photo full screen under the {colors.scrim}; the quadrilateral inside the four handles is undimmed and outlined in {spacing.stroke-control} {colors.text}. Four square handles at the corners, outlined in {spacing.stroke-control} {colors.text}, each with a 44px tap area; the hint in {typography.meta} above; Use (primary) and Cancel at the foot. [ASSUMPTION: handles 20px, like the checkbox.] |
 
 States that apply to every control:
 

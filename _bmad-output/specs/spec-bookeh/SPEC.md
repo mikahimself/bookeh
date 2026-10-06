@@ -6,6 +6,7 @@ companions:
   - ../../planning-artifacts/architecture/architecture-bookeh-2026-10-03/STORY-SLICING.md
   - ../../planning-artifacts/ux-designs/ux-bookeh-2026-10-03/EXPERIENCE.md
   - ../../planning-artifacts/ux-designs/ux-bookeh-2026-10-03/DESIGN.md
+  - ../../planning-artifacts/epics.md
   - ../../../CLAUDE.md
 sources:
   - ../../planning-artifacts/prds/prd-bookeh-2026-10-02/addendum.md
@@ -32,8 +33,8 @@ A pain to solve. Mika's roughly 200 mostly Finnish books sit in several homes, s
   - **success:** For every private collection, a two-user test shows that another user and an admin cannot read, change, delete or reference the owner's rows, by foreign id or through shelf queries. A private Book, author or series is readable only by its creator and the admin. A guessed Book id opens nothing the user does not hold.
 
 - **CAP-3 Profile and device preferences**
-  - **intent:** The user sets a display name, an interface language and an optional default location on the profile, and layout, size, theme and loans order per device (FR-4, FR-51).
-  - **success:** Changing the language switches the whole interface between English and Finnish. A new owned copy saved without a chosen location lands at the default location. Layout, size, theme and loans order are remembered on the device, not on the account, and are right on the first paint.
+  - **intent:** The user sets a display name, an interface language, an optional default location, and profile and collection visibility on the profile, and layout, size, theme and loans order per device (FR-4, FR-51).
+  - **success:** Changing the language switches the whole interface between English and Finnish. A new owned copy saved without a chosen location lands at the default location. The two visibility settings are stored with their defaults (hidden, closed), switch in Settings, and change nothing else in Phase 1. Layout, size, theme and loans order are remembered on the device, not on the account, and are right on the first paint.
 
 - **CAP-4 ISBN capture**
   - **intent:** The user scans an ISBN barcode with the phone camera inside the installed app, or types the ISBN (FR-10).
@@ -41,19 +42,19 @@ A pain to solve. Mika's roughly 200 mostly Finnish books sit in several homes, s
 
 - **CAP-5 Lookup**
   - **intent:** For an ISBN, or a title or author, the user gets an existing Book or fetched metadata from pluggable sources, without anything being saved (FR-11, FR-18, FR-20).
-  - **success:** A Book the user can read is returned before any source is called. Otherwise each field takes the first non-empty value in source order, Finna then Google Books. The outcome is found, none, or "the sources did not answer"; the last is never cached and the Answer offers Try again before entering the book by hand. A failing or slow source does not fail the lookup. Lookup writes no rows and is rate-limited per user. Adding a source changes no code in the add-book flow. The raw source response is stored on save and readable only by the admin. Searching by title or author shows the user's own copies and open wishlist entries first, then the sources.
+  - **success:** A Book the user can read is returned before any source is called. Otherwise each field takes the first non-empty value in source order, Finna then Google Books. The outcome is found, none, or "the sources did not answer"; the last is never cached and the Answer offers Try again before entering the book by hand. A failing or slow source does not fail the lookup. Lookup writes no rows and is rate-limited per user. Adding a source changes no code in the add-book flow. The raw source response is stored on save and readable only by the admin. Searching by title or author shows the user's own copies and open wishlist entries first, then the sources. When the sources hold several records for one ISBN, the Answer lists the editions, preselects the best and the user picks; the Book keeps the ISBN scanned. Search rows show binding, year and publisher.
 
 - **CAP-6 Answer and Edit book**
   - **intent:** After a scan or lookup the user sees what the book is and whether it is in the library, saves it as fetched, and edits the fetched data afterwards (FR-13, FR-14, FR-16).
-  - **success:** The Answer shows cover, title, author and edition, names the original source and never another user, says which author or series the save would create, and lists the user's copies when the edition is already owned while still allowing another copy. Add to library saves at once. Edit book, reached from the save toast or Book detail, pre-fills every field, lets the user edit all of them and the personal tags, and from the toast also the new copy's status and location. Edits to a shared Book are that user's overrides and the shared record keeps the source's values; edits to the user's private Book change the Book.
+  - **success:** The Answer shows cover, title, author and edition, names the original source and never another user, says which author or series the save would create, and lists the user's copies when the edition is already owned while still allowing another copy. Add to library saves at once. Edit book, reached from the save toast or Book detail, pre-fills every field, lets the user edit all of them and the personal tags, and from the toast also the new copy's status and location. A user's edits to a shared Book are their overrides and the shared record keeps the source's values; the admin's edits change the shared Book for everyone; edits to the user's private Book change the Book. The admin on a shared Book, and the creator of a private Book, add, replace or remove its cover from Edit book: a photo straightened and cropped to 2:3 by marking its four corners, with image metadata stripped; no one else can (FR-47, Phase 1 part).
 
 - **CAP-7 Save and Undo**
   - **intent:** One save creates the Book if needed and the copy or wishlist entry, and the user can undo it and other simple actions (FR-15, FR-17).
-  - **success:** A save is all or nothing, puts an owned copy at the default location, and returns to the scanner with a toast offering Edit and Undo that stays until the next Answer. Undo removes the copy or entry plus any Book, author or series nothing else references, and reopens entries the save closed. Undo is also offered after move, tag, read, lend, returned, received, bought and ordered, single or on a selection; removals, deletes and merges are confirmed first and have no Undo. Undo is unavailable after an app restart. A failed save shows an error toast and leaves the screen as it was. A double tap saves once. Scan to save takes under 20 s (NFR-2).
+  - **success:** A save is all or nothing, puts an owned copy at the default location, and returns to the scanner with a toast offering Edit and Undo that stays until the next Answer. Undo removes the copy or entry plus any Book, author or series nothing else references, and reopens entries the save closed. Undo is also offered after move, tag, read, lend, returned, received, bought and ordered, single or on a selection; removals, deletes and merges are confirmed first and have no Undo. Undo is unavailable after an app restart, expires 30 minutes after the action, and the toast hides it then; every toast can be closed. A failed save shows an error toast and leaves the screen as it was. A double tap saves once. Scan to save takes under 20 s (NFR-2).
 
 - **CAP-8 Manual entry**
   - **intent:** The user adds a book that no source knows, with title and author as the only required fields (FR-12, FR-22).
-  - **success:** The Not found Answer asks for title and author, also when reached from a title search with the typed text filled in. The save creates a private Book visible only to its creator. Scanning it again returns that Book, not a duplicate. When the creator later saves it and the sources now answer for its ISBN, the Book becomes shared with the source's values and the creator's differing values become their overrides. A Book without an ISBN is never merged automatically; its creator can add an ISBN on Edit book.
+  - **success:** The Not found Answer asks for title and author, also when reached from a title search with the typed text filled in. The save creates a private Book visible only to its creator. Scanning it again returns that Book, not a duplicate. When the creator later saves it, or runs Look it up again from the Book, and the sources now answer for its ISBN, the Book becomes shared with the source's values; the creator's differing values become their overrides, except the admin's, which are dropped. A Book without an ISBN is never merged automatically; its creator can add an ISBN on Edit book.
 
 - **CAP-9 Shop check**
   - **intent:** The user scans a barcode or searches by title or author and sees whether they already have the book (FR-20 to FR-22).
@@ -61,11 +62,11 @@ A pain to solve. Mika's roughly 200 mostly Finnish books sit in several homes, s
 
 - **CAP-10 Collection**
   - **intent:** The user browses, searches, filters, sorts and selects copies in their collection (FR-23 to FR-25, FR-33).
-  - **success:** The app opens in the collection; there is no home screen, and Scan book is within reach on every section. One row is one copy. The list shows rows or covers in three sizes, remembered per device, scrolls endlessly, and keeps its position when the user comes back from scanning or editing. Search matches title, author, series, ISBN and notes. Filters on author, series, genre, personal tag, publisher, year, language, page range, status, location, read and rating combine with AND, values within a field with OR, and both filters and sort use the user's overrides; author sort is by family name. An opened Book's author, series, genres, tags and location are chips that add a filter. A selection can be moved, tagged, marked read or unread, or removed, all or none. Results appear in under 1 s at 10,000 copies (NFR-3). Sorting follows Finnish collation and "a" never matches "ä" (NFR-7).
+  - **success:** The app opens in the collection; there is no home screen, and Scan book is within reach on every section. One row is one copy. The list shows rows or covers in three sizes, remembered per device, scrolls endlessly, and keeps its position when the user comes back from scanning or editing. Search matches title, author, series, ISBN and notes. Filters on author, series, genre, theme, personal tag, publisher, year, language, page range, status, location, read and rating combine with AND, values within a field with OR, and both filters and sort use the user's overrides; author sort is by family name. An opened Book's author, series, genres, themes, tags and location are chips that add a filter. A selection can be moved, tagged, marked read or unread, or removed, all or none. Results appear in under 1 s at 10,000 copies (NFR-3). Sorting follows Finnish collation and "a" never matches "ä" (NFR-7).
 
 - **CAP-11 Book detail**
   - **intent:** The user sees and acts on everything they hold on a Book in one place (FR-26, FR-27, FR-29, FR-30).
-  - **success:** Book detail opens over the collection or loans as a bottom sheet on the phone and a side panel beside the list on wide screens, addressed by `?book=`, and only for a Book the user has a copy or open wishlist entry of. It shows the Book, read flag, 1–5 rating, each copy with its location, status, note and actions (Lend, Returned, Move, Remove, Received), past loans, wishlist entries, genres and tags, with Edit and Add to wishlist at the foot. Read, rating, notes and tags change in place; Book fields change on Edit book. Read and rating belong to the user and the Book, not to a copy. A user can own several copies of one edition.
+  - **success:** Book detail opens over the collection or loans as a bottom sheet on the phone and a side panel beside the list on wide screens, addressed by `?book=`, and only for a Book the user has a copy or open wishlist entry of. It shows the Book, read flag, 1–5 rating, each copy with its location, status, note and actions (Lend, Returned, Move, Remove, Received), past loans, wishlist entries, system genres and themes, the user's genres, themes and tags, with Edit and Add to wishlist at the foot. Read, rating, notes and tags change in place; Book fields change on Edit book. Read and rating belong to the user and the Book, not to a copy. A user can own several copies of one edition.
 
 - **CAP-12 Copy status**
   - **intent:** The user tracks whether a copy is ordered or owned (FR-28).
@@ -83,13 +84,13 @@ A pain to solve. Mika's roughly 200 mostly Finnish books sit in several homes, s
   - **intent:** The user keeps several named private wishlists, with entries optionally meant for a Person (FR-38, FR-39, FR-28).
   - **success:** The wishlists section lists every list with its count; a list shows its entries with their recipients and can be renamed or deleted, which deletes its entries. Adding to a wishlist asks which list. An opened entry has a For field that can be set, changed or cleared at any time; empty means for the user. Bought or Ordered closes the entry and creates an owned or ordered copy, unless the entry is for a Person, which closes it without a copy. Remove deletes the entry.
 
-- **CAP-16 Genres**
-  - **intent:** Books carry shared, curated genres derived from source subjects (FR-17).
-  - **success:** Saves never create genres. Mapping from stored source subjects to the curated list can be re-run. A user can change a Book's genres for themselves by picking from existing genres.
+- **CAP-16 Genres and themes**
+  - **intent:** Books carry shared system genres from Google Books categories and system themes from Finna's subject terms; users add their own genres and themes beside them (FR-17, FR-17a).
+  - **success:** A save matches Google's categories to the seeded genre list by English name and creates the missing ones; the mapping can be re-run over stored subjects; the Answer says which genre a save would create. Genres show in the user's language, English when there is no Finnish name. The admin edits names, adds, merges and deletes genres in Settings, touching shared rows only, and edits a shared Book's genres on Edit book; no user can override them. Finna's subject terms are stored as themes, shown as chips and filterable, never edited, and filled by a re-fetch when empty. User genres and themes work like personal tags and may not take a system name.
 
 - **CAP-17 Admin re-fetch**
   - **intent:** The admin re-fetches metadata for a shared Book (FR-19).
-  - **success:** Only the admin can trigger it, from Book detail. It fills empty shared fields, overwrites no existing value and touches no user's overrides.
+  - **success:** Only the admin can trigger it, from Book detail. It fills empty shared fields, themes and the cover included, overwrites no existing value (an uploaded cover counts), and touches no user's overrides.
 
 - **CAP-18 Install**
   - **intent:** The app installs as a PWA on iOS and Android and works in desktop browsers (FR-50).
@@ -101,7 +102,7 @@ A pain to solve. Mika's roughly 200 mostly Finnish books sit in several homes, s
 
 - **CAP-20 Personal tags**
   - **intent:** The user tags Books for themselves and manages the tags (FR-17, FR-25, FR-33).
-  - **success:** Tags are private to the user and matched within their own tags. A tag is added or removed on one Book from Book detail or Edit book, and on a selection in one action. Tags filter the collection. In settings a tag can be renamed, merged or deleted.
+  - **success:** Personal tags, user genres and user themes are one private collection in three kinds, matched within the user's own values of that kind. In Settings each kind has its own list to rename, merge and delete; a user genre or theme may not take a system name. A tag is added or removed on one Book from Book detail or Edit book, and on a selection in one action. Tags filter the collection. In settings a tag can be renamed, merged or deleted.
 
 ## Constraints
 
@@ -120,8 +121,8 @@ A pain to solve. Mika's roughly 200 mostly Finnish books sit in several homes, s
 
 ## Non-goals
 
-- Phase 2: public internet ingress, invites and password resets, change password, email change, session list, data export, account deletion and deactivation, admin action log, friends, open collections and friend chips, profile and collection visibility.
-- Phase 3: sharing wishlists in the app or by link, suggestions, merges of Books, promotion of private Books, cover uploads.
+- Phase 2: public internet ingress, invites and password resets, change password, email change, session list, data export, account deletion and deactivation, admin action log, friends, open collections and friend chips.
+- Phase 3: sharing wishlists in the app or by link, suggestions, merges of Books, promotion of private Books, non-admin cover uploads on shared Books, cover approval and alternative covers.
 - AI recommendations, email delivery, OAuth, open self-registration, a moderator role.
 - Offline use, bulk ISBN import, order details such as shop and due date, view tracking, selling or valuing books.
 - Per-copy or per-friend visibility within an open collection.
@@ -138,11 +139,9 @@ All of Mika's roughly 200 books are catalogued in the production database with l
 - The spec covers Phase 1 only, because it is the only committed phase.
 - The PRD, the spine, the story slicing, the UX documents and CLAUDE.md stay the owners of their detail and are read alongside this spec; nothing is copied out of them.
 - Where companions disagree, the PRD decides what is built, the spine how, the UX documents how it looks and behaves; CLAUDE.md yields to all three.
-- FR-13's new-or-existing marker applies to authors and series only, because saves never create genres (AD-5).
 - The `[ASSUMPTION]` tags left in EXPERIENCE.md and DESIGN.md stand as written until a story touches them.
-- The PRD's Assumptions Index stands for the items Phase 1 touches (FR-12, FR-14, FR-28).
+- The PRD's Assumptions Index stands for the items Phase 1 touches (FR-12, FR-14 as refined on 2026-10-06, FR-28).
 
 ## Open Questions
 
-- FR-4: the PRD Build Order places all of FR-4 in Phase 1, but the spine defers the profile-visibility and collection-visibility fields to Phase 2. Which holds? Until answered, stories follow the spine.
-- Genres: how is the curated genre list seeded, and how do source subjects map to it? The spine leaves this to slice G4.
+None open. The FR-4 visibility fields are built in Phase 1 (D-1); genre seeding and mapping are decided (D-2, D-6).

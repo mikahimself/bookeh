@@ -42,8 +42,9 @@ If it works, Bookie spreads from one collector to family and friends, and possib
 - **Friend.** Another user, with mutual consent.
 - **Open or closed collection.** Whether friends can see the user's owned copies.
 - **Public or hidden profile.** Whether other users can find the user by name.
-- **Genre.** A shared, curated classification.
-- **Personal tag.** A user's private label.
+- **System genre.** A shared classification with an English and a Finnish name. The list is seeded from Google Books' top-level categories, grows when a save meets a category it lacks, and is managed by the admin.
+- **Theme.** A shared subject term stored on a Book as Finna gives it (a **system theme**). Not translated, not overridable.
+- **Personal tag, user genre, user theme.** A user's private labels, in three kinds. They sit beside the system genres and themes and are visible only to that user.
 
 ## User Journeys
 
@@ -102,17 +103,19 @@ Mika is working through a stack of books at home. His default location is Tamper
   - Lookup is read-only: a Book is created only when a copy or wishlist entry is saved.
   - Lookup requires sign-in and is rate-limited per user.
   - Any debug lookup endpoint is admin-only.
-- **FR-12** If no source finds the book, the user enters it by hand before saving, with title and author as the only required fields. The result is a **private Book**. It becomes shared only through admin approval (FR-46), or automatically when a later external lookup matches its ISBN [ASSUMPTION]. Books without an ISBN are never merged automatically; only the admin merges them (FR-46).
+  - When the sources hold several records for one ISBN (a paperback and a hardcover, several printings), the answer lists them, preselects the best and lets the user pick whose details the Book takes. The Book keeps the ISBN that was looked up.
+- **FR-12** If no source finds the book, the user enters it by hand before saving, with title and author as the only required fields. The result is a **private Book**. It becomes shared only through admin approval (FR-46), or automatically when a later external lookup matches its ISBN [ASSUMPTION]: on the creator's next save of it, or when the creator runs **Look it up again** from the Book. Hand-entered values that differ from the source's become the creator's overrides, except the admin's, which are dropped. Books without an ISBN are never merged automatically; only the admin merges them (FR-46).
 - **FR-13** A book is saved as fetched and edited afterwards; there is no review step before the save.
-  - The answer shown after a scan or lookup has a cover preview, names the original source (Finna, Google Books, …), never another user, and says whether each author and series is new or already exists.
-  - The edit screen pre-fills every field and lets the user edit all of them, along with the user's personal tags. It is reached from the save toast and from the book's detail.
+  - The answer shown after a scan or lookup has a cover preview, names the original source (Finna, Google Books, …), never another user, and says whether each author, series and genre is new or already exists.
+  - The edit screen pre-fills every field and lets the user edit all of them, along with the user's personal tags, genres and themes (FR-17), and, for the admin on a shared Book or the creator of a private Book, its cover (FR-47). It is reached from the save toast and from the book's detail.
   - Opened from the save toast, the edit screen also shows the new copy's status (owned or ordered) and its location, set to the default location.
 - **FR-14** Who gets the edits:
-  - A shared Book keeps the source's values, and a user's edits are stored as their overrides [ASSUMPTION].
+  - A shared Book keeps the source's values, and a user's edits are stored as their overrides [ASSUMPTION]. The admin's edits change the shared Book itself, for everyone. System genres and themes cannot be overridden (FR-17, FR-17a).
   - On a private Book, the creator's values are the Book's values.
 - **FR-15** Saving shows a toast with **Edit** and **Undo** and returns to the scanner. Undo removes the copy or wishlist entry, plus any Book, author or series that nothing else references. Undo is also offered after a move, a tag change, marking read, lending, Returned, Received, and marking a wishlist entry bought or ordered. Removals are confirmed first and have no Undo. A failed save shows an error toast and leaves the screen as it was.
 - **FR-16** If the user already owns a copy of the same edition, the answer says so and lists the copies, but still allows adding another copy.
-- **FR-17** Authors and series are matched to existing shared records by name, ignoring case, and created if missing. Those created from a private Book stay private along with it. Genres come from source subjects and are matched to the curated genre list. Personal tags are matched within the user's own tags, and the user can rename, merge and delete them.
+- **FR-17** Authors and series are matched to existing shared records by name, ignoring case, and created if missing. Those created from a private Book stay private along with it. System genres come from Google Books categories: a save matches them by English name to the seeded genre list and creates the missing ones, without a Finnish name. The admin adds Finnish names, adds genres, and merges or deletes duplicates. System genres are shared and not overridable; each user can add their own user genres to a Book alongside them. Personal tags, user genres and user themes are matched within the user's own, and the user can rename, merge and delete them. A user genre or theme may not take a system genre's or theme's name.
+- **FR-17a** A shared Book stores Finna's subject terms as themes, as given. Themes are shown on the Book and are a filter. They are source data: not overridable, and filled by a re-fetch when empty (FR-19). Each user can add their own user themes alongside them.
 - **FR-18** The raw source response is stored with the Book, so the parser can be improved and re-run later. It is never shown to other users.
 - **FR-19** Only the admin can re-fetch metadata for a shared Book. A re-fetch fills empty fields only and never overwrites existing values.
 
@@ -131,13 +134,13 @@ Mika is working through a stack of books at home. His default location is Tamper
 - **FR-23** The app opens in the user's collection; there is no separate home screen. A **Scan book** button is within reach on every section.
 - **FR-24** Users search their collection by title, author, series or ISBN, or by free text across those fields and notes.
 - **FR-25** Users filter and sort their collection by any metadata field. Filters combine with AND. Fields include:
-  - author, series, genre and personal tag
+  - author, series, genre, theme and personal tag (genre and theme cover the system values and the user's own)
   - publisher, year, language and page count (as a range)
   - status, location, read and rating
 
-  Filters and sorting use the user's overrides where they exist. On an opened Book, its author, series, genres, tags and location are shortcuts that add that value to the active filters.
-- **FR-26** Book detail shows the user's copies, wishlist entries, loans, read flag, rating, notes and personal tags. Read, rating, notes and tags are changed in place; the Book's own fields are changed on the edit screen (FR-13).
-- **FR-27** Overrides are visible only to the user who made them, everywhere the Book appears for that user. To change a shared value, the user suggests a fix (FR-45).
+  Filters and sorting use the user's overrides where they exist. On an opened Book, its author, series, genres, themes, tags and location are shortcuts that add that value to the active filters.
+- **FR-26** Book detail shows the user's copies, wishlist entries, loans, read flag, rating, notes, genres, themes and personal tags. Read, rating, notes and tags are changed in place; the Book's own fields are changed on the edit screen (FR-13).
+- **FR-27** Overrides are visible only to the user who made them, everywhere the Book appears for that user. To change a shared value, the user suggests a fix (FR-45); the admin changes it directly on the edit screen (FR-14).
 - **FR-28** Status on a copy is **ordered** or **owned**.
   - Users set **Ordered** on the edit screen right after adding a book, or from a wishlist entry, for example after buying online.
   - **Received** turns an ordered copy into an owned one, defaulting to the default location.
@@ -192,11 +195,11 @@ Mika is working through a stack of books at home. His default location is Tamper
 - **FR-46** The admin reviews suggestions in a queue and approves or rejects each one. The admin can also promote a private Book to shared, and merge Books, authors or series directly.
   - An approved fix updates the shared record. Overrides that equal the new value are dropped; other overrides are kept.
   - A merge moves every copy, wishlist entry, override, cover and loan to the surviving record. If a user rated both records, their most recent rating wins [ASSUMPTION].
-- **FR-47** A user can upload a cover for a Book. Uploads must be images within a size limit, and location and other image metadata are stripped. The uploaded cover is visible only to the uploader until the admin approves it. After approval it is an alternative cover anyone can pick, and it never replaces another user's choice.
+- **FR-47** A user can upload a cover for a Book, straightened and cropped to 2:3 by marking its four corners on the photo. Uploads must be images within a size limit, and location and other image metadata are stripped. In Phase 1 the admin's upload sets a shared Book's cover for everyone, and a private Book's creator sets that Book's cover, visible only to them; both from the edit screen (FR-13). Any other user's upload on a shared Book is visible only to the uploader until the admin approves it; after approval it is an alternative cover anyone can pick, and it never replaces another user's choice.
 
 ### F10 — Administration
 
-- **FR-48** The admin role covers accounts, invites, the suggestion queue and shared records. It does not include reading users' private data: copies, People, loans, wishlists, overrides and personal tags. Roles must allow a moderator role later with a subset of these rights.
+- **FR-48** The admin role covers accounts, invites, the suggestion queue and shared records. Shared records are edited in the back office and, for a Book's fields, its genres and its cover, on the edit screen (FR-14, FR-17, FR-47). It does not include reading users' private data: copies, People, loans, wishlists, overrides and personal tags. Roles must allow a moderator role later with a subset of these rights.
 - **FR-49** The back office is reachable only over the tailnet, not from the public internet [ASSUMPTION]. Admin actions are logged.
 
 ### F11 — Platform
@@ -239,12 +242,14 @@ Who can see what. Every read and write is authorised per object on the server, i
 This replaces the M1–M5 milestones in CLAUDE.md. **Only Phase 1 is committed.** Phases 2 and 3 are possible next steps, kept open but not planned. The multi-user data model (Glossary) is built in Phase 1, so later phases, if they happen, add features without migrating data.
 
 **Phase 1 (v1): Mika's catalogue, on the tailnet only**
-- The data model, and sign-in for a single seeded user (FR-1, FR-4)
+- The data model, and sign-in for a single seeded user (FR-1, FR-4, including the two visibility settings, which have no effect until F8)
 - Adding books (F2)
 - Shop check against his own collection and the external sources (F3)
 - His collection (F4, except the friend part of FR-30)
 - Locations and loans (F5, F6)
 - Private wishlists (FR-38, FR-39)
+- System genres and themes from the sources, and the admin's genre management (FR-17, FR-17a)
+- Cover upload for the admin and for private Books (FR-47, Phase 1 part)
 - PWA, localisation and backups (FR-50, FR-51, NFR-6)
 
 Search is on the phone in this phase, because checks in webshops depend on it. Done when the Phase 1 success metrics are met.
@@ -260,7 +265,7 @@ Done when Partner is using the app (Phase 2 metric).
 
 **Phase 3 (possible): Sharing and curation**
 - Sharing wishlists, in the app and by link (FR-40, FR-41)
-- Curation: suggestions, merges, promotion and covers (F9)
+- Curation: suggestions, merges, promotion, and the rest of FR-47: other users' uploads, approval and alternative covers (F9)
 
 **Later:** AI recommendations, email delivery, a moderator role, OAuth or open registration.
 
@@ -319,8 +324,8 @@ Drafter decisions Mika accepted without changes. They stay tagged so downstream 
 | Ref | Assumption |
 |---|---|
 | FR-2 | Invite links expire after 7 days. |
-| FR-12 | A private Book becomes shared on its own when a later external lookup matches its ISBN. |
-| FR-14 | A user's edits on a shared Book become their overrides, not shared values. |
+| FR-12 | A private Book becomes shared on its own when a later external lookup matches its ISBN, on the creator's next save or on Look it up again (refined 2026-10-06). |
+| FR-14 | A user's edits on a shared Book become their overrides, not shared values; the admin's edits change the shared Book (Mika, 2026-10-06). |
 | FR-28 | Buying a wishlist entry meant for another Person closes the entry without creating a copy. |
 | FR-42 | 30-day wait after a declined friend request. |
 | FR-46 | In a merge, the user's most recent rating wins. |
@@ -333,7 +338,7 @@ Also accepted without changes earlier: FR-9 (admin deactivation), FR-32, FR-33, 
 
 1. **Moderator role.** Not in v1. When does it become worth adding, and which admin rights does it get? Owner: Mika, when users grow.
 2. **Public ingress.** Tailscale Funnel, Cloudflare Tunnel or a reverse proxy? Owner: architecture, only if Phase 2 goes ahead.
-3. **Combining sources.** Does lookup stop at the first source that finds the book, or merge several results to fill gaps? How are sources registered? Owner: architecture.
-4. **Override mechanism.** An override layer on top of the shared record, or copy-on-write? Owner: architecture.
+3. **Combining sources.** Decided in the architecture (AD-9): the sources are called in parallel and merged field by field, and with several records for one ISBN the user picks the edition (2026-10-06).
+4. **Override mechanism.** Decided in the architecture (AD-6): a sparse override layer on top of the shared record.
 5. **Undoing merges.** Should an approved merge be reversible? Owner: Mika, before Phase 3.
 6. **Change password.** Not in Phase 1; the admin resets passwords by token link (FR-5). Decided by Mika on 2026-10-06. Comes with the account lifecycle in Phase 2.

@@ -88,10 +88,11 @@ Arrows are the only allowed import directions, and ESLint `no-restricted-imports
 - **Binds:** `src/lib/catalogue`, `src/lib/shelf`, the first-user seed, collection hooks
 - **Prevents:** a convenience `overrideAccess: true` or raw query appearing in a feature story; hooks that read every user's rows
 - **Rule:**
-  - System privileges are allowed in three places: `src/lib/catalogue`, for writes to `books`, `authors`, `series` and `media`, and for `isUnreferenced()`, a read-only check that no row of any user references a catalogue record; `src/lib/shelf`, for read-only Drizzle queries (AD-7); and the first-user seed in `onInit`. Adding to this list is a spine change.
+  - System privileges are allowed in three places: `src/lib/catalogue`, for writes to `books`, `authors`, `series`, `genres` and `media`, and for `isUnreferenced()`, a read-only check that no row of any user references a catalogue record; `src/lib/shelf`, for read-only Drizzle queries (AD-7); and the first-user seed in `onInit`. Adding to this list is a spine change.
   - Each such function takes the context (AD-16) and scopes by its user explicitly. It resolves every client-supplied id through the gateway before using it.
   - Private collections are always written through the gateway, also from `lib/catalogue`.
   - Hooks and access functions query only through `asRequestUser(req)` from `src/access`, which passes `req`, `req.user` and `overrideAccess: false`. Hooks never write to another collection.
+  - The admin edits shared records from the app in three places, all in `src/lib/catalogue` and guarded by `canEditShared`: Edit book (`editBook()` writes the shared Book for an admin), genre management in Settings, and cover upload (AD-14). This is the deliberate exception to "admin edits shared records in the back office" (Mika, 2026-10-06).
 
 ### AD-4 — Shared and private catalogue records share collections, split by `visibility`
 
@@ -110,23 +111,23 @@ Arrows are the only allowed import directions, and ESLint `no-restricted-imports
 - **Binds:** save flow, Edit book, `src/lib/catalogue`, access on `books`/`authors`/`series`/`genres`; FR-11, FR-12, FR-13, FR-14, FR-17, FR-19
 - **Prevents:** planted data in the shared layer; a save path and an edit path that disagree on what an override is; duplicate authors from different matchers
 - **Rule:**
-  - Users have no create, update or delete access on `books`, `authors`, `series` or `genres`, shared or private. Every user-initiated write goes through `src/lib/catalogue`. Admin edits shared records in the back office.
-  - A shared Book's values are the merged source response held server-side for that ISBN (lookup cache, re-fetched on a miss). A save carries no Book values from the client, except the title and authors of a manual Book, which is private.
-  - Book values are edited after the save, only through `editBook()` in `lib/catalogue`. The client submits a sparse `BookEdits` object containing only the fields the user changed. The server never diffs. On a shared Book, the edits become that user's overrides (AD-6). On the user's own private Book, they update the Book itself. Personal tags and the copy's status and location submitted with the same edit are written in the same transaction through their own writers (AD-18).
+  - Users have no create, update or delete access on `books`, `authors`, `series` or `genres`, shared or private. Every user-initiated write goes through `src/lib/catalogue`. The admin edits shared records in the back office and, through `lib/catalogue`, on Edit book, in genre management and by cover upload (AD-3).
+  - A shared Book's values are the merged source response held server-side for that ISBN (lookup cache, re-fetched on a miss). A save carries no Book values from the client, except the title and authors of a manual Book, which is private. With several candidates held for an ISBN it carries only `pick`, the index of the chosen candidate (AD-9).
+  - Book values are edited after the save, only through `editBook()` in `lib/catalogue`. The client submits a sparse `BookEdits` object containing only the fields the user changed. The server never diffs. On a shared Book, a user's edits become their overrides (AD-6); an admin's edits are written to the shared Book itself (scalar fields, authors and series matched among shared records, system genres) and clear the admin's own override of each edited field. Themes are never edited. On the user's own private Book, edits update the Book itself. Personal tags and the copy's status and location submitted with the same edit are written in the same transaction through their own writers (AD-18).
   - Name matching is `findOrCreateByName()` in `lib/catalogue`, by `equals` on `nameKey` (see conventions), and is the only matcher; lookup and save both call it. For a shared Book it matches and creates among shared records only. For a private Book or an override it matches shared records first, then the user's own private ones, and creates private.
-  - ISBN auto-share happens only inside the save transaction, for the acting user's own private Book, when the server-held source outcome for its ISBN is `found` (AD-9) and no shared Book exists. The save never calls the sources itself. Then: the row is kept, source values replace its fields, the creator's former values that differ become their overrides, its authors and series are re-matched to shared records, `visibility` flips and `createdBy` clears. If a shared Book already exists, the user's copies, entries and `user-books` row move to it and the private Book is deleted. Other users' private Books are never touched.
-  - Saves never create genres. On a shared Book, `books.genres` is written only by `mapSubjectsToGenres()` in `lib/catalogue`, which returns none until the genre story lands and can be re-run over stored subjects. On a private Book, genres are its creator's picks from the existing list, written by `editBook()`.
+  - ISBN auto-share happens in two places and nowhere else: inside the save transaction, for the acting user's own private Book, when the server-held source outcome for its ISBN is `found` (AD-9) and no shared Book exists; and in `lookupAgain()`, which the creator runs from Book detail or the In library Answer, which calls the sources (rate-limited) and runs the same transaction without creating a copy. The save never calls the sources itself. Then: the row is kept, source values replace its fields, the creator's former values that differ become their overrides (an admin's are dropped), its authors and series are re-matched to shared records, `visibility` flips and `createdBy` clears. If a shared Book already exists, the user's copies, entries and `user-books` row move to it and the private Book is deleted. Other users' private Books are never touched.
+  - System genres: on a shared Book, `books.genres` is written only by `mapSubjectsToGenres()` in `lib/catalogue`. It matches the Google Books categories in `rawMetadata.subjects.google` to `genres` by `nameKey` on the English name, creates the missing ones with no Finnish name, and can be re-run over stored subjects; until the genre stories land it returns none. The admin edits a shared Book's system genres on Edit book and manages the list (English and Finnish names, add, merge, delete) through `lib/catalogue`; a merge or delete touches shared rows only. On a private Book, genres are its creator's picks from the existing list, written by `editBook()`. Users have no write access on `genres`.
   - An ISBN can be added to a private Book through `editBook()`. A shared Book's ISBN never changes.
-  - Re-fetch is an admin-only function in `lib/catalogue`, triggered by an admin-only action on the Book detail page. It fills empty shared fields only and never touches `user-books`.
+  - Re-fetch is an admin-only function in `lib/catalogue`, triggered by an admin-only action on the Book detail page. It fills empty shared fields only, themes and the cover included; an uploaded cover is an existing value. It never touches `user-books`.
 
 ### AD-6 — Overrides are a sparse layer on `user-books`, read for the viewer
 
 - **Binds:** `books`, `user-books`, `editBook`, every screen that shows a Book; FR-14, FR-25, FR-27, FR-43, FR-46
 - **Prevents:** copy-on-write forks; screens showing raw shared values; "cleared" and "not overridden" being confused; a friend's overrides leaking to a viewer later
 - **Rule:**
-  - `user-books` has at most one row per owner and Book. It holds the override fields, `overridden` (a `json` field holding the array of overridden field names), read flag, rating with `ratedAt`, and personal tags.
-  - The overridable field set is declared once in `src/fields/bookFields.ts` and used by both collections. ISBN-13 is identity and is not overridable.
-  - A field is overridden if and only if its name is in `overridden`; its stored value may then be empty, meaning cleared. Relationship overrides (`authors`, `series`, `genres`) are relationship fields to the same collections. A typed author or series name that matches nothing becomes a private record (AD-5). A genre override picks from existing genres.
+  - `user-books` has at most one row per owner and Book. It holds the override fields, `overridden` (a `json` field holding the array of overridden field names), read flag, rating with `ratedAt`, and the user's tags of every kind (AD-8).
+  - The overridable field set is declared once in `src/fields/bookFields.ts` and used by both collections. ISBN-13 is identity, and genres and themes are system data; none of the three is overridable.
+  - A field is overridden if and only if its name is in `overridden`; its stored value may then be empty, meaning cleared. Relationship overrides (`authors`, `series`) are relationship fields to the same collections. A typed author or series name that matches nothing becomes a private record (AD-5). A user classifies a shared Book for themselves with user genres and user themes, which are tags (AD-8), not overrides.
   - Overrides exist only on shared Books.
   - The override row is always the viewer's: `user-books` is joined on the requesting user, never on the owner of a copy or entry. A viewer with no row gets shared values.
   - The row is lazy. `upsertUserBook()` in `lib/books` is its only writer. Every reader treats a missing row as no overrides, unread, unrated, no tags. It is not deleted when copies or entries are removed.
@@ -157,7 +158,7 @@ Arrows are the only allowed import directions, and ESLint `no-restricted-imports
   - `copies.status` is `ordered | owned` and nothing else. An ordered copy has no location.
   - A wishlist entry is a row in `wishlist-entries`, never a copy. Marking it bought or ordered closes it, and a closed entry keeps its row with `closedAt`; Remove deletes the row. Unless a rule says otherwise, "entry" means an open entry. An entry is addressed by its own id, because one Book can be on a list more than once.
   - A loan is a row in `loans` pointing at a copy and a Person; the copy keeps its location.
-  - Read flag, rating and personal tags are on `user-books`; notes are on `copies`.
+  - Read flag, rating and the user's tags are on `user-books`; notes are on `copies`. Personal tags, user genres and user themes are one `tags` collection with `kind: tag | genre | theme`. A user's name in a kind may not equal a system genre's English or Finnish name, nor a system theme on a Book the user holds (`SYSTEM_NAME`). A system genre created later with a user genre's name leaves the user genre in place.
 
 ### AD-9 — Lookup is read-only, has two layers and merges sources by priority
 
@@ -165,14 +166,14 @@ Arrows are the only allowed import directions, and ESLint `no-restricted-imports
 - **Prevents:** adapters with different result shapes or error behaviour; lookup creating records; a rescan of a hand-entered Book creating a duplicate; a source outage cached as "no such book"; raw source data reaching other users
 - **Rule:**
   - Lookup writes nothing to the database.
-  - `lookupSources(isbn13)` in `lib/metadata` calls every source in `sources/index.ts` in parallel, each under a timeout, and merges field by field, taking the first non-empty value in array order. The array order is Finna, then Google Books. It reports one of three outcomes: a merged result; `none`, when every source answered and none has the ISBN; or `unavailable`, when there is no result and at least one source failed or timed out. Results and `none` are cached in process by ISBN-13. `unavailable`, and a result merged while a source failed or timed out, are never cached.
-  - A source implements `id`, `lookupByIsbn(isbn13)` and optionally `search(query)`. It returns `SourceResult` or nothing and never throws to the caller; failures are logged. Adapters emit person names as "Given Family", with the source's inverted form as `sortName` when it gives one, and convert language codes. Adding a source is one adapter file and one array entry, with no schema change.
-  - `lookupBook(ctx, target)` in `lib/catalogue` returns `LookupResult`. It takes the ISBN as entered and normalises it. The order is: a Book the user can read with that ISBN (shared first, then the user's own private Book), then `lookupSources`. When the answer is the user's own private Book, it also runs `lookupSources`, so the next save can auto-share it (AD-5). For a Book id it answers only for a Book that passes `requireOwnBook()` (AD-7).
+  - `lookupSources(isbn13)` in `lib/metadata` calls every source in `sources/index.ts` in parallel, each under a timeout. A source's `lookupByIsbn` returns its matching records best first. `lookupSources` builds one candidate per record of the first source that answered, each gap-filled field by field from the other sources' best record in array order (Finna, then Google Books). It reports one of three outcomes: `found`, with the candidates best first and `RawMetadata`; `none`, when every source answered and none has the ISBN; or `unavailable`, when there is no result and at least one source failed or timed out. A source that has failed or timed out several times in a row is skipped for a cooldown (a circuit breaker in process state, AD-12) and counts as failed. Results and `none` are cached in process by ISBN-13. `unavailable`, and a result merged while a source failed or timed out, are never cached.
+  - A source implements `id`, `lookupByIsbn(isbn13)` and optionally `search(query)`. It returns a list of `SourceResult`, empty for none, and never throws to the caller; failures are logged. A result carries the ISBN asked for, never another ISBN in the record; `binding` is display-only and never stored. Finna's subject terms become `themes`; a source's own categories are kept as its `subjects`. Adapters emit person names as "Given Family", with the source's inverted form as `sortName` when it gives one, and convert language codes. Adding a source is one adapter file and one array entry, with no schema change.
+  - `lookupBook(ctx, target)` in `lib/catalogue` returns `LookupResult`. It takes the ISBN as entered and normalises it. The order is: a Book the user can read with that ISBN (shared first, then the user's own private Book), then `lookupSources`. When the answer is the user's own private Book, it also runs `lookupSources`, so the next save can auto-share it (AD-5). For a Book id it answers only for a Book that passes `requireOwnBook()` (AD-7). The `source` kind carries the candidates and the matches for the picked one; the Answer selects a candidate with `?pick=<n>`, an out-of-range pick falls back to the best, and once a shared Book exists for the ISBN there is nothing to pick.
   - What the user holds of a Book comes from `getHoldings()` in `lib/books`, the one reader of a viewer's copies and open entries of a Book. The Answer, Book detail, shelf rows and Lookup results all use it.
-  - `searchBooks(ctx, text)` in `lib/catalogue` is the only caller of the sources' `search()`. It merges hits in source order, keeps one hit per ISBN-13 and drops hits without one. It writes nothing.
+  - `searchBooks(ctx, text)` in `lib/catalogue` is the only caller of the sources' `search()`. It merges hits in source order, keeps one hit per ISBN-13 with its `binding` and drops hits without one. It writes nothing.
   - `books.source` is a text field holding the id of the first source in order that answered, empty for a manual Book.
   - `rawMetadata` has the `RawMetadata` shape, admin-only field read access, and is never part of `EffectiveBook`.
-  - `lookupBook` and `searchBooks` share one per-user rate limit, in process. There are no custom Payload endpoints.
+  - `lookupBook`, `searchBooks` and `lookupAgain` share one per-user rate limit, in process. There are no custom Payload endpoints.
 
 ### AD-10 — The frontend does not use Payload REST or GraphQL
 
@@ -189,7 +190,7 @@ Arrows are the only allowed import directions, and ESLint `no-restricted-imports
 - **Prevents:** half-saved books; a second route to Book values beside `editBook`; a double tap saving twice; a guessed Book id reaching the shared catalogue; Undo of a save deleting a record still in use
 - **Rule:**
   - A save takes `SaveInput` and creates every needed document in one transaction (AD-16): ensure the Book, then either `closeEntriesForBook()` and `createCopy()` (AD-18) or the new entry. A copy saved this way is owned and at the default location. Status, location, tags, the recipient of an entry and Book values are changed afterwards through their own functions.
-  - An Answer opened by ISBN sends `{ isbn13 }`. A `{ bookId }` target must pass `requireOwnBook()` (AD-7).
+  - An Answer opened by ISBN sends `{ isbn13, pick? }`. A `{ bookId }` target must pass `requireOwnBook()` (AD-7).
   - `SaveInput` carries a client-generated `requestId`. A repeat of a recent `requestId` by the same user returns the first result.
   - A save is undoable (AD-20). Its restore deletes the copy or entry and reopens closed entries. It deletes a created Book, author, series or media row only when `isUnreferenced()` (AD-3) finds no reference to it from any row of any user, and a created `user-books` row only when that user has no other copy or entry for the Book. After an auto-share (AD-5) it removes the copy and leaves the Book shared.
 
@@ -210,14 +211,15 @@ Arrows are the only allowed import directions, and ESLint `no-restricted-imports
   - Production applies migrations at start through `prodMigrations` and never pushes.
   - The old single-copy collections are replaced, not migrated. Migration history starts with the reworked model.
 
-### AD-14 — Covers are stored locally and downloaded only by `lib/catalogue`
+### AD-14 — Covers are stored locally; downloaded and uploaded only by `lib/catalogue`
 
 - **Binds:** `media`, save flow, every cover render; FR-13, FR-20, FR-47
 - **Prevents:** two downloaders; screens rendering remote source URLs; a slow download holding a transaction open
 - **Rule:**
-  - Only `lib/catalogue` downloads covers, never a hook. The URL is taken from the server-held source response. Bytes are fetched before the transaction opens and the media row is created inside it. A failed download saves the Book without a cover and logs; a rolled-back save deletes the file it wrote.
+  - Only `lib/catalogue` downloads covers, never a hook. The URL is taken from the server-held source response. Bytes are fetched before the transaction opens and the media row is created inside it. A failed download saves the Book without a cover and logs; a rolled-back save deletes the file it wrote. Downloads use `https` from an allowlist of source image hosts, with a size limit and a timeout. Files are written under a temporary name and renamed into place when complete; `onInit` removes files without a `media` row that are older than an hour.
   - The browser never loads a cover from a metadata source. The cover of a Book that is not saved yet is shown through one authenticated route handler under `(frontend)` that streams it for an ISBN-13 from the source cover URL the server recorded for that ISBN during a lookup or a search; `coverUrl()` produces that URL too. The handler never takes a URL from the client.
-  - `media` read requires a signed-in user. Create and delete are `lib/catalogue` or admin only. Stored filenames are random.
+  - `setCover(ctx, bookId, file, corners)` in `lib/catalogue` is the only upload path: the admin for a shared Book, the creator for their private Book; anyone else fails with `NOT_FOUND`. It accepts JPEG, PNG or WebP within a size limit, warps the four-corner quadrilateral into a 2:3 rectangle with sharp (a closed-form square-to-quad projective mapping with bilinear sampling, hand-written; no crop library, no general solver), strips all metadata, resizes and re-encodes, creates the `media` row with a random filename and sets `books.cover`; the replaced row is deleted when `isUnreferenced()`. `removeCover()` clears the cover. Neither is undoable. The browser decodes the photo with its orientation applied, shrinks it to about 2000 px and sends the image and the four corner points in a server action, whose body size limit is raised for it.
+  - `media` carries `visibility: shared | private` and `createdBy` as in AD-4: a source-downloaded cover and the admin's upload on a shared Book are shared; a private Book's cover is private, readable by its creator and the admin. Read requires a signed-in user and follows that constraint. Create and delete are `lib/catalogue` or admin only. Stored filenames are random.
 
 ### AD-15 — Interface text goes through the message catalogue
 
@@ -246,7 +248,7 @@ Arrows are the only allowed import directions, and ESLint `no-restricted-imports
   - `lib/wishlists` is the only writer of `wishlist-entries`. `closeEntriesForBook()` closes the user's open entries for a Book that have no recipient; `saveCopy()` calls it before `createCopy()`, in the same transaction, and folds what it closed into the save's restore. `closeEntry()` marks an entry bought or ordered and calls `createCopy()` unless the entry is for a Person.
   - `upsertUserBook()` in `lib/books` is the only writer of `user-books` (AD-6). `setRead()` and `changeTags()` in `lib/books` take either copy ids or a Book id, so they also work for a Book the user has only on a wishlist. `setRead()` takes a value or `toggle`, which the server resolves: unread when every Book is read, otherwise read.
   - `findOrCreateByName()` in `lib/catalogue` is the only matcher for authors and series (AD-5).
-  - Each private name-keyed collection has one owning service that matches by `nameKey`, creates, renames and deletes its rows, and merges them where the interface offers a merge: locations in `lib/copies`, People in `lib/people`, tags in `lib/books`, wishlists in `lib/wishlists`. The profile is read and updated only through `lib/account`. Screens never match names.
+  - Each private name-keyed collection has one owning service that matches by `nameKey`, creates, renames and deletes its rows, and merges them where the interface offers a merge: locations in `lib/copies`, People in `lib/people`, tags of every kind in `lib/books`, wishlists in `lib/wishlists`. The profile, `profileVisibility` and `collectionVisibility` included, is read and updated only through `lib/account`. System genres are managed only through `lib/catalogue`, admin only. Screens never match names.
   - An input that picks one of these rows or creates it inline is a `Ref`: an id, or a name to create. The owning service resolves it inside the action's transaction. Undo leaves a row created this way.
   - Renaming onto a `nameKey` that exists fails with `NAME_TAKEN` and the existing row's id as `conflictId`.
   - A merge is one function in the owning service, in one transaction: every reference to the source row moves to the target, then the source row is deleted.
@@ -263,7 +265,7 @@ Arrows are the only allowed import directions, and ESLint `no-restricted-imports
   - `books(isbn13)` where `visibility = shared`; `books(createdBy, isbn13)` where `visibility = private`
   - `user-books(owner, book)`
   - `loans(copy)` where the loan is open
-  - `nameKey` among shared rows, and `(createdBy, nameKey)` or `(owner, nameKey)` among private rows
+  - `nameKey` among shared rows, and `(createdBy, nameKey)` or `(owner, nameKey)` among private rows; `(owner, kind, nameKey)` for `tags`
 
   A service check for the same rule exists only to raise a `DomainError` first.
 
@@ -272,11 +274,11 @@ Arrows are the only allowed import directions, and ESLint `no-restricted-imports
 - **Binds:** `src/lib/undo`, every service function behind an action in `EXPERIENCE.md` → Undo, the toast, `undoAction`; FR-15
 - **Prevents:** one Undo per screen; the browser holding previous values; nested calls each recording a receipt, or none; a restore writing outside its transaction; a forged receipt deleting shared records; Undo reverting changes it did not make
 - **Rule:**
-  - `lib/undo` holds a bounded in-process store (AD-12) of receipts keyed by an opaque `undoToken` and the user. The client holds only the token. After a restart or once the token has expired, Undo is unavailable.
+  - `lib/undo` holds a bounded in-process store (AD-12) of receipts keyed by an opaque `undoToken` and the user. The client holds only the token. Receipts live 30 minutes; a result carries the seconds remaining on its token and the toast hides Undo when they run out. After a restart or once the token has expired, Undo is unavailable.
   - An undoable service function is written once. It takes a context, opens no transaction, records nothing, and returns `Undone<T>`: its result and a restore function. The restore closes over ids and previous values only, never a context.
   - `withUndo(ctx, fn)` in `lib/undo` is the only recorder. It opens the transaction, runs `fn`, records the restore after the commit and returns the result with its `undoToken`. A server action wraps its one service call in it. A service that calls an undoable function of another service folds the returned restore into its own or drops it.
   - `undo(ctx, token)` is the only entry point, behind one `undoAction`. It uses the token once and runs the restore in one transaction with the context of the undo request, through the owning services' writers (AD-18). A restore writes the recorded previous values to rows that still exist, whatever they hold now, and skips rows that are gone. It never touches a row its action did not change. If any step fails, nothing is restored and the result is `UNDO_FAILED`.
-  - The actions that are undoable are exactly those listed with an Undo in `EXPERIENCE.md` → Undo, whichever screen they are called from. Removals, deletes, merges and `editBook` are not.
+  - The actions that are undoable are exactly those listed with an Undo in `EXPERIENCE.md` → Undo, whichever screen they are called from. Removals, deletes, merges, `editBook`, `setCover`, `lookupAgain` and genre administration are not.
 
 ## Consistency Conventions
 
@@ -293,7 +295,7 @@ Arrows are the only allowed import directions, and ESLint `no-restricted-imports
 | Language codes | ISO 639-1 two-letter where one exists, otherwise ISO 639-2. Adapters convert. |
 | Dates | ISO 8601 UTC as Payload stores them. A loan date is a calendar date: sent as `YYYY-MM-DD`, stored at 12:00 UTC, read back by its UTC date. Every date and number shown is formatted by `next-intl`, with the time zone `Europe/Helsinki` set once in its request config. |
 | Errors | `src/lib/errors.ts` defines `DomainError`, `ActionResult`, the `ErrorCode` union (`SCREAMING_SNAKE`), `runAction()` and `runRoute()`. The message key for a code is `errors.<CODE>`. Both wrappers map Payload `Forbidden` and `NotFound` to `NOT_FOUND`, `ValidationError` to `VALIDATION` with field errors, and anything else to `INTERNAL` with a log line. Actions return `ActionResult` and never redirect. `runRoute()` answers with `ActionResult` as JSON, `Cache-Control: no-store`, and status 401 for `UNAUTHENTICATED`; the cover handler streams bytes and uses the status alone. On the client, actions and `/data` requests go through one helper, which turns a network failure into `NO_CONNECTION` and `UNAUTHENTICATED` into a move to sign-in. |
-| Toasts | One toast provider in the frontend root layout, so a toast survives navigation. It renders from `ActionResult`; an action's result carries the names its toast shows. A server render raises a toast only through `flashToast()`, a short-lived cookie the provider reads and clears. |
+| Toasts | One toast provider in the frontend root layout, so a toast survives navigation. It renders from `ActionResult`; an action's result carries the names its toast shows and the seconds remaining on its `undoToken`. Every toast has a close (X). A server render raises a toast only through `flashToast()`, a short-lived cookie the provider reads and clears. |
 | Navigation and history | Opening Book detail, an entry or a full-screen task pushes a history entry. Swapping the open Book, changing search, filters or sort, and one Answer following another replace it. Closing is history back, falling back to `/` when there is nothing to go back to; no address carries a return parameter. Overlays without an address (pickers, dialogs, the Filter sheet on the phone) handle Back inside their `components/ui` wrapper. Overlay links use router navigation with `scroll: false` and no prefetch. `cacheComponents` stays off. |
 | Logging | `payload.logger`. No `console.*` in committed code. |
 | Configuration | Environment variables only, each listed in `.env.example`. |
@@ -327,6 +329,7 @@ Arrows are the only allowed import directions, and ESLint `no-restricted-imports
 | @zxing/browser with peer `@zxing/library` (to add) | 0.2.1 with ^0.23.0 |
 | Vitest | 4.0.18 |
 | Playwright | 1.58.2 |
+| sharp (already a Payload dependency) | as installed; used by `setCover()` for the cover warp |
 | Docker Compose | v2 |
 | GitHub Actions and GHCR | hosted |
 | Tailscale (`tailscale serve`) | current stable on the LXC |
@@ -350,7 +353,6 @@ erDiagram
   BOOKS }o--o| MEDIA : cover
   USER_BOOKS }o--o{ AUTHORS : "override"
   USER_BOOKS }o--o| SERIES : "override"
-  USER_BOOKS }o--o{ GENRES : "override"
   USER_BOOKS }o--o{ TAGS : "tagged with"
   COPIES }o--o| LOCATIONS : "kept at"
   COPIES ||--o{ LOANS : "lent as"
@@ -382,12 +384,14 @@ type SourceResult = {
   pages?: number
   description?: string
   subjects: string[]
+  themes: string[] // Finna subject terms as given
+  binding?: string // "paperback", "hardcover"; display only, never stored
   coverUrl?: string
   source: SourceId // first source in order that answered
   raw: Record<SourceId, unknown>
 }
-type SourcesOutcome = { kind: 'found'; result: SourceResult } | { kind: 'none' } | { kind: 'unavailable' }
-type SearchHit = Pick<SourceResult, 'isbn13' | 'title' | 'authors' | 'publisher' | 'year' | 'source'> & { hasCover: boolean }
+type SourcesOutcome = { kind: 'found'; candidates: SourceResult[]; raw: RawMetadata } | { kind: 'none' } | { kind: 'unavailable' } // candidates best first
+type SearchHit = Pick<SourceResult, 'isbn13' | 'title' | 'authors' | 'publisher' | 'year' | 'binding' | 'source'> & { hasCover: boolean }
 type RawMetadata = {
   v: 1
   fetchedAt: string
@@ -411,7 +415,8 @@ type EffectiveBook = {
   authors: Named[]
   series: Named | null
   seriesIndex: number | null
-  genres: Named[]
+  genres: Named[] // system genres
+  themes: string[]
   publisher: string | null
   year: number | null
   language: string | null
@@ -420,7 +425,8 @@ type EffectiveBook = {
   coverUrl: string | null
   overridden: string[]
 }
-type UserBookState = { read: boolean; rating: number | null; tags: Named[] }
+type TagKind = 'tag' | 'genre' | 'theme'
+type UserBookState = { read: boolean; rating: number | null; tags: (Named & { kind: TagKind })[] }
 type CopyLine = {
   copyId: number
   status: 'owned' | 'ordered'
@@ -433,12 +439,13 @@ type Holdings = { copies: CopyLine[]; entries: EntryLine[] } // open entries onl
 
 // src/lib/catalogue
 type Match = { name: string; id: number | null } // null: will be created
+type Draft = Omit<SourceResult, 'raw' | 'coverUrl'> & { hasCover: boolean }
 type LookupResult =
   | { kind: 'existing'; book: EffectiveBook; mine: Holdings }
-  | { kind: 'source'; draft: Omit<SourceResult, 'raw' | 'coverUrl'> & { hasCover: boolean }; matches: { authors: Match[]; series: Match | null } }
+  | { kind: 'source'; candidates: Draft[]; pick: number; matches: { authors: Match[]; series: Match | null; genres: Match[] } } // matches are for candidates[pick]
   | { kind: 'none' }
   | { kind: 'unavailable' }
-type LookupTarget = { isbn: string } | { bookId: number } // isbn as entered
+type LookupTarget = { isbn: string; pick?: number } | { bookId: number } // isbn as entered
 type BookEdits = Partial<{
   isbn13: string // private Books only
   title: string
@@ -446,7 +453,7 @@ type BookEdits = Partial<{
   authors: string[] // names
   series: string | null // name
   seriesIndex: number | null
-  genres: number[] // existing genre ids
+  genres: number[] // system genre ids: private Books, and shared Books for the admin
   publisher: string | null
   year: number | null
   language: string | null
@@ -455,14 +462,15 @@ type BookEdits = Partial<{
 }>
 type SaveInput = {
   requestId: string
-  target: { bookId: number } | { isbn13: string } | { manual: { isbn?: string; title: string; authors: string[] } }
+  target: { bookId: number } | { isbn13: string; pick?: number } | { manual: { isbn?: string; title: string; authors: string[] } }
   save: { kind: 'copy' } | { kind: 'entry'; wishlist: Ref }
 }
 type SaveResult = { bookId: number; copyId?: number; entryId?: number; savedTo: Named | null } // location or wishlist
 type EditBookInput = {
   bookId: number
   edits: BookEdits // only fields the user changed
-  tags?: Ref[] // the full set
+  tags?: Partial<Record<TagKind, Ref[]>> // the full set per kind
+  // the cover goes through setCover() in the same action
   copy?: { id: number; status?: 'owned' | 'ordered'; location?: Ref | null }
 }
 
@@ -470,7 +478,8 @@ type EditBookInput = {
 type ShelfQuery = {
   q?: string
   filters: Partial<{
-    location: number[]; status: ('owned' | 'ordered')[]; read: boolean; genre: number[]; tag: number[]
+    location: number[]; status: ('owned' | 'ordered')[]; read: boolean; genre: number[]; tag: number[] // genre: system genre ids and the user's genre tag ids
+    theme: string[] // by text: system themes exactly, the user's themes by name
     language: string[]; author: number[]; series: number[]; publisher: string[]
     ratingMin: number; year: [number?, number?]; pages: [number?, number?]
   }>
@@ -484,7 +493,7 @@ type ShelfRows = { rows: ShelfRow[]; total: number; labels: Record<string, strin
 // src/lib/undo
 type Restore = (ctx: Context) => Promise<void>
 type Undone<T> = { data: T; restore: Restore } // returned by an undoable service function
-type Undoable<T> = T & { undoToken: string } // returned by withUndo
+type Undoable<T> = T & { undoToken: string; undoSeconds: number } // returned by withUndo
 
 // src/lib/errors.ts
 type ActionResult<T> =
@@ -501,7 +510,7 @@ The addresses are those of `EXPERIENCE.md` → Information Architecture, with th
 | `/` | Collection, with search, filters and sort as search params. There is no home screen. |
 | `?book=<bookId>` on `/` and `/loans` | Book detail: one server component, rendered by the section's page when the param is set. It is not a page of its own. |
 | `/login` | Sign-in. `?next=<path>` is where it returns to. |
-| `/scan` | Scanner and ISBN field. With `?isbn=<text>` or `?book=<bookId>`, the Answer, rendered by the page. With `?title=<text>`, the Not found Answer with the title filled in. |
+| `/scan` | Scanner and ISBN field. With `?isbn=<text>` or `?book=<bookId>`, the Answer, rendered by the page; `&pick=<n>` selects an edition. With `?title=<text>`, the Not found Answer with the title filled in; also reached from Scan's "Add without ISBN" Link, for a book with no barcode. |
 | `/scan/find` | Lookup by title or author. The search text is `?q=`, and the page renders the results. |
 | `/books/[bookId]/edit` | Edit book, a page on every screen width. With `?copy=<copyId>`, that copy's status and location too. |
 | `/loans`, `/wishlists`, `/settings` | Loans, the list of wishlists, settings |
@@ -530,7 +539,7 @@ flowchart LR
 - The LXC never builds. It pulls the image from GHCR with a read-only token. Migrations run at start (AD-13). The image build downloads Open Sans, so it needs network access; the running app does not.
 - The first user is created by `onInit` from `SEED_EMAIL` and `SEED_PASSWORD` when `users` is empty, with both roles.
 - Every Postgres (dev, test, CI, production) is initialised with `--locale-provider=icu --icu-locale=fi-FI`. Existing dev volumes are recreated once. The image tag is pinned; changing it means a reindex and `ALTER DATABASE ... REFRESH COLLATION VERSION`.
-- Backups: nightly `pg_dump` and a copy of the media directory to the NAS, run by a timer on the LXC. Backup paths are readable by the operator account only. Dumps are kept for a fixed number of days so erased data ages out. One restore is rehearsed before Phase 1 is called done (NFR-6).
+- Backups: nightly `pg_dump` and a copy of the media directory to the NAS, run by a timer on the LXC. Backup paths are readable by the operator account only. Dumps are kept for a fixed number of days so erased data ages out. The script refuses to dump a database with no users and writes `last-backup.json` where the app can read it; Settings shows the last backup to the admin and flags one older than 48 hours. One restore is rehearsed at the cataloguing gate, once the first real books are in, and written down (NFR-6).
 - Operations: container restart policy and Docker logs. No monitoring stack.
 - Camera access needs HTTPS: `tailscale serve` in production, `localhost` or `tailscale serve` to the dev machine when testing on a phone.
 - Known scaffold gaps the first stories close: `output: 'standalone'` missing in `next.config.ts`; the Dockerfile copies a `public/` directory that does not exist; `playwright.config.ts` starts the server with `pnpm`; no `typecheck` script; `no-explicit-any` is a warning; `Media` has `read: () => true`.
@@ -550,13 +559,13 @@ src/
     processState.ts    # in-process state on globalThis
     undo/              # receipt store, withUndo, undo
     metadata/          # source contract, sources/, merge, lookupSources, cache
-    catalogue/         # lookupBook, searchBooks, saveCopy, saveEntry, editBook, findOrCreateByName, isUnreferenced, covers, re-fetch
-    books/             # EffectiveBook, getEffectiveBooks, getHoldings, requireOwnBook, upsertUserBook, setRead, changeTags, tags, coverUrl
+    catalogue/         # lookupBook, searchBooks, saveCopy, saveEntry, editBook, findOrCreateByName, isUnreferenced, covers (download, upload and warp), re-fetch, lookupAgain, genre admin
+    books/             # EffectiveBook, getEffectiveBooks, getHoldings, requireOwnBook, upsertUserBook, setRead, changeTags and tags of every kind, coverUrl
     shelf/             # Drizzle query module, read-only: getShelfRows, values and suggestions; query.ts (pure): parseShelfQuery, shelfHref
     copies/            # createCopy, move, receive, status, note, remove; locations
     people/            # People: match, rename, merge, delete
     loans/  wishlists/
-    account/           # profile read and update
+    account/           # profile read and update, visibility
   migrations/
 messages/              # en.json, fi.json
 tests/int/  tests/e2e/  tests/helpers/  tests/fixtures/
@@ -568,7 +577,7 @@ deploy/                # production compose file, backup script
 
 | Capability / Area | Lives in | Governed by |
 | --- | --- | --- |
-| F1 Accounts (Phase 1: FR-1, FR-4) | `collections/Users`, `lib/payload`, `lib/account`, `/login`, `/settings` | AD-2, AD-16, AD-18, Accounts, Roles and Device preferences conventions |
+| F1 Accounts (Phase 1: FR-1, FR-4 with the visibility fields) | `collections/Users`, `lib/payload`, `lib/account`, `/login`, `/settings` | AD-2, AD-16, AD-18, Accounts, Roles and Device preferences conventions |
 | F2 Adding a book | `lib/metadata`, `lib/catalogue`, `/scan`, `/books/[bookId]/edit` | AD-4, AD-5, AD-6, AD-9, AD-11, AD-14, AD-18, AD-20 |
 | F3 Shop check | `lib/catalogue`, `lib/shelf`, `/scan`, `/scan/find` | AD-7, AD-9, AD-10, AD-11 |
 | F4 My collection | `lib/shelf`, `lib/books`, `lib/copies`, `/` | AD-6, AD-7, AD-8, AD-18, AD-20 |
@@ -576,7 +585,7 @@ deploy/                # production compose file, backup script
 | F6 People and loans | `collections/People`, `collections/Loans`, `lib/people`, `lib/loans` | AD-1, AD-8, AD-17, AD-18, AD-19, AD-20 |
 | F7 Wishlists (Phase 1: FR-38, FR-39) | `collections/Wishlists`, `collections/WishlistEntries`, `lib/wishlists` | AD-1, AD-8, AD-11, AD-18, AD-20 |
 | F8 Friends and visibility | Not built. Enters through access helpers and `visibleCopies`. | AD-1, AD-2, AD-6, AD-7 |
-| F9 Curation | Not built, except admin re-fetch (FR-19). Enters through `visibility` and the back office. | AD-4, AD-5 |
+| F9 Curation | Phase 1 builds admin re-fetch (FR-19), the admin's edits of shared Books on Edit book (FR-14), genre management (FR-17) and the Phase 1 part of FR-47 (cover upload). The rest enters through `visibility` and the back office. | AD-3, AD-4, AD-5, AD-14 |
 | F10 Administration | `app/(payload)`, `users.roles` | AD-1, AD-2, AD-3 |
 | F11 Platform (PWA, localisation) | `app/manifest.ts`, `messages/` | AD-15, Caching and Product name conventions |
 | Look and behaviour of the interface | `app/(frontend)`, `DESIGN.md`, `EXPERIENCE.md` | Styling, UI primitives, Font, Toasts, Navigation and history, and Device preferences conventions |
@@ -590,15 +599,15 @@ deploy/                # production compose file, backup script
 ## Deferred
 
 - **Public ingress and cover serving without `/api`** (PRD Open Question 2). Decide if Phase 2 is committed. AD-10 keeps the change to ingress rules plus `coverUrl()`.
-- **Friends, invites, password resets, share links, suggestions, merges, alternative covers.** Phases 2-3. No collections are created for them now. When built they follow AD-1, AD-2 and AD-4. Share-link pages are the only unauthenticated data route and get their own entry in the AD-3 allowlist. `media` gains `visibility` and `createdBy` when user uploads arrive.
-- **Profile visibility and collection visibility** (FR-4). Added as defaulted fields with Phase 2; they have no effect with one user.
+- **Friends, invites, password resets, share links, suggestions, merges, alternative covers.** Phases 2-3. No collections are created for them now. When built they follow AD-1, AD-2 and AD-4. Share-link pages are the only unauthenticated data route and get their own entry in the AD-3 allowlist.
+- **Non-admin cover uploads on shared Books, approval and alternative covers** (FR-47). Phase 3. They follow AD-14.
 - **Account export, deletion, deactivation, email change, session list, admin action log** (FR-6 to FR-9, FR-49). Phase 2. Deletion and export are a walk over `owner` on the AD-1 collections and `createdBy` on the AD-4 collections.
 - **Rate limiting beyond lookup**, and the other NFR-5 items. Required before public exposure, not on the tailnet.
-- **Genre curation.** How the curated list is seeded and how source subjects map to it is decided in the genre story. AD-5 fixes who writes genres; raw subjects are stored, so mapping can be re-run.
-- **Lookup tuning.** Cache size and lifetime (shorter for `none`), per-source timeout, rate-limit numbers and dump retention days are set in their stories against NFR-1 and NFR-6.
+- **Genre vocabulary.** The seeded list and its Finnish names are written in the seed story (G4). Whether Finna's genre terms are also mapped is decided by the fixture checkpoint (C9). AD-5 fixes who writes genres; raw subjects are stored, so mapping can be re-run.
+- **Lookup tuning.** Cache size and lifetime (shorter for `none`), per-source timeout, circuit-breaker thresholds, rate-limit numbers and dump retention days are set in their stories against NFR-1 and NFR-6.
 - **Search indexing** (trigram or full-text). Only if `ILIKE` misses NFR-3 when measured at 10,000 copies.
 - **Change password.** Not in Phase 1 (Mika, 2026-10-06). When it comes, it is a profile update through `lib/account`.
-- **Undo tuning.** Receipt lifetime and store size are set in the `lib/undo` story.
+- **Undo store size.** Set in the `lib/undo` story; the receipt lifetime is 30 minutes (Mika, 2026-10-06).
 - **Edit book in the detail panel's place on wide screens.** `EXPERIENCE.md` assumed it; Edit book is a page on every width (Mika, 2026-10-06).
 - **Section slide and list sweep.** `EXPERIENCE.md` marks them as enhancements. They are built with CSS or view transitions where that does not block input, and left out otherwise.
 - **Undoing merges** (PRD Open Question 5) and the **moderator role** (Open Question 1). Mika, before Phase 3. A moderator changes the role helpers in `src/access`, not collections.

@@ -6,6 +6,7 @@ sources:
   - _bmad-output/planning-artifacts/prds/prd-bookeh-2026-10-02/addendum.md
   - _bmad-output/planning-artifacts/architecture/architecture-bookeh-2026-10-03/ARCHITECTURE-SPINE.md
   - _bmad-output/planning-artifacts/architecture/architecture-bookeh-2026-10-03/STORY-SLICING.md
+  - _bmad-output/planning-artifacts/epics.md
 updated: 2026-10-06
 ---
 
@@ -40,11 +41,11 @@ Four sections, plus full-screen tasks that sit outside them.
 | **Wishlists** (section) | `/wishlists` | Its section heading | The list of wishlists, each with a count (FR-39). |
 | Wishlist | `/wishlists/{listId}` | Tapping a list | That list's entries with their recipients. |
 | Wishlist entry | `?entry={entryId}` on its wishlist | Tapping an entry | One entry: the Book, its list, the For field; Bought, Ordered, Remove. A bottom sheet on the phone, a side panel on wide screens. |
-| **Settings** (section) | `/settings` | Its section heading | Profile, language, theme, default location; manage locations, People and personal tags; sign out. |
-| Scan | `/scan` | "Scan book", present on every section | Full screen. Camera, ISBN entry, and "Find by title or author". |
+| **Settings** (section) | `/settings` | Its section heading | Profile, language, theme, profile and collection visibility, default location; manage locations, People, tags, my genres and my themes; for the admin, genres and the last backup; sign out. |
+| Scan | `/scan` | "Scan book", present on every section | Full screen. Camera, ISBN entry, "Find by title or author" and "Add without ISBN". |
 | Lookup | `/scan/find` | "Find by title or author" on Scan | Search by title or author for a shop check without a barcode (FR-20). |
-| Answer | `/scan?isbn={isbn13}` | A barcode read, an ISBN entered, or a Lookup result tapped | Full screen. Says whether the Book is in the library and offers the next step. |
-| Edit book | `/books/{bookId}/edit` | "Edit" on a save toast; "Edit" in Book detail | Full screen. Book fields and personal tags. The review screen of the PRD, now after the save. |
+| Answer | `/scan?isbn={isbn13}`, with `&pick={n}` for a chosen edition | A barcode read, an ISBN entered, or a Lookup result tapped | Full screen. Says whether the Book is in the library and offers the next step. |
+| Edit book | `/books/{bookId}/edit` | "Edit" on a save toast; "Edit" in Book detail | Full screen. Book fields, the user's tags, genres and themes, and the cover where the user may change it. The review screen of the PRD, now after the save. |
 | Pickers and dialogs | None | Lend, Move, Tag, Add to wishlist, confirmations | Short choices on top of a screen or a sheet. |
 
 **Moving between sections.** The four section names are {typography.heading-section} headings set side by side. The current one is in full ink and leads the row; the others follow in their fixed order (collection, loans, wishlists, settings), wrapping round. On the phone the row runs off the right edge; tapping a heading or swiping the screen sideways changes section, and swiping wraps from the last section to the first. On wide screens the headings are clicked; where the window is too narrow for all four, the row clips at the right edge as it does on the phone.
@@ -64,7 +65,7 @@ Mock-ups, in the final tokens. The spines win on any conflict with a mock-up.
 | [mockups/key-wishlists.html](mockups/key-wishlists.html) | The list of wishlists, one wishlist, an entry opened. |
 | [mockups/key-settings.html](mockups/key-settings.html) | Settings on wide and phone. |
 
-Not mocked, built from this spine alone: Sign in, Lookup, the Filter panel on the phone, pickers and dialogs, select mode on the phone, and sizes s and l.
+Not mocked, built from this spine alone: Sign in, Lookup, the Filter panel on the phone, pickers and dialogs, select mode on the phone, and sizes s and l. The Genres group in Settings and the Corner crop step are not mocked either; their stories start with a rendered mock-up choice.
 
 ## Voice and Tone
 
@@ -100,26 +101,27 @@ Behaviour. Visual specs live in `DESIGN.md` → Components.
 | Link | "Find by title or author", "More details", "Clear", "Filter", "Select", "Returned", "Lend", "Move", toast actions | Acts on tap. Not used to move between sections. |
 | Link, destructive | Delete in settings; Remove on a copy's line; Delete on a wishlist | Always confirmed by a dialog. No Undo afterwards. |
 | Back link | An opened wishlist | Returns to the list of wishlists. |
-| Filter chip | Author, series, genre, personal tag and location on an opened Book | Tapping one adds that value to the collection's filters; filters already active stay, and a second value in the same field widens that field (see Filter panel). The sheet closes on the phone. From loans or a wishlist it goes to the collection with that one filter. |
+| Filter chip | Author, series, genre, theme, tag and location on an opened Book | Tapping one adds that value to the collection's filters; filters already active stay, and a second value in the same field widens that field (see Filter panel). The sheet closes on the phone. From loans or a wishlist it goes to the collection with that one filter. |
 | Text field | Search, ISBN, Edit book, settings, notes | Search filters as the user types, after a short pause. A field that failed validation shows its message beneath it. |
-| Combobox | Location, Person, tags, author, series | Type to narrow the options. A value that does not exist can be created from the same field (FR-31, FR-34). Its popup is not an overlay for the one-level rule. |
+| Combobox | Location, Person, tags, author, series, theme | Type to narrow the options. A value that does not exist can be created from the same field (FR-31, FR-34). Its popup is not an overlay for the one-level rule. |
 | Date field | Lend | The platform's own date control. Defaults to today. |
 | Book row / Cover tile | Collection, loans, wishlists, Lookup results | Tap opens Book detail (Lookup results open the Answer). In select mode, tap ticks it and does not open. |
 | Cover placeholder | Any Book with no cover | Stands in for the cover everywhere a cover would show. |
 | List row | The list of wishlists; the managed lists in settings | In wishlists, tap opens the list. In settings the row is not tappable; its Links act. |
 | Selection bar | The open row or tile | Marks the copy whose Book is showing in the detail. It moves when another is opened and goes when the detail closes. |
 | Lent marker | Rows, tiles, Book detail, Answer | Shown on any copy with an open loan, always with the borrower's name (FR-37). |
-| Rating | Book detail; the Filter panel | Five stars. Tap a star to set that rating; tap the current rating again to clear it. Saved at once (FR-29). |
+| Rating | Book detail; the Filter panel | Five stars. Tap a star to set that rating; tap another to change it; tapping the current star does nothing. A "Clear" Link beside the stars, shown only while a rating is set, clears it. Saved at once (FR-29). |
 | Detail panel | Book detail on wide screens | Slides out on the right and the list narrows beside it. Clicking another row swaps its content without closing it. It is not modal: the list stays usable and focus is not trapped. X and `Esc` close it. |
 | Bottom sheet | Book detail and a wishlist entry on the phone; the Filter panel on the phone [ASSUMPTION]; pickers on the phone | Slides up to a little over half the screen; the list stays visible above, dimmed. Dragging up or tapping the handle opens it fully. Tapping the dimmed list, dragging down, X or Back closes it. The list keeps its scroll position. Modal: focus is held inside. |
 | Picker | Location (Move), tags (Tag), Person and date (Lend), wishlist (Add to wishlist) | A bottom sheet on the phone; a dialog on wide screens. One choice, then it closes. |
 | Dialog | Confirmations of removals and merges; "Discard changes?"; New list | Centred, modal, with the screen behind dimmed. The confirming button is on the right. `Esc` and tapping outside cancel. |
-| Toast | After a save or a reversible action | Sits above whatever is pinned to the bottom. Shows the result and its actions as Links. About 8 seconds, then gone; one at a time, a new one replacing the old. A toast raised on Scan goes the moment the next Answer opens. An error toast has no timer and stays until dismissed or replaced. |
+| Toast | After a save or a reversible action | Sits above whatever is pinned to the bottom. Shows the result and its actions as Links. About 8 seconds, then gone; one at a time, a new one replacing the old. A toast raised on Scan goes the moment the next Answer opens. An error toast has no timer and stays until dismissed or replaced. Every toast has a close (X). Undo is hidden once its receipt has expired (30 minutes). |
 | Action bar | Select mode | Pinned to the bottom. The count, then Move, Tag, Read, Remove, and Done. On the phone it takes the place of the pinned Scan book button and is two rows: the count and Done above, the four actions below. [ASSUMPTION] On wide screens Scan book stays in the header. Buttons other than Done are disabled while nothing is ticked. |
 | Checkbox | Select mode | Appears on every row or tile when select mode starts. |
 | Close (X) | Scan, Lookup, Answer, Edit book; the sheet and the panel | Closes the whole task or overlay in one tap and returns to the section underneath. |
 | Progress line | Any wait | Shown while a lookup, save or next page is in flight. Nothing else blocks the screen. |
 | Camera frame | Scan | Live camera with a guide line. A read barcode goes straight to the Answer with no confirm tap. |
+| Corner crop | Cover upload on Edit book | A full-screen step: the photo with four corner handles joined by a 2px outline, starting as a 2:3 rectangle in the middle, the outside dimmed by the scrim, and the hint "Shoot it straight on". Drag each handle onto a corner of the cover; on wide screens Tab moves between handles and the arrow keys move the focused one. Use (primary) is disabled while the corners cross, fold or line up; Cancel returns nothing. Not mocked; its story starts with a rendered mock-up choice. |
 
 ### Undo
 
@@ -130,13 +132,15 @@ Undo is offered where the action has a plain opposite. Removals are confirmed fi
 | Add to library, Add another copy | "Saved to {location} · Edit · Undo" | Removes the copy, plus any Book, author or series it created that nothing else uses (FR-15). |
 | Add to wishlist | "Added to {list} · Undo" | Removes the entry, and the Book on the same rule. |
 | Move (one or many) | "{n} moved to {location} · Undo" | Puts each copy back where it was. |
-| Tag (many) | "Tagged {n} · Undo" | Restores each Book's tags. |
+| Tag (one or many, any kind) | "Tagged {n} · Undo" | Restores each Book's tags. |
 | Read (one or many) | "Marked {n} read · Undo" | Restores each Book's read flag. |
 | Lend | "Lent to {person} · Undo" | Removes the loan. |
 | Returned | "Returned · Undo" | Reopens the loan. |
 | Bought, Ordered (wishlist entry) | "Saved to {location} · Undo" | Removes the copy and reopens the entry. |
 | Received | "Saved to {location} · Undo" | Sets the copy back to ordered. |
 | Save on Edit book | "Saved" | No Undo. |
+| Cover on Edit book | "Saved" | No Undo. |
+| Look it up again | "Shared · from {source}" | No Undo. |
 | Remove, Delete, Merge | None | Confirmed by a dialog first. |
 
 ### Collection controls
@@ -158,9 +162,9 @@ Opens to the left of the list on wide screens and as a bottom sheet on the phone
 
 | Field | Control | Notes |
 |---|---|---|
-| Location, status, read, genre, personal tag, language | A list of the values in use; tap to switch each on or off | Several values in one field mean "any of these". |
-| Author, series, publisher | Combobox that adds values to a short list | Too many values to list. Several mean "any of these". |
-| Rating | The Rating component, meaning "at least" | |
+| Location, status, read, genre, personal tag, language | A list of the values in use; tap to switch each on or off | Several values in one field mean "any of these". Genre lists the system genres in the user's language, then the user's own. |
+| Author, series, publisher, theme | Combobox that adds values to a short list | Too many values to list. Several mean "any of these". Theme covers Finna's themes and the user's own. |
+| Rating | The Rating component, meaning "at least" | Removed with its Clear Link. |
 | Year, pages | From and to | Either end may be empty. |
 | Sort by | Author, title, year, date added | Default is author. Tapping the chosen sort again reverses it. [ASSUMPTION] |
 
@@ -190,7 +194,9 @@ The same content in the panel and the sheet. Changes save at once; there is no S
 | Your copies | One line per copy: its location (a Filter chip) and its status. Each line has its own Links, by state: **owned** — Lend, Move, Remove; **lent** — the lent marker with "Lent to {person} since {date}", and Returned; **ordered** — "Ordered", and Received, which makes it owned at the default location (FR-28). A copy's note sits under its line and is edited in place. |
 | Lent before | The closed loans of this Book's copies, newest first: "{person} · {from} to {to}" (FR-36). Absent when there are none. |
 | On wishlists | One line per entry: "{list} · for {person}". Absent when there are none. |
-| Genres and tags | Genres and personal tags as Filter chips. "Add tag" opens the tag picker. |
+| Classification | System genres (in the user's language), the user's genres, system themes, the user's themes and personal tags as Filter chips; empty kinds are absent. "Add tag" opens the picker for tags, genres and themes. |
+| Look it up again | On the creator's own private Book with an ISBN: a Link that calls the sources. Found: the Book takes the source's values and becomes shared (the edition picker when there are several), toast "Shared · from {source}". None: toast "Still not found." Sources didn't answer: the toast names them. Without an ISBN the line reads "Add the ISBN on Edit book to look it up." Not undoable. |
+| Re-fetch | Admin only, on a shared Book: fills empty fields, themes and the cover included; never overwrites. |
 | Foot | Edit (opens Edit book) and Add to wishlist. No primary button. |
 
 The half-open sheet shows the header, read and rating, and the first copies, so Lend and Returned are reachable without opening it fully.
@@ -204,6 +210,7 @@ The half-open sheet shows the header, read and rating, and the first copies, so 
 | The same book twice | After an Answer closes, the ISBN just handled is ignored until it has left the camera's view. |
 | ISBN field | Accepts ISBN-10 and ISBN-13 with hyphens or spaces (FR-10). Submitted with the keyboard's Go key. |
 | No camera | The frame is replaced by "No camera. Type the ISBN." and the field takes focus. This is the normal state on a desktop. |
+| Add without ISBN | A Link that opens the Not found Answer with an empty title field and no ISBN, so a book with no barcode can be catalogued. |
 
 ### Lookup
 
@@ -212,7 +219,7 @@ For a shop check with no barcode, including checks in a web shop from the deskto
 | Part | Behaviour |
 |---|---|
 | Field | One field for title or author. The search runs on Go, not as the user types. |
-| Results | Two groups: "In your library" first (copies and wishlist entries that match), then "Elsewhere" (the outside sources). Rows show cover, title, author, year and publisher. |
+| Results | Two groups: "In your library" first (copies and wishlist entries that match), then "Elsewhere" (the outside sources). Rows show cover, title, author, and binding · year · publisher, so editions of one title can be told apart. |
 | Tapping a result | Opens the Answer for that Book. Back from the Answer returns to the results. |
 | Covers | Shown only where the architecture can serve them (AD-14); otherwise the Cover placeholder. |
 | Nothing found | "Nothing found" and a Link, "Add by hand", which opens the Not found Answer with the typed text in the title field. |
@@ -225,14 +232,16 @@ The heading is the first of these that applies. Every other fact that applies is
 
 | Heading | Shown when | Buttons |
 |---|---|---|
-| In library | The user owns at least one copy | Open book · Add another copy · **Back** |
-| Ordered | The user's only copy is ordered | Received · **Back** [ASSUMPTION] |
+| In library | The user owns at least one copy | Open book · Add another copy · **Back**; Look it up again on the creator's private Book |
+| Ordered | The user's only copies are ordered | **Back**; each ordered copy's line carries its own Received Link |
 | On wishlist | The Book is only on a wishlist | **Add to library** · Back [ASSUMPTION] |
 | Not in library | None of the above | Add to wishlist · **Add to library** · Back |
 | Not found | Every source answered and none has the ISBN (FR-12, FR-22) | Title and author fields, both required, then Add to wishlist · **Add to library** · Back |
 | Couldn't look it up | Nothing in the library, and a source failed or timed out, so it is not known whether a source has the ISBN | **Try again** · Back, and an "Add by hand" Link |
 
 Under the Book, the Answer names the source ("From Finna") and any author, series or genre that this save would create ("New author") (FR-13).
+
+**Several editions.** When the sources hold several records for the ISBN, the Answer says "{n} editions found" under the Book, preselects the best and offers a picker listing each candidate's binding, year, publisher, pages and cover. Picking one re-renders the Answer with `?pick={n}`, replacing the history entry, with its cover and new-record notes; Add to library and Add to wishlist save the picked one, and the Book keeps the scanned ISBN. Nothing about editions is shown with one candidate or an existing shared Book.
 
 - **Add to library** and **Add another copy** save an owned copy as fetched, at the default location, and return to Scan with the save toast. There is no review step in between. With no default location the copy has no location and the toast reads "Saved".
 - **Edit** on the save toast opens Edit book for that Book, with the new copy's status and location on its first screen. This is also how a copy is marked ordered at the moment it is added.
@@ -245,9 +254,10 @@ Under the Book, the Answer names the source ("From Finna") and any author, serie
 
 | Part | Behaviour |
 |---|---|
-| First screen | Cover, title, author, source. Personal tags. When opened from a save toast, also that copy's status (owned / ordered) and location, showing their saved values. **Save** is pinned at the bottom. |
-| More details | A Link that unfolds the remaining fields in place: title, subtitle, authors, series, number in series, publisher, year, language, pages, genres, description. Every field is editable (FR-13). |
-| Saving | Returns to where the user came from, with the toast "Saved". Edits to a shared Book are stored as the user's overrides (FR-14); the screen does not explain this. |
+| First screen | Cover, with "Add cover" or "Replace cover" and a destructive "Remove cover" beside it for the admin on a shared Book or the creator of a private Book, absent for anyone else; title, author, source. The user's tags, genres and themes. When opened from a save toast, also that copy's status (owned / ordered) and location, showing their saved values. **Save** is pinned at the bottom. |
+| More details | A Link that unfolds the remaining fields in place: title, subtitle, authors, series, number in series, publisher, year, language, pages, description, system genres and themes. Every field is editable (FR-13) with three exceptions: on a shared Book, system genres are editable for the admin and read-only for others; themes are shown and never edited; ISBN is editable on the user's own private Book only. |
+| Cover | Choosing a file (the camera is offered on the phone) opens the Corner crop; Use shows the straightened 2:3 preview in place of the cover until Save. A rejected file shows "Not an image." or "Image too large." under the cover. The cover changes on Save, with no Undo, like the rest of Edit book. |
+| Saving | Returns to where the user came from, with the toast "Saved". A user's edits to a shared Book are stored as their overrides (FR-14); the admin's change the shared Book for everyone; edits to the user's own private Book change it. The screen does not explain this. |
 | Leaving with changes | X or Back asks "Discard changes?". [ASSUMPTION] |
 | On wide screens | A centred column no wider than a phone screen, like the other full-screen tasks. |
 
@@ -278,16 +288,21 @@ Under the Book, the Answer names the source ("From Finna") and any author, serie
 
 ### Settings
 
+Two columns on wide screens: profile, language, theme, visibility, default location and Sign out in the first; the managed lists in the second. One column on the phone.
+
 | Group | Behaviour |
 |---|---|
 | Profile | Display name is a Text field, saved on leaving it. Email is shown and cannot be changed in Phase 1 (FR-6). There is no password change in Phase 1. |
 | Language | Text switch: English, Suomi. Takes effect at once (FR-51). Kept on the profile. |
 | Theme | Text switch: light, dark, system. Per device. |
+| Profile and collection visibility | Two Text switches: public / hidden and open / closed. Both on the profile, default hidden and closed; no effect until friends exist (FR-4). |
 | Default location | Combobox of the user's locations; may be empty. |
-| Locations, People, Tags | One List row each, with what uses it ("31 books", "2 loans"). Each row has Rename, Merge and Delete. On the phone these three sit on a second line. "Add location" and "Add person" add one. |
-| Rename | Edits the name in place. Renaming to a name that already exists offers to merge instead. |
+| Locations, People, Tags, My genres, My themes | One List row each, with what uses it ("31 books", "2 loans"). Each row has Rename, Merge and Delete. On the phone these three sit on a second line. "Add location" and "Add person" add one; genres and themes are added from a Book. |
+| Rename | Edits the name in place. Renaming to a name that already exists offers to merge instead. A user genre or theme may not take a system genre's or theme's name. |
 | Merge | Picks another item of the same kind; everything that used this one moves to it. Confirmed by a dialog. |
 | Delete | Confirmed by a dialog that says what will lose its location or tag. A Person who has loans, open or returned, or wishlist entries cannot be deleted; the dialog says so and offers Merge (AD-18). |
+| Genres (admin only) | One List row per system genre in the user's language with its Book count and a "No Finnish name" mark where missing. The English and Finnish names are edited in place; "Add genre" adds one; Merge and Delete are confirmed by a dialog and have no Undo. Absent for other users. Not mocked; its story starts with a rendered mock-up choice. |
+| Last backup (admin only) | "Last backup: {date}". Marked in {colors.danger} with "Backup is overdue." when the last successful backup is older than 48 hours, missing or failed. |
 | Sign out | A secondary button at the end of the first column. |
 
 ## State Patterns
@@ -308,8 +323,11 @@ Under the Book, the Answer names the source ("From Finna") and any author, serie
 | Duplicate | Answer, In library | The copies are listed; "Add another copy" is allowed (FR-16). |
 | Save failed | Any save | Error toast with the message for the returned error code. The screen and its input stay as they were (FR-15). |
 | Field rejected | Any form | The message for that field's error code, under the field. |
+| Rejected cover file | Edit book | "Not an image." or "Image too large." under the cover. |
 | Undo done | Toast | The toast becomes "Undone" for a moment. |
 | Undo failed | Toast | "Couldn't undo." |
+| Undo expired | Toast | The Undo Link is hidden once the receipt has expired. |
+| Still not found | Book detail, after Look it up again | Toast "Still not found." |
 | Nothing lent | Loans | "Nothing lent" and one dry remark. Returned loans still show below. |
 | No wishlists | Wishlists; the wishlist picker | "No wishlists" and "New list". |
 | Empty wishlist | Wishlist | "Nothing on this list." |
@@ -411,6 +429,8 @@ Decisions here that differed from, or added to, the PRD and the architecture whe
 | Architecture, conventions | No per-device preferences | Layout, size, theme and loans order are per device and readable by the server at render (for example a cookie). |
 | STORY-SLICING | Slices E5 (home), D11 to D14 (review before save), E6 and E8 (collection and detail pages) | Re-sliced on 2026-10-05. |
 
+**Brought in from the epics on 2026-10-06** (Mika's rulings in the story review): the Rating's Clear Link; a close (X) on every toast and Undo hidden after 30 minutes; Received on each ordered copy's line of the Answer; "Add without ISBN" on Scan; the two-column Settings; the edition picker (D-7); Look it up again (D-8); system and user genres and themes (D-2, D-3, D-6); cover upload with the Corner crop (D-4); the visibility switches (D-1); the admin's last-backup line.
+
 ## Key Flows
 
 Drafted from the PRD journeys and the decisions above. Mika is the PRD's protagonist; he has read and accepted these, with one change to UJ-1. UJ-3 (Partner joins) is Phase 2 and has no flow here.
@@ -437,6 +457,8 @@ Failure: no source knows the ISBN. The heading is "not found" with title and aut
 4. The fifth book is part of a series and Finna has no number for it. After adding it he taps **Edit** on the toast, opens "More details", types the number, adds a tag, and taps **Save**. Scan is back.
 5. One book reads "in library". He does own two; he taps **Add another copy**.
 6. **Climax:** the stack is gone. He taps the X and the collection's count reads forty higher than it did half an hour ago, every row with its cover and "Tampere" at the end.
+
+Variant, two editions: Finna lists the paperback and the hardcover for the ISBN. The Answer says "2 editions found" with the paperback preselected; he taps the hardcover, then Add to library.
 
 Failure: a save fails. An error toast says "Couldn't save. Try again." and the Answer is still on screen; he taps Add to library again.
 
