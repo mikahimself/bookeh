@@ -34,8 +34,9 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'pnpm dev',
+    command: 'npm run dev',
     reuseExistingServer: true,
+    timeout: 180_000,
     url: 'http://localhost:3000',
   },
 })

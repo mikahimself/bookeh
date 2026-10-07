@@ -15,3 +15,9 @@
 - source_spec: `_bmad-output/implementation-artifacts/spec-1-1-a1-bump-next-js-payload-and-node.md`
   summary: Account in Story 1.8 (`users` collection and its first migration) for Payload 3.90's new auth column `resetPasswordRequestedAt`, and note that its forgot-password rate limit applies only when email is enabled, so token-link resets (FR-5) get none from it.
   evidence: Regenerated `src/payload-types.ts` adds the field; Payload's `forgotPassword` only checks the interval when `!disableEmail && minRequestInterval > 0` (maybe-false for FR-5 until Story 1.8 checks how resets are issued).
+- source_spec: `_bmad-output/implementation-artifacts/spec-1-2-a2-github-repository-and-ci-workflow.md`
+  summary: If the first CI runs show the admin e2e `beforeAll` timing out on the cold Turbopack compile of `/admin`, raise Playwright's test `timeout` under `CI` (or warm the route) instead of relying on `retries: 2`.
+  evidence: Unverified (maybe-false, medium if true): the first `page.goto('/admin/login')` compiles the whole Payload admin inside the default 30 s test timeout on a shared runner; the first green or red run on `main` settles it.
+- source_spec: `_bmad-output/implementation-artifacts/spec-1-2-a2-github-repository-and-ci-workflow.md`
+  summary: Single source for the Node version (`.nvmrc` with 22.23.3, `node-version-file` in setup-node, `engines.node` raised) instead of the hand-synced Dockerfile and `ci.yml` pins.
+  evidence: Reviewer re-raised the 1.1 deferral: three places now name a Node floor (Dockerfile 22.23.3, ci.yml 22.23.3, `engines.node` >=20.9.0) and only a comment keeps them aligned.
