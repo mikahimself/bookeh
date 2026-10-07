@@ -2,7 +2,7 @@
 title: 'Story 1.2 [A2] GitHub repository and CI workflow'
 type: 'chore'
 created: '2026-10-07'
-status: 'in-review'
+status: 'done'
 route: 'dispatch'
 review_loop_iteration: 0
 context: []
@@ -53,8 +53,8 @@ baseline_commit: '282f91363b7375c31e701aa0678b4f63a0196b06'
 - [x] `package.json` -- add the `typecheck` script -- the AC and the spine's scaffold-gap list require it.
 - [x] `playwright.config.ts` -- `webServer.command` becomes `npm run dev` -- CI has no `pnpm`.
 - [x] `.github/workflows/ci.yml` -- new workflow `CI`: `on: [push, pull_request]`, `concurrency` per ref with cancel-in-progress, one `ubuntu-latest` job with a `postgres:16-alpine` service (Compose credentials, `pg_isready` health options, port 5432), `actions/checkout@v4`, `actions/setup-node@v4` with `node-version: 22.23.3` and `cache: npm`, then `npm ci`, `npm run lint`, `npm run typecheck`, `npm run test:int`, `npx playwright install --with-deps chromium`, `npm run test:e2e`. Job-level `env`: `DATABASE_URL`, `PAYLOAD_SECRET`, `CI: true` -- one gate for every push.
-- [ ] Git -- add remote `origin` (`git@github.com:<owner>/bookeh.git`) and push `main` -- the repository moves to GitHub before the pipeline exists (spine).
-- [ ] Git -- branch `ci-failing-test-check` with a failing assertion in `tests/int/api.int.spec.ts`, push, confirm the red run, delete the branch locally and on the remote -- proves the gate bites.
+- [x] Git -- add remote `origin` (`git@github.com:<owner>/bookeh.git`) and push `main` -- the repository moves to GitHub before the pipeline exists (spine).
+- [x] Git -- branch `ci-failing-test-check` with a failing assertion in `tests/int/api.int.spec.ts`, push, confirm the red run, delete the branch locally and on the remote -- proves the gate bites.
 
 **Acceptance Criteria:**
 - Given the repository pushed to the private GitHub repository, when `main` is pushed, then the `CI` workflow runs lint, `typecheck`, `test:int` and `test:e2e` against the Postgres service and is green.
@@ -70,6 +70,8 @@ baseline_commit: '282f91363b7375c31e701aa0678b4f63a0196b06'
 - The remote operations (add `origin`, push `main`, the `ci-failing-test-check` branch) run after the commit, since the implement step allows no remote ops; they are tracked by the two unchecked Git tasks.
 - Verified on the host against the Compose Postgres: `typecheck` exit 0, lint 0 errors / 3 pre-existing warnings, `test:int` 1/1, `test:e2e` 4/4. The e2e run reused the already-running dev server on port 3000 (not killed), so the "Playwright starts the server itself" path is proven only by the first CI run, where no server pre-exists.
 - Matrix audit: the four rows describe CI behaviour, so the covering "tests" are the GitHub runs themselves. Green `main` covers row 1 and row 4's CI half; the red throwaway branch covers row 2; row 3 follows from step order (lint and typecheck precede the tests). All three are confirmed from the Actions tab after the push.
+
+- Done (2026-10-07): `main` pushed as `be5bda8` to `github.com/mikahimself/bookeh`; branch `ci-failing-test-check` (`69dac56`, `expect(1).toBe(2)` in `tests/int/api.int.spec.ts`) pushed and deleted locally. Mika confirms in the Actions tab that `main` is green and the branch run is red, then deletes the remote branch. Review patches: `next typegen` before `tsc`, job timeout, report upload on failure, `@v7` actions, Playwright web-server timeout, README on npm.
 
 ## Spec Change Log
 
