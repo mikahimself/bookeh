@@ -16,5 +16,6 @@ describe('API', () => {
       collection: 'users',
     })
     expect(users).toBeDefined()
+    expect(1).toBe(2) // deliberate: proves CI goes red
   })
 })
