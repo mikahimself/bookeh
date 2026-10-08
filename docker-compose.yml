@@ -19,16 +19,22 @@ services:
       DATABASE_URL: postgres://bookeh:bookeh@postgres:5432/bookeh
 
   postgres:
-    image: postgres:16-alpine
+    # Pinned tag: a new image may ship a new ICU, which requires REINDEX and
+    # REFRESH COLLATION VERSION on every database (see README, Database).
+    image: postgres:16-alpine3.24
     restart: unless-stopped
     environment:
       POSTGRES_USER: bookeh
       POSTGRES_PASSWORD: bookeh
       POSTGRES_DB: bookeh
+      # Finnish ICU collation as the cluster default (NFR-7, AD-7). Only
+      # applied when the data directory is empty; see README, Database.
+      POSTGRES_INITDB_ARGS: --locale-provider=icu --icu-locale=fi-FI
     ports:
       - '5432:5432'
     volumes:
       - pgdata:/var/lib/postgresql/data
+      - ./docker/postgres/initdb:/docker-entrypoint-initdb.d:ro
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U bookeh -d bookeh']
       interval: 5s

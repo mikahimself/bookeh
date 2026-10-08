@@ -13,12 +13,14 @@ jobs:
 
     services:
       postgres:
-        # Mirrors docker-compose.yml: same image, credentials and healthcheck.
-        image: postgres:16-alpine
+        # Mirrors docker-compose.yml: same image, credentials, init args and
+        # healthcheck.
+        image: postgres:16-alpine3.24
         env:
           POSTGRES_USER: bookeh
           POSTGRES_PASSWORD: bookeh
           POSTGRES_DB: bookeh
+          POSTGRES_INITDB_ARGS: --locale-provider=icu --icu-locale=fi-FI
         ports:
           - 5432:5432
         options: >-
@@ -40,6 +42,10 @@ jobs:
           # Follows the Dockerfile's node:22.23.3-alpine.
           node-version: 22.23.3
           cache: npm
+
+      # Services start before checkout, so the Compose init script cannot be
+      # mounted; create bookeh_test the same way (inherits template1's locale).
+      - run: docker exec ${{ job.services.postgres.id }} createdb -U bookeh bookeh_test
 
       - run: npm ci
       - run: npm run lint

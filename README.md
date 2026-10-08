@@ -34,6 +34,47 @@ To do so, follow these steps:
 - Modify the `docker-compose.yml` file's `MONGODB_URL` to match the above `<dbname>`
 - Run `docker-compose up` to start the database, optionally pass `-d` to run in the background.
 
+### Database
+
+Postgres runs from `docker-compose.yml` as `postgres:16-alpine3.24`, initialised with
+`--locale-provider=icu --icu-locale=fi-FI`. Finnish ICU collation is the cluster
+default so that `ORDER BY` on text sorts a, o, z, å, ä, ö without `COLLATE` on
+every query (NFR-7, AD-7). The libc `C`/`en_US.utf8` locale would put ä between
+a and å. Every database created in the cluster inherits the locale from
+`template1`, including `bookeh_test`, which `docker/postgres/initdb/create-test-db.sql`
+creates on first start. CI mirrors this with the same image and init args and a
+`createdb bookeh_test` step.
+
+**Existing dev volume.** Init args only apply to an empty data directory. A
+`bookeh_pgdata` volume created before this change keeps its libc locale, and
+`tests/int/collation.int.spec.ts` fails against it. Recreate the volume once
+(everything in it is lost; recreate the admin user at `/admin`):
+
+```sh
+docker compose rm -sf postgres && docker volume rm bookeh_pgdata && docker compose up -d postgres
+```
+
+Check with:
+
+```sh
+docker compose exec postgres psql -U bookeh -d bookeh -Atc \
+  "select datname, datlocprovider, daticulocale from pg_database"
+```
+
+`bookeh`, `bookeh_test` and `template1` should show `i` and `fi-FI`.
+
+**Changing the image tag.** A new image may carry a new ICU version, which can
+change sort order and silently corrupt text indexes. After moving to a new tag
+(in `docker-compose.yml` and `.github/workflows/ci.yml` together), run on both
+databases:
+
+```sql
+REINDEX DATABASE bookeh;
+ALTER DATABASE bookeh REFRESH COLLATION VERSION;
+REINDEX DATABASE bookeh_test;
+ALTER DATABASE bookeh_test REFRESH COLLATION VERSION;
+```
+
 ## How it works
 
 The Payload config is tailored specifically to the needs of most websites. It is pre-configured in the following ways:
