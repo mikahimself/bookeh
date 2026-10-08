@@ -11,18 +11,20 @@ describe('database collation', () => {
     payload = await getPayload({ config: payloadConfig })
   })
 
-  it('is ICU fi-FI on the connected database and bookeh_test', async () => {
+  it('is ICU fi-FI on bookeh, bookeh_test and template1', async () => {
     const { pool } = payload.db
-    // daticulocale is the Postgres 16 column name (datlocale from 17).
+    // daticulocale is the Postgres 16 column name (datlocale from 17). Only
+    // the named databases: a developer's scratch libc database must not fail
+    // this.
     const { rows } = await pool.query<{
       datname: string
       datlocprovider: string
       daticulocale: string | null
     }>(
       `select datname, datlocprovider, daticulocale from pg_database
-       where datname in (current_database(), 'bookeh_test') order by datname`,
+       where datname in ('bookeh', 'bookeh_test', 'template1') order by datname`,
     )
-    expect(rows).toHaveLength(2)
+    expect(rows.map((r) => r.datname)).toEqual(['bookeh', 'bookeh_test', 'template1'])
     for (const row of rows) {
       expect(row).toMatchObject({ datlocprovider: 'i', daticulocale: 'fi-FI' })
     }

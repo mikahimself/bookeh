@@ -15,9 +15,10 @@
     "typecheck": "cross-env NODE_OPTIONS=--no-deprecation next typegen && tsc --noEmit",
     "payload": "cross-env NODE_OPTIONS=--no-deprecation payload",
     "start": "cross-env NODE_OPTIONS=--no-deprecation next start",
-    "test": "npm run test:int && npm run test:e2e",
+    "test": "npm run test:unit && npm run test:int && npm run test:e2e",
     "test:e2e": "cross-env NODE_OPTIONS=\"--no-deprecation --import=tsx/esm\" playwright test --config=playwright.config.ts",
-    "test:int": "cross-env NODE_OPTIONS=--no-deprecation vitest run --config ./vitest.config.mts"
+    "test:int": "cross-env NODE_OPTIONS=--no-deprecation vitest run --config ./vitest.config.mts --project int",
+    "test:unit": "cross-env NODE_OPTIONS=--no-deprecation vitest run --config ./vitest.config.mts --project unit"
   },
   "dependencies": {
     "@payloadcms/db-postgres": "3.90.2",
@@ -42,7 +43,6 @@
     "@vitejs/plugin-react": "4.5.2",
     "eslint": "^9.22.0",
     "eslint-config-next": "16.3.8",
-    "jsdom": "28.0.0",
     "prettier": "^3.4.2",
     "tsx": "4.22.4",
     "typescript": "5.7.3",

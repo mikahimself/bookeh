@@ -33,3 +33,12 @@
 - source_spec: `_bmad-output/implementation-artifacts/spec-1-3-a3-postgres-with-finnish-icu-collation.md`
   summary: In Stories 2.2 and 2.3, state in `deploy/README.md` that the production cluster needs the same `POSTGRES_INITDB_ARGS` on its empty NAS data directory, and that a restore into a database created without them keeps the libc collation (`pg_dump` carries the locale only with `-C`).
   evidence: Blind reviewer; the init args apply only to an empty data directory, and the restore rehearsal (Story 4.10) would reintroduce the libc sort order silently.
+- source_spec: `_bmad-output/implementation-artifacts/spec-1-4-a4-test-harness.md`
+  summary: Move Playwright e2e off the dev database (own server on `bookeh_test`, no `seedUser.ts` writes to `bookeh`).
+  evidence: Story 1.4 covers Vitest only; Next 16 locks the dev build directory so a second `next dev` cannot run beside the dev server. Mika chose to defer to Story 3.52 (D15), which builds the Playwright setup with the fixture source.
+- source_spec: `_bmad-output/implementation-artifacts/spec-1-4-a4-test-harness.md`
+  summary: Remove `@testing-library/react` (and the `react()` Vitest plugin) unless a component-test lane is planned.
+  evidence: Blind reviewer; no spec has ever imported it (pre-existing from the Payload template), both Vitest projects run in `node`.
+- source_spec: `_bmad-output/implementation-artifacts/spec-1-4-a4-test-harness.md`
+  summary: Decide how `bookeh_test` survives data-loss schema changes: a documented reset (`DROP DATABASE bookeh_test; CREATE DATABASE bookeh_test;`), `PAYLOAD_FORCE_DRIZZLE_PUSH=true` on the int run, or migrations instead of push (Story 1.9 territory).
+  evidence: Edge-case reviewer; `@payloadcms/drizzle/dist/utilities/pushDevSchema.js:39-58` prompts on `hasDataLoss` and `process.exit(0)` without a TTY. Tests never delete rows, so the first column-dropping change (Story 1.8 reworks `users`) meets it. Pre-existing on the dev database too.

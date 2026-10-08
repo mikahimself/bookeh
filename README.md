@@ -43,8 +43,13 @@ every query (NFR-7, AD-7). The libc `C`/`en_US.utf8` locale would put ä between
 a and å. Every database created in the cluster inherits the locale from
 `template1`, including `bookeh_test`, which `docker/postgres/initdb/create-test-db.sql`
 creates on first start. CI mirrors this with the same image and init args and a
-`createdb bookeh_test` step. Integration tests run against `DATABASE_URL` (the
-`bookeh` database) until Story 1.4 wires them to `bookeh_test`.
+`createdb bookeh_test` step.
+
+**Tests.** `npm run test:unit` runs `tests/unit/**/*.unit.spec.ts` with no
+database (a unit spec must import nothing that opens one). `npm run test:int`
+runs `tests/int/**/*.int.spec.ts` on `bookeh_test` on the server named by
+`DATABASE_URL`, never the dev `bookeh` database. `npm run test:e2e` still uses
+the dev server and its database until Story 3.52.
 
 **Existing dev volume.** Init args only apply to an empty data directory. A
 `bookeh_pgdata` volume created before this change keeps its libc locale, and
@@ -86,6 +91,11 @@ ALTER DATABASE bookeh_test REFRESH COLLATION VERSION;
 ALTER DATABASE template1 REFRESH COLLATION VERSION;
 ALTER DATABASE postgres REFRESH COLLATION VERSION;
 ```
+
+**Resetting the test database.** Tests never delete their rows, so a later
+schema push that would lose data prompts and exits silently in a test worker.
+Reset with `DROP DATABASE bookeh_test; CREATE DATABASE bookeh_test;` (inherits
+`template1`'s locale).
 
 ## How it works
 
