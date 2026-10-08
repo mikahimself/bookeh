@@ -42,3 +42,6 @@
 - source_spec: `_bmad-output/implementation-artifacts/spec-1-4-a4-test-harness.md`
   summary: Decide how `bookeh_test` survives data-loss schema changes: a documented reset (`DROP DATABASE bookeh_test; CREATE DATABASE bookeh_test;`), `PAYLOAD_FORCE_DRIZZLE_PUSH=true` on the int run, or migrations instead of push (Story 1.9 territory).
   evidence: Edge-case reviewer; `@payloadcms/drizzle/dist/utilities/pushDevSchema.js:39-58` prompts on `hasDataLoss` and `process.exit(0)` without a TTY. Tests never delete rows, so the first column-dropping change (Story 1.8 reworks `users`) meets it. Pre-existing on the dev database too.
+- source_spec: `_bmad-output/implementation-artifacts/spec-1-5-a5-remove-the-old-collections-and-graphql.md`
+  summary: Record in the Payload skill reference (or the spine's conventions) that Payload skips field-level `validate` for any field whose `admin.condition` is false, so status-dependent clearing belongs in a `beforeValidate` hook; the copies and wishlist entries of AD-6/AD-8 have such fields.
+  evidence: Blind reviewer; the rule was documented only in the deleted `src/collections/Books.ts` hook comment (commit `7d34440` verified it by storing bad values), and nothing else in the repository states it.
