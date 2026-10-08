@@ -10,6 +10,7 @@ export default defineConfig({
     include: ['tests/int/**/*.int.spec.ts'],
     // Each file calls getPayload(), which pushes the schema in dev. Two
     // workers pushing at once on an empty database race on enum creation.
+    // Revisit with Story 1.4's harness.
     fileParallelism: false,
   },
 })

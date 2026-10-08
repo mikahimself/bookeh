@@ -21,3 +21,15 @@
 - source_spec: `_bmad-output/implementation-artifacts/spec-1-2-a2-github-repository-and-ci-workflow.md`
   summary: Single source for the Node version (`.nvmrc` with 22.23.3, `node-version-file` in setup-node, `engines.node` raised) instead of the hand-synced Dockerfile and `ci.yml` pins.
   evidence: Reviewer re-raised the 1.1 deferral: three places now name a Node floor (Dockerfile 22.23.3, ci.yml 22.23.3, `engines.node` >=20.9.0) and only a comment keeps them aligned.
+- source_spec: `_bmad-output/implementation-artifacts/spec-1-3-a3-postgres-with-finnish-icu-collation.md`
+  summary: Run CI's Postgres from `docker-compose.yml` (a Compose-based job) instead of a hand-mirrored service container, so `POSTGRES_INITDB_ARGS` and the init script are exercised automatically; take it with Story 2.2's production Compose.
+  evidence: Verification-gap reviewer: delete `POSTGRES_INITDB_ARGS` from `docker-compose.yml` or break `create-test-db.sql` and CI stays green, because CI never reads either file; only the comment in `ci.yml` keeps the two aligned.
+- source_spec: `_bmad-output/implementation-artifacts/spec-1-3-a3-postgres-with-finnish-icu-collation.md`
+  summary: Rewrite `README.md` for bookeh; it is still the Payload template (MongoDB, Deploy button, cloud hosting) and now contradicts the new Database section directly above it.
+  evidence: Pre-existing; `README.md` lines 26-35 tell the reader to set `MONGODB_URL` and the next heading describes Postgres with ICU.
+- source_spec: `_bmad-output/implementation-artifacts/spec-1-3-a3-postgres-with-finnish-icu-collation.md`
+  summary: In Story 5.3 (text search), add an assertion on the ICU default that `'Ä' ilike 'ä'` is true and `'a' ilike 'ä'` is false, pinning the search half of NFR-7 against the image.
+  evidence: Verified on the recreated dev database (2026-10-08): `select 'Ä' ilike 'ä', 'a' ilike 'ä', lower('ÄÖÅ')` gives `t|f|äöå`; no test records it yet.
+- source_spec: `_bmad-output/implementation-artifacts/spec-1-3-a3-postgres-with-finnish-icu-collation.md`
+  summary: In Stories 2.2 and 2.3, state in `deploy/README.md` that the production cluster needs the same `POSTGRES_INITDB_ARGS` on its empty NAS data directory, and that a restore into a database created without them keeps the libc collation (`pg_dump` carries the locale only with `-C`).
+  evidence: Blind reviewer; the init args apply only to an empty data directory, and the restore rehearsal (Story 4.10) would reintroduce the libc sort order silently.

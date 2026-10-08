@@ -11,13 +11,21 @@ describe('database collation', () => {
     payload = await getPayload({ config: payloadConfig })
   })
 
-  it('is ICU fi-FI on the connected database', async () => {
+  it('is ICU fi-FI on the connected database and bookeh_test', async () => {
     const { pool } = payload.db
-    const { rows } = await pool.query<{ datlocprovider: string; daticulocale: string | null }>(
-      'select datlocprovider, daticulocale from pg_database where datname = current_database()',
+    // daticulocale is the Postgres 16 column name (datlocale from 17).
+    const { rows } = await pool.query<{
+      datname: string
+      datlocprovider: string
+      daticulocale: string | null
+    }>(
+      `select datname, datlocprovider, daticulocale from pg_database
+       where datname in (current_database(), 'bookeh_test') order by datname`,
     )
-    expect(rows).toHaveLength(1)
-    expect(rows[0]).toEqual({ datlocprovider: 'i', daticulocale: 'fi-FI' })
+    expect(rows).toHaveLength(2)
+    for (const row of rows) {
+      expect(row).toMatchObject({ datlocprovider: 'i', daticulocale: 'fi-FI' })
+    }
   })
 
   it('sorts å, ä and ö after z', async () => {

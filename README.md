@@ -43,7 +43,8 @@ every query (NFR-7, AD-7). The libc `C`/`en_US.utf8` locale would put ä between
 a and å. Every database created in the cluster inherits the locale from
 `template1`, including `bookeh_test`, which `docker/postgres/initdb/create-test-db.sql`
 creates on first start. CI mirrors this with the same image and init args and a
-`createdb bookeh_test` step.
+`createdb bookeh_test` step. Integration tests run against `DATABASE_URL` (the
+`bookeh` database) until Story 1.4 wires them to `bookeh_test`.
 
 **Existing dev volume.** Init args only apply to an empty data directory. A
 `bookeh_pgdata` volume created before this change keeps its libc locale, and
@@ -63,16 +64,27 @@ docker compose exec postgres psql -U bookeh -d bookeh -Atc \
 
 `bookeh`, `bookeh_test` and `template1` should show `i` and `fi-FI`.
 
-**Changing the image tag.** A new image may carry a new ICU version, which can
-change sort order and silently corrupt text indexes. After moving to a new tag
-(in `docker-compose.yml` and `.github/workflows/ci.yml` together), run on both
-databases:
+**Changing the image tag.** This applies to tag changes within Postgres 16; a
+major upgrade is a `pg_upgrade` or dump-and-restore job first. A new image may
+carry a new ICU version, which can change sort order and silently corrupt text
+indexes. After moving to a new tag (in `docker-compose.yml` and
+`.github/workflows/ci.yml` together), check whether the recorded and actual
+collation versions differ:
+
+```sql
+select datname, datcollversion, pg_database_collation_actual_version(oid) from pg_database;
+```
+
+If they do, reindex and refresh. New databases copy `template1`'s version, so
+refresh it and `postgres` too:
 
 ```sql
 REINDEX DATABASE bookeh;
 ALTER DATABASE bookeh REFRESH COLLATION VERSION;
 REINDEX DATABASE bookeh_test;
 ALTER DATABASE bookeh_test REFRESH COLLATION VERSION;
+ALTER DATABASE template1 REFRESH COLLATION VERSION;
+ALTER DATABASE postgres REFRESH COLLATION VERSION;
 ```
 
 ## How it works

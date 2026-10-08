@@ -19,8 +19,9 @@ services:
       DATABASE_URL: postgres://bookeh:bookeh@postgres:5432/bookeh
 
   postgres:
-    # Pinned tag: a new image may ship a new ICU, which requires REINDEX and
-    # REFRESH COLLATION VERSION on every database (see README, Database).
+    # The tag pins the Alpine release and with it the ICU library; 16.x
+    # minors still move. A new tag may ship a new ICU, which requires REINDEX
+    # and REFRESH COLLATION VERSION on every database (see README, Database).
     image: postgres:16-alpine3.24
     restart: unless-stopped
     environment:
@@ -36,11 +37,14 @@ services:
       - pgdata:/var/lib/postgresql/data
       - ./docker/postgres/initdb:/docker-entrypoint-initdb.d:ro
     healthcheck:
-      test: ['CMD-SHELL', 'pg_isready -U bookeh -d bookeh']
+      test: ['CMD-SHELL', 'pg_isready -h localhost -U bookeh -d bookeh']
       interval: 5s
       timeout: 5s
       retries: 10
 
 volumes:
   pgdata:
+    # Fixed name so the README's `docker volume rm bookeh_pgdata` does not
+    # depend on the Compose project name.
+    name: bookeh_pgdata
   node_modules:
