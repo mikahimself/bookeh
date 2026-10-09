@@ -11,6 +11,9 @@
   "signOut": {
     "submit": "Kirjaudu ulos"
   },
+  "toast": {
+    "close": "Sulje"
+  },
   "errors": {
     "UNAUTHENTICATED": "Kirjaudu sisään jatkaaksesi.",
     "WRONG_CREDENTIALS": "Väärä sähköposti tai salasana.",

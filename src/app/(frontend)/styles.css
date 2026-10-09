@@ -4,8 +4,9 @@
  * and breakpoint utilities produce no CSS. Exceptions Tailwind keeps: bare
  * numbers (`border-2`, `outline-2`, `outline-offset-3`; border and outline
  * widths use the numbers matching the stroke tokens), static utilities
- * (`w-full`) and arbitrary values. Bare `transition` has no duration; the
- * first motion story declares the transition defaults.
+ * (`w-full`) and arbitrary values. The transition defaults below give bare
+ * `transition` its duration and easing (declared by the toast story, the
+ * first motion story).
  * The font family comes from the layout's `next/font` (`--font-open-sans`);
  * preflight applies it through `--default-font-family`, and the root turns
  * off weight synthesis so no bold is ever drawn.
@@ -87,6 +88,11 @@
 
   /* Wide layout from 900px (EXPERIENCE.md); `max-wide:` is the phone. */
   --breakpoint-wide: 900px;
+
+  /* Motion (EXPERIENCE.md): ~200ms, never blocking input, immediate under
+     reduce motion. Must equal the toast store's `leaveMs` (toast/store.ts). */
+  --default-transition-duration: 200ms;
+  --default-transition-timing-function: ease-out;
 
   /* Corners */
   --radius: 0px;

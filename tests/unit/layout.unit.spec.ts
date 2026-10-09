@@ -1,6 +1,7 @@
 import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 
+import { NextIntlClientProvider } from 'next-intl'
 import type { ReactElement } from 'react'
 import { describe, expect, it, vi } from 'vitest'
 
@@ -12,6 +13,7 @@ vi.mock('next/font/google', () => ({ Open_Sans }))
 vi.mock('next-intl/server', () => ({ getLocale: async () => 'en' }))
 
 const { default: RootLayout } = await import('../../src/app/(frontend)/layout')
+const { ToastProvider } = await import('../../src/app/(frontend)/components/toast/ToastProvider')
 
 const styles = readFileSync(
   fileURLToPath(new URL('../../src/app/(frontend)/styles.css', import.meta.url)),
@@ -32,6 +34,19 @@ describe('frontend root layout', () => {
     const html = (await RootLayout({ children: null })) as ReactElement<{ className?: string }>
     expect(html.type).toBe('html')
     expect(html.props.className).toBe('open-sans-var')
+  })
+
+  it('mounts ToastProvider inside NextIntlClientProvider, wrapping main', async () => {
+    type Node = ReactElement<{ children?: Node }>
+    const html = (await RootLayout({ children: null })) as Node
+    const body = html.props.children as Node
+    expect(body.type).toBe('body')
+    const intl = body.props.children as Node
+    expect(intl.type).toBe(NextIntlClientProvider)
+    const toast = intl.props.children as Node
+    expect(toast.type).toBe(ToastProvider)
+    const main = toast.props.children as Node
+    expect(main.type).toBe('main')
   })
 
   it('publishes the variable that styles.css reads for --default-font-family', () => {

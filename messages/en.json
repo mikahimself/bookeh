@@ -11,6 +11,9 @@
   "signOut": {
     "submit": "Sign out"
   },
+  "toast": {
+    "close": "Close"
+  },
   "errors": {
     "UNAUTHENTICATED": "Sign in to continue.",
     "WRONG_CREDENTIALS": "Wrong email or password.",

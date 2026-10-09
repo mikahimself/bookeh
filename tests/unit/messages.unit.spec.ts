@@ -67,4 +67,13 @@ describe('message catalogues', () => {
       expect(message).not.toBe('')
     }
   })
+
+  // Consumed dynamically by the toast provider's t('toast.close').
+  it('has toast.close in both languages', () => {
+    for (const catalogue of [en, fi]) {
+      const label = lookup(catalogue, 'toast.close')
+      expect(typeof label).toBe('string')
+      expect(label).not.toBe('')
+    }
+  })
 })

@@ -115,6 +115,13 @@ const zero = { '--spacing-0': '0px' }
 // Defined by `layout.tsx` through `next/font`; preflight reads it.
 const font = { '--default-font-family': 'var(--font-open-sans), sans-serif' }
 
+// Not DESIGN.md tokens: EXPERIENCE.md motion, declared by the toast story.
+// The duration must equal the toast store's `leaveMs`.
+const motion = {
+  '--default-transition-duration': '200ms',
+  '--default-transition-timing-function': 'ease-out',
+}
+
 const empty = await build([])
 
 describe('styles.css', () => {
@@ -123,6 +130,7 @@ describe('styles.css', () => {
     expect(theme).toEqual({
       ...lower({ ...lightColours, ...typography, ...spacing, ...breakpoints, ...radius, ...zero }),
       ...font,
+      ...motion,
     })
   })
 
@@ -187,8 +195,17 @@ describe('styles.css', () => {
     ['max-wide:min-h-tap', 'min-height: var(--spacing-tap)'],
     ['wide:p-page-margin', '@media (width >= 900px)'],
     ['outline-offset-3', 'outline-offset: 3px'],
+    ['starting:translate-y-2', '@starting-style'],
+    ['motion-reduce:transition-none', '@media (prefers-reduced-motion: reduce)'],
+    ['inset-x-page-margin-phone', 'inset-inline: var(--spacing-page-margin-phone)'],
   ])('%s reads its token', async (candidate, expected) => {
     expect(block(await build([candidate]), '@layer utilities')).toContain(expected)
+  })
+
+  it('bare transition reads both motion defaults', async () => {
+    const css = block(await build(['transition']), '@layer utilities')
+    expect(css).toContain('var(--default-transition-duration)')
+    expect(css).toContain('var(--default-transition-timing-function)')
   })
 
   it.each([
