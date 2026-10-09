@@ -1,0 +1,8 @@
+{
+  "errors": {
+    "UNAUTHENTICATED": "Sign in to continue.",
+    "NOT_FOUND": "Not found.",
+    "VALIDATION": "Check the marked fields.",
+    "INTERNAL": "Didn't work. Try again."
+  }
+}

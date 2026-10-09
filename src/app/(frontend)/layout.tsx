@@ -1,3 +1,5 @@
+import { NextIntlClientProvider } from 'next-intl'
+import { getLocale } from 'next-intl/server'
 import React from 'react'
 import './styles.css'
 
@@ -10,9 +12,11 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
   const { children } = props
 
   return (
-    <html lang="en">
+    <html lang={await getLocale()}>
       <body>
-        <main>{children}</main>
+        <NextIntlClientProvider>
+          <main>{children}</main>
+        </NextIntlClientProvider>
       </body>
     </html>
   )

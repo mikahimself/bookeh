@@ -1,0 +1,8 @@
+{
+  "errors": {
+    "UNAUTHENTICATED": "Kirjaudu ensin sisään.",
+    "NOT_FOUND": "Ei löytynyt.",
+    "VALIDATION": "Tarkista merkityt kentät.",
+    "INTERNAL": "Ei onnistunut. Yritä uudelleen."
+  }
+}
