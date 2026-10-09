@@ -215,7 +215,8 @@ const eslintConfig = defineConfig([
   },
   {
     // Spine, AD-2: services reach Payload only through the gateway in lib/payload.
-    files: ['src/lib/**'],
+    // src/i18n renders every frontend page, so it is held to the same rule.
+    files: ['src/lib/**', 'src/i18n/**'],
     ignores: gatewayExempt,
     rules: {
       '@typescript-eslint/no-restricted-imports': [
@@ -250,7 +251,7 @@ const eslintConfig = defineConfig([
   {
     // Spine, AD-2: no `ctx.req.payload.*` around the gateway. Replaces the
     // roles block's selectors for these files, so it repeats them.
-    files: ['src/lib/**', 'src/app/(frontend)/**'],
+    files: ['src/lib/**', 'src/i18n/**', 'src/app/(frontend)/**'],
     ignores: gatewayExempt,
     rules: {
       'no-restricted-syntax': [

@@ -1,6 +1,7 @@
 import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 import { createLocalReq, getPayload, type PayloadRequest, type TypedUser } from 'payload'
+import { cache } from 'react'
 
 import { DomainError } from '@/lib/errors'
 import config from '@/payload.config'
@@ -13,12 +14,22 @@ import { PATH_HEADER } from './pathHeader'
  */
 export type Context = { req: PayloadRequest; user: TypedUser }
 
-/** The session of the current request, through Payload's own auth strategies. */
-async function currentContext(): Promise<Context | null> {
+/**
+ * The signed-in user of the current request, or `null`, through Payload's own
+ * auth strategies. For code that renders with or without a session (the
+ * locale in `src/i18n/request.ts`); pages use `requireUser()`. Cached per
+ * render, so the layout and the page authenticate once.
+ */
+export const currentUser = cache(async (): Promise<TypedUser | null> => {
   const payload = await getPayload({ config })
   const { user } = await payload.auth({ headers: await headers() })
+  return user
+})
+
+async function currentContext(): Promise<Context | null> {
+  const user = await currentUser()
   if (!user) return null
-  const req = await createLocalReq({ user }, payload)
+  const req = await createLocalReq({ user }, await getPayload({ config }))
   return { req, user }
 }
 

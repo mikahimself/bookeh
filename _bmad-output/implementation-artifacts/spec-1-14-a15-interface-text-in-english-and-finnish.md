@@ -244,3 +244,9 @@ The frontend root layout sets `<html lang>` from the locale and wraps its conten
 - Nothing automated checks the rendered `<html lang>`. The first real page (1.16/1.19) should assert it in whatever render test it brings.
 - `src/i18n/request.ts` reaches Payload directly, so a page that also authenticates reads the session twice. This is deferred to after Story 1.11; add `src/i18n` to 1.11's direct-Payload lint ban.
 - The template `page.tsx` and layout metadata show English under `lang="fi"` until replaced.
+
+**Follow-up after 1.11 (2026-10-09):** the first deferred item is resolved.
+- `src/i18n/request.ts` now reads the session through `currentUser()` in `src/lib/payload/context.ts`. `currentUser()` is wrapped in React `cache`, so `requireUser()` and the locale share one `payload.auth` per render.
+- `src/i18n/**` is under the gateway import and `.payload` lint bans.
+- The catch-and-log fallback is gone. A failing session read now throws, as `requireUser()` already does on the same page, and the int test pins that.
+- The lint guard against hard-coded strings is still open.

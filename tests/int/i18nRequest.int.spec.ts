@@ -63,14 +63,11 @@ describe('i18n request config', () => {
     expect(result.locale).toBe('fi')
   })
 
-  it('logs a failing session read and falls back to the browser language', async () => {
+  it('lets a failing session read throw, as requireUser() would on the same page', async () => {
     const payload = await getPayload({ config })
     vi.spyOn(payload, 'auth').mockRejectedValueOnce(new Error('auth strategy failed'))
-    const error = vi.spyOn(payload.logger, 'error').mockImplementation(() => undefined)
 
-    const result = await resolve({ 'accept-language': 'fi-FI' })
-    expect(result.locale).toBe('fi')
-    expect(error).toHaveBeenCalledTimes(1)
+    await expect(resolve({ 'accept-language': 'fi-FI' })).rejects.toThrow('auth strategy failed')
   })
 
   it('sets the Helsinki time zone and formats in the locale', async () => {
