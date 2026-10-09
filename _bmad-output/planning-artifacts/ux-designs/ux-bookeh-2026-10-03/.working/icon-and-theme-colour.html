@@ -1,0 +1,231 @@
+<title>bookeh icon and colour</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400&display=swap">
+<style>
+/* Layout: one left-aligned column on the plain ground, bookeh's own tokens; option grids wrap to one column on the phone. */
+:root {
+  --bg: #FFFFFF; --text: #1F2933; --muted: #5F6B78; --dim: #87919C; --border: #DDE2E7; --accent: #F0604F;
+  --font: 'Open Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --wall-a: #C9D3DC; --wall-b: #E9EDF1; --tile: #FFFFFF99;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #14181D; --text: #E3E8EE; --muted: #94A0AD; --dim: #626B76; --border: #2C343D; --accent: #FF8E7F;
+    --wall-a: #2A3540; --wall-b: #11161B; --tile: #FFFFFF22; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #14181D; --text: #E3E8EE; --muted: #94A0AD; --dim: #626B76; --border: #2C343D; --accent: #FF8E7F;
+  --wall-a: #2A3540; --wall-b: #11161B; --tile: #FFFFFF22; color-scheme: dark;
+}
+* { box-sizing: border-box }
+body { background: var(--bg); color: var(--text); font: 400 14px/1.45 var(--font); padding: 28px 20px 80px }
+main { max-width: 1040px; margin: 0 auto; display: grid; gap: 56px }
+h1, h2, h3 { font-weight: 300; text-transform: lowercase; margin: 0; text-wrap: balance }
+h1 { font-size: 44px; line-height: 1.1; letter-spacing: -0.015em }
+h2 { font-size: 26px; line-height: 1.15 }
+h3 { font-size: 20px; line-height: 1.3; color: var(--muted) }
+p { margin: 0; max-width: 66ch }
+.muted { color: var(--muted) }
+.meta { font-size: 13px; color: var(--muted) }
+section { display: grid; gap: 20px }
+header { display: grid; gap: 12px }
+code { font: 12px ui-monospace, Menlo, monospace }
+
+/* icon grid: marks are rows, grounds are columns */
+.grid { display: grid; grid-template-columns: 9ch repeat(3, minmax(0, 1fr)); gap: 20px 16px; align-items: start }
+.grid .colhead { font-size: 12px; color: var(--muted) }
+.grid .rowhead { font-size: 13px; color: var(--muted); padding-top: 36px }
+.pick { all: unset; cursor: pointer; display: grid; justify-items: center; gap: 8px; padding-bottom: 6px; border-bottom: 2px solid transparent }
+.pick:focus-visible { outline: 2px solid var(--text); outline-offset: 3px }
+.pick[aria-pressed="true"] { border-bottom-color: var(--accent) }
+.pick svg { width: min(112px, 100%); height: auto; border-radius: 22.4%; display: block; box-shadow: 0 0 0 1px var(--border) }
+.pick span { font-size: 13px }
+@media (max-width: 560px) {
+  .grid { grid-template-columns: repeat(3, minmax(0, 1fr)) }
+  .grid .corner, .grid .rowhead { display: none }
+  .grid .rowlabel { grid-column: 1 / -1; display: block !important; font-size: 13px; color: var(--muted); margin-top: 8px }
+}
+.grid .rowlabel { display: none }
+
+.marks { display: grid; gap: 6px; padding: 0; margin: 0; list-style: none }
+.marks li { max-width: 66ch }
+.marks b { font-weight: 400 }
+
+/* preview of the current pick */
+.preview { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 28px }
+.masks { display: flex; gap: 20px; align-items: end; flex-wrap: wrap }
+.masks figure { margin: 0; display: grid; gap: 6px; justify-items: center }
+.masks figcaption { font-size: 12px; color: var(--muted) }
+.masks svg { width: 120px; height: 120px; display: block }
+.home { padding: 22px 18px 18px; display: grid; grid-template-columns: repeat(4, 60px); justify-content: space-between; gap: 18px 8px; max-width: 320px }
+.home.light { background: linear-gradient(160deg, #C9D3DC, #EEF1F4) }
+.home.dark { background: linear-gradient(160deg, #2A3540, #0B0E11) }
+.home .app { display: grid; justify-items: center; gap: 4px; font-size: 11px }
+.home.light .app { color: #1F2933 }
+.home.dark .app { color: #E3E8EE }
+.home .app svg, .home .blank { width: 60px; height: 60px; border-radius: 13.4px; display: block }
+.home.light .blank { background: #FFFFFF8C }
+.home.dark .blank { background: #FFFFFF24 }
+.pickline { font-size: 17px }
+.pickline strong { font-weight: 400; border-bottom: 2px solid var(--accent) }
+
+/* theme colour options */
+.themes { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 32px 28px }
+.theme { display: grid; gap: 10px; align-content: start }
+.phones { display: grid; grid-template-columns: 1fr 1fr; gap: 10px }
+.phone { border: 1px solid var(--border); overflow: hidden; min-width: 0 }
+.phone .bar { height: 26px; display: flex; justify-content: space-between; align-items: center; padding: 0 12px; font-size: 11px }
+.phone .bar i { width: 18px; height: 9px; border: 1.5px solid currentColor; display: block }
+.phone .app { padding: 10px 12px 14px; display: grid; gap: 8px }
+.phone .heads { display: flex; gap: 8px; align-items: baseline; white-space: nowrap; overflow: hidden }
+.phone .heads b { font-weight: 300; font-size: 24px; line-height: 1 }
+.phone .heads span { font-weight: 300; font-size: 24px; line-height: 1 }
+.phone .search { font-size: 11px; padding-bottom: 3px; border-bottom: 2px solid }
+.phone .row { display: grid; grid-template-columns: 16px 1fr; gap: 8px; align-items: center; font-size: 11px; line-height: 1.25 }
+.phone .row i { width: 16px; height: 24px; display: block }
+.phone .row small { display: block; font-size: 10px }
+.phone .row div { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis }
+.tag { font-size: 12px; color: var(--muted) }
+.rec { font-size: 12px; color: var(--text); border-bottom: 2px solid var(--accent); justify-self: start }
+.note { display: grid; gap: 8px; padding-left: 16px; border-left: 2px solid var(--border) }
+</style>
+
+<main>
+  <header>
+    <h1>App icon and theme colour</h1>
+    <p class="muted">Story 1.21 needs both before the manifest can be written. Tap an icon to see it on a home screen. The grid shows three marks on three grounds.</p>
+  </header>
+
+  <section>
+    <h2>Icon</h2>
+    <ul class="marks">
+      <li><b>A, underline.</b> A light lowercase b on the coral line that marks a link or the primary button.</li>
+      <li><b>B, selection bar.</b> The same b with the coral bar that marks the open row.</li>
+      <li><b>C, shelf.</b> Three spines drawn as lines on a shelf, one of them coral. No lettering.</li>
+    </ul>
+    <div class="grid" id="grid"></div>
+    <p class="meta">Ground 3, coral, breaks the no-fills rule. It's here because the home screen sits outside the interface and coral stands out among other icons.</p>
+  </section>
+
+  <section>
+    <h2>On the phone</h2>
+    <p class="pickline">Picked: <strong id="picked">A1</strong></p>
+    <div class="preview">
+      <div class="masks" id="masks"></div>
+      <div class="home light" id="home-light"></div>
+      <div class="home dark" id="home-dark"></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Theme colour</h2>
+    <p class="muted">This colour tints the system bar on Android, Safari's address bar, and the window title on desktop. On an iPhone the installed app shows the page's own ground under the clock, so there the choice hardly shows.</p>
+    <div class="themes" id="themes"></div>
+    <div class="note">
+      <p class="meta">How it would be built: the theme is a cookie read on the server (story 1.18), so the layout can emit the matching <code>theme-color</code> for light or dark, and a light/dark pair with <code>media</code> when the theme follows the system. The manifest takes one <code>theme_color</code> and one <code>background_color</code> (the Android splash screen behind the icon). Both would be the light values.</p>
+    </div>
+  </section>
+</main>
+
+<script>
+const GROUNDS = {
+  1: { name: 'white', bg: '#FFFFFF', ink: '#1F2933', line: '#F0604F' },
+  2: { name: 'slate', bg: '#14181D', ink: '#E3E8EE', line: '#FF8E7F' },
+  3: { name: 'coral', bg: '#F0604F', ink: '#FFFFFF', line: '#1F2933' },
+}
+const MARKS = {
+  A: { name: 'underline', draw: g => `
+    <text x="96" y="128" text-anchor="middle" font-family="'Open Sans', sans-serif" font-weight="300" font-size="124" fill="${g.ink}">b</text>
+    <rect x="66" y="142" width="60" height="6" fill="${g.line}"/>` },
+  B: { name: 'selection bar', draw: g => `
+    <rect x="56" y="44" width="10" height="90" fill="${g.line}"/>
+    <text x="108" y="132" text-anchor="middle" font-family="'Open Sans', sans-serif" font-weight="300" font-size="124" fill="${g.ink}">b</text>` },
+  C: { name: 'shelf', draw: g => `
+    <g fill="none" stroke-width="6" stroke-linejoin="miter">
+      <rect x="53" y="62" width="22" height="81" stroke="${g.ink}"/>
+      <rect x="81" y="46" width="26" height="97" stroke="${g.line}"/>
+      <rect x="113" y="70" width="22" height="73" stroke="${g.ink}" transform="rotate(8 135 143)"/>
+    </g>
+    <line x1="42" y1="146" x2="150" y2="146" stroke="${g.ink}" stroke-width="6"/>` },
+}
+const icon = (m, n) => {
+  const g = GROUNDS[n]
+  return `<svg viewBox="0 0 192 192" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Icon ${m}${n}"><rect width="192" height="192" fill="${g.bg}"/>${MARKS[m].draw(g)}</svg>`
+}
+
+let picked = 'A1'
+try { picked = localStorage.getItem('bookeh-icon-pick') || picked } catch {}
+
+function renderGrid() {
+  const el = document.getElementById('grid')
+  let html = '<div class="corner"></div>' + Object.entries(GROUNDS).map(([n, g]) => `<div class="colhead">${n}, ${g.name}</div>`).join('')
+  for (const [m, mark] of Object.entries(MARKS)) {
+    html += `<div class="rowhead">${m}, ${mark.name}</div><div class="rowlabel">${m}, ${mark.name}</div>`
+    for (const n of Object.keys(GROUNDS)) {
+      const id = m + n
+      html += `<button class="pick" id="pick-${id}" data-id="${id}" aria-pressed="${id === picked}">${icon(m, n)}<span>${id}</span></button>`
+    }
+  }
+  el.innerHTML = html
+}
+
+function renderPreview() {
+  const [m, n] = picked.split('')
+  document.getElementById('picked').textContent = `${picked} · ${MARKS[m].name} on ${GROUNDS[n].name}`
+  document.getElementById('masks').innerHTML = `
+    <figure><svg viewBox="0 0 192 192"><defs><clipPath id="sq"><rect width="192" height="192" rx="43"/></clipPath></defs><g clip-path="url(#sq)">${icon(m, n).replace(/^<svg[^>]*>|<\/svg>$/g, '')}</g></svg><figcaption>iPhone</figcaption></figure>
+    <figure><svg viewBox="0 0 192 192"><defs><clipPath id="ci"><circle cx="96" cy="96" r="96"/></clipPath></defs><g clip-path="url(#ci)">${icon(m, n).replace(/^<svg[^>]*>|<\/svg>$/g, '')}</g></svg><figcaption>Android, round mask</figcaption></figure>`
+  const home = `<div class="app"><span class="blank"></span></div><div class="app"><span class="blank"></span></div><div class="app">${icon(m, n)}<span>bookeh</span></div><div class="app"><span class="blank"></span></div><div class="app"><span class="blank"></span></div><div class="app"><span class="blank"></span></div><div class="app"><span class="blank"></span></div><div class="app"><span class="blank"></span></div>`
+  document.getElementById('home-light').innerHTML = home
+  document.getElementById('home-dark').innerHTML = home
+}
+
+document.getElementById('grid').addEventListener('click', e => {
+  const b = e.target.closest('.pick')
+  if (!b) return
+  picked = b.dataset.id
+  try { localStorage.setItem('bookeh-icon-pick', picked) } catch {}
+  document.querySelectorAll('.pick').forEach(p => p.setAttribute('aria-pressed', p.dataset.id === picked))
+  renderPreview()
+})
+
+const APP = {
+  light: { bg: '#FFFFFF', text: '#1F2933', muted: '#5F6B78', dim: '#87919C' },
+  dark: { bg: '#14181D', text: '#E3E8EE', muted: '#94A0AD', dim: '#626B76' },
+}
+const BOOKS = [
+  ['Seitsemän veljestä', 'Aleksis Kivi', '#6C7A5A'],
+  ['Sinuhe egyptiläinen', 'Mika Waltari', '#B58A3C'],
+  ['Kesäkirja', 'Tove Jansson', '#5B86A6'],
+  ['Tuntematon sotilas', 'Väinö Linna', '#7E4B3A'],
+]
+const THEMES = [
+  { id: 'T1', name: 'Same as the ground', rec: true, desc: 'White in light, #14181D in dark. The bar disappears into the app, which fits a look without filled areas.',
+    bar: { light: ['#FFFFFF', '#1F2933'], dark: ['#14181D', '#E3E8EE'] } },
+  { id: 'T2', name: 'Always slate', desc: '#14181D in both themes. In light mode the app gets a dark strip above it, the way a book has a spine.',
+    bar: { light: ['#14181D', '#E3E8EE'], dark: ['#14181D', '#E3E8EE'] } },
+  { id: 'T3', name: 'Coral', desc: '#F0604F in both themes. Coral is the brand colour, but here it fills an area, which the interface never does.',
+    bar: { light: ['#F0604F', '#FFFFFF'], dark: ['#F0604F', '#FFFFFF'] } },
+]
+const phone = (t, mode) => {
+  const a = APP[mode], [bar, barInk] = t.bar[mode]
+  return `<div class="phone" style="background:${a.bg};color:${a.text}">
+    <div class="bar" style="background:${bar};color:${barInk}"><span>9.41</span><i></i></div>
+    <div class="app">
+      <div class="heads"><b>collection</b><span style="color:${a.dim}">loans</span></div>
+      <div class="search" style="color:${a.dim};border-color:${a.dim}">Search</div>
+      ${BOOKS.map(([t, au, c]) => `<div class="row"><i style="background:${c}"></i><div>${t}<small style="color:${a.muted}">${au}</small></div></div>`).join('')}
+    </div></div>`
+}
+document.getElementById('themes').innerHTML = THEMES.map(t => `
+  <div class="theme">
+    <h3>${t.id}, ${t.name}</h3>
+    ${t.rec ? '<span class="rec">Recommended</span>' : ''}
+    <div class="phones">${phone(t, 'light')}${phone(t, 'dark')}</div>
+    <div class="phones"><span class="tag">light</span><span class="tag">dark</span></div>
+    <p class="meta">${t.desc}</p>
+  </div>`).join('')
+
+renderGrid()
+renderPreview()
+</script>

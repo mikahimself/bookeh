@@ -374,6 +374,22 @@ States that apply to every control:
 | Disabled | Label and outline in {colors.text-dim}. [ASSUMPTION] |
 | Tap area | On the phone every control's tap area is at least 44px high, by padding, whatever its drawn height. |
 
+## App Icon & Theme Colour
+
+Chosen 2026-10-09 from rendered options (`.working/icon-and-theme-colour.html`, option A3 and T1).
+
+**Icon.** A lowercase b in Open Sans 300, white (`#FFFFFF`), on a full-bleed coral ground ({colors.accent} light value, `#F0604F`), with a slate bar ({colors.text} light value, `#1F2933`) under it. The icon lives outside the interface, so it is the one place where coral fills an area. In a 192-unit square:
+
+| Part | Geometry |
+|---|---|
+| Ground | The whole square, with no rounded corners and no transparency. The platform applies its own mask. |
+| b | Font size 124, centred on x = 96, baseline at y = 128. Converted to a path in the source SVG, so the icon does not depend on the font. |
+| Underline | x 66–126, y 142–148 (60 × 6). |
+
+The mark stays inside the central 80% circle, so one image serves as both `any` and `maskable`. The icon is exported from that SVG at 192, 512 and 180 px (the 180 px size is the Apple touch icon).
+
+**Theme colour.** `theme-color` is the {colors.background} of the theme in use: `#FFFFFF` in light, `#14181D` in dark. The layout emits the value for the theme saved on the device. When the theme follows the system, it emits a light and dark pair with `media`. The manifest takes a single `theme_color` and `background_color`, both `#FFFFFF`.
+
 ## Do's and Don'ts
 
 | Do | Don't |

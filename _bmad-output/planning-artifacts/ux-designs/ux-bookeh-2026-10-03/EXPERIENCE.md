@@ -65,7 +65,7 @@ Mock-ups, in the final tokens. The spines win on any conflict with a mock-up.
 | [mockups/key-wishlists.html](mockups/key-wishlists.html) | The list of wishlists, one wishlist, an entry opened. |
 | [mockups/key-settings.html](mockups/key-settings.html) | Settings on wide and phone. |
 
-Not mocked, built from this spine alone: Sign in, Lookup, the Filter panel on the phone, pickers and dialogs, select mode on the phone, and sizes s and l. The Genres group in Settings and the Corner crop step are not mocked either; their stories start with a rendered mock-up choice. So do the tag picker, the Lend picker, creating a list from the wishlist picker when there is none, the admin's Re-fetch result, and the app icon and theme colour, which are not designed yet.
+Not mocked, built from this spine alone: Sign in, Lookup, the Filter panel on the phone, pickers and dialogs, select mode on the phone, and sizes s and l. The Genres group in Settings and the Corner crop step are not mocked either; their stories start with a rendered mock-up choice. So do the tag picker, the Lend picker, creating a list from the wishlist picker when there is none and the admin's Re-fetch result. The app icon and theme colour are settled in DESIGN.md → App Icon & Theme Colour.
 
 ## Voice and Tone
 
