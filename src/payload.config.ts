@@ -28,6 +28,8 @@ export default buildConfig({
     pool: {
       connectionString: process.env.DATABASE_URL || '',
     },
+    // CI sets DATABASE_PUSH=false so the int tests run on the migration-built schema.
+    push: process.env.DATABASE_PUSH !== 'false',
   }),
   sharp,
   plugins: [],

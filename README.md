@@ -97,6 +97,16 @@ schema push that would lose data prompts and exits silently in a test worker.
 Reset with `DROP DATABASE bookeh_test; CREATE DATABASE bookeh_test;` (inherits
 `template1`'s locale).
 
+**Migration check in CI.** CI fails when `payload migrate:create --skip-empty`
+would write a file (a schema change without its migration), applies the
+committed migrations to the empty `bookeh_test`, and runs the int tests with
+`DATABASE_PUSH=false`, so they use the migration-built schema. To reproduce
+locally: reset `bookeh_test`, then
+`DATABASE_URL=postgres://bookeh:bookeh@localhost:5432/bookeh_test npm run payload -- migrate`
+and `DATABASE_PUSH=false npm run test:int`. For a red drift check, run
+`npm run payload -- migrate:create <name> --skip-empty` locally and commit the
+generated `.ts`, `.json` and `index.ts` under a real migration name.
+
 ## How it works
 
 The Payload config is tailored specifically to the needs of most websites. It is pre-configured in the following ways:

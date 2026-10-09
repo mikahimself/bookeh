@@ -50,8 +50,47 @@ jobs:
       - run: npm ci
       - run: npm run lint
       - run: npm run typecheck
+
+      # Fails when the config differs from the newest committed migration
+      # snapshot, i.e. a schema change was committed without its migration.
+      # No database needed. stdin is closed, so a drizzle-kit prompt (e.g. an
+      # ambiguous rename) reads EOF and exits 0 without writing; the step
+      # fails unless Payload logged that both diffs finished.
+      - name: Check for missing migrations
+        run: |
+          out="$(npm run payload -- migrate:create ci_drift_check --skip-empty </dev/null 2>&1)" || { echo "$out"; exit 1; }
+          echo "$out"
+          if ! grep -q "Migration DOWN statements generation complete" <<<"$out"; then
+            echo "::error::migrate:create did not finish (likely a prompt, e.g. an ambiguous rename). Run it locally to resolve."
+            exit 1
+          fi
+          drift="$(git status --porcelain -- src/migrations)"
+          if [ -n "$drift" ]; then
+            echo "::error::Schema changed without a migration. migrate:create would write:"
+            echo "$drift"
+            cat src/migrations/*_ci_drift_check.ts
+            exit 1
+          fi
+
+      # Builds the empty bookeh_test from the committed migrations; the int
+      # tests below run on it with push off.
+      - name: Apply migrations to bookeh_test
+        run: npm run payload -- migrate </dev/null
+        env:
+          DATABASE_URL: postgres://bookeh:bookeh@localhost:5432/bookeh_test
+
       - run: npm run test:unit
       - run: npm run test:int
+        env:
+          DATABASE_PUSH: 'false'
+      # A dev push writes a batch -1 row; there must be none, or push was on.
+      - name: Check push stayed off
+        run: |
+          pushes="$(docker exec ${{ job.services.postgres.id }} psql -U bookeh -d bookeh_test -tAc "select count(*) from payload_migrations where batch = -1")"
+          if [ "$pushes" != "0" ]; then
+            echo "::error::bookeh_test was schema-pushed during test:int (DATABASE_PUSH not honoured)."
+            exit 1
+          fi
       - run: npx playwright install --with-deps chromium
       - run: npm run test:e2e
 
