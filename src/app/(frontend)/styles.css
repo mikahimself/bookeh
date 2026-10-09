@@ -1,164 +1,127 @@
-:root {
-  --font-mono: 'Roboto Mono', monospace;
+/*
+ * The only home of the DESIGN.md tokens (spine, Styling). The theme starts
+ * from nothing, so default colour, radius, shadow, font, text-size, spacing
+ * and breakpoint utilities produce no CSS. Exceptions Tailwind keeps: bare
+ * numbers (`border-2`, `outline-2`, `outline-offset-3`; border and outline
+ * widths use the numbers matching the stroke tokens), static utilities
+ * (`w-full`) and arbitrary values. Bare `transition` has no duration; the
+ * first motion story declares the transition defaults.
+ * Dark values follow the light ones twice: once for `data-theme="dark"` and
+ * once for the OS preference when the theme is anything but `light` or
+ * `dark`. Keep the two dark blocks equal.
+ */
+@import 'tailwindcss' source('../..');
+
+@theme static {
+  --*: initial;
+
+  /* Colours (light) */
+  --color-background: #ffffff;
+  --color-text: #1f2933;
+  --color-text-muted: #5f6b78;
+  --color-text-dim: #87919c;
+  --color-border: #dde2e7;
+  --color-accent: #f0604f;
+  --color-scrim: #00000033;
+  --color-danger: #9b1c31;
+  --color-shadow: #1f293324;
+
+  /* Type roles */
+  --text-heading-section: 44px;
+  --text-heading-section--line-height: 1.1;
+  --text-heading-section--font-weight: 300;
+  --text-heading-section--letter-spacing: -0.015em;
+  --text-heading-section-phone: 38px;
+  --text-heading-section-phone--line-height: 1.1;
+  --text-heading-section-phone--font-weight: 300;
+  --text-heading-section-phone--letter-spacing: -0.015em;
+  --text-heading-detail: 26px;
+  --text-heading-detail--line-height: 1.15;
+  --text-heading-detail--font-weight: 300;
+  --text-heading-group: 20px;
+  --text-heading-group--line-height: 1.3;
+  --text-heading-group--font-weight: 300;
+  --text-title: 17px;
+  --text-title--line-height: 1.3;
+  --text-title--font-weight: 400;
+  --text-control: 17px;
+  --text-control--line-height: 1.3;
+  --text-control--font-weight: 400;
+  --text-button: 15px;
+  --text-button--line-height: 1.3;
+  --text-button--font-weight: 400;
+  --text-body: 14px;
+  --text-body--line-height: 1.45;
+  --text-body--font-weight: 400;
+  --text-meta: 13px;
+  --text-meta--line-height: 1.4;
+  --text-meta--font-weight: 400;
+  --text-label: 12px;
+  --text-label--line-height: 1.3;
+  --text-label--font-weight: 400;
+
+  /* Spacing and strokes. `0` keeps `p-0`, `inset-0` and the like. */
+  --spacing-0: 0px;
+  --spacing-1: 4px;
+  --spacing-2: 8px;
+  --spacing-3: 12px;
+  --spacing-4: 16px;
+  --spacing-5: 20px;
+  --spacing-6: 24px;
+  --spacing-7: 28px;
+  --spacing-page-margin: 28px;
+  --spacing-page-margin-phone: 20px;
+  --spacing-stroke-hairline: 1px;
+  --spacing-stroke-control: 2px;
+  --spacing-stroke-selection: 4px;
+  --spacing-panel-width: 360px;
+
+  /* Corners */
+  --radius: 0px;
 }
 
-* {
-  box-sizing: border-box;
-}
-
-html {
-  font-size: 18px;
-  line-height: 32px;
-
-  background: rgb(0, 0, 0);
-  -webkit-font-smoothing: antialiased;
-}
-
-html,
-body,
-#app {
-  height: 100%;
-}
-
-body {
-  font-family: system-ui;
-  font-size: 18px;
-  line-height: 32px;
-
-  margin: 0;
-  color: rgb(1000, 1000, 1000);
-
-  @media (max-width: 1024px) {
-    font-size: 15px;
-    line-height: 24px;
-  }
-}
-
-img {
-  max-width: 100%;
-  height: auto;
-  display: block;
-}
-
-h1 {
-  margin: 40px 0;
-  font-size: 64px;
-  line-height: 70px;
-  font-weight: bold;
-
-  @media (max-width: 1024px) {
-    margin: 24px 0;
-    font-size: 42px;
-    line-height: 42px;
-  }
-
-  @media (max-width: 768px) {
-    font-size: 38px;
-    line-height: 38px;
-  }
-
-  @media (max-width: 400px) {
-    font-size: 32px;
-    line-height: 32px;
-  }
-}
-
-p {
-  margin: 24px 0;
-
-  @media (max-width: 1024px) {
-    margin: calc(var(--base) * 0.75) 0;
-  }
-}
-
-a {
-  color: currentColor;
-
-  &:focus {
-    opacity: 0.8;
-    outline: none;
-  }
-
-  &:active {
-    opacity: 0.7;
-    outline: none;
-  }
-}
-
-svg {
-  vertical-align: middle;
-}
-
-.home {
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: center;
-  height: 100vh;
-  padding: 45px;
-  max-width: 1024px;
-  margin: 0 auto;
-  overflow: hidden;
-
-  @media (max-width: 400px) {
-    padding: 24px;
+@layer theme {
+  :root[data-theme='dark'] {
+    color-scheme: dark;
+    --color-background: #14181d;
+    --color-text: #e3e8ee;
+    --color-text-muted: #94a0ad;
+    --color-text-dim: #626b76;
+    --color-border: #2c343d;
+    --color-accent: #ff8e7f;
+    --color-scrim: #00000066;
+    --color-danger: #e0566f;
+    --color-shadow: #00000073;
   }
 
-  .content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    flex-grow: 1;
-
-    h1 {
-      text-align: center;
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme='light'], [data-theme='dark']) {
+      color-scheme: dark;
+      --color-background: #14181d;
+      --color-text: #e3e8ee;
+      --color-text-muted: #94a0ad;
+      --color-text-dim: #626b76;
+      --color-border: #2c343d;
+      --color-accent: #ff8e7f;
+      --color-scrim: #00000066;
+      --color-danger: #e0566f;
+      --color-shadow: #00000073;
     }
   }
+}
 
-  .links {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-
-    a {
-      text-decoration: none;
-      padding: 0.25rem 0.5rem;
-      border-radius: 4px;
-    }
-
-    .admin {
-      color: rgb(0, 0, 0);
-      background: rgb(1000, 1000, 1000);
-      border: 1px solid rgb(0, 0, 0);
-    }
-
-    .docs {
-      color: rgb(1000, 1000, 1000);
-      background: rgb(0, 0, 0);
-      border: 1px solid rgb(1000, 1000, 1000);
-    }
+@layer base {
+  html {
+    background-color: var(--color-background);
+    color: var(--color-text);
   }
 
-  .footer {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-
-    @media (max-width: 1024px) {
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    p {
-      margin: 0;
-    }
-
-    .codeLink {
-      text-decoration: none;
-      padding: 0 0.5rem;
-      background: rgb(60, 60, 60);
-      border-radius: 4px;
-    }
+  body {
+    @apply text-body;
   }
+}
+
+/* Lowercase for headings, buttons and switches (DESIGN.md, Lowercase). */
+@utility ui-case {
+  text-transform: lowercase;
 }
