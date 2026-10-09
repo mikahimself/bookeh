@@ -10,13 +10,21 @@ const password = 'test-password'
 
 const payload = () => getPayload({ config })
 
-/** Creates a user with a unique email. Never cleaned up. */
+/** Creates a user (role `user` unless given) with a unique email. Never cleaned up. */
 export async function createUser(
   data: Partial<Omit<User, 'id' | 'collection'>> = {},
 ): Promise<User> {
   return (await payload()).create({
     collection: 'users',
-    data: { email: `user-${randomUUID()}@test.invalid`, password, ...data },
+    data: {
+      email: `user-${randomUUID()}@test.invalid`,
+      password,
+      displayName: 'Test User',
+      // Payload's create type requires `required` fields even with a defaultValue.
+      roles: ['user'],
+      language: 'en',
+      ...data,
+    },
   })
 }
 

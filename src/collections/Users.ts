@@ -1,13 +1,59 @@
-import type { CollectionConfig } from 'payload'
+import type { Access, CollectionConfig, FieldAccess } from 'payload'
+
+import { isAdmin } from '@/access/roles'
+
+/** Admin reads and updates every user; a signed-in user only themself. */
+const adminOrSelf: Access = ({ req: { user } }) => {
+  if (isAdmin(user)) return true
+  if (user) return { id: { equals: user.id } }
+  return false
+}
+
+const adminOnly: Access = ({ req: { user } }) => isAdmin(user)
+
+const adminOnlyField: FieldAccess = ({ req: { user } }) => isAdmin(user)
 
 export const Users: CollectionConfig = {
   slug: 'users',
   admin: {
-    useAsTitle: 'email',
+    useAsTitle: 'displayName',
+    defaultColumns: ['displayName', 'email', 'roles'],
   },
-  auth: true,
+  auth: {
+    tokenExpiration: 60 * 60 * 24 * 30,
+  },
+  access: {
+    admin: ({ req: { user } }) => isAdmin(user),
+    create: adminOnly,
+    read: adminOrSelf,
+    update: adminOrSelf,
+    delete: adminOnly,
+    unlock: adminOnly,
+  },
   fields: [
-    // Email added by default
-    // Add more fields as needed
+    {
+      name: 'roles',
+      type: 'select',
+      hasMany: true,
+      required: true,
+      options: ['admin', 'user'],
+      defaultValue: ['user'],
+      access: {
+        create: adminOnlyField,
+        update: adminOnlyField,
+      },
+    },
+    {
+      name: 'displayName',
+      type: 'text',
+      required: true,
+    },
+    {
+      name: 'language',
+      type: 'select',
+      required: true,
+      options: ['en', 'fi'],
+      defaultValue: 'en',
+    },
   ],
 }

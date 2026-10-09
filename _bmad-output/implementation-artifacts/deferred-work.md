@@ -57,3 +57,12 @@
 - source_spec: `_bmad-output/implementation-artifacts/spec-1-7-a7-role-helpers-and-asrequestuser.md`
   summary: Lint-ban `overrideAccess: true` (and unscoped Local API calls) outside the AD-3 allowlist (`src/lib/catalogue`, `src/lib/shelf`, the `onInit` seed).
   evidence: AD-3 says hooks and access functions query only through `asRequestUser(req)` and system privileges are an allowlist, but only review enforces it; Story 1.7's AC covers the helper, not the ban. Natural home is the gateway story (1.11) or the first allowlisted module.
+- source_spec: `_bmad-output/implementation-artifacts/spec-1-8-a8-users-collection.md`
+  summary: In Story 1.10, close the `/admin/create-first-user` and `POST /api/users/first-register` path, or make the first user admin, so the first account cannot come out as a `user` locked out of `/admin` and no tailnet client can claim an empty instance.
+  evidence: `@payloadcms/next/dist/views/CreateFirstUser/index.js:48-52` renders every field with `roles` pre-filled `['user']`; `registerFirstUser` creates with `overrideAccess: true`; the dev `bookeh` database has 0 users since 2026-10-09.
+- source_spec: `_bmad-output/implementation-artifacts/spec-1-8-a8-users-collection.md`
+  summary: Decide which fields a user may change on their own `users` document (email, password) and whether the current password is required, with FR-6 and the profile service (Story 1.22).
+  evidence: `adminOrSelf` update lets a signed-in user change their own `email` and `password` over REST with no current-password check; before 1.8 any user could change any user.
+- source_spec: `_bmad-output/implementation-artifacts/spec-1-8-a8-users-collection.md`
+  summary: Guard dev data against schema pushes from a running `next dev`: a README warning or a pre-change step for schema stories, or `push: false` with migrations on dev.
+  evidence: In Story 1.8 the pre-existing port-3000 `next dev` hot-reloaded `Users.ts`, its data-loss prompt was accepted, and `bookeh.users` was truncated, losing the owner's dev account.

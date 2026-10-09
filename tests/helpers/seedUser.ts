@@ -22,10 +22,10 @@ export async function seedTestUser(): Promise<void> {
     },
   })
 
-  // Create fresh test user
+  // Create fresh test user; only admins enter /admin.
   await payload.create({
     collection: 'users',
-    data: testUser,
+    data: { ...testUser, displayName: 'E2E Admin', roles: ['admin', 'user'], language: 'en' },
   })
 }
 

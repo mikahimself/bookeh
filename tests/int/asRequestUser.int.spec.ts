@@ -6,9 +6,9 @@ import config from '@/payload.config'
 
 import { as, createUser } from '../helpers/harness'
 
-// The Local API skips access unless overrideAccess is false. Payload's default
-// `users` read access needs a signed-in user, so a request without one shows
-// whether access ran.
+// The Local API skips access unless overrideAccess is false. `users` read
+// access needs a signed-in user, so a request without one shows whether
+// access ran.
 describe('asRequestUser in a Local API call', () => {
   it('denies a request without a user', async () => {
     const payload = await getPayload({ config })
