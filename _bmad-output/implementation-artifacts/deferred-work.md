@@ -63,9 +63,14 @@
 - source_spec: `_bmad-output/implementation-artifacts/spec-1-8-a8-users-collection.md`
   summary: Decide which fields a user may change on their own `users` document (email, password) and whether the current password is required, with FR-6 and the profile service (Story 1.22).
   evidence: `adminOrSelf` update lets a signed-in user change their own `email` and `password` over REST with no current-password check; before 1.8 any user could change any user.
+  decided: Profile-service half, in Story 1.22. `updateProfile()` in `src/lib/account/profile.ts` changes display name and language only; email and password are not editable in Phase 1 (email is shown, not edited; no password change).
+  open: The REST path is unchanged: a signed-in user can still `PATCH /api/users/<own id>` with `email` or `password` and no current-password check. Close it (field-level `update` access, or `admin`-only REST update) or accept it explicitly.
 - source_spec: `_bmad-output/implementation-artifacts/spec-1-8-a8-users-collection.md`
   summary: Guard dev data against schema pushes from a running `next dev`: a README warning or a pre-change step for schema stories, or `push: false` with migrations on dev.
   evidence: In Story 1.8 the pre-existing port-3000 `next dev` hot-reloaded `Users.ts`, its data-loss prompt was accepted, and `bookeh.users` was truncated, losing the owner's dev account.
 - source_spec: `_bmad-output/implementation-artifacts/spec-1-11-a10-request-context-and-gateway-in-lib-payload.md`
   summary: In Story 1.16, add an e2e test that a signed-out visit to a page calling `requireUser()` lands on `/login?next=<encoded path and search>`.
   evidence: The hand-off from `src/proxy.ts` (`x-bookeh-path`) to `requireUser()` is unit- and int-tested separately; it was checked by hand under `next dev` in 1.11, but nothing committed keeps Next picking up the proxy and forwarding the header.
+- source_spec: `_bmad-output/implementation-artifacts/spec-1-22-k9-profile-service.md`
+  summary: In Story 1.23, check that changing the language in Settings re-renders in the new language in the same request, and if not, refresh the cached session user after `updateProfile()`.
+  evidence: `updateProfile()` writes the row but leaves `ctx.user` as it was, and `currentUser()` in `src/lib/payload/context.ts` is wrapped in React `cache` and returns that same object. If the cache spans the server action and its re-render, `src/i18n/request.ts` would resolve the locale from the old `language`. Unverified: no action exists yet.
