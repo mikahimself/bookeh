@@ -40,7 +40,7 @@ development_status:
   1-2-a2-github-repository-and-ci-workflow: done
   1-3-a3-postgres-with-finnish-icu-collation: done
   1-4-a4-test-harness: done
-  1-5-a5-remove-the-old-collections-and-graphql: review
+  1-5-a5-remove-the-old-collections-and-graphql: done
   1-6-a6-layer-import-rules-and-strict-any: backlog
   1-7-a7-role-helpers-and-asrequestuser: backlog
   1-8-a8-users-collection: backlog
