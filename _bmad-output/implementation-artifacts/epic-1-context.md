@@ -1,6 +1,6 @@
 # Epic 1 Context: Sign in to bookeh, in my language and theme
 
-<!-- Compiled from planning artifacts. Edit freely. Regenerate with compile-epic-context if planning docs change. -->
+<!-- Generated from planning artifacts. Regenerate with compile-epic-context if planning docs change. -->
 
 ## Goal
 
@@ -68,11 +68,14 @@ Mika opens bookeh, installed as a PWA, signs in and moves between the four secti
 - **Voice:** terse fragments, no pleasantries, no exclamation marks. Finnish is written natively.
 - **Accessibility:** 4.5:1 contrast for text, 44px minimum tap height on the phone, full keyboard operation on wide screens, section name announced on change, nothing conveyed by colour alone.
 - **Motion:** full-screen tasks, section changes and toasts slide in about 200–300 ms, never block input, and become immediate under reduce motion. No animation library.
-- **Pending design choice:** the PWA icon and theme colour are not designed yet. Mika picks them from rendered options, and the choice is recorded in DESIGN.md.
+- **Installed PWA:** `app/manifest.ts` names the app "bookeh" and opens standalone in the collection with no browser bars; pinned buttons respect safe areas. No service worker, no offline use. The camera is used only inside the Scan task.
+- **App icon (settled):** a lowercase "b" in Open Sans 300, white `#FFFFFF`, on a full-bleed coral ground `#F0604F` (accent light value), with a slate `#1F2933` bar under it (text light value). It is the one place coral fills an area. On a 192-unit square: ground is the whole square, square corners, no transparency (the platform masks it); the b is font size 124, centred on x = 96, baseline y = 128, converted to a path in the source SVG so it doesn't depend on the font; the bar is x 66–126, y 142–148. The mark stays inside the central 80% circle, so one image serves as both `any` and `maskable`. Export from that SVG at 192, 512 and 180 px (180 is the Apple touch icon). Rendered reference: `ux-designs/ux-bookeh-2026-10-03/.working/icon-and-theme-colour.html` (option A3).
+- **Theme colour (settled, option T1):** the `theme-color` meta is the `background` of the theme in use: `#FFFFFF` light, `#14181D` dark. The layout emits the value for the theme saved on the device (from `bookeh_prefs`); when the theme is `system`, it emits a light and a dark pair with `media`. The manifest has a single `theme_color` and `background_color`, both `#FFFFFF`.
 
 ## Cross-Story Dependencies
 
 - Order within the epic: 1.1 → 1.2 → 1.9. 1.3 → 1.4 → 1.8. 1.5 → 1.6 and 1.7 → 1.8 → 1.10, 1.11, 1.14 and 1.9. 1.11 → 1.22 → 1.23 → 1.24. 1.13 → 1.15, 1.17, 1.18 and 1.21. 1.16 (needs 1.11, 1.13, 1.14) → 1.19 (needs 1.15) → 1.20 and 1.23. 1.12 → 1.17.
 - 1.8 and 1.24 change schema: they merge one at a time with committed migrations.
 - Later epics plug into this epic's pieces. `/scan` content arrives in Epic 3. The Scan task and the overlay wrappers register through `useSuspendSwipe()`. The Scan save toast needs a "hold until replaced" mode in the toast provider. Default location (Epic 3) and the managed lists (Epics 3, 5, 6 and 9) are added to Settings later.
-- Epic 2 (production deploy) depends on CI and the pinned images from this epic.
+- Epic 2 (production deploy) depends on CI and the pinned images from this epic. The Dockerfile copies a `public/` directory that doesn't exist yet, which Story 2.1 fixes; if Story 1.21 puts icons in `public/`, the production image must still ship them.
+- Story 1.21's theme-colour meta reads the device theme from Story 1.18's preferences.
