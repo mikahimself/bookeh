@@ -29,7 +29,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 10-06-2026 17:50
-last_updated: 10-09-2026 14:00
+last_updated: 10-09-2026 14:20
 project: bookeh
 project_key: NOKEY
 tracking_system: file-system
@@ -44,9 +44,9 @@ development_status:
   1-6-a6-layer-import-rules-and-strict-any: review
   1-7-a7-role-helpers-and-asrequestuser: review
   1-8-a8-users-collection: done
-  1-9-k7-ci-migration-check: backlog
-  1-10-a9-first-user-seed: backlog
-  1-11-a10-request-context-and-gateway-in-lib-payload: backlog
+  1-9-k7-ci-migration-check: done
+  1-10-a9-first-user-seed: done
+  1-11-a10-request-context-and-gateway-in-lib-payload: done
   1-12-a13-errors-and-action-results: done
   1-13-a14-tailwind-4-and-the-design-tokens: done
   1-14-a15-interface-text-in-english-and-finnish: backlog
