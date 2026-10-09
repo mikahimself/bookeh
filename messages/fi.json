@@ -14,6 +14,23 @@
   "toast": {
     "close": "Sulje"
   },
+  "sections": {
+    "label": "Osiot",
+    "collection": "Kokoelma",
+    "loans": "Lainat",
+    "wishlists": "Toivelistat",
+    "settings": "Asetukset"
+  },
+  "scan": {
+    "open": "Skannaa kirja",
+    "heading": "Skannaa"
+  },
+  "task": {
+    "close": "Sulje"
+  },
+  "progress": {
+    "loading": "Ladataan"
+  },
   "errors": {
     "UNAUTHENTICATED": "Kirjaudu sisään jatkaaksesi.",
     "WRONG_CREDENTIALS": "Väärä sähköposti tai salasana.",

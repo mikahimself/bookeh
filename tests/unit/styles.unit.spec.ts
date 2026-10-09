@@ -122,6 +122,16 @@ const motion = {
   '--default-transition-timing-function': 'ease-out',
 }
 
+// Not DESIGN.md tokens: sizes the section shell (1.19) needs. The pinned bar is a
+// tap-high control with spacing-4 above and below; a task column is a large phone
+// (EXPERIENCE.md, Responsive).
+const shell = {
+  '--spacing-pinned-bar': 'calc(var(--spacing-tap) + 2 * var(--spacing-4))',
+  '--spacing-task-width': '430px',
+  // DESIGN.md, Progress line.
+  '--animate-progress': 'progress 1.2s ease-in-out infinite',
+}
+
 const empty = await build([])
 
 describe('styles.css', () => {
@@ -131,6 +141,66 @@ describe('styles.css', () => {
       ...lower({ ...lightColours, ...typography, ...spacing, ...breakpoints, ...radius, ...zero }),
       ...font,
       ...motion,
+      ...shell,
+    })
+  })
+
+  it('moves the progress line across, from off the left edge to off the right', () => {
+    expect(declarations(block(block(empty, '@keyframes progress'), 'from'))).toEqual({
+      translate: '-100% 0',
+    })
+    expect(declarations(block(block(empty, '@keyframes progress'), 'to'))).toEqual({
+      translate: '100% 0',
+    })
+  })
+
+  describe('view transitions', () => {
+    it('never block input', () => {
+      expect(declarations(block(empty, '::view-transition'))).toEqual({ 'pointer-events': 'none' })
+    })
+
+    it('leave the root snapshots still, and hide the new root while a task opens', () => {
+      expect(
+        declarations(block(empty, '::view-transition-old(root), ::view-transition-new(root)')),
+      ).toEqual({ animation: 'none', 'mix-blend-mode': 'normal' })
+      expect(
+        declarations(
+          block(empty, ':root:active-view-transition-type(task-open)::view-transition-new(root)'),
+        ),
+      ).toEqual({ visibility: 'hidden' })
+    })
+
+    it.each([
+      ['::view-transition-new(.task-enter)', 'both'],
+      ['::view-transition-old(.task-exit), ::view-transition-old(task-closing)', 'both reverse'],
+    ])('%s slides over the motion defaults (%s)', (selector, fill) => {
+      expect(declarations(block(empty, selector))).toEqual({
+        animation: `task-slide var(--default-transition-duration) var(--default-transition-timing-function) ${fill}`,
+      })
+    })
+
+    it('names a task the X is closing, so its snapshot slides out by itself', () => {
+      expect(declarations(block(empty, '[data-task-closing]'))).toEqual({
+        'view-transition-name': 'task-closing',
+      })
+    })
+
+    it('slides a task in from the right edge', () => {
+      expect(declarations(block(block(empty, '@keyframes task-slide'), 'from'))).toEqual({
+        translate: '100% 0',
+      })
+    })
+
+    it('swap at once under reduce motion', () => {
+      const reduce = block(empty, '@media (prefers-reduced-motion: reduce)')
+      expect(
+        declarations(
+          block(
+            reduce,
+            '::view-transition-group(*), ::view-transition-image-pair(*), ::view-transition-old(*), ::view-transition-new(*)',
+          ),
+        ),
+      ).toEqual({ animation: 'none !important' })
     })
   })
 
@@ -198,6 +268,17 @@ describe('styles.css', () => {
     ['starting:translate-y-2', '@starting-style'],
     ['motion-reduce:transition-none', '@media (prefers-reduced-motion: reduce)'],
     ['inset-x-page-margin-phone', 'inset-inline: var(--spacing-page-margin-phone)'],
+    ['max-w-task-width', 'max-width: var(--spacing-task-width)'],
+    ['animate-progress', 'animation: var(--animate-progress)'],
+    ['motion-reduce:animate-none', 'animation: none'],
+    [
+      'max-wide:peer-has-data-pinned-bottom:bottom-[calc(var(--spacing-pinned-bar)+var(--spacing-4)+env(safe-area-inset-bottom))]',
+      'bottom: calc(var(--spacing-pinned-bar) + var(--spacing-4) + env(safe-area-inset-bottom))',
+    ],
+    [
+      'max-wide:peer-has-data-pinned-bottom:bottom-[calc(var(--spacing-pinned-bar)+var(--spacing-4)+env(safe-area-inset-bottom))]',
+      ':where(.peer):has([data-pinned-bottom]) ~ *',
+    ],
   ])('%s reads its token', async (candidate, expected) => {
     expect(block(await build([candidate]), '@layer utilities')).toContain(expected)
   })

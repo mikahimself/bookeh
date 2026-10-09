@@ -25,6 +25,7 @@ vi.mock('next/headers', () => ({
 
 const { default: RootLayout } = await import('../../src/app/(frontend)/layout')
 const { ToastProvider } = await import('../../src/app/(frontend)/components/toast/ToastProvider')
+const { NavigationTracker } = await import('../../src/app/(frontend)/components/navigation')
 
 const styles = readFileSync(
   fileURLToPath(new URL('../../src/app/(frontend)/styles.css', import.meta.url)),
@@ -62,17 +63,20 @@ describe('frontend root layout', () => {
     expect(html.props['data-theme']).toBe('system')
   })
 
-  it('mounts ToastProvider inside NextIntlClientProvider, wrapping main', async () => {
-    type Node = ReactElement<{ children?: Node }>
+  it('mounts NavigationTracker and ToastProvider inside NextIntlClientProvider, the toasts wrapping a peer main', async () => {
+    type Node = ReactElement<{ children?: Node | Node[]; className?: string }>
     const html = (await RootLayout({ children: null })) as Node
     const body = html.props.children as Node
     expect(body.type).toBe('body')
     const intl = body.props.children as Node
     expect(intl.type).toBe(NextIntlClientProvider)
-    const toast = intl.props.children as Node
+    const [tracker, toast] = intl.props.children as Node[]
+    expect(tracker.type).toBe(NavigationTracker)
     expect(toast.type).toBe(ToastProvider)
     const main = toast.props.children as Node
     expect(main.type).toBe('main')
+    // The toast region, a later sibling inside ToastProvider, reads `peer-has-…`.
+    expect(main.props.className).toBe('peer')
   })
 
   it('publishes the variable that styles.css reads for --default-font-family', () => {

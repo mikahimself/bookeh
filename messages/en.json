@@ -14,6 +14,23 @@
   "toast": {
     "close": "Close"
   },
+  "sections": {
+    "label": "Sections",
+    "collection": "Collection",
+    "loans": "Loans",
+    "wishlists": "Wishlists",
+    "settings": "Settings"
+  },
+  "scan": {
+    "open": "Scan book",
+    "heading": "Scan"
+  },
+  "task": {
+    "close": "Close"
+  },
+  "progress": {
+    "loading": "Loading"
+  },
   "errors": {
     "UNAUTHENTICATED": "Sign in to continue.",
     "WRONG_CREDENTIALS": "Wrong email or password.",

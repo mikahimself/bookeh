@@ -85,6 +85,12 @@
   --spacing-panel-width: 360px;
   /* Minimum control height on the phone (DESIGN.md, Tap area). */
   --spacing-tap: 44px;
+  /* The pinned bottom bar (Scan book on the phone): a tap-high control with
+     spacing-4 above and below, before the safe area. */
+  --spacing-pinned-bar: calc(var(--spacing-tap) + 2 * var(--spacing-4));
+  /* A full-screen task's column on wide screens: a large phone
+     (EXPERIENCE.md, Responsive). */
+  --spacing-task-width: 430px;
 
   /* Wide layout from 900px (EXPERIENCE.md); `max-wide:` is the phone. */
   --breakpoint-wide: 900px;
@@ -93,6 +99,18 @@
      reduce motion. Must equal the toast store's `leaveMs` (toast/store.ts). */
   --default-transition-duration: 200ms;
   --default-transition-timing-function: ease-out;
+
+  /* DESIGN.md, Progress line: the one movement during a wait. */
+  --animate-progress: progress 1.2s ease-in-out infinite;
+
+  @keyframes progress {
+    from {
+      translate: -100% 0;
+    }
+    to {
+      translate: 100% 0;
+    }
+  }
 
   /* Corners */
   --radius: 0px;
@@ -142,6 +160,64 @@
   /* DESIGN.md, Focus: a 2px text outline 3px outside, never the accent. */
   :focus-visible {
     @apply outline-2 outline-offset-3 outline-solid outline-text;
+  }
+}
+
+/*
+ * Full-screen task motion (scan/page.tsx, navigation.ts). On the way in,
+ * React's <ViewTransition> slides the task's own snapshot in from the right
+ * while the page behind stays still: the Scan book link sets the type
+ * `task-open`, which hides the new root, so the section stays under the task
+ * as it slides over it. React renders a history traversal synchronously,
+ * with no view transition, so the X going back starts one by hand: it marks
+ * the task `data-task-closing`, whose old snapshot slides out to the right
+ * over the section beneath. The X replacing to `/` is a normal transition,
+ * so React's `task-exit` plays the same slide. Browser Back swaps at once.
+ * The overlay never takes input, and under reduce motion every snapshot
+ * swaps at once.
+ */
+::view-transition {
+  pointer-events: none;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  /* Not the default plus-lighter: two opaque roots would add up and wash out. */
+  mix-blend-mode: normal;
+}
+
+:root:active-view-transition-type(task-open)::view-transition-new(root) {
+  visibility: hidden;
+}
+
+::view-transition-new(.task-enter) {
+  animation: task-slide var(--default-transition-duration) var(--default-transition-timing-function)
+    both;
+}
+
+::view-transition-old(.task-exit),
+::view-transition-old(task-closing) {
+  animation: task-slide var(--default-transition-duration) var(--default-transition-timing-function)
+    both reverse;
+}
+
+[data-task-closing] {
+  view-transition-name: task-closing;
+}
+
+@keyframes task-slide {
+  from {
+    translate: 100% 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-image-pair(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
   }
 }
 

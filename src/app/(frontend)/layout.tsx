@@ -4,6 +4,7 @@ import { getLocale, getTranslations } from 'next-intl/server'
 import { Open_Sans } from 'next/font/google'
 import React from 'react'
 
+import { NavigationTracker } from './components/navigation'
 import { ToastProvider } from './components/toast/ToastProvider'
 import { devicePrefs } from './prefs'
 import './styles.css'
@@ -30,8 +31,10 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
       <body>
         <NextIntlClientProvider>
           {/* Above the pages (spine, Toasts): a toast survives navigation. */}
+          <NavigationTracker />
           <ToastProvider>
-            <main>{children}</main>
+            {/* `peer`: the toast region rises above a bar pinned to the bottom. */}
+            <main className="peer">{children}</main>
           </ToastProvider>
         </NextIntlClientProvider>
       </body>
