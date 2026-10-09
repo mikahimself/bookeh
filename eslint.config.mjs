@@ -141,6 +141,28 @@ const clientLibImports = {
 
 const noDatabaseAccess = 'Spine, Design Paradigm: lib/metadata has no database access.'
 
+const rolesSyntax = [
+  "MemberExpression[property.name='roles'][computed=false]",
+  "MemberExpression[property.value='roles']",
+  "ObjectPattern > Property[key.name='roles']",
+].map((selector) => ({
+  selector,
+  message:
+    'Spine, AD-2: test roles only through the helpers in src/access/roles.ts (isAdmin, canEditShared).',
+}))
+
+// Spine, AD-2 and AD-3: the gateway itself, the system-privilege allowlist
+// (catalogue, shelf) and lib/metadata, which has its own stricter block.
+const gatewayExempt = [
+  'src/lib/payload/**',
+  'src/lib/catalogue/**',
+  'src/lib/shelf/**',
+  'src/lib/metadata/**',
+]
+
+const throughGateway =
+  "Spine, AD-2: services reach Payload only through lib/payload's gateway (import * as gateway from '@/lib/payload/gateway')."
+
 const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
@@ -188,16 +210,59 @@ const eslintConfig = defineConfig([
     files: ['src/**'],
     ignores: ['src/access/roles.ts'],
     rules: {
+      'no-restricted-syntax': ['error', ...rolesSyntax],
+    },
+  },
+  {
+    // Spine, AD-2: services reach Payload only through the gateway in lib/payload.
+    files: ['src/lib/**'],
+    ignores: gatewayExempt,
+    rules: {
+      '@typescript-eslint/no-restricted-imports': [
+        'error',
+        {
+          paths: [
+            { name: '@payload-config', allowTypeImports: true, message: throughGateway },
+            {
+              name: 'payload',
+              importNames: [
+                'default',
+                'getPayload',
+                'createLocalReq',
+                'BasePayload',
+                'createPayloadRequest',
+                'reload',
+              ],
+              allowTypeImports: true,
+              message: throughGateway,
+            },
+          ],
+          patterns: [
+            // `@/payload.config` and relative paths to it.
+            '(^@/|/)payload\\.config(\\.[jt]s)?$',
+            '(^@/|/)collections(/|$)',
+            '^(drizzle-orm|@payloadcms/(db-postgres|drizzle)|pg)(/|$)',
+          ].map((regex) => ({ regex, allowTypeImports: true, message: throughGateway })),
+        },
+      ],
+    },
+  },
+  {
+    // Spine, AD-2: no `ctx.req.payload.*` around the gateway. Replaces the
+    // roles block's selectors for these files, so it repeats them.
+    files: ['src/lib/**', 'src/app/(frontend)/**'],
+    ignores: gatewayExempt,
+    rules: {
       'no-restricted-syntax': [
         'error',
+        ...rolesSyntax,
         ...[
-          "MemberExpression[property.name='roles'][computed=false]",
-          "MemberExpression[property.value='roles']",
-          "ObjectPattern > Property[key.name='roles']",
+          "MemberExpression[property.name='payload'][computed=false]",
+          "MemberExpression[property.value='payload']",
+          "ObjectPattern > Property[key.name='payload']",
         ].map((selector) => ({
           selector,
-          message:
-            'Spine, AD-2: test roles only through the helpers in src/access/roles.ts (isAdmin, canEditShared).',
+          message: `${throughGateway} Do not call \`req.payload\` directly.`,
         })),
       ],
     },

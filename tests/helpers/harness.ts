@@ -3,6 +3,7 @@ import { randomUUID } from 'node:crypto'
 import { createLocalReq, getPayload } from 'payload'
 
 import { asRequestUser } from '@/access/asRequestUser'
+import type { Context } from '@/lib/payload/context'
 import config from '@/payload.config'
 import type { User } from '@/payload-types'
 
@@ -26,6 +27,15 @@ export async function createUser(
       ...data,
     },
   })
+}
+
+/**
+ * A gateway context acting as `user` (Spine, AD-16: tests build contexts with
+ * an explicit user; `src/lib` exports no such builder).
+ */
+export async function contextFor(user: User): Promise<Context> {
+  const typed = { ...user, collection: 'users' as const }
+  return { req: await createLocalReq({ user: typed }, await payload()), user: typed }
 }
 
 /**
