@@ -182,6 +182,27 @@ const eslintConfig = defineConfig([
     },
   },
   {
+    // Spine, AD-2: roles are tested only through the helpers in src/access/roles.ts.
+    // Tests may assert on `roles`. A later block that sets no-restricted-syntax
+    // for these files replaces these selectors, so it must include them.
+    files: ['src/**'],
+    ignores: ['src/access/roles.ts'],
+    rules: {
+      'no-restricted-syntax': [
+        'error',
+        ...[
+          "MemberExpression[property.name='roles'][computed=false]",
+          "MemberExpression[property.value='roles']",
+          "ObjectPattern > Property[key.name='roles']",
+        ].map((selector) => ({
+          selector,
+          message:
+            'Spine, AD-2: test roles only through the helpers in src/access/roles.ts (isAdmin, canEditShared).',
+        })),
+      ],
+    },
+  },
+  {
     // Spine, Design Paradigm: lib/metadata has no database access.
     files: ['src/lib/metadata/**'],
     rules: {

@@ -54,3 +54,6 @@
 - source_spec: `_bmad-output/implementation-artifacts/spec-1-6-a6-layer-import-rules-and-strict-any.md`
   summary: Resolve the spine's own conflict with its one-way table before Story 9.2: AD-5 has `editBook()` in `lib/catalogue` writing personal tags through `changeTags()` in `lib/tags`, which `catalogue` may not import; check too whether AD-18's default-location resolution in `lib/copies` needs `lib/account` or only the context user.
   evidence: Blind reviewer, verified in ARCHITECTURE-SPINE.md lines 60, 116, 247-251; the zones now enforce the table at `error`, so the first story implementing either path hits a lint wall.
+- source_spec: `_bmad-output/implementation-artifacts/spec-1-7-a7-role-helpers-and-asrequestuser.md`
+  summary: Lint-ban `overrideAccess: true` (and unscoped Local API calls) outside the AD-3 allowlist (`src/lib/catalogue`, `src/lib/shelf`, the `onInit` seed).
+  evidence: AD-3 says hooks and access functions query only through `asRequestUser(req)` and system privileges are an allowlist, but only review enforces it; Story 1.7's AC covers the helper, not the ban. Natural home is the gateway story (1.11) or the first allowlisted module.
