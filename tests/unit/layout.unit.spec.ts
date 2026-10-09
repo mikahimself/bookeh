@@ -3,14 +3,25 @@ import { fileURLToPath } from 'node:url'
 
 import { NextIntlClientProvider } from 'next-intl'
 import type { ReactElement } from 'react'
-import { describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const { Open_Sans } = vi.hoisted(() => ({
   Open_Sans: vi.fn(() => ({ variable: 'open-sans-var', className: 'x', style: {} })),
 }))
 
+// The `bookeh_prefs` value the next render's request carries; `undefined` is no cookie.
+let prefsCookie: string | undefined
+
 vi.mock('next/font/google', () => ({ Open_Sans }))
 vi.mock('next-intl/server', () => ({ getLocale: async () => 'en' }))
+vi.mock('next/headers', () => ({
+  cookies: async () => ({
+    get: (name: string) =>
+      name === 'bookeh_prefs' && prefsCookie !== undefined
+        ? { name, value: prefsCookie }
+        : undefined,
+  }),
+}))
 
 const { default: RootLayout } = await import('../../src/app/(frontend)/layout')
 const { ToastProvider } = await import('../../src/app/(frontend)/components/toast/ToastProvider')
@@ -21,6 +32,10 @@ const styles = readFileSync(
 )
 
 describe('frontend root layout', () => {
+  beforeEach(() => {
+    prefsCookie = undefined
+  })
+
   it('loads Open Sans once, at 300 and 400, latin subset, as a CSS variable', () => {
     expect(Open_Sans).toHaveBeenCalledTimes(1)
     expect(Open_Sans).toHaveBeenCalledWith({
@@ -34,6 +49,17 @@ describe('frontend root layout', () => {
     const html = (await RootLayout({ children: null })) as ReactElement<{ className?: string }>
     expect(html.type).toBe('html')
     expect(html.props.className).toBe('open-sans-var')
+  })
+
+  it('puts the stored theme on <html> as data-theme', async () => {
+    prefsCookie = encodeURIComponent(JSON.stringify({ theme: 'dark' }))
+    const html = (await RootLayout({ children: null })) as ReactElement<{ 'data-theme'?: string }>
+    expect(html.props['data-theme']).toBe('dark')
+  })
+
+  it('renders data-theme="system" without the cookie', async () => {
+    const html = (await RootLayout({ children: null })) as ReactElement<{ 'data-theme'?: string }>
+    expect(html.props['data-theme']).toBe('system')
   })
 
   it('mounts ToastProvider inside NextIntlClientProvider, wrapping main', async () => {

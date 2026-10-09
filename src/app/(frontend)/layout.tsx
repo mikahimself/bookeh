@@ -5,6 +5,7 @@ import { Open_Sans } from 'next/font/google'
 import React from 'react'
 
 import { ToastProvider } from './components/toast/ToastProvider'
+import { devicePrefs } from './prefs'
 import './styles.css'
 
 // Publishes `--font-open-sans`; `styles.css` applies it.
@@ -21,9 +22,11 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function RootLayout(props: { children: React.ReactNode }) {
   const { children } = props
+  // Decided on the server from the cookie, so the first paint has the right colours.
+  const { theme } = await devicePrefs()
 
   return (
-    <html lang={await getLocale()} className={openSans.variable}>
+    <html lang={await getLocale()} className={openSans.variable} data-theme={theme}>
       <body>
         <NextIntlClientProvider>
           {/* Above the pages (spine, Toasts): a toast survives navigation. */}
