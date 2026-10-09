@@ -6,6 +6,9 @@
  * widths use the numbers matching the stroke tokens), static utilities
  * (`w-full`) and arbitrary values. Bare `transition` has no duration; the
  * first motion story declares the transition defaults.
+ * The font family comes from the layout's `next/font` (`--font-open-sans`);
+ * preflight applies it through `--default-font-family`, and the root turns
+ * off weight synthesis so no bold is ever drawn.
  * Dark values follow the light ones twice: once for `data-theme="dark"` and
  * once for the OS preference when the theme is anything but `light` or
  * `dark`. Keep the two dark blocks equal.
@@ -14,6 +17,10 @@
 
 @theme static {
   --*: initial;
+
+  /* Font. `layout.tsx` defines `--font-open-sans` through `next/font`; it
+     names no generic family, so `sans-serif` covers a missing face. */
+  --default-font-family: var(--font-open-sans), sans-serif;
 
   /* Colours (light) */
   --color-background: #ffffff;
@@ -114,6 +121,7 @@
   html {
     background-color: var(--color-background);
     color: var(--color-text);
+    font-synthesis-weight: none;
   }
 
   body {

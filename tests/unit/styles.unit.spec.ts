@@ -107,12 +107,23 @@ const radius = { '--radius': '0px' }
 // Not a DESIGN.md token: keeps `p-0`, `inset-0` and the like once `--spacing` is cleared.
 const zero = { '--spacing-0': '0px' }
 
+// Defined by `layout.tsx` through `next/font`; preflight reads it.
+const font = { '--default-font-family': 'var(--font-open-sans), sans-serif' }
+
 const empty = await build([])
 
 describe('styles.css', () => {
   it('declares every DESIGN.md token with its value, and nothing else', () => {
     const theme = declarations(block(block(empty, '@layer theme'), ':root, :host'))
-    expect(theme).toEqual(lower({ ...lightColours, ...typography, ...spacing, ...radius, ...zero }))
+    expect(theme).toEqual({
+      ...lower({ ...lightColours, ...typography, ...spacing, ...radius, ...zero }),
+      ...font,
+    })
+  })
+
+  it("points preflight's root font-family at --default-font-family", () => {
+    const preflight = declarations(block(block(empty, '@layer base'), 'html, :host'))
+    expect(preflight['font-family']).toMatch(/^var\(--default-font-family,/)
   })
 
   it('sets all nine colours to their dark values under data-theme="dark"', () => {
@@ -134,6 +145,7 @@ describe('styles.css', () => {
     expect(declarations(block(base, 'html'))).toEqual({
       'background-color': 'var(--color-background)',
       color: 'var(--color-text)',
+      'font-synthesis-weight': 'none',
     })
     expect(declarations(block(base, 'body'))).toEqual({
       'font-size': 'var(--text-body)',
@@ -163,6 +175,9 @@ describe('styles.css', () => {
     'rounded-lg',
     'shadow-md',
     'font-bold',
+    'font-semibold',
+    'font-normal',
+    'font-light',
     'font-sans',
     'text-xl',
     'leading-tight',
