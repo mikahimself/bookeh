@@ -73,7 +73,7 @@ deferred:
 ## Tasks & Acceptance
 
 **Execution:**
-- `messages/en.json`, `messages/fi.json` -- `{ "errors": { "UNAUTHENTICATED", "NOT_FOUND", "VALIDATION", "INTERNAL" } }` in both languages, terse: UNAUTHENTICATED "Sign in to continue." / "Kirjaudu ensin sisään.", NOT_FOUND "Not found." / "Ei löytynyt.", VALIDATION "Check the marked fields." / "Tarkista merkityt kentät.", INTERNAL "Didn't work. Try again." / "Ei onnistunut. Yritä uudelleen." -- catalogues with the first real keys.
+- `messages/en.json`, `messages/fi.json` -- `{ "errors": { "UNAUTHENTICATED", "NOT_FOUND", "VALIDATION", "INTERNAL" } }` in both languages, terse: UNAUTHENTICATED "Sign in to continue." / "Kirjaudu sisään jatkaaksesi.", NOT_FOUND "Not found." / "Ei löytynyt.", VALIDATION "Check the marked fields." / "Tarkista merkityt kentät.", INTERNAL "Didn't work. Try again." / "Ei onnistunut. Yritä uudelleen." -- catalogues with the first real keys.
 - `src/i18n/locale.ts` -- export `locales = ['en', 'fi'] as const`, `Locale`, `defaultLocale`, `timeZone = 'Europe/Helsinki'`, and pure `resolveLocale(language, acceptLanguage)` parsing q-values per RFC 9110 (primary subtag match, case-insensitive, stable on equal q, `q=0` excluded, malformed entries skipped) -- testable without Next or a DB.
 - `src/i18n/request.ts` -- `getRequestConfig`: read `headers()`, `getPayload` (a failure there throws: broken config is loud), then `payload.auth({ headers })` for the session user; Payload itself returns no user for a missing or invalid token. Only if `payload.auth` throws, log through `payload.logger.error({ err }, …)` and treat the request as anonymous. `resolveLocale(user?.language, accept-language)`, return `{ locale, timeZone, messages }` with messages from a static `{ en, fi }` map -- the single place next-intl is configured.
 - `src/i18n/next-intl.d.ts` -- augment `next-intl`'s `AppConfig` with `Locale` and `Messages: typeof en` -- typed keys.
@@ -110,6 +110,9 @@ deferred:
   - The layout with `lang={await getLocale()}` and a prop-less `NextIntlClientProvider`.
   - `tests/unit/locale.unit.spec.ts` and `tests/unit/messages.unit.spec.ts`: `keyDiff` and the exhaustive `ErrorCode` list.
   - In the int test: mock `next-intl/server`'s `getRequestConfig` as identity, because outside the `react-server` condition it resolves to throwing stubs.
+
+### 2026-10-09 — Owner review
+- Mika chose "Kirjaudu sisään jatkaaksesi." for Finnish UNAUTHENTICATED, over loop 1's "Kirjaudu ensin sisään.". NOT_FOUND and VALIDATION were approved as written.
 
 ## Review Triage Log
 
