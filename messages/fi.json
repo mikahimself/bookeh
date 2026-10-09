@@ -1,6 +1,19 @@
 {
+  "app": {
+    "name": "bookeh"
+  },
+  "signIn": {
+    "heading": "Kirjaudu sisään",
+    "email": "Sähköposti",
+    "password": "Salasana",
+    "submit": "Kirjaudu"
+  },
+  "signOut": {
+    "submit": "Kirjaudu ulos"
+  },
   "errors": {
     "UNAUTHENTICATED": "Kirjaudu sisään jatkaaksesi.",
+    "WRONG_CREDENTIALS": "Väärä sähköposti tai salasana.",
     "NOT_FOUND": "Ei löytynyt.",
     "VALIDATION": "Tarkista merkityt kentät.",
     "INTERNAL": "Ei onnistunut. Yritä uudelleen."

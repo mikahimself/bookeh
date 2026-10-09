@@ -1,26 +1,17 @@
-import { test, expect, Page } from '@playwright/test'
+import { test, expect } from '@playwright/test'
 
 test.describe('Frontend', () => {
-  let page: Page
+  test('sends a signed-out visit to sign in, keeping the address', async ({ page }) => {
+    await page.goto('http://localhost:3000/?a=1')
 
-  test.beforeAll(async ({ browser }, testInfo) => {
-    const context = await browser.newContext()
-    page = await context.newPage()
-  })
-
-  test('can go on homepage', async ({ page }) => {
-    await page.goto('http://localhost:3000')
-
-    await expect(page).toHaveTitle(/Payload Blank Template/)
-
-    const heading = page.locator('h1').first()
-
-    await expect(heading).toHaveText('Welcome to your new project.')
+    await expect(page).toHaveURL('http://localhost:3000/login?next=%2F%3Fa%3D1')
+    await expect(page.getByRole('heading', { level: 1, name: 'Sign in' })).toBeVisible()
+    await expect(page.getByLabel('Email')).toBeVisible()
   })
 
   test('serves the design tokens and switches them with data-theme', async ({ page }) => {
     await page.emulateMedia({ colorScheme: 'light' })
-    await page.goto('http://localhost:3000')
+    await page.goto('http://localhost:3000/login')
 
     const token = (name: string) =>
       page.evaluate(

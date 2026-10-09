@@ -1,6 +1,19 @@
 {
+  "app": {
+    "name": "bookeh"
+  },
+  "signIn": {
+    "heading": "Sign in",
+    "email": "Email",
+    "password": "Password",
+    "submit": "Sign in"
+  },
+  "signOut": {
+    "submit": "Sign out"
+  },
   "errors": {
     "UNAUTHENTICATED": "Sign in to continue.",
+    "WRONG_CREDENTIALS": "Wrong email or password.",
     "NOT_FOUND": "Not found.",
     "VALIDATION": "Check the marked fields.",
     "INTERNAL": "Didn't work. Try again."

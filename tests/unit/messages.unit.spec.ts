@@ -54,6 +54,7 @@ describe('message catalogues', () => {
   // Exhaustive: adding an ErrorCode fails typecheck until it is listed here.
   const codes = Object.keys({
     UNAUTHENTICATED: true,
+    WRONG_CREDENTIALS: true,
     NOT_FOUND: true,
     VALIDATION: true,
     INTERNAL: true,

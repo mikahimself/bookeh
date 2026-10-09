@@ -3,7 +3,8 @@ import { defaultLoggerOptions, Forbidden, NotFound, ValidationError } from 'payl
 import { pino, type Logger } from 'pino'
 
 /** Spine, Errors convention. The message key for a code is `errors.<CODE>`. */
-export type ErrorCode = 'UNAUTHENTICATED' | 'NOT_FOUND' | 'VALIDATION' | 'INTERNAL'
+export type ErrorCode =
+  'UNAUTHENTICATED' | 'WRONG_CREDENTIALS' | 'NOT_FOUND' | 'VALIDATION' | 'INTERNAL'
 
 export type ActionResult<T> =
   | { ok: true; data: T }

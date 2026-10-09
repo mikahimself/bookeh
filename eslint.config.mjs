@@ -163,6 +163,9 @@ const gatewayExempt = [
 const throughGateway =
   "Spine, AD-2: services reach Payload only through lib/payload's gateway (import * as gateway from '@/lib/payload/gateway')."
 
+const frontendThroughServices =
+  'Spine, Design Paradigm: src/app/(frontend) reaches Payload only through the services in src/lib (and requireUser / requireUserOrThrow).'
+
 const eslintConfig = defineConfig([
   ...nextVitals,
   ...nextTs,
@@ -291,12 +294,16 @@ const eslintConfig = defineConfig([
   },
   {
     // Spine, Design Paradigm: src/app/(frontend) imports from lib/payload only
-    // requireUser, requireUserOrThrow and types. It never calls the gateway.
+    // requireUser, requireUserOrThrow and types. It never calls the gateway,
+    // and never touches Payload, its config, its collections or the database.
     files: ['src/app/(frontend)/**'],
     rules: {
       '@typescript-eslint/no-restricted-imports': [
         'error',
         {
+          paths: [
+            { name: '@payload-config', allowTypeImports: true, message: frontendThroughServices },
+          ],
           patterns: [
             {
               regex: '/lib/payload(/|$)',
@@ -305,9 +312,18 @@ const eslintConfig = defineConfig([
               message:
                 'Spine, Design Paradigm: src/app/(frontend) imports from lib/payload only requireUser, requireUserOrThrow and types.',
             },
+            ...[
+              '^payload(/|$)',
+              '(^@/|/)payload\\.config(\\.[jt]s)?$',
+              '(^@/|/)collections(/|$)',
+              '^(drizzle-orm|pg)(/|$)',
+              '^@payloadcms/',
+            ].map((regex) => ({ regex, allowTypeImports: true, message: frontendThroughServices })),
           ],
         },
       ],
+      // Every interface string comes from messages/*.json (spine, i18n).
+      'react/jsx-no-literals': ['error', { noStrings: true, ignoreProps: true }],
     },
   },
   globalIgnores([

@@ -82,6 +82,11 @@
   --spacing-stroke-control: 2px;
   --spacing-stroke-selection: 4px;
   --spacing-panel-width: 360px;
+  /* Minimum control height on the phone (DESIGN.md, Tap area). */
+  --spacing-tap: 44px;
+
+  /* Wide layout from 900px (EXPERIENCE.md); `max-wide:` is the phone. */
+  --breakpoint-wide: 900px;
 
   /* Corners */
   --radius: 0px;
@@ -126,6 +131,11 @@
 
   body {
     @apply text-body;
+  }
+
+  /* DESIGN.md, Focus: a 2px text outline 3px outside, never the accent. */
+  :focus-visible {
+    @apply outline-2 outline-offset-3 outline-solid outline-text;
   }
 }
 

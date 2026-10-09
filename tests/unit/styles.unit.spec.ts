@@ -100,7 +100,12 @@ const spacing = {
   '--spacing-stroke-control': '2px',
   '--spacing-stroke-selection': '4px',
   '--spacing-panel-width': '360px',
+  // DESIGN.md, Tap area.
+  '--spacing-tap': '44px',
 }
+
+// EXPERIENCE.md, Wide.
+const breakpoints = { '--breakpoint-wide': '900px' }
 
 const radius = { '--radius': '0px' }
 
@@ -116,7 +121,7 @@ describe('styles.css', () => {
   it('declares every DESIGN.md token with its value, and nothing else', () => {
     const theme = declarations(block(block(empty, '@layer theme'), ':root, :host'))
     expect(theme).toEqual({
-      ...lower({ ...lightColours, ...typography, ...spacing, ...radius, ...zero }),
+      ...lower({ ...lightColours, ...typography, ...spacing, ...breakpoints, ...radius, ...zero }),
       ...font,
     })
   })
@@ -154,6 +159,17 @@ describe('styles.css', () => {
     })
   })
 
+  it('gives keyboard focus a 2px text outline 3px outside', () => {
+    const base = block(empty.slice(empty.lastIndexOf('@layer base {')), '@layer base')
+    expect(declarations(block(base, ':focus-visible'))).toEqual({
+      'outline-style': 'solid',
+      'outline-width': '2px',
+      'outline-offset': '3px',
+      'outline-color': 'var(--color-text)',
+      '--tw-outline-style': 'solid',
+    })
+  })
+
   it.each([
     ['bg-accent', 'background-color: var(--color-accent)'],
     ['text-text-muted', 'color: var(--color-text-muted)'],
@@ -166,6 +182,11 @@ describe('styles.css', () => {
     ['rounded', 'border-radius: var(--radius)'],
     ['p-0', 'padding: var(--spacing-0)'],
     ['ui-case', 'text-transform: lowercase'],
+    ['min-h-tap', 'min-height: var(--spacing-tap)'],
+    ['max-wide:min-h-tap', '@media (width < 900px)'],
+    ['max-wide:min-h-tap', 'min-height: var(--spacing-tap)'],
+    ['wide:p-page-margin', '@media (width >= 900px)'],
+    ['outline-offset-3', 'outline-offset: 3px'],
   ])('%s reads its token', async (candidate, expected) => {
     expect(block(await build([candidate]), '@layer utilities')).toContain(expected)
   })
