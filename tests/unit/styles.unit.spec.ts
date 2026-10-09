@@ -159,9 +159,23 @@ describe('styles.css', () => {
       expect(declarations(block(empty, '::view-transition'))).toEqual({ 'pointer-events': 'none' })
     })
 
-    it('leave the root snapshots still, and hide the new root while a task opens', () => {
+    it('leave the root, Scan book and toast snapshots still, and hide the new root while a task opens', () => {
       expect(
-        declarations(block(empty, '::view-transition-old(root), ::view-transition-new(root)')),
+        declarations(
+          block(
+            empty,
+            [
+              '::view-transition-old(root)',
+              '::view-transition-new(root)',
+              '::view-transition-old(pinned-bottom)',
+              '::view-transition-new(pinned-bottom)',
+              '::view-transition-old(toast-region)',
+              '::view-transition-new(toast-region)',
+              '::view-transition-old(scan-book)',
+              '::view-transition-new(scan-book)',
+            ].join(', '),
+          ),
+        ),
       ).toEqual({ animation: 'none', 'mix-blend-mode': 'normal' })
       expect(
         declarations(
@@ -175,7 +189,7 @@ describe('styles.css', () => {
       ['::view-transition-old(.task-exit), ::view-transition-old(task-closing)', 'both reverse'],
     ])('%s slides over the motion defaults (%s)', (selector, fill) => {
       expect(declarations(block(empty, selector))).toEqual({
-        animation: `task-slide var(--default-transition-duration) var(--default-transition-timing-function) ${fill}`,
+        animation: `slide-from-right var(--default-transition-duration) var(--default-transition-timing-function) ${fill}`,
       })
     })
 
@@ -185,10 +199,53 @@ describe('styles.css', () => {
       })
     })
 
-    it('slides a task in from the right edge', () => {
-      expect(declarations(block(block(empty, '@keyframes task-slide'), 'from'))).toEqual({
+    it('slide in from the right edge, and out to the left', () => {
+      expect(declarations(block(block(empty, '@keyframes slide-from-right'), 'from'))).toEqual({
         translate: '100% 0',
       })
+      expect(declarations(block(block(empty, '@keyframes slide-to-left'), 'to'))).toEqual({
+        translate: '-100% 0',
+      })
+      expect(empty).not.toContain('task-slide')
+    })
+
+    it.each([
+      ['::view-transition-new(.section-next)', 'slide-from-right', 'both'],
+      ['::view-transition-old(.section-next)', 'slide-to-left', 'both'],
+      ['::view-transition-new(.section-prev)', 'slide-to-left', 'both reverse'],
+      ['::view-transition-old(.section-prev)', 'slide-from-right', 'both reverse'],
+    ])('%s slides with %s (%s)', (selector, keyframes, fill) => {
+      expect(declarations(block(empty, selector))).toEqual({
+        animation: `${keyframes} var(--default-transition-duration) var(--default-transition-timing-function) ${fill}`,
+        'mix-blend-mode': 'normal',
+      })
+    })
+
+    it("keeps the section boundary's group in step with the slide", () => {
+      expect(
+        declarations(
+          block(
+            empty,
+            '::view-transition-group(.section-next), ::view-transition-group(.section-prev)',
+          ),
+        ),
+      ).toEqual({
+        'animation-duration': 'var(--default-transition-duration)',
+        'animation-timing-function': 'var(--default-transition-timing-function)',
+      })
+    })
+
+    it.each([
+      ['[data-pinned-bottom]', 'pinned-bottom'],
+      ['[data-toast-region]', 'toast-region'],
+      ['[data-scan-book]', 'scan-book'],
+    ])('names %s only while a section slides', (marker, name) => {
+      expect(
+        declarations(
+          block(empty, `:root:active-view-transition-type(section-next, section-prev) ${marker}`),
+        ),
+      ).toEqual({ 'view-transition-name': name })
+      expect(empty.match(new RegExp(`view-transition-name: ${name};`, 'g'))).toHaveLength(1)
     })
 
     it('swap at once under reduce motion', () => {

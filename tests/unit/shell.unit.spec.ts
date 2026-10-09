@@ -2,7 +2,7 @@ import { readFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 
 import { compile } from '@tailwindcss/node'
-import { createElement } from 'react'
+import { createElement, type ReactNode } from 'react'
 import { renderToStaticMarkup } from 'react-dom/server'
 import { describe, expect, it, vi } from 'vitest'
 
@@ -27,6 +27,10 @@ const translator =
 vi.mock('next-intl', () => ({ useTranslations: translator }))
 vi.mock('next-intl/server', () => ({ getTranslations: async (ns?: string) => translator(ns) }))
 vi.mock('@/lib/payload/context', () => ({ requireUser: vi.fn(async () => ({})) }))
+// The installed React has no `ViewTransition`; the boundary renders no DOM of its own.
+vi.mock('@/app/(frontend)/components/SectionTransition', () => ({
+  SectionTransition: ({ children }: { children: ReactNode }) => children,
+}))
 
 const { SectionNav } = await import('@/app/(frontend)/components/SectionNav')
 const { ActionLink, BackLink, TextLink } = await import('@/app/(frontend)/components/Link')
@@ -196,7 +200,11 @@ describe('sections loading', () => {
 describe('ToastProvider', () => {
   it('raises the toast region above a bar pinned to the bottom of a peer', () => {
     expect(toasts).toMatch(/^<main><\/main><div role="status"/)
-    expect(classOf(toasts, /<div role="status" class="([^"]*)"/)).toContain(raise)
+    expect(classOf(toasts, /<div role="status" [^>]*class="([^"]*)"/)).toContain(raise)
+  })
+
+  it('marks the toast region, so it stays still while a section slides', () => {
+    expect(toasts).toMatch(/<div role="status" data-toast-region="true"/)
   })
 })
 
@@ -229,7 +237,19 @@ describe('sections layout', () => {
       expect(link).toEqual(expect.arrayContaining(['border-2', 'border-accent', 'ui-case']))
     }
     expect(wide).toEqual(expect.arrayContaining(['hidden', 'wide:inline-flex']))
+    // The header copy is marked so it stays still while a section slides.
+    expect(scanLinks.map(([tag]) => tag.includes('data-scan-book="true"'))).toEqual([true, false])
     expect(phone).toEqual(expect.arrayContaining(['flex', 'w-full']))
+  })
+
+  it('holds the headings and the content in one column, the pinned bar outside it', () => {
+    expect(shell).toMatch(
+      /^<div class="[^"]*"><div class="flex flex-1 flex-col"><header [^>]*>.*<\/header><div class="flex-1"><\/div><\/div><div data-pinned-bottom/,
+    )
+    const links = [...shell.matchAll(/<nav [^>]*>(.*?)<\/nav>/g)].flatMap(([, row]) =>
+      [...row.matchAll(/href="([^"]*)"/g)].map(([, href]) => href),
+    )
+    expect(links).toEqual(['/loans', '/wishlists', '/settings'])
   })
 
   it('pins the phone copy in a bar at the bottom, hidden on wide screens', () => {

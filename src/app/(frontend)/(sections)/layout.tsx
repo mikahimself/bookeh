@@ -6,19 +6,24 @@ import { requireUser } from '@/lib/payload/context'
 
 import { buttonClass } from '../components/Button'
 import { SectionNav } from '../components/SectionNav'
+import { SectionTransition } from '../components/SectionTransition'
+import { SectionSwipe } from '../components/swipe'
 
 /**
  * The section shell (EXPERIENCE.md, Navigation): the headings row and Scan
  * book, on every section. Scan book is rendered once per width, the other
  * copy `hidden`: pinned full width at the bottom under 900px, top right from
- * 900px. Each keeps DOM and focus order in step with what is drawn.
+ * 900px. Each keeps DOM and focus order in step with what is drawn. The
+ * header and the content slide together on a section change; Scan book, in
+ * either place, stays put. Under 900px a sideways swipe changes section.
  */
 export default async function SectionsLayout({ children }: { children: ReactNode }) {
   await requireUser()
   const t = await getTranslations('scan')
 
-  const scanBook = (className: string) => (
+  const scanBook = (className: string, props: { 'data-scan-book'?: true } = {}) => (
     <Link
+      {...props}
       href="/scan"
       transitionTypes={['task-open']}
       className={`${buttonClass('primary')} items-center justify-center ${className}`}
@@ -29,11 +34,16 @@ export default async function SectionsLayout({ children }: { children: ReactNode
 
   return (
     <div className="flex min-h-dvh flex-col">
-      <header className="flex items-center gap-6 px-page-margin-phone pt-page-margin-phone wide:px-page-margin wide:pt-page-margin">
-        <SectionNav />
-        {scanBook('hidden shrink-0 wide:inline-flex')}
-      </header>
-      <div className="flex-1">{children}</div>
+      <SectionTransition>
+        <div className="flex flex-1 flex-col">
+          <header className="flex items-center gap-6 px-page-margin-phone pt-page-margin-phone wide:px-page-margin wide:pt-page-margin">
+            <SectionNav />
+            {scanBook('hidden shrink-0 wide:inline-flex', { 'data-scan-book': true })}
+          </header>
+          <div className="flex-1">{children}</div>
+        </div>
+      </SectionTransition>
+      <SectionSwipe />
       <div
         data-pinned-bottom
         className="sticky bottom-0 bg-background px-page-margin-phone pt-4 pb-[calc(var(--spacing-4)+env(safe-area-inset-bottom))] wide:hidden"

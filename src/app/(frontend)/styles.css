@@ -175,6 +175,14 @@
  * the task `data-task-closing`, whose old snapshot slides out to the right
  * over the section beneath. The X replacing to `/` is a normal transition,
  * so React's `task-exit` plays the same slide. Browser Back swaps at once.
+ *
+ * Section motion (SectionTransition.tsx, swipe.ts). A swipe or a heading tap
+ * sets `section-next` or `section-prev`, and the header and content slide
+ * together that way: the old snapshot out one side, the new one in from the
+ * other. For those types alone Scan book (the pinned bar, or the wide copy
+ * in the header) and the toast region get names of their own, so their still
+ * snapshots sit above the slide.
+ *
  * The overlay never takes input, and under reduce motion every snapshot
  * swaps at once.
  */
@@ -183,7 +191,13 @@
 }
 
 ::view-transition-old(root),
-::view-transition-new(root) {
+::view-transition-new(root),
+::view-transition-old(pinned-bottom),
+::view-transition-new(pinned-bottom),
+::view-transition-old(toast-region),
+::view-transition-new(toast-region),
+::view-transition-old(scan-book),
+::view-transition-new(scan-book) {
   animation: none;
   /* Not the default plus-lighter: two opaque roots would add up and wash out. */
   mix-blend-mode: normal;
@@ -194,23 +208,72 @@
 }
 
 ::view-transition-new(.task-enter) {
-  animation: task-slide var(--default-transition-duration) var(--default-transition-timing-function)
-    both;
+  animation: slide-from-right var(--default-transition-duration)
+    var(--default-transition-timing-function) both;
 }
 
 ::view-transition-old(.task-exit),
 ::view-transition-old(task-closing) {
-  animation: task-slide var(--default-transition-duration) var(--default-transition-timing-function)
-    both reverse;
+  animation: slide-from-right var(--default-transition-duration)
+    var(--default-transition-timing-function) both reverse;
 }
 
 [data-task-closing] {
   view-transition-name: task-closing;
 }
 
-@keyframes task-slide {
+::view-transition-new(.section-next) {
+  animation: slide-from-right var(--default-transition-duration)
+    var(--default-transition-timing-function) both;
+  mix-blend-mode: normal;
+}
+
+::view-transition-old(.section-next) {
+  animation: slide-to-left var(--default-transition-duration)
+    var(--default-transition-timing-function) both;
+  mix-blend-mode: normal;
+}
+
+::view-transition-new(.section-prev) {
+  animation: slide-to-left var(--default-transition-duration)
+    var(--default-transition-timing-function) both reverse;
+  mix-blend-mode: normal;
+}
+
+::view-transition-old(.section-prev) {
+  animation: slide-from-right var(--default-transition-duration)
+    var(--default-transition-timing-function) both reverse;
+  mix-blend-mode: normal;
+}
+
+:root:active-view-transition-type(section-next, section-prev) [data-pinned-bottom] {
+  view-transition-name: pinned-bottom;
+}
+
+:root:active-view-transition-type(section-next, section-prev) [data-toast-region] {
+  view-transition-name: toast-region;
+}
+
+:root:active-view-transition-type(section-next, section-prev) [data-scan-book] {
+  view-transition-name: scan-book;
+}
+
+/* Any change of size or place keeps step with the slide. */
+::view-transition-group(.section-next),
+::view-transition-group(.section-prev) {
+  animation-duration: var(--default-transition-duration);
+  animation-timing-function: var(--default-transition-timing-function);
+}
+
+@keyframes slide-from-right {
   from {
     translate: 100% 0;
+  }
+}
+
+@keyframes slide-to-left {
+  to {
+    translate: -100% 0;
   }
 }
 

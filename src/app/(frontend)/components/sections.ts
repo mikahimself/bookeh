@@ -26,3 +26,9 @@ export function sectionRow(current: SectionKey): Section[] {
   const at = SECTIONS.findIndex(({ key }) => key === current)
   return [...SECTIONS.slice(at), ...SECTIONS.slice(0, at)]
 }
+
+/** The section `step` places from `current` in the fixed order, wrapping round. */
+export function sectionAfter(current: SectionKey, step: 1 | -1): Section {
+  const at = SECTIONS.findIndex(({ key }) => key === current)
+  return SECTIONS[(at + step + SECTIONS.length) % SECTIONS.length]
+}

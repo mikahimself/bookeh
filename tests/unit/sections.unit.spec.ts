@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { sectionOf, sectionRow } from '@/app/(frontend)/components/sections'
+import { sectionAfter, sectionOf, sectionRow } from '@/app/(frontend)/components/sections'
 
 describe('sectionOf', () => {
   it.each([
@@ -37,5 +37,19 @@ describe('sectionRow', () => {
       '/',
       '/loans',
     ])
+  })
+})
+
+describe('sectionAfter', () => {
+  it.each([
+    ['collection', 1, 'loans'],
+    ['loans', 1, 'wishlists'],
+    ['wishlists', 1, 'settings'],
+    ['settings', 1, 'collection'],
+    ['collection', -1, 'settings'],
+    ['loans', -1, 'collection'],
+    ['settings', -1, 'wishlists'],
+  ] as const)('%s by %i is %s', (current, step, key) => {
+    expect(sectionAfter(current, step).key).toBe(key)
   })
 })

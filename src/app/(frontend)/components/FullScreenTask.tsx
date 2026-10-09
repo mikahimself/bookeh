@@ -5,17 +5,20 @@ import { useRef, type ReactNode } from 'react'
 
 import { CloseButton } from './CloseButton'
 import { useCloseTask } from './navigation'
+import { useSuspendSwipe } from './swipe'
 
 /**
  * A full-screen task (EXPERIENCE.md): covers the screen and scrolls within
  * itself. On wide screens the content is a centred column the width of a
  * large phone. The X goes back, sliding the task away, or to `/` when the
- * task was opened directly.
+ * task was opened directly. While it is open, swiping between sections is
+ * suspended.
  */
 export function FullScreenTask({ title, children }: { title: string; children?: ReactNode }) {
   const t = useTranslations('task')
   const close = useCloseTask()
   const frame = useRef<HTMLDivElement>(null)
+  useSuspendSwipe()
 
   return (
     <div ref={frame} className="fixed inset-0 overflow-y-auto bg-background">

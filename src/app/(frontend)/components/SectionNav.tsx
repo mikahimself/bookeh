@@ -13,7 +13,8 @@ const heading =
  * The headings row (EXPERIENCE.md, Navigation): the current section as the
  * page's `h1`, then links to the others. The row never wraps; it clips at
  * the right edge. The live region is in the server HTML, so only a client
- * section change is announced.
+ * section change is announced. Every other heading follows the current one,
+ * so a tap always slides forward (`section-next`).
  */
 export function SectionNav() {
   const t = useTranslations('sections')
@@ -27,7 +28,12 @@ export function SectionNav() {
       <h1 className={`${heading} text-text`}>{t(current.key)}</h1>
       <nav aria-label={t('label')} className="flex shrink-0 gap-6 wide:gap-7">
         {others.map(({ key, href }) => (
-          <Link key={key} href={href} className={`${heading} text-text-dim`}>
+          <Link
+            key={key}
+            href={href}
+            transitionTypes={['section-next']}
+            className={`${heading} text-text-dim`}
+          >
             {t(key)}
           </Link>
         ))}

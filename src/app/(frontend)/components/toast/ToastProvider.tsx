@@ -62,9 +62,11 @@ export function ToastProvider({ children }: { children: ReactNode }) {
           a polite live region only announces content inserted after the
           region exists. An error's own role="alert" announces on insertion.
           Under 900px it rises above a bar pinned to the bottom (Scan book):
-          the region follows the layout's `peer` <main>. */}
+          the region follows the layout's `peer` <main>. `data-toast-region`
+          keeps it still while a section slides (styles.css). */}
       <div
         role="status"
+        data-toast-region
         className="fixed inset-x-page-margin-phone bottom-4 z-10 max-wide:peer-has-data-pinned-bottom:bottom-[calc(var(--spacing-pinned-bar)+var(--spacing-4)+env(safe-area-inset-bottom))] wide:inset-x-page-margin"
       >
         {state && (
