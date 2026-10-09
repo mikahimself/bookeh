@@ -222,7 +222,7 @@ describe('styles.css', () => {
     expect(system).toEqual({ 'color-scheme': 'dark', ...lower(darkColours) })
   })
 
-  it('gives the root the ground and text colours and the body the body role', () => {
+  it('gives the root the ground and text colours, and the body the body role and the side safe areas', () => {
     // Preflight opens the first base block; ours is the last.
     const base = block(empty.slice(empty.lastIndexOf('@layer base {')), '@layer base')
     expect(declarations(block(base, 'html'))).toEqual({
@@ -234,6 +234,7 @@ describe('styles.css', () => {
       'font-size': 'var(--text-body)',
       'line-height': 'var(--tw-leading, var(--text-body--line-height))',
       'font-weight': 'var(--tw-font-weight, var(--text-body--font-weight))',
+      'padding-inline': 'env(safe-area-inset-left) env(safe-area-inset-right)',
     })
   })
 

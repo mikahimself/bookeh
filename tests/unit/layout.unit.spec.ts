@@ -23,7 +23,7 @@ vi.mock('next/headers', () => ({
   }),
 }))
 
-const { default: RootLayout } = await import('../../src/app/(frontend)/layout')
+const { default: RootLayout, generateViewport } = await import('../../src/app/(frontend)/layout')
 const { ToastProvider } = await import('../../src/app/(frontend)/components/toast/ToastProvider')
 const { NavigationTracker } = await import('../../src/app/(frontend)/components/navigation')
 
@@ -77,6 +77,27 @@ describe('frontend root layout', () => {
     expect(main.type).toBe('main')
     // The toast region, a later sibling inside ToastProvider, reads `peer-has-…`.
     expect(main.props.className).toBe('peer')
+  })
+
+  describe('generateViewport', () => {
+    const light = '#FFFFFF'
+    const dark = '#14181D'
+    const pair = [
+      { media: '(prefers-color-scheme: light)', color: light },
+      { media: '(prefers-color-scheme: dark)', color: dark },
+    ]
+    const cookie = (theme: string) => encodeURIComponent(JSON.stringify({ theme }))
+
+    it.each([
+      ['no cookie', undefined, pair],
+      ['theme dark', cookie('dark'), dark],
+      ['theme light', cookie('light'), light],
+      ['theme system', cookie('system'), pair],
+      ['a garbage cookie', '%%%', pair],
+    ])('gives %s its theme colour, under viewport-fit=cover', async (_, value, themeColor) => {
+      prefsCookie = value
+      expect(await generateViewport()).toEqual({ viewportFit: 'cover', themeColor })
+    })
   })
 
   it('publishes the variable that styles.css reads for --default-font-family', () => {

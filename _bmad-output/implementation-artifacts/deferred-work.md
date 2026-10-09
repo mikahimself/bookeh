@@ -74,3 +74,9 @@
 - source_spec: `_bmad-output/implementation-artifacts/spec-1-22-k9-profile-service.md`
   summary: In Story 1.23, check that changing the language in Settings re-renders in the new language in the same request, and if not, refresh the cached session user after `updateProfile()`.
   evidence: `updateProfile()` writes the row but leaves `ctx.user` as it was, and `currentUser()` in `src/lib/payload/context.ts` is wrapped in React `cache` and returns that same object. If the cache spans the server action and its re-render, `src/i18n/request.ts` would resolve the locale from the old `language`. Unverified: no action exists yet.
+- source_spec: `_bmad-output/implementation-artifacts/spec-1-21-k1-installable-pwa.md`
+  summary: Pad the fixed elements (toast region, full-screen task) for `safe-area-inset-left` and `safe-area-inset-right`, so they clear the notch in landscape. ProgressLine (`fixed inset-x-0 top-0`) is fixed too, but it is a thin full-bleed line and is likely fine left edge to edge.
+  evidence: Story 1.21 sets `viewport-fit=cover` and pads `body` inline with the side insets, but `position: fixed` elements are placed against the viewport, not the body, so in landscape on a notched iPhone they can still run under the notch.
+- source_spec: `_bmad-output/implementation-artifacts/spec-1-21-k1-installable-pwa.md`
+  summary: Known consequence of DESIGN.md option T1, not a defect to fix unprompted: with a dark device theme the installed app launches with a white splash screen and title bar, until the page's `theme-color` takes over.
+  evidence: The manifest's `theme_color` and `background_color` are fixed at `#FFFFFF` (T1); a manifest is one per app and its request carries no device preferences, so it cannot follow the `bookeh_prefs` theme.
