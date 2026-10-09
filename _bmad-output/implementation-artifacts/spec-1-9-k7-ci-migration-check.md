@@ -5,10 +5,17 @@ created: '2026-10-09'
 status: 'done'
 baseline_commit: '5e67a23a9031d03ba390917ea8c2cf48bd7f8907'
 review_loop_iteration: 0
-followup_review_recommended: true
+followup_review_recommended: false
 context: []
 warnings: [oversized]
-deferred: []
+deferred:
+  - summary: >-
+      Check src/migrations/index.ts against the migration files on disk once prodMigrations is wired (Epic 2).
+    evidence: |-
+      `payload migrate` reads every `*.ts` in src/migrations and never reads index.ts, and the drift step rewrites index.ts only on drift. A migration committed without its index.ts entry (e.g. after a rebase merge) therefore passes the drift, migrate and int steps. prodMigrations, which AD-13 says production applies at start, reads only index.ts and would skip that migration. No harm until prodMigrations exists, and the intent excludes it (Epic 2). Fix: regenerate the index with Payload's writeMigrationIndex in CI and fail on a diff.
+    location: >-
+      .github/workflows/ci.yml (Check for missing migrations)
+    severity: medium
 ---
 
 <intent-contract>
@@ -88,6 +95,28 @@ deferred: []
   - `[high]` `[patch]` A rename-ambiguous drift makes drizzle-kit's prompt read EOF and exit 0, writing nothing, so the check passes (edge-case) — reproduced (snapshot `alt` → `alt2`: exit 0, no files). Patched: the step fails unless the output has "Migration DOWN statements generation complete"; re-run: rename exit 1, clean exit 0.
   - `[high]` `[patch]` The spec's claim "fails ... without waiting on input" is false for renames (edge-case, claim) — same root and fix.
 
+### 2026-10-09 — Review pass (follow-up)
+- verdicts: 18 findings — high 0, medium 1, low 11, false 5, maybe-false 1
+- findings:
+  - `[false]` `[reject]` "Push off honoured" (empty DB, no migrate) never runs as a negative in CI (intent-alignment) — the "Check push stayed off" step asserts the property on every run; the negative was proved locally.
+  - `[false]` `[reject]` Broken-SQL detection moved into a structural diff that is skipped with the default env (intent-alignment) — intended: it runs where push is off (CI), and the other int specs still fail on missing relations.
+  - `[low]` `[reject]` No test for the "Default" row (intent-alignment) — `!== 'false'` keeps Payload's own default, and every local int run and the e2e dev server exercise it; a dedicated test adds a config-loading spec for one comparison.
+  - `[low]` `[patch]` The drift grep depends on Payload's log wording (intent-alignment) — grouped with the blind "Payload internals" row. Patched: the comment names `buildCreateMigration.js` (3.90.2) and says to recheck on a bump.
+  - `[false]` `[reject]` carried: No CI path has run (intent-alignment) — same claim as the first pass; every path ran locally with the extracted step scripts.
+  - `[false]` `[reject]` The README migrates the local `bookeh_test`, against "never to a dev database" (intent-alignment) — the dev database is `bookeh`; `bookeh_test` is the test database the README already resets.
+  - `[false]` `[reject]` The new spec and the push-stayed-off step go beyond the Approach (intent-alignment) — they come from first-pass review patches, and no Never clause excludes them.
+  - `[medium]` `[defer]` `index.ts` is never checked, so a migration missing from it passes CI and `prodMigrations` would skip it (blind) — real: `payload migrate` reads `*.ts` from disk. prodMigrations is Epic 2 and excluded by the intent; added to `deferred`.
+  - `[low]` `[reject]` The schema spec passes vacuously on a push-built `bookeh_test` (blind) — only when the README's reset step is skipped locally; in CI the push-stayed-off step catches it.
+  - `[low]` `[patch]` The spec's `pushSchema` can prompt on an ambiguous rename and time out with no hint (blind) — grouped with edge-case row 1. Patched: explicit 30 s timeout, plus a comment that a timeout means a name mismatch between the migration and the config.
+  - `[low]` `[patch]` The README does not cover the "did not finish" red state (blind) — patched: one sentence on running `migrate:create <name>` interactively and answering the prompt.
+  - `[low]` `[patch]` Checks that depend on Payload internals don't say where to look after an upgrade (blind) — patched: both comments name the source file and Payload 3.90.2.
+  - `[low]` `[reject]` `down` migrations are never run (blind) — not in the AC; production never runs `down`, and a reset round trip adds a CI step for an unused path.
+  - `[low]` `[patch]` `pushSchema` prompt shows up as a timeout with no statements (edge-case) — same root and fix as the blind prompt row.
+  - `[maybe-false]` `[reject]` The 5 s default timeout could fail a slow runner (edge-case) — locally 234 ms; settled by CI timings. If true it is only low, and the explicit 30 s timeout covers it anyway.
+  - `[low]` `[reject]` carried: `DATABASE_PUSH` accepts only the literal `false` (edge-case) — same claim as the first pass; the push-stayed-off step catches a misspelling in CI.
+  - `[low]` `[reject]` A local run with a misspelled value skips the spec while push runs (edge-case) — the README gives the exact `DATABASE_PUSH=false`; CI is authoritative.
+  - `[low]` `[patch]` Rename drift fails with a generic error, naming no files or SQL (edge-case, claim) — by design the step fails safe; patched through the README sentence on resolving the prompt locally.
+
 ## Design Notes
 
 - The drift check needs no database: `migrate:create` compares the config with the committed snapshot. Applying migrations then int tests with push off proves the `.ts` SQL actually builds what the snapshot claims. Together they cover AD-13's two failure modes.
@@ -122,3 +151,12 @@ deferred: []
 **Verification:** lint 0 errors (7 existing warnings); typecheck clean; unit 89/89; int 19/19 with the default env (implementation run); migrate plus `DATABASE_PUSH=false` int green; push-off negative fails on missing relations; the drift step extracted from `ci.yml` passes on the clean tree, fails on additive drift with SQL printed, and fails on rename drift; the schema spec passes on a migrated DB and fails after `drop column alt`.
 
 **Residual risks:** The story 1.10 session works in the same tree and pushed `bookeh_test` during testing (one schema-spec run falsely passed; repeated back to back, it fails correctly). Its uncommitted hunks in `src/payload.config.ts` and `.env.example` were left out of this commit. After 1.10 lands, its `onInit` seed runs in the CI int lane on the migration-built schema.
+
+### Follow-up pass (2026-10-09)
+
+- **Patched (all low):** the schema spec gets a 30 s timeout and a comment on rename prompts; the drift-step and spec comments name the Payload 3.90.2 source files to recheck on a bump; the README covers the "did not finish" state. No logic change.
+- **Deferred:** checking `index.ts` against the migration files, to Epic 2 with `prodMigrations` (medium; see `deferred`).
+- **Rejected:** 5 false and 7 low or maybe-false, with reasons in the triage log.
+- **Follow-up review:** not recommended. This pass patched no high finding, so the work has converged. Patched counts: high 0, medium 0, low 5 rows in 3 entries.
+- **Verification:** lint 0 errors (7 existing warnings); typecheck clean; unit 89/89; schema spec 1/1 with `DATABASE_PUSH=false` on the migrated `bookeh_test`; the drift step extracted from `ci.yml` exits 0 on a clean tree.
+- **Residual risk:** unchanged. The new steps still have to prove themselves on the first GitHub Actions run.

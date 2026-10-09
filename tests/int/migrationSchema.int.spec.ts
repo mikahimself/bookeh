@@ -31,7 +31,10 @@ describe.runIf(process.env.DATABASE_PUSH === 'false')('migration-built schema', 
   it('matches the config (drizzle-kit has nothing to push)', async () => {
     const adapter = payload.db
     const { pushSchema } = adapter.requireDrizzleKit()
-    // Same call as Payload's pushDevSchema, without apply().
+    // Mirrors pushSchema in @payloadcms/drizzle/dist/utilities/pushDevSchema.js
+    // (Payload 3.90.2), without apply(); recheck it on a Payload bump.
+    // drizzle-kit resolves create-vs-rename interactively, so a timeout here
+    // means it is prompting: migration SQL and config disagree on a name.
     const result: unknown = await pushSchema(
       adapter.schema,
       adapter.drizzle,
@@ -44,5 +47,5 @@ describe.runIf(process.env.DATABASE_PUSH === 'false')('migration-built schema', 
     const { statementsToExecute } = result as { statementsToExecute: string[] }
     const noOp = await Promise.all(statementsToExecute.map(isNoOp))
     expect(statementsToExecute.filter((_, i) => !noOp[i])).toEqual([])
-  })
+  }, 30_000)
 })

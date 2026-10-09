@@ -105,7 +105,11 @@ locally: reset `bookeh_test`, then
 `DATABASE_URL=postgres://bookeh:bookeh@localhost:5432/bookeh_test npm run payload -- migrate`
 and `DATABASE_PUSH=false npm run test:int`. For a red drift check, run
 `npm run payload -- migrate:create <name> --skip-empty` locally and commit the
-generated `.ts`, `.json` and `index.ts` under a real migration name.
+generated `.ts`, `.json` and `index.ts` under a real migration name. If it
+says `migrate:create did not finish` (a rename prompt), run
+`npm run payload -- migrate:create <name>` interactively, without
+`--skip-empty` and with stdin open, answer the prompt, then commit the
+generated `.ts`, `.json` and `index.ts`.
 
 ## How it works
 

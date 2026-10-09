@@ -55,7 +55,9 @@ jobs:
       # snapshot, i.e. a schema change was committed without its migration.
       # No database needed. stdin is closed, so a drizzle-kit prompt (e.g. an
       # ambiguous rename) reads EOF and exits 0 without writing; the step
-      # fails unless Payload logged that both diffs finished.
+      # fails unless Payload logged that both diffs finished. That log line
+      # comes from @payloadcms/drizzle/dist/utilities/buildCreateMigration.js
+      # (Payload 3.90.2); recheck its wording on a Payload bump.
       - name: Check for missing migrations
         run: |
           out="$(npm run payload -- migrate:create ci_drift_check --skip-empty </dev/null 2>&1)" || { echo "$out"; exit 1; }
