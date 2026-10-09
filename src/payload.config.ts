@@ -6,6 +6,7 @@ import sharp from 'sharp'
 
 import { Users } from './collections/Users'
 import { Media } from './collections/Media'
+import { seedFirstUser } from './lib/account/seedFirstUser'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -30,4 +31,5 @@ export default buildConfig({
   }),
   sharp,
   plugins: [],
+  onInit: seedFirstUser,
 })
