@@ -62,6 +62,9 @@ describe('setDevicePrefsAction', () => {
       maxAge: 400 * 24 * 60 * 60,
       sameSite: 'lax',
       httpOnly: true,
+      // Production-gated (Story 2.2): non-Secure outside production so
+      // http://localhost dev keeps working.
+      secure: false,
     })
   })
 

@@ -1,0 +1,23 @@
+# bookeh production stack. Install as /etc/systemd/system/bookeh.service with
+# the compose file, wrapper script and .env in /opt/bookeh (see README.md).
+#
+# RequiresMountsFor keeps the stack from starting before the NAS mount is up;
+# the marker-file check in postgres-entrypoint.sh guards the same condition
+# at every container (re)start after boot.
+
+[Unit]
+Description=bookeh (app + Postgres via Docker Compose)
+Requires=docker.service
+After=docker.service network-online.target
+Wants=network-online.target
+RequiresMountsFor=/mnt/nas/bookeh
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+WorkingDirectory=/opt/bookeh
+ExecStart=/usr/bin/docker compose -f compose.prod.yml up -d
+ExecStop=/usr/bin/docker compose -f compose.prod.yml down
+
+[Install]
+WantedBy=multi-user.target

@@ -101,6 +101,9 @@ describe('flashToast', () => {
       maxAge: 60,
       sameSite: 'lax',
       httpOnly: false,
+      // Production-gated (Story 2.2): outside production the cookie must
+      // stay non-Secure so http://localhost dev keeps working.
+      secure: false,
     })
     expect(FLASH_COOKIE).toBe('bookeh_flash')
   })

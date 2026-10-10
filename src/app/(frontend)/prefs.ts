@@ -40,6 +40,7 @@ export const PREFS_COOKIE_OPTIONS = {
   maxAge: 400 * 24 * 60 * 60,
   sameSite: 'lax',
   httpOnly: true,
+  secure: process.env.NODE_ENV === 'production',
 } as const
 
 const isOption = <K extends keyof DevicePrefs>(field: K, value: unknown): value is DevicePrefs[K] =>

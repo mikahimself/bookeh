@@ -6,7 +6,7 @@ concurrency:
   group: ci-${{ github.ref }}
   # Branch/PR runs cancel each other; main runs queue instead, so an in-flight
   # publish is never killed — every main commit's SHA tag must reach GHCR
-  # (Story 2.2's compose pins full SHAs).
+  # (the LXC's compose can pin a full SHA via BOOKEH_IMAGE_TAG).
   cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 jobs:
@@ -155,27 +155,19 @@ jobs:
           load: true
           tags: bookeh:smoke
 
-      - uses: actions/setup-node@v7
-        with:
-          # Follows the Dockerfile's node:22.23.3-alpine.
-          node-version: 22.23.3
-          cache: npm
-
-      - run: npm ci
-
-      # The production image runs on a migration-built schema (no dev push),
-      # so build it the same way the LXC database is built.
-      - name: Apply migrations
-        run: npm run payload -- migrate </dev/null
-
       # The image that builds but cannot serve must not ship: start it against
-      # the service Postgres and require the sign-in page plus one static
-      # asset it references.
+      # the EMPTY service Postgres — the container itself must apply the
+      # migrations via prodMigrations (that is how the LXC database is built)
+      # and seed the first user — then require the sign-in page plus one
+      # static asset it references, and a login whose session cookie carries
+      # Secure (the production-only cookie branch).
       - name: Smoke-run the image
         run: |
           docker run -d --name smoke --network host \
             -e DATABASE_URL="$DATABASE_URL" \
             -e PAYLOAD_SECRET="$PAYLOAD_SECRET" \
+            -e SEED_EMAIL="smoke@bookeh.test" \
+            -e SEED_PASSWORD="ci-only-smoke-password" \
             bookeh:smoke
           for i in $(seq 1 30); do
             curl -fsS -o /dev/null http://localhost:3000/login && break
@@ -186,6 +178,11 @@ jobs:
           asset="$(grep -o '/_next/static/[^"]*' <<<"$page" | head -1)"
           test -n "$asset"
           curl -fsS -o /dev/null "http://localhost:3000$asset"
+          login="$(curl -is -X POST http://localhost:3000/api/users/login \
+            -H 'Content-Type: application/json' \
+            -d '{"email":"smoke@bookeh.test","password":"ci-only-smoke-password"}')"
+          grep -i '^set-cookie: payload-token' <<<"$login" | grep -qi Secure \
+            || { echo "payload-token cookie is not Secure"; docker logs smoke; exit 1; }
           docker rm -f smoke
 
       - uses: docker/login-action@v3

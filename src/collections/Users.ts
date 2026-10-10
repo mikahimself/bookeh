@@ -21,6 +21,11 @@ export const Users: CollectionConfig = {
   },
   auth: {
     tokenExpiration: 60 * 60 * 24 * 30,
+    cookies: {
+      // Production serves over tailnet HTTPS (`tailscale serve`); dev runs on
+      // plain http://localhost and must stay non-Secure.
+      secure: process.env.NODE_ENV === 'production',
+    },
   },
   access: {
     admin: ({ req: { user } }) => isAdmin(user),

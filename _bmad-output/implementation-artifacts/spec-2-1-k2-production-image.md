@@ -16,6 +16,9 @@ deferred:
       Story 2.2's production compose (restart: unless-stopped) is the natural
       home for a readiness check — either a compose-level healthcheck or an
       image HEALTHCHECK using busybox wget. Decide there.
+      Resolved in Story 2.2: compose-level healthcheck in
+      deploy/compose.prod.yml (busybox wget against /login); the image stays
+      untouched.
     location: >-
       Dockerfile (runner stage)
     severity: low

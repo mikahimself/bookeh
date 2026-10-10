@@ -18,5 +18,6 @@ export async function flashToast(input: ToastInput): Promise<void> {
     maxAge: 60,
     sameSite: 'lax',
     httpOnly: false,
+    secure: process.env.NODE_ENV === 'production',
   })
 }

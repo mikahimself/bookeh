@@ -1,0 +1,83 @@
+# Production stack for the LXC (Story 2.2). The LXC never builds: the app
+# image is pulled from GHCR (built and pushed by CI, Story 2.1). Variables
+# come from the deploy .env file next to this file (chmod 600, operator-owned;
+# template in .env.example). Operated via the bookeh systemd unit; manual
+# update is `docker compose pull && docker compose up -d`.
+#
+# AD-12: exactly one app container. Payload's onInit seed and in-process
+# assumptions are not safe to scale out — never add replicas of `app`.
+
+services:
+  app:
+    image: ghcr.io/mikahimself/bookeh:${BOOKEH_IMAGE_TAG:-latest}
+    restart: unless-stopped
+    ports:
+      # Loopback only: `tailscale serve` on the LXC is the sole way in.
+      - '127.0.0.1:3000:3000'
+    volumes:
+      # Media uploads on the NAS; the directory must be owned by uid 1001
+      # (the image's nextjs user) — see README.
+      - ${BOOKEH_MEDIA_DIR}:/app/media
+    environment:
+      DATABASE_URL: postgres://bookeh:${POSTGRES_PASSWORD}@postgres:5432/bookeh
+      PAYLOAD_SECRET: ${PAYLOAD_SECRET}
+      # Defaulted to empty: the operator clears these lines from .env once
+      # the first account exists (README step 4), and compose must not warn
+      # on every later invocation.
+      SEED_EMAIL: ${SEED_EMAIL:-}
+      SEED_PASSWORD: ${SEED_PASSWORD:-}
+    depends_on:
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      # Compose-level readiness (resolves Story 2.1's deferred healthcheck
+      # finding without touching the image): the alpine runner ships busybox
+      # wget. /login is SSR but cheap at this cadence.
+      test: ['CMD', 'wget', '-q', '-O', '/dev/null', 'http://127.0.0.1:3000/login']
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 60s
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: '3'
+
+  postgres:
+    # Same pinned image and ICU collation as dev (docker-compose.yml); the tag
+    # pins the Alpine release and with it the ICU library version.
+    image: postgres:16-alpine3.24
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: bookeh
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: bookeh
+      # Finnish ICU collation as the cluster default (NFR-7, AD-7). Applied
+      # only when the data directory is empty — see README, collation note.
+      POSTGRES_INITDB_ARGS: --locale-provider=icu --icu-locale=fi-FI
+    volumes:
+      # Bind the data/ subdirectory exactly: binding the parent would let the
+      # image's VOLUME /var/lib/postgresql/data shadow it with an anonymous
+      # local volume and the cluster would silently not be on the NAS.
+      - ${BOOKEH_PG_DIR}/data:/var/lib/postgresql/data
+      # The parent holds the NAS marker file; the wrapper checks it on every
+      # start before the stock entrypoint can initdb.
+      - ${BOOKEH_PG_DIR}:/bookeh-nas:ro
+      - ./postgres-entrypoint.sh:/bookeh-entrypoint.sh:ro
+    entrypoint: ['sh', '/bookeh-entrypoint.sh']
+    command: ['postgres']
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -h localhost -U bookeh -d bookeh']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      # First initdb onto NAS storage can be slow; without this the 5s x 10
+      # window could mark the container unhealthy mid-initdb and abort the
+      # app's service_healthy dependency.
+      start_period: 120s
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: '3'
