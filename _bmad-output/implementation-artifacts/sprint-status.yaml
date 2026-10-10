@@ -308,7 +308,7 @@ action_items:
     action: 'Fix tests/e2e/admin.e2e.spec.ts URL assertion to tolerate Payload list-view
       query params'
     owner: 'Mika'
-    status: open
+    status: done
     ref: '_bmad-output/implementation-artifacts/epic-1-retro-2026-10-10.md'
   - id: 'epic-1-retro-item-10-rework-task-close-to-track-in-app-histor'
     epic: 1
