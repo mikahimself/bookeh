@@ -26,6 +26,15 @@
       "light": "Light",
       "dark": "Dark",
       "system": "System"
+    },
+    "visibility": "Visibility",
+    "profileVisibility": "Profile",
+    "collectionVisibility": "Collection",
+    "visibilities": {
+      "public": "Public",
+      "hidden": "Hidden",
+      "open": "Open",
+      "closed": "Closed"
     }
   },
   "toast": {

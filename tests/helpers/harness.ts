@@ -24,6 +24,8 @@ export async function createUser(
       // Payload's create type requires `required` fields even with a defaultValue.
       roles: ['user'],
       language: 'en',
+      profileVisibility: 'hidden',
+      collectionVisibility: 'closed',
       ...data,
     },
   })

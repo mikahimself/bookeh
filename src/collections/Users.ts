@@ -55,5 +55,21 @@ export const Users: CollectionConfig = {
       options: ['en', 'fi'],
       defaultValue: 'en',
     },
+    // Visibility towards friends (FR-4, D-1): stored from the start so Phase 2
+    // needs no schema rework. Nothing reads them in Phase 1.
+    {
+      name: 'profileVisibility',
+      type: 'select',
+      required: true,
+      options: ['public', 'hidden'],
+      defaultValue: 'hidden',
+    },
+    {
+      name: 'collectionVisibility',
+      type: 'select',
+      required: true,
+      options: ['open', 'closed'],
+      defaultValue: 'closed',
+    },
   ],
 }

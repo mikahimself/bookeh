@@ -41,7 +41,13 @@ describe('updateProfileAction', () => {
     const result = await updateProfileAction({ displayName: '  Mäki ' })
     expect(result).toEqual({
       ok: true,
-      data: { email: user.email, displayName: 'Mäki', language: 'en' },
+      data: {
+        email: user.email,
+        displayName: 'Mäki',
+        language: 'en',
+        profileVisibility: 'hidden',
+        collectionVisibility: 'closed',
+      },
     })
     expect((await stored()).displayName).toBe('Mäki')
   })
@@ -60,9 +66,51 @@ describe('updateProfileAction', () => {
     const result = await updateProfileAction({ language: 'fi' })
     expect(result).toEqual({
       ok: true,
-      data: { email: user.email, displayName: 'Before', language: 'fi' },
+      data: {
+        email: user.email,
+        displayName: 'Before',
+        language: 'fi',
+        profileVisibility: 'hidden',
+        collectionVisibility: 'closed',
+      },
     })
     expect((await stored()).language).toBe('fi')
+  })
+
+  it.each([
+    ['profileVisibility', 'public'],
+    ['collectionVisibility', 'open'],
+  ] as const)('persists %s %s', async (field, value) => {
+    const result = await updateProfileAction({ [field]: value })
+    expect(result).toEqual({
+      ok: true,
+      data: {
+        email: user.email,
+        displayName: 'Before',
+        language: 'en',
+        profileVisibility: 'hidden',
+        collectionVisibility: 'closed',
+        [field]: value,
+      },
+    })
+    expect((await stored())[field]).toBe(value)
+  })
+
+  it('saves a mixed change in one write and answers both new values', async () => {
+    const result = await updateProfileAction({ displayName: 'Mika', collectionVisibility: 'open' })
+    expect(result).toEqual({
+      ok: true,
+      data: {
+        email: user.email,
+        displayName: 'Mika',
+        language: 'en',
+        profileVisibility: 'hidden',
+        collectionVisibility: 'open',
+      },
+    })
+    const row = await stored()
+    expect(row.displayName).toBe('Mika')
+    expect(row.collectionVisibility).toBe('open')
   })
 
   it.each<[string, unknown]>([
@@ -72,6 +120,9 @@ describe('updateProfileAction', () => {
     ['an unknown language', { language: 'sv' }],
     ['a display name of the wrong type', { displayName: 1 }],
     ['a valid key beside roles', { displayName: 'A', roles: ['admin'] }],
+    ['an unknown profile visibility', { profileVisibility: 'x' }],
+    ['a collection visibility of the wrong type', { collectionVisibility: true }],
+    ['a profile visibility from the wrong tuple', { profileVisibility: 'open' }],
   ])('answers VALIDATION for %s and leaves the row unchanged', async (_, changes) => {
     const before = await stored()
     expect(await updateProfileAction(changes)).toEqual({ ok: false, code: 'VALIDATION' })
@@ -84,7 +135,13 @@ describe('updateProfileAction', () => {
     const before = await stored()
     expect(await updateProfileAction({})).toEqual({
       ok: true,
-      data: { email: user.email, displayName: 'Before', language: 'en' },
+      data: {
+        email: user.email,
+        displayName: 'Before',
+        language: 'en',
+        profileVisibility: 'hidden',
+        collectionVisibility: 'closed',
+      },
     })
     expect((await stored()).updatedAt).toBe(before.updatedAt)
   })

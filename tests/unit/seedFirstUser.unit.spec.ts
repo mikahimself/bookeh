@@ -45,6 +45,8 @@ describe('seedFirstUser', () => {
         roles: ['admin', 'user'],
         displayName: 'first.user',
         language: 'en',
+        profileVisibility: 'hidden',
+        collectionVisibility: 'closed',
       },
     })
     expect(args).not.toHaveProperty('overrideAccess')

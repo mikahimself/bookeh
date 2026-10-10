@@ -7,7 +7,13 @@ import { describe, expect, it, vi } from 'vitest'
 
 import en from '../../messages/en.json'
 
-const profile = { email: 'mika@example.fi', displayName: 'Mika', language: 'fi' as const }
+const profile = {
+  email: 'mika@example.fi',
+  displayName: 'Mika',
+  language: 'fi' as const,
+  profileVisibility: 'hidden' as const,
+  collectionVisibility: 'closed' as const,
+}
 const prefsCookie = encodeURIComponent(JSON.stringify({ theme: 'dark' }))
 
 // The English catalogue, looked up by dotted key under the namespace.
@@ -33,7 +39,11 @@ vi.mock('next-intl/server', () => ({ getTranslations: async (ns?: string) => tra
 vi.mock('@/lib/payload/context', () => ({
   requireUser: vi.fn(async () => ({ user: { id: 1 } })),
 }))
-vi.mock('@/lib/account/profile', () => ({ getProfile: vi.fn(async () => profile) }))
+vi.mock('@/lib/account/profile', () => ({
+  getProfile: vi.fn(async () => profile),
+  PROFILE_VISIBILITIES: ['public', 'hidden'],
+  COLLECTION_VISIBILITIES: ['open', 'closed'],
+}))
 vi.mock('@/app/(frontend)/actions/account', () => ({
   signOutAction: vi.fn(),
   updateProfileAction: vi.fn(),
@@ -77,9 +87,14 @@ describe('settings page', () => {
     expect(getProfile).toHaveBeenCalledWith({ user: { id: 1 } })
   })
 
-  it('heads the groups Profile, Language, Theme in that order', () => {
+  it('heads the groups Profile, Language, Theme, Visibility in that order', () => {
     const headings = [...html.matchAll(/<h2 class="([^"]*)">([^<]*)<\/h2>/g)]
-    expect(headings.map(([, , text]) => text)).toEqual(['Profile', 'Language', 'Theme'])
+    expect(headings.map(([, , text]) => text)).toEqual([
+      'Profile',
+      'Language',
+      'Theme',
+      'Visibility',
+    ])
     for (const [, cls] of headings) {
       expect(cls.split(' ')).toEqual(
         expect.arrayContaining(['text-heading-group', 'text-text-muted', 'ui-case']),
@@ -114,6 +129,19 @@ describe('settings page', () => {
       ['Dark', true],
       ['System', false],
     ])
+  })
+
+  it('draws the visibility switches with the stored options pressed, under visible labels', () => {
+    expect(options('Profile')).toEqual([
+      ['Public', false],
+      ['Hidden', true],
+    ])
+    expect(options('Collection')).toEqual([
+      ['Open', false],
+      ['Closed', true],
+    ])
+    expect(html).toMatch(/<p class="text-label text-text-muted">Profile<\/p>/)
+    expect(html).toMatch(/<p class="text-label text-text-muted">Collection<\/p>/)
   })
 
   it('ends the first column with Sign out as the secondary button', () => {

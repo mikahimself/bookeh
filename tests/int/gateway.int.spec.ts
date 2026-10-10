@@ -66,6 +66,8 @@ describe('gateway', () => {
           displayName: 'Created',
           roles: ['user'],
           language: 'en',
+          profileVisibility: 'hidden',
+          collectionVisibility: 'closed',
         },
       }),
     ).rejects.toThrow(Forbidden)
@@ -130,6 +132,8 @@ describe('gateway', () => {
                 displayName: 'Created',
                 roles: ['user' as const],
                 language: 'en' as const,
+                profileVisibility: 'hidden' as const,
+                collectionVisibility: 'closed' as const,
               },
             }),
           ),

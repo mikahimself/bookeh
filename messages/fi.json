@@ -26,6 +26,15 @@
       "light": "Vaalea",
       "dark": "Tumma",
       "system": "Järjestelmä"
+    },
+    "visibility": "Näkyvyys",
+    "profileVisibility": "Profiili",
+    "collectionVisibility": "Kokoelma",
+    "visibilities": {
+      "public": "Julkinen",
+      "hidden": "Piilotettu",
+      "open": "Avoin",
+      "closed": "Suljettu"
     }
   },
   "toast": {

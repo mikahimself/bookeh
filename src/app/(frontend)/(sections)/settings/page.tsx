@@ -1,7 +1,7 @@
 import { getTranslations } from 'next-intl/server'
 import type { ReactNode } from 'react'
 
-import { getProfile } from '@/lib/account/profile'
+import { COLLECTION_VISIBILITIES, getProfile, PROFILE_VISIBILITIES } from '@/lib/account/profile'
 import { requireUser } from '@/lib/payload/context'
 
 import { SignOutButton } from '../../components/SignOutButton'
@@ -9,6 +9,7 @@ import { devicePrefs, THEMES } from '../../prefs'
 import { DisplayNameField } from './DisplayNameField'
 import { LanguageSwitch } from './LanguageSwitch'
 import { ThemeSwitch } from './ThemeSwitch'
+import { VisibilitySwitch } from './VisibilitySwitch'
 
 function Group({ heading, children }: { heading: string; children: ReactNode }) {
   return (
@@ -20,8 +21,9 @@ function Group({ heading, children }: { heading: string; children: ReactNode }) 
 }
 
 /**
- * Settings (EXPERIENCE.md, Settings): profile, language, theme and Sign out
- * in the first of two columns on wide screens, one column on the phone.
+ * Settings (EXPERIENCE.md, Settings): profile, language, theme, visibility
+ * and Sign out in the first of two columns on wide screens, one column on the
+ * phone.
  * Reads go through `getProfile()` and `devicePrefs()`; the controls write
  * through `updateProfileAction` and `setDevicePrefsAction`.
  */
@@ -49,6 +51,20 @@ export default async function SettingsPage() {
         </Group>
         <Group heading={t('theme')}>
           <ThemeSwitch initial={theme} options={THEMES} />
+        </Group>
+        <Group heading={t('visibility')}>
+          <VisibilitySwitch
+            field="profileVisibility"
+            label={t('profileVisibility')}
+            initial={profile.profileVisibility}
+            options={PROFILE_VISIBILITIES}
+          />
+          <VisibilitySwitch
+            field="collectionVisibility"
+            label={t('collectionVisibility')}
+            initial={profile.collectionVisibility}
+            options={COLLECTION_VISIBILITIES}
+          />
         </Group>
         <SignOutButton />
       </div>

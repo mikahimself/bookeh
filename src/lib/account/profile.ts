@@ -4,15 +4,32 @@ import * as gateway from '@/lib/payload/gateway'
 import type { User } from '@/payload-types'
 
 /** The signed-in user's profile as Settings shows it. Email is shown, never edited. */
-export type Profile = Pick<User, 'email' | 'displayName' | 'language'>
+export type Profile = Pick<
+  User,
+  'email' | 'displayName' | 'language' | 'profileVisibility' | 'collectionVisibility'
+>
 
 /** What a user may change on their own profile. An absent or `undefined` key is left as is. */
-export type ProfileChanges = Partial<Pick<User, 'displayName' | 'language'>>
+export type ProfileChanges = Partial<
+  Pick<User, 'displayName' | 'language' | 'profileVisibility' | 'collectionVisibility'>
+>
 
-const toProfile = ({ email, displayName, language }: User): Profile => ({
+/** Visibility towards friends (FR-4): stored now, read by nothing in Phase 1. */
+export const PROFILE_VISIBILITIES: readonly User['profileVisibility'][] = ['public', 'hidden']
+export const COLLECTION_VISIBILITIES: readonly User['collectionVisibility'][] = ['open', 'closed']
+
+const toProfile = ({
   email,
   displayName,
   language,
+  profileVisibility,
+  collectionVisibility,
+}: User): Profile => ({
+  email,
+  displayName,
+  language,
+  profileVisibility,
+  collectionVisibility,
 })
 
 /**
@@ -41,6 +58,9 @@ export async function updateProfile(ctx: Context, changes: ProfileChanges): Prom
     data.displayName = displayName
   }
   if (changes.language !== undefined) data.language = changes.language
+  if (changes.profileVisibility !== undefined) data.profileVisibility = changes.profileVisibility
+  if (changes.collectionVisibility !== undefined)
+    data.collectionVisibility = changes.collectionVisibility
 
   if (Object.keys(data).length === 0) return getProfile(ctx)
   return toProfile(await gateway.updateByID(ctx, { collection: 'users', id: ctx.user.id, data }))

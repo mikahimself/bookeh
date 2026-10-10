@@ -22,6 +22,8 @@ const newUser = (tag: string): RequiredDataFromCollectionSlug<'users'> => ({
   displayName: tag,
   roles: ['user'],
   language: 'en',
+  profileVisibility: 'hidden',
+  collectionVisibility: 'closed',
 })
 
 describe('users collection', () => {
@@ -174,6 +176,8 @@ describe('users collection', () => {
     })
     expect(created.roles).toEqual(['user'])
     expect(created.language).toBe('en')
+    expect(created.profileVisibility).toBe('hidden')
+    expect(created.collectionVisibility).toBe('closed')
   })
 
   it('rejects an unknown language', async () => {

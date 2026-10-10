@@ -27,6 +27,8 @@ export async function seedFirstUser(
       roles,
       displayName: email.slice(0, email.lastIndexOf('@')),
       language: 'en',
+      profileVisibility: 'hidden',
+      collectionVisibility: 'closed',
     },
   })
   payload.logger.info(`Seeded the first user ${email} (${roles.join(', ')}).`)

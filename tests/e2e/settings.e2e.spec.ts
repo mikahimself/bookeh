@@ -62,6 +62,7 @@ test.describe('Settings', () => {
       'Profile',
       'Language',
       'Theme',
+      'Visibility',
     ])
     await expect(page.getByLabel('Display name')).toHaveValue('E2E Admin')
 
@@ -76,6 +77,15 @@ test.describe('Settings', () => {
     const theme = group(page, 'Theme')
     await expect(theme.getByRole('button')).toHaveText(['Light', 'Dark', 'System'])
     await pressed(page, 'Theme', 'System')
+
+    // A fresh user: the visibility defaults are pressed.
+    const profileVisibility = group(page, 'Profile')
+    await expect(profileVisibility.getByRole('button')).toHaveText(['Public', 'Hidden'])
+    await pressed(page, 'Profile', 'Hidden')
+    const collectionVisibility = group(page, 'Collection')
+    await expect(collectionVisibility.getByRole('button')).toHaveText(['Open', 'Closed'])
+    await pressed(page, 'Collection', 'Closed')
+
     await expect(page.getByRole('button', { name: 'Sign out' })).toBeVisible()
   })
 
@@ -229,6 +239,54 @@ test.describe('Settings', () => {
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'system')
     await pressed(page, 'Theme', 'System')
     await expect(group(page, 'Theme').getByRole('button', { name: 'Dark' })).toHaveAttribute(
+      'aria-pressed',
+      'false',
+    )
+  })
+
+  test('visibility changes apply at once and survive a reload', async ({ page }) => {
+    const saved = () =>
+      page.waitForResponse(
+        (response) =>
+          response.request().method() === 'POST' && response.url() === `${BASE}/settings`,
+      )
+
+    // The action's request is held until the optimistic press has been checked.
+    let release!: () => void
+    const held = new Promise<void>((resolve) => {
+      release = resolve
+    })
+    await page.route(`${BASE}/settings`, async (route) => {
+      if (route.request().method() === 'POST') await held
+      await route.continue()
+    })
+    let answered = saved()
+    await group(page, 'Profile').getByRole('button', { name: 'Public' }).click()
+    await pressed(page, 'Profile', 'Public')
+    release()
+    await answered
+    await page.unroute(`${BASE}/settings`)
+
+    answered = saved()
+    await group(page, 'Collection').getByRole('button', { name: 'Open' }).click()
+    await pressed(page, 'Collection', 'Open')
+    await answered
+
+    await page.reload()
+    await pressed(page, 'Profile', 'Public')
+    await pressed(page, 'Collection', 'Open')
+  })
+
+  test('a failed visibility change restores the old option and shows an error toast', async ({
+    page,
+  }) => {
+    await page.route(`${BASE}/settings`, (route) =>
+      route.request().method() === 'POST' ? route.abort() : route.continue(),
+    )
+    await group(page, 'Profile').getByRole('button', { name: 'Public' }).click()
+    await expect(page.getByText("Didn't work. Try again.")).toBeVisible()
+    await pressed(page, 'Profile', 'Hidden')
+    await expect(group(page, 'Profile').getByRole('button', { name: 'Public' })).toHaveAttribute(
       'aria-pressed',
       'false',
     )

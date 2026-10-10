@@ -13,6 +13,10 @@ describe('parseProfileChanges', () => {
     ['an undefined display name', { displayName: undefined }],
     ['a valid key beside an extra one', { displayName: 'A', roles: ['admin'] }],
     ['a class instance', new Date()],
+    ['an unknown profile visibility', { profileVisibility: 'x' }],
+    ['a collection visibility from the wrong tuple', { collectionVisibility: 'hidden' }],
+    ['a profile visibility from the wrong tuple', { profileVisibility: 'open' }],
+    ['a collection visibility of the wrong type', { collectionVisibility: true }],
   ])('rejects %s', (_, value) => {
     expect(parseProfileChanges(value)).toBeNull()
   })
@@ -25,6 +29,18 @@ describe('parseProfileChanges', () => {
 
   it.each(['en', 'fi'] as const)('accepts the language %s', (language) => {
     expect(parseProfileChanges({ language })).toStrictEqual({ language })
+  })
+
+  it.each(['public', 'hidden'] as const)('accepts the profile visibility %s', (value) => {
+    expect(parseProfileChanges({ profileVisibility: value })).toStrictEqual({
+      profileVisibility: value,
+    })
+  })
+
+  it.each(['open', 'closed'] as const)('accepts the collection visibility %s', (value) => {
+    expect(parseProfileChanges({ collectionVisibility: value })).toStrictEqual({
+      collectionVisibility: value,
+    })
   })
 
   it('accepts both keys together', () => {

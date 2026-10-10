@@ -27,9 +27,15 @@ describe('profile service', () => {
     ctx = await contextFor(a)
   })
 
-  it('reads the context user’s email, display name and language only', async () => {
+  it('reads the context user’s email, display name, language and visibilities only', async () => {
     const profile = await getProfile(ctx)
-    expect(profile).toStrictEqual({ email: a.email, displayName: 'Profile A', language: 'en' })
+    expect(profile).toStrictEqual({
+      email: a.email,
+      displayName: 'Profile A',
+      language: 'en',
+      profileVisibility: 'hidden',
+      collectionVisibility: 'closed',
+    })
   })
 
   it('trims and NFC-normalises the display name', async () => {
@@ -49,9 +55,30 @@ describe('profile service', () => {
 
   it('changes the language and leaves the display name', async () => {
     const profile = await updateProfile(ctx, { language: 'fi' })
-    expect(profile).toStrictEqual({ email: a.email, displayName: 'Profile A', language: 'fi' })
+    expect(profile).toStrictEqual({
+      email: a.email,
+      displayName: 'Profile A',
+      language: 'fi',
+      profileVisibility: 'hidden',
+      collectionVisibility: 'closed',
+    })
     const row = await stored(a.id)
     expect(row.language).toBe('fi')
+    expect(row.displayName).toBe('Profile A')
+  })
+
+  it('persists a visibility and leaves the rest', async () => {
+    const profile = await updateProfile(ctx, { collectionVisibility: 'open' })
+    expect(profile).toStrictEqual({
+      email: a.email,
+      displayName: 'Profile A',
+      language: 'en',
+      profileVisibility: 'hidden',
+      collectionVisibility: 'open',
+    })
+    const row = await stored(a.id)
+    expect(row.collectionVisibility).toBe('open')
+    expect(row.profileVisibility).toBe('hidden')
     expect(row.displayName).toBe('Profile A')
   })
 
@@ -65,9 +92,27 @@ describe('profile service', () => {
     expect((await stored(a.id)).language).toBe('en')
   })
 
+  it('leaves an unknown visibility to Payload’s validation', async () => {
+    const result = await runAction(() => updateProfile(ctx, smuggle({ profileVisibility: 'x' })))
+    expect(result).toStrictEqual({
+      ok: false,
+      code: 'VALIDATION',
+      fields: { profileVisibility: 'VALIDATION' },
+    })
+    const row = await stored(a.id)
+    expect(row.profileVisibility).toBe('hidden')
+    expect(row.updatedAt).toBe(a.updatedAt)
+  })
+
   it('returns the current profile and writes nothing when nothing changes', async () => {
     const profile = await updateProfile(ctx, { displayName: undefined })
-    expect(profile).toStrictEqual({ email: a.email, displayName: 'Profile A', language: 'en' })
+    expect(profile).toStrictEqual({
+      email: a.email,
+      displayName: 'Profile A',
+      language: 'en',
+      profileVisibility: 'hidden',
+      collectionVisibility: 'closed',
+    })
     expect(await updateProfile(ctx, {})).toStrictEqual(profile)
     expect((await stored(a.id)).updatedAt).toBe(a.updatedAt)
   })

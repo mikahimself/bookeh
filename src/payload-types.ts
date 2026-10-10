@@ -145,6 +145,8 @@ export interface User {
   roles: ('admin' | 'user')[];
   displayName: string;
   language: 'en' | 'fi';
+  profileVisibility: 'public' | 'hidden';
+  collectionVisibility: 'open' | 'closed';
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -265,6 +267,8 @@ export interface UsersSelect<T extends boolean = true> {
   roles?: T;
   displayName?: T;
   language?: T;
+  profileVisibility?: T;
+  collectionVisibility?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
