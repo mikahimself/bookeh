@@ -74,11 +74,16 @@ export function useSuspendSwipe(active = true): void {
   useEffect(() => (active ? suspendSwipe() : undefined), [active])
 }
 
+/** A touch on a text field is typing or text selection, never a swipe. */
+const inTextField = (target: EventTarget | null): boolean =>
+  target instanceof Element && target.closest('input, textarea, [contenteditable]') !== null
+
 /**
  * Mounted in the sections layout: a sideways swipe of one finger opens the
  * next or previous section, wrapping round, judged when the finger lifts.
- * Listeners are passive, so scrolling stays native. A second finger or a
- * cancel drops the gesture; a suspension is checked at its start and end.
+ * Listeners are passive, so scrolling stays native. A second finger, a
+ * start on a text field or a cancel drops the gesture; a suspension is
+ * checked at its start and end.
  */
 export function SectionSwipe() {
   const router = useRouter()
@@ -90,7 +95,7 @@ export function SectionSwipe() {
     const onStart = (event: TouchEvent) => {
       const [touch] = event.touches
       start =
-        event.touches.length === 1 && !swipeSuspended()
+        event.touches.length === 1 && !swipeSuspended() && !inTextField(event.target)
           ? { x: touch.clientX, y: touch.clientY }
           : null
     }

@@ -176,6 +176,21 @@ test.describe('Swiping between sections', () => {
     await expectSection(page, '/wishlists', 'Wishlists')
   })
 
+  test('a swipe starting on a text field changes nothing', async ({ page }) => {
+    await signIn(page)
+    await open(page, '/settings', 'Settings')
+    const before = await page.evaluate(() => history.length)
+    const box = await page.getByLabel('Display name').boundingBox()
+    if (!box) throw new Error('Display name field not found')
+    const y = box.y + box.height / 2
+    const from = box.x + box.width * 0.8
+
+    await swipe(page, { x: from, y }, { x: from - 200, y })
+
+    await expectStill(page, '/settings', before)
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Settings')
+  })
+
   test('on a wide screen a swipe changes nothing', async ({ page }) => {
     await page.setViewportSize({ width: 1280, height: 800 })
     await signIn(page)

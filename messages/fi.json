@@ -11,6 +11,23 @@
   "signOut": {
     "submit": "Kirjaudu ulos"
   },
+  "settings": {
+    "profile": "Profiili",
+    "displayName": "Näyttönimi",
+    "displayNameRequired": "Anna nimi.",
+    "email": "Sähköposti",
+    "language": "Kieli",
+    "languages": {
+      "en": "English",
+      "fi": "Suomi"
+    },
+    "theme": "Teema",
+    "themes": {
+      "light": "Vaalea",
+      "dark": "Tumma",
+      "system": "Järjestelmä"
+    }
+  },
   "toast": {
     "close": "Sulje"
   },

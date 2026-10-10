@@ -11,6 +11,23 @@
   "signOut": {
     "submit": "Sign out"
   },
+  "settings": {
+    "profile": "Profile",
+    "displayName": "Display name",
+    "displayNameRequired": "Enter a name.",
+    "email": "Email",
+    "language": "Language",
+    "languages": {
+      "en": "English",
+      "fi": "Suomi"
+    },
+    "theme": "Theme",
+    "themes": {
+      "light": "Light",
+      "dark": "Dark",
+      "system": "System"
+    }
+  },
   "toast": {
     "close": "Close"
   },
