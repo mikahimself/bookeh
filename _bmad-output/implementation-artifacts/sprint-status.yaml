@@ -29,7 +29,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 10-06-2026 17:50
-last_updated: 10-10-2026 11:58
+last_updated: 10-10-2026 12:02
 project: bookeh
 project_key: NOKEY
 tracking_system: file-system
@@ -55,7 +55,7 @@ development_status:
   1-17-a17-toasts: done
   1-18-a21-device-preferences-and-theme: done
   1-19-a22-section-shell: done
-  1-20-a26-swiping-between-sections: backlog
+  1-20-a26-swiping-between-sections: done
   1-21-k1-installable-pwa: done
   1-22-k9-profile-service: done
   1-23-k5-settings: backlog
