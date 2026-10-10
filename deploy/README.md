@@ -57,7 +57,9 @@ lags and may miss the compose plugin):
 
 ```sh
 curl -fsSL https://get.docker.com | sh
-docker compose version   # must print a v2 version
+docker compose version   # any version — it only answers when the compose
+                         # plugin is installed (the legacy standalone
+                         # `docker-compose` v1 is not it)
 ```
 
 ### Tailscale — [lxc]
