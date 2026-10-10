@@ -297,7 +297,7 @@ After I2, the first real shop check works.
 | K12 | Rehearsed restore at the cataloguing gate | Setup | K4, D22 | NFR-6 |
 | K13 | Phase 1 acceptance: the success metrics measured and written down | Test | everything | PRD Success Metrics |
 | K14 | Last backup in Settings, admin only | Screen | K4, K5 | NFR-6 |
-| K15 | Epic 1 clean-up: e2e specs outside the Tests convention removed, the flash-cookie encoding fixed, sign-out failures as an error toast (Epic 1 retrospective) | Test | A16, A17 | Tests |
+| K15 | Epic 1 clean-up: e2e specs outside the Tests convention removed, unit and integration tests trimmed to a functional minimum, the flash-cookie encoding fixed, sign-out failures as an error toast (Epic 1 retrospective) | Test | A16, A17 | Tests |
 
 ## Retired slices
 

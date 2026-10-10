@@ -890,7 +890,7 @@ Scan or type an ISBN, see what the book is, and add it to the library in one tap
 ### Story 3.54: [K15] Epic 1 test and toast clean-up
 
 As the developer,
-I want Epic 1's tests back within the spine and the toast defects it left fixed,
+I want Epic 1's tests cut back to a functional minimum within the spine, and the toast defects it left fixed,
 So that tests stay at a functional minimum and Epic 3 builds on toasts that work (Tests convention).
 
 **Acceptance Criteria:**
@@ -900,6 +900,7 @@ So that tests stay at a functional minimum and Epic 3 builds on toasts that work
 **Then** it holds no spec outside the spine's Playwright scope (scan-to-save and shop check), so the seven Epic 1 specs (admin, frontend, graphql, pwa, sections, settings, swipe) are removed, with the helpers only they use (`login.ts`, `seedUser.ts`, `viewTransitions.ts`)
 **And** a behaviour that only a removed spec proved moves to a unit or integration test when it matters and can be tested there (the `/api/graphql` 404, say); anything else goes
 **And** `playwright.config.ts` and CI's e2e step stay and pass with no specs, so Story 3.52 only adds its own
+**And** the unit and integration suites are trimmed to a functional minimum: a test stays when it guards behaviour that can break in a way that matters (access and the gateway's scope, sessions and the `next` check, error mapping, preference and profile parsing, the toast store, the seed, collation, migrations) or when an Epic 1 acceptance criterion or the spine's Tests convention requires it (the two-user tests, catalogue parity, an off-token utility emitting no CSS); a test that restates markup, class names, CSS declarations or the manifest goes (most of `styles`, `shell`, `controls`, `settings`, `layout`, `toastView`, `sections` and `pwa` in `tests/unit/`)
 **And** the value `flashToast()` writes through Next's cookie serialisation decodes back to the same toast input in the provider; one test pins that round trip through Next's own serialiser, not a hand-encoded value (today Next encodes a second time on set and the client decodes once, so the toast is dropped — Epic 1 retrospective)
 **And** a failed sign-out shows an error toast, like every other failed action (EXPERIENCE.md: Save failed, Action with no connection), not an inline message
 
