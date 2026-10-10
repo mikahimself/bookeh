@@ -62,8 +62,8 @@ development_status:
   1-24-k10-profile-and-collection-visibility: done
   epic-1-retrospective: done
 
-  epic-2: backlog
-  2-1-k2-production-image: backlog
+  epic-2: in-progress
+  2-1-k2-production-image: done
   2-2-k3-production-on-the-lxc: backlog
   2-3-k4-nightly-backups: backlog
   epic-2-retrospective: optional
@@ -337,7 +337,7 @@ action_items:
     action: 'Pin docker-compose.yml app image to node:22.23.3-alpine or fold into
       Epic 2 image story'
     owner: 'Mika'
-    status: open
+    status: done
     ref: '_bmad-output/implementation-artifacts/epic-1-retro-2026-10-10.md'
   - id: 'epic-1-retro-item-14-review-story-3-52-scope-at-epic-3-planni'
     epic: 1

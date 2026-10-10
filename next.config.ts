@@ -8,6 +8,8 @@ const __filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(__filename)
 
 const nextConfig: NextConfig = {
+  // Emits .next/standalone for the production Docker image (see Dockerfile).
+  output: 'standalone',
   images: {
     localPatterns: [
       {

@@ -4,7 +4,10 @@ on: [push, pull_request]
 
 concurrency:
   group: ci-${{ github.ref }}
-  cancel-in-progress: true
+  # Branch/PR runs cancel each other; main runs queue instead, so an in-flight
+  # publish is never killed — every main commit's SHA tag must reach GHCR
+  # (Story 2.2's compose pins full SHAs).
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 jobs:
   check:
@@ -104,3 +107,101 @@ jobs:
             playwright-report/
             test-results/
           retention-days: 7
+
+  # Builds the production image, smoke-runs it, and pushes it to GHCR on every
+  # push to main once check has passed. Story 2.2's LXC only ever pulls; it
+  # never builds — so nothing that cannot serve may reach the registry.
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: check
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    permissions:
+      contents: read
+      packages: write
+
+    services:
+      postgres:
+        # Mirrors the check job: same image, credentials, init args and
+        # healthcheck.
+        image: postgres:16-alpine3.24
+        env:
+          POSTGRES_USER: bookeh
+          POSTGRES_PASSWORD: bookeh
+          POSTGRES_DB: bookeh
+          POSTGRES_INITDB_ARGS: --locale-provider=icu --icu-locale=fi-FI
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -h localhost -U bookeh -d bookeh"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+
+    env:
+      DATABASE_URL: postgres://bookeh:bookeh@localhost:5432/bookeh
+      # CI-only value; never a real secret.
+      PAYLOAD_SECRET: ci-only-payload-secret-not-for-production
+
+    steps:
+      - uses: actions/checkout@v7
+
+      # Build without pushing; load the image into the local daemon so it can
+      # be smoke-run before anything reaches GHCR.
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: false
+          load: true
+          tags: bookeh:smoke
+
+      - uses: actions/setup-node@v7
+        with:
+          # Follows the Dockerfile's node:22.23.3-alpine.
+          node-version: 22.23.3
+          cache: npm
+
+      - run: npm ci
+
+      # The production image runs on a migration-built schema (no dev push),
+      # so build it the same way the LXC database is built.
+      - name: Apply migrations
+        run: npm run payload -- migrate </dev/null
+
+      # The image that builds but cannot serve must not ship: start it against
+      # the service Postgres and require the sign-in page plus one static
+      # asset it references.
+      - name: Smoke-run the image
+        run: |
+          docker run -d --name smoke --network host \
+            -e DATABASE_URL="$DATABASE_URL" \
+            -e PAYLOAD_SECRET="$PAYLOAD_SECRET" \
+            bookeh:smoke
+          for i in $(seq 1 30); do
+            curl -fsS -o /dev/null http://localhost:3000/login && break
+            sleep 2
+          done
+          page="$(curl -fsS http://localhost:3000/login)" || { docker logs smoke; exit 1; }
+          grep -qi bookeh <<<"$page"
+          asset="$(grep -o '/_next/static/[^"]*' <<<"$page" | head -1)"
+          test -n "$asset"
+          curl -fsS -o /dev/null "http://localhost:3000$asset"
+          docker rm -f smoke
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          # The workflow's own token; no PAT.
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Rebuild-and-push is free: the build cache from the smoke build is
+      # reused. Full commit SHA (what the LXC's compose file references)
+      # + latest.
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ghcr.io/mikahimself/bookeh:${{ github.sha }}
+            ghcr.io/mikahimself/bookeh:latest

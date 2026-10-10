@@ -1,6 +1,8 @@
 services:
   payload:
-    image: node:22-alpine
+    # Pinned to the same Node as the Dockerfile and CI's setup-node; keep the
+    # three in lock-step (epic 1 retro item 13).
+    image: node:22.23.3-alpine
     ports:
       - '3000:3000'
     volumes:
