@@ -29,7 +29,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 10-06-2026 17:50
-last_updated: 10-10-2026 12:41
+last_updated: 10-10-2026 14:02
 project: bookeh
 project_key: NOKEY
 tracking_system: file-system
@@ -60,7 +60,7 @@ development_status:
   1-22-k9-profile-service: done
   1-23-k5-settings: done
   1-24-k10-profile-and-collection-visibility: done
-  epic-1-retrospective: optional
+  epic-1-retrospective: done
 
   epic-2: backlog
   2-1-k2-production-image: backlog
@@ -245,3 +245,110 @@ development_status:
   9-14-g12-genres-in-settings-admin-only: backlog
   9-15-k13-phase-1-acceptance: backlog
   epic-9-retrospective: optional
+action_items:
+  - id: "epic-1-retro-item-1-fix-the-flash-toast-cookie-contract-doub"
+    epic: 1
+    action: "Fix the flash-toast cookie contract (double-encode on set, single decode
+      on read) and pin it with a round-trip test; must land before Epic 3 scan-save
+      adopts flashToast()"
+    owner: "Mika"
+    status: open
+    ref: "_bmad-output/implementation-artifacts/epic-1-retro-2026-10-10.md"
+  - id: "epic-1-retro-item-2-fix-the-settings-switch-revert-race-them"
+    epic: 1
+    action: "Fix the settings switch revert race (ThemeSwitch/LanguageSwitch/VisibilitySwitch):
+      ignore stale settles via a per-control request sequence"
+    owner: "Mika"
+    status: open
+    ref: "_bmad-output/implementation-artifacts/epic-1-retro-2026-10-10.md"
+  - id: "epic-1-retro-item-3-guard-the-first-user-seed-against-concur"
+    epic: 1
+    action: "Guard the first-user seed against concurrent init: treat unique violation
+      as already-seeded"
+    owner: "Mika"
+    status: open
+    ref: "_bmad-output/implementation-artifacts/epic-1-retro-2026-10-10.md"
+  - id: "epic-1-retro-item-4-extract-a-shared-client-action-failure-h"
+    epic: 1
+    action: "Extract a shared client action-failure helper (settled/useReportFailure)
+      with pathname-derived next; reuse in SignOutButton and LoginForm; dedupe isPlainObject/tuple
+      guards"
+    owner: "Mika"
+    status: open
+    ref: "_bmad-output/implementation-artifacts/epic-1-retro-2026-10-10.md"
+  - id: "epic-1-retro-item-5-add-a-runtime-by-id-guard-to-gateway-upd"
+    epic: 1
+    action: "Add a runtime by-ID guard to gateway updateByID/deleteByID"
+    owner: "Mika"
+    status: open
+    ref: "_bmad-output/implementation-artifacts/epic-1-retro-2026-10-10.md"
+  - id: "epic-1-retro-item-6-cap-displayname-server-side-length-and-c"
+    epic: 1
+    action: "Cap displayName server-side (length and control characters) in lib/account/profile.ts"
+    owner: "Mika"
+    status: open
+    ref: "_bmad-output/implementation-artifacts/epic-1-retro-2026-10-10.md"
+  - id: "epic-1-retro-item-7-default-e2e-seed-users-to-the-user-role"
+    epic: 1
+    action: "Default e2e seed users to the user role; opt into admin only where /admin
+      is tested"
+    owner: "Mika"
+    status: open
+    ref: "_bmad-output/implementation-artifacts/epic-1-retro-2026-10-10.md"
+  - id: "epic-1-retro-item-8-harden-the-ci-migration-drift-check-to-a"
+    epic: 1
+    action: "Harden the CI migration drift check to assert the postcondition instead
+      of grepping a Payload log line"
+    owner: "Mika"
+    status: open
+    ref: "_bmad-output/implementation-artifacts/epic-1-retro-2026-10-10.md"
+  - id: "epic-1-retro-item-9-fix-tests-e2e-admin-e2e-spec-ts-url-asse"
+    epic: 1
+    action: "Fix tests/e2e/admin.e2e.spec.ts URL assertion to tolerate Payload list-view
+      query params"
+    owner: "Mika"
+    status: open
+    ref: "_bmad-output/implementation-artifacts/epic-1-retro-2026-10-10.md"
+  - id: "epic-1-retro-item-10-rework-task-close-to-track-in-app-histor"
+    epic: 1
+    action: "Rework task-close to track in-app history entries directly (history.length
+      caps at 50) and debounce the X, before Epic 3 story 3.1"
+    owner: "Mika"
+    status: open
+    ref: "_bmad-output/implementation-artifacts/epic-1-retro-2026-10-10.md"
+  - id: "epic-1-retro-item-11-epic-2-security-gate-own-email-password"
+    epic: 1
+    action: "Epic 2 security gate: own email/password changeable over REST without
+      current password; cookies never Secure; sign-in timing leak - resolve or re-accept
+      before production deploy"
+    owner: "Mika"
+    status: open
+    ref: "_bmad-output/implementation-artifacts/epic-1-retro-2026-10-10.md"
+  - id: "epic-1-retro-item-12-fix-visibility-switch-accessible-group-n"
+    epic: 1
+    action: "Fix visibility switch accessible group naming and label association in
+      Settings"
+    owner: "Mika"
+    status: open
+    ref: "_bmad-output/implementation-artifacts/epic-1-retro-2026-10-10.md"
+  - id: "epic-1-retro-item-13-pin-docker-compose-yml-app-image-to-node"
+    epic: 1
+    action: "Pin docker-compose.yml app image to node:22.23.3-alpine or fold into
+      Epic 2 image story"
+    owner: "Mika"
+    status: open
+    ref: "_bmad-output/implementation-artifacts/epic-1-retro-2026-10-10.md"
+  - id: "epic-1-retro-item-14-review-story-3-52-scope-at-epic-3-planni"
+    epic: 1
+    action: "Review story 3.52 scope at Epic 3 planning: it accumulates the e2e-database
+      move plus deferred browser verification for login, toasts and fonts"
+    owner: "Mika"
+    status: open
+    ref: "_bmad-output/implementation-artifacts/epic-1-retro-2026-10-10.md"
+  - id: "epic-1-retro-item-15-add-fixture-based-tests-for-the-custom-c"
+    epic: 1
+    action: "Add fixture-based tests for the custom clientLibImports lint rule and
+      close the src/app barrel re-export loophole"
+    owner: "Mika"
+    status: open
+    ref: "_bmad-output/implementation-artifacts/epic-1-retro-2026-10-10.md"
