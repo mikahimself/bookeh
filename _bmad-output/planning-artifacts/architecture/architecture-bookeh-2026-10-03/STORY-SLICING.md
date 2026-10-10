@@ -48,7 +48,7 @@ flowchart LR
   A --> K["K Platform and operations"]
 ```
 
-Recommended sequence, as the epics order it: A with K1, K5, K9 and K10; K2 to K4; then D9, C9, B, U, C, D1 to D8, D10, D15 to D18, D23, D25, D26, D32, E26, F1, F2, I9, A20, A23, K11 and C12 for the first saved book; then E21, D5, D19 to D22, D24, D27 and F6 for Edit book with the copy's status and location, which with K2 to K4 opens the cataloguing gate (K12 rehearses the restore once real books are in); then D28 to D31 (covers), E, F3 to F5, F7, F8, H13, D33, K6 and K14; then J, H, I, G, and K13 last. Edit book comes before the collection (D-5) so real cataloguing never produces a book without a location.
+Recommended sequence, as the epics order it: A with K1, K5, K9 and K10; K2 to K4; then K15, D9, C9, B, U, C, D1 to D8, D10, D15 to D18, D23, D25, D26, D32, E26, F1, F2, I9, A20, A23, K11 and C12 for the first saved book; then E21, D5, D19 to D22, D24, D27 and F6 for Edit book with the copy's status and location, which with K2 to K4 opens the cataloguing gate (K12 rehearses the restore once real books are in); then D28 to D31 (covers), E, F3 to F5, F7, F8, H13, D33, K6 and K14; then J, H, I, G, and K13 last. Edit book comes before the collection (D-5) so real cataloguing never produces a book without a location.
 
 ## A — Foundation
 
@@ -297,6 +297,7 @@ After I2, the first real shop check works.
 | K12 | Rehearsed restore at the cataloguing gate | Setup | K4, D22 | NFR-6 |
 | K13 | Phase 1 acceptance: the success metrics measured and written down | Test | everything | PRD Success Metrics |
 | K14 | Last backup in Settings, admin only | Screen | K4, K5 | NFR-6 |
+| K15 | Playwright on `bookeh_test`; browser tests of sign-in, sign-out, the toast provider and font loading; the flash-cookie encoding fix (Epic 1 retrospective) | Test | A4, A16, A17 | Tests |
 
 ## Retired slices
 

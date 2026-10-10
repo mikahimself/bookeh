@@ -858,6 +858,7 @@ So that I can use it anywhere on my tailnet, with the camera working over HTTPS 
 **And** migrations apply at start through `prodMigrations`; push is off
 **And** `tailscale serve` exposes the app over HTTPS on the tailnet only, and the phone reaches the sign-in page there
 **And** the seed variables create the first user on the empty production database
+**And** in production the session cookie is `Secure` (`auth.cookies.secure` on `users`), and so are `bookeh_prefs` and `bookeh_flash`; dev on `http://localhost` keeps them non-Secure (Epic 1 retrospective)
 **And** exactly one app container runs (AD-12)
 
 ### Story 2.3: [K4] Nightly backups
@@ -882,9 +883,29 @@ So that a dead disk doesn't take my catalogue with it (NFR-6).
 
 Scan or type an ISBN, see what the book is, and add it to the library in one tap at the default location, with Undo. An owned edition answers "In library" with Add another copy. An unknown ISBN is entered by hand as a private Book, shared automatically once a source knows it. "Couldn't look it up" offers Try again.
 
-**Order.** Stories 3.1–3.2 open the epic. Then two lanes run side by side: the **lookup lane** (3.3–3.9, no database access) and the **schema lane** (3.10–3.26, schema stories merged one at a time with their migration, AD-13). The schema lane starts once 3.3 and 3.8 have merged, since both lanes use `isbnField`, `nameKeyField` and `processState`. The lanes join from 3.27. Within each lane, stories depend only on earlier stories.
+**Order.** Story 3.54 runs first, then Stories 3.1–3.2 open the epic. Story 3.54 was added by the Epic 1 retrospective and is numbered last so existing cross-references keep their numbers. Then two lanes run side by side: the **lookup lane** (3.3–3.9, no database access) and the **schema lane** (3.10–3.26, schema stories merged one at a time with their migration, AD-13). The schema lane starts once 3.3 and 3.8 have merged, since both lanes use `isbnField`, `nameKeyField` and `processState`. The lanes join from 3.27. Within each lane, stories depend only on earlier stories.
 
 **Base UI.** Story 3.40 adds the `@base-ui/react` dependency, its import lint rule and the dialog and sheet wrappers; Story 3.41 adds the combobox, menu and picker wrappers on top of them (slices A20 and A23).
+
+### Story 3.54: [K15] Playwright on `bookeh_test` and the Epic 1 browser checks
+
+As the developer,
+I want end-to-end tests on their own database, covering the flows Epic 1 left unverified in a browser,
+So that e2e never touches my dev data and Epic 3 builds on sign-in and toasts that are proven to work (Tests convention).
+
+**Acceptance Criteria:**
+
+**Given** the Playwright config, locally and in CI
+**When** the e2e suite runs
+**Then** the server it starts uses `bookeh_test` with migrations applied and push off, never the dev database, and nothing in `tests/helpers/` writes to `bookeh`
+**And** it runs while a `next dev` on the dev database is up (Next 16 locks the dev build directory, so the test server needs its own)
+**And** seeded e2e users have only the `user` role unless the test exercises `/admin`
+**And** a browser test signs in from `/login?next=%2F%3Fa%3D1` and lands on `/?a=1`; a wrong password shows "Wrong email or password." and keeps the email; Sign out lands on `/login`, after which `/` redirects to sign-in again
+**And** a failed sign-out shows an error toast, like every other failed action (EXPERIENCE.md: Save failed, Action with no connection), not an inline message
+**And** a server action calling `flashToast()` before a redirect shows that toast on the page it lands on and clears `bookeh_flash`; this needs the flash cookie's encoding to match on both sides (today Next encodes it a second time on set and the client decodes once, so the toast is dropped — Epic 1 retrospective)
+**And** a toast survives client navigation, and its X dismisses it at once
+**And** no request reaches a font host while pages render
+**And** the admin list-view test accepts the query string Payload adds (`?depth=1&limit=10`)
 
 ### Story 3.1: [D9] Scan screen
 

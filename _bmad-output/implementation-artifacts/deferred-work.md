@@ -36,6 +36,7 @@
 - source_spec: `_bmad-output/implementation-artifacts/spec-1-4-a4-test-harness.md`
   summary: Move Playwright e2e off the dev database (own server on `bookeh_test`, no `seedUser.ts` writes to `bookeh`).
   evidence: Story 1.4 covers Vitest only; Next 16 locks the dev build directory so a second `next dev` cannot run beside the dev server. Mika chose to defer to Story 3.52 (D15), which builds the Playwright setup with the fixture source.
+  decided: Moved to Story 3.54 (K15), split out of 3.52 by the Epic 1 retrospective (Mika, 2026-10-10), together with 1.16's sign-in and sign-out browser test and 1.17's toast provider test. Story 3.54 runs first in Epic 3.
 - source_spec: `_bmad-output/implementation-artifacts/spec-1-4-a4-test-harness.md`
   summary: Remove `@testing-library/react` (and the `react()` Vitest plugin) unless a component-test lane is planned.
   evidence: Blind reviewer; no spec has ever imported it (pre-existing from the Payload template), both Vitest projects run in `node`.
@@ -64,7 +65,7 @@
   summary: Decide which fields a user may change on their own `users` document (email, password) and whether the current password is required, with FR-6 and the profile service (Story 1.22).
   evidence: `adminOrSelf` update lets a signed-in user change their own `email` and `password` over REST with no current-password check; before 1.8 any user could change any user.
   decided: Profile-service half, in Story 1.22. `updateProfile()` in `src/lib/account/profile.ts` changes display name and language only; email and password are not editable in Phase 1 (email is shown, not edited; no password change).
-  open: The REST path is unchanged: a signed-in user can still `PATCH /api/users/<own id>` with `email` or `password` and no current-password check. Close it (field-level `update` access, or `admin`-only REST update) or accept it explicitly.
+  decided: REST half, in the Epic 1 retrospective (Mika, 2026-10-10). Close it now as a small access fix: a non-admin cannot change their own `email` or `password` through `PATCH /api/users/<own id>`, proven by a two-user access test. Tracked as an Epic 1 retro action item.
 - source_spec: `_bmad-output/implementation-artifacts/spec-1-8-a8-users-collection.md`
   summary: Guard dev data against schema pushes from a running `next dev`: a README warning or a pre-change step for schema stories, or `push: false` with migrations on dev.
   evidence: In Story 1.8 the pre-existing port-3000 `next dev` hot-reloaded `Users.ts`, its data-loss prompt was accepted, and `bookeh.users` was truncated, losing the owner's dev account.
@@ -81,3 +82,11 @@
 - source_spec: `_bmad-output/implementation-artifacts/spec-1-21-k1-installable-pwa.md`
   summary: Known consequence of DESIGN.md option T1, not a defect to fix unprompted: with a dark device theme the installed app launches with a white splash screen and title bar, until the page's `theme-color` takes over.
   evidence: The manifest's `theme_color` and `background_color` are fixed at `#FFFFFF` (T1); a manifest is one per app and its request carries no device preferences, so it cannot follow the `bookeh_prefs` theme.
+- source_spec: `_bmad-output/implementation-artifacts/spec-1-16-a16-sign-in-and-sign-out.md`
+  summary: Set the session cookie (`auth.cookies.secure` on `users`), `bookeh_prefs` and `bookeh_flash` to `Secure` in production.
+  evidence: No cookie the app sets is `Secure`; dev runs on `http://localhost`, so the flag must be production-only. Production is served over HTTPS by `tailscale serve`.
+  decided: Epic 1 retrospective (Mika, 2026-10-10): a criterion on Story 2.2, where HTTPS arrives.
+- source_spec: `_bmad-output/implementation-artifacts/spec-1-16-a16-sign-in-and-sign-out.md`
+  summary: Make sign-in take the same time whether or not the account exists or is locked.
+  evidence: Payload skips password hashing for unknown and locked accounts, so response time reveals which emails have accounts.
+  decided: Accepted for Phase 1 in the Epic 1 retrospective (Mika, 2026-10-10): v1 is tailnet only with one user. Revisit with NFR-5 if Phase 2 opens bookeh to others.

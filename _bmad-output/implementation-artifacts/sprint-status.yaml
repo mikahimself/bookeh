@@ -29,7 +29,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 10-06-2026 17:50
-last_updated: 10-10-2026 14:02
+last_updated: 10-10-2026 15:59
 project: bookeh
 project_key: NOKEY
 tracking_system: file-system
@@ -69,6 +69,7 @@ development_status:
   epic-2-retrospective: optional
 
   epic-3: backlog
+  3-54-k15-playwright-on-bookeh-test-and-the-epic-1-browser-checks: backlog
   3-1-d9-scan-screen: backlog
   3-2-c9-real-book-fixture-capture: backlog
   3-3-b1-isbn-and-name-key-fields: backlog
@@ -343,12 +344,20 @@ action_items:
     action: "Review story 3.52 scope at Epic 3 planning: it accumulates the e2e-database
       move plus deferred browser verification for login, toasts and fonts"
     owner: "Mika"
-    status: open
+    status: done
     ref: "_bmad-output/implementation-artifacts/epic-1-retro-2026-10-10.md"
   - id: "epic-1-retro-item-15-add-fixture-based-tests-for-the-custom-c"
     epic: 1
     action: "Add fixture-based tests for the custom clientLibImports lint rule and
       close the src/app barrel re-export loophole"
+    owner: "Mika"
+    status: open
+    ref: "_bmad-output/implementation-artifacts/epic-1-retro-2026-10-10.md"
+  - id: "epic-1-retro-item-16-close-rest-self-update-of-email-and-password"
+    epic: 1
+    action: "Close the REST self-update of email and password: a non-admin cannot
+      change their own email or password via PATCH /api/users/<own id> (field-level
+      update access), proven by a two-user access test"
     owner: "Mika"
     status: open
     ref: "_bmad-output/implementation-artifacts/epic-1-retro-2026-10-10.md"
