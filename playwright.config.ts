@@ -26,6 +26,14 @@ export default defineConfig({
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
+
+    /* On Linux, Chromium's native swipe-to-go-back steals the synthetic
+       touches of the swipe tests (the app sees a touchcancel and the browser
+       navigates back instead). The product keeps the device gesture on real
+       devices; only the test browser turns it off. */
+    launchOptions: {
+      args: ['--disable-features=OverscrollHistoryNavigation,TouchpadOverscrollHistoryNavigation'],
+    },
   },
   projects: [
     {
