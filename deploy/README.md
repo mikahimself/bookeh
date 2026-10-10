@@ -29,10 +29,65 @@ Four machines appear below. Every command is tagged with where it runs:
 
 ## Prerequisites
 
-- **[lxc]** Docker with the compose plugin; Tailscale up and logged in.
-- **[NAS]** A shared folder for Proxmox data (examples below use a share
-  named `proxmox` with a `bookeh` folder inside it).
-- A GitHub account that can read the `bookeh` package on GHCR.
+Four things must exist before first-time setup: a container that can run
+Docker and Tailscale, those two installed inside it, a NAS folder to hold
+the data, and a GHCR pull token.
+
+### The container — [host]
+
+Any current Debian template works. Two services inside it need container
+features that are off by default:
+
+- **Docker** needs nesting (and keyctl in an unprivileged container). In
+  the Proxmox UI: container → Options → Features → enable **nesting** and
+  **keyctl**. (CLI: `pct set <vmid> -features nesting=1,keyctl=1`.)
+- **Tailscale** needs the TUN device. Add to `/etc/pve/lxc/<vmid>.conf`:
+
+  ```
+  lxc.cgroup2.devices.allow: c 10:200 rwm
+  lxc.mount.entry: /dev/net/tun dev/net/tun none bind,create=file
+  ```
+
+Restart the container after either change (`pct reboot <vmid>`).
+
+### Docker with the compose plugin — [lxc]
+
+Install from Docker's own apt repository (the Debian `docker.io` package
+lags and may miss the compose plugin):
+
+```sh
+curl -fsSL https://get.docker.com | sh
+docker compose version   # must print a v2 version
+```
+
+### Tailscale — [lxc]
+
+```sh
+curl -fsSL https://tailscale.com/install.sh | sh
+tailscale up             # prints a login URL; approve the machine there
+tailscale status         # the container is listed with its tailnet name
+```
+
+The tailnet name shown here is the address the phone will use in step 8.
+
+### A NAS folder for the data — [NAS]
+
+In DSM: Control Panel → Shared Folder → Create. Examples below use a share
+named `proxmox` with a `bookeh` folder inside it (create the folder in File
+Station). Skip the encryption and recycle-bin extras — this holds a live
+Postgres cluster. Exporting it over NFS is step 1 of the setup.
+
+### A GHCR pull token — browser
+
+The LXC authenticates to GHCR with a **classic** personal access token
+(GitHub → Settings → Developer settings → Personal access tokens →
+Tokens (classic) → Generate new):
+
+- Scope: **`read:packages` only.** The token lives on the LXC; read-only
+  means a leaked token cannot push images or touch repositories.
+- Set an expiry and record it in the slot in step 6.
+
+Keep the token at hand; it goes into `/opt/bookeh/.env` in step 5.
 
 ## First-time setup
 
