@@ -49,6 +49,13 @@ services:
     # pins the Alpine release and with it the ICU library version.
     image: postgres:16-alpine3.24
     restart: unless-stopped
+    # Run as the postgres user (uid 70) from the start. Over NFS from an
+    # unprivileged LXC, container-root is a nobody on the wire: the
+    # entrypoint's root phase (chmod/chown of the data directory) gets
+    # EPERM from the server. As uid 70 every operation comes from the
+    # directory's owner — which README step 3 sets up — and the entrypoint
+    # skips its root phase.
+    user: postgres
     environment:
       POSTGRES_USER: bookeh
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}

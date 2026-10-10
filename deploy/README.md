@@ -118,8 +118,13 @@ Mount the export on the Proxmox host, then bind it into the container
 Add to `/etc/fstab` (one line; replace the placeholders):
 
 ```
-<nas-ip>:/volume1/<share>/bookeh  /mnt/nas/bookeh  nfs  nofail,x-systemd.automount,_netdev,timeo=14,retrans=2  0  0
+<nas-ip>:/volume1/<share>/bookeh  /mnt/nas/bookeh  nfs  vers=3,nofail,x-systemd.automount,_netdev,timeo=14,retrans=2  0  0
 ```
+
+`vers=3` is deliberate: NFSv4 maps owners by id-mapping domain, and with
+the domains unmatched (the default) every file shows as `nobody:nogroup`
+and chown is refused regardless of the squash rule. v3 passes numeric uids
+through untranslated.
 
 Activate and verify:
 
@@ -140,22 +145,46 @@ Inside the container, `findmnt /mnt/nas/bookeh` **[lxc]** must now show the
 NFS mount. The path matters: the systemd unit's `RequiresMountsFor` and the
 compose file both expect `/mnt/nas/bookeh`.
 
-### 3. Create the data directories and the marker file — [lxc]
+### 3. Create the data directories and the marker file — [host]
+
+Run this on the **host**, not in the LXC: over NFS only real root (which
+the step-1 rule leaves unsquashed) may chown, and an unprivileged LXC's
+root is not it.
+
+First check whether the container is unprivileged — it decides the uids:
+
+```sh
+pct config <vmid> | grep unprivileged   # "unprivileged: 1" or nothing
+```
+
+An unprivileged container shifts uids by 100000 on its way out, so
+container-uid 70 (postgres) and 1001 (the app's nextjs user) must appear
+as 100070 and 101001 on the NAS:
 
 ```sh
 mkdir -p /mnt/nas/bookeh/postgres/data /mnt/nas/bookeh/media
 touch /mnt/nas/bookeh/postgres/.bookeh-nas-mounted
-chown 1001 /mnt/nas/bookeh/media
+chmod 755 /mnt/nas/bookeh /mnt/nas/bookeh/postgres /mnt/nas/bookeh/media
+chown 100070 /mnt/nas/bookeh/postgres/data   # 70 in a privileged container
+chown 101001 /mnt/nas/bookeh/media           # 1001 in a privileged container
 ```
 
 - **The marker file** exists only on the real NAS. The Postgres container
   checks it on **every** start (entrypoint wrapper) and exits with an error
   instead of initdb-ing a fresh cluster when the mount is missing.
-- **`media` must be owned by uid 1001** — the image's `nextjs` user — or
-  uploads fail with EACCES.
-- **If the NFS rule squashes root** (step 1 alternative): pre-own the data
-  directory yourself with `chown 70 /mnt/nas/bookeh/postgres/data` (uid 70
-  is the image's `postgres` user).
+- **The `chmod`s matter**: a folder created through DSM is ACL-managed and
+  can carry a POSIX mode of `000` or `555`, which blocks the container
+  users even when ownership is right.
+- **Ownership is load-bearing, not cosmetic**: the Postgres service runs as
+  uid 70 (`user: postgres` in the compose file) and the app writes media as
+  uid 1001; each must own its directory or the first start fails with
+  EPERM/EACCES.
+
+Verify from inside the LXC with `ls -ln /mnt/nas/bookeh
+/mnt/nas/bookeh/postgres` **[lxc]**: `data` must show owner `70` and
+`media` owner `1001`. (Host-root-owned entries showing as `nobody:nogroup`
+in there is normal — host uids outside the container's shifted range have
+no identity inside — and harmless wherever the mode is 755.)
 
 ### 4. Copy the deploy files to the LXC — [dev]
 
@@ -304,6 +333,16 @@ purpose — `bookeh_test` is a dev/CI artifact.
   permission rule on the Synology is missing, doesn't cover the host's IP,
   or lacks "Allow users to access mounted subfolders" (step 1).
   `showmount -e <nas-ip>` lists the exports and who may mount them.
+- **Everything on the NAS shows `nobody:nogroup` on the host and chown is
+  refused even for root:** the mount negotiated NFSv4 and its id-mapping
+  domain doesn't match. Force `vers=3` in the host fstab (step 2) and
+  remount.
+- **Postgres loops with `chmod: /var/lib/postgresql/data: Operation not
+  permitted` / `find: ... Permission denied`:** the data directory's owner
+  on the NAS doesn't match the uid the container runs as — in an
+  unprivileged LXC that owner must be 100070 (step 3). The service runs as
+  `user: postgres` precisely so no operation needs container-root, which
+  NFS sees as an unprivileged nobody.
 
 ## Acceptance checklist (run on the LXC)
 
