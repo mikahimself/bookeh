@@ -36,7 +36,7 @@
 - source_spec: `_bmad-output/implementation-artifacts/spec-1-4-a4-test-harness.md`
   summary: Move Playwright e2e off the dev database (own server on `bookeh_test`, no `seedUser.ts` writes to `bookeh`).
   evidence: Story 1.4 covers Vitest only; Next 16 locks the dev build directory so a second `next dev` cannot run beside the dev server. Mika chose to defer to Story 3.52 (D15), which builds the Playwright setup with the fixture source.
-  decided: Moved to Story 3.54 (K15), split out of 3.52 by the Epic 1 retrospective (Mika, 2026-10-10), together with 1.16's sign-in and sign-out browser test and 1.17's toast provider test. Story 3.54 runs first in Epic 3.
+  decided: Stays with Story 3.52, now an explicit criterion there (Epic 1 retrospective, Mika, 2026-10-10). Until then nothing writes to `bookeh`: Story 3.54 removes the Epic 1 e2e specs, which are outside the spine's Playwright scope. 1.16's sign-in browser test and 1.17's toast provider browser test are dropped for the same reason.
 - source_spec: `_bmad-output/implementation-artifacts/spec-1-4-a4-test-harness.md`
   summary: Remove `@testing-library/react` (and the `react()` Vitest plugin) unless a component-test lane is planned.
   evidence: Blind reviewer; no spec has ever imported it (pre-existing from the Payload template), both Vitest projects run in `node`.

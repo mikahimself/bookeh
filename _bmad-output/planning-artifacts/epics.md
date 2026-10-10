@@ -887,25 +887,21 @@ Scan or type an ISBN, see what the book is, and add it to the library in one tap
 
 **Base UI.** Story 3.40 adds the `@base-ui/react` dependency, its import lint rule and the dialog and sheet wrappers; Story 3.41 adds the combobox, menu and picker wrappers on top of them (slices A20 and A23).
 
-### Story 3.54: [K15] Playwright on `bookeh_test` and the Epic 1 browser checks
+### Story 3.54: [K15] Epic 1 test and toast clean-up
 
 As the developer,
-I want end-to-end tests on their own database, covering the flows Epic 1 left unverified in a browser,
-So that e2e never touches my dev data and Epic 3 builds on sign-in and toasts that are proven to work (Tests convention).
+I want Epic 1's tests back within the spine and the toast defects it left fixed,
+So that tests stay at a functional minimum and Epic 3 builds on toasts that work (Tests convention).
 
 **Acceptance Criteria:**
 
-**Given** the Playwright config, locally and in CI
-**When** the e2e suite runs
-**Then** the server it starts uses `bookeh_test` with migrations applied and push off, never the dev database, and nothing in `tests/helpers/` writes to `bookeh`
-**And** it runs while a `next dev` on the dev database is up (Next 16 locks the dev build directory, so the test server needs its own)
-**And** seeded e2e users have only the `user` role unless the test exercises `/admin`
-**And** a browser test signs in from `/login?next=%2F%3Fa%3D1` and lands on `/?a=1`; a wrong password shows "Wrong email or password." and keeps the email; Sign out lands on `/login`, after which `/` redirects to sign-in again
+**Given** `tests/e2e/`
+**When** the story is done
+**Then** it holds no spec outside the spine's Playwright scope (scan-to-save and shop check), so the seven Epic 1 specs (admin, frontend, graphql, pwa, sections, settings, swipe) are removed, with the helpers only they use (`login.ts`, `seedUser.ts`, `viewTransitions.ts`)
+**And** a behaviour that only a removed spec proved moves to a unit or integration test when it matters and can be tested there (the `/api/graphql` 404, say); anything else goes
+**And** `playwright.config.ts` and CI's e2e step stay and pass with no specs, so Story 3.52 only adds its own
+**And** the value `flashToast()` writes through Next's cookie serialisation decodes back to the same toast input in the provider; one test pins that round trip through Next's own serialiser, not a hand-encoded value (today Next encodes a second time on set and the client decodes once, so the toast is dropped — Epic 1 retrospective)
 **And** a failed sign-out shows an error toast, like every other failed action (EXPERIENCE.md: Save failed, Action with no connection), not an inline message
-**And** a server action calling `flashToast()` before a redirect shows that toast on the page it lands on and clears `bookeh_flash`; this needs the flash cookie's encoding to match on both sides (today Next encodes it a second time on set and the client decodes once, so the toast is dropped — Epic 1 retrospective)
-**And** a toast survives client navigation, and its X dismisses it at once
-**And** no request reaches a font host while pages render
-**And** the admin list-view test accepts the query string Payload adds (`?depth=1&limit=10`)
 
 ### Story 3.1: [D9] Scan screen
 
@@ -1684,6 +1680,7 @@ So that cataloguing can't silently break (Tests convention).
 **When** the Playwright test runs
 **Then** it signs in, opens Scan, enters the ISBN, sees "not in library" with "From" the fixture source, taps Add to library, sees "Saved to {location}", taps Undo, sees "Undone", and saves again
 **And** it makes no network call outside the app
+**And** the server Playwright starts runs on `bookeh_test` with migrations applied and push off, never the dev database, and can run while a `next dev` on the dev database is up (deferred here from Story 1.4)
 **And** the fixture source is enabled by `BOOKEH_SOURCES=fixture`, which the app refuses under `NODE_ENV=production`; it serves the `tests/fixtures/` responses, and its covers come from a local test route allowlisted only under that setting
 
 ### Story 3.53: [C12] Pick the edition
