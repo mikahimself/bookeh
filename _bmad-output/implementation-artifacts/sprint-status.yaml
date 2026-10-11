@@ -29,7 +29,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 10-06-2026 17:50
-last_updated: 10-11-2026 08:47
+last_updated: 10-11-2026 10:25
 project: bookeh
 project_key: NOKEY
 tracking_system: file-system
@@ -70,7 +70,7 @@ development_status:
 
   epic-3: in-progress
   3-54-k15-epic-1-test-and-toast-clean-up: done
-  3-1-d9-scan-screen: backlog
+  3-1-d9-scan-screen: done
   3-2-c9-real-book-fixture-capture: backlog
   3-3-b1-isbn-and-name-key-fields: backlog
   3-4-c1-source-contract-and-merge: backlog
@@ -315,7 +315,12 @@ action_items:
     action: 'Rework task-close to track in-app history entries directly (history.length
       caps at 50) and debounce the X, before Epic 3 story 3.1'
     owner: 'Mika'
-    status: open
+    status: done
+    resolution: '2026-10-11: story 3.1. navigation.ts stamps a depth on every history
+      state it writes (push: one deeper, replace: carried) and follows popstate; the X
+      goes back when the depth is above 0 and replaces to / otherwise, never reading
+      history.length. A module closing flag makes a second tap during the slide a no-op.
+      Pinned by tests/unit/navigation.unit.spec.ts.'
     ref: '_bmad-output/implementation-artifacts/epic-1-retro-2026-10-10.md'
   - id: 'epic-1-retro-item-11-epic-2-security-gate-own-email-password'
     epic: 1

@@ -49,7 +49,10 @@
   },
   "scan": {
     "open": "Scan book",
-    "heading": "Scan"
+    "heading": "Scan",
+    "cameraHint": "Point the camera at the barcode",
+    "isbn": "Or type an ISBN",
+    "noCamera": "No camera. Type the ISBN."
   },
   "task": {
     "close": "Close"

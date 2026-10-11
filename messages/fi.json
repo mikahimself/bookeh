@@ -49,7 +49,10 @@
   },
   "scan": {
     "open": "Skannaa kirja",
-    "heading": "Skannaa"
+    "heading": "Skannaa",
+    "cameraHint": "Osoita kameralla viivakoodia",
+    "isbn": "Tai kirjoita ISBN",
+    "noCamera": "Ei kameraa. Kirjoita ISBN."
   },
   "task": {
     "close": "Sulje"
