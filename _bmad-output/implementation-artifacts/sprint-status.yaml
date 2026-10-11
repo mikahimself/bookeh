@@ -323,7 +323,11 @@ action_items:
       current password; cookies never Secure; sign-in timing leak - resolve or re-accept
       before production deploy'
     owner: 'Mika'
-    status: open
+    status: done
+    resolution: '2026-10-11: cookies are Secure in production since story 2.2. The
+      REST self-update and sign-in timing leak are re-accepted by the owner for the
+      tailnet-only phase (v1: single user, no public ingress). Item 16 remains open
+      as the fix to land before any exposure beyond the tailnet or a second user.'
     ref: '_bmad-output/implementation-artifacts/epic-1-retro-2026-10-10.md'
   - id: 'epic-1-retro-item-12-fix-visibility-switch-accessible-group-n'
     epic: 1
