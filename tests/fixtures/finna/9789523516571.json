@@ -1,0 +1,929 @@
+{
+  "resultCount": 3,
+  "records": [
+    {
+      "id": "jykdok.2323838",
+      "recordPage": "/Record/jykdok.2323838",
+      "formats": [
+        {
+          "value": "0/Book/",
+          "translated": "Kirja"
+        },
+        {
+          "value": "1/Book/AudioBook/",
+          "translated": "Äänikirja"
+        },
+        {
+          "value": "2/Book/AudioBook/Online/",
+          "translated": "E-äänikirja"
+        }
+      ],
+      "title": "Pikkuporvarit : pohdintaa aikamme hengestä",
+      "shortTitle": "Pikkuporvarit",
+      "subTitle": "pohdintaa aikamme hengestä",
+      "uniformTitles": [],
+      "authors": {
+        "primary": {
+          "Kontula, Anna": {
+            "role": [
+              "kirjoittaja"
+            ]
+          },
+          "Paavola, Satu": {
+            "role": [
+              "-"
+            ]
+          }
+        },
+        "secondary": {
+          "Paavola, Satu, lukija": {
+            "role": [
+              "lukija"
+            ]
+          }
+        },
+        "corporate": {
+          "Into Kustannus, kustantaja": {
+            "role": [
+              "kustantaja"
+            ]
+          }
+        }
+      },
+      "primaryAuthors": [
+        "Kontula, Anna",
+        "Paavola, Satu"
+      ],
+      "nonPresenterAuthors": [
+        {
+          "name": "Kontula, Anna",
+          "role": "kirjoittaja",
+          "id": "(FI-ASTERI-N)000133671",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Paavola, Satu",
+          "role": "lukija",
+          "id": "(FI-ASTERI-N)000140455",
+          "type": "Personal Name"
+        }
+      ],
+      "secondaryAuthors": [
+        "Paavola, Satu, lukija"
+      ],
+      "corporateAuthors": [
+        "Into Kustannus, kustantaja"
+      ],
+      "isbns": [
+        "978-952-351-956-5 MP3"
+      ],
+      "cleanIsbn": "9523519565",
+      "languages": [
+        "fin"
+      ],
+      "originalLanguages": [],
+      "publishers": [
+        "Into"
+      ],
+      "publicationDates": [
+        "2021"
+      ],
+      "placesOfPublication": [
+        "Helsinki :"
+      ],
+      "year": "2021",
+      "physicalDescriptions": [
+        "1 verkkoaineisto (1 äänitiedosto (3 h 18 min))",
+        "Julkaistu myös painettuna"
+      ],
+      "series": [],
+      "subjects": [
+        [
+          "yhteiskuntaluokat"
+        ],
+        [
+          "keskiluokkaistuminen"
+        ],
+        [
+          "ajan henki"
+        ],
+        [
+          "keskiluokka"
+        ],
+        [
+          "porvaristo"
+        ],
+        [
+          "elämäntapa"
+        ],
+        [
+          "arvot (käsitykset)"
+        ],
+        [
+          "ihanteet"
+        ],
+        [
+          "maailmankuva"
+        ],
+        [
+          "oikeistolaisuus"
+        ],
+        [
+          "elämänhallinta"
+        ],
+        [
+          "yksilö"
+        ],
+        [
+          "menestyminen"
+        ],
+        [
+          "käsitykset"
+        ],
+        [
+          "kritiikki"
+        ],
+        [
+          "yhteiskuntakritiikki"
+        ]
+      ],
+      "subjectsExtended": [
+        {
+          "heading": [
+            "yhteiskuntaluokat"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p6310"
+        },
+        {
+          "heading": [
+            "keskiluokkaistuminen"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p27551"
+        },
+        {
+          "heading": [
+            "ajan henki"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p27521"
+        },
+        {
+          "heading": [
+            "keskiluokka"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p19365"
+        },
+        {
+          "heading": [
+            "porvaristo"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p7786"
+        },
+        {
+          "heading": [
+            "elämäntapa"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p8760"
+        },
+        {
+          "heading": [
+            "arvot (käsitykset)"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p1044"
+        },
+        {
+          "heading": [
+            "ihanteet"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p1039"
+        },
+        {
+          "heading": [
+            "maailmankuva"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p219"
+        },
+        {
+          "heading": [
+            "oikeistolaisuus"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p4141"
+        },
+        {
+          "heading": [
+            "elämänhallinta"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p4357"
+        },
+        {
+          "heading": [
+            "yksilö"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p9260"
+        },
+        {
+          "heading": [
+            "menestyminen"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p2418"
+        },
+        {
+          "heading": [
+            "käsitykset"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p6333"
+        },
+        {
+          "heading": [
+            "kritiikki"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p1067"
+        },
+        {
+          "heading": [
+            "yhteiskuntakritiikki"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p19297"
+        }
+      ],
+      "genres": [
+        "äänikirjat"
+      ],
+      "majorGenres": [
+        "nonfiction"
+      ],
+      "classifications": {
+        "ykl": [
+          "30.11",
+          "30.12",
+          "30.1"
+        ]
+      },
+      "images": [],
+      "imagesExtended": [],
+      "summary": [],
+      "sectors": [
+        {
+          "value": "0/lib/",
+          "translated": "Kirjasto"
+        },
+        {
+          "value": "1/lib/uni/",
+          "translated": "Yliopisto"
+        }
+      ],
+      "dedupIds": [
+        "jykdok.2323838",
+        "fikka.5548192"
+      ],
+      "fullRecord": "<?xml version=\"1.0\"?>\n<collection xmlns=\"http://www.loc.gov/MARC21/slim\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd\"><record><leader>00000cim a22000004i 4500</leader><controlfield tag=\"001\">018084576</controlfield><controlfield tag=\"003\">FI-MELINDA</controlfield><controlfield tag=\"005\">20260514094545.0</controlfield><controlfield tag=\"006\">m|||||o||h||||||||</controlfield><controlfield tag=\"007\">sr uunnnnnuneu</controlfield><controlfield tag=\"007\">cr nnannnuuuuu</controlfield><controlfield tag=\"008\">211223s2021    fi |||n|o||||||z||||fin|c</controlfield><datafield tag=\"020\" ind1=\" \" ind2=\" \"><subfield code=\"a\">978-952-351-956-5</subfield><subfield code=\"q\">MP3</subfield></datafield><datafield tag=\"035\" ind1=\" \" ind2=\" \"><subfield code=\"a\">FCC018084576</subfield></datafield><datafield tag=\"040\" ind1=\" \" ind2=\" \"><subfield code=\"a\">FI-Piki</subfield><subfield code=\"b\">fin</subfield><subfield code=\"e\">rda</subfield><subfield code=\"d\">FI-NL</subfield></datafield><datafield tag=\"041\" ind1=\"0\" ind2=\" \"><subfield code=\"d\">fin</subfield></datafield><datafield tag=\"084\" ind1=\" \" ind2=\" \"><subfield code=\"a\">30.11</subfield><subfield code=\"2\">ykl</subfield></datafield><datafield tag=\"084\" ind1=\" \" ind2=\" \"><subfield code=\"a\">30.12</subfield><subfield code=\"2\">ykl</subfield></datafield><datafield tag=\"084\" ind1=\" \" ind2=\" \"><subfield code=\"a\">30.1</subfield><subfield code=\"2\">ykl</subfield></datafield><datafield tag=\"100\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Kontula, Anna,</subfield><subfield code=\"e\">kirjoittaja.</subfield><subfield code=\"0\">(FI-ASTERI-N)000133671</subfield></datafield><datafield tag=\"245\" ind1=\"1\" ind2=\"0\"><subfield code=\"a\">Pikkuporvarit :</subfield><subfield code=\"b\">pohdintaa aikamme hengestä /</subfield><subfield code=\"c\">Anna Kontula.</subfield></datafield><datafield tag=\"246\" ind1=\"3\" ind2=\"0\"><subfield code=\"a\">Pohdintaa aikamme hengestä</subfield></datafield><datafield tag=\"264\" ind1=\" \" ind2=\"1\"><subfield code=\"a\">Helsinki :</subfield><subfield code=\"b\">Into,</subfield><subfield code=\"c\">[2021]</subfield></datafield><datafield tag=\"300\" ind1=\" \" ind2=\" \"><subfield code=\"a\">1 verkkoaineisto (1 äänitiedosto (3 h 18 min))</subfield></datafield><datafield tag=\"306\" ind1=\" \" ind2=\" \"><subfield code=\"a\">031800</subfield></datafield><datafield tag=\"336\" ind1=\" \" ind2=\" \"><subfield code=\"a\">puhe</subfield><subfield code=\"b\">spw</subfield><subfield code=\"2\">rdacontent</subfield></datafield><datafield tag=\"337\" ind1=\" \" ind2=\" \"><subfield code=\"a\">tietokonekäyttöinen</subfield><subfield code=\"b\">c</subfield><subfield code=\"2\">rdamedia</subfield></datafield><datafield tag=\"338\" ind1=\" \" ind2=\" \"><subfield code=\"a\">verkkoaineisto</subfield><subfield code=\"b\">cr</subfield><subfield code=\"2\">rdacarrier</subfield></datafield><datafield tag=\"341\" ind1=\" \" ind2=\" \"><subfield code=\"a\">auditory</subfield><subfield code=\"2\">sapdv</subfield></datafield><datafield tag=\"344\" ind1=\" \" ind2=\" \"><subfield code=\"a\">digitaalinen</subfield></datafield><datafield tag=\"347\" ind1=\" \" ind2=\" \"><subfield code=\"a\">äänitiedosto</subfield><subfield code=\"b\">MP3</subfield></datafield><datafield tag=\"506\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Aineisto on käytettävissä vapaakappaletyöasemilla.</subfield><subfield code=\"f\">Online access with authorization</subfield><subfield code=\"2\">star</subfield></datafield><datafield tag=\"506\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Käytettävissä lisenssin hankkineissa organisaatioissa.</subfield><subfield code=\"f\">Online access with authorization</subfield><subfield code=\"2\">star</subfield></datafield><datafield tag=\"511\" ind1=\"0\" ind2=\" \"><subfield code=\"a\">Lukija: Satu Paavola.</subfield></datafield><datafield tag=\"530\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Julkaistu myös painettuna.</subfield></datafield><datafield tag=\"540\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Aineisto on käytettävissä tutkimus- ja muihin tarkoituksiin;</subfield><subfield code=\"b\">Kansalliskirjasto;</subfield><subfield code=\"c\">Laki kulttuuriaineistojen tallettamisesta ja säilyttämisestä</subfield><subfield code=\"u\">http://www.finlex.fi/fi/laki/ajantasa/2007/20071433</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">yhteiskuntaluokat</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p6310</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">keskiluokkaistuminen</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p27551</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">ajan henki</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p27521</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">keskiluokka</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p19365</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">porvaristo</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p7786</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">elämäntapa</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p8760</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">arvot (käsitykset)</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p1044</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">ihanteet</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p1039</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">maailmankuva</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p219</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">oikeistolaisuus</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p4141</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">elämänhallinta</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p4357</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">yksilö</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p9260</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">menestyminen</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p2418</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">käsitykset</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p6333</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kritiikki</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p1067</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">yhteiskuntakritiikki</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p19297</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">äänikirjat</subfield><subfield code=\"2\">slm/fin</subfield><subfield code=\"0\">http://urn.fi/URN:NBN:fi:au:slm:s579</subfield></datafield><datafield tag=\"700\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Paavola, Satu,</subfield><subfield code=\"e\">lukija.</subfield><subfield code=\"0\">(FI-ASTERI-N)000140455</subfield></datafield><datafield tag=\"710\" ind1=\"2\" ind2=\" \"><subfield code=\"a\">Into Kustannus,</subfield><subfield code=\"e\">kustantaja.</subfield><subfield code=\"0\">(FI-ASTERI-N)000221684</subfield></datafield><datafield tag=\"776\" ind1=\"0\" ind2=\"8\"><subfield code=\"i\">Painettu:</subfield><subfield code=\"z\">978-952-351-657-1</subfield></datafield><datafield tag=\"856\" ind1=\"4\" ind2=\"0\"><subfield code=\"u\">https://urn.fi/URN:ISBN:978-952-351-956-5</subfield><subfield code=\"z\">Käytettävissä vapaakappaletyöasemilla</subfield></datafield><datafield tag=\"999\" ind1=\" \" ind2=\" \"><subfield code=\"c\">2323838</subfield><subfield code=\"d\">2323838</subfield></datafield></record></collection>\n"
+    },
+    {
+      "id": "jykdok.2245145",
+      "recordPage": "/Record/jykdok.2245145",
+      "formats": [
+        {
+          "value": "0/Book/",
+          "translated": "Kirja"
+        },
+        {
+          "value": "1/Book/eBook/",
+          "translated": "E-kirja"
+        }
+      ],
+      "title": "Pikkuporvarit : pohdintaa aikamme hengestä",
+      "shortTitle": "Pikkuporvarit",
+      "subTitle": "pohdintaa aikamme hengestä",
+      "uniformTitles": [],
+      "authors": {
+        "primary": {
+          "Kontula, Anna": {
+            "role": [
+              "kirjoittaja"
+            ]
+          }
+        },
+        "secondary": [],
+        "corporate": {
+          "Into Kustannus, kustantaja": {
+            "role": [
+              "kustantaja"
+            ]
+          }
+        }
+      },
+      "primaryAuthors": [
+        "Kontula, Anna"
+      ],
+      "nonPresenterAuthors": [
+        {
+          "name": "Kontula, Anna",
+          "role": "kirjoittaja",
+          "id": "(FI-ASTERI-N)000133671",
+          "type": "Personal Name"
+        }
+      ],
+      "secondaryAuthors": [],
+      "corporateAuthors": [
+        "Into Kustannus, kustantaja"
+      ],
+      "isbns": [
+        "978-952-351-777-6 EPUB"
+      ],
+      "cleanIsbn": "9523517775",
+      "languages": [
+        "fin"
+      ],
+      "originalLanguages": [],
+      "publishers": [
+        "Into"
+      ],
+      "publicationDates": [
+        "2021"
+      ],
+      "placesOfPublication": [
+        "Helsinki :"
+      ],
+      "year": "2021",
+      "physicalDescriptions": [
+        "1 verkkoaineisto",
+        "Julkaistu myös painettuna"
+      ],
+      "series": [],
+      "subjects": [
+        [
+          "yhteiskuntaluokat"
+        ],
+        [
+          "keskiluokkaistuminen"
+        ],
+        [
+          "ajan henki"
+        ],
+        [
+          "keskiluokka"
+        ],
+        [
+          "porvaristo"
+        ],
+        [
+          "elämäntapa"
+        ],
+        [
+          "arvot (käsitykset)"
+        ],
+        [
+          "ihanteet"
+        ],
+        [
+          "maailmankuva"
+        ],
+        [
+          "oikeistolaisuus"
+        ],
+        [
+          "elämänhallinta"
+        ],
+        [
+          "yksilö"
+        ],
+        [
+          "menestyminen"
+        ],
+        [
+          "käsitykset"
+        ],
+        [
+          "kritiikki"
+        ],
+        [
+          "yhteiskuntakritiikki"
+        ]
+      ],
+      "subjectsExtended": [
+        {
+          "heading": [
+            "yhteiskuntaluokat"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p6310"
+        },
+        {
+          "heading": [
+            "keskiluokkaistuminen"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p27551"
+        },
+        {
+          "heading": [
+            "ajan henki"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p27521"
+        },
+        {
+          "heading": [
+            "keskiluokka"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p19365"
+        },
+        {
+          "heading": [
+            "porvaristo"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p7786"
+        },
+        {
+          "heading": [
+            "elämäntapa"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p8760"
+        },
+        {
+          "heading": [
+            "arvot (käsitykset)"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p1044"
+        },
+        {
+          "heading": [
+            "ihanteet"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p1039"
+        },
+        {
+          "heading": [
+            "maailmankuva"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p219"
+        },
+        {
+          "heading": [
+            "oikeistolaisuus"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p4141"
+        },
+        {
+          "heading": [
+            "elämänhallinta"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p4357"
+        },
+        {
+          "heading": [
+            "yksilö"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p9260"
+        },
+        {
+          "heading": [
+            "menestyminen"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p2418"
+        },
+        {
+          "heading": [
+            "käsitykset"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p6333"
+        },
+        {
+          "heading": [
+            "kritiikki"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p1067"
+        },
+        {
+          "heading": [
+            "yhteiskuntakritiikki"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p19297"
+        }
+      ],
+      "genres": [],
+      "majorGenres": [
+        "nonfiction"
+      ],
+      "classifications": {
+        "ykl": [
+          "30.11",
+          "30.12",
+          "30.1"
+        ]
+      },
+      "images": [],
+      "imagesExtended": [],
+      "summary": [],
+      "sectors": [
+        {
+          "value": "0/lib/",
+          "translated": "Kirjasto"
+        },
+        {
+          "value": "1/lib/uni/",
+          "translated": "Yliopisto"
+        }
+      ],
+      "dedupIds": [
+        "jykdok.2245145",
+        "fikka.5522200"
+      ],
+      "fullRecord": "<?xml version=\"1.0\"?>\n<collection xmlns=\"http://www.loc.gov/MARC21/slim\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd\"><record><leader>00000cam a22000004i 4500</leader><controlfield tag=\"001\">017985014</controlfield><controlfield tag=\"003\">FI-MELINDA</controlfield><controlfield tag=\"005\">20260510002344.0</controlfield><controlfield tag=\"006\">m|||||o||d||||||||</controlfield><controlfield tag=\"007\">cr |||||||||||</controlfield><controlfield tag=\"008\">210914s2021    fi |||||o|||||||||0|fin||</controlfield><datafield tag=\"020\" ind1=\" \" ind2=\" \"><subfield code=\"a\">978-952-351-777-6</subfield><subfield code=\"q\">EPUB</subfield></datafield><datafield tag=\"035\" ind1=\" \" ind2=\" \"><subfield code=\"a\">FCC017985014</subfield></datafield><datafield tag=\"040\" ind1=\" \" ind2=\" \"><subfield code=\"a\">FI-Piki</subfield><subfield code=\"b\">fin</subfield><subfield code=\"e\">rda</subfield><subfield code=\"d\">FI-NL</subfield></datafield><datafield tag=\"041\" ind1=\"0\" ind2=\" \"><subfield code=\"a\">fin</subfield></datafield><datafield tag=\"084\" ind1=\" \" ind2=\" \"><subfield code=\"a\">30.11</subfield><subfield code=\"2\">ykl</subfield></datafield><datafield tag=\"084\" ind1=\" \" ind2=\" \"><subfield code=\"a\">30.12</subfield><subfield code=\"2\">ykl</subfield></datafield><datafield tag=\"084\" ind1=\" \" ind2=\" \"><subfield code=\"a\">30.1</subfield><subfield code=\"2\">ykl</subfield></datafield><datafield tag=\"100\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Kontula, Anna,</subfield><subfield code=\"e\">kirjoittaja.</subfield><subfield code=\"0\">(FI-ASTERI-N)000133671</subfield></datafield><datafield tag=\"245\" ind1=\"1\" ind2=\"0\"><subfield code=\"a\">Pikkuporvarit :</subfield><subfield code=\"b\">pohdintaa aikamme hengestä /</subfield><subfield code=\"c\">Anna Kontula.</subfield></datafield><datafield tag=\"246\" ind1=\"3\" ind2=\"0\"><subfield code=\"a\">Pohdintaa aikamme hengestä</subfield></datafield><datafield tag=\"264\" ind1=\" \" ind2=\"1\"><subfield code=\"a\">Helsinki :</subfield><subfield code=\"b\">Into,</subfield><subfield code=\"c\">[2021]</subfield></datafield><datafield tag=\"300\" ind1=\" \" ind2=\" \"><subfield code=\"a\">1 verkkoaineisto</subfield></datafield><datafield tag=\"336\" ind1=\" \" ind2=\" \"><subfield code=\"a\">teksti</subfield><subfield code=\"b\">txt</subfield><subfield code=\"2\">rdacontent</subfield></datafield><datafield tag=\"337\" ind1=\" \" ind2=\" \"><subfield code=\"a\">tietokonekäyttöinen</subfield><subfield code=\"b\">c</subfield><subfield code=\"2\">rdamedia</subfield></datafield><datafield tag=\"338\" ind1=\" \" ind2=\" \"><subfield code=\"a\">verkkoaineisto</subfield><subfield code=\"b\">cr</subfield><subfield code=\"2\">rdacarrier</subfield></datafield><datafield tag=\"341\" ind1=\" \" ind2=\" \"><subfield code=\"a\">textual</subfield><subfield code=\"2\">sapdv</subfield></datafield><datafield tag=\"347\" ind1=\" \" ind2=\" \"><subfield code=\"a\">tekstitiedosto</subfield><subfield code=\"b\">EPUB</subfield></datafield><datafield tag=\"506\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Aineisto on käytettävissä vapaakappaletyöasemilla.</subfield><subfield code=\"f\">Online access with authorization</subfield><subfield code=\"2\">star</subfield></datafield><datafield tag=\"506\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Käytettävissä lisenssin hankkineissa organisaatioissa.</subfield><subfield code=\"f\">Online access with authorization</subfield><subfield code=\"2\">star</subfield></datafield><datafield tag=\"530\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Julkaistu myös painettuna.</subfield></datafield><datafield tag=\"540\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Aineisto on käytettävissä tutkimus- ja muihin tarkoituksiin;</subfield><subfield code=\"b\">Kansalliskirjasto;</subfield><subfield code=\"c\">Laki kulttuuriaineistojen tallettamisesta ja säilyttämisestä</subfield><subfield code=\"u\">http://www.finlex.fi/fi/laki/ajantasa/2007/20071433</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">yhteiskuntaluokat</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p6310</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">keskiluokkaistuminen</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p27551</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">ajan henki</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p27521</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">keskiluokka</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p19365</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">porvaristo</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p7786</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">elämäntapa</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p8760</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">arvot (käsitykset)</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p1044</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">ihanteet</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p1039</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">maailmankuva</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p219</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">oikeistolaisuus</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p4141</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">elämänhallinta</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p4357</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">yksilö</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p9260</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">menestyminen</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p2418</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">käsitykset</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p6333</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kritiikki</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p1067</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">yhteiskuntakritiikki</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p19297</subfield></datafield><datafield tag=\"710\" ind1=\"2\" ind2=\" \"><subfield code=\"a\">Into Kustannus,</subfield><subfield code=\"e\">kustantaja.</subfield><subfield code=\"0\">(FI-ASTERI-N)000221684</subfield></datafield><datafield tag=\"776\" ind1=\"0\" ind2=\"8\"><subfield code=\"i\">Painettu:</subfield><subfield code=\"z\">978-952-351-657-1</subfield></datafield><datafield tag=\"856\" ind1=\"4\" ind2=\"0\"><subfield code=\"u\">https://urn.fi/URN:ISBN:978-952-351-777-6</subfield><subfield code=\"z\">Käytettävissä vapaakappaletyöasemilla</subfield></datafield><datafield tag=\"999\" ind1=\" \" ind2=\" \"><subfield code=\"c\">2245145</subfield><subfield code=\"d\">2245145</subfield></datafield></record></collection>\n"
+    },
+    {
+      "id": "3amk.291474",
+      "recordPage": "/Record/3amk.291474",
+      "formats": [
+        {
+          "value": "0/Book/",
+          "translated": "Kirja"
+        },
+        {
+          "value": "1/Book/Book/",
+          "translated": "Kirja"
+        }
+      ],
+      "title": "Pikkuporvarit : pohdintaa aikamme hengestä",
+      "shortTitle": "Pikkuporvarit",
+      "subTitle": "pohdintaa aikamme hengestä",
+      "uniformTitles": [],
+      "authors": {
+        "primary": {
+          "Kontula, Anna": {
+            "role": [
+              "kirjoittaja"
+            ]
+          }
+        },
+        "secondary": [],
+        "corporate": {
+          "Into Kustannus, kustantaja": {
+            "role": [
+              "kustantaja"
+            ]
+          }
+        }
+      },
+      "primaryAuthors": [
+        "Kontula, Anna"
+      ],
+      "nonPresenterAuthors": [
+        {
+          "name": "Kontula, Anna",
+          "role": "kirjoittaja",
+          "id": "(FI-ASTERI-N)000133671",
+          "type": "Personal Name"
+        }
+      ],
+      "secondaryAuthors": [],
+      "corporateAuthors": [
+        "Into Kustannus, kustantaja"
+      ],
+      "isbns": [
+        "978-952-351-657-1 kovakantinen"
+      ],
+      "cleanIsbn": "9523516574",
+      "languages": [
+        "fin"
+      ],
+      "originalLanguages": [],
+      "publishers": [
+        "Into"
+      ],
+      "publicationDates": [
+        "2021"
+      ],
+      "placesOfPublication": [
+        "Helsinki :"
+      ],
+      "year": "2021",
+      "physicalDescriptions": [
+        "194 sivua ; 21 cm"
+      ],
+      "series": [],
+      "subjects": [
+        [
+          "yhteiskuntaluokat"
+        ],
+        [
+          "keskiluokkaistuminen"
+        ],
+        [
+          "ajan henki"
+        ],
+        [
+          "keskiluokka"
+        ],
+        [
+          "porvaristo"
+        ],
+        [
+          "elämäntapa"
+        ],
+        [
+          "arvot"
+        ],
+        [
+          "ihanteet"
+        ],
+        [
+          "maailmankuva"
+        ],
+        [
+          "oikeistolaisuus"
+        ],
+        [
+          "elämänhallinta"
+        ],
+        [
+          "menestyminen"
+        ],
+        [
+          "käsitykset"
+        ],
+        [
+          "kritiikki"
+        ],
+        [
+          "yhteiskuntakritiikki"
+        ],
+        [
+          "yksilö"
+        ],
+        [
+          "arvot (käsitykset)"
+        ]
+      ],
+      "subjectsExtended": [
+        {
+          "heading": [
+            "yhteiskuntaluokat"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p6310"
+        },
+        {
+          "heading": [
+            "keskiluokkaistuminen"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p27551"
+        },
+        {
+          "heading": [
+            "ajan henki"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p27521"
+        },
+        {
+          "heading": [
+            "keskiluokka"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p19365"
+        },
+        {
+          "heading": [
+            "porvaristo"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p7786"
+        },
+        {
+          "heading": [
+            "elämäntapa"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p8760"
+        },
+        {
+          "heading": [
+            "arvot"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p1044"
+        },
+        {
+          "heading": [
+            "ihanteet"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p1039"
+        },
+        {
+          "heading": [
+            "maailmankuva"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p219"
+        },
+        {
+          "heading": [
+            "oikeistolaisuus"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p4141"
+        },
+        {
+          "heading": [
+            "elämänhallinta"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p4357"
+        },
+        {
+          "heading": [
+            "menestyminen"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p2418"
+        },
+        {
+          "heading": [
+            "käsitykset"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p6333"
+        },
+        {
+          "heading": [
+            "kritiikki"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p1067"
+        },
+        {
+          "heading": [
+            "yhteiskuntakritiikki"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p19297"
+        },
+        {
+          "heading": [
+            "yksilö"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p9260"
+        },
+        {
+          "heading": [
+            "arvot (käsitykset)"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p1044"
+        }
+      ],
+      "genres": [
+        "pamfletit"
+      ],
+      "majorGenres": [
+        "nonfiction"
+      ],
+      "classifications": {
+        "ykl": [
+          "30.11",
+          "30.12"
+        ]
+      },
+      "images": [],
+      "imagesExtended": [],
+      "summary": [],
+      "sectors": [
+        {
+          "value": "0/lib/",
+          "translated": "Kirjasto"
+        },
+        {
+          "value": "1/lib/poly/",
+          "translated": "AMK"
+        }
+      ],
+      "dedupIds": [
+        "3amk.291474",
+        "anders.a2987ca4-c899-41a3-a4c2-43d62271dc63",
+        "blanka.5165ec22-db81-46ab-bd3f-75fac503c658",
+        "ekk.994253533206250",
+        "eepos.2767020",
+        "heili.51c84ba7-6ffb-40ae-81b9-01f3e27a754e",
+        "helka.9934111874206253",
+        "helle.1570491",
+        "helmet.2474163",
+        "uef.9914941761005966",
+        "tiekko.753832",
+        "jykdok.2084201",
+        "kainet.1239877",
+        "fikka.5494882",
+        "keski.3150168",
+        "kirkes.1481883",
+        "kristinestad.e2eaa381-d9ba-469a-beec-1fb3eb64745a",
+        "kuopio.1520245",
+        "kyyti.1450988",
+        "lapinkirjasto.1845666",
+        "lastu.1765050",
+        "lep.400838",
+        "louna.8b7de7d6-fd6b-493d-83d0-4fab5f77c4a2",
+        "lukki.897381",
+        "lumme.3053796",
+        "oy.9917719556706252",
+        "outi.2204851",
+        "jakobstad.1f6d668b-21b9-401b-96ae-35da7b95378a",
+        "piki.4868090",
+        "ratamo.1870726",
+        "rutakko.176c81b1-1996-4e22-8ae7-9488b9a0d3b0",
+        "satakirjastot.1457815",
+        "siilinjarvi.582313",
+        "somero.84b304e8-112a-4d2a-9602-c294bd9e2e07",
+        "tuni.9911242683805973",
+        "utu.9922811433905971",
+        "vaarakirjastot.11644093",
+        "vaasa.63950908-586a-41e4-91a3-95694fe3ccec",
+        "vanamo.062c1896-85d6-498e-9e4c-3c37fecef2f6",
+        "vaari.2663870",
+        "vaski.4184748",
+        "abo.9913589350205972"
+      ],
+      "fullRecord": "<?xml version=\"1.0\"?>\n<collection xmlns=\"http://www.loc.gov/MARC21/slim\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd\"><record><leader>00000cam a2200000 i 4500</leader><controlfield tag=\"001\">291474</controlfield><controlfield tag=\"003\">FI-MELINDA</controlfield><controlfield tag=\"005\">20250320101130.0</controlfield><controlfield tag=\"008\">210324t20212021fi ||||  b    |0| 0|fin| </controlfield><datafield tag=\"020\" ind1=\" \" ind2=\" \"><subfield code=\"a\">978-952-351-657-1</subfield><subfield code=\"q\">kovakantinen</subfield></datafield><datafield tag=\"035\" ind1=\" \" ind2=\" \"><subfield code=\"a\">FCC017552136</subfield></datafield><datafield tag=\"040\" ind1=\" \" ind2=\" \"><subfield code=\"a\">FI-BTJ</subfield><subfield code=\"b\">fin</subfield><subfield code=\"e\">rda</subfield><subfield code=\"d\">FI-NL</subfield><subfield code=\"d\">FI-Ku</subfield></datafield><datafield tag=\"041\" ind1=\"0\" ind2=\" \"><subfield code=\"a\">fin</subfield></datafield><datafield tag=\"084\" ind1=\" \" ind2=\" \"><subfield code=\"a\">30.11</subfield><subfield code=\"2\">ykl</subfield></datafield><datafield tag=\"084\" ind1=\" \" ind2=\" \"><subfield code=\"a\">30.12</subfield><subfield code=\"2\">ykl</subfield></datafield><datafield tag=\"100\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Kontula, Anna,</subfield><subfield code=\"e\">kirjoittaja.</subfield><subfield code=\"0\">(FI-ASTERI-N)000133671</subfield></datafield><datafield tag=\"245\" ind1=\"1\" ind2=\"0\"><subfield code=\"a\">Pikkuporvarit :</subfield><subfield code=\"b\">pohdintaa aikamme hengestä /</subfield><subfield code=\"c\">Anna Kontula.</subfield></datafield><datafield tag=\"246\" ind1=\"3\" ind2=\"0\"><subfield code=\"a\">Pohdintaa aikamme hengestä</subfield></datafield><datafield tag=\"264\" ind1=\" \" ind2=\"1\"><subfield code=\"a\">Helsinki :</subfield><subfield code=\"b\">Into,</subfield><subfield code=\"c\">[2021]</subfield></datafield><datafield tag=\"264\" ind1=\" \" ind2=\"3\"><subfield code=\"a\">Riika :</subfield><subfield code=\"b\">Livonia Print</subfield></datafield><datafield tag=\"264\" ind1=\" \" ind2=\"4\"><subfield code=\"c\">©2021</subfield></datafield><datafield tag=\"300\" ind1=\" \" ind2=\" \"><subfield code=\"a\">194 sivua ;</subfield><subfield code=\"c\">21 cm</subfield></datafield><datafield tag=\"336\" ind1=\" \" ind2=\" \"><subfield code=\"a\">teksti</subfield><subfield code=\"b\">txt</subfield><subfield code=\"2\">rdacontent</subfield></datafield><datafield tag=\"337\" ind1=\" \" ind2=\" \"><subfield code=\"a\">käytettävissä ilman laitetta</subfield><subfield code=\"b\">n</subfield><subfield code=\"2\">rdamedia</subfield></datafield><datafield tag=\"338\" ind1=\" \" ind2=\" \"><subfield code=\"a\">nide</subfield><subfield code=\"b\">nc</subfield><subfield code=\"2\">rdacarrier</subfield></datafield><datafield tag=\"500\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Lisäpainokset: 2. painos 2021. - 3. painos 2021. - 5. painos 2022.</subfield></datafield><datafield tag=\"504\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Sisältää bibliografisia lähdeviitteitä.</subfield></datafield><datafield tag=\"505\" ind1=\"0\" ind2=\" \"><subfield code=\"a\">Johdanto -- Pikkuporvarillisuuden kritiikin historiaa -- Pikkuporvarillisuus tänään -- Hallinnan harha -- Ulkokultaisuus -- Mukavuudenhalu -- Pikkuporvarillisuuden ekspansio -- Pikkuporvarillisuuden veto.</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">yhteiskuntaluokat</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p6310</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">keskiluokkaistuminen</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p27551</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">ajan henki</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p27521</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">keskiluokka</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p19365</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">porvaristo</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p7786</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">elämäntapa</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p8760</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">arvot</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p1044</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">ihanteet</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p1039</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">maailmankuva</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p219</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">oikeistolaisuus</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p4141</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">elämänhallinta</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p4357</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">menestyminen</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p2418</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">käsitykset</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p6333</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kritiikki</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p1067</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">yhteiskuntakritiikki</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p19297</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">yksilö</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p9260</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">arvot (käsitykset)</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p1044</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">pamfletit</subfield><subfield code=\"2\">slm/fin</subfield><subfield code=\"0\">http://urn.fi/URN:NBN:fi:au:slm:s729</subfield></datafield><datafield tag=\"710\" ind1=\"2\" ind2=\" \"><subfield code=\"a\">Into Kustannus,</subfield><subfield code=\"e\">kustantaja.</subfield><subfield code=\"0\">(FI-ASTERI-N)000221684</subfield></datafield><datafield tag=\"776\" ind1=\"0\" ind2=\"8\"><subfield code=\"i\">Verkkoaineisto:</subfield><subfield code=\"z\">9789523517776</subfield></datafield><datafield tag=\"942\" ind1=\" \" ind2=\" \"><subfield code=\"2\">z</subfield></datafield><datafield tag=\"999\" ind1=\" \" ind2=\" \"><subfield code=\"c\">291474</subfield><subfield code=\"d\">291474</subfield></datafield><datafield tag=\"952\" ind1=\" \" ind2=\" \"><subfield code=\"b\">HHPAS</subfield><subfield code=\"c\">YLEIS</subfield><subfield code=\"o\">316 KONTULA</subfield><subfield code=\"8\">HH</subfield></datafield><datafield tag=\"952\" ind1=\" \" ind2=\" \"><subfield code=\"b\">LAULEP</subfield><subfield code=\"c\">YLEIS</subfield><subfield code=\"o\">30.11 KONTULA</subfield><subfield code=\"8\">LAU</subfield><subfield code=\"9\">1</subfield></datafield></record></collection>\n"
+    }
+  ],
+  "status": "OK"
+}

@@ -1,0 +1,299 @@
+{
+  "resultCount": 1,
+  "records": [
+    {
+      "id": "3amk.310052",
+      "recordPage": "/Record/3amk.310052",
+      "formats": [
+        {
+          "value": "0/Book/",
+          "translated": "Kirja"
+        },
+        {
+          "value": "1/Book/Book/",
+          "translated": "Kirja"
+        }
+      ],
+      "title": "Kadonneen järjen metsästys",
+      "shortTitle": "Kadonneen järjen metsästys",
+      "uniformTitles": [
+        "Kadonneen järjen metsästys. Suomi"
+      ],
+      "authors": {
+        "primary": {
+          "Kontula, Anna": {
+            "role": [
+              "kirjoittaja"
+            ]
+          }
+        },
+        "secondary": [],
+        "corporate": {
+          "Into Kustannus, kustantaja": {
+            "role": [
+              "kustantaja"
+            ]
+          }
+        }
+      },
+      "primaryAuthors": [
+        "Kontula, Anna"
+      ],
+      "nonPresenterAuthors": [
+        {
+          "name": "Kontula, Anna",
+          "role": "kirjoittaja",
+          "id": "(FI-ASTERI-N)000133671",
+          "type": "Personal Name"
+        }
+      ],
+      "secondaryAuthors": [],
+      "corporateAuthors": [
+        "Into Kustannus, kustantaja"
+      ],
+      "isbns": [
+        "978-952-393-487-0 pehmeäkantinen"
+      ],
+      "cleanIsbn": "9523934872",
+      "languages": [
+        "fin"
+      ],
+      "originalLanguages": [],
+      "publishers": [
+        "Into"
+      ],
+      "publicationDates": [
+        "2024"
+      ],
+      "placesOfPublication": [
+        "[Helsinki] :"
+      ],
+      "year": "2024",
+      "physicalDescriptions": [
+        "231 sivua ; 21 cm"
+      ],
+      "series": [],
+      "subjects": [
+        [
+          "yhteiskuntakritiikki"
+        ],
+        [
+          "yhteiskunta"
+        ],
+        [
+          "politiikka"
+        ],
+        [
+          "tasa-arvo"
+        ],
+        [
+          "eriarvoisuus"
+        ],
+        [
+          "yhteiskuntaluokat"
+        ],
+        [
+          "terveydenhuolto"
+        ],
+        [
+          "kriisit"
+        ],
+        [
+          "ongelmanratkaisu"
+        ],
+        [
+          "hoito"
+        ],
+        [
+          "hoitomenetelmät"
+        ],
+        [
+          "luokat"
+        ],
+        [
+          "yhteiskuntapolitiikka"
+        ]
+      ],
+      "subjectsExtended": [
+        {
+          "heading": [
+            "yhteiskuntakritiikki"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p19297"
+        },
+        {
+          "heading": [
+            "yhteiskunta"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p9778"
+        },
+        {
+          "heading": [
+            "politiikka"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p454"
+        },
+        {
+          "heading": [
+            "tasa-arvo"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p2399"
+        },
+        {
+          "heading": [
+            "eriarvoisuus"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p3478"
+        },
+        {
+          "heading": [
+            "yhteiskuntaluokat"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p6310"
+        },
+        {
+          "heading": [
+            "terveydenhuolto"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p2658"
+        },
+        {
+          "heading": [
+            "kriisit"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p6173"
+        },
+        {
+          "heading": [
+            "ongelmanratkaisu"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p6006"
+        },
+        {
+          "heading": [
+            "hoito"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p824"
+        },
+        {
+          "heading": [
+            "hoitomenetelmät"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p392"
+        },
+        {
+          "heading": [
+            "luokat"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p25710"
+        },
+        {
+          "heading": [
+            "yhteiskuntapolitiikka"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p3908"
+        }
+      ],
+      "genres": [
+        "esseet"
+      ],
+      "majorGenres": [
+        "nonfiction"
+      ],
+      "classifications": {
+        "ykl": [
+          "30",
+          "30.11"
+        ]
+      },
+      "images": [],
+      "imagesExtended": [],
+      "summary": [],
+      "sectors": [
+        {
+          "value": "0/lib/",
+          "translated": "Kirjasto"
+        },
+        {
+          "value": "1/lib/poly/",
+          "translated": "AMK"
+        }
+      ],
+      "dedupIds": [
+        "3amk.310052",
+        "anders.9704ae8c-741b-493b-9621-3c3cc4d46622",
+        "blanka.6c9aee32-06ca-48c9-8da3-ef44cc9406ca",
+        "colibri.80951",
+        "diana.124028",
+        "ekk.994339533806250",
+        "eepos.3134875",
+        "heili.f4b3e2a3-cf91-4d95-bb6f-32bd6457412d",
+        "helka.9934705437206253",
+        "helle.1636404",
+        "helmet.2580602",
+        "hurma.85133",
+        "uef.9915184837705966",
+        "tiekko.1089633",
+        "jykdok.2161101",
+        "kainet.1356875",
+        "fikka.5703383",
+        "keski.3339397",
+        "kirkes.1620499",
+        "kuopio.1691918",
+        "kyyti.1544353",
+        "lapinkirjasto.1937773",
+        "luc.994905753606246",
+        "lastu.1959308",
+        "lep.473281",
+        "louna.f2fcf965-dee2-483f-a8bc-0413a7fceeb4",
+        "lukki.1013125",
+        "lumme.3153912",
+        "oy.9918252971006252",
+        "outi.2348469",
+        "piki.5533637",
+        "ratamo.2035498",
+        "rutakko.e52d7d22-a8bb-40b7-a903-235fc87eba08",
+        "satakirjastot.1714434",
+        "savonia.994923705106248",
+        "seamk.991394493905969",
+        "somero.818fce55-9095-4d41-90f8-44712ebf17ad",
+        "tuni.9911564604805973",
+        "utu.9923530421705971",
+        "vaarakirjastot.11740618",
+        "vaasa.89547edf-2fa5-4681-9f92-08b35acb8bc9",
+        "vanamo.bb6c9ae2-0b58-4314-b861-2dc934c4cdc3",
+        "vaari.2941501",
+        "vaski.4365716",
+        "abo.9913810282705972"
+      ],
+      "fullRecord": "<?xml version=\"1.0\"?>\n<collection xmlns=\"http://www.loc.gov/MARC21/slim\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd\"><record><leader>00000cam a2200000 i 4500</leader><controlfield tag=\"001\">310052</controlfield><controlfield tag=\"003\">FI-MELINDA</controlfield><controlfield tag=\"005\">20250114112256.0</controlfield><controlfield tag=\"008\">240314t20242024fi            00| e|fin| </controlfield><datafield tag=\"020\" ind1=\" \" ind2=\" \"><subfield code=\"a\">978-952-393-487-0</subfield><subfield code=\"q\">pehmeäkantinen</subfield></datafield><datafield tag=\"035\" ind1=\" \" ind2=\" \"><subfield code=\"a\">FCC019054528</subfield></datafield><datafield tag=\"040\" ind1=\" \" ind2=\" \"><subfield code=\"a\">FI-Tyl</subfield><subfield code=\"b\">fin</subfield><subfield code=\"e\">rda</subfield><subfield code=\"d\">FI-BTJ</subfield><subfield code=\"d\">FI-NL</subfield></datafield><datafield tag=\"041\" ind1=\"0\" ind2=\" \"><subfield code=\"a\">fin</subfield></datafield><datafield tag=\"084\" ind1=\" \" ind2=\" \"><subfield code=\"a\">30</subfield><subfield code=\"2\">ykl</subfield></datafield><datafield tag=\"084\" ind1=\" \" ind2=\" \"><subfield code=\"a\">30.11</subfield><subfield code=\"2\">ykl</subfield></datafield><datafield tag=\"100\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Kontula, Anna,</subfield><subfield code=\"e\">kirjoittaja.</subfield><subfield code=\"0\">(FI-ASTERI-N)000133671</subfield></datafield><datafield tag=\"240\" ind1=\"1\" ind2=\"0\"><subfield code=\"a\">Kadonneen järjen metsästys.</subfield><subfield code=\"l\">Suomi</subfield></datafield><datafield tag=\"245\" ind1=\"1\" ind2=\"0\"><subfield code=\"a\">Kadonneen järjen metsästys /</subfield><subfield code=\"c\">Anna Kontula.</subfield></datafield><datafield tag=\"264\" ind1=\" \" ind2=\"1\"><subfield code=\"a\">[Helsinki] :</subfield><subfield code=\"b\">Into,</subfield><subfield code=\"c\">[2024]</subfield></datafield><datafield tag=\"264\" ind1=\" \" ind2=\"3\"><subfield code=\"a\">Viro:</subfield><subfield code=\"b\">Meedia Zone</subfield></datafield><datafield tag=\"264\" ind1=\" \" ind2=\"4\"><subfield code=\"c\">©2024</subfield></datafield><datafield tag=\"300\" ind1=\" \" ind2=\" \"><subfield code=\"a\">231 sivua ;</subfield><subfield code=\"c\">21 cm</subfield></datafield><datafield tag=\"336\" ind1=\" \" ind2=\" \"><subfield code=\"a\">teksti</subfield><subfield code=\"b\">txt</subfield><subfield code=\"2\">rdacontent</subfield></datafield><datafield tag=\"337\" ind1=\" \" ind2=\" \"><subfield code=\"a\">käytettävissä ilman laitetta</subfield><subfield code=\"b\">n</subfield><subfield code=\"2\">rdamedia</subfield></datafield><datafield tag=\"338\" ind1=\" \" ind2=\" \"><subfield code=\"a\">nide</subfield><subfield code=\"b\">nc</subfield><subfield code=\"2\">rdacarrier</subfield></datafield><datafield tag=\"500\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Lisäpainokset: 2. painos 2024. - 3. painos 2024 (painopaikka: Nordprint Oy, Helsinki).</subfield></datafield><datafield tag=\"504\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Sisältää bibliografisia viitteitä (sivut 213-231).</subfield></datafield><datafield tag=\"505\" ind1=\"0\" ind2=\" \"><subfield code=\"a\">Johdanto -- Terapiayhteiskunta päästi kapitalismin sieluun -- Kun sosiaalityö unohti köyhyyden -- Huonosti käyttäytyvät isoäidit -- Kaataako ekokatastrofi parlamentarismin? -- MIten kysymys kissojen ulkoilutuksesta tule ratkaista? -- Jälkikirjoitus: Argumentin rakentamisesta.</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">yhteiskuntakritiikki</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p19297</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">yhteiskunta</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p9778</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">politiikka</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p454</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">tasa-arvo</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p2399</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">eriarvoisuus</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p3478</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">yhteiskuntaluokat</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p6310</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">terveydenhuolto</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p2658</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kriisit</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p6173</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">ongelmanratkaisu</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p6006</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">hoito</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p824</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">hoitomenetelmät</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p392</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">luokat</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p25710</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">yhteiskuntapolitiikka</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p3908</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">esseet</subfield><subfield code=\"2\">slm/fin</subfield><subfield code=\"0\">http://urn.fi/URN:NBN:fi:au:slm:s110</subfield></datafield><datafield tag=\"710\" ind1=\"2\" ind2=\" \"><subfield code=\"a\">Into Kustannus,</subfield><subfield code=\"e\">kustantaja.</subfield><subfield code=\"0\">(FI-ASTERI-N)000221684</subfield></datafield><datafield tag=\"999\" ind1=\" \" ind2=\" \"><subfield code=\"c\">310052</subfield><subfield code=\"d\">310052</subfield></datafield><datafield tag=\"952\" ind1=\" \" ind2=\" \"><subfield code=\"b\">HHPAS</subfield><subfield code=\"c\">YLEIS</subfield><subfield code=\"o\">316 KONTULA</subfield><subfield code=\"8\">HH</subfield></datafield><datafield tag=\"952\" ind1=\" \" ind2=\" \"><subfield code=\"b\">LAUTIK</subfield><subfield code=\"c\">YLEIS</subfield><subfield code=\"o\">30.1 KONTULA</subfield><subfield code=\"8\">LAU</subfield><subfield code=\"9\">1</subfield></datafield><datafield tag=\"952\" ind1=\" \" ind2=\" \"><subfield code=\"b\">LAULEP</subfield><subfield code=\"c\">YLEIS</subfield><subfield code=\"o\">30.1 KONTULA</subfield><subfield code=\"8\">LAU</subfield><subfield code=\"9\">1</subfield></datafield><datafield tag=\"952\" ind1=\" \" ind2=\" \"><subfield code=\"b\">METMYL</subfield><subfield code=\"c\">YLEIS</subfield><subfield code=\"o\">300 KONTULA</subfield><subfield code=\"8\">MET</subfield><subfield code=\"9\">1</subfield></datafield></record></collection>\n"
+    }
+  ],
+  "status": "OK"
+}

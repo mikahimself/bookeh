@@ -1,0 +1,154 @@
+{
+  "resultCount": 1,
+  "records": [
+    {
+      "id": "eepos.146105",
+      "recordPage": "/Record/eepos.146105",
+      "formats": [
+        {
+          "value": "0/Book/",
+          "translated": "Kirja"
+        },
+        {
+          "value": "1/Book/Book/",
+          "translated": "Kirja"
+        }
+      ],
+      "title": "Uhoan voimaa",
+      "shortTitle": "Uhoan voimaa",
+      "uniformTitles": [
+        "Defiant pose"
+      ],
+      "authors": {
+        "primary": {
+          "Home, Stewart": {
+            "role": [
+              "kirjoittaja"
+            ]
+          },
+          "Ahokas, Juha": {
+            "role": [
+              "-"
+            ]
+          }
+        },
+        "secondary": [],
+        "corporate": []
+      },
+      "primaryAuthors": [
+        "Home, Stewart",
+        "Ahokas, Juha"
+      ],
+      "nonPresenterAuthors": [
+        {
+          "name": "Home, Stewart",
+          "role": "kirjoittaja",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Ahokas, Juha",
+          "id": "(FIN11)000110347",
+          "type": "Personal Name"
+        }
+      ],
+      "secondaryAuthors": [
+        "Ahokas, Juha"
+      ],
+      "corporateAuthors": [],
+      "isbns": [
+        "951-578-217-1 nidottu"
+      ],
+      "cleanIsbn": "9515782171",
+      "languages": [
+        "fin"
+      ],
+      "originalLanguages": [
+        "eng"
+      ],
+      "publishers": [
+        "Like"
+      ],
+      "publicationDates": [
+        "1995"
+      ],
+      "placesOfPublication": [
+        "Helsinki :"
+      ],
+      "year": "1995",
+      "physicalDescriptions": [
+        "207 s. ; 20 cm"
+      ],
+      "series": [],
+      "subjects": [
+        [
+          "nuorisokulttuuri"
+        ],
+        [
+          "Englanti"
+        ]
+      ],
+      "subjectsExtended": [
+        {
+          "heading": [
+            "nuorisokulttuuri"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p4806"
+        },
+        {
+          "heading": [
+            "Englanti"
+          ],
+          "type": "geographic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p107128"
+        }
+      ],
+      "genres": [],
+      "majorGenres": [
+        "fiction"
+      ],
+      "classifications": {
+        "ykl": [
+          "84.2"
+        ]
+      },
+      "images": [],
+      "imagesExtended": [],
+      "summary": [],
+      "sectors": [
+        {
+          "value": "0/lib/",
+          "translated": "Kirjasto"
+        },
+        {
+          "value": "1/lib/pub/",
+          "translated": "Yleinen"
+        }
+      ],
+      "dedupIds": [
+        "eepos.146105",
+        "helka.998018863506253",
+        "helmet.1301088",
+        "jykdok.495966",
+        "kainet.232427",
+        "fikka.3660952",
+        "kyyti.394139",
+        "lukki.160709",
+        "lumme.233552",
+        "oy.994210393906252",
+        "outi.1162616",
+        "piki.286180",
+        "rutakko.e92fd227-2182-4c39-a488-fcfe825efc00",
+        "satakirjastot.104698",
+        "utu.994431165405971",
+        "vaarakirjastot.153814",
+        "vaari.562294",
+        "vaski.272962"
+      ],
+      "fullRecord": "<?xml version=\"1.0\"?>\n<collection xmlns=\"http://www.loc.gov/MARC21/slim\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd\"><record><leader>00000cam a22000004i 4500</leader><controlfield tag=\"001\">146105</controlfield><controlfield tag=\"003\">ANDL100007</controlfield><controlfield tag=\"005\">20180604095742.7</controlfield><controlfield tag=\"008\">950315s1995    fi |||||||||||||||f|fin| </controlfield><datafield tag=\"020\" ind1=\" \" ind2=\" \"><subfield code=\"a\">951-578-217-1</subfield><subfield code=\"q\">nidottu</subfield></datafield><datafield tag=\"035\" ind1=\" \" ind2=\" \"><subfield code=\"a\">(FI-Seitti)Ppro743_146105</subfield></datafield><datafield tag=\"035\" ind1=\" \" ind2=\" \"><subfield code=\"a\">(FI-MELINDA)000794009</subfield></datafield><datafield tag=\"040\" ind1=\" \" ind2=\" \"><subfield code=\"a\">FI-NL</subfield><subfield code=\"b\">fin</subfield></datafield><datafield tag=\"041\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">fin</subfield><subfield code=\"h\">eng</subfield></datafield><datafield tag=\"042\" ind1=\" \" ind2=\" \"><subfield code=\"a\">finb</subfield></datafield><datafield tag=\"084\" ind1=\" \" ind2=\" \"><subfield code=\"a\">84.2</subfield><subfield code=\"2\">ykl</subfield></datafield><datafield tag=\"100\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Home, Stewart,</subfield><subfield code=\"e\">kirjoittaja.</subfield></datafield><datafield tag=\"240\" ind1=\"1\" ind2=\"0\"><subfield code=\"a\">Defiant pose</subfield></datafield><datafield tag=\"245\" ind1=\"1\" ind2=\"0\"><subfield code=\"a\">Uhoan voimaa /</subfield><subfield code=\"c\">Stewart Home ; suomentanut Juha Ahokas.</subfield></datafield><datafield tag=\"260\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Helsinki :</subfield><subfield code=\"b\">Like,</subfield><subfield code=\"c\">1995.</subfield></datafield><datafield tag=\"300\" ind1=\" \" ind2=\" \"><subfield code=\"a\">207 s. ;</subfield><subfield code=\"c\">20 cm</subfield></datafield><datafield tag=\"336\" ind1=\" \" ind2=\" \"><subfield code=\"a\">teksti</subfield><subfield code=\"b\">txt</subfield><subfield code=\"2\">rdacontent</subfield></datafield><datafield tag=\"337\" ind1=\" \" ind2=\" \"><subfield code=\"a\">käytettävissä ilman laitetta</subfield><subfield code=\"b\">n</subfield><subfield code=\"2\">rdamedia</subfield></datafield><datafield tag=\"338\" ind1=\" \" ind2=\" \"><subfield code=\"a\">nide</subfield><subfield code=\"b\">nc</subfield><subfield code=\"2\">rdacarrier</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">nuorisokulttuuri</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p4806</subfield></datafield><datafield tag=\"651\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">Englanti</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p107128</subfield></datafield><datafield tag=\"700\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Ahokas, Juha.</subfield><subfield code=\"0\">(FIN11)000110347</subfield></datafield><datafield tag=\"852\" ind1=\" \" ind2=\" \"><subfield code=\"a\">1</subfield><subfield code=\"b\">001</subfield><subfield code=\"c\">1</subfield></datafield><datafield tag=\"908\" ind1=\" \" ind2=\" \"><subfield code=\"a\">fin</subfield></datafield></record></collection>\n"
+    }
+  ],
+  "status": "OK"
+}

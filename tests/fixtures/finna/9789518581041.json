@@ -1,0 +1,610 @@
+{
+  "resultCount": 2,
+  "records": [
+    {
+      "id": "jykdok.2295301",
+      "recordPage": "/Record/jykdok.2295301",
+      "formats": [
+        {
+          "value": "0/Book/",
+          "translated": "Kirja"
+        },
+        {
+          "value": "1/Book/eBook/",
+          "translated": "E-kirja"
+        }
+      ],
+      "title": "Löytöretki suomeen",
+      "shortTitle": "Löytöretki suomeen",
+      "uniformTitles": [],
+      "authors": {
+        "primary": {
+          "Juva, Kersti": {
+            "role": [
+              "kirjoittaja"
+            ]
+          }
+        },
+        "secondary": [],
+        "corporate": []
+      },
+      "primaryAuthors": [
+        "Juva, Kersti"
+      ],
+      "nonPresenterAuthors": [
+        {
+          "name": "Juva, Kersti",
+          "role": "kirjoittaja",
+          "id": "(FI-ASTERI-N)000065229",
+          "type": "Personal Name"
+        }
+      ],
+      "secondaryAuthors": [],
+      "corporateAuthors": [],
+      "isbns": [
+        "978-951-858-166-9 EPUB"
+      ],
+      "cleanIsbn": "9518581665",
+      "languages": [
+        "fin"
+      ],
+      "originalLanguages": [],
+      "publishers": [
+        "Suomalaisen Kirjallisuuden Seura"
+      ],
+      "publicationDates": [
+        "2019"
+      ],
+      "placesOfPublication": [
+        "Helsinki :"
+      ],
+      "year": "2019",
+      "physicalDescriptions": [
+        "1 verkkoaineisto (301 sivua)",
+        "Julkaistu myös painettuna"
+      ],
+      "series": [],
+      "subjects": [
+        [
+          "aikamuodot"
+        ],
+        [
+          "aspekti"
+        ],
+        [
+          "englannin kieli"
+        ],
+        [
+          "erot"
+        ],
+        [
+          "kaunokirjallisuus"
+        ],
+        [
+          "kielelliset ominaisuudet"
+        ],
+        [
+          "kirjallisuuden kieli"
+        ],
+        [
+          "käännökset"
+        ],
+        [
+          "kääntäminen"
+        ],
+        [
+          "lauseet"
+        ],
+        [
+          "modaalisuus (kielitiede)"
+        ],
+        [
+          "pronominit"
+        ],
+        [
+          "sanajärjestys"
+        ],
+        [
+          "subjekti (lauseenjäsenet)"
+        ],
+        [
+          "suomen kieli"
+        ],
+        [
+          "viittaussuhteet"
+        ]
+      ],
+      "subjectsExtended": [
+        {
+          "heading": [
+            "aikamuodot"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p6489"
+        },
+        {
+          "heading": [
+            "aspekti"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p8369"
+        },
+        {
+          "heading": [
+            "englannin kieli"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p2573"
+        },
+        {
+          "heading": [
+            "erot"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p3482"
+        },
+        {
+          "heading": [
+            "kaunokirjallisuus"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p4"
+        },
+        {
+          "heading": [
+            "kielelliset ominaisuudet"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p28827"
+        },
+        {
+          "heading": [
+            "kirjallisuuden kieli"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p4678"
+        },
+        {
+          "heading": [
+            "käännökset"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p16349"
+        },
+        {
+          "heading": [
+            "kääntäminen"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p9586"
+        },
+        {
+          "heading": [
+            "lauseet"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p21419"
+        },
+        {
+          "heading": [
+            "modaalisuus (kielitiede)"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p9173"
+        },
+        {
+          "heading": [
+            "pronominit"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p5812"
+        },
+        {
+          "heading": [
+            "sanajärjestys"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p18505"
+        },
+        {
+          "heading": [
+            "subjekti (lauseenjäsenet)"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p24659"
+        },
+        {
+          "heading": [
+            "suomen kieli"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p8856"
+        },
+        {
+          "heading": [
+            "viittaussuhteet"
+          ],
+          "type": "topic",
+          "source": "kta",
+          "id": "http://www.yso.fi/onto/kto/p524"
+        }
+      ],
+      "genres": [],
+      "majorGenres": [
+        "nonfiction"
+      ],
+      "classifications": {
+        "udk2": [
+          "811.511.111"
+        ],
+        "udkf": [
+          "809.454.1",
+          "800/801"
+        ],
+        "ykl": [
+          "87",
+          "88.2"
+        ]
+      },
+      "images": [],
+      "imagesExtended": [],
+      "summary": [],
+      "sectors": [
+        {
+          "value": "0/lib/",
+          "translated": "Kirjasto"
+        },
+        {
+          "value": "1/lib/uni/",
+          "translated": "Yliopisto"
+        }
+      ],
+      "dedupIds": [
+        "jykdok.2295301",
+        "fikka.5781628"
+      ],
+      "fullRecord": "<?xml version=\"1.0\"?>\n<collection xmlns=\"http://www.loc.gov/MARC21/slim\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd\"><record><leader>00000cam a22000004i 4500</leader><controlfield tag=\"001\">016713996</controlfield><controlfield tag=\"003\">FI-MELINDA</controlfield><controlfield tag=\"005\">20260513000135.0</controlfield><controlfield tag=\"006\">m|||||o||d||||||||</controlfield><controlfield tag=\"007\">cr || ||||||||</controlfield><controlfield tag=\"008\">200123s2019    fi      o|||| 000|0 fin c</controlfield><datafield tag=\"020\" ind1=\" \" ind2=\" \"><subfield code=\"a\">978-951-858-166-9</subfield><subfield code=\"q\">EPUB</subfield></datafield><datafield tag=\"035\" ind1=\" \" ind2=\" \"><subfield code=\"a\">FCC016713996</subfield></datafield><datafield tag=\"040\" ind1=\" \" ind2=\" \"><subfield code=\"b\">fin</subfield><subfield code=\"e\">rda</subfield><subfield code=\"d\">FI-NL</subfield></datafield><datafield tag=\"041\" ind1=\"0\" ind2=\" \"><subfield code=\"a\">fin</subfield></datafield><datafield tag=\"080\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">811.511.111</subfield><subfield code=\"2\">2019</subfield></datafield><datafield tag=\"080\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">809.454.1</subfield><subfield code=\"2\">1974/fin/fennica</subfield></datafield><datafield tag=\"080\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">800/801</subfield><subfield code=\"2\">1974/fin/fennica</subfield></datafield><datafield tag=\"084\" ind1=\" \" ind2=\" \"><subfield code=\"a\">87</subfield><subfield code=\"2\">ykl</subfield></datafield><datafield tag=\"084\" ind1=\" \" ind2=\" \"><subfield code=\"a\">88.2</subfield><subfield code=\"2\">ykl</subfield></datafield><datafield tag=\"100\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Juva, Kersti,</subfield><subfield code=\"e\">kirjoittaja.</subfield><subfield code=\"0\">(FI-ASTERI-N)000065229</subfield></datafield><datafield tag=\"245\" ind1=\"1\" ind2=\"0\"><subfield code=\"a\">Löytöretki suomeen /</subfield><subfield code=\"c\">Kersti Juva.</subfield></datafield><datafield tag=\"264\" ind1=\" \" ind2=\"1\"><subfield code=\"a\">Helsinki :</subfield><subfield code=\"b\">Suomalaisen Kirjallisuuden Seura,</subfield><subfield code=\"c\">2019.</subfield></datafield><datafield tag=\"300\" ind1=\" \" ind2=\" \"><subfield code=\"a\">1 verkkoaineisto (301 sivua)</subfield></datafield><datafield tag=\"336\" ind1=\" \" ind2=\" \"><subfield code=\"a\">teksti</subfield><subfield code=\"b\">txt</subfield><subfield code=\"2\">rdacontent</subfield></datafield><datafield tag=\"337\" ind1=\" \" ind2=\" \"><subfield code=\"a\">tietokonekäyttöinen</subfield><subfield code=\"b\">c</subfield><subfield code=\"2\">rdamedia</subfield></datafield><datafield tag=\"338\" ind1=\" \" ind2=\" \"><subfield code=\"a\">verkkoaineisto</subfield><subfield code=\"b\">cr</subfield><subfield code=\"2\">rdacarrier</subfield></datafield><datafield tag=\"341\" ind1=\" \" ind2=\" \"><subfield code=\"a\">textual</subfield><subfield code=\"2\">sapdv</subfield></datafield><datafield tag=\"347\" ind1=\" \" ind2=\" \"><subfield code=\"a\">tekstitiedosto</subfield><subfield code=\"b\">EPUB</subfield></datafield><datafield tag=\"506\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Aineisto on käytettävissä vapaakappaletyöasemilla.</subfield><subfield code=\"f\">Online access with authorization</subfield><subfield code=\"2\">star</subfield></datafield><datafield tag=\"506\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Käytettävissä lisenssin hankkineissa organisaatioissa.</subfield><subfield code=\"f\">Online access with authorization</subfield><subfield code=\"2\">star</subfield></datafield><datafield tag=\"530\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Julkaistu myös painettuna.</subfield></datafield><datafield tag=\"540\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Aineisto on käytettävissä tutkimus- ja muihin tarkoituksiin;</subfield><subfield code=\"b\">Kansalliskirjasto;</subfield><subfield code=\"c\">Laki kulttuuriaineistojen tallettamisesta ja säilyttämisestä</subfield><subfield code=\"u\">http://www.finlex.fi/fi/laki/ajantasa/2007/20071433</subfield></datafield><datafield tag=\"588\" ind1=\"0\" ind2=\" \"><subfield code=\"a\">Kuvailun perustana verkkoaineisto; nimeke nimiösivulta (katsottu 23.1.2019).</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">aikamuodot</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p6489</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">aspekti</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p8369</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">englannin kieli</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p2573</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">erot</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p3482</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kaunokirjallisuus</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p4</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kielelliset ominaisuudet</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p28827</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kirjallisuuden kieli</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p4678</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">käännökset</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p16349</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kääntäminen</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p9586</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">lauseet</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p21419</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">modaalisuus (kielitiede)</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p9173</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">pronominit</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p5812</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">sanajärjestys</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p18505</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">subjekti (lauseenjäsenet)</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p24659</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">suomen kieli</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p8856</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">viittaussuhteet</subfield><subfield code=\"2\">kta</subfield><subfield code=\"0\">http://www.yso.fi/onto/kto/p524</subfield></datafield><datafield tag=\"776\" ind1=\"0\" ind2=\"8\"><subfield code=\"i\">Painettu:</subfield><subfield code=\"z\">9789518581041</subfield></datafield><datafield tag=\"856\" ind1=\"4\" ind2=\"0\"><subfield code=\"u\">https://urn.fi/URN:ISBN:978-951-858-166-9</subfield><subfield code=\"z\">Käytettävissä vapaakappaletyöasemilla</subfield></datafield><datafield tag=\"999\" ind1=\" \" ind2=\" \"><subfield code=\"c\">2295301</subfield><subfield code=\"d\">2295301</subfield></datafield></record></collection>\n"
+    },
+    {
+      "id": "3amk.280912",
+      "recordPage": "/Record/3amk.280912",
+      "formats": [
+        {
+          "value": "0/Book/",
+          "translated": "Kirja"
+        },
+        {
+          "value": "1/Book/Book/",
+          "translated": "Kirja"
+        }
+      ],
+      "title": "Löytöretki suomeen",
+      "shortTitle": "Löytöretki suomeen",
+      "uniformTitles": [],
+      "authors": {
+        "primary": {
+          "Juva, Kersti": {
+            "role": [
+              "kirjoittaja"
+            ]
+          }
+        },
+        "secondary": [],
+        "corporate": []
+      },
+      "primaryAuthors": [
+        "Juva, Kersti"
+      ],
+      "nonPresenterAuthors": [
+        {
+          "name": "Juva, Kersti",
+          "role": "kirjoittaja",
+          "id": "(FI-ASTERI-N)000065229",
+          "type": "Personal Name"
+        }
+      ],
+      "secondaryAuthors": [],
+      "corporateAuthors": [],
+      "isbns": [
+        "978-951-858-104-1 pehmeäkantinen"
+      ],
+      "cleanIsbn": "9518581045",
+      "languages": [
+        "fin"
+      ],
+      "originalLanguages": [],
+      "publishers": [
+        "Suomalaisen Kirjallisuuden Seura"
+      ],
+      "publicationDates": [
+        "2019"
+      ],
+      "placesOfPublication": [
+        "Helsinki :"
+      ],
+      "year": "2019",
+      "physicalDescriptions": [
+        "413 sivua ; 22 cm"
+      ],
+      "series": [
+        {
+          "name": "Kirjokansi",
+          "additional": "223.",
+          "issn": "2323-7392"
+        },
+        {
+          "name": "Kirjokansi",
+          "additional": "223",
+          "issn": "2323-7392"
+        }
+      ],
+      "subjects": [
+        [
+          "sanajärjestys"
+        ],
+        [
+          "lauseet"
+        ],
+        [
+          "aikamuodot"
+        ],
+        [
+          "aspekti"
+        ],
+        [
+          "pronominit"
+        ],
+        [
+          "modaalisuus (kielitiede)"
+        ],
+        [
+          "subjekti (lauseenjäsenet)"
+        ],
+        [
+          "erot"
+        ],
+        [
+          "suomen kieli"
+        ],
+        [
+          "kielelliset ominaisuudet"
+        ],
+        [
+          "englannin kieli"
+        ],
+        [
+          "kääntäminen"
+        ],
+        [
+          "käännökset"
+        ],
+        [
+          "kirjallisuuden kieli"
+        ],
+        [
+          "kaunokirjallisuus"
+        ]
+      ],
+      "subjectsExtended": [
+        {
+          "heading": [
+            "sanajärjestys"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p18505"
+        },
+        {
+          "heading": [
+            "lauseet"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p21419"
+        },
+        {
+          "heading": [
+            "aikamuodot"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p6489"
+        },
+        {
+          "heading": [
+            "aspekti"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p8369"
+        },
+        {
+          "heading": [
+            "pronominit"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p5812"
+        },
+        {
+          "heading": [
+            "modaalisuus (kielitiede)"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p9173"
+        },
+        {
+          "heading": [
+            "subjekti (lauseenjäsenet)"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p24659"
+        },
+        {
+          "heading": [
+            "erot"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p3482"
+        },
+        {
+          "heading": [
+            "suomen kieli"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p8856"
+        },
+        {
+          "heading": [
+            "kielelliset ominaisuudet"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p28827"
+        },
+        {
+          "heading": [
+            "englannin kieli"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p2573"
+        },
+        {
+          "heading": [
+            "kääntäminen"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p9586"
+        },
+        {
+          "heading": [
+            "käännökset"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p16349"
+        },
+        {
+          "heading": [
+            "kirjallisuuden kieli"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p4678"
+        },
+        {
+          "heading": [
+            "kaunokirjallisuus"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p4"
+        }
+      ],
+      "genres": [],
+      "majorGenres": [
+        "nonfiction"
+      ],
+      "classifications": {
+        "ykl": [
+          "88.2",
+          "87"
+        ]
+      },
+      "images": [],
+      "imagesExtended": [],
+      "summary": [
+        "Suomea on väitetty maailman vaikeimmaksi kieleksi. Minkälainen rakas kielemme oikeastaan on? Tämän kirjan luettuasi oma kieli avautuu aivan uudessa valossa. Suomalaiset ovat jäyhää ja hiljaista kansaa, mutta kun puhe kääntyy suomen kieleen, tulee hämäläiseenkin eloa. Suomen kieli on suomalaisille rakas, ja suhtaudumme siihen intohimoisesti."
+      ],
+      "sectors": [
+        {
+          "value": "0/lib/",
+          "translated": "Kirjasto"
+        },
+        {
+          "value": "1/lib/poly/",
+          "translated": "AMK"
+        }
+      ],
+      "dedupIds": [
+        "3amk.280912",
+        "anders.a2362d10-9c8c-4021-8146-1734aaad74a0",
+        "kavi_kirjasto.41441",
+        "blanka.ee99ba49-c97a-4255-a3ae-fe581b114671",
+        "colibri.78385",
+        "diana.116547",
+        "ekk.994193514006250",
+        "eepos.2516885",
+        "heili.daf2f08e-7d19-42f9-9d0e-b99ebf089033",
+        "helka.9932696833506253",
+        "helle.1526257",
+        "helmet.2389500",
+        "hurma.76548",
+        "uef.9914606553705966",
+        "tiekko.686062",
+        "jykdok.2011812",
+        "kaakkuri.225010",
+        "kainet.1169136",
+        "kangasniemi.5f2fdd42-b07b-4e5e-8d02-3ca8908e9da6",
+        "fikka.4311130",
+        "keski.2991765",
+        "kirkes.1364538",
+        "kristinestad.ae0650fb-36c4-4b72-bc33-fdabf5fbcafa",
+        "kuopio.1406876",
+        "kyyti.1381591",
+        "lapinkirjasto.1788852",
+        "luc.994619983806246",
+        "lastu.1596268",
+        "lep.354220",
+        "louna.b65dba74-49a1-429c-a98e-b1089cbd2875",
+        "lukki.811031",
+        "lumme.3003880",
+        "korsholm.957a0c08-5bc7-4fef-9a24-901d94295ef0",
+        "oy.9917180643906252",
+        "outi.2128291",
+        "jakobstad.25705870-c14b-455a-b803-f72e4de8c745",
+        "piki.4434576",
+        "polamk.24865",
+        "ratamo.1567706",
+        "rutakko.9a9c3154-87ce-426d-8f59-c8e3cd950a84",
+        "satakirjastot.1322075",
+        "seamk.991159416805969",
+        "siilinjarvi.550920",
+        "somero.0432b2f8-8ba4-4d9c-9263-d9c409c34799",
+        "uniarts_print.995111134206249",
+        "tuni.9910394454205973",
+        "turkuamk_finna.995460807205970",
+        "utu.9921428815405971",
+        "vaarakirjastot.11529326",
+        "vaasa.a886a823-7523-42ba-8c82-823b82d5de59",
+        "vanamo.21cc7447-fb09-4023-bee4-63082199d910",
+        "vaari.2640523",
+        "vaski.3910205",
+        "abo.9913382123405972"
+      ],
+      "fullRecord": "<?xml version=\"1.0\"?>\n<collection xmlns=\"http://www.loc.gov/MARC21/slim\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd\"><record><leader>00000cam a2200000 i 4500</leader><controlfield tag=\"001\">280912</controlfield><controlfield tag=\"003\">FI-MELINDA</controlfield><controlfield tag=\"005\">20241111094740.0</controlfield><controlfield tag=\"008\">190314s2019    fi ||||| b    000 0 fin  </controlfield><datafield tag=\"020\" ind1=\" \" ind2=\" \"><subfield code=\"a\">978-951-858-104-1</subfield><subfield code=\"q\">pehmeäkantinen</subfield></datafield><datafield tag=\"024\" ind1=\"3\" ind2=\" \"><subfield code=\"a\">9789518581041</subfield></datafield><datafield tag=\"035\" ind1=\" \" ind2=\" \"><subfield code=\"a\">FCC015422541</subfield></datafield><datafield tag=\"040\" ind1=\" \" ind2=\" \"><subfield code=\"a\">FI-S</subfield><subfield code=\"b\">fin</subfield><subfield code=\"e\">rda</subfield><subfield code=\"d\">FI-BTJ</subfield><subfield code=\"d\">FI-NL</subfield></datafield><datafield tag=\"041\" ind1=\"0\" ind2=\" \"><subfield code=\"a\">fin</subfield></datafield><datafield tag=\"084\" ind1=\" \" ind2=\" \"><subfield code=\"a\">88.2</subfield><subfield code=\"2\">ykl</subfield></datafield><datafield tag=\"084\" ind1=\" \" ind2=\" \"><subfield code=\"a\">87</subfield><subfield code=\"2\">ykl</subfield></datafield><datafield tag=\"100\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Juva, Kersti,</subfield><subfield code=\"e\">kirjoittaja.</subfield><subfield code=\"0\">(FI-ASTERI-N)000065229</subfield></datafield><datafield tag=\"245\" ind1=\"1\" ind2=\"0\"><subfield code=\"a\">Löytöretki suomeen /</subfield><subfield code=\"c\">Kersti Juva.</subfield></datafield><datafield tag=\"264\" ind1=\" \" ind2=\"1\"><subfield code=\"a\">Helsinki :</subfield><subfield code=\"b\">Suomalaisen Kirjallisuuden Seura,</subfield><subfield code=\"c\">2019.</subfield></datafield><datafield tag=\"264\" ind1=\" \" ind2=\"3\"><subfield code=\"a\">Riika :</subfield><subfield code=\"b\">Jelgava Printing House</subfield></datafield><datafield tag=\"300\" ind1=\" \" ind2=\" \"><subfield code=\"a\">413 sivua ;</subfield><subfield code=\"c\">22 cm</subfield></datafield><datafield tag=\"336\" ind1=\" \" ind2=\" \"><subfield code=\"a\">teksti</subfield><subfield code=\"b\">txt</subfield><subfield code=\"2\">rdacontent</subfield></datafield><datafield tag=\"337\" ind1=\" \" ind2=\" \"><subfield code=\"a\">käytettävissä ilman laitetta</subfield><subfield code=\"b\">n</subfield><subfield code=\"2\">rdamedia</subfield></datafield><datafield tag=\"338\" ind1=\" \" ind2=\" \"><subfield code=\"a\">nide</subfield><subfield code=\"b\">nc</subfield><subfield code=\"2\">rdacarrier</subfield></datafield><datafield tag=\"490\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Kirjokansi,</subfield><subfield code=\"x\">2323-7392 ;</subfield><subfield code=\"v\">223</subfield></datafield><datafield tag=\"500\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Lisäpainokset: 2. tarkistettu painos 2019.</subfield></datafield><datafield tag=\"504\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Sisältää bibliografisia viitteitä.</subfield></datafield><datafield tag=\"505\" ind1=\"0\" ind2=\" \"><subfield code=\"a\">Lukijalle -- Virkkeen rakentaminen -- Sanajärjestys -- Aika : oleva, mennyt ja tuleva, seisova ja juokseva -- Vaihtoehtoisia maailmoja : modaalisuudesta -- Toimija piilosilla -- Tietty henkilö ja määrätty paikka : viittaussuhteista ja osoittamisesta -- Lopuksi.</subfield></datafield><datafield tag=\"505\" ind1=\"2\" ind2=\"0\"><subfield code=\"t\">Kersti Juvan käännökset</subfield><subfield code=\"g\">(sivut 400-403).</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">sanajärjestys</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p18505</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">lauseet</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p21419</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">aikamuodot</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p6489</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">aspekti</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p8369</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">pronominit</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p5812</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">modaalisuus (kielitiede)</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p9173</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">subjekti (lauseenjäsenet)</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p24659</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">erot</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p3482</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">suomen kieli</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p8856</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kielelliset ominaisuudet</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p28827</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">englannin kieli</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p2573</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kääntäminen</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p9586</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">käännökset</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p16349</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kirjallisuuden kieli</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p4678</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kaunokirjallisuus</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p4</subfield></datafield><datafield tag=\"830\" ind1=\" \" ind2=\"0\"><subfield code=\"a\">Kirjokansi,</subfield><subfield code=\"x\">2323-7392 ;</subfield><subfield code=\"v\">223.</subfield></datafield><datafield tag=\"942\" ind1=\" \" ind2=\" \"><subfield code=\"1\">2019-11-20 11:13:39</subfield><subfield code=\"2\">z</subfield></datafield><datafield tag=\"999\" ind1=\" \" ind2=\" \"><subfield code=\"c\">280912</subfield><subfield code=\"d\">280912</subfield></datafield><datafield tag=\"952\" ind1=\" \" ind2=\" \"><subfield code=\"b\">METARA</subfield><subfield code=\"c\">YLEIS</subfield><subfield code=\"o\">800 JUVA</subfield><subfield code=\"8\">MET</subfield><subfield code=\"9\">1</subfield></datafield><datafield tag=\"952\" ind1=\" \" ind2=\" \"><subfield code=\"b\">HHPAS</subfield><subfield code=\"c\">YLEIS</subfield><subfield code=\"o\">809.45 JUVA</subfield><subfield code=\"8\">HH</subfield><subfield code=\"9\">1</subfield></datafield><datafield tag=\"952\" ind1=\" \" ind2=\" \"><subfield code=\"b\">PORV</subfield><subfield code=\"c\">YLEIS</subfield><subfield code=\"o\">809.454.1 JUVA</subfield><subfield code=\"8\">HH</subfield><subfield code=\"9\">1</subfield></datafield><datafield tag=\"952\" ind1=\" \" ind2=\" \"><subfield code=\"b\">LAULOH</subfield><subfield code=\"c\">YLEIS</subfield><subfield code=\"o\">88.2 JUVA</subfield><subfield code=\"8\">LAU</subfield><subfield code=\"9\">1</subfield></datafield><datafield tag=\"952\" ind1=\" \" ind2=\" \"><subfield code=\"b\">LAULEP</subfield><subfield code=\"c\">YLEIS</subfield><subfield code=\"o\">88.2 JUVA</subfield><subfield code=\"8\">LAU</subfield><subfield code=\"9\">1</subfield></datafield><datafield tag=\"952\" ind1=\" \" ind2=\" \"><subfield code=\"b\">LAUTIK</subfield><subfield code=\"c\">YLEIS</subfield><subfield code=\"o\">88.2 JUVA</subfield><subfield code=\"8\">LAU</subfield><subfield code=\"9\">1</subfield></datafield></record></collection>\n"
+    }
+  ],
+  "status": "OK"
+}

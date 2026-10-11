@@ -1,0 +1,713 @@
+{
+  "resultCount": 3,
+  "records": [
+    {
+      "id": "3amk.305943",
+      "recordPage": "/Record/3amk.305943",
+      "formats": [
+        {
+          "value": "0/Book/",
+          "translated": "Kirja"
+        },
+        {
+          "value": "1/Book/Book/",
+          "translated": "Kirja"
+        }
+      ],
+      "title": "Mikä internetiä vaivaa?",
+      "shortTitle": "Mikä internetiä vaivaa?",
+      "uniformTitles": [
+        "Mikä internetiä vaivaa? Suomi"
+      ],
+      "authors": {
+        "primary": {
+          "Lahtinen, Veikka": {
+            "role": [
+              "kirjoittaja"
+            ]
+          },
+          "Purokuru, Pontus": {
+            "role": [
+              "-"
+            ]
+          },
+          "Brunila, Mikael (tutkija)": {
+            "role": [
+              "-"
+            ]
+          }
+        },
+        "secondary": {
+          "Brunila, Mikael (tutkija) loppusanojen kirjoittaja": {
+            "role": [
+              "loppusanojen kirjoittaja"
+            ]
+          }
+        },
+        "corporate": {
+          "Kosmos (kustantamo), kustantaja": {
+            "role": [
+              "kustantaja"
+            ]
+          }
+        }
+      },
+      "primaryAuthors": [
+        "Lahtinen, Veikka",
+        "Purokuru, Pontus",
+        "Brunila, Mikael (tutkija)"
+      ],
+      "nonPresenterAuthors": [
+        {
+          "name": "Lahtinen, Veikka",
+          "role": "kirjoittaja",
+          "id": "(FI-ASTERI-N)000161703",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Purokuru, Pontus",
+          "date": "1987-",
+          "role": "kirjoittaja",
+          "id": "(FI-ASTERI-N)000162888",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Brunila, Mikael (tutkija)",
+          "role": "loppusanojen kirjoittaja",
+          "id": "(FI-ASTERI-N)000228440",
+          "type": "Personal Name"
+        }
+      ],
+      "secondaryAuthors": [
+        "Brunila, Mikael (tutkija) loppusanojen kirjoittaja"
+      ],
+      "corporateAuthors": [
+        "Kosmos (kustantamo), kustantaja"
+      ],
+      "isbns": [
+        "978-952-352-195-7 kovakantinen"
+      ],
+      "cleanIsbn": "9523521950",
+      "languages": [
+        "fin"
+      ],
+      "originalLanguages": [],
+      "publishers": [
+        "Kosmos"
+      ],
+      "publicationDates": [
+        "2024"
+      ],
+      "placesOfPublication": [
+        "[Helsinki] :"
+      ],
+      "year": "2024",
+      "physicalDescriptions": [
+        "267 sivua ; 23 cm"
+      ],
+      "series": [],
+      "subjects": [
+        [
+          "Internet"
+        ],
+        [
+          "meemit"
+        ],
+        [
+          "filosofia"
+        ],
+        [
+          "sosiaalinen media"
+        ],
+        [
+          "sosiologia"
+        ],
+        [
+          "työvoima"
+        ],
+        [
+          "digitaalinen kulttuuri"
+        ],
+        [
+          "digitaaliset pelit"
+        ],
+        [
+          "ilmiöt"
+        ],
+        [
+          "kritiikki"
+        ],
+        [
+          "poliittinen filosofia"
+        ],
+        [
+          "yhteiskuntafilosofia"
+        ],
+        [
+          "kapitalismi"
+        ]
+      ],
+      "subjectsExtended": [
+        {
+          "heading": [
+            "Internet"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p20405"
+        },
+        {
+          "heading": [
+            "meemit"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p10362"
+        },
+        {
+          "heading": [
+            "filosofia"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p1056"
+        },
+        {
+          "heading": [
+            "sosiaalinen media"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p20774"
+        },
+        {
+          "heading": [
+            "sosiologia"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p331"
+        },
+        {
+          "heading": [
+            "työvoima"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p4192"
+        },
+        {
+          "heading": [
+            "digitaalinen kulttuuri"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p24121"
+        },
+        {
+          "heading": [
+            "digitaaliset pelit"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p22353"
+        },
+        {
+          "heading": [
+            "ilmiöt"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p3974"
+        },
+        {
+          "heading": [
+            "kritiikki"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p1067"
+        },
+        {
+          "heading": [
+            "poliittinen filosofia"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p18022"
+        },
+        {
+          "heading": [
+            "yhteiskuntafilosofia"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p13819"
+        },
+        {
+          "heading": [
+            "kapitalismi"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p16573"
+        }
+      ],
+      "genres": [],
+      "majorGenres": [
+        "nonfiction"
+      ],
+      "classifications": {
+        "ykl": [
+          "32.01",
+          "30",
+          "61.72"
+        ]
+      },
+      "images": [],
+      "imagesExtended": [],
+      "summary": [],
+      "sectors": [
+        {
+          "value": "0/lib/",
+          "translated": "Kirjasto"
+        },
+        {
+          "value": "1/lib/poly/",
+          "translated": "AMK"
+        }
+      ],
+      "dedupIds": [
+        "3amk.305943",
+        "anders.9d1fc0e3-2bec-4f1a-aa58-4488544eb4ae",
+        "kavi_kirjasto.44554",
+        "ekk.994328532906250",
+        "eepos.3071715",
+        "heili.c0a7dfa0-2784-4c27-b8b7-443fc111726f",
+        "helka.9934624808406253",
+        "helle.1628006",
+        "helmet.2566150",
+        "hurma.84634",
+        "uef.9915156839605966",
+        "tiekko.1080346",
+        "jamk.993785444706251",
+        "jykdok.2146349",
+        "kainet.1338384",
+        "fikka.5651487",
+        "keski.3309269",
+        "kirkes.1604425",
+        "kuopio.1661939",
+        "kyyti.1527761",
+        "lapinkirjasto.1924865",
+        "luc.994905749906246",
+        "lastu.1927915",
+        "louna.96a0f577-5491-4937-96c2-d6fd3f90ecd3",
+        "lukki.996868",
+        "lumme.3142856",
+        "lut.992134324006254",
+        "oy.9918157438606252",
+        "outi.2327727",
+        "jakobstad.b34a0409-4ac6-4902-a07c-300d8c24967a",
+        "piki.5422066",
+        "ratamo.2008738",
+        "rutakko.e5f74bcd-611b-4767-9ebb-9978ecd5955f",
+        "satakirjastot.1688124",
+        "samk.991555205105968",
+        "seamk.991396588105969",
+        "siilinjarvi.605643",
+        "somero.f92c43ed-8fe6-49ae-be7e-4c8634830a41",
+        "tuni.9911583912905973",
+        "tria.383721",
+        "utu.9923360469305971",
+        "vaarakirjastot.11726317",
+        "vaasa.938ce523-7f2b-444c-b576-61f73de4250d",
+        "vanamo.dc4bef56-a35e-46a6-9ce6-ed90f27269e0",
+        "vaski.4334192",
+        "abo.9913739341205972"
+      ],
+      "fullRecord": "<?xml version=\"1.0\"?>\n<collection xmlns=\"http://www.loc.gov/MARC21/slim\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd\"><record><leader>00000cam a2200000 i 4500</leader><controlfield tag=\"001\">305943</controlfield><controlfield tag=\"003\">FI-MELINDA</controlfield><controlfield tag=\"005\">20240829090112.0</controlfield><controlfield tag=\"008\">230902t20242024fi     e b    000 0 fin  </controlfield><datafield tag=\"020\" ind1=\" \" ind2=\" \"><subfield code=\"a\">978-952-352-195-7</subfield><subfield code=\"q\">kovakantinen</subfield></datafield><datafield tag=\"035\" ind1=\" \" ind2=\" \"><subfield code=\"a\">FCC018854671</subfield></datafield><datafield tag=\"040\" ind1=\" \" ind2=\" \"><subfield code=\"a\">FI-BTJ</subfield><subfield code=\"b\">fin</subfield><subfield code=\"e\">rda</subfield><subfield code=\"d\">FI-NL</subfield><subfield code=\"d\">FI-Tyl</subfield></datafield><datafield tag=\"041\" ind1=\"0\" ind2=\" \"><subfield code=\"a\">fin</subfield></datafield><datafield tag=\"084\" ind1=\" \" ind2=\" \"><subfield code=\"a\">32.01</subfield><subfield code=\"2\">ykl</subfield></datafield><datafield tag=\"084\" ind1=\" \" ind2=\" \"><subfield code=\"a\">30</subfield><subfield code=\"2\">ykl</subfield></datafield><datafield tag=\"084\" ind1=\" \" ind2=\" \"><subfield code=\"a\">61.72</subfield><subfield code=\"2\">ykl</subfield></datafield><datafield tag=\"100\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Lahtinen, Veikka,</subfield><subfield code=\"e\">kirjoittaja.</subfield><subfield code=\"0\">(FI-ASTERI-N)000161703</subfield></datafield><datafield tag=\"240\" ind1=\"1\" ind2=\"0\"><subfield code=\"a\">Mikä internetiä vaivaa?</subfield><subfield code=\"l\">Suomi</subfield></datafield><datafield tag=\"245\" ind1=\"1\" ind2=\"0\"><subfield code=\"a\">Mikä internetiä vaivaa? /</subfield><subfield code=\"c\">Veikka Lahtinen, Pontus Purokuru.</subfield></datafield><datafield tag=\"264\" ind1=\" \" ind2=\"1\"><subfield code=\"a\">[Helsinki] :</subfield><subfield code=\"b\">Kosmos,</subfield><subfield code=\"c\">[2024]</subfield></datafield><datafield tag=\"264\" ind1=\" \" ind2=\"3\"><subfield code=\"a\">EU:ssa</subfield></datafield><datafield tag=\"264\" ind1=\" \" ind2=\"4\"><subfield code=\"c\">©2024</subfield></datafield><datafield tag=\"300\" ind1=\" \" ind2=\" \"><subfield code=\"a\">267 sivua ;</subfield><subfield code=\"c\">23 cm</subfield></datafield><datafield tag=\"336\" ind1=\" \" ind2=\" \"><subfield code=\"a\">teksti</subfield><subfield code=\"b\">txt</subfield><subfield code=\"2\">rdacontent</subfield></datafield><datafield tag=\"337\" ind1=\" \" ind2=\" \"><subfield code=\"a\">käytettävissä ilman laitetta</subfield><subfield code=\"b\">n</subfield><subfield code=\"2\">rdamedia</subfield></datafield><datafield tag=\"338\" ind1=\" \" ind2=\" \"><subfield code=\"a\">nide</subfield><subfield code=\"b\">nc</subfield><subfield code=\"2\">rdacarrier</subfield></datafield><datafield tag=\"504\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Sisältää bibligrafisia viitteitä.</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">Internet</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p20405</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">meemit</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p10362</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">filosofia</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p1056</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">sosiaalinen media</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p20774</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">sosiologia</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p331</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">työvoima</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p4192</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">digitaalinen kulttuuri</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p24121</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">digitaaliset pelit</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p22353</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">ilmiöt</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p3974</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kritiikki</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p1067</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">poliittinen filosofia</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p18022</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">yhteiskuntafilosofia</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p13819</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kapitalismi</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p16573</subfield></datafield><datafield tag=\"700\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Purokuru, Pontus,</subfield><subfield code=\"d\">1987-</subfield><subfield code=\"e\">kirjoittaja.</subfield><subfield code=\"0\">(FI-ASTERI-N)000162888</subfield></datafield><datafield tag=\"700\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Brunila, Mikael</subfield><subfield code=\"c\">(tutkija)</subfield><subfield code=\"e\">loppusanojen kirjoittaja.</subfield><subfield code=\"0\">(FI-ASTERI-N)000228440</subfield></datafield><datafield tag=\"710\" ind1=\"2\" ind2=\" \"><subfield code=\"a\">Kosmos (kustantamo),</subfield><subfield code=\"e\">kustantaja.</subfield><subfield code=\"0\">(FI-ASTERI-N)000219016</subfield></datafield><datafield tag=\"776\" ind1=\"0\" ind2=\"8\"><subfield code=\"i\">Verkkoaineisto (EPUB):</subfield><subfield code=\"z\">978-952-352-196-4</subfield></datafield><datafield tag=\"776\" ind1=\"0\" ind2=\"8\"><subfield code=\"i\">Verkkoaineisto (MP3):</subfield><subfield code=\"z\">978-952-352-197-1</subfield></datafield><datafield tag=\"999\" ind1=\" \" ind2=\" \"><subfield code=\"c\">305943</subfield><subfield code=\"d\">305943</subfield></datafield><datafield tag=\"952\" ind1=\" \" ind2=\" \"><subfield code=\"b\">HHPAS</subfield><subfield code=\"c\">YLEIS</subfield><subfield code=\"o\">004.7 LAHTINEN</subfield><subfield code=\"8\">HH</subfield><subfield code=\"9\">1</subfield></datafield><datafield tag=\"952\" ind1=\" \" ind2=\" \"><subfield code=\"b\">LAULEP</subfield><subfield code=\"c\">YLEIS</subfield><subfield code=\"o\">30 LAHTINEN</subfield><subfield code=\"8\">LAU</subfield><subfield code=\"9\">1</subfield></datafield><datafield tag=\"952\" ind1=\" \" ind2=\" \"><subfield code=\"b\">LAUTIK</subfield><subfield code=\"c\">YLEIS</subfield><subfield code=\"o\">32 LAHTINEN</subfield><subfield code=\"8\">LAU</subfield></datafield><datafield tag=\"952\" ind1=\" \" ind2=\" \"><subfield code=\"b\">METARA</subfield><subfield code=\"c\">YLEIS</subfield><subfield code=\"o\">004 LAHTINEN</subfield><subfield code=\"8\">MET</subfield><subfield code=\"9\">1</subfield></datafield></record></collection>\n"
+    },
+    {
+      "id": "jykdok.2252684",
+      "recordPage": "/Record/jykdok.2252684",
+      "formats": [
+        {
+          "value": "0/Book/",
+          "translated": "Kirja"
+        },
+        {
+          "value": "1/Book/eBook/",
+          "translated": "E-kirja"
+        }
+      ],
+      "title": "Mikä internetiä vaivaa?",
+      "shortTitle": "Mikä internetiä vaivaa?",
+      "uniformTitles": [
+        "Mikä internetiä vaivaa?. Suomi"
+      ],
+      "authors": {
+        "primary": {
+          "Purokuru, Pontus": {
+            "role": [
+              "kirjoittaja"
+            ]
+          },
+          "Lahtinen, Veikka": {
+            "role": [
+              "-"
+            ]
+          }
+        },
+        "secondary": [],
+        "corporate": {
+          "Kosmos, kustantaja": {
+            "role": [
+              "kustantaja"
+            ]
+          }
+        }
+      },
+      "primaryAuthors": [
+        "Purokuru, Pontus",
+        "Lahtinen, Veikka"
+      ],
+      "nonPresenterAuthors": [
+        {
+          "name": "Purokuru, Pontus",
+          "role": "kirjoittaja",
+          "id": "https://isni.org/isni/0000000484131330",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Lahtinen, Veikka",
+          "role": "kirjoittaja",
+          "id": "https://isni.org/isni/0000000484148466",
+          "type": "Personal Name"
+        }
+      ],
+      "secondaryAuthors": [],
+      "corporateAuthors": [
+        "Kosmos, kustantaja"
+      ],
+      "isbns": [
+        "978-952-352-196-4 EPUB"
+      ],
+      "cleanIsbn": "9523521969",
+      "languages": [
+        "fin"
+      ],
+      "originalLanguages": [],
+      "publishers": [
+        "Kosmos"
+      ],
+      "publicationDates": [
+        "2024"
+      ],
+      "placesOfPublication": [],
+      "year": "2024",
+      "physicalDescriptions": [
+        "1 verkkoaineisto"
+      ],
+      "series": [],
+      "subjects": [
+        [
+          "Internet",
+          "ENNAKKOTIETO"
+        ],
+        [
+          "meemit",
+          "ENNAKKOTIETO"
+        ],
+        [
+          "filosofia",
+          "ENNAKKOTIETO"
+        ],
+        [
+          "sosiaalinen media",
+          "ENNAKKOTIETO"
+        ],
+        [
+          "sosiologia",
+          "ENNAKKOTIETO"
+        ],
+        [
+          "työvoima",
+          "ENNAKKOTIETO"
+        ],
+        [
+          "digitaaliset pelit",
+          "ENNAKKOTIETO"
+        ],
+        [
+          "ilmiöt",
+          "ENNAKKOTIETO"
+        ],
+        [
+          "kritiikki",
+          "ENNAKKOTIETO"
+        ],
+        [
+          "poliittinen filosofia",
+          "ENNAKKOTIETO"
+        ],
+        [
+          "yhteiskuntafilosofia",
+          "ENNAKKOTIETO"
+        ],
+        [
+          "kapitalismi",
+          "ENNAKKOTIETO"
+        ],
+        [
+          "digitaalinen kulttuuri",
+          "Ennakkotieto"
+        ]
+      ],
+      "subjectsExtended": [
+        {
+          "heading": [
+            "Internet",
+            "ENNAKKOTIETO"
+          ]
+        },
+        {
+          "heading": [
+            "meemit",
+            "ENNAKKOTIETO"
+          ]
+        },
+        {
+          "heading": [
+            "filosofia",
+            "ENNAKKOTIETO"
+          ]
+        },
+        {
+          "heading": [
+            "sosiaalinen media",
+            "ENNAKKOTIETO"
+          ]
+        },
+        {
+          "heading": [
+            "sosiologia",
+            "ENNAKKOTIETO"
+          ]
+        },
+        {
+          "heading": [
+            "työvoima",
+            "ENNAKKOTIETO"
+          ]
+        },
+        {
+          "heading": [
+            "digitaaliset pelit",
+            "ENNAKKOTIETO"
+          ]
+        },
+        {
+          "heading": [
+            "ilmiöt",
+            "ENNAKKOTIETO"
+          ]
+        },
+        {
+          "heading": [
+            "kritiikki",
+            "ENNAKKOTIETO"
+          ]
+        },
+        {
+          "heading": [
+            "poliittinen filosofia",
+            "ENNAKKOTIETO"
+          ]
+        },
+        {
+          "heading": [
+            "yhteiskuntafilosofia",
+            "ENNAKKOTIETO"
+          ]
+        },
+        {
+          "heading": [
+            "kapitalismi",
+            "ENNAKKOTIETO"
+          ]
+        },
+        {
+          "heading": [
+            "digitaalinen kulttuuri",
+            "Ennakkotieto"
+          ]
+        }
+      ],
+      "genres": [],
+      "majorGenres": [
+        "nonfiction"
+      ],
+      "classifications": {
+        "ykl": [
+          "32.01"
+        ]
+      },
+      "images": [],
+      "imagesExtended": [],
+      "summary": [],
+      "sectors": [
+        {
+          "value": "0/lib/",
+          "translated": "Kirjasto"
+        },
+        {
+          "value": "1/lib/uni/",
+          "translated": "Yliopisto"
+        }
+      ],
+      "dedupIds": [
+        "jykdok.2252684",
+        "fikka.5652252"
+      ],
+      "fullRecord": "<?xml version=\"1.0\"?>\n<collection xmlns=\"http://www.loc.gov/MARC21/slim\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd\"><record><leader>00000cam a22000002i 4500</leader><controlfield tag=\"001\">018857575</controlfield><controlfield tag=\"003\">FI-MELINDA</controlfield><controlfield tag=\"005\">20260510040611.0</controlfield><controlfield tag=\"006\">m|||||o||d||||||||</controlfield><controlfield tag=\"007\">cr |||||||||||</controlfield><controlfield tag=\"008\">230907s2024    fi |||||o|||||||||0|fin||</controlfield><datafield tag=\"020\" ind1=\" \" ind2=\" \"><subfield code=\"a\">978-952-352-196-4</subfield><subfield code=\"q\">EPUB</subfield></datafield><datafield tag=\"035\" ind1=\" \" ind2=\" \"><subfield code=\"a\">FCC018857575</subfield></datafield><datafield tag=\"040\" ind1=\" \" ind2=\" \"><subfield code=\"b\">fin</subfield><subfield code=\"e\">rda</subfield><subfield code=\"d\">FI-NL</subfield></datafield><datafield tag=\"041\" ind1=\"0\" ind2=\" \"><subfield code=\"a\">fin</subfield></datafield><datafield tag=\"084\" ind1=\" \" ind2=\" \"><subfield code=\"a\">32.01</subfield><subfield code=\"2\">ykl</subfield></datafield><datafield tag=\"100\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Purokuru, Pontus,</subfield><subfield code=\"e\">kirjoittaja.</subfield><subfield code=\"0\">https://isni.org/isni/0000000484131330</subfield></datafield><datafield tag=\"240\" ind1=\"1\" ind2=\"0\"><subfield code=\"a\">Mikä internetiä vaivaa?.</subfield><subfield code=\"l\">Suomi</subfield></datafield><datafield tag=\"245\" ind1=\"1\" ind2=\"0\"><subfield code=\"a\">Mikä internetiä vaivaa?</subfield></datafield><datafield tag=\"264\" ind1=\" \" ind2=\"1\"><subfield code=\"b\">Kosmos,</subfield><subfield code=\"c\">2024.</subfield></datafield><datafield tag=\"300\" ind1=\" \" ind2=\" \"><subfield code=\"a\">1 verkkoaineisto</subfield></datafield><datafield tag=\"336\" ind1=\" \" ind2=\" \"><subfield code=\"a\">teksti</subfield><subfield code=\"b\">txt</subfield><subfield code=\"2\">rdacontent</subfield></datafield><datafield tag=\"337\" ind1=\" \" ind2=\" \"><subfield code=\"a\">tietokonekäyttöinen</subfield><subfield code=\"b\">c</subfield><subfield code=\"2\">rdamedia</subfield></datafield><datafield tag=\"338\" ind1=\" \" ind2=\" \"><subfield code=\"a\">verkkoaineisto</subfield><subfield code=\"b\">cr</subfield><subfield code=\"2\">rdacarrier</subfield></datafield><datafield tag=\"341\" ind1=\" \" ind2=\" \"><subfield code=\"a\">textual</subfield><subfield code=\"2\">sapdv</subfield></datafield><datafield tag=\"347\" ind1=\" \" ind2=\" \"><subfield code=\"a\">tekstitiedosto</subfield><subfield code=\"b\">EPUB</subfield></datafield><datafield tag=\"500\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Koneellisesti tuotettu tietue.</subfield></datafield><datafield tag=\"506\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Aineisto on käytettävissä vapaakappaletyöasemilla.</subfield><subfield code=\"f\">Online access with authorization</subfield><subfield code=\"2\">star</subfield></datafield><datafield tag=\"540\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Aineisto on käytettävissä tutkimus- ja muihin tarkoituksiin;</subfield><subfield code=\"b\">Kansalliskirjasto;</subfield><subfield code=\"c\">Laki kulttuuriaineistojen tallettamisesta ja säilyttämisestä</subfield><subfield code=\"u\">http://www.finlex.fi/fi/laki/ajantasa/2007/20071433</subfield></datafield><datafield tag=\"653\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Internet</subfield><subfield code=\"g\">ENNAKKOTIETO</subfield></datafield><datafield tag=\"653\" ind1=\" \" ind2=\" \"><subfield code=\"a\">meemit</subfield><subfield code=\"g\">ENNAKKOTIETO</subfield></datafield><datafield tag=\"653\" ind1=\" \" ind2=\" \"><subfield code=\"a\">filosofia</subfield><subfield code=\"g\">ENNAKKOTIETO</subfield></datafield><datafield tag=\"653\" ind1=\" \" ind2=\" \"><subfield code=\"a\">sosiaalinen media</subfield><subfield code=\"g\">ENNAKKOTIETO</subfield></datafield><datafield tag=\"653\" ind1=\" \" ind2=\" \"><subfield code=\"a\">sosiologia</subfield><subfield code=\"g\">ENNAKKOTIETO</subfield></datafield><datafield tag=\"653\" ind1=\" \" ind2=\" \"><subfield code=\"a\">työvoima</subfield><subfield code=\"g\">ENNAKKOTIETO</subfield></datafield><datafield tag=\"653\" ind1=\" \" ind2=\" \"><subfield code=\"a\">digitaaliset pelit</subfield><subfield code=\"g\">ENNAKKOTIETO</subfield></datafield><datafield tag=\"653\" ind1=\" \" ind2=\" \"><subfield code=\"a\">ilmiöt</subfield><subfield code=\"g\">ENNAKKOTIETO</subfield></datafield><datafield tag=\"653\" ind1=\" \" ind2=\" \"><subfield code=\"a\">kritiikki</subfield><subfield code=\"g\">ENNAKKOTIETO</subfield></datafield><datafield tag=\"653\" ind1=\" \" ind2=\" \"><subfield code=\"a\">poliittinen filosofia</subfield><subfield code=\"g\">ENNAKKOTIETO</subfield></datafield><datafield tag=\"653\" ind1=\" \" ind2=\" \"><subfield code=\"a\">yhteiskuntafilosofia</subfield><subfield code=\"g\">ENNAKKOTIETO</subfield></datafield><datafield tag=\"653\" ind1=\" \" ind2=\" \"><subfield code=\"a\">kapitalismi</subfield><subfield code=\"g\">ENNAKKOTIETO</subfield></datafield><datafield tag=\"653\" ind1=\" \" ind2=\" \"><subfield code=\"a\">digitaalinen kulttuuri</subfield><subfield code=\"g\">Ennakkotieto</subfield></datafield><datafield tag=\"700\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Lahtinen, Veikka,</subfield><subfield code=\"e\">kirjoittaja.</subfield><subfield code=\"0\">https://isni.org/isni/0000000484148466</subfield></datafield><datafield tag=\"710\" ind1=\"2\" ind2=\" \"><subfield code=\"a\">Kosmos,</subfield><subfield code=\"e\">kustantaja.</subfield></datafield><datafield tag=\"776\" ind1=\"0\" ind2=\" \"><subfield code=\"z\">978-952-352-195-7</subfield></datafield><datafield tag=\"776\" ind1=\"0\" ind2=\" \"><subfield code=\"z\">978-952-352-197-1</subfield></datafield><datafield tag=\"856\" ind1=\"4\" ind2=\"0\"><subfield code=\"u\">https://urn.fi/URN:ISBN:978-952-352-196-4</subfield><subfield code=\"z\">Käytettävissä vapaakappaletyöasemilla</subfield></datafield><datafield tag=\"999\" ind1=\" \" ind2=\" \"><subfield code=\"c\">2252684</subfield><subfield code=\"d\">2252684</subfield></datafield></record></collection>\n"
+    },
+    {
+      "id": "jykdok.2318564",
+      "recordPage": "/Record/jykdok.2318564",
+      "formats": [
+        {
+          "value": "0/Book/",
+          "translated": "Kirja"
+        },
+        {
+          "value": "1/Book/AudioBook/",
+          "translated": "Äänikirja"
+        },
+        {
+          "value": "2/Book/AudioBook/Online/",
+          "translated": "E-äänikirja"
+        }
+      ],
+      "title": "Mikä internetiä vaivaa?",
+      "shortTitle": "Mikä internetiä vaivaa?",
+      "uniformTitles": [
+        "Mikä internetiä vaivaa?. Suomi"
+      ],
+      "authors": {
+        "primary": {
+          "Purokuru, Pontus": {
+            "role": [
+              "kirjoittaja"
+            ]
+          },
+          "Lahtinen, Veikka": {
+            "role": [
+              "-"
+            ]
+          },
+          "Niemelä, Ville-Veikko": {
+            "role": [
+              "-"
+            ]
+          }
+        },
+        "secondary": {
+          "Niemelä, Ville-Veikko, lukija": {
+            "role": [
+              "lukija"
+            ]
+          }
+        },
+        "corporate": {
+          "Kosmos, kustantaja": {
+            "role": [
+              "kustantaja"
+            ]
+          }
+        }
+      },
+      "primaryAuthors": [
+        "Purokuru, Pontus",
+        "Lahtinen, Veikka",
+        "Niemelä, Ville-Veikko"
+      ],
+      "nonPresenterAuthors": [
+        {
+          "name": "Purokuru, Pontus",
+          "role": "kirjoittaja",
+          "id": "https://isni.org/isni/0000000484131330",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Lahtinen, Veikka",
+          "role": "kirjoittaja",
+          "id": "https://isni.org/isni/0000000484148466",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Niemelä, Ville-Veikko",
+          "role": "lukija",
+          "id": "(FI-ASTERI-N)000233696",
+          "type": "Personal Name"
+        }
+      ],
+      "secondaryAuthors": [
+        "Niemelä, Ville-Veikko, lukija"
+      ],
+      "corporateAuthors": [
+        "Kosmos, kustantaja"
+      ],
+      "isbns": [
+        "978-952-352-197-1 MP3"
+      ],
+      "cleanIsbn": "9523521977",
+      "languages": [
+        "fin"
+      ],
+      "originalLanguages": [],
+      "publishers": [
+        "Kosmos"
+      ],
+      "publicationDates": [
+        "2024"
+      ],
+      "placesOfPublication": [],
+      "year": "2024",
+      "physicalDescriptions": [
+        "1 verkkoaineisto (7 h 49 min)"
+      ],
+      "series": [],
+      "subjects": [],
+      "genres": [
+        "äänikirjat"
+      ],
+      "majorGenres": [
+        "nonfiction"
+      ],
+      "classifications": {
+        "ykl": [
+          "32.01"
+        ]
+      },
+      "images": [],
+      "imagesExtended": [],
+      "summary": [],
+      "sectors": [
+        {
+          "value": "0/lib/",
+          "translated": "Kirjasto"
+        },
+        {
+          "value": "1/lib/uni/",
+          "translated": "Yliopisto"
+        }
+      ],
+      "dedupIds": [
+        "jykdok.2318564",
+        "fikka.5652253"
+      ],
+      "fullRecord": "<?xml version=\"1.0\"?>\n<collection xmlns=\"http://www.loc.gov/MARC21/slim\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd\"><record><leader>00000cim a22000002i 4500</leader><controlfield tag=\"001\">018857576</controlfield><controlfield tag=\"003\">FI-MELINDA</controlfield><controlfield tag=\"005\">20260514071240.0</controlfield><controlfield tag=\"006\">m|||||o||h||||||||</controlfield><controlfield tag=\"007\">sr uunnnnnuneu</controlfield><controlfield tag=\"007\">cr nnannnuuuuu</controlfield><controlfield tag=\"008\">230907s2024    fi |||||o|||||||||||fin||</controlfield><datafield tag=\"020\" ind1=\" \" ind2=\" \"><subfield code=\"a\">978-952-352-197-1</subfield><subfield code=\"q\">MP3</subfield></datafield><datafield tag=\"035\" ind1=\" \" ind2=\" \"><subfield code=\"a\">FCC018857576</subfield></datafield><datafield tag=\"040\" ind1=\" \" ind2=\" \"><subfield code=\"b\">fin</subfield><subfield code=\"e\">rda</subfield><subfield code=\"d\">FI-NL</subfield></datafield><datafield tag=\"041\" ind1=\"0\" ind2=\" \"><subfield code=\"d\">fin</subfield></datafield><datafield tag=\"084\" ind1=\" \" ind2=\" \"><subfield code=\"a\">32.01</subfield><subfield code=\"2\">ykl</subfield></datafield><datafield tag=\"100\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Purokuru, Pontus,</subfield><subfield code=\"e\">kirjoittaja.</subfield><subfield code=\"0\">https://isni.org/isni/0000000484131330</subfield></datafield><datafield tag=\"240\" ind1=\"1\" ind2=\"0\"><subfield code=\"a\">Mikä internetiä vaivaa?.</subfield><subfield code=\"l\">Suomi</subfield></datafield><datafield tag=\"245\" ind1=\"1\" ind2=\"0\"><subfield code=\"a\">Mikä internetiä vaivaa?</subfield></datafield><datafield tag=\"264\" ind1=\" \" ind2=\"1\"><subfield code=\"b\">Kosmos,</subfield><subfield code=\"c\">2024.</subfield></datafield><datafield tag=\"300\" ind1=\" \" ind2=\" \"><subfield code=\"a\">1 verkkoaineisto (7 h 49 min)</subfield></datafield><datafield tag=\"306\" ind1=\" \" ind2=\" \"><subfield code=\"a\">074900</subfield></datafield><datafield tag=\"336\" ind1=\" \" ind2=\" \"><subfield code=\"a\">puhe</subfield><subfield code=\"b\">spw</subfield><subfield code=\"2\">rdacontent</subfield></datafield><datafield tag=\"337\" ind1=\" \" ind2=\" \"><subfield code=\"a\">tietokonekäyttöinen</subfield><subfield code=\"b\">c</subfield><subfield code=\"2\">rdamedia</subfield></datafield><datafield tag=\"338\" ind1=\" \" ind2=\" \"><subfield code=\"a\">verkkoaineisto</subfield><subfield code=\"b\">cr</subfield><subfield code=\"2\">rdacarrier</subfield></datafield><datafield tag=\"341\" ind1=\" \" ind2=\" \"><subfield code=\"a\">auditory</subfield><subfield code=\"2\">sapdv</subfield></datafield><datafield tag=\"344\" ind1=\" \" ind2=\" \"><subfield code=\"a\">digitaalinen</subfield></datafield><datafield tag=\"347\" ind1=\" \" ind2=\" \"><subfield code=\"a\">äänitiedosto</subfield><subfield code=\"b\">MP3</subfield></datafield><datafield tag=\"500\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Koneellisesti tuotettu tietue.</subfield></datafield><datafield tag=\"506\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Aineisto on käytettävissä vapaakappaletyöasemilla.</subfield><subfield code=\"f\">Online access with authorization</subfield><subfield code=\"2\">star</subfield></datafield><datafield tag=\"511\" ind1=\"0\" ind2=\" \"><subfield code=\"a\">Lukija: Ville-Veikko Niemelä.</subfield></datafield><datafield tag=\"540\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Aineisto on käytettävissä tutkimus- ja muihin tarkoituksiin;</subfield><subfield code=\"b\">Kansalliskirjasto;</subfield><subfield code=\"c\">Laki kulttuuriaineistojen tallettamisesta ja säilyttämisestä</subfield><subfield code=\"u\">http://www.finlex.fi/fi/laki/ajantasa/2007/20071433</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">äänikirjat</subfield><subfield code=\"2\">slm/fin</subfield><subfield code=\"0\">https://urn.fi/URN:NBN:fi:au:slm:s579</subfield></datafield><datafield tag=\"700\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Lahtinen, Veikka,</subfield><subfield code=\"e\">kirjoittaja.</subfield><subfield code=\"0\">https://isni.org/isni/0000000484148466</subfield></datafield><datafield tag=\"700\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Niemelä, Ville-Veikko,</subfield><subfield code=\"e\">lukija.</subfield><subfield code=\"0\">(FI-ASTERI-N)000233696</subfield></datafield><datafield tag=\"710\" ind1=\"2\" ind2=\" \"><subfield code=\"a\">Kosmos,</subfield><subfield code=\"e\">kustantaja.</subfield></datafield><datafield tag=\"776\" ind1=\"0\" ind2=\" \"><subfield code=\"z\">978-952-352-195-7</subfield></datafield><datafield tag=\"776\" ind1=\"0\" ind2=\" \"><subfield code=\"z\">978-952-352-196-4</subfield></datafield><datafield tag=\"856\" ind1=\"4\" ind2=\"0\"><subfield code=\"u\">https://urn.fi/URN:ISBN:978-952-352-197-1</subfield><subfield code=\"z\">Käytettävissä vapaakappaletyöasemilla</subfield></datafield><datafield tag=\"999\" ind1=\" \" ind2=\" \"><subfield code=\"c\">2318564</subfield><subfield code=\"d\">2318564</subfield></datafield></record></collection>\n"
+    }
+  ],
+  "status": "OK"
+}

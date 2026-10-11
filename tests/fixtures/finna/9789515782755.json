@@ -1,0 +1,136 @@
+{
+  "resultCount": 1,
+  "records": [
+    {
+      "id": "anders.1efe000c-689d-472f-8498-08823897f23f",
+      "recordPage": "/Record/anders.1efe000c-689d-472f-8498-08823897f23f",
+      "formats": [
+        {
+          "value": "0/Book/",
+          "translated": "Kirja"
+        },
+        {
+          "value": "1/Book/Book/",
+          "translated": "Kirja"
+        }
+      ],
+      "title": "Oppi tulee idästä",
+      "shortTitle": "Oppi tulee idästä",
+      "uniformTitles": [
+        "Blow job"
+      ],
+      "authors": {
+        "primary": {
+          "Home, Stewart": {
+            "role": [
+              "kirjoittaja"
+            ]
+          },
+          "Ahokas, Juha": {
+            "role": [
+              "-"
+            ]
+          }
+        },
+        "secondary": {
+          "Ahokas, Juha kääntäjä": {
+            "role": [
+              "kääntäjä"
+            ]
+          }
+        },
+        "corporate": []
+      },
+      "primaryAuthors": [
+        "Home, Stewart",
+        "Ahokas, Juha"
+      ],
+      "nonPresenterAuthors": [
+        {
+          "name": "Home, Stewart",
+          "role": "kirjoittaja",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Ahokas, Juha",
+          "role": "kääntäjä",
+          "id": "000110347",
+          "type": "Personal Name"
+        }
+      ],
+      "secondaryAuthors": [
+        "Ahokas, Juha kääntäjä"
+      ],
+      "corporateAuthors": [],
+      "isbns": [
+        "951-578-275-9"
+      ],
+      "cleanIsbn": "9515782759",
+      "languages": [
+        "fin"
+      ],
+      "originalLanguages": [],
+      "publishers": [
+        "Like"
+      ],
+      "publicationDates": [
+        "1996"
+      ],
+      "placesOfPublication": [
+        "Helsinki"
+      ],
+      "year": "1996",
+      "physicalDescriptions": [
+        "231 sivua"
+      ],
+      "series": [],
+      "subjects": [],
+      "genres": [],
+      "majorGenres": [
+        "fiction"
+      ],
+      "classifications": {
+        "ykl": [
+          "84.2"
+        ]
+      },
+      "images": [],
+      "imagesExtended": [],
+      "summary": [],
+      "sectors": [
+        {
+          "value": "0/lib/",
+          "translated": "Kirjasto"
+        },
+        {
+          "value": "1/lib/pub/",
+          "translated": "Yleinen"
+        }
+      ],
+      "dedupIds": [
+        "anders.1efe000c-689d-472f-8498-08823897f23f",
+        "eepos.161895",
+        "helka.999484093506253",
+        "helmet.1301070",
+        "tiekko.897598",
+        "jykdok.618162",
+        "kainet.232425",
+        "fikka.3748810",
+        "keski.159062",
+        "lapinkirjasto.182584",
+        "lastu.75349",
+        "lumme.233550",
+        "oy.994971943906252",
+        "outi.319106",
+        "piki.301701",
+        "ratamo.104922",
+        "utu.995950145405971",
+        "vanamo.db317e1b-711f-4b98-8fba-de9d017aec42",
+        "vaari.847687",
+        "vaski.284347"
+      ],
+      "fullRecord": "<?xml version=\"1.0\"?>\n<collection xmlns=\"http://www.loc.gov/MARC21/slim\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd\"><record><leader>00000 am  22000001  0000</leader><controlfield tag=\"001\">1efe000c-689d-472f-8498-08823897f23f</controlfield><controlfield tag=\"003\">38ce7306-5873-4a96-8ad7-d42bf004dbec</controlfield><controlfield tag=\"008\">000000s1996       ||||g     |00| 1|fin||</controlfield><datafield tag=\"035\" ind1=\" \" ind2=\" \"><subfield code=\"a\">(FI-Anders)135824</subfield></datafield><datafield tag=\"035\" ind1=\" \" ind2=\" \"><subfield code=\"a\">(FI-BTJ)9515782759</subfield></datafield><datafield tag=\"035\" ind1=\" \" ind2=\" \"><subfield code=\"a\">(FI-MELINDA)000838859</subfield></datafield><datafield tag=\"020\" ind1=\" \" ind2=\" \"><subfield code=\"a\">951-578-275-9</subfield></datafield><datafield tag=\"084\" ind1=\" \" ind2=\" \"><subfield code=\"a\">84.2</subfield><subfield code=\"2\">ykl</subfield></datafield><datafield tag=\"100\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Home, Stewart</subfield><subfield code=\"e\">kirjoittaja</subfield></datafield><datafield tag=\"240\" ind1=\"1\" ind2=\"0\"><subfield code=\"a\">Blow job</subfield></datafield><datafield tag=\"245\" ind1=\" \" ind2=\"0\"><subfield code=\"a\">Oppi tulee idästä /</subfield><subfield code=\"c\">Stewart Home ; suomentanut Juha Ahokas</subfield></datafield><datafield tag=\"260\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Helsinki</subfield><subfield code=\"b\">Like</subfield><subfield code=\"c\">1996</subfield></datafield><datafield tag=\"300\" ind1=\" \" ind2=\" \"><subfield code=\"a\">231 sivua</subfield></datafield><datafield tag=\"336\" ind1=\" \" ind2=\" \"><subfield code=\"b\">txt</subfield></datafield><datafield tag=\"337\" ind1=\" \" ind2=\" \"><subfield code=\"b\">n</subfield></datafield><datafield tag=\"338\" ind1=\" \" ind2=\" \"><subfield code=\"b\">nc</subfield></datafield><datafield tag=\"500\" ind1=\" \" ind2=\" \"><subfield code=\"a\">nidottu</subfield></datafield><datafield tag=\"500\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Alkuperäinen kieli: eng</subfield></datafield><datafield tag=\"700\" ind1=\"3\" ind2=\" \"><subfield code=\"a\">Ahokas, Juha</subfield><subfield code=\"e\">kääntäjä</subfield><subfield code=\"0\">000110347</subfield><subfield code=\"2\">FI-ASTERI-N</subfield></datafield><datafield tag=\"852\" ind1=\" \" ind2=\" \"><subfield code=\"a\">5c42fd73-5eee-4ae7-a679-92099a9a982a</subfield><subfield code=\"b\">cc75b551-dc4b-430f-9da9-64469370647a</subfield><subfield code=\"c\">d6a3ddd9-ee66-43a9-a3a3-5fe4329d126b</subfield></datafield></record></collection>\n"
+    }
+  ],
+  "status": "OK"
+}

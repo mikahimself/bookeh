@@ -1,0 +1,1209 @@
+{
+  "resultCount": 5,
+  "records": [
+    {
+      "id": "diana.117195",
+      "recordPage": "/Record/diana.117195",
+      "formats": [
+        {
+          "value": "0/Book/",
+          "translated": "Kirja"
+        },
+        {
+          "value": "1/Book/eBook/",
+          "translated": "E-kirja"
+        }
+      ],
+      "title": "Sapiens : ihmisen lyhyt historia",
+      "shortTitle": "Sapiens",
+      "subTitle": "ihmisen lyhyt historia",
+      "uniformTitles": [
+        "Kitzur toldot ha'enoshut. Suomi"
+      ],
+      "authors": {
+        "primary": {
+          "Harari, Yuval Noah": {
+            "role": [
+              "kirjoittaja"
+            ]
+          },
+          "Iso-Markku, Jaana": {
+            "role": [
+              "-"
+            ]
+          }
+        },
+        "secondary": {
+          "Iso-Markku, Jaana, kääntäjä": {
+            "role": [
+              "kääntäjä"
+            ]
+          }
+        },
+        "corporate": []
+      },
+      "primaryAuthors": [
+        "Harari, Yuval Noah",
+        "Iso-Markku, Jaana"
+      ],
+      "nonPresenterAuthors": [
+        {
+          "name": "Harari, Yuval Noah",
+          "role": "kirjoittaja",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Iso-Markku, Jaana",
+          "role": "kääntäjä",
+          "type": "Personal Name"
+        }
+      ],
+      "secondaryAuthors": [
+        "Iso-Markku, Jaana, kääntäjä"
+      ],
+      "corporateAuthors": [],
+      "isbns": [
+        "978-952-279-274-7 EPUB"
+      ],
+      "cleanIsbn": "9522792748",
+      "languages": [
+        "fin"
+      ],
+      "originalLanguages": [
+        "heb"
+      ],
+      "publishers": [
+        "Bazar"
+      ],
+      "publicationDates": [
+        "2016"
+      ],
+      "placesOfPublication": [
+        "[Helsinki] :"
+      ],
+      "year": "2016",
+      "physicalDescriptions": [
+        "1 verkkoaineisto (500 sivua) ; kuvitettu, karttoja",
+        "Julkaistu myös painettuna"
+      ],
+      "series": [],
+      "subjects": [
+        [
+          "evoluutio"
+        ],
+        [
+          "ihminen"
+        ],
+        [
+          "evoluutioteoria"
+        ],
+        [
+          "biologinen antropologia"
+        ],
+        [
+          "kulttuurievoluutio"
+        ],
+        [
+          "ihmiskunta"
+        ],
+        [
+          "sivilisaatio"
+        ],
+        [
+          "historia"
+        ],
+        [
+          "maailmanhistoria"
+        ],
+        [
+          "e-kirjat"
+        ]
+      ],
+      "subjectsExtended": [
+        {
+          "heading": [
+            "evoluutio"
+          ],
+          "type": "topic",
+          "source": "yso/fin"
+        },
+        {
+          "heading": [
+            "ihminen"
+          ],
+          "type": "topic",
+          "source": "yso/fin"
+        },
+        {
+          "heading": [
+            "evoluutioteoria"
+          ],
+          "type": "topic",
+          "source": "yso/fin"
+        },
+        {
+          "heading": [
+            "biologinen antropologia"
+          ],
+          "type": "topic",
+          "source": "yso/fin"
+        },
+        {
+          "heading": [
+            "kulttuurievoluutio"
+          ],
+          "type": "topic",
+          "source": "yso/fin"
+        },
+        {
+          "heading": [
+            "ihmiskunta"
+          ],
+          "type": "topic",
+          "source": "yso/fin"
+        },
+        {
+          "heading": [
+            "sivilisaatio"
+          ],
+          "type": "topic",
+          "source": "yso/fin"
+        },
+        {
+          "heading": [
+            "historia"
+          ],
+          "type": "topic",
+          "source": "yso/fin"
+        },
+        {
+          "heading": [
+            "maailmanhistoria"
+          ],
+          "type": "topic",
+          "source": "yso/fin"
+        },
+        {
+          "heading": [
+            "e-kirjat"
+          ],
+          "type": "topic",
+          "source": "yso/fin"
+        }
+      ],
+      "genres": [],
+      "majorGenres": [
+        "nonfiction"
+      ],
+      "classifications": {
+        "ykl": [
+          "56.411",
+          "49"
+        ]
+      },
+      "images": [],
+      "imagesExtended": [],
+      "summary": [],
+      "sectors": [
+        {
+          "value": "0/lib/",
+          "translated": "Kirjasto"
+        },
+        {
+          "value": "1/lib/poly/",
+          "translated": "AMK"
+        }
+      ],
+      "dedupIds": [
+        "diana.117195",
+        "jykdok.2231154",
+        "fikka.5626563"
+      ],
+      "fullRecord": "<?xml version=\"1.0\"?>\n<collection xmlns=\"http://www.loc.gov/MARC21/slim\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd\"><record><leader>00000cam a22000004i 4500</leader><controlfield tag=\"001\">117195</controlfield><controlfield tag=\"003\">FI-MELINDA</controlfield><controlfield tag=\"005\">20240813115020.0</controlfield><controlfield tag=\"006\">m|||||o||d||||||||</controlfield><controlfield tag=\"007\">cr||||||||||||</controlfield><controlfield tag=\"008\">160314s2016    fi ab||go|||| 000|| fin|c</controlfield><datafield tag=\"020\" ind1=\" \" ind2=\" \"><subfield code=\"a\">978-952-279-274-7</subfield><subfield code=\"q\">EPUB</subfield></datafield><datafield tag=\"035\" ind1=\" \" ind2=\" \"><subfield code=\"a\">FCC009809953</subfield></datafield><datafield tag=\"037\" ind1=\" \" ind2=\" \"><subfield code=\"b\">Ellibs</subfield><subfield code=\"5\">FI-Diak</subfield></datafield><datafield tag=\"041\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">fin</subfield><subfield code=\"k\">eng</subfield><subfield code=\"h\">heb</subfield></datafield><datafield tag=\"084\" ind1=\" \" ind2=\" \"><subfield code=\"a\">56.411</subfield><subfield code=\"2\">ykl</subfield></datafield><datafield tag=\"084\" ind1=\" \" ind2=\" \"><subfield code=\"a\">49</subfield><subfield code=\"2\">ykl</subfield></datafield><datafield tag=\"100\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Harari, Yuval Noah,</subfield><subfield code=\"e\">kirjoittaja.</subfield></datafield><datafield tag=\"240\" ind1=\"1\" ind2=\"0\"><subfield code=\"a\">Kitzur toldot ha'enoshut.</subfield><subfield code=\"l\">Suomi</subfield></datafield><datafield tag=\"245\" ind1=\"1\" ind2=\"0\"><subfield code=\"a\">Sapiens :</subfield><subfield code=\"b\">ihmisen lyhyt historia /</subfield><subfield code=\"c\">Yuval Noah Harari ; suomentanut Jaana Iso-Markku.</subfield></datafield><datafield tag=\"246\" ind1=\"3\" ind2=\"0\"><subfield code=\"a\">Ihmisen lyhyt historia</subfield></datafield><datafield tag=\"264\" ind1=\" \" ind2=\"1\"><subfield code=\"a\">[Helsinki] :</subfield><subfield code=\"b\">Bazar,</subfield><subfield code=\"c\">2016.</subfield></datafield><datafield tag=\"300\" ind1=\" \" ind2=\" \"><subfield code=\"a\">1 verkkoaineisto (500 sivua) ;</subfield><subfield code=\"b\">kuvitettu, karttoja</subfield></datafield><datafield tag=\"336\" ind1=\" \" ind2=\" \"><subfield code=\"a\">teksti</subfield><subfield code=\"b\">txt</subfield><subfield code=\"2\">rdacontent</subfield></datafield><datafield tag=\"337\" ind1=\" \" ind2=\" \"><subfield code=\"a\">tietokonekäyttöinen</subfield><subfield code=\"b\">c</subfield><subfield code=\"2\">rdamedia</subfield></datafield><datafield tag=\"338\" ind1=\" \" ind2=\" \"><subfield code=\"a\">verkkoaineisto</subfield><subfield code=\"b\">cr</subfield><subfield code=\"2\">rdacarrier</subfield></datafield><datafield tag=\"500\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Suomennettu englanninkielisestä käännöksestä: Sapiens : a brief history of humankind.</subfield></datafield><datafield tag=\"506\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Käytettävissä lisenssin hankkineissa organisaatioissa</subfield><subfield code=\"f\">Online access with authorization</subfield><subfield code=\"2\">star</subfield></datafield><datafield tag=\"530\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Julkaistu myös painettuna.</subfield></datafield><datafield tag=\"588\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Kuvailu tarkistettu verkkoaineistosta 18.12.2017.</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">evoluutio</subfield><subfield code=\"2\">yso/fin</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">ihminen</subfield><subfield code=\"2\">yso/fin</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">evoluutioteoria</subfield><subfield code=\"2\">yso/fin</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">biologinen antropologia</subfield><subfield code=\"2\">yso/fin</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kulttuurievoluutio</subfield><subfield code=\"2\">yso/fin</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">ihmiskunta</subfield><subfield code=\"2\">yso/fin</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">sivilisaatio</subfield><subfield code=\"2\">yso/fin</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">historia</subfield><subfield code=\"2\">yso/fin</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">maailmanhistoria</subfield><subfield code=\"2\">yso/fin</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">e-kirjat</subfield><subfield code=\"2\">yso/fin</subfield></datafield><datafield tag=\"700\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Iso-Markku, Jaana,</subfield><subfield code=\"e\">kääntäjä.</subfield></datafield><datafield tag=\"776\" ind1=\"0\" ind2=\"8\"><subfield code=\"i\">Painettu:</subfield><subfield code=\"a\">9789522792310</subfield></datafield><datafield tag=\"776\" ind1=\"0\" ind2=\"8\"><subfield code=\"i\">Painettu:</subfield><subfield code=\"a\">9789522794703</subfield></datafield><datafield tag=\"856\" ind1=\"4\" ind2=\"0\"><subfield code=\"u\">https://www.ellibslibrary.com/diak/9789522792747</subfield><subfield code=\"y\">E-kirja / E-book</subfield><subfield code=\"z\">Käyttö Diakin käyttäjätunnuksella / Access with Diak username</subfield></datafield><datafield tag=\"908\" ind1=\" \" ind2=\" \"><subfield code=\"a\">is</subfield></datafield><datafield tag=\"999\" ind1=\" \" ind2=\" \"><subfield code=\"c\">117195</subfield><subfield code=\"d\">117195</subfield></datafield></record></collection>\n"
+    },
+    {
+      "id": "3amk.211700",
+      "recordPage": "/Record/3amk.211700",
+      "formats": [
+        {
+          "value": "0/Book/",
+          "translated": "Kirja"
+        },
+        {
+          "value": "1/Book/Book/",
+          "translated": "Kirja"
+        }
+      ],
+      "title": "Sapiens : ihmisen lyhyt historia",
+      "shortTitle": "Sapiens",
+      "subTitle": "ihmisen lyhyt historia",
+      "uniformTitles": [
+        "Kitzur toldot ha'enoshut, suomi"
+      ],
+      "authors": {
+        "primary": {
+          "Harari, Yuval Noah": {
+            "role": [
+              "kirjoittaja"
+            ]
+          },
+          "Iso-Markku, Jaana": {
+            "role": [
+              "-"
+            ]
+          }
+        },
+        "secondary": {
+          "Iso-Markku, Jaana, 1956- kääntäjä": {
+            "role": [
+              "kääntäjä"
+            ]
+          }
+        },
+        "corporate": {
+          "Bazar Kustannus, kustantaja": {
+            "role": [
+              "kustantaja"
+            ]
+          }
+        }
+      },
+      "primaryAuthors": [
+        "Harari, Yuval Noah",
+        "Iso-Markku, Jaana"
+      ],
+      "nonPresenterAuthors": [
+        {
+          "name": "Harari, Yuval Noah",
+          "role": "kirjoittaja",
+          "id": "(FI-ASTERI-N)000226158",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Iso-Markku, Jaana",
+          "date": "1956-",
+          "role": "kääntäjä",
+          "id": "(FI-ASTERI-N)000045388",
+          "type": "Personal Name"
+        }
+      ],
+      "secondaryAuthors": [
+        "Iso-Markku, Jaana, 1956- kääntäjä"
+      ],
+      "corporateAuthors": [
+        "Bazar Kustannus, kustantaja"
+      ],
+      "isbns": [
+        "978-952-279-470-3 pehmeäkantinen"
+      ],
+      "cleanIsbn": "9522794708",
+      "languages": [
+        "fin"
+      ],
+      "originalLanguages": [],
+      "publishers": [
+        "Bazar"
+      ],
+      "publicationDates": [
+        "2017"
+      ],
+      "placesOfPublication": [
+        "Helsinki :"
+      ],
+      "year": "2017",
+      "edition": "2. nidottu laitos",
+      "physicalDescriptions": [
+        "491 sivua : kuvitettu, karttoja ; 22 cm"
+      ],
+      "series": [
+        {
+          "name": "Mitä Suomi lukee"
+        }
+      ],
+      "subjects": [
+        [
+          "evoluutio"
+        ],
+        [
+          "evoluutioteoria"
+        ],
+        [
+          "biologinen antropologia"
+        ],
+        [
+          "kulttuurievoluutio"
+        ],
+        [
+          "ihmiskunta"
+        ],
+        [
+          "sivilisaatio"
+        ],
+        [
+          "historia"
+        ],
+        [
+          "maailmanhistoria"
+        ],
+        [
+          "ihminen"
+        ]
+      ],
+      "subjectsExtended": [
+        {
+          "heading": [
+            "evoluutio"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p8278"
+        },
+        {
+          "heading": [
+            "evoluutioteoria"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p21943"
+        },
+        {
+          "heading": [
+            "biologinen antropologia"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p3879"
+        },
+        {
+          "heading": [
+            "kulttuurievoluutio"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p8279"
+        },
+        {
+          "heading": [
+            "ihmiskunta"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p19246"
+        },
+        {
+          "heading": [
+            "sivilisaatio"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p14980"
+        },
+        {
+          "heading": [
+            "historia"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p1780"
+        },
+        {
+          "heading": [
+            "maailmanhistoria"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p19656"
+        },
+        {
+          "heading": [
+            "ihminen"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p18849"
+        }
+      ],
+      "genres": [],
+      "majorGenres": [
+        "nonfiction"
+      ],
+      "classifications": {
+        "ykl": [
+          "56.411",
+          "49"
+        ]
+      },
+      "images": [],
+      "imagesExtended": [],
+      "summary": [
+        "100 000 vuotta sitten maapallolla asui ainakin kuusi ihmislajia. Nykyään lajeja on vain yksi: homo sapiens. Miten meidän lajimme onnistui päihittämään muut lajit? Miten metsästäjistä tuli kaupunkien ja kuningaskuntien rakentajia? Miten ryhdyimme uskomaan jumaliin, valtioihin ja ihmisoikeuksiin sekä luottamaan rahaan, kirjoihin ja lakeihin? Miksi alistuimme byrokratialle, aikatauluille ja kuluttamiselle? Ja millaiseksi maailma on muuttumassa? Kirjassaan Sapiens. Ihmisen lyhyt historia Yuval Noah Harari käy läpi koko ihmisen historian, aina ensimmäisistä maan kamaralla kulkeneista ihmisistä kohti nykypäivää. Lajimme kehitykseen on vaikuttanut useita radikaaleja ja joskus tuhoisiakin läpimurtoja. Miten historian virrat ovat muovanneet ihmistä, yhteiskuntaa ja kaikkea ympärillämme?"
+      ],
+      "sectors": [
+        {
+          "value": "0/lib/",
+          "translated": "Kirjasto"
+        },
+        {
+          "value": "1/lib/poly/",
+          "translated": "AMK"
+        }
+      ],
+      "dedupIds": [
+        "3amk.211700",
+        "anders.d5ca4b77-1ee0-4f62-af94-060d2be7c56d",
+        "blanka.75081383-f68b-43c5-a3ed-9213e91f6ae0",
+        "colibri.78495",
+        "ekk.994111224006250",
+        "eepos.2318189",
+        "heili.2f14d98a-31d8-4466-bfe5-8674697f99fb",
+        "helka.9929256193506253",
+        "helle.854486",
+        "helmet.2297836",
+        "vanaicat.131495",
+        "uef.9914343283705966",
+        "tiekko.552601",
+        "jamk.993340644806251",
+        "jykdok.1542763",
+        "kainet.1073824",
+        "kangasniemi.afc3d30b-6ded-4cd1-9573-1d73e71ada11",
+        "fikka.4268054",
+        "keski.2890706",
+        "kirkes.1227696",
+        "rise.40525",
+        "kristinestad.55635cc4-ddb4-440f-9eec-5323723a0040",
+        "kronoby.3e4ec72c-de08-4d1e-84da-22d5ec3ae092",
+        "kuopio.1283675",
+        "kyyti.351980",
+        "lapinkirjasto.1423697",
+        "luc.994503053806246",
+        "lastu.418798",
+        "lep.5299",
+        "louna.9ee0539f-aab9-4ebd-b2c3-a1a68a1b647f",
+        "lukki.711867",
+        "lumme.2348434",
+        "lut.991581863906254",
+        "taisto.145647",
+        "korsholm.6d108090-85b7-487b-abe4-e8862dce3535",
+        "oy.9915682813906252",
+        "outi.1855667",
+        "jakobstad.f20b80dd-7386-4803-88b6-a040a9cea5f8",
+        "piki.4025734",
+        "polamk.23780",
+        "ratamo.459735",
+        "rutakko.c821db15-9c74-4606-8d5a-6701d6f58c8c",
+        "satakirjastot.274711",
+        "seamk.991143736805969",
+        "siilinjarvi.267361",
+        "somero.5e822364-1612-49cf-93b9-4cd22c4694d8",
+        "uniarts_print.994988634206249",
+        "tuni.998880584205973",
+        "turkuamk_finna.993191607205970",
+        "utu.9920027755405971",
+        "vaarakirjastot.11452303",
+        "vaasa.d4618cee-62c5-463f-bc74-8cc6e1da0d05",
+        "vanamo.dd15c6bd-d1c4-4b6b-bb5c-fc3ffe95f248",
+        "vaari.2053999",
+        "vaski.3172713",
+        "abo.9913298413405972"
+      ],
+      "fullRecord": "<?xml version=\"1.0\"?>\n<collection xmlns=\"http://www.loc.gov/MARC21/slim\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd\"><record><leader>00000cam a22000004i 4500</leader><controlfield tag=\"001\">220670</controlfield><controlfield tag=\"003\">FI-Metro</controlfield><controlfield tag=\"005\">20240209162104.0</controlfield><controlfield tag=\"008\">170403s2017    fi ||||| b    001|0 fin| </controlfield><datafield tag=\"020\" ind1=\" \" ind2=\" \"><subfield code=\"a\">978-952-279-470-3</subfield><subfield code=\"q\">pehmeäkantinen</subfield></datafield><datafield tag=\"024\" ind1=\"3\" ind2=\" \"><subfield code=\"a\">9789522794703</subfield></datafield><datafield tag=\"035\" ind1=\" \" ind2=\" \"><subfield code=\"a\">(FI-Halti)109375</subfield></datafield><datafield tag=\"035\" ind1=\" \" ind2=\" \"><subfield code=\"a\">(FI-Laure)90578</subfield></datafield><datafield tag=\"035\" ind1=\" \" ind2=\" \"><subfield code=\"a\">(FI-Metro)220670</subfield></datafield><datafield tag=\"035\" ind1=\" \" ind2=\" \"><subfield code=\"a\">FCC010869771</subfield></datafield><datafield tag=\"040\" ind1=\" \" ind2=\" \"><subfield code=\"a\">FI-Vaski</subfield><subfield code=\"b\">fin</subfield><subfield code=\"e\">rda</subfield><subfield code=\"d\">FI-NL</subfield></datafield><datafield tag=\"041\" ind1=\"0\" ind2=\" \"><subfield code=\"a\">fin</subfield><subfield code=\"k\">eng</subfield><subfield code=\"h\">heb</subfield></datafield><datafield tag=\"084\" ind1=\" \" ind2=\" \"><subfield code=\"a\">56.411</subfield><subfield code=\"2\">ykl</subfield></datafield><datafield tag=\"084\" ind1=\" \" ind2=\" \"><subfield code=\"a\">49</subfield><subfield code=\"2\">ykl</subfield></datafield><datafield tag=\"100\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Harari, Yuval Noah,</subfield><subfield code=\"e\">kirjoittaja.</subfield><subfield code=\"0\">(FI-ASTERI-N)000226158</subfield></datafield><datafield tag=\"240\" ind1=\"1\" ind2=\"0\"><subfield code=\"a\">Kitzur toldot ha'enoshut,</subfield><subfield code=\"l\">suomi</subfield></datafield><datafield tag=\"245\" ind1=\"1\" ind2=\"0\"><subfield code=\"a\">Sapiens :</subfield><subfield code=\"b\">ihmisen lyhyt historia /</subfield><subfield code=\"c\">Yuval Noah Harari ; suomentanut Jaana Iso-Markku.</subfield></datafield><datafield tag=\"246\" ind1=\"3\" ind2=\"0\"><subfield code=\"a\">Ihmisen lyhyt historia</subfield></datafield><datafield tag=\"250\" ind1=\" \" ind2=\" \"><subfield code=\"a\">2. nidottu laitos</subfield></datafield><datafield tag=\"264\" ind1=\" \" ind2=\"1\"><subfield code=\"a\">Helsinki :</subfield><subfield code=\"b\">Bazar,</subfield><subfield code=\"c\">[2017]</subfield></datafield><datafield tag=\"264\" ind1=\" \" ind2=\"3\"><subfield code=\"a\">Liettua :</subfield><subfield code=\"b\">ScanBook UAB,</subfield><subfield code=\"c\">2017.</subfield></datafield><datafield tag=\"300\" ind1=\" \" ind2=\" \"><subfield code=\"a\">491 sivua :</subfield><subfield code=\"b\">kuvitettu, karttoja ;</subfield><subfield code=\"c\">22 cm</subfield></datafield><datafield tag=\"336\" ind1=\" \" ind2=\" \"><subfield code=\"a\">teksti</subfield><subfield code=\"b\">txt</subfield><subfield code=\"2\">rdacontent</subfield></datafield><datafield tag=\"337\" ind1=\" \" ind2=\" \"><subfield code=\"a\">käytettävissä ilman laitetta</subfield><subfield code=\"b\">n</subfield><subfield code=\"2\">rdamedia</subfield></datafield><datafield tag=\"338\" ind1=\" \" ind2=\" \"><subfield code=\"a\">nide</subfield><subfield code=\"b\">nc</subfield><subfield code=\"2\">rdacarrier</subfield></datafield><datafield tag=\"490\" ind1=\"0\" ind2=\" \"><subfield code=\"a\">Mitä Suomi lukee</subfield></datafield><datafield tag=\"546\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Suomennettu englanninkielisestä käännöksestä: Sapiens : a brief history of humankind.</subfield></datafield><datafield tag=\"500\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Lisäpainokset: 4. painos 2017. - 5. painos 2017. - 6. painos 2018. - 10. painos 2018. - 12. painos 2019. - 16. painos 2020.</subfield></datafield><datafield tag=\"500\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Lisäpainokset: 4. painos 2017. - 5. painos 2017. - 6. painos 2018. - 10. painos 2018.</subfield></datafield><datafield tag=\"500\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Suomennettu englanninkielisestä käännöksestä: Sapiens : a brief history of humankind.</subfield></datafield><datafield tag=\"500\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Lisäpainokset: 4. painos 2017. - 5. painos 2017. - 6. painos 2018.</subfield></datafield><datafield tag=\"504\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Sisältää bibliografisia lähdeviitteitä ja hakemiston.</subfield></datafield><datafield tag=\"505\" ind1=\"0\" ind2=\" \"><subfield code=\"a\">Ensimmäinen osa: Kognitiivinen vallankumous -- Toinen osa: Maanviljelyn vallankumous -- Kolmas osa: Ihmiskunnan yhdentyminen -- Neljäs osa: Tieteellinen vallankumous -- Jälkisanat: Eläin, josta tuli jumala.</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">evoluutio</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p8278</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">evoluutioteoria</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p21943</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">biologinen antropologia</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p3879</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kulttuurievoluutio</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p8279</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">ihmiskunta</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p19246</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">sivilisaatio</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p14980</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">historia</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p1780</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">maailmanhistoria</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p19656</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">ihminen</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p18849</subfield></datafield><datafield tag=\"700\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Iso-Markku, Jaana,</subfield><subfield code=\"d\">1956-</subfield><subfield code=\"e\">kääntäjä.</subfield><subfield code=\"0\">(FI-ASTERI-N)000045388</subfield></datafield><datafield tag=\"710\" ind1=\"2\" ind2=\" \"><subfield code=\"a\">Bazar Kustannus,</subfield><subfield code=\"e\">kustantaja.</subfield><subfield code=\"0\">(FI-ASTERI-N)000219017</subfield></datafield><datafield tag=\"999\" ind1=\" \" ind2=\" \"><subfield code=\"c\">211700</subfield><subfield code=\"d\">211700</subfield></datafield><datafield tag=\"952\" ind1=\" \" ind2=\" \"><subfield code=\"b\">LAUTIK</subfield><subfield code=\"c\">YLEIS</subfield><subfield code=\"o\">56 HARARI, Yuval Noah</subfield><subfield code=\"8\">LAU</subfield><subfield code=\"9\">1</subfield></datafield><datafield tag=\"952\" ind1=\" \" ind2=\" \"><subfield code=\"b\">LAULEP</subfield><subfield code=\"c\">YLEIS</subfield><subfield code=\"o\">30.11 HARARI, Yuval Noah</subfield><subfield code=\"8\">LAU</subfield><subfield code=\"9\">1</subfield></datafield><datafield tag=\"952\" ind1=\" \" ind2=\" \"><subfield code=\"b\">METMYL</subfield><subfield code=\"c\">YLEIS</subfield><subfield code=\"o\">100 HARARI</subfield><subfield code=\"8\">MET</subfield><subfield code=\"9\">1</subfield></datafield><datafield tag=\"952\" ind1=\" \" ind2=\" \"><subfield code=\"b\">PORV</subfield><subfield code=\"c\">YLEIS</subfield><subfield code=\"o\">316 HARARI</subfield><subfield code=\"8\">HH</subfield><subfield code=\"9\">1</subfield></datafield></record></collection>\n"
+    },
+    {
+      "id": "jykdok.2298993",
+      "recordPage": "/Record/jykdok.2298993",
+      "formats": [
+        {
+          "value": "0/Book/",
+          "translated": "Kirja"
+        },
+        {
+          "value": "1/Book/AudioBook/",
+          "translated": "Äänikirja"
+        },
+        {
+          "value": "2/Book/AudioBook/Online/",
+          "translated": "E-äänikirja"
+        }
+      ],
+      "title": "Sapiens : Ihmisen lyhyt historia",
+      "shortTitle": "Sapiens",
+      "subTitle": "Ihmisen lyhyt historia",
+      "uniformTitles": [
+        "Sapiens. A Brief History of Humankind. Suomi"
+      ],
+      "authors": {
+        "primary": {
+          "Harari, Yuval Noah": {
+            "role": [
+              "kirjoittaja"
+            ]
+          },
+          "Iso-Markku, Jaana": {
+            "role": [
+              "-"
+            ]
+          },
+          "Holopainen, Tuomo": {
+            "role": [
+              "-"
+            ]
+          }
+        },
+        "secondary": {
+          "Iso-Markku, Jaana, kääntäjä": {
+            "role": [
+              "kääntäjä"
+            ]
+          },
+          "Holopainen, Tuomo, lukija": {
+            "role": [
+              "lukija"
+            ]
+          }
+        },
+        "corporate": {
+          "Bazar, kustantaja": {
+            "role": [
+              "kustantaja"
+            ]
+          }
+        }
+      },
+      "primaryAuthors": [
+        "Harari, Yuval Noah",
+        "Iso-Markku, Jaana",
+        "Holopainen, Tuomo"
+      ],
+      "nonPresenterAuthors": [
+        {
+          "name": "Harari, Yuval Noah",
+          "role": "kirjoittaja",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Iso-Markku, Jaana",
+          "role": "kääntäjä",
+          "id": "https://isni.org/isni/0000000484006564",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Holopainen, Tuomo",
+          "role": "lukija",
+          "id": "https://isni.org/isni/0000000467158179",
+          "type": "Personal Name"
+        }
+      ],
+      "secondaryAuthors": [
+        "Iso-Markku, Jaana, kääntäjä",
+        "Holopainen, Tuomo, lukija"
+      ],
+      "corporateAuthors": [
+        "Bazar, kustantaja"
+      ],
+      "isbns": [
+        "978-952-279-735-3 MP3"
+      ],
+      "cleanIsbn": "9522797359",
+      "languages": [
+        "fin"
+      ],
+      "originalLanguages": [
+        "eng"
+      ],
+      "publishers": [
+        "Bazar"
+      ],
+      "publicationDates": [
+        "2019"
+      ],
+      "placesOfPublication": [
+        "Helsinki :"
+      ],
+      "year": "2019",
+      "physicalDescriptions": [
+        "1 verkkoaineisto (19 h 22 min)"
+      ],
+      "series": [
+        {
+          "name": "Harari"
+        }
+      ],
+      "subjects": [
+        [
+          "biologinen antropologia",
+          "ENNAKKOTIETO"
+        ],
+        [
+          "e-kirjat",
+          "ENNAKKOTIETO"
+        ],
+        [
+          "evoluutio",
+          "ENNAKKOTIETO"
+        ],
+        [
+          "evoluutioteoria",
+          "ENNAKKOTIETO"
+        ],
+        [
+          "historia",
+          "ENNAKKOTIETO"
+        ],
+        [
+          "ihminen",
+          "ENNAKKOTIETO"
+        ],
+        [
+          "ihmiskunta",
+          "ENNAKKOTIETO"
+        ],
+        [
+          "kulttuurievoluutio",
+          "ENNAKKOTIETO"
+        ],
+        [
+          "maailmanhistoria",
+          "ENNAKKOTIETO"
+        ],
+        [
+          "sivilisaatio",
+          "ENNAKKOTIETO"
+        ]
+      ],
+      "subjectsExtended": [
+        {
+          "heading": [
+            "biologinen antropologia",
+            "ENNAKKOTIETO"
+          ]
+        },
+        {
+          "heading": [
+            "e-kirjat",
+            "ENNAKKOTIETO"
+          ]
+        },
+        {
+          "heading": [
+            "evoluutio",
+            "ENNAKKOTIETO"
+          ]
+        },
+        {
+          "heading": [
+            "evoluutioteoria",
+            "ENNAKKOTIETO"
+          ]
+        },
+        {
+          "heading": [
+            "historia",
+            "ENNAKKOTIETO"
+          ]
+        },
+        {
+          "heading": [
+            "ihminen",
+            "ENNAKKOTIETO"
+          ]
+        },
+        {
+          "heading": [
+            "ihmiskunta",
+            "ENNAKKOTIETO"
+          ]
+        },
+        {
+          "heading": [
+            "kulttuurievoluutio",
+            "ENNAKKOTIETO"
+          ]
+        },
+        {
+          "heading": [
+            "maailmanhistoria",
+            "ENNAKKOTIETO"
+          ]
+        },
+        {
+          "heading": [
+            "sivilisaatio",
+            "ENNAKKOTIETO"
+          ]
+        }
+      ],
+      "genres": [
+        "äänikirjat"
+      ],
+      "majorGenres": [
+        "nonfiction"
+      ],
+      "classifications": {
+        "ykl": [
+          "56.41"
+        ]
+      },
+      "images": [],
+      "imagesExtended": [],
+      "summary": [],
+      "sectors": [
+        {
+          "value": "0/lib/",
+          "translated": "Kirjasto"
+        },
+        {
+          "value": "1/lib/uni/",
+          "translated": "Yliopisto"
+        }
+      ],
+      "dedupIds": [
+        "jykdok.2298993",
+        "fikka.4305066"
+      ],
+      "fullRecord": "<?xml version=\"1.0\"?>\n<collection xmlns=\"http://www.loc.gov/MARC21/slim\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd\"><record><leader>00000cim a22000002i 4500</leader><controlfield tag=\"001\">015291602</controlfield><controlfield tag=\"003\">FI-MELINDA</controlfield><controlfield tag=\"005\">20260513191532.0</controlfield><controlfield tag=\"006\">m|||||o||h||||||||</controlfield><controlfield tag=\"007\">sr uunnnnnuneu</controlfield><controlfield tag=\"007\">cr nnannnuuuuu</controlfield><controlfield tag=\"008\">230307s2019    fi |||||o|||||||||||fin||</controlfield><datafield tag=\"020\" ind1=\" \" ind2=\" \"><subfield code=\"a\">978-952-279-735-3</subfield><subfield code=\"q\">MP3</subfield></datafield><datafield tag=\"035\" ind1=\" \" ind2=\" \"><subfield code=\"a\">FCC015291602</subfield></datafield><datafield tag=\"040\" ind1=\" \" ind2=\" \"><subfield code=\"b\">fin</subfield><subfield code=\"e\">rda</subfield><subfield code=\"d\">FI-NL</subfield></datafield><datafield tag=\"041\" ind1=\"1\" ind2=\" \"><subfield code=\"d\">fin</subfield><subfield code=\"h\">eng</subfield></datafield><datafield tag=\"084\" ind1=\" \" ind2=\" \"><subfield code=\"a\">56.41</subfield><subfield code=\"2\">ykl</subfield></datafield><datafield tag=\"100\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Harari, Yuval Noah,</subfield><subfield code=\"e\">kirjoittaja.</subfield></datafield><datafield tag=\"240\" ind1=\"1\" ind2=\"0\"><subfield code=\"a\">Sapiens. A Brief History of Humankind.</subfield><subfield code=\"l\">Suomi</subfield></datafield><datafield tag=\"245\" ind1=\"1\" ind2=\"0\"><subfield code=\"a\">Sapiens :</subfield><subfield code=\"b\">Ihmisen lyhyt historia.</subfield></datafield><datafield tag=\"264\" ind1=\" \" ind2=\"1\"><subfield code=\"a\">Helsinki :</subfield><subfield code=\"b\">Bazar,</subfield><subfield code=\"c\">2019.</subfield></datafield><datafield tag=\"300\" ind1=\" \" ind2=\" \"><subfield code=\"a\">1 verkkoaineisto (19 h 22 min)</subfield></datafield><datafield tag=\"306\" ind1=\" \" ind2=\" \"><subfield code=\"a\">192200</subfield></datafield><datafield tag=\"336\" ind1=\" \" ind2=\" \"><subfield code=\"a\">puhe</subfield><subfield code=\"b\">spw</subfield><subfield code=\"2\">rdacontent</subfield></datafield><datafield tag=\"337\" ind1=\" \" ind2=\" \"><subfield code=\"a\">tietokonekäyttöinen</subfield><subfield code=\"b\">c</subfield><subfield code=\"2\">rdamedia</subfield></datafield><datafield tag=\"338\" ind1=\" \" ind2=\" \"><subfield code=\"a\">verkkoaineisto</subfield><subfield code=\"b\">cr</subfield><subfield code=\"2\">rdacarrier</subfield></datafield><datafield tag=\"341\" ind1=\" \" ind2=\" \"><subfield code=\"a\">auditory</subfield><subfield code=\"2\">sapdv</subfield></datafield><datafield tag=\"344\" ind1=\" \" ind2=\" \"><subfield code=\"a\">digitaalinen</subfield></datafield><datafield tag=\"347\" ind1=\" \" ind2=\" \"><subfield code=\"a\">äänitiedosto</subfield><subfield code=\"b\">MP3</subfield></datafield><datafield tag=\"490\" ind1=\"0\" ind2=\" \"><subfield code=\"a\">Harari</subfield></datafield><datafield tag=\"500\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Koneellisesti tuotettu tietue.</subfield></datafield><datafield tag=\"506\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Aineisto on käytettävissä vapaakappaletyöasemilla.</subfield><subfield code=\"f\">Online access with authorization</subfield><subfield code=\"2\">star</subfield></datafield><datafield tag=\"511\" ind1=\"0\" ind2=\" \"><subfield code=\"a\">Lukija: Tuomo Holopainen.</subfield></datafield><datafield tag=\"540\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Aineisto on käytettävissä tutkimus- ja muihin tarkoituksiin;</subfield><subfield code=\"b\">Kansalliskirjasto;</subfield><subfield code=\"c\">Laki kulttuuriaineistojen tallettamisesta ja säilyttämisestä</subfield><subfield code=\"u\">http://www.finlex.fi/fi/laki/ajantasa/2007/20071433</subfield></datafield><datafield tag=\"653\" ind1=\" \" ind2=\" \"><subfield code=\"a\">biologinen antropologia</subfield><subfield code=\"g\">ENNAKKOTIETO</subfield></datafield><datafield tag=\"653\" ind1=\" \" ind2=\" \"><subfield code=\"a\">e-kirjat</subfield><subfield code=\"g\">ENNAKKOTIETO</subfield></datafield><datafield tag=\"653\" ind1=\" \" ind2=\" \"><subfield code=\"a\">evoluutio</subfield><subfield code=\"g\">ENNAKKOTIETO</subfield></datafield><datafield tag=\"653\" ind1=\" \" ind2=\" \"><subfield code=\"a\">evoluutioteoria</subfield><subfield code=\"g\">ENNAKKOTIETO</subfield></datafield><datafield tag=\"653\" ind1=\" \" ind2=\" \"><subfield code=\"a\">historia</subfield><subfield code=\"g\">ENNAKKOTIETO</subfield></datafield><datafield tag=\"653\" ind1=\" \" ind2=\" \"><subfield code=\"a\">ihminen</subfield><subfield code=\"g\">ENNAKKOTIETO</subfield></datafield><datafield tag=\"653\" ind1=\" \" ind2=\" \"><subfield code=\"a\">ihmiskunta</subfield><subfield code=\"g\">ENNAKKOTIETO</subfield></datafield><datafield tag=\"653\" ind1=\" \" ind2=\" \"><subfield code=\"a\">kulttuurievoluutio</subfield><subfield code=\"g\">ENNAKKOTIETO</subfield></datafield><datafield tag=\"653\" ind1=\" \" ind2=\" \"><subfield code=\"a\">maailmanhistoria</subfield><subfield code=\"g\">ENNAKKOTIETO</subfield></datafield><datafield tag=\"653\" ind1=\" \" ind2=\" \"><subfield code=\"a\">sivilisaatio</subfield><subfield code=\"g\">ENNAKKOTIETO</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">äänikirjat</subfield><subfield code=\"2\">slm/fin</subfield><subfield code=\"0\">http://urn.fi/URN:NBN:fi:au:slm:s579</subfield></datafield><datafield tag=\"700\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Iso-Markku, Jaana,</subfield><subfield code=\"e\">kääntäjä.</subfield><subfield code=\"0\">https://isni.org/isni/0000000484006564</subfield></datafield><datafield tag=\"700\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Holopainen, Tuomo,</subfield><subfield code=\"e\">lukija.</subfield><subfield code=\"0\">https://isni.org/isni/0000000467158179</subfield></datafield><datafield tag=\"710\" ind1=\"2\" ind2=\" \"><subfield code=\"a\">Bazar,</subfield><subfield code=\"e\">kustantaja.</subfield></datafield><datafield tag=\"776\" ind1=\"0\" ind2=\" \"><subfield code=\"z\">978-952-403-569-9</subfield></datafield><datafield tag=\"776\" ind1=\"0\" ind2=\" \"><subfield code=\"z\">978-952-279-231-0</subfield></datafield><datafield tag=\"776\" ind1=\"0\" ind2=\" \"><subfield code=\"z\">978-952-279-470-3</subfield></datafield><datafield tag=\"776\" ind1=\"0\" ind2=\" \"><subfield code=\"z\">978-952-279-274-7</subfield></datafield><datafield tag=\"856\" ind1=\"4\" ind2=\"0\"><subfield code=\"u\">https://urn.fi/URN:ISBN:978-952-279-735-3</subfield><subfield code=\"z\">Käytettävissä vapaakappaletyöasemilla</subfield></datafield><datafield tag=\"999\" ind1=\" \" ind2=\" \"><subfield code=\"c\">2298993</subfield><subfield code=\"d\">2298993</subfield></datafield></record></collection>\n"
+    },
+    {
+      "id": "helle.1637236",
+      "recordPage": "/Record/helle.1637236",
+      "formats": [
+        {
+          "value": "0/Book/",
+          "translated": "Kirja"
+        },
+        {
+          "value": "1/Book/Book/",
+          "translated": "Kirja"
+        }
+      ],
+      "title": "Sapiens : ihmisen lyhyt historia",
+      "shortTitle": "Sapiens",
+      "subTitle": "ihmisen lyhyt historia",
+      "uniformTitles": [
+        "Kitzur toldot ha'enoshut. Suomi"
+      ],
+      "authors": {
+        "primary": {
+          "Harari, Yuval Noah": {
+            "role": [
+              "kirjoittaja"
+            ]
+          },
+          "Iso-Markku, Jaana": {
+            "role": [
+              "-"
+            ]
+          }
+        },
+        "secondary": {
+          "Iso-Markku, Jaana, kääntäjä": {
+            "role": [
+              "kääntäjä"
+            ]
+          },
+          "Noah Harari, Yuval": {
+            "role": [
+              "-"
+            ]
+          }
+        },
+        "corporate": {
+          "Bazar Kustannus, kustantaja": {
+            "role": [
+              "kustantaja"
+            ]
+          }
+        }
+      },
+      "primaryAuthors": [
+        "Harari, Yuval Noah",
+        "Iso-Markku, Jaana"
+      ],
+      "nonPresenterAuthors": [
+        {
+          "name": "Harari, Yuval Noah",
+          "role": "kirjoittaja",
+          "id": "(FI-ASTERI-N)000226158",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Iso-Markku, Jaana",
+          "role": "kääntäjä",
+          "id": "(FI-ASTERI-N)000045388",
+          "type": "Personal Name"
+        }
+      ],
+      "secondaryAuthors": [
+        "Iso-Markku, Jaana, kääntäjä",
+        "Noah Harari, Yuval"
+      ],
+      "corporateAuthors": [
+        "Bazar Kustannus, kustantaja"
+      ],
+      "isbns": [
+        "978-952-403-569-9 pehmeäkantinen"
+      ],
+      "cleanIsbn": "9524035693",
+      "languages": [
+        "fin"
+      ],
+      "originalLanguages": [
+        "heb"
+      ],
+      "publishers": [
+        "Bazar"
+      ],
+      "publicationDates": [
+        "2024"
+      ],
+      "placesOfPublication": [
+        "[Helsinki] :"
+      ],
+      "year": "2024",
+      "physicalDescriptions": [
+        "491 sivua : kuvitettu, karttoja ; 18 cm"
+      ],
+      "series": [],
+      "subjects": [
+        [
+          "ihminen"
+        ],
+        [
+          "evoluutio"
+        ],
+        [
+          "evoluutioteoria"
+        ],
+        [
+          "biologinen antropologia"
+        ],
+        [
+          "kulttuurievoluutio"
+        ],
+        [
+          "ihmiskunta"
+        ],
+        [
+          "sivilisaatio"
+        ],
+        [
+          "maailmanhistoria"
+        ],
+        [
+          "historia"
+        ]
+      ],
+      "subjectsExtended": [
+        {
+          "heading": [
+            "ihminen"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p18849"
+        },
+        {
+          "heading": [
+            "evoluutio"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p8278"
+        },
+        {
+          "heading": [
+            "evoluutioteoria"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p21943"
+        },
+        {
+          "heading": [
+            "biologinen antropologia"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p3879"
+        },
+        {
+          "heading": [
+            "kulttuurievoluutio"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p8279"
+        },
+        {
+          "heading": [
+            "ihmiskunta"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p19246"
+        },
+        {
+          "heading": [
+            "sivilisaatio"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p14980"
+        },
+        {
+          "heading": [
+            "maailmanhistoria"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p19656"
+        },
+        {
+          "heading": [
+            "historia"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p1780"
+        }
+      ],
+      "genres": [],
+      "majorGenres": [
+        "nonfiction"
+      ],
+      "classifications": {
+        "ykl": [
+          "56.411",
+          "49"
+        ]
+      },
+      "images": [
+        "/Cover/Show?source=Solr&id=helle.1637236&index=0&size=large"
+      ],
+      "imagesExtended": [
+        {
+          "urls": {
+            "small": "/Cover/Show?source=Solr&id=helle.1637236&index=0&size=small",
+            "medium": "/Cover/Show?source=Solr&id=helle.1637236&index=0&size=medium",
+            "large": "/Cover/Show?source=Solr&id=helle.1637236&index=0&size=large"
+          },
+          "rights": {
+            "copyright": "Kuvaan voi liittyä käytön rajoituksia."
+          }
+        }
+      ],
+      "summary": [],
+      "sectors": [
+        {
+          "value": "0/lib/",
+          "translated": "Kirjasto"
+        },
+        {
+          "value": "1/lib/pub/",
+          "translated": "Yleinen"
+        }
+      ],
+      "dedupIds": [
+        "helle.1637236",
+        "helmet.2583012",
+        "tiekko.1098102",
+        "jykdok.2146182",
+        "fikka.5700093",
+        "keski.3340445",
+        "kyyti.1546044",
+        "lapinkirjasto.1940588",
+        "louna.1ccb9323-ee9a-450e-9ada-8e53e31a4cc8",
+        "lukki.1015069",
+        "taisto.173131",
+        "oy.9918215363006252",
+        "outi.2351467",
+        "piki.5538949",
+        "satakirjastot.1716392",
+        "vaski.4367669",
+        "abo.9913769746905972"
+      ],
+      "fullRecord": "<?xml version=\"1.0\"?>\n<collection xmlns=\"http://www.loc.gov/MARC21/slim\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd\"><record><leader>00000cam a22000004i 4500</leader><controlfield tag=\"001\">7459995</controlfield><controlfield tag=\"003\">FI-BTJ</controlfield><controlfield tag=\"005\">20240930010711.0</controlfield><controlfield tag=\"008\">240722t20242016fi ||||       |0| 0|fin|c</controlfield><datafield tag=\"020\" ind1=\" \" ind2=\" \"><subfield code=\"a\">978-952-403-569-9</subfield><subfield code=\"q\">pehmeäkantinen</subfield></datafield><datafield tag=\"035\" ind1=\" \" ind2=\" \"><subfield code=\"a\">(FI-BTJ)7459995</subfield></datafield><datafield tag=\"040\" ind1=\" \" ind2=\" \"><subfield code=\"a\">FI-BTJ</subfield><subfield code=\"b\">fin</subfield><subfield code=\"e\">rda</subfield></datafield><datafield tag=\"041\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">fin</subfield><subfield code=\"k\">eng</subfield><subfield code=\"h\">heb</subfield></datafield><datafield tag=\"084\" ind1=\" \" ind2=\" \"><subfield code=\"a\">56.411</subfield><subfield code=\"2\">ykl</subfield></datafield><datafield tag=\"084\" ind1=\" \" ind2=\" \"><subfield code=\"a\">49</subfield><subfield code=\"2\">ykl</subfield></datafield><datafield tag=\"100\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Harari, Yuval Noah,</subfield><subfield code=\"e\">kirjoittaja.</subfield><subfield code=\"0\">(FI-ASTERI-N)000226158</subfield></datafield><datafield tag=\"240\" ind1=\"1\" ind2=\"0\"><subfield code=\"a\">Kitzur toldot ha'enoshut.</subfield><subfield code=\"l\">Suomi</subfield></datafield><datafield tag=\"245\" ind1=\"1\" ind2=\"0\"><subfield code=\"a\">Sapiens :</subfield><subfield code=\"b\">ihmisen lyhyt historia /</subfield><subfield code=\"c\">Yuval Noah Harari ; suomentanut Jaana Iso-Markku.</subfield></datafield><datafield tag=\"246\" ind1=\"3\" ind2=\"0\"><subfield code=\"a\">Ihmisen lyhyt historia</subfield></datafield><datafield tag=\"264\" ind1=\" \" ind2=\"1\"><subfield code=\"a\">[Helsinki] :</subfield><subfield code=\"b\">Bazar,</subfield><subfield code=\"c\">[2024]</subfield></datafield><datafield tag=\"264\" ind1=\" \" ind2=\"4\"><subfield code=\"c\">©2016</subfield></datafield><datafield tag=\"300\" ind1=\" \" ind2=\" \"><subfield code=\"a\">491 sivua :</subfield><subfield code=\"b\">kuvitettu, karttoja ;</subfield><subfield code=\"c\">18 cm</subfield></datafield><datafield tag=\"336\" ind1=\" \" ind2=\" \"><subfield code=\"a\">teksti</subfield><subfield code=\"b\">txt</subfield><subfield code=\"2\">rdacontent</subfield></datafield><datafield tag=\"337\" ind1=\" \" ind2=\" \"><subfield code=\"a\">käytettävissä ilman laitetta</subfield><subfield code=\"b\">n</subfield><subfield code=\"2\">rdamedia</subfield></datafield><datafield tag=\"338\" ind1=\" \" ind2=\" \"><subfield code=\"a\">nide</subfield><subfield code=\"b\">nc</subfield><subfield code=\"2\">rdacarrier</subfield></datafield><datafield tag=\"500\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Suomennettu englanninkielisestä käännöksestä: Sapiens : a brief history of humankind.</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">ihminen</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p18849</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">evoluutio</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p8278</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">evoluutioteoria</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p21943</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">biologinen antropologia</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p3879</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kulttuurievoluutio</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p8279</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">ihmiskunta</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p19246</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">sivilisaatio</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p14980</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">maailmanhistoria</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p19656</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">historia</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p1780</subfield></datafield><datafield tag=\"700\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Iso-Markku, Jaana,</subfield><subfield code=\"e\">kääntäjä.</subfield><subfield code=\"0\">(FI-ASTERI-N)000045388</subfield></datafield><datafield tag=\"710\" ind1=\"2\" ind2=\" \"><subfield code=\"a\">Bazar Kustannus,</subfield><subfield code=\"e\">kustantaja.</subfield><subfield code=\"0\">(FI-ASTERI-N)000219017</subfield></datafield><datafield tag=\"856\" ind1=\"4\" ind2=\"2\"><subfield code=\"q\">image/jpeg</subfield><subfield code=\"u\">https://media.kirjavalitys.fi/onix/cover/9789524035699?format=image&amp;size=width235</subfield><subfield code=\"z\">Kansikuva</subfield></datafield><datafield tag=\"856\" ind1=\"4\" ind2=\"2\"><subfield code=\"q\">text/html</subfield><subfield code=\"u\">https://media.kirjavalitys.fi/onix/description/9789524035699?format=html</subfield><subfield code=\"z\">Kuvaus</subfield></datafield><datafield tag=\"900\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Noah Harari, Yuval</subfield><subfield code=\"y\">Harari, Yuval Noah</subfield></datafield><datafield tag=\"942\" ind1=\" \" ind2=\" \"><subfield code=\"c\">KIRJA</subfield></datafield><datafield tag=\"999\" ind1=\" \" ind2=\" \"><subfield code=\"c\">1637236</subfield><subfield code=\"d\">1637236</subfield></datafield><datafield tag=\"952\" ind1=\" \" ind2=\" \"><subfield code=\"b\">PRVPK</subfield><subfield code=\"c\">A</subfield><subfield code=\"o\">56.411 HAR</subfield><subfield code=\"9\">1</subfield></datafield></record></collection>\n"
+    },
+    {
+      "id": "ekk.994159314006250",
+      "recordPage": "/Record/ekk.994159314006250",
+      "formats": [
+        {
+          "value": "0/Book/",
+          "translated": "Kirja"
+        },
+        {
+          "value": "1/Book/Book/",
+          "translated": "Kirja"
+        }
+      ],
+      "title": "Sapiens : ihmisen lyhyt historia",
+      "shortTitle": "Sapiens",
+      "subTitle": "ihmisen lyhyt historia",
+      "uniformTitles": [
+        "Kitzur toldot ha'enoshut, suomi"
+      ],
+      "authors": {
+        "primary": {
+          "Harari, Yuval Noah": {
+            "role": [
+              "kirjoittaja"
+            ]
+          },
+          "Iso-Markku, Jaana": {
+            "role": [
+              "-"
+            ]
+          }
+        },
+        "secondary": {
+          "Iso-Markku, Jaana, 1956- kääntäjä": {
+            "role": [
+              "kääntäjä"
+            ]
+          }
+        },
+        "corporate": []
+      },
+      "primaryAuthors": [
+        "Harari, Yuval Noah",
+        "Iso-Markku, Jaana"
+      ],
+      "nonPresenterAuthors": [
+        {
+          "name": "Harari, Yuval Noah",
+          "role": "kirjoittaja",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Iso-Markku, Jaana",
+          "date": "1956-",
+          "role": "kääntäjä",
+          "type": "Personal Name"
+        }
+      ],
+      "secondaryAuthors": [
+        "Iso-Markku, Jaana, 1956- kääntäjä"
+      ],
+      "corporateAuthors": [],
+      "isbns": [
+        "978-952-279-470-3 pehmeäkantinen"
+      ],
+      "cleanIsbn": "9522794708",
+      "languages": [
+        "fin"
+      ],
+      "originalLanguages": [],
+      "publishers": [
+        "Bazar"
+      ],
+      "publicationDates": [
+        "2017"
+      ],
+      "placesOfPublication": [
+        "Helsinki :"
+      ],
+      "year": "2017",
+      "edition": "2. nidottu laitos",
+      "physicalDescriptions": [
+        "491 sivua : kuvitettu, karttoja ; 22 cm"
+      ],
+      "series": [
+        {
+          "name": "Mitä Suomi lukee"
+        }
+      ],
+      "subjects": [
+        [
+          "antropologia"
+        ],
+        [
+          "evoluutioteoria"
+        ],
+        [
+          "historia"
+        ]
+      ],
+      "subjectsExtended": [
+        {
+          "heading": [
+            "antropologia"
+          ],
+          "type": "topic",
+          "source": "eks"
+        },
+        {
+          "heading": [
+            "evoluutioteoria"
+          ],
+          "type": "topic",
+          "source": "eks"
+        },
+        {
+          "heading": [
+            "historia"
+          ],
+          "type": "topic",
+          "source": "eks"
+        }
+      ],
+      "genres": [],
+      "majorGenres": [
+        "nonfiction"
+      ],
+      "classifications": [],
+      "images": [],
+      "imagesExtended": [],
+      "summary": [
+        "100 000 vuotta sitten maapallolla asui ainakin kuusi ihmislajia. Nykyään lajeja on vain yksi: homo sapiens. Miten meidän lajimme onnistui päihittämään muut lajit? Miten metsästäjistä tuli kaupunkien ja kuningaskuntien rakentajia? Miten ryhdyimme uskomaan jumaliin, valtioihin ja ihmisoikeuksiin sekä luottamaan rahaan, kirjoihin ja lakeihin? Miksi alistuimme byrokratialle, aikatauluille ja kuluttamiselle? Ja millaiseksi maailma on muuttumassa? Kirjassaan Sapiens. Ihmisen lyhyt historia Yuval Noah Harari käy läpi koko ihmisen historian, aina ensimmäisistä maan kamaralla kulkeneista ihmisistä kohti nykypäivää. Lajimme kehitykseen on vaikuttanut useita radikaaleja ja joskus tuhoisiakin läpimurtoja. Miten historian virrat ovat muovanneet ihmistä, yhteiskuntaa ja kaikkea ympärillämme?"
+      ],
+      "sectors": [
+        {
+          "value": "0/lib/",
+          "translated": "Kirjasto"
+        },
+        {
+          "value": "1/lib/spl/",
+          "translated": "Erikoiskirjasto"
+        }
+      ],
+      "dedupIds": [
+        "ekk.994159314006250",
+        "eepos.1277316",
+        "heili.41b938da-6af5-4b8a-83f0-946b2548d499",
+        "helle.1666195",
+        "helmet.2227772",
+        "hurma.79945",
+        "uef.9910795763705966",
+        "tiekko.938078",
+        "jykdok.1992290",
+        "kainet.991686",
+        "fikka.4236239",
+        "keski.2694503",
+        "kirkes.439999",
+        "kuopio.1203248",
+        "kyyti.1293270",
+        "lapinkirjasto.1235255",
+        "luc.994748123506246",
+        "lastu.265886",
+        "lukki.643466",
+        "lumme.2928963",
+        "taisto.152141",
+        "oy.9915206923906252",
+        "outi.1545757",
+        "piki.3808581",
+        "ratamo.1568438",
+        "rutakko.3a18935f-831d-4ee5-9af2-67dd4df19844",
+        "satakirjastot.380299",
+        "tuni.992569955305973",
+        "utu.9917932295405971",
+        "vaarakirjastot.11398524",
+        "vaasa.d65efdfd-a3fd-430c-a44f-46e9c1868260",
+        "vanamo.750053a2-28a8-43b2-956f-d09758cf14c5",
+        "vaski.3582958",
+        "abo.9912875653405972"
+      ],
+      "fullRecord": "<?xml version=\"1.0\"?>\n<collection xmlns=\"http://www.loc.gov/MARC21/slim\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd\"><record><leader>00000cam a22000004i 4500</leader><controlfield tag=\"005\">20201027121723.0</controlfield><controlfield tag=\"008\">170403s2017    fi ||||| |||||001|0|fin| </controlfield><controlfield tag=\"001\">994159314006250</controlfield><datafield tag=\"020\" ind1=\" \" ind2=\" \"><subfield code=\"a\">978-952-279-470-3</subfield><subfield code=\"q\">pehmeäkantinen</subfield></datafield><datafield tag=\"024\" ind1=\"3\" ind2=\" \"><subfield code=\"a\">9789522794703</subfield></datafield><datafield tag=\"035\" ind1=\" \" ind2=\" \"><subfield code=\"a\">(FI-E)415931-parldb</subfield></datafield><datafield tag=\"035\" ind1=\" \" ind2=\" \"><subfield code=\"a\">(FI-MELINDA)010869771</subfield></datafield><datafield tag=\"040\" ind1=\" \" ind2=\" \"><subfield code=\"a\">FI-Vaski</subfield><subfield code=\"b\">fin</subfield><subfield code=\"e\">rda</subfield><subfield code=\"d\">FI-NL</subfield></datafield><datafield tag=\"041\" ind1=\"0\" ind2=\" \"><subfield code=\"a\">fin</subfield><subfield code=\"k\">eng</subfield><subfield code=\"h\">heb</subfield></datafield><datafield tag=\"042\" ind1=\" \" ind2=\" \"><subfield code=\"a\">finb</subfield></datafield><datafield tag=\"100\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Harari, Yuval Noah,</subfield><subfield code=\"e\">kirjoittaja.</subfield></datafield><datafield tag=\"240\" ind1=\"1\" ind2=\"0\"><subfield code=\"a\">Kitzur toldot ha'enoshut,</subfield><subfield code=\"l\">suomi</subfield></datafield><datafield tag=\"245\" ind1=\"1\" ind2=\"0\"><subfield code=\"a\">Sapiens :</subfield><subfield code=\"b\">ihmisen lyhyt historia /</subfield><subfield code=\"c\">Yuval Noah Harari ; suomentanut Jaana Iso-Markku.</subfield></datafield><datafield tag=\"246\" ind1=\"3\" ind2=\"0\"><subfield code=\"a\">Ihmisen lyhyt historia</subfield></datafield><datafield tag=\"250\" ind1=\" \" ind2=\" \"><subfield code=\"a\">2. nidottu laitos</subfield></datafield><datafield tag=\"264\" ind1=\" \" ind2=\"1\"><subfield code=\"a\">Helsinki :</subfield><subfield code=\"b\">Bazar,</subfield><subfield code=\"c\">[2017]</subfield></datafield><datafield tag=\"264\" ind1=\" \" ind2=\"3\"><subfield code=\"a\">Liettua :</subfield><subfield code=\"b\">ScanBook UAB,</subfield><subfield code=\"c\">2017.</subfield></datafield><datafield tag=\"300\" ind1=\" \" ind2=\" \"><subfield code=\"a\">491 sivua :</subfield><subfield code=\"b\">kuvitettu, karttoja ;</subfield><subfield code=\"c\">22 cm</subfield></datafield><datafield tag=\"336\" ind1=\" \" ind2=\" \"><subfield code=\"a\">teksti</subfield><subfield code=\"b\">txt</subfield><subfield code=\"2\">rdacontent</subfield></datafield><datafield tag=\"337\" ind1=\" \" ind2=\" \"><subfield code=\"a\">käytettävissä ilman laitetta</subfield><subfield code=\"b\">n</subfield><subfield code=\"2\">rdamedia</subfield></datafield><datafield tag=\"338\" ind1=\" \" ind2=\" \"><subfield code=\"a\">nide</subfield><subfield code=\"b\">nc</subfield><subfield code=\"2\">rdacarrier</subfield></datafield><datafield tag=\"490\" ind1=\"0\" ind2=\" \"><subfield code=\"a\">Mitä Suomi lukee</subfield></datafield><datafield tag=\"500\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Lisäpainokset: 4. painos 2017. - 5. painos 2017.</subfield></datafield><datafield tag=\"500\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Suomennettu englanninkielisestä käännöksestä: Sapiens : a brief history of humankind.</subfield></datafield><datafield tag=\"504\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Sisältää bibliografisia viitteitä ja hakemiston.</subfield></datafield><datafield tag=\"505\" ind1=\"0\" ind2=\" \"><subfield code=\"a\">Ensimmäinen osa: Kognitiivinen vallankumous -- Toinen osa: Maanviljelyn vallankumous -- Kolmas osa: Ihmiskunnan yhdentyminen -- Neljäs osa: Tieteellinen vallankumous -- Jälkisanat: Eläin, josta tuli jumala.</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">antropologia</subfield><subfield code=\"2\">eks</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">evoluutioteoria</subfield><subfield code=\"2\">eks</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">historia</subfield><subfield code=\"2\">eks</subfield></datafield><datafield tag=\"700\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Iso-Markku, Jaana,</subfield><subfield code=\"d\">1956-</subfield><subfield code=\"e\">kääntäjä.</subfield></datafield><datafield tag=\"852\" ind1=\"8\" ind2=\" \"><subfield code=\"a\">E</subfield><subfield code=\"b\">LIBPARL</subfield><subfield code=\"c\">varasto110</subfield><subfield code=\"8\">2240764880006250</subfield></datafield><datafield tag=\"952\" ind1=\" \" ind2=\" \"><subfield code=\"b\">LIBPARL</subfield><subfield code=\"c\">varasto110</subfield><subfield code=\"o\">KBE 120</subfield><subfield code=\"9\">1</subfield></datafield><datafield tag=\"090\" ind1=\" \" ind2=\" \"><subfield code=\"a\">(Alma)994159314006250</subfield></datafield></record></collection>\n"
+    }
+  ],
+  "status": "OK"
+}

@@ -1,0 +1,360 @@
+{
+  "resultCount": 1,
+  "records": [
+    {
+      "id": "3amk.163124",
+      "recordPage": "/Record/3amk.163124",
+      "formats": [
+        {
+          "value": "0/Book/",
+          "translated": "Kirja"
+        },
+        {
+          "value": "1/Book/Book/",
+          "translated": "Kirja"
+        }
+      ],
+      "title": "Sorrettujen pedagogiikka",
+      "shortTitle": "Sorrettujen pedagogiikka",
+      "uniformTitles": [
+        "Pedagogia do oprimido. Suomi"
+      ],
+      "authors": {
+        "primary": {
+          "Freire, Paulo": {
+            "role": [
+              "kirjoittaja"
+            ]
+          },
+          "Tomperi, Tuukka": {
+            "role": [
+              "-"
+            ]
+          },
+          "Suoranta, Juha": {
+            "role": [
+              "-"
+            ]
+          },
+          "Kuortti, Joel": {
+            "role": [
+              "-"
+            ]
+          }
+        },
+        "secondary": {
+          "Kuortti, Joel, 1963- kääntäjä": {
+            "role": [
+              "kääntäjä"
+            ]
+          }
+        },
+        "corporate": {
+          "Vastapaino (kustantamo), kustantaja": {
+            "role": [
+              "kustantaja"
+            ]
+          }
+        }
+      },
+      "primaryAuthors": [
+        "Freire, Paulo",
+        "Tomperi, Tuukka",
+        "Suoranta, Juha",
+        "Kuortti, Joel"
+      ],
+      "nonPresenterAuthors": [
+        {
+          "name": "Freire, Paulo",
+          "role": "kirjoittaja",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Tomperi, Tuukka",
+          "date": "1971-",
+          "role": "kirjoittaja, toimittaja",
+          "id": "(FI-ASTERI-N)000119960",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Suoranta, Juha",
+          "date": "1966-",
+          "role": "kirjoittaja",
+          "id": "(FI-ASTERI-N)000084499",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Kuortti, Joel",
+          "date": "1963-",
+          "role": "kääntäjä",
+          "id": "(FI-ASTERI-N)000095397",
+          "type": "Personal Name"
+        }
+      ],
+      "secondaryAuthors": [
+        "Kuortti, Joel, 1963- kääntäjä"
+      ],
+      "corporateAuthors": [
+        "Vastapaino (kustantamo), kustantaja"
+      ],
+      "isbns": [
+        "978-951-768-553-5 pehmeäkantinen"
+      ],
+      "cleanIsbn": "951768553X",
+      "languages": [
+        "fin"
+      ],
+      "originalLanguages": [
+        "por"
+      ],
+      "publishers": [
+        "Vastapaino"
+      ],
+      "publicationDates": [
+        "2016"
+      ],
+      "placesOfPublication": [
+        "Tampere :"
+      ],
+      "year": "2016",
+      "edition": "2. painos",
+      "physicalDescriptions": [
+        "250 sivua ; 18 cm"
+      ],
+      "series": [],
+      "subjects": [
+        [
+          "kasvatusfilosofia"
+        ],
+        [
+          "Freire-pedagogiikka"
+        ],
+        [
+          "ihmisyys"
+        ],
+        [
+          "tiedostaminen"
+        ],
+        [
+          "vapautuminen"
+        ],
+        [
+          "sorto"
+        ],
+        [
+          "dialogi"
+        ],
+        [
+          "vuorovaikutus"
+        ],
+        [
+          "opettaja-oppilassuhde"
+        ],
+        [
+          "oppiminen"
+        ],
+        [
+          "kriittisyys"
+        ],
+        [
+          "kriittinen pedagogiikka"
+        ],
+        [
+          "emansipaatio"
+        ],
+        [
+          "kasvatus"
+        ],
+        [
+          "kasvatusteoriat"
+        ]
+      ],
+      "subjectsExtended": [
+        {
+          "heading": [
+            "kasvatusfilosofia"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p2746"
+        },
+        {
+          "heading": [
+            "Freire-pedagogiikka"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p7961"
+        },
+        {
+          "heading": [
+            "ihmisyys"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p14396"
+        },
+        {
+          "heading": [
+            "tiedostaminen"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p7066"
+        },
+        {
+          "heading": [
+            "vapautuminen"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p8930"
+        },
+        {
+          "heading": [
+            "sorto"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p6304"
+        },
+        {
+          "heading": [
+            "dialogi"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p14560"
+        },
+        {
+          "heading": [
+            "vuorovaikutus"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p10591"
+        },
+        {
+          "heading": [
+            "opettaja-oppilassuhde"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p1050"
+        },
+        {
+          "heading": [
+            "oppiminen"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p2945"
+        },
+        {
+          "heading": [
+            "kriittisyys"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p15653"
+        },
+        {
+          "heading": [
+            "kriittinen pedagogiikka"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p20298"
+        },
+        {
+          "heading": [
+            "emansipaatio"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p6364"
+        },
+        {
+          "heading": [
+            "kasvatus"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p476"
+        },
+        {
+          "heading": [
+            "kasvatusteoriat"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p7960"
+        }
+      ],
+      "genres": [],
+      "majorGenres": [
+        "nonfiction"
+      ],
+      "classifications": {
+        "ykl": [
+          "38.01",
+          "38"
+        ]
+      },
+      "images": [],
+      "imagesExtended": [],
+      "summary": [],
+      "sectors": [
+        {
+          "value": "0/lib/",
+          "translated": "Kirjasto"
+        },
+        {
+          "value": "1/lib/poly/",
+          "translated": "AMK"
+        }
+      ],
+      "dedupIds": [
+        "3amk.163124",
+        "anders.b563097e-04e4-4d38-87f5-756eeccf3004",
+        "diana.115149",
+        "eepos.1319190",
+        "heili.87925e41-2d7c-4e4a-87a6-4a53379e371f",
+        "helka.9930669473506253",
+        "helle.868508",
+        "helmet.2259175",
+        "hurma.71434",
+        "uef.9913800883705966",
+        "tiekko.935615",
+        "jamk.993694943506251",
+        "jykdok.1700618",
+        "kamk.99575285106247",
+        "fikka.4251547",
+        "keski.2750107",
+        "kirkes.447293",
+        "kuopio.1238106",
+        "kyyti.1251336",
+        "lapinkirjasto.1263714",
+        "lastu.325923",
+        "louna.baa7046e-1157-4c9e-9be0-8c0fe103b3b8",
+        "lumme.2879205",
+        "oy.9915559623906252",
+        "outi.1693714",
+        "piki.3902826",
+        "ratamo.470308",
+        "satakirjastot.280151",
+        "savonia.991850676406248",
+        "uniarts_print.994904394206249",
+        "tuni.999829494205973",
+        "utu.9917941375405971",
+        "vaarakirjastot.11420779",
+        "vaasa.c5faa451-3e42-4dc9-851a-b764f26bc85f",
+        "vaari.1936661",
+        "vaski.3484247",
+        "abo.9913156283405972"
+      ],
+      "fullRecord": "<?xml version=\"1.0\"?>\n<collection xmlns=\"http://www.loc.gov/MARC21/slim\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd\"><record><leader>00000cam a2200000 i 4500</leader><controlfield tag=\"001\">171228</controlfield><controlfield tag=\"003\">FI-Metro</controlfield><controlfield tag=\"005\">20251218124925.0</controlfield><controlfield tag=\"008\">160525s2016    fi ||||       |0| 0|fin| </controlfield><datafield tag=\"020\" ind1=\" \" ind2=\" \"><subfield code=\"a\">978-951-768-553-5</subfield><subfield code=\"q\">pehmeäkantinen</subfield></datafield><datafield tag=\"024\" ind1=\"3\" ind2=\" \"><subfield code=\"a\">9789517685535</subfield></datafield><datafield tag=\"035\" ind1=\" \" ind2=\" \"><subfield code=\"a\">(FI-Metro)171228</subfield></datafield><datafield tag=\"035\" ind1=\" \" ind2=\" \"><subfield code=\"a\">FCC009593238</subfield></datafield><datafield tag=\"040\" ind1=\" \" ind2=\" \"><subfield code=\"a\">FI-NL</subfield><subfield code=\"b\">fin</subfield><subfield code=\"e\">rda</subfield></datafield><datafield tag=\"041\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">fin</subfield><subfield code=\"h\">por</subfield></datafield><datafield tag=\"084\" ind1=\" \" ind2=\" \"><subfield code=\"a\">38.01</subfield><subfield code=\"2\">ykl</subfield></datafield><datafield tag=\"084\" ind1=\" \" ind2=\" \"><subfield code=\"a\">38</subfield><subfield code=\"2\">ykl</subfield></datafield><datafield tag=\"100\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Freire, Paulo,</subfield><subfield code=\"e\">kirjoittaja.</subfield></datafield><datafield tag=\"240\" ind1=\"1\" ind2=\"0\"><subfield code=\"a\">Pedagogia do oprimido.</subfield><subfield code=\"l\">Suomi</subfield></datafield><datafield tag=\"245\" ind1=\"1\" ind2=\"0\"><subfield code=\"a\">Sorrettujen pedagogiikka /</subfield><subfield code=\"c\">Paulo Freire ; suomentanut Joel Kuortti ; toimittanut Tuukka Tomperi ; johdanto ja jälkisanat: Tuukka Tomperi &amp; Juha Suoranta.</subfield></datafield><datafield tag=\"250\" ind1=\" \" ind2=\" \"><subfield code=\"a\">2. painos.</subfield></datafield><datafield tag=\"264\" ind1=\" \" ind2=\"1\"><subfield code=\"a\">Tampere :</subfield><subfield code=\"b\">Vastapaino,</subfield><subfield code=\"c\">[2016]</subfield></datafield><datafield tag=\"264\" ind1=\" \" ind2=\"3\"><subfield code=\"a\">Tallinna :</subfield><subfield code=\"b\">Tallinna Raamatutrükikoja OÜ,</subfield><subfield code=\"c\">2016.</subfield></datafield><datafield tag=\"300\" ind1=\" \" ind2=\" \"><subfield code=\"a\">250 sivua ;</subfield><subfield code=\"c\">18 cm</subfield></datafield><datafield tag=\"336\" ind1=\" \" ind2=\" \"><subfield code=\"a\">teksti</subfield><subfield code=\"b\">txt</subfield><subfield code=\"2\">rdacontent</subfield></datafield><datafield tag=\"337\" ind1=\" \" ind2=\" \"><subfield code=\"a\">käytettävissä ilman laitetta</subfield><subfield code=\"b\">n</subfield><subfield code=\"2\">rdamedia</subfield></datafield><datafield tag=\"338\" ind1=\" \" ind2=\" \"><subfield code=\"a\">nide</subfield><subfield code=\"b\">nc</subfield><subfield code=\"2\">rdacarrier</subfield></datafield><datafield tag=\"500\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Lisäpainokset: Lisäpainos 2018.</subfield></datafield><datafield tag=\"500\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Lisäpainokset: 3. painos 2024.</subfield></datafield><datafield tag=\"505\" ind1=\"0\" ind2=\" \"><subfield code=\"a\">1. Sorrettujen pedagogiikan oikeutus -- 2. Tallettava kasvatus ja problematisoiva kasvatus -- 3. Dialogisuus: vapautuksen käytäntönä olevan kasvatuksen olemus -- 4. Antidialogisuus ja dialogisuus vastakkaisina kulttuurisen toiminnan teorioina.</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kasvatusfilosofia</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p2746</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">Freire-pedagogiikka</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p7961</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">ihmisyys</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p14396</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">tiedostaminen</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p7066</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">vapautuminen</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p8930</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">sorto</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p6304</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">dialogi</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p14560</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">vuorovaikutus</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p10591</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">opettaja-oppilassuhde</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p1050</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">oppiminen</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p2945</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kriittisyys</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p15653</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kriittinen pedagogiikka</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p20298</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">emansipaatio</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p6364</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kasvatus</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p476</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kasvatusteoriat</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p7960</subfield></datafield><datafield tag=\"700\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Tomperi, Tuukka,</subfield><subfield code=\"d\">1971-</subfield><subfield code=\"e\">kirjoittaja,</subfield><subfield code=\"e\">toimittaja.</subfield><subfield code=\"0\">(FI-ASTERI-N)000119960</subfield></datafield><datafield tag=\"700\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Suoranta, Juha,</subfield><subfield code=\"d\">1966-</subfield><subfield code=\"e\">kirjoittaja.</subfield><subfield code=\"0\">(FI-ASTERI-N)000084499</subfield></datafield><datafield tag=\"700\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Kuortti, Joel,</subfield><subfield code=\"d\">1963-</subfield><subfield code=\"e\">kääntäjä.</subfield><subfield code=\"0\">(FI-ASTERI-N)000095397</subfield></datafield><datafield tag=\"710\" ind1=\"2\" ind2=\" \"><subfield code=\"a\">Vastapaino (kustantamo),</subfield><subfield code=\"e\">kustantaja.</subfield><subfield code=\"0\">(FI-ASTERI-N)000011656</subfield></datafield><datafield tag=\"999\" ind1=\" \" ind2=\" \"><subfield code=\"c\">163124</subfield><subfield code=\"d\">163124</subfield></datafield><datafield tag=\"952\" ind1=\" \" ind2=\" \"><subfield code=\"b\">METARA</subfield><subfield code=\"c\">YLEIS</subfield><subfield code=\"o\">370 FREIRE</subfield><subfield code=\"8\">MET</subfield></datafield><datafield tag=\"952\" ind1=\" \" ind2=\" \"><subfield code=\"b\">METMYL</subfield><subfield code=\"c\">YLEIS</subfield><subfield code=\"o\">370 FREIRE</subfield><subfield code=\"8\">MET</subfield><subfield code=\"9\">1</subfield></datafield><datafield tag=\"952\" ind1=\" \" ind2=\" \"><subfield code=\"b\">LAUTIK</subfield><subfield code=\"c\">YLEIS</subfield><subfield code=\"o\">38 FREIRE</subfield><subfield code=\"8\">LAU</subfield><subfield code=\"9\">1</subfield></datafield><datafield tag=\"952\" ind1=\" \" ind2=\" \"><subfield code=\"b\">LAUHYV</subfield><subfield code=\"c\">YLEIS</subfield><subfield code=\"o\">38 FREIRE</subfield><subfield code=\"8\">LAU</subfield><subfield code=\"9\">1</subfield></datafield><datafield tag=\"952\" ind1=\" \" ind2=\" \"><subfield code=\"b\">PORV</subfield><subfield code=\"c\">YLEIS</subfield><subfield code=\"o\">37 FREIRE</subfield><subfield code=\"8\">LAU</subfield><subfield code=\"9\">1</subfield></datafield></record></collection>\n"
+    }
+  ],
+  "status": "OK"
+}

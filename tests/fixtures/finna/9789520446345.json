@@ -1,0 +1,1332 @@
+{
+  "resultCount": 5,
+  "records": [
+    {
+      "id": "satakirjastot.1752208",
+      "recordPage": "/Record/satakirjastot.1752208",
+      "formats": [
+        {
+          "value": "0/Book/",
+          "translated": "Kirja"
+        },
+        {
+          "value": "1/Book/AudioBook/",
+          "translated": "Äänikirja"
+        },
+        {
+          "value": "2/Book/AudioBook/Daisy/",
+          "translated": "Celia-äänikirja"
+        }
+      ],
+      "title": "Muutos : metodi : Daisy-äänikirja vain lukemisesteisille",
+      "shortTitle": "Muutos",
+      "subTitle": "metodi : Daisy-äänikirja vain lukemisesteisille",
+      "uniformTitles": [
+        "Changer : méthode, suomi"
+      ],
+      "authors": {
+        "primary": {
+          "Louis, Édouard": {
+            "role": [
+              "kirjoittaja"
+            ]
+          },
+          "Toivanen, Lotta": {
+            "role": [
+              "-"
+            ]
+          }
+        },
+        "secondary": {
+          "Toivanen, Lotta, kääntäjä": {
+            "role": [
+              "kääntäjä"
+            ]
+          },
+          "Louis, Édouard. kääntäjä": {
+            "role": [
+              "-"
+            ]
+          }
+        },
+        "corporate": []
+      },
+      "primaryAuthors": [
+        "Louis, Édouard",
+        "Toivanen, Lotta"
+      ],
+      "nonPresenterAuthors": [
+        {
+          "name": "Louis, Édouard",
+          "role": "kirjoittaja",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Toivanen, Lotta",
+          "role": "kääntäjä",
+          "id": "(FI-ASTERI-N)000116517",
+          "type": "Personal Name"
+        }
+      ],
+      "secondaryAuthors": [
+        "Toivanen, Lotta, kääntäjä",
+        "Louis, Édouard. kääntäjä"
+      ],
+      "corporateAuthors": [],
+      "isbns": [],
+      "languages": [
+        "fin"
+      ],
+      "originalLanguages": [],
+      "publishers": [
+        "Celia"
+      ],
+      "publicationDates": [
+        "2023"
+      ],
+      "placesOfPublication": [
+        "[Helsinki] :"
+      ],
+      "year": "2023",
+      "physicalDescriptions": [
+        "1 CD-levy (Daisy) (5 h 41 min)"
+      ],
+      "series": [],
+      "subjects": [
+        [
+          "Bellegueule, Eddy",
+          "(fiktiivinen hahmo)"
+        ],
+        [
+          "nuoruus"
+        ],
+        [
+          "aikuistuminen"
+        ],
+        [
+          "elämänmuutokset"
+        ],
+        [
+          "muutto"
+        ],
+        [
+          "ihmissuhteet"
+        ],
+        [
+          "sosiaalinen nousu"
+        ],
+        [
+          "keskiluokkaisuus"
+        ],
+        [
+          "asenteet"
+        ],
+        [
+          "arvot"
+        ]
+      ],
+      "subjectsExtended": [
+        {
+          "heading": [
+            "Bellegueule, Eddy",
+            "(fiktiivinen hahmo)"
+          ],
+          "type": "personal name",
+          "source": "unknown",
+          "authType": "Personal Name"
+        },
+        {
+          "heading": [
+            "nuoruus"
+          ],
+          "type": "topic",
+          "source": "kauno/fin",
+          "id": "http://www.yso.fi/onto/kauno/p1823"
+        },
+        {
+          "heading": [
+            "aikuistuminen"
+          ],
+          "type": "topic",
+          "source": "kauno/fin",
+          "id": "http://www.yso.fi/onto/kauno/p1491"
+        },
+        {
+          "heading": [
+            "elämänmuutokset"
+          ],
+          "type": "topic",
+          "source": "kauno/fin",
+          "id": "http://www.yso.fi/onto/kauno/p2593"
+        },
+        {
+          "heading": [
+            "muutto"
+          ],
+          "type": "topic",
+          "source": "kauno/fin",
+          "id": "http://www.yso.fi/onto/kauno/p2687"
+        },
+        {
+          "heading": [
+            "ihmissuhteet"
+          ],
+          "type": "topic",
+          "source": "kauno/fin",
+          "id": "http://www.yso.fi/onto/kauno/p1541"
+        },
+        {
+          "heading": [
+            "sosiaalinen nousu"
+          ],
+          "type": "topic",
+          "source": "kauno/fin",
+          "id": "http://www.yso.fi/onto/kauno/p5436"
+        },
+        {
+          "heading": [
+            "keskiluokkaisuus"
+          ],
+          "type": "topic",
+          "source": "kauno/fin",
+          "id": "http://www.yso.fi/onto/kauno/p3643"
+        },
+        {
+          "heading": [
+            "asenteet"
+          ],
+          "type": "topic",
+          "source": "kauno/fin",
+          "id": "http://www.yso.fi/onto/kauno/p1546"
+        },
+        {
+          "heading": [
+            "arvot"
+          ],
+          "type": "topic",
+          "source": "kauno/fin",
+          "id": "http://www.yso.fi/onto/kauno/p1736"
+        }
+      ],
+      "genres": [
+        "autofiktio",
+        "kehitysromaanit",
+        "psykologiset romaanit",
+        "romaanit",
+        "kaunokirjallisuus",
+        "käännökset",
+        "ranskankielinen kirjallisuus"
+      ],
+      "majorGenres": [
+        "fiction"
+      ],
+      "classifications": {
+        "ykl": [
+          "84.2"
+        ]
+      },
+      "images": [],
+      "imagesExtended": [],
+      "summary": [],
+      "sectors": [
+        {
+          "value": "0/lib/",
+          "translated": "Kirjasto"
+        },
+        {
+          "value": "1/lib/pub/",
+          "translated": "Yleinen"
+        }
+      ],
+      "fullRecord": "<?xml version=\"1.0\"?>\n<collection xmlns=\"http://www.loc.gov/MARC21/slim\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd\"><record><leader>00000nim a22000004i 4500</leader><controlfield tag=\"001\">1752208</controlfield><controlfield tag=\"003\">ANDL100020</controlfield><controlfield tag=\"005\">20250131134454.3</controlfield><controlfield tag=\"007\">co||g|||||||||</controlfield><controlfield tag=\"008\">250131s2023    fi ||||f |||||||||||fin|c</controlfield><datafield tag=\"028\" ind1=\"0\" ind2=\"1\"><subfield code=\"b\">Celia</subfield><subfield code=\"a\">386452</subfield></datafield><datafield tag=\"035\" ind1=\" \" ind2=\" \"><subfield code=\"a\">(FI-Sata)0001752208</subfield></datafield><datafield tag=\"035\" ind1=\" \" ind2=\" \"><subfield code=\"a\">(FI-MELINDA)019259770</subfield></datafield><datafield tag=\"040\" ind1=\" \" ind2=\" \"><subfield code=\"a\">FI-Sata</subfield><subfield code=\"b\">fin</subfield><subfield code=\"e\">rda</subfield></datafield><datafield tag=\"041\" ind1=\"0\" ind2=\" \"><subfield code=\"d\">fin</subfield></datafield><datafield tag=\"084\" ind1=\" \" ind2=\" \"><subfield code=\"a\">84.2</subfield><subfield code=\"2\">ykl</subfield></datafield><datafield tag=\"100\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Louis, Édouard,</subfield><subfield code=\"e\">kirjoittaja.</subfield></datafield><datafield tag=\"240\" ind1=\"1\" ind2=\"0\"><subfield code=\"a\">Changer : méthode,</subfield><subfield code=\"l\">suomi</subfield></datafield><datafield tag=\"245\" ind1=\"1\" ind2=\"0\"><subfield code=\"a\">Muutos :</subfield><subfield code=\"b\">metodi : Daisy-äänikirja vain lukemisesteisille /</subfield><subfield code=\"c\">Édouard Louis ; suomentanut Lotta Toivanen.</subfield></datafield><datafield tag=\"264\" ind1=\" \" ind2=\"1\"><subfield code=\"a\">[Helsinki] :</subfield><subfield code=\"b\">Celia,</subfield><subfield code=\"c\">2023.</subfield></datafield><datafield tag=\"300\" ind1=\" \" ind2=\" \"><subfield code=\"a\">1 CD-levy (Daisy) (5 h 41 min)</subfield></datafield><datafield tag=\"336\" ind1=\" \" ind2=\" \"><subfield code=\"a\">puhe</subfield><subfield code=\"b\">spw</subfield><subfield code=\"2\">rdacontent</subfield></datafield><datafield tag=\"337\" ind1=\" \" ind2=\" \"><subfield code=\"a\">audio</subfield><subfield code=\"b\">s</subfield><subfield code=\"2\">rdamedia</subfield></datafield><datafield tag=\"338\" ind1=\" \" ind2=\" \"><subfield code=\"a\">äänilevy</subfield><subfield code=\"b\">sd</subfield><subfield code=\"2\">rdacarrier</subfield></datafield><datafield tag=\"341\" ind1=\"0\" ind2=\" \"><subfield code=\"a\">kuuloon perustuva</subfield></datafield><datafield tag=\"344\" ind1=\" \" ind2=\" \"><subfield code=\"a\">digitaalinen</subfield><subfield code=\"b\">optinen</subfield></datafield><datafield tag=\"347\" ind1=\" \" ind2=\" \"><subfield code=\"a\">äänitiedosto</subfield><subfield code=\"b\">MP3</subfield><subfield code=\"b\">Daisy</subfield></datafield><datafield tag=\"500\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Jatkoa teokselle: Ei enää Eddy.</subfield></datafield><datafield tag=\"506\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Vain lukemisesteisille.</subfield></datafield><datafield tag=\"511\" ind1=\"0\" ind2=\" \"><subfield code=\"a\">Lukija: Panu Vauhkonen.</subfield></datafield><datafield tag=\"538\" ind1=\" \" ind2=\" \"><subfield code=\"a\">DAISY-lukulaite tai MP3-tiedostoja toistava laite.</subfield></datafield><datafield tag=\"540\" ind1=\" \" ind2=\" \"><subfield code=\"c\">Tekijänoikeuslaki</subfield><subfield code=\"u\">http://www.finlex.fi/fi/laki/ajantasa/1961/19610404</subfield></datafield><datafield tag=\"600\" ind1=\"1\" ind2=\"4\"><subfield code=\"a\">Bellegueule, Eddy</subfield><subfield code=\"c\">(fiktiivinen hahmo)</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">nuoruus</subfield><subfield code=\"2\">kauno/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p1823</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">aikuistuminen</subfield><subfield code=\"2\">kauno/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p1491</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">elämänmuutokset</subfield><subfield code=\"2\">kauno/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p2593</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">muutto</subfield><subfield code=\"2\">kauno/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p2687</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">ihmissuhteet</subfield><subfield code=\"2\">kauno/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p1541</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">sosiaalinen nousu</subfield><subfield code=\"2\">kauno/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p5436</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">keskiluokkaisuus</subfield><subfield code=\"2\">kauno/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p3643</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">asenteet</subfield><subfield code=\"2\">kauno/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p1546</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">arvot</subfield><subfield code=\"2\">kauno/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p1736</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">autofiktio</subfield><subfield code=\"2\">slm/fin</subfield><subfield code=\"0\">http://urn.fi/URN:NBN:fi:au:slm:s611</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kehitysromaanit</subfield><subfield code=\"2\">slm/fin</subfield><subfield code=\"0\">http://urn.fi/URN:NBN:fi:au:slm:s665</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">psykologiset romaanit</subfield><subfield code=\"2\">slm/fin</subfield><subfield code=\"0\">http://urn.fi/URN:NBN:fi:au:slm:s604</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">romaanit</subfield><subfield code=\"2\">slm/fin</subfield><subfield code=\"0\">http://urn.fi/URN:NBN:fi:au:slm:s518</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kaunokirjallisuus</subfield><subfield code=\"2\">slm/fin</subfield><subfield code=\"0\">http://urn.fi/URN:NBN:fi:au:slm:s975</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">käännökset</subfield><subfield code=\"2\">slm/fin</subfield><subfield code=\"0\">http://urn.fi/URN:NBN:fi:au:slm:s1044</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">ranskankielinen kirjallisuus</subfield><subfield code=\"2\">local</subfield></datafield><datafield tag=\"700\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Toivanen, Lotta,</subfield><subfield code=\"e\">kääntäjä.</subfield><subfield code=\"0\">(FI-ASTERI-N)000116517</subfield></datafield><datafield tag=\"700\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Louis, Édouard.</subfield><subfield code=\"e\">kääntäjä.</subfield><subfield code=\"i\">Jatkoa teokselle:</subfield><subfield code=\"t\">En finir avec Eddy Bellegueule.</subfield></datafield><datafield tag=\"776\" ind1=\"0\" ind2=\"8\"><subfield code=\"i\">Painettu:</subfield><subfield code=\"z\">9789520446345</subfield></datafield><datafield tag=\"852\" ind1=\" \" ind2=\" \"><subfield code=\"a\">9</subfield><subfield code=\"b\">120</subfield><subfield code=\"c\">2</subfield></datafield></record></collection>\n"
+    },
+    {
+      "id": "keski.3354308",
+      "recordPage": "/Record/keski.3354308",
+      "formats": [
+        {
+          "value": "0/Book/",
+          "translated": "Kirja"
+        },
+        {
+          "value": "1/Book/AudioBook/",
+          "translated": "Äänikirja"
+        },
+        {
+          "value": "2/Book/AudioBook/Daisy/",
+          "translated": "Celia-äänikirja"
+        }
+      ],
+      "title": "Muutos : metodi",
+      "shortTitle": "Muutos",
+      "subTitle": "metodi",
+      "uniformTitles": [
+        "Changer : méthode, suomi"
+      ],
+      "authors": {
+        "primary": {
+          "Louis, Édouard": {
+            "role": [
+              "kirjoittaja",
+              "-"
+            ]
+          },
+          "Toivanen, Lotta": {
+            "role": [
+              "-"
+            ]
+          },
+          "Vauhkonen, Panu": {
+            "role": [
+              "-"
+            ]
+          }
+        },
+        "secondary": {
+          "Toivanen, Lotta, kääntäjä": {
+            "role": [
+              "kääntäjä"
+            ]
+          },
+          "Vauhkonen, Panu, lukija": {
+            "role": [
+              "lukija"
+            ]
+          }
+        },
+        "corporate": []
+      },
+      "primaryAuthors": [
+        "Louis, Édouard",
+        "Toivanen, Lotta",
+        "Vauhkonen, Panu"
+      ],
+      "nonPresenterAuthors": [
+        {
+          "name": "Louis, Édouard",
+          "role": "kirjoittaja",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Toivanen, Lotta",
+          "role": "kääntäjä",
+          "id": "(FI-ASTERI-N)000116517",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Vauhkonen, Panu",
+          "role": "lukija",
+          "type": "Personal Name"
+        }
+      ],
+      "secondaryAuthors": [
+        "Toivanen, Lotta, kääntäjä",
+        "Vauhkonen, Panu, lukija",
+        "Louis, Édouard"
+      ],
+      "corporateAuthors": [],
+      "isbns": [],
+      "languages": [
+        "fin"
+      ],
+      "originalLanguages": [
+        "fre"
+      ],
+      "publishers": [
+        "Celia"
+      ],
+      "publicationDates": [
+        "2023"
+      ],
+      "placesOfPublication": [
+        "[Helsinki] :"
+      ],
+      "year": "2023",
+      "physicalDescriptions": [
+        "1 CD-levy (Daisy) (5 h 41min)"
+      ],
+      "series": [],
+      "subjects": [
+        [
+          "Bellegueule, Eddy",
+          "(fiktiivinen hahmo)"
+        ],
+        [
+          "nuoruus"
+        ],
+        [
+          "aikuistuminen"
+        ],
+        [
+          "elämänmuutokset"
+        ],
+        [
+          "muutto"
+        ],
+        [
+          "ihmissuhteet"
+        ],
+        [
+          "sosiaalinen nousu"
+        ],
+        [
+          "keskiluokkaisuus"
+        ],
+        [
+          "asenteet"
+        ],
+        [
+          "arvot"
+        ]
+      ],
+      "subjectsExtended": [
+        {
+          "heading": [
+            "Bellegueule, Eddy",
+            "(fiktiivinen hahmo)"
+          ],
+          "type": "personal name",
+          "source": "unknown",
+          "authType": "Personal Name"
+        },
+        {
+          "heading": [
+            "nuoruus"
+          ],
+          "type": "topic",
+          "source": "kauno/fin",
+          "id": "http://www.yso.fi/onto/kauno/p1823"
+        },
+        {
+          "heading": [
+            "aikuistuminen"
+          ],
+          "type": "topic",
+          "source": "kauno/fin",
+          "id": "http://www.yso.fi/onto/kauno/p1491"
+        },
+        {
+          "heading": [
+            "elämänmuutokset"
+          ],
+          "type": "topic",
+          "source": "kauno/fin",
+          "id": "http://www.yso.fi/onto/kauno/p2593"
+        },
+        {
+          "heading": [
+            "muutto"
+          ],
+          "type": "topic",
+          "source": "kauno/fin",
+          "id": "http://www.yso.fi/onto/kauno/p2687"
+        },
+        {
+          "heading": [
+            "ihmissuhteet"
+          ],
+          "type": "topic",
+          "source": "kauno/fin",
+          "id": "http://www.yso.fi/onto/kauno/p1541"
+        },
+        {
+          "heading": [
+            "sosiaalinen nousu"
+          ],
+          "type": "topic",
+          "source": "kauno/fin",
+          "id": "http://www.yso.fi/onto/kauno/p5436"
+        },
+        {
+          "heading": [
+            "keskiluokkaisuus"
+          ],
+          "type": "topic",
+          "source": "kauno/fin",
+          "id": "http://www.yso.fi/onto/kauno/p3643"
+        },
+        {
+          "heading": [
+            "asenteet"
+          ],
+          "type": "topic",
+          "source": "kauno/fin",
+          "id": "http://www.yso.fi/onto/kauno/p1546"
+        },
+        {
+          "heading": [
+            "arvot"
+          ],
+          "type": "topic",
+          "source": "kauno/fin",
+          "id": "http://www.yso.fi/onto/kauno/p1736"
+        }
+      ],
+      "genres": [
+        "autofiktio",
+        "kehitysromaanit",
+        "psykologiset romaanit",
+        "romaanit",
+        "kaunokirjallisuus",
+        "käännökset",
+        "ranskankielinen kirjallisuus",
+        "lukemisesteisten äänikirjat"
+      ],
+      "majorGenres": [
+        "fiction"
+      ],
+      "classifications": {
+        "ykl": [
+          "84.2"
+        ]
+      },
+      "images": [],
+      "imagesExtended": [],
+      "summary": [],
+      "sectors": [
+        {
+          "value": "0/lib/",
+          "translated": "Kirjasto"
+        },
+        {
+          "value": "1/lib/pub/",
+          "translated": "Yleinen"
+        }
+      ],
+      "dedupIds": [
+        "keski.3354308",
+        "lastu.1976340"
+      ],
+      "fullRecord": "<?xml version=\"1.0\"?>\n<collection xmlns=\"http://www.loc.gov/MARC21/slim\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd\"><record><leader>00000nim_a22000004i 4500</leader><controlfield tag=\"001\">3354308</controlfield><controlfield tag=\"003\">ANDL100006</controlfield><controlfield tag=\"005\">20240627083417.5</controlfield><controlfield tag=\"007\">co| |  |||  ||</controlfield><controlfield tag=\"008\">240627s2023    fi ||||fq||||||f |||fin|c</controlfield><datafield tag=\"028\" ind1=\"0\" ind2=\"1\"><subfield code=\"b\">Celia</subfield><subfield code=\"a\">386452</subfield></datafield><datafield tag=\"035\" ind1=\" \" ind2=\" \"><subfield code=\"a\">(FI-Keski)0003354308</subfield></datafield><datafield tag=\"040\" ind1=\" \" ind2=\" \"><subfield code=\"a\">FI-Keski</subfield><subfield code=\"b\">fin</subfield><subfield code=\"e\">rda</subfield></datafield><datafield tag=\"041\" ind1=\"1\" ind2=\" \"><subfield code=\"d\">fin</subfield><subfield code=\"h\">fre</subfield><subfield code=\"a\">fin</subfield></datafield><datafield tag=\"084\" ind1=\" \" ind2=\" \"><subfield code=\"a\">84.2</subfield><subfield code=\"2\">ykl</subfield></datafield><datafield tag=\"100\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Louis, Édouard,</subfield><subfield code=\"e\">kirjoittaja.</subfield></datafield><datafield tag=\"240\" ind1=\"1\" ind2=\"0\"><subfield code=\"a\">Changer : méthode,</subfield><subfield code=\"l\">suomi</subfield></datafield><datafield tag=\"245\" ind1=\"1\" ind2=\"0\"><subfield code=\"a\">Muutos :</subfield><subfield code=\"b\">metodi /</subfield><subfield code=\"c\">Édouard Louis ; suomentanut Lotta Toivanen.</subfield></datafield><datafield tag=\"264\" ind1=\" \" ind2=\"1\"><subfield code=\"a\">[Helsinki] :</subfield><subfield code=\"b\">Celia,</subfield><subfield code=\"c\">2023.</subfield></datafield><datafield tag=\"300\" ind1=\" \" ind2=\" \"><subfield code=\"a\">1 CD-levy (Daisy) (5 h 41min)</subfield></datafield><datafield tag=\"336\" ind1=\" \" ind2=\" \"><subfield code=\"a\">puhe</subfield><subfield code=\"b\">spw</subfield><subfield code=\"2\">rdacontent</subfield></datafield><datafield tag=\"337\" ind1=\" \" ind2=\" \"><subfield code=\"a\">audio</subfield><subfield code=\"b\">s</subfield><subfield code=\"2\">rdamedia</subfield></datafield><datafield tag=\"338\" ind1=\" \" ind2=\" \"><subfield code=\"a\">äänilevy</subfield><subfield code=\"b\">sd</subfield><subfield code=\"2\">rdacarrier</subfield></datafield><datafield tag=\"341\" ind1=\" \" ind2=\" \"><subfield code=\"a\">kuuloon perustuva</subfield></datafield><datafield tag=\"344\" ind1=\" \" ind2=\" \"><subfield code=\"a\">digitaalinen</subfield><subfield code=\"b\">optinen</subfield></datafield><datafield tag=\"347\" ind1=\" \" ind2=\" \"><subfield code=\"a\">äänitiedosto</subfield><subfield code=\"b\">MP3</subfield><subfield code=\"b\">Daisy</subfield></datafield><datafield tag=\"500\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Jatkoa teokselle: Ei enää Eddy.</subfield></datafield><datafield tag=\"506\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Tämä kirja on tuotettu tekijänoikeuslain 17 §:n nojalla ainoastaan lukemisesteisten henkilöiden käyttöön.</subfield><subfield code=\"5\">Celia</subfield></datafield><datafield tag=\"511\" ind1=\"0\" ind2=\" \"><subfield code=\"a\">Lukija: Panu Vauhkonen.</subfield></datafield><datafield tag=\"532\" ind1=\"0\" ind2=\" \"><subfield code=\"a\">Vaatii kuuntelulaitteen.</subfield></datafield><datafield tag=\"538\" ind1=\" \" ind2=\" \"><subfield code=\"a\">DAISY-lukulaite tai MP3-tiedostoja toistava laite.</subfield></datafield><datafield tag=\"540\" ind1=\" \" ind2=\" \"><subfield code=\"c\">Tekijänoikeuslaki</subfield><subfield code=\"u\">http://www.finlex.fi/fi/laki/ajantasa/1961/19610404</subfield></datafield><datafield tag=\"600\" ind1=\"1\" ind2=\"4\"><subfield code=\"a\">Bellegueule, Eddy</subfield><subfield code=\"c\">(fiktiivinen hahmo)</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">nuoruus</subfield><subfield code=\"2\">kauno/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p1823</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">aikuistuminen</subfield><subfield code=\"2\">kauno/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p1491</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">elämänmuutokset</subfield><subfield code=\"2\">kauno/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p2593</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">muutto</subfield><subfield code=\"2\">kauno/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p2687</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">ihmissuhteet</subfield><subfield code=\"2\">kauno/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p1541</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">sosiaalinen nousu</subfield><subfield code=\"2\">kauno/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p5436</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">keskiluokkaisuus</subfield><subfield code=\"2\">kauno/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p3643</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">asenteet</subfield><subfield code=\"2\">kauno/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p1546</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">arvot</subfield><subfield code=\"2\">kauno/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p1736</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">autofiktio</subfield><subfield code=\"2\">slm/fin</subfield><subfield code=\"0\">http://urn.fi/URN:NBN:fi:au:slm:s611</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kehitysromaanit</subfield><subfield code=\"2\">slm/fin</subfield><subfield code=\"0\">http://urn.fi/URN:NBN:fi:au:slm:s665</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">psykologiset romaanit</subfield><subfield code=\"2\">slm/fin</subfield><subfield code=\"0\">http://urn.fi/URN:NBN:fi:au:slm:s604</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">romaanit</subfield><subfield code=\"2\">slm/fin</subfield><subfield code=\"0\">http://urn.fi/URN:NBN:fi:au:slm:s518</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kaunokirjallisuus</subfield><subfield code=\"2\">slm/fin</subfield><subfield code=\"0\">http://urn.fi/URN:NBN:fi:au:slm:s975</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">käännökset</subfield><subfield code=\"2\">slm/fin</subfield><subfield code=\"0\">http://urn.fi/URN:NBN:fi:au:slm:s1044</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">ranskankielinen kirjallisuus</subfield><subfield code=\"2\">local</subfield><subfield code=\"0\">http://urn.fi/URN:NBN:fi:au:slm:s58</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">lukemisesteisten äänikirjat</subfield><subfield code=\"2\">slm/fin</subfield><subfield code=\"0\">http://urn.fi/URN:NBN:fi:au:slm:s58</subfield></datafield><datafield tag=\"700\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Toivanen, Lotta,</subfield><subfield code=\"e\">kääntäjä.</subfield><subfield code=\"0\">(FI-ASTERI-N)000116517</subfield></datafield><datafield tag=\"700\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Vauhkonen, Panu,</subfield><subfield code=\"e\">lukija.</subfield></datafield><datafield tag=\"700\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Louis, Édouard.</subfield><subfield code=\"i\">Jatkoa teokselle:</subfield><subfield code=\"t\">En finir avec Eddy Bellegueule.</subfield></datafield></record></collection>\n"
+    },
+    {
+      "id": "anders.bd1190be-af53-4407-9286-daca1f063394",
+      "recordPage": "/Record/anders.bd1190be-af53-4407-9286-daca1f063394",
+      "formats": [
+        {
+          "value": "0/Book/",
+          "translated": "Kirja"
+        },
+        {
+          "value": "1/Book/Book/",
+          "translated": "Kirja"
+        }
+      ],
+      "title": "Muutos / metodi",
+      "shortTitle": "Muutos",
+      "subTitle": "metodi",
+      "uniformTitles": [
+        "Changer : méthode"
+      ],
+      "authors": {
+        "primary": {
+          "Louis, Édouard": {
+            "role": [
+              "kirjoittaja",
+              "-"
+            ]
+          },
+          "Toivanen, Lotta": {
+            "role": [
+              "-"
+            ]
+          },
+          "Tammi (yhtiö)": {
+            "role": [
+              "-"
+            ]
+          }
+        },
+        "secondary": {
+          "Toivanen, Lotta 1965- kääntäjä": {
+            "role": [
+              "kääntäjä"
+            ]
+          },
+          "Louis, Édouard 1992-": {
+            "role": [
+              "-"
+            ]
+          },
+          "Bellegueule, Eddy, 1992-": {
+            "role": [
+              "-"
+            ]
+          },
+          "Λουί, Εντουάρ, 1992-": {
+            "role": [
+              "-"
+            ]
+          }
+        },
+        "corporate": []
+      },
+      "primaryAuthors": [
+        "Louis, Édouard",
+        "Toivanen, Lotta",
+        "Louis, Édouard",
+        "Tammi (yhtiö)"
+      ],
+      "nonPresenterAuthors": [
+        {
+          "name": "Louis, Édouard",
+          "date": "1992-",
+          "role": "kirjoittaja",
+          "id": "000233160",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Toivanen, Lotta",
+          "date": "1965-",
+          "role": "kääntäjä",
+          "id": "000116517",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Louis, Édouard",
+          "date": "1992-",
+          "id": "000233160",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Tammi (yhtiö)",
+          "id": "000038407",
+          "type": "Corporate Name"
+        }
+      ],
+      "secondaryAuthors": [
+        "Toivanen, Lotta 1965- kääntäjä",
+        "Louis, Édouard 1992-",
+        "Bellegueule, Eddy, 1992-",
+        "Λουί, Εντουάρ, 1992-"
+      ],
+      "corporateAuthors": [
+        "Tammi (yhtiö)"
+      ],
+      "isbns": [
+        "978-952-04-4634-5"
+      ],
+      "cleanIsbn": "9520446346",
+      "languages": [
+        "fin"
+      ],
+      "originalLanguages": [],
+      "publishers": [
+        "Tammi"
+      ],
+      "publicationDates": [
+        "2023"
+      ],
+      "placesOfPublication": [
+        "Helsinki"
+      ],
+      "year": "2023",
+      "physicalDescriptions": [
+        "265 sivua"
+      ],
+      "series": [
+        {
+          "name": "Keltainen kirjasto",
+          "additional": "539"
+        }
+      ],
+      "subjects": [
+        [
+          "Bellegueule, Eddy"
+        ],
+        [
+          "nuoruus"
+        ],
+        [
+          "aikuistuminen"
+        ],
+        [
+          "elämänmuutokset"
+        ],
+        [
+          "muutto"
+        ],
+        [
+          "ihmissuhteet"
+        ],
+        [
+          "sosiaalinen nousu"
+        ],
+        [
+          "keskiluokkaisuus"
+        ],
+        [
+          "asenteet"
+        ],
+        [
+          "arvot"
+        ]
+      ],
+      "subjectsExtended": [
+        {
+          "heading": [
+            "Bellegueule, Eddy"
+          ],
+          "type": "personal name",
+          "source": "unknown",
+          "authType": "Personal Name"
+        },
+        {
+          "heading": [
+            "nuoruus"
+          ],
+          "type": "topic",
+          "source": "kauno/fin",
+          "id": "http://www.yso.fi/onto/kauno/p1823"
+        },
+        {
+          "heading": [
+            "aikuistuminen"
+          ],
+          "type": "topic",
+          "source": "kauno/fin",
+          "id": "http://www.yso.fi/onto/kauno/p1491"
+        },
+        {
+          "heading": [
+            "elämänmuutokset"
+          ],
+          "type": "topic",
+          "source": "kauno/fin",
+          "id": "http://www.yso.fi/onto/kauno/p2593"
+        },
+        {
+          "heading": [
+            "muutto"
+          ],
+          "type": "topic",
+          "source": "kauno/fin",
+          "id": "http://www.yso.fi/onto/kauno/p2687"
+        },
+        {
+          "heading": [
+            "ihmissuhteet"
+          ],
+          "type": "topic",
+          "source": "kauno/fin",
+          "id": "http://www.yso.fi/onto/kauno/p1541"
+        },
+        {
+          "heading": [
+            "sosiaalinen nousu"
+          ],
+          "type": "topic",
+          "source": "kauno/fin",
+          "id": "http://www.yso.fi/onto/kauno/p5436"
+        },
+        {
+          "heading": [
+            "keskiluokkaisuus"
+          ],
+          "type": "topic",
+          "source": "kauno/fin",
+          "id": "http://www.yso.fi/onto/kauno/p3643"
+        },
+        {
+          "heading": [
+            "asenteet"
+          ],
+          "type": "topic",
+          "source": "kauno/fin",
+          "id": "http://www.yso.fi/onto/kauno/p1546"
+        },
+        {
+          "heading": [
+            "arvot"
+          ],
+          "type": "topic",
+          "source": "kauno/fin",
+          "id": "http://www.yso.fi/onto/kauno/p1736"
+        }
+      ],
+      "genres": [
+        "autofiktio",
+        "kehitysromaanit",
+        "psykologiset romaanit",
+        "romaanit",
+        "kaunokirjallisuus",
+        "käännökset",
+        "ranskankielinen kirjallisuus"
+      ],
+      "majorGenres": [
+        "fiction"
+      ],
+      "classifications": {
+        "ykl": [
+          "84.2"
+        ]
+      },
+      "images": [],
+      "imagesExtended": [],
+      "summary": [],
+      "sectors": [
+        {
+          "value": "0/lib/",
+          "translated": "Kirjasto"
+        },
+        {
+          "value": "1/lib/pub/",
+          "translated": "Yleinen"
+        }
+      ],
+      "dedupIds": [
+        "anders.bd1190be-af53-4407-9286-daca1f063394",
+        "blanka.7f4d5ae7-0b69-4950-9416-0252aa91fdc6",
+        "diana.121923",
+        "eepos.2972735",
+        "heili.935ea7e7-5b83-4ef0-85e1-0a67b15fb14f",
+        "helle.1612202",
+        "helmet.2543352",
+        "tiekko.1070884",
+        "jykdok.2120967",
+        "kainet.1315220",
+        "kangasniemi.3281312b-b122-4cb4-9126-2107e7265449",
+        "fikka.5617490",
+        "keski.3272353",
+        "kirkes.1583110",
+        "kuopio.1628209",
+        "kyyti.1509510",
+        "lapinkirjasto.1900454",
+        "lastu.1891057",
+        "lep.446859",
+        "louna.f943ce74-a04e-4e64-ae91-a789f641bdf6",
+        "lukki.969488",
+        "lumme.3109040",
+        "korsholm.6fba4c3d-98b1-4a92-bcca-2b37178285b6",
+        "oy.9917971333906252",
+        "outi.2298047",
+        "jakobstad.183cf4a4-41b7-4590-8fbd-0049783ffe03",
+        "piki.5220424",
+        "ratamo.1976563",
+        "rutakko.00675aa1-9b70-4c67-abde-fae9b6b3be62",
+        "satakirjastot.1640040",
+        "siilinjarvi.601050",
+        "somero.b3b22caf-14a8-4bfe-ac82-91e13330fe50",
+        "utu.9923176181405971",
+        "vaarakirjastot.11701669",
+        "vaasa.6553f3b4-c3c3-4f0f-b8fa-07b8abc95149",
+        "vanamo.4c226c5b-6780-43d3-9ece-0b6b56f633b2",
+        "vaski.4300796",
+        "abo.9913680948105972"
+      ],
+      "fullRecord": "<?xml version=\"1.0\"?>\n<collection xmlns=\"http://www.loc.gov/MARC21/slim\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd\"><record><leader>00000 am  22000001  0000</leader><controlfield tag=\"001\">bd1190be-af53-4407-9286-daca1f063394</controlfield><controlfield tag=\"003\">38ce7306-5873-4a96-8ad7-d42bf004dbec</controlfield><controlfield tag=\"008\">000000s2023       ||||g     |00| 1|fin||</controlfield><datafield tag=\"035\" ind1=\" \" ind2=\" \"><subfield code=\"a\">(FI-Anders)1929877</subfield></datafield><datafield tag=\"035\" ind1=\" \" ind2=\" \"><subfield code=\"a\">(FI-Anders)0001929877</subfield></datafield><datafield tag=\"035\" ind1=\" \" ind2=\" \"><subfield code=\"a\">(FI-MELINDA)018703488</subfield></datafield><datafield tag=\"020\" ind1=\" \" ind2=\" \"><subfield code=\"a\">978-952-04-4634-5</subfield></datafield><datafield tag=\"084\" ind1=\" \" ind2=\" \"><subfield code=\"a\">84.2</subfield><subfield code=\"2\">ykl</subfield></datafield><datafield tag=\"100\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Louis, Édouard</subfield><subfield code=\"d\">1992-</subfield><subfield code=\"e\">kirjoittaja</subfield><subfield code=\"0\">000233160</subfield><subfield code=\"2\">FI-ASTERI-N</subfield></datafield><datafield tag=\"240\" ind1=\"1\" ind2=\"0\"><subfield code=\"a\">Changer : méthode</subfield></datafield><datafield tag=\"245\" ind1=\" \" ind2=\"0\"><subfield code=\"a\">Muutos /</subfield><subfield code=\"b\">metodi</subfield><subfield code=\"c\">Édouard Louis ; suomentanut Lotta Toivanen</subfield></datafield><datafield tag=\"260\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Helsinki</subfield><subfield code=\"b\">Tammi</subfield><subfield code=\"c\">2023</subfield></datafield><datafield tag=\"300\" ind1=\" \" ind2=\" \"><subfield code=\"a\">265 sivua</subfield></datafield><datafield tag=\"336\" ind1=\" \" ind2=\" \"><subfield code=\"b\">txt</subfield></datafield><datafield tag=\"337\" ind1=\" \" ind2=\" \"><subfield code=\"b\">n</subfield></datafield><datafield tag=\"338\" ind1=\" \" ind2=\" \"><subfield code=\"b\">nc</subfield></datafield><datafield tag=\"490\" ind1=\"0\" ind2=\" \"><subfield code=\"a\">Keltainen kirjasto</subfield><subfield code=\"v\">539</subfield></datafield><datafield tag=\"500\" ind1=\" \" ind2=\" \"><subfield code=\"a\">kovakantinen</subfield></datafield><datafield tag=\"500\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Jatkoa teokselle: Ei enää Eddy</subfield></datafield><datafield tag=\"500\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Alkuperäinen kieli: fre</subfield></datafield><datafield tag=\"600\" ind1=\"0\" ind2=\"4\"><subfield code=\"a\">Bellegueule, Eddy</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">nuoruus</subfield><subfield code=\"2\">kauno/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p1823</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">aikuistuminen</subfield><subfield code=\"2\">kauno/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p1491</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">elämänmuutokset</subfield><subfield code=\"2\">kauno/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p2593</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p4356</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p2593a</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">muutto</subfield><subfield code=\"2\">kauno/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p2687</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">ihmissuhteet</subfield><subfield code=\"2\">kauno/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p1541</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p6936</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p154165</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p2362</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">sosiaalinen nousu</subfield><subfield code=\"2\">kauno/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p5436</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">keskiluokkaisuus</subfield><subfield code=\"2\">kauno/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p3643</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">asenteet</subfield><subfield code=\"2\">kauno/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p1546</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">arvot</subfield><subfield code=\"2\">kauno/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p1736</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">autofiktio</subfield><subfield code=\"2\">slm/fin</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kehitysromaanit</subfield><subfield code=\"2\">slm/fin</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">psykologiset romaanit</subfield><subfield code=\"2\">slm/fin</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">romaanit</subfield><subfield code=\"2\">slm/fin</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kaunokirjallisuus</subfield><subfield code=\"2\">slm/fin</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">käännökset</subfield><subfield code=\"2\">slm/fin</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">ranskankielinen kirjallisuus</subfield><subfield code=\"2\">local</subfield></datafield><datafield tag=\"700\" ind1=\"3\" ind2=\" \"><subfield code=\"a\">Toivanen, Lotta</subfield><subfield code=\"d\">1965-</subfield><subfield code=\"e\">kääntäjä</subfield><subfield code=\"0\">000116517</subfield><subfield code=\"2\">FI-ASTERI-N</subfield></datafield><datafield tag=\"700\" ind1=\"3\" ind2=\" \"><subfield code=\"a\">Louis, Édouard</subfield><subfield code=\"d\">1992-</subfield><subfield code=\"0\">000233160</subfield><subfield code=\"2\">FI-ASTERI-N</subfield></datafield><datafield tag=\"710\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Tammi (yhtiö)</subfield><subfield code=\"0\">000038407</subfield><subfield code=\"2\">FI-ASTERI-N</subfield></datafield><datafield tag=\"852\" ind1=\" \" ind2=\" \"><subfield code=\"a\">d984d9ac-4606-4c09-8c18-d8c31cb8506a</subfield><subfield code=\"b\">91a20927-50ba-4203-b27d-3359d02ab8fc</subfield><subfield code=\"c\">8b4b8fbc-d5ee-41e2-af7e-da3ed060e18f</subfield></datafield><datafield tag=\"852\" ind1=\" \" ind2=\" \"><subfield code=\"a\">d984d9ac-4606-4c09-8c18-d8c31cb8506a</subfield><subfield code=\"b\">8f8b0d98-60ef-4345-8d75-dc357a85fe99</subfield><subfield code=\"c\">04c731fa-6498-4017-8121-e8d3c13e593e</subfield></datafield><datafield tag=\"852\" ind1=\" \" ind2=\" \"><subfield code=\"a\">d984d9ac-4606-4c09-8c18-d8c31cb8506a</subfield><subfield code=\"b\">8dcbee81-c1ac-4565-a950-7a4b7dfaa467</subfield><subfield code=\"c\">0a2716a6-0a1d-4a40-a5db-fd0702bcc392</subfield></datafield><datafield tag=\"852\" ind1=\" \" ind2=\" \"><subfield code=\"a\">8bf5b262-9883-4f4d-8652-2cb507b27135</subfield><subfield code=\"b\">1800201b-fd3a-4e7e-a3f7-d2a1dae0c63d</subfield><subfield code=\"c\">03dbce9e-43cb-4600-b4e8-8591ee5ab747</subfield></datafield><datafield tag=\"852\" ind1=\" \" ind2=\" \"><subfield code=\"a\">30cc8835-356a-4db5-b350-7e22231b4bbb</subfield><subfield code=\"b\">94225df6-6aed-48ed-9181-e8172678f545</subfield><subfield code=\"c\">487bd788-3e5e-49d6-9f4a-f94f65586ec7</subfield></datafield><datafield tag=\"900\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Bellegueule, Eddy, 1992-</subfield><subfield code=\"a\">Λουί, Εντουάρ, 1992-</subfield></datafield></record></collection>\n"
+    },
+    {
+      "id": "jykdok.2320796",
+      "recordPage": "/Record/jykdok.2320796",
+      "formats": [
+        {
+          "value": "0/Book/",
+          "translated": "Kirja"
+        },
+        {
+          "value": "1/Book/AudioBook/",
+          "translated": "Äänikirja"
+        },
+        {
+          "value": "2/Book/AudioBook/Online/",
+          "translated": "E-äänikirja"
+        }
+      ],
+      "title": "Muutos : metodi",
+      "shortTitle": "Muutos",
+      "subTitle": "metodi",
+      "uniformTitles": [
+        "Changer. Suomi (Toivanen). Puhe (Niemelä)"
+      ],
+      "authors": {
+        "primary": {
+          "Louis, Édouard": {
+            "role": [
+              "kirjoittaja"
+            ]
+          },
+          "Toivanen, Lotta": {
+            "role": [
+              "-"
+            ]
+          },
+          "Niemelä, Ville-Veikko": {
+            "role": [
+              "-"
+            ]
+          }
+        },
+        "secondary": {
+          "Toivanen, Lotta, kääntäjä": {
+            "role": [
+              "kääntäjä"
+            ]
+          },
+          "Niemelä, Ville-Veikko, lukija": {
+            "role": [
+              "lukija"
+            ]
+          }
+        },
+        "corporate": {
+          "Tammi, kustantaja": {
+            "role": [
+              "kustantaja"
+            ]
+          }
+        }
+      },
+      "primaryAuthors": [
+        "Louis, Édouard",
+        "Toivanen, Lotta",
+        "Niemelä, Ville-Veikko"
+      ],
+      "nonPresenterAuthors": [
+        {
+          "name": "Louis, Édouard",
+          "role": "kirjoittaja",
+          "id": "(FI-ASTERI-N)000233160",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Toivanen, Lotta",
+          "role": "kääntäjä",
+          "id": "https://isni.org/isni/0000000484701954",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Niemelä, Ville-Veikko",
+          "role": "lukija",
+          "id": "(FI-ASTERI-N)000233696",
+          "type": "Personal Name"
+        }
+      ],
+      "secondaryAuthors": [
+        "Toivanen, Lotta, kääntäjä",
+        "Niemelä, Ville-Veikko, lukija"
+      ],
+      "corporateAuthors": [
+        "Tammi, kustantaja"
+      ],
+      "isbns": [
+        "978-952-04-4636-9 MP3"
+      ],
+      "cleanIsbn": "9520446362",
+      "languages": [
+        "fin"
+      ],
+      "originalLanguages": [
+        "fre"
+      ],
+      "publishers": [
+        "Tammi"
+      ],
+      "publicationDates": [
+        "2023"
+      ],
+      "placesOfPublication": [
+        "Helsinki :"
+      ],
+      "year": "2023",
+      "physicalDescriptions": [
+        "1 verkkoaineisto (6 h 36 min)"
+      ],
+      "series": [
+        {
+          "name": "Keltainen kirjasto"
+        }
+      ],
+      "subjects": [
+        [
+          "Louis, Édouard,",
+          "1992-"
+        ],
+        [
+          "nuoruus",
+          "ENNAKKOTIETO"
+        ],
+        [
+          "aikuistuminen",
+          "ENNAKKOTIETO"
+        ],
+        [
+          "elämänmuutokset",
+          "ENNAKKOTIETO"
+        ],
+        [
+          "muutto",
+          "ENNAKKOTIETO"
+        ],
+        [
+          "ihmissuhteet",
+          "ENNAKKOTIETO"
+        ],
+        [
+          "sosiaalinen nousu",
+          "ENNAKKOTIETO"
+        ],
+        [
+          "keskiluokkaisuus",
+          "ENNAKKOTIETO"
+        ],
+        [
+          "asenteet",
+          "ENNAKKOTIETO"
+        ],
+        [
+          "arvot",
+          "ENNAKKOTIETO"
+        ]
+      ],
+      "subjectsExtended": [
+        {
+          "heading": [
+            "Louis, Édouard,",
+            "1992-"
+          ],
+          "type": "personal name",
+          "source": "unknown",
+          "id": "(FI-ASTERI-N)000233160",
+          "authType": "Personal Name"
+        },
+        {
+          "heading": [
+            "nuoruus",
+            "ENNAKKOTIETO"
+          ]
+        },
+        {
+          "heading": [
+            "aikuistuminen",
+            "ENNAKKOTIETO"
+          ]
+        },
+        {
+          "heading": [
+            "elämänmuutokset",
+            "ENNAKKOTIETO"
+          ]
+        },
+        {
+          "heading": [
+            "muutto",
+            "ENNAKKOTIETO"
+          ]
+        },
+        {
+          "heading": [
+            "ihmissuhteet",
+            "ENNAKKOTIETO"
+          ]
+        },
+        {
+          "heading": [
+            "sosiaalinen nousu",
+            "ENNAKKOTIETO"
+          ]
+        },
+        {
+          "heading": [
+            "keskiluokkaisuus",
+            "ENNAKKOTIETO"
+          ]
+        },
+        {
+          "heading": [
+            "asenteet",
+            "ENNAKKOTIETO"
+          ]
+        },
+        {
+          "heading": [
+            "arvot",
+            "ENNAKKOTIETO"
+          ]
+        }
+      ],
+      "genres": [
+        "äänikirjat",
+        "käännökset",
+        "psykologiset romaanit"
+      ],
+      "majorGenres": [
+        "fiction"
+      ],
+      "classifications": {
+        "ykl": [
+          "84.2"
+        ]
+      },
+      "images": [],
+      "imagesExtended": [],
+      "summary": [],
+      "sectors": [
+        {
+          "value": "0/lib/",
+          "translated": "Kirjasto"
+        },
+        {
+          "value": "1/lib/uni/",
+          "translated": "Yliopisto"
+        }
+      ],
+      "dedupIds": [
+        "jykdok.2320796",
+        "fikka.5617483"
+      ],
+      "fullRecord": "<?xml version=\"1.0\"?>\n<collection xmlns=\"http://www.loc.gov/MARC21/slim\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd\"><record><leader>00000cim a22000002i 4500</leader><controlfield tag=\"001\">018703458</controlfield><controlfield tag=\"003\">FI-MELINDA</controlfield><controlfield tag=\"005\">20260514081925.0</controlfield><controlfield tag=\"006\">m|||||o||h||||||||</controlfield><controlfield tag=\"007\">sr uunnnnnuneu</controlfield><controlfield tag=\"007\">cr nnannnuuuuu</controlfield><controlfield tag=\"008\">230316s2023    fi nnnn|o||||||f  n fin||</controlfield><datafield tag=\"020\" ind1=\" \" ind2=\" \"><subfield code=\"a\">978-952-04-4636-9</subfield><subfield code=\"q\">MP3</subfield></datafield><datafield tag=\"035\" ind1=\" \" ind2=\" \"><subfield code=\"a\">FCC018703458</subfield></datafield><datafield tag=\"040\" ind1=\" \" ind2=\" \"><subfield code=\"b\">fin</subfield><subfield code=\"e\">rda</subfield><subfield code=\"d\">FI-NL</subfield></datafield><datafield tag=\"041\" ind1=\"1\" ind2=\" \"><subfield code=\"d\">fin</subfield><subfield code=\"h\">fre</subfield></datafield><datafield tag=\"072\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">87</subfield><subfield code=\"2\">kkaa</subfield></datafield><datafield tag=\"072\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">PQ</subfield><subfield code=\"2\">lcco</subfield></datafield><datafield tag=\"084\" ind1=\" \" ind2=\" \"><subfield code=\"a\">84.2</subfield><subfield code=\"2\">ykl</subfield></datafield><datafield tag=\"100\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Louis, Édouard,</subfield><subfield code=\"e\">kirjoittaja.</subfield><subfield code=\"0\">(FI-ASTERI-N)000233160</subfield></datafield><datafield tag=\"240\" ind1=\"1\" ind2=\"0\"><subfield code=\"a\">Changer.</subfield><subfield code=\"l\">Suomi</subfield><subfield code=\"s\">(Toivanen).</subfield><subfield code=\"h\">Puhe</subfield><subfield code=\"s\">(Niemelä)</subfield></datafield><datafield tag=\"245\" ind1=\"1\" ind2=\"0\"><subfield code=\"a\">Muutos :</subfield><subfield code=\"b\">metodi.</subfield></datafield><datafield tag=\"264\" ind1=\" \" ind2=\"1\"><subfield code=\"a\">Helsinki :</subfield><subfield code=\"b\">Tammi,</subfield><subfield code=\"c\">2023.</subfield></datafield><datafield tag=\"300\" ind1=\" \" ind2=\" \"><subfield code=\"a\">1 verkkoaineisto (6 h 36 min)</subfield></datafield><datafield tag=\"306\" ind1=\" \" ind2=\" \"><subfield code=\"a\">063600</subfield></datafield><datafield tag=\"336\" ind1=\" \" ind2=\" \"><subfield code=\"a\">puhe</subfield><subfield code=\"b\">spw</subfield><subfield code=\"2\">rdacontent</subfield></datafield><datafield tag=\"337\" ind1=\" \" ind2=\" \"><subfield code=\"a\">tietokonekäyttöinen</subfield><subfield code=\"b\">c</subfield><subfield code=\"2\">rdamedia</subfield></datafield><datafield tag=\"338\" ind1=\" \" ind2=\" \"><subfield code=\"a\">verkkoaineisto</subfield><subfield code=\"b\">cr</subfield><subfield code=\"2\">rdacarrier</subfield></datafield><datafield tag=\"341\" ind1=\" \" ind2=\" \"><subfield code=\"a\">auditory</subfield><subfield code=\"2\">sapdv</subfield></datafield><datafield tag=\"344\" ind1=\" \" ind2=\" \"><subfield code=\"a\">digitaalinen</subfield></datafield><datafield tag=\"347\" ind1=\" \" ind2=\" \"><subfield code=\"a\">äänitiedosto</subfield><subfield code=\"b\">MP3</subfield></datafield><datafield tag=\"490\" ind1=\"0\" ind2=\" \"><subfield code=\"a\">Keltainen kirjasto</subfield></datafield><datafield tag=\"500\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Koneellisesti tuotettu tietue.</subfield></datafield><datafield tag=\"506\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Aineisto on käytettävissä vapaakappaletyöasemilla.</subfield><subfield code=\"f\">Online access with authorization</subfield><subfield code=\"2\">star</subfield></datafield><datafield tag=\"511\" ind1=\"0\" ind2=\" \"><subfield code=\"a\">Lukija: Ville-Veikko Niemelä.</subfield></datafield><datafield tag=\"540\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Aineisto on käytettävissä tutkimus- ja muihin tarkoituksiin;</subfield><subfield code=\"b\">Kansalliskirjasto;</subfield><subfield code=\"c\">Laki kulttuuriaineistojen tallettamisesta ja säilyttämisestä</subfield><subfield code=\"u\">http://www.finlex.fi/fi/laki/ajantasa/2007/20071433</subfield></datafield><datafield tag=\"600\" ind1=\"1\" ind2=\"4\"><subfield code=\"a\">Louis, Édouard,</subfield><subfield code=\"d\">1992-</subfield><subfield code=\"0\">(FI-ASTERI-N)000233160</subfield></datafield><datafield tag=\"653\" ind1=\" \" ind2=\" \"><subfield code=\"a\">nuoruus</subfield><subfield code=\"g\">ENNAKKOTIETO</subfield></datafield><datafield tag=\"653\" ind1=\" \" ind2=\" \"><subfield code=\"a\">aikuistuminen</subfield><subfield code=\"g\">ENNAKKOTIETO</subfield></datafield><datafield tag=\"653\" ind1=\" \" ind2=\" \"><subfield code=\"a\">elämänmuutokset</subfield><subfield code=\"g\">ENNAKKOTIETO</subfield></datafield><datafield tag=\"653\" ind1=\" \" ind2=\" \"><subfield code=\"a\">muutto</subfield><subfield code=\"g\">ENNAKKOTIETO</subfield></datafield><datafield tag=\"653\" ind1=\" \" ind2=\" \"><subfield code=\"a\">ihmissuhteet</subfield><subfield code=\"g\">ENNAKKOTIETO</subfield></datafield><datafield tag=\"653\" ind1=\" \" ind2=\" \"><subfield code=\"a\">sosiaalinen nousu</subfield><subfield code=\"g\">ENNAKKOTIETO</subfield></datafield><datafield tag=\"653\" ind1=\" \" ind2=\" \"><subfield code=\"a\">keskiluokkaisuus</subfield><subfield code=\"g\">ENNAKKOTIETO</subfield></datafield><datafield tag=\"653\" ind1=\" \" ind2=\" \"><subfield code=\"a\">asenteet</subfield><subfield code=\"g\">ENNAKKOTIETO</subfield></datafield><datafield tag=\"653\" ind1=\" \" ind2=\" \"><subfield code=\"a\">arvot</subfield><subfield code=\"g\">ENNAKKOTIETO</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">äänikirjat</subfield><subfield code=\"2\">slm/fin</subfield><subfield code=\"0\">http://urn.fi/URN:NBN:fi:au:slm:s579</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">käännökset</subfield><subfield code=\"2\">slm/fin</subfield><subfield code=\"0\">http://urn.fi/URN:NBN:fi:au:slm:s1044</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">psykologiset romaanit</subfield><subfield code=\"2\">slm/fin</subfield><subfield code=\"0\">http://urn.fi/URN:NBN:fi:au:slm:s604</subfield></datafield><datafield tag=\"700\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Toivanen, Lotta,</subfield><subfield code=\"e\">kääntäjä.</subfield><subfield code=\"0\">https://isni.org/isni/0000000484701954</subfield></datafield><datafield tag=\"700\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Niemelä, Ville-Veikko,</subfield><subfield code=\"e\">lukija.</subfield><subfield code=\"0\">(FI-ASTERI-N)000233696</subfield></datafield><datafield tag=\"710\" ind1=\"2\" ind2=\" \"><subfield code=\"a\">Tammi,</subfield><subfield code=\"e\">kustantaja.</subfield></datafield><datafield tag=\"776\" ind1=\"0\" ind2=\" \"><subfield code=\"z\">978-952-04-4634-5</subfield></datafield><datafield tag=\"776\" ind1=\"0\" ind2=\" \"><subfield code=\"z\">978-952-04-4635-2</subfield></datafield><datafield tag=\"856\" ind1=\"4\" ind2=\"0\"><subfield code=\"u\">https://urn.fi/URN:ISBN:978-952-04-4636-9</subfield><subfield code=\"z\">Käytettävissä vapaakappaletyöasemilla</subfield></datafield><datafield tag=\"999\" ind1=\" \" ind2=\" \"><subfield code=\"c\">2320796</subfield><subfield code=\"d\">2320796</subfield></datafield></record></collection>\n"
+    },
+    {
+      "id": "jykdok.2320864",
+      "recordPage": "/Record/jykdok.2320864",
+      "formats": [
+        {
+          "value": "0/Book/",
+          "translated": "Kirja"
+        },
+        {
+          "value": "1/Book/eBook/",
+          "translated": "E-kirja"
+        }
+      ],
+      "title": "Muutos : metodi",
+      "shortTitle": "Muutos",
+      "subTitle": "metodi",
+      "uniformTitles": [
+        "Changer. Suomi"
+      ],
+      "authors": {
+        "primary": {
+          "Louis, Édouard": {
+            "role": [
+              "kirjoittaja"
+            ]
+          },
+          "Toivanen, Lotta": {
+            "role": [
+              "-"
+            ]
+          },
+          "Tammi (yhtiö)": {
+            "role": [
+              "-"
+            ]
+          }
+        },
+        "secondary": {
+          "Toivanen, Lotta, kääntäjä": {
+            "role": [
+              "kääntäjä"
+            ]
+          }
+        },
+        "corporate": {
+          "Tammi (yhtiö), kustantaja, julkaisija": {
+            "role": [
+              "kustantaja"
+            ]
+          }
+        }
+      },
+      "primaryAuthors": [
+        "Louis, Édouard",
+        "Toivanen, Lotta",
+        "Tammi (yhtiö)"
+      ],
+      "nonPresenterAuthors": [
+        {
+          "name": "Louis, Édouard",
+          "role": "kirjoittaja",
+          "id": "(FI-ASTERI-N)000233160",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Toivanen, Lotta",
+          "role": "kääntäjä",
+          "id": "https://isni.org/isni/0000000484701954",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Tammi (yhtiö)",
+          "role": "kustantaja, julkaisija",
+          "id": "(FI-ASTERI-N)000038407",
+          "type": "Corporate Name"
+        }
+      ],
+      "secondaryAuthors": [
+        "Toivanen, Lotta, kääntäjä"
+      ],
+      "corporateAuthors": [
+        "Tammi (yhtiö), kustantaja, julkaisija"
+      ],
+      "isbns": [
+        "978-952-04-4635-2 EPUB"
+      ],
+      "cleanIsbn": "9520446354",
+      "languages": [
+        "fin"
+      ],
+      "originalLanguages": [
+        "fre"
+      ],
+      "publishers": [
+        "Tammi"
+      ],
+      "publicationDates": [
+        "2023"
+      ],
+      "placesOfPublication": [
+        "Helsinki :"
+      ],
+      "year": "2023",
+      "physicalDescriptions": [
+        "1 verkkoaineisto"
+      ],
+      "series": [
+        {
+          "name": "Keltainen kirjasto"
+        }
+      ],
+      "subjects": [
+        [
+          "Louis, Édouard,",
+          "1992-"
+        ],
+        [
+          "nuoruus",
+          "ENNAKKOTIETO"
+        ],
+        [
+          "aikuistuminen",
+          "ENNAKKOTIETO"
+        ],
+        [
+          "elämänmuutokset",
+          "ENNAKKOTIETO"
+        ],
+        [
+          "muutto",
+          "ENNAKKOTIETO"
+        ],
+        [
+          "ihmissuhteet",
+          "ENNAKKOTIETO"
+        ],
+        [
+          "sosiaalinen nousu",
+          "ENNAKKOTIETO"
+        ],
+        [
+          "keskiluokkaisuus",
+          "ENNAKKOTIETO"
+        ],
+        [
+          "asenteet",
+          "ENNAKKOTIETO"
+        ],
+        [
+          "arvot",
+          "ENNAKKOTIETO"
+        ]
+      ],
+      "subjectsExtended": [
+        {
+          "heading": [
+            "Louis, Édouard,",
+            "1992-"
+          ],
+          "type": "personal name",
+          "source": "unknown",
+          "id": "(FI-ASTERI-N)000233160",
+          "authType": "Personal Name"
+        },
+        {
+          "heading": [
+            "nuoruus",
+            "ENNAKKOTIETO"
+          ]
+        },
+        {
+          "heading": [
+            "aikuistuminen",
+            "ENNAKKOTIETO"
+          ]
+        },
+        {
+          "heading": [
+            "elämänmuutokset",
+            "ENNAKKOTIETO"
+          ]
+        },
+        {
+          "heading": [
+            "muutto",
+            "ENNAKKOTIETO"
+          ]
+        },
+        {
+          "heading": [
+            "ihmissuhteet",
+            "ENNAKKOTIETO"
+          ]
+        },
+        {
+          "heading": [
+            "sosiaalinen nousu",
+            "ENNAKKOTIETO"
+          ]
+        },
+        {
+          "heading": [
+            "keskiluokkaisuus",
+            "ENNAKKOTIETO"
+          ]
+        },
+        {
+          "heading": [
+            "asenteet",
+            "ENNAKKOTIETO"
+          ]
+        },
+        {
+          "heading": [
+            "arvot",
+            "ENNAKKOTIETO"
+          ]
+        }
+      ],
+      "genres": [
+        "käännökset",
+        "psykologiset romaanit"
+      ],
+      "majorGenres": [
+        "fiction"
+      ],
+      "classifications": {
+        "ykl": [
+          "84.2"
+        ]
+      },
+      "images": [],
+      "imagesExtended": [],
+      "summary": [],
+      "sectors": [
+        {
+          "value": "0/lib/",
+          "translated": "Kirjasto"
+        },
+        {
+          "value": "1/lib/uni/",
+          "translated": "Yliopisto"
+        }
+      ],
+      "dedupIds": [
+        "jykdok.2320864",
+        "fikka.5617294"
+      ],
+      "fullRecord": "<?xml version=\"1.0\"?>\n<collection xmlns=\"http://www.loc.gov/MARC21/slim\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd\"><record><leader>00000cam a22000002i 4500</leader><controlfield tag=\"001\">018703269</controlfield><controlfield tag=\"003\">FI-MELINDA</controlfield><controlfield tag=\"005\">20260514082117.0</controlfield><controlfield tag=\"006\">m|||||o||d||||||||</controlfield><controlfield tag=\"007\">cr |||||||||||</controlfield><controlfield tag=\"008\">230307s2023    fi |||||o|||||||| f|fin c</controlfield><datafield tag=\"020\" ind1=\" \" ind2=\" \"><subfield code=\"a\">978-952-04-4635-2</subfield><subfield code=\"q\">EPUB</subfield></datafield><datafield tag=\"035\" ind1=\" \" ind2=\" \"><subfield code=\"a\">FCC018703269</subfield></datafield><datafield tag=\"040\" ind1=\" \" ind2=\" \"><subfield code=\"b\">fin</subfield><subfield code=\"e\">rda</subfield><subfield code=\"d\">FI-NL</subfield></datafield><datafield tag=\"041\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">fin</subfield><subfield code=\"h\">fre</subfield></datafield><datafield tag=\"072\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">87</subfield><subfield code=\"2\">kkaa</subfield></datafield><datafield tag=\"072\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">PQ</subfield><subfield code=\"2\">lcco</subfield></datafield><datafield tag=\"084\" ind1=\" \" ind2=\" \"><subfield code=\"a\">84.2</subfield><subfield code=\"2\">ykl</subfield></datafield><datafield tag=\"100\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Louis, Édouard,</subfield><subfield code=\"e\">kirjoittaja.</subfield><subfield code=\"0\">(FI-ASTERI-N)000233160</subfield></datafield><datafield tag=\"240\" ind1=\"1\" ind2=\"0\"><subfield code=\"a\">Changer.</subfield><subfield code=\"l\">Suomi</subfield></datafield><datafield tag=\"245\" ind1=\"1\" ind2=\"0\"><subfield code=\"a\">Muutos :</subfield><subfield code=\"b\">metodi.</subfield></datafield><datafield tag=\"264\" ind1=\" \" ind2=\"1\"><subfield code=\"a\">Helsinki :</subfield><subfield code=\"b\">Tammi,</subfield><subfield code=\"c\">2023.</subfield></datafield><datafield tag=\"300\" ind1=\" \" ind2=\" \"><subfield code=\"a\">1 verkkoaineisto</subfield></datafield><datafield tag=\"336\" ind1=\" \" ind2=\" \"><subfield code=\"a\">teksti</subfield><subfield code=\"b\">txt</subfield><subfield code=\"2\">rdacontent</subfield></datafield><datafield tag=\"337\" ind1=\" \" ind2=\" \"><subfield code=\"a\">tietokonekäyttöinen</subfield><subfield code=\"b\">c</subfield><subfield code=\"2\">rdamedia</subfield></datafield><datafield tag=\"338\" ind1=\" \" ind2=\" \"><subfield code=\"a\">verkkoaineisto</subfield><subfield code=\"b\">cr</subfield><subfield code=\"2\">rdacarrier</subfield></datafield><datafield tag=\"341\" ind1=\" \" ind2=\" \"><subfield code=\"a\">textual</subfield><subfield code=\"2\">sapdv</subfield></datafield><datafield tag=\"347\" ind1=\" \" ind2=\" \"><subfield code=\"a\">tekstitiedosto</subfield><subfield code=\"b\">EPUB</subfield></datafield><datafield tag=\"490\" ind1=\"0\" ind2=\" \"><subfield code=\"a\">Keltainen kirjasto</subfield></datafield><datafield tag=\"500\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Koneellisesti tuotettu tietue.</subfield></datafield><datafield tag=\"506\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Aineisto on käytettävissä vapaakappaletyöasemilla.</subfield><subfield code=\"f\">Online access with authorization</subfield><subfield code=\"2\">star</subfield></datafield><datafield tag=\"540\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Aineisto on käytettävissä tutkimus- ja muihin tarkoituksiin;</subfield><subfield code=\"b\">Kansalliskirjasto;</subfield><subfield code=\"c\">Laki kulttuuriaineistojen tallettamisesta ja säilyttämisestä</subfield><subfield code=\"u\">http://www.finlex.fi/fi/laki/ajantasa/2007/20071433</subfield></datafield><datafield tag=\"600\" ind1=\"1\" ind2=\"4\"><subfield code=\"a\">Louis, Édouard,</subfield><subfield code=\"d\">1992-</subfield><subfield code=\"0\">(FI-ASTERI-N)000233160</subfield></datafield><datafield tag=\"653\" ind1=\" \" ind2=\" \"><subfield code=\"a\">nuoruus</subfield><subfield code=\"g\">ENNAKKOTIETO</subfield></datafield><datafield tag=\"653\" ind1=\" \" ind2=\" \"><subfield code=\"a\">aikuistuminen</subfield><subfield code=\"g\">ENNAKKOTIETO</subfield></datafield><datafield tag=\"653\" ind1=\" \" ind2=\" \"><subfield code=\"a\">elämänmuutokset</subfield><subfield code=\"g\">ENNAKKOTIETO</subfield></datafield><datafield tag=\"653\" ind1=\" \" ind2=\" \"><subfield code=\"a\">muutto</subfield><subfield code=\"g\">ENNAKKOTIETO</subfield></datafield><datafield tag=\"653\" ind1=\" \" ind2=\" \"><subfield code=\"a\">ihmissuhteet</subfield><subfield code=\"g\">ENNAKKOTIETO</subfield></datafield><datafield tag=\"653\" ind1=\" \" ind2=\" \"><subfield code=\"a\">sosiaalinen nousu</subfield><subfield code=\"g\">ENNAKKOTIETO</subfield></datafield><datafield tag=\"653\" ind1=\" \" ind2=\" \"><subfield code=\"a\">keskiluokkaisuus</subfield><subfield code=\"g\">ENNAKKOTIETO</subfield></datafield><datafield tag=\"653\" ind1=\" \" ind2=\" \"><subfield code=\"a\">asenteet</subfield><subfield code=\"g\">ENNAKKOTIETO</subfield></datafield><datafield tag=\"653\" ind1=\" \" ind2=\" \"><subfield code=\"a\">arvot</subfield><subfield code=\"g\">ENNAKKOTIETO</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">käännökset</subfield><subfield code=\"2\">slm/fin</subfield><subfield code=\"0\">http://urn.fi/URN:NBN:fi:au:slm:s1044</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">psykologiset romaanit</subfield><subfield code=\"2\">slm/fin</subfield><subfield code=\"0\">http://urn.fi/URN:NBN:fi:au:slm:s604</subfield></datafield><datafield tag=\"700\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Toivanen, Lotta,</subfield><subfield code=\"e\">kääntäjä.</subfield><subfield code=\"0\">https://isni.org/isni/0000000484701954</subfield></datafield><datafield tag=\"710\" ind1=\"2\" ind2=\" \"><subfield code=\"a\">Tammi (yhtiö),</subfield><subfield code=\"e\">kustantaja,</subfield><subfield code=\"e\">julkaisija.</subfield><subfield code=\"0\">(FI-ASTERI-N)000038407</subfield></datafield><datafield tag=\"776\" ind1=\"0\" ind2=\" \"><subfield code=\"z\">978-952-04-4634-5</subfield></datafield><datafield tag=\"776\" ind1=\"0\" ind2=\" \"><subfield code=\"z\">978-952-04-4636-9</subfield></datafield><datafield tag=\"856\" ind1=\"4\" ind2=\"0\"><subfield code=\"u\">https://urn.fi/URN:ISBN:978-952-04-4635-2</subfield><subfield code=\"z\">Käytettävissä vapaakappaletyöasemilla</subfield></datafield><datafield tag=\"999\" ind1=\" \" ind2=\" \"><subfield code=\"c\">2320864</subfield><subfield code=\"d\">2320864</subfield></datafield></record></collection>\n"
+    }
+  ],
+  "status": "OK"
+}

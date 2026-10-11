@@ -1,0 +1,492 @@
+{
+  "resultCount": 2,
+  "records": [
+    {
+      "id": "3amk.294750",
+      "recordPage": "/Record/3amk.294750",
+      "formats": [
+        {
+          "value": "0/Book/",
+          "translated": "Kirja"
+        },
+        {
+          "value": "1/Book/Book/",
+          "translated": "Kirja"
+        }
+      ],
+      "title": "Lihan loppu",
+      "shortTitle": "Lihan loppu",
+      "uniformTitles": [],
+      "authors": {
+        "primary": {
+          "Auvinen, Suvi": {
+            "role": [
+              "kirjoittaja"
+            ]
+          }
+        },
+        "secondary": [],
+        "corporate": []
+      },
+      "primaryAuthors": [
+        "Auvinen, Suvi"
+      ],
+      "nonPresenterAuthors": [
+        {
+          "name": "Auvinen, Suvi",
+          "role": "kirjoittaja",
+          "id": "(FI-ASTERI-N)000204143",
+          "type": "Personal Name"
+        }
+      ],
+      "secondaryAuthors": [],
+      "corporateAuthors": [],
+      "isbns": [
+        "978-952-352-066-0 pehmeäkantinen"
+      ],
+      "cleanIsbn": "9523520660",
+      "languages": [
+        "fin"
+      ],
+      "originalLanguages": [],
+      "publishers": [
+        "Kosmos"
+      ],
+      "publicationDates": [
+        "2020"
+      ],
+      "placesOfPublication": [
+        "[Helsinki] :"
+      ],
+      "year": "2020",
+      "edition": "Täydennetty laitos",
+      "physicalDescriptions": [
+        "257 sivua ; 18 cm"
+      ],
+      "series": [],
+      "subjects": [
+        [
+          "lihansyönti"
+        ],
+        [
+          "liha"
+        ],
+        [
+          "syöminen"
+        ],
+        [
+          "lihantuotanto"
+        ],
+        [
+          "muutos"
+        ],
+        [
+          "vegetarismi"
+        ],
+        [
+          "kasvisravinto"
+        ],
+        [
+          "ruokakulttuuri"
+        ],
+        [
+          "ruokatottumukset"
+        ],
+        [
+          "eettinen kulutus"
+        ],
+        [
+          "ympäristövaikutukset"
+        ],
+        [
+          "ilmastovaikutukset"
+        ],
+        [
+          "yhteiskunnallinen muutos"
+        ]
+      ],
+      "subjectsExtended": [
+        {
+          "heading": [
+            "lihansyönti"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p17429"
+        },
+        {
+          "heading": [
+            "liha"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p7150"
+        },
+        {
+          "heading": [
+            "syöminen"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p14372"
+        },
+        {
+          "heading": [
+            "lihantuotanto"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p1422"
+        },
+        {
+          "heading": [
+            "muutos"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p277"
+        },
+        {
+          "heading": [
+            "vegetarismi"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p9026"
+        },
+        {
+          "heading": [
+            "kasvisravinto"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p9024"
+        },
+        {
+          "heading": [
+            "ruokakulttuuri"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p5529"
+        },
+        {
+          "heading": [
+            "ruokatottumukset"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p5527"
+        },
+        {
+          "heading": [
+            "eettinen kulutus"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p21079"
+        },
+        {
+          "heading": [
+            "ympäristövaikutukset"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p9862"
+        },
+        {
+          "heading": [
+            "ilmastovaikutukset"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p20949"
+        },
+        {
+          "heading": [
+            "yhteiskunnallinen muutos"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p2954"
+        }
+      ],
+      "genres": [],
+      "majorGenres": [
+        "nonfiction"
+      ],
+      "classifications": {
+        "ykl": [
+          "67.7",
+          "50.19"
+        ]
+      },
+      "images": [],
+      "imagesExtended": [],
+      "summary": [],
+      "sectors": [
+        {
+          "value": "0/lib/",
+          "translated": "Kirjasto"
+        },
+        {
+          "value": "1/lib/poly/",
+          "translated": "AMK"
+        }
+      ],
+      "dedupIds": [
+        "3amk.294750",
+        "heili.71abb402-18c4-4aa7-8945-25daba4546be",
+        "helmet.2431202",
+        "tiekko.1112765",
+        "jykdok.2060372",
+        "fikka.5441333",
+        "keski.3076137",
+        "kirkes.1427354",
+        "lastu.1691941",
+        "lukki.862706",
+        "oy.9917665867206252",
+        "piki.4666896",
+        "ratamo.1647558",
+        "utu.9922291139305971",
+        "vaarakirjastot.11570642",
+        "vaski.4068014",
+        "abo.9913514429805972"
+      ],
+      "fullRecord": "<?xml version=\"1.0\"?>\n<collection xmlns=\"http://www.loc.gov/MARC21/slim\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd\"><record><leader>00000cam a2200000 i 4500</leader><controlfield tag=\"001\">016786619</controlfield><controlfield tag=\"003\">FI-MELINDA</controlfield><controlfield tag=\"005\">20250408102004.0</controlfield><controlfield tag=\"008\">201105s2020    fi ||||       |0| 0|fin|c</controlfield><datafield tag=\"020\" ind1=\" \" ind2=\" \"><subfield code=\"a\">978-952-352-066-0</subfield><subfield code=\"q\">pehmeäkantinen</subfield></datafield><datafield tag=\"035\" ind1=\" \" ind2=\" \"><subfield code=\"a\">FCC016786619</subfield></datafield><datafield tag=\"040\" ind1=\" \" ind2=\" \"><subfield code=\"a\">FI-BTJ</subfield><subfield code=\"b\">fin</subfield><subfield code=\"e\">rda</subfield><subfield code=\"d\">FI-NL</subfield></datafield><datafield tag=\"041\" ind1=\"0\" ind2=\" \"><subfield code=\"a\">fin</subfield></datafield><datafield tag=\"084\" ind1=\" \" ind2=\" \"><subfield code=\"a\">67.7</subfield><subfield code=\"2\">ykl</subfield></datafield><datafield tag=\"084\" ind1=\" \" ind2=\" \"><subfield code=\"a\">50.19</subfield><subfield code=\"2\">ykl</subfield></datafield><datafield tag=\"100\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Auvinen, Suvi,</subfield><subfield code=\"e\">kirjoittaja.</subfield><subfield code=\"0\">(FI-ASTERI-N)000204143</subfield></datafield><datafield tag=\"245\" ind1=\"1\" ind2=\"0\"><subfield code=\"a\">Lihan loppu /</subfield><subfield code=\"c\">Suvi Auvinen.</subfield></datafield><datafield tag=\"250\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Täydennetty laitos.</subfield></datafield><datafield tag=\"264\" ind1=\" \" ind2=\"1\"><subfield code=\"a\">[Helsinki] :</subfield><subfield code=\"b\">Kosmos,</subfield><subfield code=\"c\">2020.</subfield></datafield><datafield tag=\"264\" ind1=\" \" ind2=\"3\"><subfield code=\"a\">EU:ssa</subfield></datafield><datafield tag=\"300\" ind1=\" \" ind2=\" \"><subfield code=\"a\">257 sivua ;</subfield><subfield code=\"c\">18 cm</subfield></datafield><datafield tag=\"336\" ind1=\" \" ind2=\" \"><subfield code=\"a\">teksti</subfield><subfield code=\"b\">txt</subfield><subfield code=\"2\">rdacontent</subfield></datafield><datafield tag=\"337\" ind1=\" \" ind2=\" \"><subfield code=\"a\">käytettävissä ilman laitetta</subfield><subfield code=\"b\">n</subfield><subfield code=\"2\">rdamedia</subfield></datafield><datafield tag=\"338\" ind1=\" \" ind2=\" \"><subfield code=\"a\">nide</subfield><subfield code=\"b\">nc</subfield><subfield code=\"2\">rdacarrier</subfield></datafield><datafield tag=\"500\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Ensimmäinen painos ilmestyi 2019.</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">lihansyönti</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p17429</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">liha</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p7150</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">syöminen</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p14372</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">lihantuotanto</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p1422</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">muutos</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p277</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">vegetarismi</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p9026</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kasvisravinto</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p9024</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">ruokakulttuuri</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p5529</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">ruokatottumukset</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p5527</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">eettinen kulutus</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p21079</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">ympäristövaikutukset</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p9862</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">ilmastovaikutukset</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p20949</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">yhteiskunnallinen muutos</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p2954</subfield></datafield><datafield tag=\"999\" ind1=\" \" ind2=\" \"><subfield code=\"c\">294750</subfield><subfield code=\"d\">294750</subfield></datafield><datafield tag=\"952\" ind1=\" \" ind2=\" \"><subfield code=\"b\">LAUHYV</subfield><subfield code=\"c\">YLEIS</subfield><subfield code=\"o\">67 AUVINEN</subfield><subfield code=\"8\">LAU</subfield><subfield code=\"9\">1</subfield></datafield></record></collection>\n"
+    },
+    {
+      "id": "jykdok.2207138",
+      "recordPage": "/Record/jykdok.2207138",
+      "formats": [
+        {
+          "value": "0/Book/",
+          "translated": "Kirja"
+        },
+        {
+          "value": "1/Book/eBook/",
+          "translated": "E-kirja"
+        }
+      ],
+      "title": "Lihan loppu",
+      "shortTitle": "Lihan loppu",
+      "uniformTitles": [
+        "Lihan loppu. Suomi"
+      ],
+      "authors": {
+        "primary": {
+          "Auvinen, Suvi": {
+            "role": [
+              "kirjoittaja"
+            ]
+          }
+        },
+        "secondary": [],
+        "corporate": {
+          "Kosmos, kustantaja": {
+            "role": [
+              "kustantaja"
+            ]
+          }
+        }
+      },
+      "primaryAuthors": [
+        "Auvinen, Suvi"
+      ],
+      "nonPresenterAuthors": [
+        {
+          "name": "Auvinen, Suvi",
+          "role": "kirjoittaja",
+          "id": "https://isni.org/isni/0000000484300966",
+          "type": "Personal Name"
+        }
+      ],
+      "secondaryAuthors": [],
+      "corporateAuthors": [
+        "Kosmos, kustantaja"
+      ],
+      "isbns": [
+        "978-952-352-100-1 EPUB"
+      ],
+      "cleanIsbn": "9523521004",
+      "languages": [
+        "fin"
+      ],
+      "originalLanguages": [],
+      "publishers": [
+        "Kosmos"
+      ],
+      "publicationDates": [
+        "2020"
+      ],
+      "placesOfPublication": [],
+      "year": "2020",
+      "physicalDescriptions": [
+        "1 verkkoaineisto"
+      ],
+      "series": [],
+      "subjects": [
+        [
+          "eettinen kulutus",
+          "ENNAKKOTIETO"
+        ],
+        [
+          "ilmastovaikutukset",
+          "ENNAKKOTIETO"
+        ],
+        [
+          "kasvisravinto",
+          "ENNAKKOTIETO"
+        ],
+        [
+          "liha",
+          "ENNAKKOTIETO"
+        ],
+        [
+          "lihansyönti",
+          "ENNAKKOTIETO"
+        ],
+        [
+          "lihantuotanto",
+          "ENNAKKOTIETO"
+        ],
+        [
+          "muutos",
+          "ENNAKKOTIETO"
+        ],
+        [
+          "ruokakulttuuri",
+          "ENNAKKOTIETO"
+        ],
+        [
+          "ruokatottumukset",
+          "ENNAKKOTIETO"
+        ],
+        [
+          "syöminen",
+          "ENNAKKOTIETO"
+        ],
+        [
+          "vegetarismi",
+          "ENNAKKOTIETO"
+        ],
+        [
+          "yhteiskunnallinen muutos",
+          "ENNAKKOTIETO"
+        ],
+        [
+          "ympäristövaikutukset",
+          "ENNAKKOTIETO"
+        ]
+      ],
+      "subjectsExtended": [
+        {
+          "heading": [
+            "eettinen kulutus",
+            "ENNAKKOTIETO"
+          ]
+        },
+        {
+          "heading": [
+            "ilmastovaikutukset",
+            "ENNAKKOTIETO"
+          ]
+        },
+        {
+          "heading": [
+            "kasvisravinto",
+            "ENNAKKOTIETO"
+          ]
+        },
+        {
+          "heading": [
+            "liha",
+            "ENNAKKOTIETO"
+          ]
+        },
+        {
+          "heading": [
+            "lihansyönti",
+            "ENNAKKOTIETO"
+          ]
+        },
+        {
+          "heading": [
+            "lihantuotanto",
+            "ENNAKKOTIETO"
+          ]
+        },
+        {
+          "heading": [
+            "muutos",
+            "ENNAKKOTIETO"
+          ]
+        },
+        {
+          "heading": [
+            "ruokakulttuuri",
+            "ENNAKKOTIETO"
+          ]
+        },
+        {
+          "heading": [
+            "ruokatottumukset",
+            "ENNAKKOTIETO"
+          ]
+        },
+        {
+          "heading": [
+            "syöminen",
+            "ENNAKKOTIETO"
+          ]
+        },
+        {
+          "heading": [
+            "vegetarismi",
+            "ENNAKKOTIETO"
+          ]
+        },
+        {
+          "heading": [
+            "yhteiskunnallinen muutos",
+            "ENNAKKOTIETO"
+          ]
+        },
+        {
+          "heading": [
+            "ympäristövaikutukset",
+            "ENNAKKOTIETO"
+          ]
+        }
+      ],
+      "genres": [],
+      "majorGenres": [
+        "nonfiction"
+      ],
+      "classifications": {
+        "ykl": [
+          "67.7"
+        ]
+      },
+      "images": [],
+      "imagesExtended": [],
+      "summary": [],
+      "sectors": [
+        {
+          "value": "0/lib/",
+          "translated": "Kirjasto"
+        },
+        {
+          "value": "1/lib/uni/",
+          "translated": "Yliopisto"
+        }
+      ],
+      "dedupIds": [
+        "jykdok.2207138",
+        "fikka.5492380"
+      ],
+      "fullRecord": "<?xml version=\"1.0\"?>\n<collection xmlns=\"http://www.loc.gov/MARC21/slim\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd\"><record><leader>00000cam a22000002i 4500</leader><controlfield tag=\"001\">017537382</controlfield><controlfield tag=\"003\">FI-MELINDA</controlfield><controlfield tag=\"005\">20260509013307.0</controlfield><controlfield tag=\"006\">m|||||o||d||||||||</controlfield><controlfield tag=\"007\">cr |||||||||||</controlfield><controlfield tag=\"008\">230102s2020    fi |||||o|||||||||0|fin||</controlfield><datafield tag=\"020\" ind1=\" \" ind2=\" \"><subfield code=\"a\">978-952-352-100-1</subfield><subfield code=\"q\">EPUB</subfield></datafield><datafield tag=\"035\" ind1=\" \" ind2=\" \"><subfield code=\"a\">FCC017537382</subfield></datafield><datafield tag=\"040\" ind1=\" \" ind2=\" \"><subfield code=\"b\">fin</subfield><subfield code=\"e\">rda</subfield><subfield code=\"d\">FI-NL</subfield></datafield><datafield tag=\"041\" ind1=\"0\" ind2=\" \"><subfield code=\"a\">fin</subfield></datafield><datafield tag=\"084\" ind1=\" \" ind2=\" \"><subfield code=\"a\">67.7</subfield><subfield code=\"2\">ykl</subfield></datafield><datafield tag=\"100\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Auvinen, Suvi,</subfield><subfield code=\"e\">kirjoittaja.</subfield><subfield code=\"0\">https://isni.org/isni/0000000484300966</subfield></datafield><datafield tag=\"240\" ind1=\"1\" ind2=\"0\"><subfield code=\"a\">Lihan loppu.</subfield><subfield code=\"l\">Suomi</subfield></datafield><datafield tag=\"245\" ind1=\"1\" ind2=\"0\"><subfield code=\"a\">Lihan loppu.</subfield></datafield><datafield tag=\"264\" ind1=\" \" ind2=\"1\"><subfield code=\"b\">Kosmos,</subfield><subfield code=\"c\">2020.</subfield></datafield><datafield tag=\"300\" ind1=\" \" ind2=\" \"><subfield code=\"a\">1 verkkoaineisto</subfield></datafield><datafield tag=\"336\" ind1=\" \" ind2=\" \"><subfield code=\"a\">teksti</subfield><subfield code=\"b\">txt</subfield><subfield code=\"2\">rdacontent</subfield></datafield><datafield tag=\"337\" ind1=\" \" ind2=\" \"><subfield code=\"a\">tietokonekäyttöinen</subfield><subfield code=\"b\">c</subfield><subfield code=\"2\">rdamedia</subfield></datafield><datafield tag=\"338\" ind1=\" \" ind2=\" \"><subfield code=\"a\">verkkoaineisto</subfield><subfield code=\"b\">cr</subfield><subfield code=\"2\">rdacarrier</subfield></datafield><datafield tag=\"341\" ind1=\" \" ind2=\" \"><subfield code=\"a\">textual</subfield><subfield code=\"2\">sapdv</subfield></datafield><datafield tag=\"347\" ind1=\" \" ind2=\" \"><subfield code=\"a\">tekstitiedosto</subfield><subfield code=\"b\">EPUB</subfield></datafield><datafield tag=\"500\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Koneellisesti tuotettu tietue.</subfield></datafield><datafield tag=\"506\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Aineisto on käytettävissä vapaakappaletyöasemilla.</subfield><subfield code=\"f\">Online access with authorization</subfield><subfield code=\"2\">star</subfield></datafield><datafield tag=\"540\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Aineisto on käytettävissä tutkimus- ja muihin tarkoituksiin;</subfield><subfield code=\"b\">Kansalliskirjasto;</subfield><subfield code=\"c\">Laki kulttuuriaineistojen tallettamisesta ja säilyttämisestä</subfield><subfield code=\"u\">http://www.finlex.fi/fi/laki/ajantasa/2007/20071433</subfield></datafield><datafield tag=\"653\" ind1=\" \" ind2=\" \"><subfield code=\"a\">eettinen kulutus</subfield><subfield code=\"g\">ENNAKKOTIETO</subfield></datafield><datafield tag=\"653\" ind1=\" \" ind2=\" \"><subfield code=\"a\">ilmastovaikutukset</subfield><subfield code=\"g\">ENNAKKOTIETO</subfield></datafield><datafield tag=\"653\" ind1=\" \" ind2=\" \"><subfield code=\"a\">kasvisravinto</subfield><subfield code=\"g\">ENNAKKOTIETO</subfield></datafield><datafield tag=\"653\" ind1=\" \" ind2=\" \"><subfield code=\"a\">liha</subfield><subfield code=\"g\">ENNAKKOTIETO</subfield></datafield><datafield tag=\"653\" ind1=\" \" ind2=\" \"><subfield code=\"a\">lihansyönti</subfield><subfield code=\"g\">ENNAKKOTIETO</subfield></datafield><datafield tag=\"653\" ind1=\" \" ind2=\" \"><subfield code=\"a\">lihantuotanto</subfield><subfield code=\"g\">ENNAKKOTIETO</subfield></datafield><datafield tag=\"653\" ind1=\" \" ind2=\" \"><subfield code=\"a\">muutos</subfield><subfield code=\"g\">ENNAKKOTIETO</subfield></datafield><datafield tag=\"653\" ind1=\" \" ind2=\" \"><subfield code=\"a\">ruokakulttuuri</subfield><subfield code=\"g\">ENNAKKOTIETO</subfield></datafield><datafield tag=\"653\" ind1=\" \" ind2=\" \"><subfield code=\"a\">ruokatottumukset</subfield><subfield code=\"g\">ENNAKKOTIETO</subfield></datafield><datafield tag=\"653\" ind1=\" \" ind2=\" \"><subfield code=\"a\">syöminen</subfield><subfield code=\"g\">ENNAKKOTIETO</subfield></datafield><datafield tag=\"653\" ind1=\" \" ind2=\" \"><subfield code=\"a\">vegetarismi</subfield><subfield code=\"g\">ENNAKKOTIETO</subfield></datafield><datafield tag=\"653\" ind1=\" \" ind2=\" \"><subfield code=\"a\">yhteiskunnallinen muutos</subfield><subfield code=\"g\">ENNAKKOTIETO</subfield></datafield><datafield tag=\"653\" ind1=\" \" ind2=\" \"><subfield code=\"a\">ympäristövaikutukset</subfield><subfield code=\"g\">ENNAKKOTIETO</subfield></datafield><datafield tag=\"710\" ind1=\"2\" ind2=\" \"><subfield code=\"a\">Kosmos,</subfield><subfield code=\"e\">kustantaja.</subfield></datafield><datafield tag=\"776\" ind1=\"0\" ind2=\" \"><subfield code=\"z\">978-952-352-066-0</subfield></datafield><datafield tag=\"856\" ind1=\"4\" ind2=\"0\"><subfield code=\"u\">https://urn.fi/URN:ISBN:978-952-352-100-1</subfield><subfield code=\"z\">Käytettävissä vapaakappaletyöasemilla</subfield></datafield><datafield tag=\"999\" ind1=\" \" ind2=\" \"><subfield code=\"c\">2207138</subfield><subfield code=\"d\">2207138</subfield></datafield></record></collection>\n"
+    }
+  ],
+  "status": "OK"
+}

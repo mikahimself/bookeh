@@ -1,0 +1,1160 @@
+{
+  "resultCount": 3,
+  "records": [
+    {
+      "id": "heili.23d7b7da-f58a-4656-b136-90bb2ca6855c",
+      "recordPage": "/Record/heili.23d7b7da-f58a-4656-b136-90bb2ca6855c",
+      "formats": [
+        {
+          "value": "0/Book/",
+          "translated": "Kirja"
+        },
+        {
+          "value": "1/Book/Book/",
+          "translated": "Kirja"
+        }
+      ],
+      "title": "Supernaiivi",
+      "shortTitle": "Supernaiivi",
+      "uniformTitles": [
+        "Naiv. Super"
+      ],
+      "authors": {
+        "primary": {
+          "Loe, Erlend": {
+            "role": [
+              "-"
+            ]
+          },
+          "Menna, Outi": {
+            "role": [
+              "-"
+            ]
+          }
+        },
+        "secondary": {
+          "Menna, Outi 1973-": {
+            "role": [
+              "-"
+            ]
+          }
+        },
+        "corporate": []
+      },
+      "primaryAuthors": [
+        "Loe, Erlend",
+        "Menna, Outi"
+      ],
+      "nonPresenterAuthors": [
+        {
+          "name": "Loe, Erlend",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Menna, Outi",
+          "date": "1973-",
+          "id": "000110284",
+          "type": "Personal Name"
+        }
+      ],
+      "secondaryAuthors": [
+        "Menna, Outi 1973-"
+      ],
+      "corporateAuthors": [],
+      "isbns": [
+        "951-578-963-X"
+      ],
+      "cleanIsbn": "951578963X",
+      "languages": [
+        "fin"
+      ],
+      "originalLanguages": [],
+      "publishers": [
+        "Like"
+      ],
+      "publicationDates": [
+        "2002"
+      ],
+      "placesOfPublication": [
+        "Helsinki"
+      ],
+      "year": "2002",
+      "edition": "5. p.",
+      "physicalDescriptions": [
+        "222, [1] sivua"
+      ],
+      "series": [
+        {
+          "name": "Like-pokkari"
+        }
+      ],
+      "subjects": [
+        [
+          "minä"
+        ],
+        [
+          "veli"
+        ],
+        [
+          "Børre"
+        ],
+        [
+          "Lise"
+        ],
+        [
+          "Kim"
+        ],
+        [
+          "huumori"
+        ],
+        [
+          "henkinen kasvu"
+        ],
+        [
+          "identiteetti",
+          "etsintä"
+        ],
+        [
+          "kriisit",
+          "aikuisuus"
+        ],
+        [
+          "elämänodotukset"
+        ],
+        [
+          "aikuistuminen",
+          "miehet"
+        ],
+        [
+          "minäkuva"
+        ],
+        [
+          "ystävyys"
+        ],
+        [
+          "telekopiointi"
+        ],
+        [
+          "leikkikalut"
+        ],
+        [
+          "matkat",
+          "New York"
+        ],
+        [
+          "opiskelijat"
+        ],
+        [
+          "ystävät"
+        ],
+        [
+          "kaupungit",
+          "Norja"
+        ],
+        [
+          "kaupungit",
+          "New York"
+        ],
+        [
+          "elämän tarkoitus"
+        ],
+        [
+          "veljet"
+        ]
+      ],
+      "subjectsExtended": [
+        {
+          "heading": [
+            "minä"
+          ],
+          "type": "personal name",
+          "source": "unknown",
+          "authType": "Personal Name"
+        },
+        {
+          "heading": [
+            "veli"
+          ],
+          "type": "personal name",
+          "source": "unknown",
+          "authType": "Personal Name"
+        },
+        {
+          "heading": [
+            "Børre"
+          ],
+          "type": "personal name",
+          "source": "unknown",
+          "authType": "Personal Name"
+        },
+        {
+          "heading": [
+            "Lise"
+          ],
+          "type": "personal name",
+          "source": "FI-ASTERI-N",
+          "id": "000133765",
+          "authType": "Personal Name"
+        },
+        {
+          "heading": [
+            "Kim"
+          ],
+          "type": "personal name",
+          "source": "unknown",
+          "authType": "Personal Name"
+        },
+        {
+          "heading": [
+            "huumori"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "henkinen kasvu"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "identiteetti",
+            "etsintä"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "kriisit",
+            "aikuisuus"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "elämänodotukset"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "aikuistuminen",
+            "miehet"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "minäkuva"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "ystävyys"
+          ],
+          "type": "topic",
+          "source": "kaunokki",
+          "id": "http://www.yso.fi/onto/kauno/p3515"
+        },
+        {
+          "heading": [
+            "telekopiointi"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "leikkikalut"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "matkat",
+            "New York"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "opiskelijat"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "ystävät"
+          ],
+          "type": "topic",
+          "source": "kaunokki",
+          "id": "http://www.yso.fi/onto/kauno/p2191"
+        },
+        {
+          "heading": [
+            "kaupungit",
+            "Norja"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "kaupungit",
+            "New York"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "elämän tarkoitus"
+          ],
+          "type": "topic",
+          "source": "kauno/fin",
+          "id": "http://www.yso.fi/onto/kauno/p263"
+        },
+        {
+          "heading": [
+            "veljet"
+          ],
+          "type": "topic",
+          "source": "kauno/fin",
+          "id": "http://www.yso.fi/onto/kauno/p2324"
+        }
+      ],
+      "genres": [
+        "kehitysromaanit"
+      ],
+      "majorGenres": [
+        "fiction"
+      ],
+      "classifications": {
+        "ykl": [
+          "84.2"
+        ]
+      },
+      "images": [],
+      "imagesExtended": [],
+      "summary": [],
+      "sectors": [
+        {
+          "value": "0/lib/",
+          "translated": "Kirjasto"
+        },
+        {
+          "value": "1/lib/pub/",
+          "translated": "Yleinen"
+        }
+      ],
+      "dedupIds": [
+        "heili.23d7b7da-f58a-4656-b136-90bb2ca6855c",
+        "rutakko.a0b21dc6-e9b3-46b9-96ae-ddda62097d00"
+      ],
+      "fullRecord": "<?xml version=\"1.0\"?>\n<collection xmlns=\"http://www.loc.gov/MARC21/slim\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd\"><record><leader>00000 am  22000001  0000</leader><controlfield tag=\"001\">23d7b7da-f58a-4656-b136-90bb2ca6855c</controlfield><controlfield tag=\"003\">cdfc1036-0a87-4e11-8edf-bdbd516424f9</controlfield><controlfield tag=\"008\">000000s2002       ||||e     |00| 1|fin||</controlfield><datafield tag=\"035\" ind1=\" \" ind2=\" \"><subfield code=\"a\">(FI-Heili)302114</subfield></datafield><datafield tag=\"035\" ind1=\" \" ind2=\" \"><subfield code=\"a\">(FI-Heili)d7d5beb490ed43b1acfd3201e7ecd7aa</subfield></datafield><datafield tag=\"035\" ind1=\" \" ind2=\" \"><subfield code=\"a\">(FI-MELINDA)000380813</subfield></datafield><datafield tag=\"035\" ind1=\" \" ind2=\" \"><subfield code=\"a\">D7D5BEB4-90ED-43B1-ACFD-3201E7ECD7AA</subfield></datafield><datafield tag=\"020\" ind1=\" \" ind2=\" \"><subfield code=\"a\">951-578-963-X</subfield></datafield><datafield tag=\"084\" ind1=\" \" ind2=\" \"><subfield code=\"a\">84.2</subfield><subfield code=\"2\">ykl</subfield></datafield><datafield tag=\"100\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Loe, Erlend</subfield></datafield><datafield tag=\"240\" ind1=\"1\" ind2=\"0\"><subfield code=\"a\">Naiv. Super</subfield></datafield><datafield tag=\"245\" ind1=\" \" ind2=\"0\"><subfield code=\"a\">Supernaiivi /</subfield><subfield code=\"c\">Erlend Loe ; suomentanut Outi Menna</subfield></datafield><datafield tag=\"250\" ind1=\" \" ind2=\" \"><subfield code=\"a\">5. p.</subfield></datafield><datafield tag=\"260\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Helsinki</subfield><subfield code=\"b\">Like</subfield><subfield code=\"c\">2002</subfield></datafield><datafield tag=\"300\" ind1=\" \" ind2=\" \"><subfield code=\"a\">222, [1] sivua</subfield></datafield><datafield tag=\"336\" ind1=\" \" ind2=\" \"><subfield code=\"b\">txt</subfield></datafield><datafield tag=\"337\" ind1=\" \" ind2=\" \"><subfield code=\"b\">n</subfield></datafield><datafield tag=\"338\" ind1=\" \" ind2=\" \"><subfield code=\"b\">nc</subfield></datafield><datafield tag=\"490\" ind1=\"0\" ind2=\" \"><subfield code=\"a\">Like-pokkari</subfield></datafield><datafield tag=\"500\" ind1=\" \" ind2=\" \"><subfield code=\"a\">nidottu</subfield></datafield><datafield tag=\"500\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Lisäpainokset: 6. p. 2002. - 7.-8. p. 2003. - 9. p. 2004. - 10. p. 2005</subfield></datafield><datafield tag=\"500\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Alkuperäinen kieli: nor</subfield></datafield><datafield tag=\"600\" ind1=\"0\" ind2=\"4\"><subfield code=\"a\">minä</subfield></datafield><datafield tag=\"600\" ind1=\"0\" ind2=\"4\"><subfield code=\"a\">veli</subfield></datafield><datafield tag=\"600\" ind1=\"0\" ind2=\"4\"><subfield code=\"a\">Børre</subfield></datafield><datafield tag=\"600\" ind1=\"0\" ind2=\"7\"><subfield code=\"a\">Lise</subfield><subfield code=\"0\">000133765</subfield><subfield code=\"2\">FI-ASTERI-N</subfield></datafield><datafield tag=\"600\" ind1=\"0\" ind2=\"4\"><subfield code=\"a\">Kim</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">huumori</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">henkinen kasvu</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">identiteetti</subfield><subfield code=\"2\">kaunokki</subfield><subfield code=\"x\">etsintä</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kriisit</subfield><subfield code=\"2\">kaunokki</subfield><subfield code=\"x\">aikuisuus</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">elämänodotukset</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">aikuistuminen</subfield><subfield code=\"2\">kaunokki</subfield><subfield code=\"x\">miehet</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">minäkuva</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">ystävyys</subfield><subfield code=\"2\">kaunokki</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p3515</subfield><subfield code=\"0\">http://urn.fi/URN:NBN:fi:au:kaunokki:43764</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">telekopiointi</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">leikkikalut</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">matkat</subfield><subfield code=\"2\">kaunokki</subfield><subfield code=\"z\">New York</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">opiskelijat</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">ystävät</subfield><subfield code=\"2\">kaunokki</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p2191</subfield><subfield code=\"0\">http://urn.fi/URN:NBN:fi:au:kaunokki:44885</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kaupungit</subfield><subfield code=\"2\">kaunokki</subfield><subfield code=\"z\">Norja</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kaupungit</subfield><subfield code=\"2\">kaunokki</subfield><subfield code=\"z\">New York</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">elämän tarkoitus</subfield><subfield code=\"2\">kauno/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p263</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p9342</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">veljet</subfield><subfield code=\"2\">kauno/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p2324</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kehitysromaanit</subfield><subfield code=\"2\">slm/fin</subfield></datafield><datafield tag=\"700\" ind1=\"3\" ind2=\" \"><subfield code=\"a\">Menna, Outi</subfield><subfield code=\"d\">1973-</subfield><subfield code=\"0\">000110284</subfield><subfield code=\"2\">FI-ASTERI-N</subfield></datafield><datafield tag=\"852\" ind1=\" \" ind2=\" \"><subfield code=\"a\">76ce464b-7b23-4aa2-afe6-583f5a3c195d</subfield><subfield code=\"b\">8d0d7dcb-ede0-46e7-bbc4-a5f550bc93e1</subfield><subfield code=\"c\">653e0167-1d6f-4679-af34-94aeee7f30b7</subfield></datafield></record></collection>\n"
+    },
+    {
+      "id": "eepos.302394",
+      "recordPage": "/Record/eepos.302394",
+      "formats": [
+        {
+          "value": "0/Book/",
+          "translated": "Kirja"
+        },
+        {
+          "value": "1/Book/Book/",
+          "translated": "Kirja"
+        }
+      ],
+      "title": "Supernaiivi",
+      "shortTitle": "Supernaiivi",
+      "uniformTitles": [
+        "Naiv. super"
+      ],
+      "authors": {
+        "primary": {
+          "Loe, Erlend": {
+            "role": [
+              "-"
+            ]
+          },
+          "Menna, Outi": {
+            "role": [
+              "-"
+            ]
+          }
+        },
+        "secondary": [],
+        "corporate": []
+      },
+      "primaryAuthors": [
+        "Loe, Erlend",
+        "Menna, Outi"
+      ],
+      "nonPresenterAuthors": [
+        {
+          "name": "Loe, Erlend",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Menna, Outi",
+          "type": "Personal Name"
+        }
+      ],
+      "secondaryAuthors": [
+        "Menna, Outi"
+      ],
+      "corporateAuthors": [],
+      "isbns": [
+        "951-578-963-X nidottu"
+      ],
+      "cleanIsbn": "951578963X",
+      "languages": [
+        "fin"
+      ],
+      "originalLanguages": [
+        "nor"
+      ],
+      "publishers": [
+        "Like"
+      ],
+      "publicationDates": [
+        "2002"
+      ],
+      "placesOfPublication": [
+        "Helsinki :"
+      ],
+      "year": "2002",
+      "edition": "5. p.",
+      "physicalDescriptions": [
+        "222, [1] sivua ; 18 cm"
+      ],
+      "series": [
+        {
+          "name": "Like-pokkari"
+        },
+        {
+          "name": "Like-pokkari"
+        }
+      ],
+      "subjects": [
+        [
+          "minä,",
+          "(fiktiivinen hahmo)"
+        ],
+        [
+          "veli,",
+          "(fiktiivinen hahmo)"
+        ],
+        [
+          "Børre,",
+          "(fiktiivinen hahmo)"
+        ],
+        [
+          "Lise,",
+          "(fiktiivinen hahmo)"
+        ],
+        [
+          "Kim,",
+          "(fiktiivinen hahmo)"
+        ],
+        [
+          "kehitysromaanit"
+        ],
+        [
+          "huumori"
+        ],
+        [
+          "elämän tarkoitus"
+        ],
+        [
+          "henkinen kasvu"
+        ],
+        [
+          "identiteetti",
+          "etsintä"
+        ],
+        [
+          "kriisit",
+          "aikuisuus"
+        ],
+        [
+          "elämänodotukset"
+        ],
+        [
+          "aikuistuminen",
+          "miehet"
+        ],
+        [
+          "minäkuva"
+        ],
+        [
+          "ystävyys"
+        ],
+        [
+          "telekopiointi"
+        ],
+        [
+          "leikkikalut"
+        ],
+        [
+          "matkat",
+          "New York"
+        ],
+        [
+          "opiskelijat"
+        ],
+        [
+          "veljet"
+        ],
+        [
+          "ystävät"
+        ],
+        [
+          "kaupungit",
+          "Norja"
+        ],
+        [
+          "kaupungit",
+          "New York"
+        ]
+      ],
+      "subjectsExtended": [
+        {
+          "heading": [
+            "minä,",
+            "(fiktiivinen hahmo)"
+          ],
+          "type": "personal name",
+          "source": "unknown",
+          "authType": "Personal Name"
+        },
+        {
+          "heading": [
+            "veli,",
+            "(fiktiivinen hahmo)"
+          ],
+          "type": "personal name",
+          "source": "unknown",
+          "authType": "Personal Name"
+        },
+        {
+          "heading": [
+            "Børre,",
+            "(fiktiivinen hahmo)"
+          ],
+          "type": "personal name",
+          "source": "unknown",
+          "authType": "Personal Name"
+        },
+        {
+          "heading": [
+            "Lise,",
+            "(fiktiivinen hahmo)"
+          ],
+          "type": "personal name",
+          "source": "unknown",
+          "authType": "Personal Name"
+        },
+        {
+          "heading": [
+            "Kim,",
+            "(fiktiivinen hahmo)"
+          ],
+          "type": "personal name",
+          "source": "unknown",
+          "authType": "Personal Name"
+        },
+        {
+          "heading": [
+            "kehitysromaanit"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "huumori"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "elämän tarkoitus"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "henkinen kasvu"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "identiteetti",
+            "etsintä"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "kriisit",
+            "aikuisuus"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "elämänodotukset"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "aikuistuminen",
+            "miehet"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "minäkuva"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "ystävyys"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "telekopiointi"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "leikkikalut"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "matkat",
+            "New York"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "opiskelijat"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "veljet"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "ystävät"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "kaupungit",
+            "Norja"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "kaupungit",
+            "New York"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        }
+      ],
+      "genres": [],
+      "majorGenres": [
+        "fiction"
+      ],
+      "classifications": {
+        "ykl": [
+          "84.2"
+        ]
+      },
+      "images": [],
+      "imagesExtended": [],
+      "summary": [],
+      "sectors": [
+        {
+          "value": "0/lib/",
+          "translated": "Kirjasto"
+        },
+        {
+          "value": "1/lib/pub/",
+          "translated": "Yleinen"
+        }
+      ],
+      "dedupIds": [
+        "eepos.302394",
+        "heili.7fc9a7f5-aebb-41d4-acad-f0b86719e710",
+        "helka.9921408183506253",
+        "helle.362042",
+        "helmet.1380306",
+        "tiekko.242110",
+        "jykdok.885624",
+        "fikka.3952360",
+        "keski.260941",
+        "kirkes.1505356",
+        "kyyti.641673",
+        "luc.992422923806246",
+        "lastu.393266",
+        "lep.55827",
+        "louna.92856af8-1bd5-474f-9647-ad1c0d4c26f8",
+        "lukki.144721",
+        "lumme.393939",
+        "oy.997424403906252",
+        "outi.833900",
+        "piki.493592",
+        "ratamo.268541",
+        "rutakko.9f7f75d8-0257-4ccc-a92e-1d97c80c1e97",
+        "satakirjastot.395181",
+        "utu.999033855405971",
+        "vaasa.525ddad8-1f10-4f4d-b156-ac34fee92c9f",
+        "vaari.1203981",
+        "vaski.402659"
+      ],
+      "fullRecord": "<?xml version=\"1.0\"?>\n<collection xmlns=\"http://www.loc.gov/MARC21/slim\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd\"><record><leader>00000nam a22000004i 4500</leader><controlfield tag=\"001\">302394</controlfield><controlfield tag=\"003\">ANDL100007</controlfield><controlfield tag=\"005\">20081120000000.0</controlfield><controlfield tag=\"008\">020605s2002    fi |||||||||| ||||f|fin|c</controlfield><datafield tag=\"020\" ind1=\" \" ind2=\" \"><subfield code=\"a\">951-578-963-X</subfield><subfield code=\"q\">nidottu</subfield></datafield><datafield tag=\"024\" ind1=\"8\" ind2=\" \"><subfield code=\"a\">A0714650</subfield></datafield><datafield tag=\"035\" ind1=\" \" ind2=\" \"><subfield code=\"a\">(FI-Seitti)Ppro743_302394</subfield></datafield><datafield tag=\"035\" ind1=\" \" ind2=\" \"><subfield code=\"a\">(Seitti)Ppro743_302394</subfield></datafield><datafield tag=\"035\" ind1=\" \" ind2=\" \"><subfield code=\"a\">(FI-MELINDA)000380813</subfield></datafield><datafield tag=\"040\" ind1=\" \" ind2=\" \"><subfield code=\"b\">fin</subfield></datafield><datafield tag=\"041\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">fin</subfield><subfield code=\"h\">nor</subfield></datafield><datafield tag=\"084\" ind1=\" \" ind2=\" \"><subfield code=\"a\">84.2</subfield><subfield code=\"2\">ykl</subfield></datafield><datafield tag=\"100\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Loe, Erlend.</subfield></datafield><datafield tag=\"240\" ind1=\"1\" ind2=\"0\"><subfield code=\"a\">Naiv. super</subfield></datafield><datafield tag=\"245\" ind1=\"1\" ind2=\"0\"><subfield code=\"a\">Supernaiivi /</subfield><subfield code=\"c\">Erlend Loe ; suomentanut Outi Menna.</subfield></datafield><datafield tag=\"250\" ind1=\" \" ind2=\" \"><subfield code=\"a\">5. p.</subfield></datafield><datafield tag=\"260\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Helsinki :</subfield><subfield code=\"b\">Like,</subfield><subfield code=\"c\">2002</subfield><subfield code=\"e\">(Keuruu :</subfield><subfield code=\"f\">Otava)</subfield></datafield><datafield tag=\"300\" ind1=\" \" ind2=\" \"><subfield code=\"a\">222, [1] sivua ;</subfield><subfield code=\"c\">18 cm</subfield></datafield><datafield tag=\"336\" ind1=\" \" ind2=\" \"><subfield code=\"a\">teksti</subfield><subfield code=\"b\">txt</subfield><subfield code=\"2\">rdacontent</subfield></datafield><datafield tag=\"337\" ind1=\" \" ind2=\" \"><subfield code=\"a\">käytettävissä ilman laitetta</subfield><subfield code=\"b\">n</subfield><subfield code=\"2\">rdamedia</subfield></datafield><datafield tag=\"338\" ind1=\" \" ind2=\" \"><subfield code=\"a\">nide</subfield><subfield code=\"b\">nc</subfield><subfield code=\"2\">rdacarrier</subfield></datafield><datafield tag=\"490\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Like-pokkari</subfield></datafield><datafield tag=\"500\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Lisäpainokset: 6. p. 2002. - 7.-8. p. 2003. - 9. p. 2004. - 10. p. 2005.</subfield></datafield><datafield tag=\"600\" ind1=\"0\" ind2=\"4\"><subfield code=\"a\">minä,</subfield><subfield code=\"c\">(fiktiivinen hahmo)</subfield></datafield><datafield tag=\"600\" ind1=\"0\" ind2=\"4\"><subfield code=\"a\">veli,</subfield><subfield code=\"c\">(fiktiivinen hahmo)</subfield></datafield><datafield tag=\"600\" ind1=\"0\" ind2=\"4\"><subfield code=\"a\">Børre,</subfield><subfield code=\"c\">(fiktiivinen hahmo)</subfield></datafield><datafield tag=\"600\" ind1=\"0\" ind2=\"4\"><subfield code=\"a\">Lise,</subfield><subfield code=\"c\">(fiktiivinen hahmo)</subfield></datafield><datafield tag=\"600\" ind1=\"0\" ind2=\"4\"><subfield code=\"a\">Kim,</subfield><subfield code=\"c\">(fiktiivinen hahmo)</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kehitysromaanit</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">huumori</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">elämän tarkoitus</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">henkinen kasvu</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">identiteetti</subfield><subfield code=\"x\">etsintä</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kriisit</subfield><subfield code=\"x\">aikuisuus</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">elämänodotukset</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">aikuistuminen</subfield><subfield code=\"x\">miehet</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">minäkuva</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">ystävyys</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">telekopiointi</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">leikkikalut</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">matkat</subfield><subfield code=\"z\">New York</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">opiskelijat</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">veljet</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">ystävät</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kaupungit</subfield><subfield code=\"z\">Norja</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kaupungit</subfield><subfield code=\"z\">New York</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"700\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Menna, Outi.</subfield></datafield><datafield tag=\"830\" ind1=\" \" ind2=\"0\"><subfield code=\"a\">Like-pokkari.</subfield></datafield><datafield tag=\"852\" ind1=\" \" ind2=\" \"><subfield code=\"a\">27</subfield><subfield code=\"b\">209</subfield><subfield code=\"c\">1</subfield></datafield><datafield tag=\"852\" ind1=\" \" ind2=\" \"><subfield code=\"a\">50</subfield><subfield code=\"b\">419</subfield><subfield code=\"c\">1</subfield></datafield><datafield tag=\"908\" ind1=\" \" ind2=\" \"><subfield code=\"a\">fin</subfield></datafield></record></collection>\n"
+    },
+    {
+      "id": "anders.e7575ff7-67ab-4005-855b-6276bfb7aefc",
+      "recordPage": "/Record/anders.e7575ff7-67ab-4005-855b-6276bfb7aefc",
+      "formats": [
+        {
+          "value": "0/Book/",
+          "translated": "Kirja"
+        },
+        {
+          "value": "1/Book/Book/",
+          "translated": "Kirja"
+        }
+      ],
+      "title": "Supernaiivi",
+      "shortTitle": "Supernaiivi",
+      "uniformTitles": [
+        "Naiv. super"
+      ],
+      "authors": {
+        "primary": {
+          "Loe, Erlend": {
+            "role": [
+              "-"
+            ]
+          },
+          "Menna, Outi": {
+            "role": [
+              "-"
+            ]
+          }
+        },
+        "secondary": {
+          "Menna, Outi 1973-": {
+            "role": [
+              "-"
+            ]
+          }
+        },
+        "corporate": []
+      },
+      "primaryAuthors": [
+        "Loe, Erlend",
+        "Menna, Outi"
+      ],
+      "nonPresenterAuthors": [
+        {
+          "name": "Loe, Erlend",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Menna, Outi",
+          "date": "1973-",
+          "id": "000110284",
+          "type": "Personal Name"
+        }
+      ],
+      "secondaryAuthors": [
+        "Menna, Outi 1973-"
+      ],
+      "corporateAuthors": [],
+      "isbns": [
+        "951-578-565-0"
+      ],
+      "cleanIsbn": "9515785650",
+      "languages": [
+        "fin"
+      ],
+      "originalLanguages": [],
+      "publishers": [
+        "Like"
+      ],
+      "publicationDates": [
+        "1998"
+      ],
+      "placesOfPublication": [
+        "Helsinki"
+      ],
+      "year": "1998",
+      "physicalDescriptions": [
+        "222, [2] sivua"
+      ],
+      "series": [],
+      "subjects": [
+        [
+          "Veli"
+        ],
+        [
+          "Børre"
+        ],
+        [
+          "Lise"
+        ],
+        [
+          "Kim"
+        ],
+        [
+          "kehitysromaanit"
+        ],
+        [
+          "huumori"
+        ],
+        [
+          "elämän tarkoitus"
+        ],
+        [
+          "henkinen kasvu"
+        ],
+        [
+          "identiteetti",
+          "etsintä"
+        ],
+        [
+          "kriisit",
+          "aikuisuus"
+        ],
+        [
+          "elämänodotukset"
+        ],
+        [
+          "aikuistuminen",
+          "miehet"
+        ],
+        [
+          "minäkuva"
+        ],
+        [
+          "ystävyys"
+        ],
+        [
+          "telekopiointi"
+        ],
+        [
+          "leikkikalut"
+        ],
+        [
+          "matkat",
+          "New York"
+        ],
+        [
+          "opiskelijat"
+        ],
+        [
+          "veljet"
+        ],
+        [
+          "ystävät"
+        ],
+        [
+          "kaupungit",
+          "Norja"
+        ],
+        [
+          "kaupungit",
+          "New York"
+        ]
+      ],
+      "subjectsExtended": [
+        {
+          "heading": [
+            "Veli"
+          ],
+          "type": "personal name",
+          "source": "unknown",
+          "authType": "Personal Name"
+        },
+        {
+          "heading": [
+            "Børre"
+          ],
+          "type": "personal name",
+          "source": "unknown",
+          "authType": "Personal Name"
+        },
+        {
+          "heading": [
+            "Lise"
+          ],
+          "type": "personal name",
+          "source": "FI-ASTERI-N",
+          "id": "000133765",
+          "authType": "Personal Name"
+        },
+        {
+          "heading": [
+            "Kim"
+          ],
+          "type": "personal name",
+          "source": "unknown",
+          "authType": "Personal Name"
+        },
+        {
+          "heading": [
+            "kehitysromaanit"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "huumori"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "elämän tarkoitus"
+          ],
+          "type": "topic",
+          "source": "kaunokki",
+          "id": "http://www.yso.fi/onto/kauno/p263"
+        },
+        {
+          "heading": [
+            "henkinen kasvu"
+          ],
+          "type": "topic",
+          "source": "kaunokki",
+          "id": "http://urn.fi/URN:NBN:fi:au:kaunokki:46924"
+        },
+        {
+          "heading": [
+            "identiteetti",
+            "etsintä"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "kriisit",
+            "aikuisuus"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "elämänodotukset"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "aikuistuminen",
+            "miehet"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "minäkuva"
+          ],
+          "type": "topic",
+          "source": "kaunokki",
+          "id": "http://urn.fi/URN:NBN:fi:au:kaunokki:42665"
+        },
+        {
+          "heading": [
+            "ystävyys"
+          ],
+          "type": "topic",
+          "source": "kaunokki",
+          "id": "http://urn.fi/URN:NBN:fi:au:kaunokki:43764"
+        },
+        {
+          "heading": [
+            "telekopiointi"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "leikkikalut"
+          ],
+          "type": "topic",
+          "source": "kaunokki",
+          "id": "http://www.yso.fi/onto/kauno/p1232"
+        },
+        {
+          "heading": [
+            "matkat",
+            "New York"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "opiskelijat"
+          ],
+          "type": "topic",
+          "source": "kaunokki",
+          "id": "http://urn.fi/URN:NBN:fi:au:kaunokki:44818"
+        },
+        {
+          "heading": [
+            "veljet"
+          ],
+          "type": "topic",
+          "source": "kaunokki",
+          "id": "http://www.yso.fi/onto/kauno/p2324"
+        },
+        {
+          "heading": [
+            "ystävät"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "kaupungit",
+            "Norja"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "kaupungit",
+            "New York"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        }
+      ],
+      "genres": [],
+      "majorGenres": [
+        "fiction"
+      ],
+      "classifications": {
+        "ykl": [
+          "84.2"
+        ]
+      },
+      "images": [],
+      "imagesExtended": [],
+      "summary": [],
+      "sectors": [
+        {
+          "value": "0/lib/",
+          "translated": "Kirjasto"
+        },
+        {
+          "value": "1/lib/pub/",
+          "translated": "Yleinen"
+        }
+      ],
+      "dedupIds": [
+        "anders.e7575ff7-67ab-4005-855b-6276bfb7aefc",
+        "blanka.f2e80660-e2f2-4aff-8749-f6778f2c5754",
+        "eepos.193910",
+        "heili.b8019330-ae28-4674-9f1e-b493ad986beb",
+        "helka.9912029993506253",
+        "helle.1395179",
+        "helmet.1380307",
+        "uef.993068583705966",
+        "tiekko.242109",
+        "jykdok.769438",
+        "kainet.405928",
+        "kangasniemi.a41f8015-c96b-4c1c-935a-f13f2b112c70",
+        "fikka.3862153",
+        "keski.194046",
+        "kirkes.206501",
+        "kyyti.641672",
+        "lapinkirjasto.284952",
+        "luc.992098903806246",
+        "lastu.77604",
+        "louna.0afa3df6-2efb-4347-8ddf-e84862546d68",
+        "lukki.95059",
+        "lumme.1143250",
+        "korsholm.5fd01971-49e9-4ecb-b2b1-ea987e0d0fc8",
+        "oy.995910503906252",
+        "outi.382524",
+        "jakobstad.2c760982-a31a-4361-bfaf-7040012a5ec0",
+        "piki.342451",
+        "ratamo.120662",
+        "rutakko.68df17f6-4f03-494d-becf-7ee5681248a2",
+        "satakirjastot.104075",
+        "utu.997371375405971",
+        "vaarakirjastot.184910",
+        "vaasa.1e7a0fba-d8d8-4001-8d63-04cb2a14aec4",
+        "vanamo.3e81a071-b0a7-4050-a437-b5588739c1dc",
+        "vaari.863412",
+        "vaski.326772",
+        "abo.996698113405972"
+      ],
+      "fullRecord": "<?xml version=\"1.0\"?>\n<collection xmlns=\"http://www.loc.gov/MARC21/slim\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd\"><record><leader>00000 am  22000001  0000</leader><controlfield tag=\"001\">e7575ff7-67ab-4005-855b-6276bfb7aefc</controlfield><controlfield tag=\"003\">38ce7306-5873-4a96-8ad7-d42bf004dbec</controlfield><controlfield tag=\"008\">000000s1998       ||||g     |00| 1|fin||</controlfield><datafield tag=\"035\" ind1=\" \" ind2=\" \"><subfield code=\"a\">(FI-Anders)154569</subfield></datafield><datafield tag=\"035\" ind1=\" \" ind2=\" \"><subfield code=\"a\">(FI-BTJ)9515785650</subfield></datafield><datafield tag=\"035\" ind1=\" \" ind2=\" \"><subfield code=\"a\">342451</subfield></datafield><datafield tag=\"035\" ind1=\" \" ind2=\" \"><subfield code=\"a\">(PIKI)Ppro837_342451</subfield></datafield><datafield tag=\"035\" ind1=\" \" ind2=\" \"><subfield code=\"a\">(FI-MELINDA)000893133</subfield></datafield><datafield tag=\"020\" ind1=\" \" ind2=\" \"><subfield code=\"a\">951-578-565-0</subfield></datafield><datafield tag=\"084\" ind1=\" \" ind2=\" \"><subfield code=\"a\">84.2</subfield><subfield code=\"2\">ykl</subfield></datafield><datafield tag=\"100\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Loe, Erlend</subfield></datafield><datafield tag=\"240\" ind1=\"1\" ind2=\"0\"><subfield code=\"a\">Naiv. super</subfield></datafield><datafield tag=\"245\" ind1=\" \" ind2=\"0\"><subfield code=\"a\">Supernaiivi /</subfield><subfield code=\"c\">Erlend Loe ; suomentanut Outi Menna</subfield></datafield><datafield tag=\"260\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Helsinki</subfield><subfield code=\"b\">Like</subfield><subfield code=\"c\">1998</subfield></datafield><datafield tag=\"300\" ind1=\" \" ind2=\" \"><subfield code=\"a\">222, [2] sivua</subfield></datafield><datafield tag=\"336\" ind1=\" \" ind2=\" \"><subfield code=\"b\">txt</subfield></datafield><datafield tag=\"337\" ind1=\" \" ind2=\" \"><subfield code=\"b\">n</subfield></datafield><datafield tag=\"338\" ind1=\" \" ind2=\" \"><subfield code=\"b\">nc</subfield></datafield><datafield tag=\"500\" ind1=\" \" ind2=\" \"><subfield code=\"a\">nidottu</subfield></datafield><datafield tag=\"500\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Lisäpainokset: 4. p. 2001.</subfield></datafield><datafield tag=\"500\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Alkuperäinen kieli: nor</subfield></datafield><datafield tag=\"600\" ind1=\"0\" ind2=\"4\"><subfield code=\"a\">Veli</subfield></datafield><datafield tag=\"600\" ind1=\"0\" ind2=\"4\"><subfield code=\"a\">Børre</subfield></datafield><datafield tag=\"600\" ind1=\"0\" ind2=\"7\"><subfield code=\"a\">Lise</subfield><subfield code=\"0\">000133765</subfield><subfield code=\"2\">FI-ASTERI-N</subfield></datafield><datafield tag=\"600\" ind1=\"0\" ind2=\"4\"><subfield code=\"a\">Kim</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kehitysromaanit</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">huumori</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">elämän tarkoitus</subfield><subfield code=\"2\">kaunokki</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p263</subfield><subfield code=\"0\">http://urn.fi/URN:NBN:fi:au:kaunokki:42866</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">henkinen kasvu</subfield><subfield code=\"2\">kaunokki</subfield><subfield code=\"0\">http://urn.fi/URN:NBN:fi:au:kaunokki:46924</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">identiteetti</subfield><subfield code=\"2\">kaunokki</subfield><subfield code=\"x\">etsintä</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kriisit</subfield><subfield code=\"2\">kaunokki</subfield><subfield code=\"x\">aikuisuus</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">elämänodotukset</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">aikuistuminen</subfield><subfield code=\"2\">kaunokki</subfield><subfield code=\"x\">miehet</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">minäkuva</subfield><subfield code=\"2\">kaunokki</subfield><subfield code=\"0\">http://urn.fi/URN:NBN:fi:au:kaunokki:42665</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">ystävyys</subfield><subfield code=\"2\">kaunokki</subfield><subfield code=\"0\">http://urn.fi/URN:NBN:fi:au:kaunokki:43764</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p3515</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">telekopiointi</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">leikkikalut</subfield><subfield code=\"2\">kaunokki</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p1232</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">matkat</subfield><subfield code=\"2\">kaunokki</subfield><subfield code=\"z\">New York</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">opiskelijat</subfield><subfield code=\"2\">kaunokki</subfield><subfield code=\"0\">http://urn.fi/URN:NBN:fi:au:kaunokki:44818</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p702</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">veljet</subfield><subfield code=\"2\">kaunokki</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p2324</subfield><subfield code=\"0\">http://urn.fi/URN:NBN:fi:au:kaunokki:44466</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">ystävät</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kaupungit</subfield><subfield code=\"2\">kaunokki</subfield><subfield code=\"z\">Norja</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kaupungit</subfield><subfield code=\"2\">kaunokki</subfield><subfield code=\"z\">New York</subfield></datafield><datafield tag=\"700\" ind1=\"3\" ind2=\" \"><subfield code=\"a\">Menna, Outi</subfield><subfield code=\"d\">1973-</subfield><subfield code=\"0\">000110284</subfield><subfield code=\"2\">FI-ASTERI-N</subfield></datafield><datafield tag=\"852\" ind1=\" \" ind2=\" \"><subfield code=\"a\">8bf5b262-9883-4f4d-8652-2cb507b27135</subfield><subfield code=\"b\">1800201b-fd3a-4e7e-a3f7-d2a1dae0c63d</subfield><subfield code=\"c\">03dbce9e-43cb-4600-b4e8-8591ee5ab747</subfield></datafield><datafield tag=\"852\" ind1=\" \" ind2=\" \"><subfield code=\"a\">5c42fd73-5eee-4ae7-a679-92099a9a982a</subfield><subfield code=\"b\">cc75b551-dc4b-430f-9da9-64469370647a</subfield><subfield code=\"c\">d6a3ddd9-ee66-43a9-a3a3-5fe4329d126b</subfield></datafield></record></collection>\n"
+    }
+  ],
+  "status": "OK"
+}

@@ -1,0 +1,635 @@
+{
+  "resultCount": 3,
+  "records": [
+    {
+      "id": "3amk.287790",
+      "recordPage": "/Record/3amk.287790",
+      "formats": [
+        {
+          "value": "0/Book/",
+          "translated": "Kirja"
+        },
+        {
+          "value": "1/Book/Book/",
+          "translated": "Kirja"
+        }
+      ],
+      "title": "Mikä libεralismia vaivaa?",
+      "shortTitle": "Mikä libεralismia vaivaa?",
+      "uniformTitles": [],
+      "authors": {
+        "primary": {
+          "Lahtinen, Veikka": {
+            "role": [
+              "kirjoittaja"
+            ]
+          },
+          "Purokuru, Pontus": {
+            "role": [
+              "-"
+            ]
+          }
+        },
+        "secondary": [],
+        "corporate": []
+      },
+      "primaryAuthors": [
+        "Lahtinen, Veikka",
+        "Purokuru, Pontus"
+      ],
+      "nonPresenterAuthors": [
+        {
+          "name": "Lahtinen, Veikka",
+          "role": "kirjoittaja",
+          "id": "(FI-ASTERI-N)000161703",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Purokuru, Pontus",
+          "date": "1987-",
+          "role": "kirjoittaja",
+          "id": "(FI-ASTERI-N)000162888",
+          "type": "Personal Name"
+        }
+      ],
+      "secondaryAuthors": [],
+      "corporateAuthors": [],
+      "isbns": [
+        "978-952-352-068-4 kovakantinen"
+      ],
+      "cleanIsbn": "9523520687",
+      "languages": [
+        "fin"
+      ],
+      "originalLanguages": [],
+      "publishers": [
+        "Kosmos"
+      ],
+      "publicationDates": [
+        "2020"
+      ],
+      "placesOfPublication": [
+        "[Helsinki] :"
+      ],
+      "year": "2020",
+      "physicalDescriptions": [
+        "207 sivua ; 23 cm"
+      ],
+      "series": [],
+      "subjects": [
+        [
+          "liberalismi"
+        ],
+        [
+          "ideologiat"
+        ],
+        [
+          "yhteiskuntakehitys"
+        ],
+        [
+          "yhteiskuntakritiikki"
+        ],
+        [
+          "poliittinen filosofia"
+        ],
+        [
+          "yhteiskuntafilosofia"
+        ]
+      ],
+      "subjectsExtended": [
+        {
+          "heading": [
+            "liberalismi"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p9443"
+        },
+        {
+          "heading": [
+            "ideologiat"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p216"
+        },
+        {
+          "heading": [
+            "yhteiskuntakehitys"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p9763"
+        },
+        {
+          "heading": [
+            "yhteiskuntakritiikki"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p19297"
+        },
+        {
+          "heading": [
+            "poliittinen filosofia"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p18022"
+        },
+        {
+          "heading": [
+            "yhteiskuntafilosofia"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p13819"
+        }
+      ],
+      "genres": [],
+      "majorGenres": [
+        "nonfiction"
+      ],
+      "classifications": {
+        "ykl": [
+          "32.01",
+          "30"
+        ]
+      },
+      "images": [
+        "/Cover/Show?source=Solr&id=3amk.287790&index=0&size=large"
+      ],
+      "imagesExtended": [
+        {
+          "urls": {
+            "small": "/Cover/Show?source=Solr&id=3amk.287790&index=0&size=small",
+            "medium": "/Cover/Show?source=Solr&id=3amk.287790&index=0&size=medium",
+            "large": "/Cover/Show?source=Solr&id=3amk.287790&index=0&size=large"
+          },
+          "rights": {
+            "copyright": "Kuvaan voi liittyä käytön rajoituksia."
+          }
+        }
+      ],
+      "summary": [],
+      "sectors": [
+        {
+          "value": "0/lib/",
+          "translated": "Kirjasto"
+        },
+        {
+          "value": "1/lib/poly/",
+          "translated": "AMK"
+        }
+      ],
+      "dedupIds": [
+        "3amk.287790",
+        "anders.739b3e6e-53a5-496e-a6fb-0c1ca276d642",
+        "ekk.994249428006250",
+        "eepos.2638648",
+        "heili.95425651-062a-45b9-951e-1e4537e78bf7",
+        "helka.9933739253106253",
+        "helle.1549271",
+        "helmet.2432294",
+        "hurma.78239",
+        "uef.9914959324005966",
+        "tiekko.722185",
+        "jykdok.2059155",
+        "kainet.1208035",
+        "fikka.5440511",
+        "keski.3075970",
+        "kirkes.1419355",
+        "kuopio.1454417",
+        "kyyti.1417707",
+        "lapinkirjasto.1815746",
+        "luc.994750822406246",
+        "lastu.1684414",
+        "louna.e4b1ec94-e41b-4e34-a72a-055e51f90cf7",
+        "lukki.856264",
+        "lumme.3030119",
+        "oy.9917658777606252",
+        "outi.2168418",
+        "jakobstad.0aba81b6-de4b-4243-b7da-5adc5dde3335",
+        "piki.4643082",
+        "ratamo.1636728",
+        "rutakko.84e7c60b-1e07-4995-bfdd-f65d236e28d5",
+        "satakirjastot.1375743",
+        "siilinjarvi.567152",
+        "utu.9922111735605971",
+        "vaarakirjastot.11564224",
+        "vaasa.0157c47a-0c3c-4069-bce9-9dda5d86523f",
+        "vanamo.dbc8c40e-bcc5-483f-af9b-cf543eb21fd4",
+        "vaski.4051808",
+        "abo.9913514431305972"
+      ],
+      "fullRecord": "<?xml version=\"1.0\"?>\n<collection xmlns=\"http://www.loc.gov/MARC21/slim\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd\"><record><leader>00000cam a2200000 i 4500</leader><controlfield tag=\"001\">016785811</controlfield><controlfield tag=\"003\">FI-MELINDA</controlfield><controlfield tag=\"005\">20250409164827.0</controlfield><controlfield tag=\"008\">200507t20202020fi ||||       |0| 0|fin| </controlfield><datafield tag=\"020\" ind1=\" \" ind2=\" \"><subfield code=\"a\">978-952-352-068-4</subfield><subfield code=\"q\">kovakantinen</subfield></datafield><datafield tag=\"035\" ind1=\" \" ind2=\" \"><subfield code=\"a\">FCC016785811</subfield></datafield><datafield tag=\"040\" ind1=\" \" ind2=\" \"><subfield code=\"a\">FI-BTJ</subfield><subfield code=\"b\">fin</subfield><subfield code=\"e\">rda</subfield><subfield code=\"d\">FI-NL</subfield></datafield><datafield tag=\"041\" ind1=\"0\" ind2=\" \"><subfield code=\"a\">fin</subfield></datafield><datafield tag=\"084\" ind1=\" \" ind2=\" \"><subfield code=\"a\">32.01</subfield><subfield code=\"2\">ykl</subfield></datafield><datafield tag=\"084\" ind1=\" \" ind2=\" \"><subfield code=\"a\">30</subfield><subfield code=\"2\">ykl</subfield></datafield><datafield tag=\"100\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Lahtinen, Veikka,</subfield><subfield code=\"e\">kirjoittaja.</subfield><subfield code=\"0\">(FI-ASTERI-N)000161703</subfield></datafield><datafield tag=\"245\" ind1=\"1\" ind2=\"0\"><subfield code=\"a\">Mikä libεralismia vaivaa? /</subfield><subfield code=\"c\">Veikka Lahtinen, Pontus Purokuru.</subfield></datafield><datafield tag=\"246\" ind1=\"3\" ind2=\" \"><subfield code=\"a\">Mikä liberalismia vaivaa?</subfield></datafield><datafield tag=\"264\" ind1=\" \" ind2=\"1\"><subfield code=\"a\">[Helsinki] :</subfield><subfield code=\"b\">Kosmos,</subfield><subfield code=\"c\">[2020]</subfield></datafield><datafield tag=\"264\" ind1=\" \" ind2=\"3\"><subfield code=\"a\">EU:ssa</subfield></datafield><datafield tag=\"264\" ind1=\" \" ind2=\"4\"><subfield code=\"c\">©2020</subfield></datafield><datafield tag=\"300\" ind1=\" \" ind2=\" \"><subfield code=\"a\">207 sivua ;</subfield><subfield code=\"c\">23 cm</subfield></datafield><datafield tag=\"336\" ind1=\" \" ind2=\" \"><subfield code=\"a\">teksti</subfield><subfield code=\"b\">txt</subfield><subfield code=\"2\">rdacontent</subfield></datafield><datafield tag=\"337\" ind1=\" \" ind2=\" \"><subfield code=\"a\">käytettävissä ilman laitetta</subfield><subfield code=\"b\">n</subfield><subfield code=\"2\">rdamedia</subfield></datafield><datafield tag=\"338\" ind1=\" \" ind2=\" \"><subfield code=\"a\">nide</subfield><subfield code=\"b\">nc</subfield><subfield code=\"2\">rdacarrier</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">liberalismi</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p9443</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">ideologiat</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p216</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">yhteiskuntakehitys</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p9763</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">yhteiskuntakritiikki</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p19297</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">poliittinen filosofia</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p18022</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">yhteiskuntafilosofia</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p13819</subfield></datafield><datafield tag=\"700\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Purokuru, Pontus,</subfield><subfield code=\"d\">1987-</subfield><subfield code=\"e\">kirjoittaja.</subfield><subfield code=\"0\">(FI-ASTERI-N)000162888</subfield></datafield><datafield tag=\"856\" ind1=\"4\" ind2=\"2\"><subfield code=\"u\">https://media.kirjavalitys.fi/onix/cover/9789523520684?format=image&amp;size=width235</subfield><subfield code=\"z\">Kansikuva</subfield></datafield><datafield tag=\"856\" ind1=\"4\" ind2=\"2\"><subfield code=\"u\">https://media.kirjavalitys.fi/onix/description/9789523520684?format=html</subfield><subfield code=\"z\">Kuvaus</subfield></datafield><datafield tag=\"942\" ind1=\" \" ind2=\" \"><subfield code=\"1\">2020-10-23 07:51:50</subfield></datafield><datafield tag=\"999\" ind1=\" \" ind2=\" \"><subfield code=\"c\">287790</subfield><subfield code=\"d\">287790</subfield></datafield><datafield tag=\"952\" ind1=\" \" ind2=\" \"><subfield code=\"b\">METARA</subfield><subfield code=\"c\">YLEIS</subfield><subfield code=\"o\">300 LAHTINEN</subfield><subfield code=\"8\">MET</subfield><subfield code=\"9\">1</subfield></datafield></record></collection>\n"
+    },
+    {
+      "id": "jykdok.2296185",
+      "recordPage": "/Record/jykdok.2296185",
+      "formats": [
+        {
+          "value": "0/Book/",
+          "translated": "Kirja"
+        },
+        {
+          "value": "1/Book/AudioBook/",
+          "translated": "Äänikirja"
+        },
+        {
+          "value": "2/Book/AudioBook/Online/",
+          "translated": "E-äänikirja"
+        }
+      ],
+      "title": "Mikä liberalismia vaivaa?",
+      "shortTitle": "Mikä liberalismia vaivaa?",
+      "uniformTitles": [
+        "Mikä liberalismia vaivaa?. Suomi"
+      ],
+      "authors": {
+        "primary": {
+          "Purokuru, Pontus": {
+            "role": [
+              "kirjoittaja"
+            ]
+          },
+          "Lahtinen, Veikka": {
+            "role": [
+              "-"
+            ]
+          },
+          "Niemelä, Ville-Veikko": {
+            "role": [
+              "-"
+            ]
+          }
+        },
+        "secondary": {
+          "Niemelä, Ville-Veikko, lukija": {
+            "role": [
+              "lukija"
+            ]
+          }
+        },
+        "corporate": {
+          "Kosmos, kustantaja": {
+            "role": [
+              "kustantaja"
+            ]
+          }
+        }
+      },
+      "primaryAuthors": [
+        "Purokuru, Pontus",
+        "Lahtinen, Veikka",
+        "Niemelä, Ville-Veikko"
+      ],
+      "nonPresenterAuthors": [
+        {
+          "name": "Purokuru, Pontus",
+          "role": "kirjoittaja",
+          "id": "https://isni.org/isni/0000000484131330",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Lahtinen, Veikka",
+          "role": "kirjoittaja",
+          "id": "https://isni.org/isni/0000000484148466",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Niemelä, Ville-Veikko",
+          "role": "lukija",
+          "id": "(FI-ASTERI-N)000233696",
+          "type": "Personal Name"
+        }
+      ],
+      "secondaryAuthors": [
+        "Niemelä, Ville-Veikko, lukija"
+      ],
+      "corporateAuthors": [
+        "Kosmos, kustantaja"
+      ],
+      "isbns": [
+        "978-952-352-070-7 MP3"
+      ],
+      "cleanIsbn": "9523520709",
+      "languages": [
+        "fin"
+      ],
+      "originalLanguages": [],
+      "publishers": [
+        "Kosmos"
+      ],
+      "publicationDates": [
+        "2020"
+      ],
+      "placesOfPublication": [
+        "Helsinki :"
+      ],
+      "year": "2020",
+      "physicalDescriptions": [
+        "1 verkkoaineisto (6 h 19 min)"
+      ],
+      "series": [],
+      "subjects": [
+        [
+          "liberalismi",
+          "ENNAKKOTIETO"
+        ],
+        [
+          "ideologiat",
+          "ENNAKKOTIETO"
+        ],
+        [
+          "poliittinen filosofia",
+          "ENNAKKOTIETO"
+        ],
+        [
+          "yhteiskuntafilosofia",
+          "ENNAKKOTIETO"
+        ],
+        [
+          "yhteiskuntakehitys",
+          "ENNAKKOTIETO"
+        ],
+        [
+          "yhteiskuntakritiikki",
+          "ENNAKKOTIETO"
+        ]
+      ],
+      "subjectsExtended": [
+        {
+          "heading": [
+            "liberalismi",
+            "ENNAKKOTIETO"
+          ],
+          "type": "topic",
+          "source": "yso/fin"
+        },
+        {
+          "heading": [
+            "ideologiat",
+            "ENNAKKOTIETO"
+          ]
+        },
+        {
+          "heading": [
+            "liberalismi",
+            "ENNAKKOTIETO"
+          ]
+        },
+        {
+          "heading": [
+            "poliittinen filosofia",
+            "ENNAKKOTIETO"
+          ]
+        },
+        {
+          "heading": [
+            "yhteiskuntafilosofia",
+            "ENNAKKOTIETO"
+          ]
+        },
+        {
+          "heading": [
+            "yhteiskuntakehitys",
+            "ENNAKKOTIETO"
+          ]
+        },
+        {
+          "heading": [
+            "yhteiskuntakritiikki",
+            "ENNAKKOTIETO"
+          ]
+        }
+      ],
+      "genres": [
+        "äänikirjat"
+      ],
+      "majorGenres": [
+        "nonfiction"
+      ],
+      "classifications": {
+        "ykl": [
+          "32.01"
+        ]
+      },
+      "images": [],
+      "imagesExtended": [],
+      "summary": [],
+      "sectors": [
+        {
+          "value": "0/lib/",
+          "translated": "Kirjasto"
+        },
+        {
+          "value": "1/lib/uni/",
+          "translated": "Yliopisto"
+        }
+      ],
+      "dedupIds": [
+        "jykdok.2296185",
+        "fikka.5442568"
+      ],
+      "fullRecord": "<?xml version=\"1.0\"?>\n<collection xmlns=\"http://www.loc.gov/MARC21/slim\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd\"><record><leader>00000cim a22000002i 4500</leader><controlfield tag=\"001\">016787827</controlfield><controlfield tag=\"003\">FI-MELINDA</controlfield><controlfield tag=\"005\">20260513003014.0</controlfield><controlfield tag=\"006\">m|||||o||h||||||||</controlfield><controlfield tag=\"007\">sr uunnnnnuneu</controlfield><controlfield tag=\"007\">cr nnannnuuuuu</controlfield><controlfield tag=\"008\">230102s2020    fi |||||o|||||||||||fin||</controlfield><datafield tag=\"020\" ind1=\" \" ind2=\" \"><subfield code=\"a\">978-952-352-070-7</subfield><subfield code=\"q\">MP3</subfield></datafield><datafield tag=\"035\" ind1=\" \" ind2=\" \"><subfield code=\"a\">FCC016787827</subfield></datafield><datafield tag=\"040\" ind1=\" \" ind2=\" \"><subfield code=\"b\">fin</subfield><subfield code=\"e\">rda</subfield><subfield code=\"d\">FI-NL</subfield></datafield><datafield tag=\"041\" ind1=\"0\" ind2=\" \"><subfield code=\"d\">fin</subfield></datafield><datafield tag=\"084\" ind1=\" \" ind2=\" \"><subfield code=\"a\">32.01</subfield><subfield code=\"2\">ykl</subfield></datafield><datafield tag=\"100\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Purokuru, Pontus,</subfield><subfield code=\"e\">kirjoittaja.</subfield><subfield code=\"0\">https://isni.org/isni/0000000484131330</subfield></datafield><datafield tag=\"240\" ind1=\"1\" ind2=\"0\"><subfield code=\"a\">Mikä liberalismia vaivaa?.</subfield><subfield code=\"l\">Suomi</subfield></datafield><datafield tag=\"245\" ind1=\"1\" ind2=\"0\"><subfield code=\"a\">Mikä liberalismia vaivaa?</subfield></datafield><datafield tag=\"264\" ind1=\" \" ind2=\"1\"><subfield code=\"a\">Helsinki :</subfield><subfield code=\"b\">Kosmos,</subfield><subfield code=\"c\">2020.</subfield></datafield><datafield tag=\"300\" ind1=\" \" ind2=\" \"><subfield code=\"a\">1 verkkoaineisto (6 h 19 min)</subfield></datafield><datafield tag=\"306\" ind1=\" \" ind2=\" \"><subfield code=\"a\">061900</subfield></datafield><datafield tag=\"336\" ind1=\" \" ind2=\" \"><subfield code=\"a\">puhe</subfield><subfield code=\"b\">spw</subfield><subfield code=\"2\">rdacontent</subfield></datafield><datafield tag=\"337\" ind1=\" \" ind2=\" \"><subfield code=\"a\">tietokonekäyttöinen</subfield><subfield code=\"b\">c</subfield><subfield code=\"2\">rdamedia</subfield></datafield><datafield tag=\"338\" ind1=\" \" ind2=\" \"><subfield code=\"a\">verkkoaineisto</subfield><subfield code=\"b\">cr</subfield><subfield code=\"2\">rdacarrier</subfield></datafield><datafield tag=\"341\" ind1=\" \" ind2=\" \"><subfield code=\"a\">auditory</subfield><subfield code=\"2\">sapdv</subfield></datafield><datafield tag=\"344\" ind1=\" \" ind2=\" \"><subfield code=\"a\">digitaalinen</subfield></datafield><datafield tag=\"347\" ind1=\" \" ind2=\" \"><subfield code=\"a\">äänitiedosto</subfield><subfield code=\"b\">MP3</subfield></datafield><datafield tag=\"500\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Koneellisesti tuotettu tietue.</subfield></datafield><datafield tag=\"506\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Aineisto on käytettävissä vapaakappaletyöasemilla.</subfield><subfield code=\"f\">Online access with authorization</subfield><subfield code=\"2\">star</subfield></datafield><datafield tag=\"511\" ind1=\"0\" ind2=\" \"><subfield code=\"a\">Lukija: Ville-Veikko Niemelä.</subfield></datafield><datafield tag=\"540\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Aineisto on käytettävissä tutkimus- ja muihin tarkoituksiin;</subfield><subfield code=\"b\">Kansalliskirjasto;</subfield><subfield code=\"c\">Laki kulttuuriaineistojen tallettamisesta ja säilyttämisestä</subfield><subfield code=\"u\">http://www.finlex.fi/fi/laki/ajantasa/2007/20071433</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">liberalismi</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"g\">ENNAKKOTIETO</subfield></datafield><datafield tag=\"653\" ind1=\" \" ind2=\" \"><subfield code=\"a\">ideologiat</subfield><subfield code=\"g\">ENNAKKOTIETO</subfield></datafield><datafield tag=\"653\" ind1=\" \" ind2=\" \"><subfield code=\"a\">liberalismi</subfield><subfield code=\"g\">ENNAKKOTIETO</subfield></datafield><datafield tag=\"653\" ind1=\" \" ind2=\" \"><subfield code=\"a\">poliittinen filosofia</subfield><subfield code=\"g\">ENNAKKOTIETO</subfield></datafield><datafield tag=\"653\" ind1=\" \" ind2=\" \"><subfield code=\"a\">yhteiskuntafilosofia</subfield><subfield code=\"g\">ENNAKKOTIETO</subfield></datafield><datafield tag=\"653\" ind1=\" \" ind2=\" \"><subfield code=\"a\">yhteiskuntakehitys</subfield><subfield code=\"g\">ENNAKKOTIETO</subfield></datafield><datafield tag=\"653\" ind1=\" \" ind2=\" \"><subfield code=\"a\">yhteiskuntakritiikki</subfield><subfield code=\"g\">ENNAKKOTIETO</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">äänikirjat</subfield><subfield code=\"2\">slm/fin</subfield><subfield code=\"0\">http://urn.fi/URN:NBN:fi:au:slm:s579</subfield></datafield><datafield tag=\"700\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Lahtinen, Veikka,</subfield><subfield code=\"e\">kirjoittaja.</subfield><subfield code=\"0\">https://isni.org/isni/0000000484148466</subfield></datafield><datafield tag=\"700\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Niemelä, Ville-Veikko,</subfield><subfield code=\"e\">lukija.</subfield><subfield code=\"0\">(FI-ASTERI-N)000233696</subfield></datafield><datafield tag=\"710\" ind1=\"2\" ind2=\" \"><subfield code=\"a\">Kosmos,</subfield><subfield code=\"e\">kustantaja.</subfield></datafield><datafield tag=\"776\" ind1=\"0\" ind2=\" \"><subfield code=\"z\">978-952-352-068-4</subfield></datafield><datafield tag=\"776\" ind1=\"0\" ind2=\" \"><subfield code=\"z\">978-952-352-069-1</subfield></datafield><datafield tag=\"856\" ind1=\"4\" ind2=\"0\"><subfield code=\"u\">https://urn.fi/URN:ISBN:978-952-352-070-7</subfield><subfield code=\"z\">Käytettävissä vapaakappaletyöasemilla</subfield></datafield><datafield tag=\"999\" ind1=\" \" ind2=\" \"><subfield code=\"c\">2296185</subfield><subfield code=\"d\">2296185</subfield></datafield></record></collection>\n"
+    },
+    {
+      "id": "jykdok.2273385",
+      "recordPage": "/Record/jykdok.2273385",
+      "formats": [
+        {
+          "value": "0/Book/",
+          "translated": "Kirja"
+        },
+        {
+          "value": "1/Book/eBook/",
+          "translated": "E-kirja"
+        }
+      ],
+      "title": "Mikä liberalismia vaivaa?",
+      "shortTitle": "Mikä liberalismia vaivaa?",
+      "uniformTitles": [
+        "Mikä liberalismia vaivaa?. Suomi"
+      ],
+      "authors": {
+        "primary": {
+          "Purokuru, Pontus": {
+            "role": [
+              "kirjoittaja"
+            ]
+          },
+          "Lahtinen, Veikka": {
+            "role": [
+              "-"
+            ]
+          }
+        },
+        "secondary": [],
+        "corporate": {
+          "Kosmos, kustantaja": {
+            "role": [
+              "kustantaja"
+            ]
+          }
+        }
+      },
+      "primaryAuthors": [
+        "Purokuru, Pontus",
+        "Lahtinen, Veikka"
+      ],
+      "nonPresenterAuthors": [
+        {
+          "name": "Purokuru, Pontus",
+          "role": "kirjoittaja",
+          "id": "https://isni.org/isni/0000000484131330",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Lahtinen, Veikka",
+          "role": "kirjoittaja",
+          "id": "https://isni.org/isni/0000000484148466",
+          "type": "Personal Name"
+        }
+      ],
+      "secondaryAuthors": [],
+      "corporateAuthors": [
+        "Kosmos, kustantaja"
+      ],
+      "isbns": [
+        "978-952-352-069-1 EPUB"
+      ],
+      "cleanIsbn": "9523520695",
+      "languages": [
+        "fin"
+      ],
+      "originalLanguages": [],
+      "publishers": [
+        "Kosmos"
+      ],
+      "publicationDates": [
+        "2020"
+      ],
+      "placesOfPublication": [
+        "Helsinki :"
+      ],
+      "year": "2020",
+      "physicalDescriptions": [
+        "1 verkkoaineisto (198 sivua)"
+      ],
+      "series": [],
+      "subjects": [
+        [
+          "liberalismi",
+          "ENNAKKOTIETO"
+        ],
+        [
+          "liberalismi",
+          "Ennakkotieto"
+        ],
+        [
+          "ideologiat",
+          "ENNAKKOTIETO"
+        ],
+        [
+          "poliittinen filosofia",
+          "ENNAKKOTIETO"
+        ],
+        [
+          "yhteiskuntafilosofia",
+          "ENNAKKOTIETO"
+        ],
+        [
+          "yhteiskuntakehitys",
+          "ENNAKKOTIETO"
+        ],
+        [
+          "yhteiskuntakritiikki",
+          "ENNAKKOTIETO"
+        ]
+      ],
+      "subjectsExtended": [
+        {
+          "heading": [
+            "liberalismi",
+            "ENNAKKOTIETO"
+          ],
+          "type": "topic",
+          "source": "yso/fin"
+        },
+        {
+          "heading": [
+            "liberalismi",
+            "Ennakkotieto"
+          ],
+          "type": "topic",
+          "source": "yso/fin"
+        },
+        {
+          "heading": [
+            "ideologiat",
+            "ENNAKKOTIETO"
+          ]
+        },
+        {
+          "heading": [
+            "liberalismi",
+            "ENNAKKOTIETO"
+          ]
+        },
+        {
+          "heading": [
+            "poliittinen filosofia",
+            "ENNAKKOTIETO"
+          ]
+        },
+        {
+          "heading": [
+            "yhteiskuntafilosofia",
+            "ENNAKKOTIETO"
+          ]
+        },
+        {
+          "heading": [
+            "yhteiskuntakehitys",
+            "ENNAKKOTIETO"
+          ]
+        },
+        {
+          "heading": [
+            "yhteiskuntakritiikki",
+            "ENNAKKOTIETO"
+          ]
+        }
+      ],
+      "genres": [],
+      "majorGenres": [
+        "nonfiction"
+      ],
+      "classifications": {
+        "ykl": [
+          "32.01"
+        ]
+      },
+      "images": [],
+      "imagesExtended": [],
+      "summary": [],
+      "sectors": [
+        {
+          "value": "0/lib/",
+          "translated": "Kirjasto"
+        },
+        {
+          "value": "1/lib/uni/",
+          "translated": "Yliopisto"
+        }
+      ],
+      "dedupIds": [
+        "jykdok.2273385",
+        "fikka.5444141"
+      ],
+      "fullRecord": "<?xml version=\"1.0\"?>\n<collection xmlns=\"http://www.loc.gov/MARC21/slim\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd\"><record><leader>00000cam a22000002i 4500</leader><controlfield tag=\"001\">016789368</controlfield><controlfield tag=\"003\">FI-MELINDA</controlfield><controlfield tag=\"005\">20260510220357.0</controlfield><controlfield tag=\"006\">m|||||o||d||||||||</controlfield><controlfield tag=\"007\">cr |||||||||||</controlfield><controlfield tag=\"008\">230102s2020    fi |||||o|||||||||0|fin||</controlfield><datafield tag=\"020\" ind1=\" \" ind2=\" \"><subfield code=\"a\">978-952-352-069-1</subfield><subfield code=\"q\">EPUB</subfield></datafield><datafield tag=\"035\" ind1=\" \" ind2=\" \"><subfield code=\"a\">FCC016789368</subfield></datafield><datafield tag=\"040\" ind1=\" \" ind2=\" \"><subfield code=\"b\">fin</subfield><subfield code=\"e\">rda</subfield><subfield code=\"d\">FI-NL</subfield></datafield><datafield tag=\"041\" ind1=\"0\" ind2=\" \"><subfield code=\"a\">fin</subfield></datafield><datafield tag=\"084\" ind1=\" \" ind2=\" \"><subfield code=\"a\">32.01</subfield><subfield code=\"2\">ykl</subfield></datafield><datafield tag=\"100\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Purokuru, Pontus,</subfield><subfield code=\"e\">kirjoittaja.</subfield><subfield code=\"0\">https://isni.org/isni/0000000484131330</subfield></datafield><datafield tag=\"240\" ind1=\"1\" ind2=\"0\"><subfield code=\"a\">Mikä liberalismia vaivaa?.</subfield><subfield code=\"l\">Suomi</subfield></datafield><datafield tag=\"245\" ind1=\"1\" ind2=\"0\"><subfield code=\"a\">Mikä liberalismia vaivaa?</subfield></datafield><datafield tag=\"264\" ind1=\" \" ind2=\"1\"><subfield code=\"a\">Helsinki :</subfield><subfield code=\"b\">Kosmos,</subfield><subfield code=\"c\">2020.</subfield></datafield><datafield tag=\"300\" ind1=\" \" ind2=\" \"><subfield code=\"a\">1 verkkoaineisto (198 sivua)</subfield></datafield><datafield tag=\"336\" ind1=\" \" ind2=\" \"><subfield code=\"a\">teksti</subfield><subfield code=\"b\">txt</subfield><subfield code=\"2\">rdacontent</subfield></datafield><datafield tag=\"337\" ind1=\" \" ind2=\" \"><subfield code=\"a\">tietokonekäyttöinen</subfield><subfield code=\"b\">c</subfield><subfield code=\"2\">rdamedia</subfield></datafield><datafield tag=\"338\" ind1=\" \" ind2=\" \"><subfield code=\"a\">verkkoaineisto</subfield><subfield code=\"b\">cr</subfield><subfield code=\"2\">rdacarrier</subfield></datafield><datafield tag=\"341\" ind1=\" \" ind2=\" \"><subfield code=\"a\">textual</subfield><subfield code=\"2\">sapdv</subfield></datafield><datafield tag=\"347\" ind1=\" \" ind2=\" \"><subfield code=\"a\">tekstitiedosto</subfield><subfield code=\"b\">EPUB</subfield></datafield><datafield tag=\"500\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Koneellisesti tuotettu tietue.</subfield></datafield><datafield tag=\"506\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Aineisto on käytettävissä vapaakappaletyöasemilla.</subfield><subfield code=\"f\">Online access with authorization</subfield><subfield code=\"2\">star</subfield></datafield><datafield tag=\"540\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Aineisto on käytettävissä tutkimus- ja muihin tarkoituksiin;</subfield><subfield code=\"b\">Kansalliskirjasto;</subfield><subfield code=\"c\">Laki kulttuuriaineistojen tallettamisesta ja säilyttämisestä</subfield><subfield code=\"u\">http://www.finlex.fi/fi/laki/ajantasa/2007/20071433</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">liberalismi</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"g\">ENNAKKOTIETO</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">liberalismi</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"g\">Ennakkotieto</subfield></datafield><datafield tag=\"653\" ind1=\" \" ind2=\" \"><subfield code=\"a\">ideologiat</subfield><subfield code=\"g\">ENNAKKOTIETO</subfield></datafield><datafield tag=\"653\" ind1=\" \" ind2=\" \"><subfield code=\"a\">liberalismi</subfield><subfield code=\"g\">ENNAKKOTIETO</subfield></datafield><datafield tag=\"653\" ind1=\" \" ind2=\" \"><subfield code=\"a\">poliittinen filosofia</subfield><subfield code=\"g\">ENNAKKOTIETO</subfield></datafield><datafield tag=\"653\" ind1=\" \" ind2=\" \"><subfield code=\"a\">yhteiskuntafilosofia</subfield><subfield code=\"g\">ENNAKKOTIETO</subfield></datafield><datafield tag=\"653\" ind1=\" \" ind2=\" \"><subfield code=\"a\">yhteiskuntakehitys</subfield><subfield code=\"g\">ENNAKKOTIETO</subfield></datafield><datafield tag=\"653\" ind1=\" \" ind2=\" \"><subfield code=\"a\">yhteiskuntakritiikki</subfield><subfield code=\"g\">ENNAKKOTIETO</subfield></datafield><datafield tag=\"700\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Lahtinen, Veikka,</subfield><subfield code=\"e\">kirjoittaja.</subfield><subfield code=\"0\">https://isni.org/isni/0000000484148466</subfield></datafield><datafield tag=\"710\" ind1=\"2\" ind2=\" \"><subfield code=\"a\">Kosmos,</subfield><subfield code=\"e\">kustantaja.</subfield></datafield><datafield tag=\"776\" ind1=\"0\" ind2=\" \"><subfield code=\"z\">978-952-352-068-4</subfield></datafield><datafield tag=\"776\" ind1=\"0\" ind2=\" \"><subfield code=\"z\">978-952-352-070-7</subfield></datafield><datafield tag=\"856\" ind1=\"4\" ind2=\"0\"><subfield code=\"u\">https://urn.fi/URN:ISBN:978-952-352-069-1</subfield><subfield code=\"z\">Käytettävissä vapaakappaletyöasemilla</subfield></datafield><datafield tag=\"999\" ind1=\" \" ind2=\" \"><subfield code=\"c\">2273385</subfield><subfield code=\"d\">2273385</subfield></datafield></record></collection>\n"
+    }
+  ],
+  "status": "OK"
+}

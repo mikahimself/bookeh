@@ -1,0 +1,1176 @@
+{
+  "resultCount": 5,
+  "records": [
+    {
+      "id": "heili.9b0863f1-0a4a-4395-bf24-e73d249c5a1b",
+      "recordPage": "/Record/heili.9b0863f1-0a4a-4395-bf24-e73d249c5a1b",
+      "formats": [
+        {
+          "value": "0/Book/",
+          "translated": "Kirja"
+        },
+        {
+          "value": "1/Book/AudioBook/",
+          "translated": "Äänikirja"
+        },
+        {
+          "value": "2/Book/AudioBook/Daisy/",
+          "translated": "Celia-äänikirja"
+        }
+      ],
+      "title": "Väkivallan historia",
+      "shortTitle": "Väkivallan historia",
+      "uniformTitles": [
+        "Histoire de la violence"
+      ],
+      "authors": {
+        "primary": {
+          "Louis, Édouard": {
+            "role": [
+              "kirjoittaja"
+            ]
+          },
+          "Toivanen, Lotta": {
+            "role": [
+              "-"
+            ]
+          },
+          "Mäkynen, Timo": {
+            "role": [
+              "-"
+            ]
+          }
+        },
+        "secondary": {
+          "Toivanen, Lotta 1965- kääntäjä": {
+            "role": [
+              "kääntäjä"
+            ]
+          },
+          "Mäkynen, Timo 1968- lukija": {
+            "role": [
+              "lukija"
+            ]
+          },
+          "Bellegueule, Eddy, 1992-": {
+            "role": [
+              "-"
+            ]
+          },
+          "Λουί, Εντουάρ, 1992-": {
+            "role": [
+              "-"
+            ]
+          }
+        },
+        "corporate": []
+      },
+      "primaryAuthors": [
+        "Louis, Édouard",
+        "Toivanen, Lotta",
+        "Mäkynen, Timo"
+      ],
+      "nonPresenterAuthors": [
+        {
+          "name": "Louis, Édouard",
+          "date": "1992-",
+          "role": "kirjoittaja",
+          "id": "000233160",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Toivanen, Lotta",
+          "date": "1965-",
+          "role": "kääntäjä",
+          "id": "000116517",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Mäkynen, Timo",
+          "date": "1968-",
+          "role": "lukija",
+          "id": "000139567",
+          "type": "Personal Name"
+        }
+      ],
+      "secondaryAuthors": [
+        "Toivanen, Lotta 1965- kääntäjä",
+        "Mäkynen, Timo 1968- lukija",
+        "Bellegueule, Eddy, 1992-",
+        "Λουί, Εντουάρ, 1992-"
+      ],
+      "corporateAuthors": [],
+      "isbns": [],
+      "languages": [
+        "fin"
+      ],
+      "originalLanguages": [],
+      "publishers": [
+        "Celia"
+      ],
+      "publicationDates": [
+        "2020"
+      ],
+      "placesOfPublication": [
+        "Helsinki"
+      ],
+      "year": "2020",
+      "physicalDescriptions": [
+        "1 CD-levy (Daisy) (4 h 56 min)"
+      ],
+      "series": [
+        {
+          "name": "Keltainen kirjasto",
+          "additional": "509"
+        }
+      ],
+      "subjects": [
+        [
+          "Louis, Édouard"
+        ],
+        [
+          "omaelämäkerrallisuus"
+        ],
+        [
+          "väkivalta"
+        ],
+        [
+          "raiskaus"
+        ],
+        [
+          "traumat"
+        ],
+        [
+          "homoseksuaalit"
+        ],
+        [
+          "miehet"
+        ],
+        [
+          "uhrit"
+        ],
+        [
+          "homoseksuaalisuus"
+        ]
+      ],
+      "subjectsExtended": [
+        {
+          "heading": [
+            "Louis, Édouard"
+          ],
+          "type": "personal name",
+          "source": "FI-ASTERI-N",
+          "id": "000233160",
+          "authType": "Personal Name"
+        },
+        {
+          "heading": [
+            "omaelämäkerrallisuus"
+          ],
+          "type": "topic",
+          "source": "kauno/fin",
+          "id": "http://www.yso.fi/onto/kauno/p146"
+        },
+        {
+          "heading": [
+            "väkivalta"
+          ],
+          "type": "topic",
+          "source": "kauno/fin",
+          "id": "http://www.yso.fi/onto/kauno/p2136"
+        },
+        {
+          "heading": [
+            "raiskaus"
+          ],
+          "type": "topic",
+          "source": "kauno/fin",
+          "id": "http://www.yso.fi/onto/kauno/p4018"
+        },
+        {
+          "heading": [
+            "traumat"
+          ],
+          "type": "topic",
+          "source": "kauno/fin",
+          "id": "http://www.yso.fi/onto/kauno/p988"
+        },
+        {
+          "heading": [
+            "homoseksuaalit"
+          ],
+          "type": "topic",
+          "source": "kauno/fin",
+          "id": "http://www.yso.fi/onto/kauno/p733"
+        },
+        {
+          "heading": [
+            "miehet"
+          ],
+          "type": "topic",
+          "source": "kauno/fin",
+          "id": "http://www.yso.fi/onto/kauno/p3104"
+        },
+        {
+          "heading": [
+            "uhrit"
+          ],
+          "type": "topic",
+          "source": "kauno/fin",
+          "id": "http://www.yso.fi/onto/kauno/p3940"
+        },
+        {
+          "heading": [
+            "homoseksuaalisuus"
+          ],
+          "type": "topic",
+          "source": "kauno/fin",
+          "id": "http://www.yso.fi/onto/kauno/p1233"
+        }
+      ],
+      "genres": [
+        "psykologiset romaanit",
+        "romaanit",
+        "kaunokirjallisuus",
+        "käännökset",
+        "ranskankielinen kirjallisuus",
+        "lukemisesteisten äänikirjat"
+      ],
+      "majorGenres": [
+        "fiction"
+      ],
+      "classifications": {
+        "ykl": [
+          "84.2"
+        ]
+      },
+      "images": [],
+      "imagesExtended": [],
+      "summary": [],
+      "sectors": [
+        {
+          "value": "0/lib/",
+          "translated": "Kirjasto"
+        },
+        {
+          "value": "1/lib/pub/",
+          "translated": "Yleinen"
+        }
+      ],
+      "dedupIds": [
+        "heili.9b0863f1-0a4a-4395-bf24-e73d249c5a1b",
+        "lastu.1906793"
+      ],
+      "fullRecord": "<?xml version=\"1.0\"?>\n<collection xmlns=\"http://www.loc.gov/MARC21/slim\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd\"><record><leader>00000 i   22000001  0000</leader><controlfield tag=\"001\">9b0863f1-0a4a-4395-bf24-e73d249c5a1b</controlfield><controlfield tag=\"003\">cdfc1036-0a87-4e11-8edf-bdbd516424f9</controlfield><controlfield tag=\"007\">s</controlfield><controlfield tag=\"008\">000000s2020       ||||f     |00| 1|fin||</controlfield><datafield tag=\"035\" ind1=\" \" ind2=\" \"><subfield code=\"a\">(FI-Heili)1431784</subfield></datafield><datafield tag=\"035\" ind1=\" \" ind2=\" \"><subfield code=\"a\">(FI-Heili)0001431784</subfield></datafield><datafield tag=\"084\" ind1=\" \" ind2=\" \"><subfield code=\"a\">84.2</subfield><subfield code=\"2\">ykl</subfield></datafield><datafield tag=\"100\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Louis, Édouard</subfield><subfield code=\"d\">1992-</subfield><subfield code=\"e\">kirjoittaja</subfield><subfield code=\"0\">000233160</subfield><subfield code=\"2\">FI-ASTERI-N</subfield></datafield><datafield tag=\"240\" ind1=\"1\" ind2=\"0\"><subfield code=\"a\">Histoire de la violence</subfield></datafield><datafield tag=\"245\" ind1=\" \" ind2=\"0\"><subfield code=\"a\">Väkivallan historia /</subfield><subfield code=\"c\">Édouard Louis ; suomentanut Lotta Toivanen</subfield></datafield><datafield tag=\"260\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Helsinki</subfield><subfield code=\"b\">Celia</subfield><subfield code=\"c\">2020</subfield></datafield><datafield tag=\"300\" ind1=\" \" ind2=\" \"><subfield code=\"a\">1 CD-levy (Daisy) (4 h 56 min)</subfield></datafield><datafield tag=\"336\" ind1=\" \" ind2=\" \"><subfield code=\"b\">spw</subfield></datafield><datafield tag=\"337\" ind1=\" \" ind2=\" \"><subfield code=\"b\">s</subfield></datafield><datafield tag=\"338\" ind1=\" \" ind2=\" \"><subfield code=\"b\">sd</subfield></datafield><datafield tag=\"490\" ind1=\"0\" ind2=\" \"><subfield code=\"a\">Keltainen kirjasto</subfield><subfield code=\"v\">509</subfield></datafield><datafield tag=\"500\" ind1=\" \" ind2=\" \"><subfield code=\"a\">DAISY</subfield></datafield><datafield tag=\"500\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Tämä kirja on tuotettu tekijänoikeuslain 17 §:n nojalla ainoastaan lukemisesteisten henkilöiden käyttöön.</subfield></datafield><datafield tag=\"500\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Lukija: Timo Mäkynen</subfield></datafield><datafield tag=\"500\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Laitteistovaatimukset: Daisy-lukulaite, MP3-tiedostoja toistava CD-soitin tai tietokone, johon on asennettu Daisy-lukuohjelma</subfield></datafield><datafield tag=\"500\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Alkuperäinen kieli: fre</subfield></datafield><datafield tag=\"600\" ind1=\"0\" ind2=\"7\"><subfield code=\"a\">Louis, Édouard</subfield><subfield code=\"0\">000233160</subfield><subfield code=\"2\">FI-ASTERI-N</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">omaelämäkerrallisuus</subfield><subfield code=\"2\">kauno/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p146</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p16155</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">väkivalta</subfield><subfield code=\"2\">kauno/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p2136</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">raiskaus</subfield><subfield code=\"2\">kauno/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p4018</subfield><subfield code=\"0\">http:/ www.yso.fi/onto/kauno/p4018</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">traumat</subfield><subfield code=\"2\">kauno/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p988</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p9794</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">homoseksuaalit</subfield><subfield code=\"2\">kauno/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p733</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">miehet</subfield><subfield code=\"2\">kauno/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p3104</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p8173</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">uhrit</subfield><subfield code=\"2\">kauno/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p3940</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p16056</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">homoseksuaalisuus</subfield><subfield code=\"2\">kauno/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p1233</subfield><subfield code=\"0\">http://urn.fi/URN:NBN:fi:au:kaunokki:42572</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">psykologiset romaanit</subfield><subfield code=\"2\">slm/fin</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">romaanit</subfield><subfield code=\"2\">slm/fin</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kaunokirjallisuus</subfield><subfield code=\"2\">slm/fin</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">käännökset</subfield><subfield code=\"2\">slm/fin</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">ranskankielinen kirjallisuus</subfield><subfield code=\"2\">local</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">lukemisesteisten äänikirjat</subfield><subfield code=\"2\">slm/fin</subfield></datafield><datafield tag=\"700\" ind1=\"3\" ind2=\" \"><subfield code=\"a\">Toivanen, Lotta</subfield><subfield code=\"d\">1965-</subfield><subfield code=\"e\">kääntäjä.</subfield><subfield code=\"0\">000116517</subfield><subfield code=\"2\">FI-ASTERI-N</subfield></datafield><datafield tag=\"700\" ind1=\"3\" ind2=\" \"><subfield code=\"a\">Mäkynen, Timo</subfield><subfield code=\"d\">1968-</subfield><subfield code=\"e\">lukija</subfield><subfield code=\"0\">000139567</subfield><subfield code=\"2\">FI-ASTERI-N</subfield></datafield><datafield tag=\"852\" ind1=\" \" ind2=\" \"><subfield code=\"a\">76ce464b-7b23-4aa2-afe6-583f5a3c195d</subfield><subfield code=\"b\">95a7847e-a913-40ed-9257-5c09afdc543e</subfield><subfield code=\"c\">833e7e5f-2eb4-4951-a1ad-df88d1eef1bb</subfield></datafield><datafield tag=\"856\" ind1=\" \" ind2=\" \"><subfield code=\"u\">https://media.kirjavalitys.fi/onix/description/9789520410650?format=html</subfield><subfield code=\"y\">Kuvaus</subfield><subfield code=\"z\">Kuvaus</subfield></datafield><datafield tag=\"900\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Bellegueule, Eddy, 1992-</subfield><subfield code=\"a\">Λουί, Εντουάρ, 1992-</subfield></datafield></record></collection>\n"
+    },
+    {
+      "id": "jykdok.2236833",
+      "recordPage": "/Record/jykdok.2236833",
+      "formats": [
+        {
+          "value": "0/Book/",
+          "translated": "Kirja"
+        },
+        {
+          "value": "1/Book/eBook/",
+          "translated": "E-kirja"
+        }
+      ],
+      "title": "Väkivallan historia",
+      "shortTitle": "Väkivallan historia",
+      "uniformTitles": [
+        "Histoire de la violence. Suomi (Toivanen)"
+      ],
+      "authors": {
+        "primary": {
+          "Louis, Édouard": {
+            "role": [
+              "kirjoittaja"
+            ]
+          },
+          "Toivanen, Lotta": {
+            "role": [
+              "-"
+            ]
+          },
+          "Tammi (yhtiö)": {
+            "role": [
+              "-"
+            ]
+          }
+        },
+        "secondary": {
+          "Toivanen, Lotta, kääntäjä": {
+            "role": [
+              "kääntäjä"
+            ]
+          }
+        },
+        "corporate": {
+          "Tammi (yhtiö), kustantaja, julkaisija": {
+            "role": [
+              "kustantaja"
+            ]
+          }
+        }
+      },
+      "primaryAuthors": [
+        "Louis, Édouard",
+        "Toivanen, Lotta",
+        "Tammi (yhtiö)"
+      ],
+      "nonPresenterAuthors": [
+        {
+          "name": "Louis, Édouard",
+          "role": "kirjoittaja",
+          "id": "(FI-ASTERI-N)000233160",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Toivanen, Lotta",
+          "role": "kääntäjä",
+          "id": "https://isni.org/isni/0000000484701954",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Tammi (yhtiö)",
+          "role": "kustantaja, julkaisija",
+          "id": "(FI-ASTERI-N)000038407",
+          "type": "Corporate Name"
+        }
+      ],
+      "secondaryAuthors": [
+        "Toivanen, Lotta, kääntäjä"
+      ],
+      "corporateAuthors": [
+        "Tammi (yhtiö), kustantaja, julkaisija"
+      ],
+      "isbns": [
+        "978-952-04-1254-8 EPUB"
+      ],
+      "cleanIsbn": "9520412549",
+      "languages": [
+        "fin"
+      ],
+      "originalLanguages": [
+        "fre"
+      ],
+      "publishers": [
+        "Tammi"
+      ],
+      "publicationDates": [
+        "2020"
+      ],
+      "placesOfPublication": [
+        "Helsinki :"
+      ],
+      "year": "2020",
+      "physicalDescriptions": [
+        "1 verkkoaineisto"
+      ],
+      "series": [
+        {
+          "name": "Keltainen kirjasto (sarja)"
+        },
+        {
+          "name": "Keltainen kirjasto"
+        }
+      ],
+      "subjects": [
+        [
+          "Louis, Édouard,",
+          "1992-"
+        ],
+        [
+          "homoseksuaalisuus",
+          "ENNAKKOTIETO"
+        ],
+        [
+          "homomiehet",
+          "ENNAKKOTIETO"
+        ],
+        [
+          "miehet",
+          "ENNAKKOTIETO"
+        ],
+        [
+          "omaelämäkerrallisuus",
+          "ENNAKKOTIETO"
+        ],
+        [
+          "raiskaus",
+          "ENNAKKOTIETO"
+        ],
+        [
+          "traumat",
+          "ENNAKKOTIETO"
+        ],
+        [
+          "uhrit",
+          "ENNAKKOTIETO"
+        ],
+        [
+          "väkivalta",
+          "ENNAKKOTIETO"
+        ]
+      ],
+      "subjectsExtended": [
+        {
+          "heading": [
+            "Louis, Édouard,",
+            "1992-"
+          ],
+          "type": "personal name",
+          "source": "unknown",
+          "id": "(FI-ASTERI-N)000233160",
+          "authType": "Personal Name"
+        },
+        {
+          "heading": [
+            "homoseksuaalisuus",
+            "ENNAKKOTIETO"
+          ]
+        },
+        {
+          "heading": [
+            "homomiehet",
+            "ENNAKKOTIETO"
+          ]
+        },
+        {
+          "heading": [
+            "miehet",
+            "ENNAKKOTIETO"
+          ]
+        },
+        {
+          "heading": [
+            "omaelämäkerrallisuus",
+            "ENNAKKOTIETO"
+          ]
+        },
+        {
+          "heading": [
+            "raiskaus",
+            "ENNAKKOTIETO"
+          ]
+        },
+        {
+          "heading": [
+            "traumat",
+            "ENNAKKOTIETO"
+          ]
+        },
+        {
+          "heading": [
+            "uhrit",
+            "ENNAKKOTIETO"
+          ]
+        },
+        {
+          "heading": [
+            "väkivalta",
+            "ENNAKKOTIETO"
+          ]
+        }
+      ],
+      "genres": [
+        "käännökset",
+        "psykologiset romaanit"
+      ],
+      "majorGenres": [
+        "fiction"
+      ],
+      "classifications": {
+        "ykl": [
+          "84.2"
+        ]
+      },
+      "images": [],
+      "imagesExtended": [],
+      "summary": [],
+      "sectors": [
+        {
+          "value": "0/lib/",
+          "translated": "Kirjasto"
+        },
+        {
+          "value": "1/lib/uni/",
+          "translated": "Yliopisto"
+        }
+      ],
+      "dedupIds": [
+        "jykdok.2236833",
+        "fikka.5442032"
+      ],
+      "fullRecord": "<?xml version=\"1.0\"?>\n<collection xmlns=\"http://www.loc.gov/MARC21/slim\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd\"><record><leader>00000cam a22000002i 4500</leader><controlfield tag=\"001\">016787303</controlfield><controlfield tag=\"003\">FI-MELINDA</controlfield><controlfield tag=\"005\">20260509202047.0</controlfield><controlfield tag=\"006\">m|||||o||d||||||||</controlfield><controlfield tag=\"007\">cr |||||||||||</controlfield><controlfield tag=\"008\">230102s2020    fi ||||eo|||| 000 f|fin |</controlfield><datafield tag=\"020\" ind1=\" \" ind2=\" \"><subfield code=\"a\">978-952-04-1254-8</subfield><subfield code=\"q\">EPUB</subfield></datafield><datafield tag=\"035\" ind1=\" \" ind2=\" \"><subfield code=\"a\">FCC016787303</subfield></datafield><datafield tag=\"040\" ind1=\" \" ind2=\" \"><subfield code=\"b\">fin</subfield><subfield code=\"e\">rda</subfield><subfield code=\"d\">FI-NL</subfield></datafield><datafield tag=\"041\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">fin</subfield><subfield code=\"h\">fre</subfield></datafield><datafield tag=\"072\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">87</subfield><subfield code=\"2\">kkaa</subfield></datafield><datafield tag=\"072\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">PQ</subfield><subfield code=\"2\">lcco</subfield></datafield><datafield tag=\"084\" ind1=\" \" ind2=\" \"><subfield code=\"a\">84.2</subfield><subfield code=\"2\">ykl</subfield></datafield><datafield tag=\"100\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Louis, Édouard,</subfield><subfield code=\"e\">kirjoittaja.</subfield><subfield code=\"0\">(FI-ASTERI-N)000233160</subfield></datafield><datafield tag=\"240\" ind1=\"1\" ind2=\"0\"><subfield code=\"a\">Histoire de la violence.</subfield><subfield code=\"l\">Suomi</subfield><subfield code=\"s\">(Toivanen)</subfield></datafield><datafield tag=\"245\" ind1=\"1\" ind2=\"0\"><subfield code=\"a\">Väkivallan historia.</subfield></datafield><datafield tag=\"264\" ind1=\" \" ind2=\"1\"><subfield code=\"a\">Helsinki :</subfield><subfield code=\"b\">Tammi,</subfield><subfield code=\"c\">2020.</subfield></datafield><datafield tag=\"300\" ind1=\" \" ind2=\" \"><subfield code=\"a\">1 verkkoaineisto</subfield></datafield><datafield tag=\"336\" ind1=\" \" ind2=\" \"><subfield code=\"a\">teksti</subfield><subfield code=\"b\">txt</subfield><subfield code=\"2\">rdacontent</subfield></datafield><datafield tag=\"337\" ind1=\" \" ind2=\" \"><subfield code=\"a\">tietokonekäyttöinen</subfield><subfield code=\"b\">c</subfield><subfield code=\"2\">rdamedia</subfield></datafield><datafield tag=\"338\" ind1=\" \" ind2=\" \"><subfield code=\"a\">verkkoaineisto</subfield><subfield code=\"b\">cr</subfield><subfield code=\"2\">rdacarrier</subfield></datafield><datafield tag=\"341\" ind1=\" \" ind2=\" \"><subfield code=\"a\">textual</subfield><subfield code=\"2\">sapdv</subfield></datafield><datafield tag=\"347\" ind1=\" \" ind2=\" \"><subfield code=\"a\">tekstitiedosto</subfield><subfield code=\"b\">EPUB</subfield></datafield><datafield tag=\"490\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Keltainen kirjasto</subfield></datafield><datafield tag=\"500\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Koneellisesti tuotettu tietue.</subfield></datafield><datafield tag=\"506\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Aineisto on käytettävissä vapaakappaletyöasemilla.</subfield><subfield code=\"f\">Online access with authorization</subfield><subfield code=\"2\">star</subfield></datafield><datafield tag=\"540\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Aineisto on käytettävissä tutkimus- ja muihin tarkoituksiin;</subfield><subfield code=\"b\">Kansalliskirjasto;</subfield><subfield code=\"c\">Laki kulttuuriaineistojen tallettamisesta ja säilyttämisestä</subfield><subfield code=\"u\">http://www.finlex.fi/fi/laki/ajantasa/2007/20071433</subfield></datafield><datafield tag=\"600\" ind1=\"1\" ind2=\"4\"><subfield code=\"a\">Louis, Édouard,</subfield><subfield code=\"d\">1992-</subfield><subfield code=\"0\">(FI-ASTERI-N)000233160</subfield></datafield><datafield tag=\"653\" ind1=\" \" ind2=\" \"><subfield code=\"a\">homoseksuaalisuus</subfield><subfield code=\"g\">ENNAKKOTIETO</subfield></datafield><datafield tag=\"653\" ind1=\" \" ind2=\" \"><subfield code=\"a\">homomiehet</subfield><subfield code=\"g\">ENNAKKOTIETO</subfield></datafield><datafield tag=\"653\" ind1=\" \" ind2=\" \"><subfield code=\"a\">miehet</subfield><subfield code=\"g\">ENNAKKOTIETO</subfield></datafield><datafield tag=\"653\" ind1=\" \" ind2=\" \"><subfield code=\"a\">omaelämäkerrallisuus</subfield><subfield code=\"g\">ENNAKKOTIETO</subfield></datafield><datafield tag=\"653\" ind1=\" \" ind2=\" \"><subfield code=\"a\">raiskaus</subfield><subfield code=\"g\">ENNAKKOTIETO</subfield></datafield><datafield tag=\"653\" ind1=\" \" ind2=\" \"><subfield code=\"a\">traumat</subfield><subfield code=\"g\">ENNAKKOTIETO</subfield></datafield><datafield tag=\"653\" ind1=\" \" ind2=\" \"><subfield code=\"a\">uhrit</subfield><subfield code=\"g\">ENNAKKOTIETO</subfield></datafield><datafield tag=\"653\" ind1=\" \" ind2=\" \"><subfield code=\"a\">väkivalta</subfield><subfield code=\"g\">ENNAKKOTIETO</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">käännökset</subfield><subfield code=\"2\">slm/fin</subfield><subfield code=\"0\">http://urn.fi/URN:NBN:fi:au:slm:s1044</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">psykologiset romaanit</subfield><subfield code=\"2\">slm/fin</subfield><subfield code=\"0\">http://urn.fi/URN:NBN:fi:au:slm:s604</subfield></datafield><datafield tag=\"700\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Toivanen, Lotta,</subfield><subfield code=\"e\">kääntäjä.</subfield><subfield code=\"0\">https://isni.org/isni/0000000484701954</subfield></datafield><datafield tag=\"710\" ind1=\"2\" ind2=\" \"><subfield code=\"a\">Tammi (yhtiö),</subfield><subfield code=\"e\">kustantaja,</subfield><subfield code=\"e\">julkaisija.</subfield><subfield code=\"0\">(FI-ASTERI-N)000038407</subfield></datafield><datafield tag=\"776\" ind1=\"0\" ind2=\" \"><subfield code=\"z\">978-952-04-1065-0</subfield></datafield><datafield tag=\"776\" ind1=\"0\" ind2=\" \"><subfield code=\"z\">978-952-04-1253-1</subfield></datafield><datafield tag=\"776\" ind1=\"0\" ind2=\" \"><subfield code=\"z\">978-952-04-4422-8</subfield></datafield><datafield tag=\"830\" ind1=\" \" ind2=\"0\"><subfield code=\"a\">Keltainen kirjasto (sarja)</subfield><subfield code=\"0\">(FI-ASTERI-W)000015233</subfield></datafield><datafield tag=\"856\" ind1=\"4\" ind2=\"0\"><subfield code=\"u\">https://urn.fi/URN:ISBN:978-952-04-1254-8</subfield><subfield code=\"z\">Käytettävissä vapaakappaletyöasemilla</subfield></datafield><datafield tag=\"999\" ind1=\" \" ind2=\" \"><subfield code=\"c\">2236833</subfield><subfield code=\"d\">2236833</subfield></datafield></record></collection>\n"
+    },
+    {
+      "id": "anders.f9ee67e9-8e4e-4df1-ae89-753f1f38bd84",
+      "recordPage": "/Record/anders.f9ee67e9-8e4e-4df1-ae89-753f1f38bd84",
+      "formats": [
+        {
+          "value": "0/Book/",
+          "translated": "Kirja"
+        },
+        {
+          "value": "1/Book/Book/",
+          "translated": "Kirja"
+        }
+      ],
+      "title": "Väkivallan historia",
+      "shortTitle": "Väkivallan historia",
+      "uniformTitles": [
+        "Histoire de la violence"
+      ],
+      "authors": {
+        "primary": {
+          "Louis, Édouard": {
+            "role": [
+              "kirjoittaja"
+            ]
+          },
+          "Toivanen, Lotta": {
+            "role": [
+              "-"
+            ]
+          }
+        },
+        "secondary": {
+          "Toivanen, Lotta 1965- kääntäjä": {
+            "role": [
+              "kääntäjä"
+            ]
+          },
+          "Bellegueule, Eddy, 1992-": {
+            "role": [
+              "-"
+            ]
+          },
+          "Λουί, Εντουάρ, 1992-": {
+            "role": [
+              "-"
+            ]
+          }
+        },
+        "corporate": []
+      },
+      "primaryAuthors": [
+        "Louis, Édouard",
+        "Toivanen, Lotta"
+      ],
+      "nonPresenterAuthors": [
+        {
+          "name": "Louis, Édouard",
+          "date": "1992-",
+          "role": "kirjoittaja",
+          "id": "000233160",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Toivanen, Lotta",
+          "date": "1965-",
+          "role": "kääntäjä",
+          "id": "000116517",
+          "type": "Personal Name"
+        }
+      ],
+      "secondaryAuthors": [
+        "Toivanen, Lotta 1965- kääntäjä",
+        "Bellegueule, Eddy, 1992-",
+        "Λουί, Εντουάρ, 1992-"
+      ],
+      "corporateAuthors": [],
+      "isbns": [
+        "978-952-04-1065-0"
+      ],
+      "cleanIsbn": "9520410651",
+      "languages": [
+        "fin"
+      ],
+      "originalLanguages": [],
+      "publishers": [
+        "Tammi"
+      ],
+      "publicationDates": [
+        "2020"
+      ],
+      "placesOfPublication": [
+        "Helsinki"
+      ],
+      "year": "2020",
+      "physicalDescriptions": [
+        "196 sivua"
+      ],
+      "series": [
+        {
+          "name": "Keltainen kirjasto",
+          "additional": "509"
+        }
+      ],
+      "subjects": [
+        [
+          "Louis, Édouard"
+        ],
+        [
+          "omaelämäkerrallisuus"
+        ],
+        [
+          "homoseksuaalisuus"
+        ],
+        [
+          "väkivalta"
+        ],
+        [
+          "raiskaus"
+        ],
+        [
+          "traumat"
+        ],
+        [
+          "homoseksuaalit"
+        ],
+        [
+          "miehet"
+        ],
+        [
+          "uhrit"
+        ]
+      ],
+      "subjectsExtended": [
+        {
+          "heading": [
+            "Louis, Édouard"
+          ],
+          "type": "personal name",
+          "source": "FI-ASTERI-N",
+          "id": "000233160",
+          "authType": "Personal Name"
+        },
+        {
+          "heading": [
+            "omaelämäkerrallisuus"
+          ],
+          "type": "topic",
+          "source": "kauno/fin",
+          "id": "http://www.yso.fi/onto/kauno/p146"
+        },
+        {
+          "heading": [
+            "homoseksuaalisuus"
+          ],
+          "type": "topic",
+          "source": "kauno/fin",
+          "id": "http://www.yso.fi/onto/kauno/p1233"
+        },
+        {
+          "heading": [
+            "väkivalta"
+          ],
+          "type": "topic",
+          "source": "kauno/fin",
+          "id": "http://www.yso.fi/onto/kauno/p2136"
+        },
+        {
+          "heading": [
+            "raiskaus"
+          ],
+          "type": "topic",
+          "source": "kauno/fin",
+          "id": "http://www.yso.fi/onto/kauno/p4018"
+        },
+        {
+          "heading": [
+            "traumat"
+          ],
+          "type": "topic",
+          "source": "kauno/fin",
+          "id": "http://www.yso.fi/onto/kauno/p988"
+        },
+        {
+          "heading": [
+            "homoseksuaalit"
+          ],
+          "type": "topic",
+          "source": "kauno/fin",
+          "id": "http://www.yso.fi/onto/kauno/p733"
+        },
+        {
+          "heading": [
+            "miehet"
+          ],
+          "type": "topic",
+          "source": "kauno/fin",
+          "id": "http://www.yso.fi/onto/kauno/p3104"
+        },
+        {
+          "heading": [
+            "uhrit"
+          ],
+          "type": "topic",
+          "source": "kauno/fin",
+          "id": "http://www.yso.fi/onto/kauno/p3940"
+        }
+      ],
+      "genres": [
+        "psykologiset romaanit",
+        "romaanit",
+        "kaunokirjallisuus",
+        "käännökset",
+        "ranskankielinen kirjallisuus"
+      ],
+      "majorGenres": [
+        "fiction"
+      ],
+      "classifications": {
+        "ykl": [
+          "84.2"
+        ]
+      },
+      "images": [],
+      "imagesExtended": [],
+      "summary": [],
+      "sectors": [
+        {
+          "value": "0/lib/",
+          "translated": "Kirjasto"
+        },
+        {
+          "value": "1/lib/pub/",
+          "translated": "Yleinen"
+        }
+      ],
+      "dedupIds": [
+        "anders.f9ee67e9-8e4e-4df1-ae89-753f1f38bd84",
+        "blanka.400c12cd-2e94-41b7-bb5b-981cf3d73405",
+        "diana.117865",
+        "eepos.2638688",
+        "heili.53b86073-8b63-49f1-986c-3827de8ef671",
+        "helle.1548265",
+        "helmet.2428671",
+        "tiekko.719941",
+        "jykdok.2058612",
+        "kainet.1205174",
+        "kangasniemi.6ec9e28c-469f-409e-a391-b469b30c1736",
+        "fikka.5440719",
+        "keski.3070979",
+        "kirkes.1419395",
+        "rise.42500",
+        "kuopio.1454536",
+        "kyyti.1414679",
+        "lapinkirjasto.1815982",
+        "lastu.1684454",
+        "lep.380750",
+        "louna.b989f628-1ded-4420-b969-9e6b747bd76d",
+        "lukki.856319",
+        "lumme.3027887",
+        "oy.9917656573106252",
+        "outi.2168203",
+        "jakobstad.4598f7f4-33ef-4836-a487-ac194cf7d52c",
+        "piki.4643122",
+        "ratamo.1636783",
+        "rutakko.20ecf635-49a7-482d-8419-bdaa8ad3af65",
+        "satakirjastot.1375798",
+        "siilinjarvi.566616",
+        "somero.74567ed5-51c1-42e4-8679-43ceb7362d43",
+        "utu.9922113437805971",
+        "vaarakirjastot.11564043",
+        "vaasa.69b304ac-1a8c-44d2-bf22-a33e6f80e6a5",
+        "vanamo.37e105a4-ce96-46e3-ba95-ec184c5da355",
+        "vaski.4051577",
+        "abo.9913513396605972"
+      ],
+      "fullRecord": "<?xml version=\"1.0\"?>\n<collection xmlns=\"http://www.loc.gov/MARC21/slim\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd\"><record><leader>00000 am  22000001  0000</leader><controlfield tag=\"001\">f9ee67e9-8e4e-4df1-ae89-753f1f38bd84</controlfield><controlfield tag=\"003\">38ce7306-5873-4a96-8ad7-d42bf004dbec</controlfield><controlfield tag=\"008\">000000s2020       ||||g     |00| 1|fin||</controlfield><datafield tag=\"035\" ind1=\" \" ind2=\" \"><subfield code=\"a\">(FI-Anders)1814824</subfield></datafield><datafield tag=\"035\" ind1=\" \" ind2=\" \"><subfield code=\"a\">(FI-Anders)0001814824</subfield></datafield><datafield tag=\"035\" ind1=\" \" ind2=\" \"><subfield code=\"a\">(FI-MELINDA)016786016</subfield></datafield><datafield tag=\"020\" ind1=\" \" ind2=\" \"><subfield code=\"a\">978-952-04-1065-0</subfield></datafield><datafield tag=\"084\" ind1=\" \" ind2=\" \"><subfield code=\"a\">84.2</subfield><subfield code=\"2\">ykl</subfield></datafield><datafield tag=\"100\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Louis, Édouard</subfield><subfield code=\"d\">1992-</subfield><subfield code=\"e\">kirjoittaja</subfield><subfield code=\"0\">000233160</subfield><subfield code=\"2\">FI-ASTERI-N</subfield></datafield><datafield tag=\"240\" ind1=\"1\" ind2=\"0\"><subfield code=\"a\">Histoire de la violence</subfield></datafield><datafield tag=\"245\" ind1=\" \" ind2=\"0\"><subfield code=\"a\">Väkivallan historia /</subfield><subfield code=\"c\">Édouard Louis ; suomentanut Lotta Toivanen</subfield></datafield><datafield tag=\"260\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Helsinki</subfield><subfield code=\"b\">Tammi</subfield><subfield code=\"c\">2020</subfield></datafield><datafield tag=\"300\" ind1=\" \" ind2=\" \"><subfield code=\"a\">196 sivua</subfield></datafield><datafield tag=\"336\" ind1=\" \" ind2=\" \"><subfield code=\"b\">txt</subfield></datafield><datafield tag=\"337\" ind1=\" \" ind2=\" \"><subfield code=\"b\">n</subfield></datafield><datafield tag=\"338\" ind1=\" \" ind2=\" \"><subfield code=\"b\">nc</subfield></datafield><datafield tag=\"490\" ind1=\"0\" ind2=\" \"><subfield code=\"a\">Keltainen kirjasto</subfield><subfield code=\"v\">509</subfield></datafield><datafield tag=\"500\" ind1=\" \" ind2=\" \"><subfield code=\"a\">sidottu</subfield></datafield><datafield tag=\"500\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Alkuperäinen kieli: fre</subfield></datafield><datafield tag=\"600\" ind1=\"0\" ind2=\"7\"><subfield code=\"a\">Louis, Édouard</subfield><subfield code=\"0\">000233160</subfield><subfield code=\"2\">FI-ASTERI-N</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">omaelämäkerrallisuus</subfield><subfield code=\"2\">kauno/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p146</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p16155</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">homoseksuaalisuus</subfield><subfield code=\"2\">kauno/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p1233</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">väkivalta</subfield><subfield code=\"2\">kauno/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p2136</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">raiskaus</subfield><subfield code=\"2\">kauno/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p4018</subfield><subfield code=\"0\">http:/ www.yso.fi/onto/kauno/p4018</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">traumat</subfield><subfield code=\"2\">kauno/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p988</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p9794</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">homoseksuaalit</subfield><subfield code=\"2\">kauno/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p733</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">miehet</subfield><subfield code=\"2\">kauno/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p3104</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">uhrit</subfield><subfield code=\"2\">kauno/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p3940</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p16056</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">psykologiset romaanit</subfield><subfield code=\"2\">slm/fin</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">romaanit</subfield><subfield code=\"2\">slm/fin</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kaunokirjallisuus</subfield><subfield code=\"2\">slm/fin</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">käännökset</subfield><subfield code=\"2\">slm/fin</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">ranskankielinen kirjallisuus</subfield><subfield code=\"2\">local</subfield></datafield><datafield tag=\"700\" ind1=\"3\" ind2=\" \"><subfield code=\"a\">Toivanen, Lotta</subfield><subfield code=\"d\">1965-</subfield><subfield code=\"e\">kääntäjä</subfield><subfield code=\"0\">000116517</subfield><subfield code=\"2\">FI-ASTERI-N</subfield></datafield><datafield tag=\"852\" ind1=\" \" ind2=\" \"><subfield code=\"a\">d984d9ac-4606-4c09-8c18-d8c31cb8506a</subfield><subfield code=\"b\">91a20927-50ba-4203-b27d-3359d02ab8fc</subfield><subfield code=\"c\">8b4b8fbc-d5ee-41e2-af7e-da3ed060e18f</subfield></datafield><datafield tag=\"852\" ind1=\" \" ind2=\" \"><subfield code=\"a\">d984d9ac-4606-4c09-8c18-d8c31cb8506a</subfield><subfield code=\"b\">8f8b0d98-60ef-4345-8d75-dc357a85fe99</subfield><subfield code=\"c\">04c731fa-6498-4017-8121-e8d3c13e593e</subfield></datafield><datafield tag=\"852\" ind1=\" \" ind2=\" \"><subfield code=\"a\">5c42fd73-5eee-4ae7-a679-92099a9a982a</subfield><subfield code=\"b\">cc75b551-dc4b-430f-9da9-64469370647a</subfield><subfield code=\"c\">d6a3ddd9-ee66-43a9-a3a3-5fe4329d126b</subfield></datafield><datafield tag=\"856\" ind1=\" \" ind2=\" \"><subfield code=\"u\">http://data.kirjavalitys.fi/data/servlets/ProductRequestServlet?action=getimage&amp;ISBN=9789520410650</subfield><subfield code=\"y\">Kansikuva</subfield><subfield code=\"z\">Kansikuva</subfield></datafield><datafield tag=\"856\" ind1=\" \" ind2=\" \"><subfield code=\"u\">https://media.kirjavalitys.fi/onix/description/9789520410650?format=html</subfield><subfield code=\"y\">Kuvaus</subfield><subfield code=\"z\">Kuvaus</subfield></datafield><datafield tag=\"900\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Bellegueule, Eddy, 1992-</subfield><subfield code=\"a\">Λουί, Εντουάρ, 1992-</subfield></datafield></record></collection>\n"
+    },
+    {
+      "id": "jykdok.2099831",
+      "recordPage": "/Record/jykdok.2099831",
+      "formats": [
+        {
+          "value": "0/Book/",
+          "translated": "Kirja"
+        },
+        {
+          "value": "1/Book/Book/",
+          "translated": "Kirja"
+        }
+      ],
+      "title": "Väkivallan historia",
+      "shortTitle": "Väkivallan historia",
+      "uniformTitles": [
+        "Histoire de la violence, suomi"
+      ],
+      "authors": {
+        "primary": {
+          "Louis, Édouard": {
+            "role": [
+              "kirjoittaja"
+            ]
+          },
+          "Toivanen, Lotta": {
+            "role": [
+              "-"
+            ]
+          }
+        },
+        "secondary": {
+          "Toivanen, Lotta, kääntäjä": {
+            "role": [
+              "kääntäjä"
+            ]
+          }
+        },
+        "corporate": []
+      },
+      "primaryAuthors": [
+        "Louis, Édouard",
+        "Toivanen, Lotta"
+      ],
+      "nonPresenterAuthors": [
+        {
+          "name": "Louis, Édouard",
+          "role": "kirjoittaja",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Toivanen, Lotta",
+          "role": "kääntäjä",
+          "id": "(FI-ASTERI-N)000116517",
+          "type": "Personal Name"
+        }
+      ],
+      "secondaryAuthors": [
+        "Toivanen, Lotta, kääntäjä"
+      ],
+      "corporateAuthors": [],
+      "isbns": [
+        "978-952-04-4422-8 pehmeäkantinen"
+      ],
+      "cleanIsbn": "952044422X",
+      "languages": [
+        "fin"
+      ],
+      "originalLanguages": [
+        "fre"
+      ],
+      "publishers": [
+        "Tammi"
+      ],
+      "publicationDates": [
+        "2022"
+      ],
+      "placesOfPublication": [
+        "Helsinki :"
+      ],
+      "year": "2022",
+      "physicalDescriptions": [
+        "196 sivua ; 18 cm"
+      ],
+      "series": [
+        {
+          "name": "Keltainen pokkari"
+        }
+      ],
+      "subjects": [],
+      "genres": [],
+      "majorGenres": [
+        "fiction"
+      ],
+      "classifications": {
+        "udkf": [
+          "840-3"
+        ],
+        "ykl": [
+          "84.2"
+        ]
+      },
+      "images": [],
+      "imagesExtended": [],
+      "summary": [],
+      "sectors": [
+        {
+          "value": "0/lib/",
+          "translated": "Kirjasto"
+        },
+        {
+          "value": "1/lib/uni/",
+          "translated": "Yliopisto"
+        }
+      ],
+      "dedupIds": [
+        "jykdok.2099831",
+        "fikka.5553573",
+        "kirkes.1519605",
+        "lumme.3075741",
+        "oy.9917806238106252",
+        "polamk.29235",
+        "utu.9922925844005971",
+        "vaski.4228225"
+      ],
+      "fullRecord": "<?xml version=\"1.0\"?>\n<collection xmlns=\"http://www.loc.gov/MARC21/slim\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd\"><record><leader>00000cam a2200000 i 4500</leader><controlfield tag=\"001\">018113305</controlfield><controlfield tag=\"003\">FI-MELINDA</controlfield><controlfield tag=\"005\">20220930143805.0</controlfield><controlfield tag=\"008\">211222t20222020fi ||||       |0| f|fin| </controlfield><datafield tag=\"020\" ind1=\" \" ind2=\" \"><subfield code=\"a\">978-952-04-4422-8</subfield><subfield code=\"q\">pehmeäkantinen</subfield></datafield><datafield tag=\"035\" ind1=\" \" ind2=\" \"><subfield code=\"a\">FCC018113305</subfield></datafield><datafield tag=\"040\" ind1=\" \" ind2=\" \"><subfield code=\"a\">FI-NL</subfield><subfield code=\"b\">fin</subfield><subfield code=\"e\">rda</subfield></datafield><datafield tag=\"041\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">fin</subfield><subfield code=\"h\">fre</subfield></datafield><datafield tag=\"080\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">840</subfield><subfield code=\"x\">-3</subfield><subfield code=\"2\">1974/fin/fennica</subfield></datafield><datafield tag=\"084\" ind1=\" \" ind2=\" \"><subfield code=\"a\">84.2</subfield><subfield code=\"2\">ykl</subfield></datafield><datafield tag=\"100\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Louis, Édouard,</subfield><subfield code=\"e\">kirjoittaja.</subfield></datafield><datafield tag=\"240\" ind1=\"1\" ind2=\"0\"><subfield code=\"a\">Histoire de la violence,</subfield><subfield code=\"l\">suomi</subfield></datafield><datafield tag=\"245\" ind1=\"1\" ind2=\"0\"><subfield code=\"a\">Väkivallan historia /</subfield><subfield code=\"c\">Édouard Louis ; suomentanut Lotta Toivanen.</subfield></datafield><datafield tag=\"264\" ind1=\" \" ind2=\"1\"><subfield code=\"a\">Helsinki :</subfield><subfield code=\"b\">Tammi,</subfield><subfield code=\"c\">[2022]</subfield></datafield><datafield tag=\"264\" ind1=\" \" ind2=\"3\"><subfield code=\"a\">EU:ssa</subfield></datafield><datafield tag=\"264\" ind1=\" \" ind2=\"4\"><subfield code=\"c\">©2020</subfield></datafield><datafield tag=\"300\" ind1=\" \" ind2=\" \"><subfield code=\"a\">196 sivua ;</subfield><subfield code=\"c\">18 cm</subfield></datafield><datafield tag=\"336\" ind1=\" \" ind2=\" \"><subfield code=\"a\">teksti</subfield><subfield code=\"b\">txt</subfield><subfield code=\"2\">rdacontent</subfield></datafield><datafield tag=\"337\" ind1=\" \" ind2=\" \"><subfield code=\"a\">käytettävissä ilman laitetta</subfield><subfield code=\"b\">n</subfield><subfield code=\"2\">rdamedia</subfield></datafield><datafield tag=\"338\" ind1=\" \" ind2=\" \"><subfield code=\"a\">nide</subfield><subfield code=\"b\">nc</subfield><subfield code=\"2\">rdacarrier</subfield></datafield><datafield tag=\"490\" ind1=\"0\" ind2=\" \"><subfield code=\"a\">Keltainen pokkari</subfield></datafield><datafield tag=\"500\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Ensimmäinen suomenkielinen painos ilmestyi 2020.</subfield></datafield><datafield tag=\"700\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Toivanen, Lotta,</subfield><subfield code=\"0\">(FI-ASTERI-N)000116517</subfield><subfield code=\"e\">kääntäjä.</subfield></datafield><datafield tag=\"942\" ind1=\" \" ind2=\" \"><subfield code=\"2\">z</subfield></datafield><datafield tag=\"999\" ind1=\" \" ind2=\" \"><subfield code=\"c\">2099831</subfield><subfield code=\"d\">2099831</subfield></datafield><datafield tag=\"952\" ind1=\" \" ind2=\" \"><subfield code=\"b\">KANAVUORI</subfield><subfield code=\"c\">1210</subfield><subfield code=\"o\">P pn 0358472</subfield><subfield code=\"9\">1</subfield></datafield></record></collection>\n"
+    },
+    {
+      "id": "jykdok.2296282",
+      "recordPage": "/Record/jykdok.2296282",
+      "formats": [
+        {
+          "value": "0/Book/",
+          "translated": "Kirja"
+        },
+        {
+          "value": "1/Book/AudioBook/",
+          "translated": "Äänikirja"
+        },
+        {
+          "value": "2/Book/AudioBook/Online/",
+          "translated": "E-äänikirja"
+        }
+      ],
+      "title": "Väkivallan historia",
+      "shortTitle": "Väkivallan historia",
+      "uniformTitles": [
+        "Histoire de la violence. Suomi (Toivanen). Puhe (Niemelä)"
+      ],
+      "authors": {
+        "primary": {
+          "Louis, Édouard": {
+            "role": [
+              "kirjoittaja"
+            ]
+          },
+          "Toivanen, Lotta": {
+            "role": [
+              "-"
+            ]
+          },
+          "Niemelä, Ville-Veikko": {
+            "role": [
+              "-"
+            ]
+          },
+          "Tammi (yhtiö)": {
+            "role": [
+              "-"
+            ]
+          }
+        },
+        "secondary": {
+          "Toivanen, Lotta, kääntäjä": {
+            "role": [
+              "kääntäjä"
+            ]
+          },
+          "Niemelä, Ville-Veikko, lukija": {
+            "role": [
+              "lukija"
+            ]
+          }
+        },
+        "corporate": {
+          "Tammi (yhtiö), kustantaja, julkaisija": {
+            "role": [
+              "kustantaja"
+            ]
+          }
+        }
+      },
+      "primaryAuthors": [
+        "Louis, Édouard",
+        "Toivanen, Lotta",
+        "Niemelä, Ville-Veikko",
+        "Tammi (yhtiö)"
+      ],
+      "nonPresenterAuthors": [
+        {
+          "name": "Louis, Édouard",
+          "role": "kirjoittaja",
+          "id": "(FI-ASTERI-N)000233160",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Toivanen, Lotta",
+          "role": "kääntäjä",
+          "id": "(FI-ASTERI-N)000116517",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Niemelä, Ville-Veikko",
+          "role": "lukija",
+          "id": "(FI-ASTERI-N)000233696",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Tammi (yhtiö)",
+          "role": "kustantaja, julkaisija",
+          "id": "(FI-ASTERI-N)000038407",
+          "type": "Corporate Name"
+        }
+      ],
+      "secondaryAuthors": [
+        "Toivanen, Lotta, kääntäjä",
+        "Niemelä, Ville-Veikko, lukija"
+      ],
+      "corporateAuthors": [
+        "Tammi (yhtiö), kustantaja, julkaisija"
+      ],
+      "isbns": [
+        "978-952-04-1253-1 MP3"
+      ],
+      "cleanIsbn": "9520412530",
+      "languages": [
+        "fin"
+      ],
+      "originalLanguages": [
+        "fre"
+      ],
+      "publishers": [
+        "Tammi"
+      ],
+      "publicationDates": [
+        "2020"
+      ],
+      "placesOfPublication": [
+        "Helsinki :"
+      ],
+      "year": "2020",
+      "physicalDescriptions": [
+        "1 verkkoaineisto (6 h 12 min)"
+      ],
+      "series": [
+        {
+          "name": "Keltainen kirjasto"
+        }
+      ],
+      "subjects": [
+        [
+          "Louis, Édouard,",
+          "1992-"
+        ],
+        [
+          "homoseksuaalisuus",
+          "ENNAKKOTIETO"
+        ],
+        [
+          "homoseksuaalit",
+          "ENNAKKOTIETO"
+        ],
+        [
+          "miehet",
+          "ENNAKKOTIETO"
+        ],
+        [
+          "omaelämäkerrallisuus",
+          "ENNAKKOTIETO"
+        ],
+        [
+          "raiskaus",
+          "ENNAKKOTIETO"
+        ],
+        [
+          "traumat",
+          "ENNAKKOTIETO"
+        ],
+        [
+          "uhrit",
+          "ENNAKKOTIETO"
+        ],
+        [
+          "väkivalta",
+          "ENNAKKOTIETO"
+        ]
+      ],
+      "subjectsExtended": [
+        {
+          "heading": [
+            "Louis, Édouard,",
+            "1992-"
+          ],
+          "type": "personal name",
+          "source": "unknown",
+          "id": "(FI-ASTERI-N)000233160",
+          "authType": "Personal Name"
+        },
+        {
+          "heading": [
+            "homoseksuaalisuus",
+            "ENNAKKOTIETO"
+          ]
+        },
+        {
+          "heading": [
+            "homoseksuaalit",
+            "ENNAKKOTIETO"
+          ]
+        },
+        {
+          "heading": [
+            "miehet",
+            "ENNAKKOTIETO"
+          ]
+        },
+        {
+          "heading": [
+            "omaelämäkerrallisuus",
+            "ENNAKKOTIETO"
+          ]
+        },
+        {
+          "heading": [
+            "raiskaus",
+            "ENNAKKOTIETO"
+          ]
+        },
+        {
+          "heading": [
+            "traumat",
+            "ENNAKKOTIETO"
+          ]
+        },
+        {
+          "heading": [
+            "uhrit",
+            "ENNAKKOTIETO"
+          ]
+        },
+        {
+          "heading": [
+            "väkivalta",
+            "ENNAKKOTIETO"
+          ]
+        }
+      ],
+      "genres": [
+        "äänikirjat",
+        "käännökset",
+        "psykologiset romaanit"
+      ],
+      "majorGenres": [
+        "fiction"
+      ],
+      "classifications": {
+        "ykl": [
+          "84.2"
+        ]
+      },
+      "images": [],
+      "imagesExtended": [],
+      "summary": [],
+      "sectors": [
+        {
+          "value": "0/lib/",
+          "translated": "Kirjasto"
+        },
+        {
+          "value": "1/lib/uni/",
+          "translated": "Yliopisto"
+        }
+      ],
+      "dedupIds": [
+        "jykdok.2296282",
+        "fikka.5443375"
+      ],
+      "fullRecord": "<?xml version=\"1.0\"?>\n<collection xmlns=\"http://www.loc.gov/MARC21/slim\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd\"><record><leader>00000cim a22000002i 4500</leader><controlfield tag=\"001\">016788617</controlfield><controlfield tag=\"003\">FI-MELINDA</controlfield><controlfield tag=\"005\">20260513003425.0</controlfield><controlfield tag=\"006\">m|||||o||h||||||||</controlfield><controlfield tag=\"007\">sr uunnnnnuneu</controlfield><controlfield tag=\"007\">cr nnannnuuuuu</controlfield><controlfield tag=\"008\">230308s2020    fi |||||o||||||f |||fin||</controlfield><datafield tag=\"020\" ind1=\" \" ind2=\" \"><subfield code=\"a\">978-952-04-1253-1</subfield><subfield code=\"q\">MP3</subfield></datafield><datafield tag=\"035\" ind1=\" \" ind2=\" \"><subfield code=\"a\">FCC016788617</subfield></datafield><datafield tag=\"040\" ind1=\" \" ind2=\" \"><subfield code=\"b\">fin</subfield><subfield code=\"e\">rda</subfield><subfield code=\"d\">FI-NL</subfield></datafield><datafield tag=\"041\" ind1=\"1\" ind2=\" \"><subfield code=\"d\">fin</subfield><subfield code=\"h\">fre</subfield></datafield><datafield tag=\"072\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">87</subfield><subfield code=\"2\">kkaa</subfield></datafield><datafield tag=\"072\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">PQ</subfield><subfield code=\"2\">lcco</subfield></datafield><datafield tag=\"084\" ind1=\" \" ind2=\" \"><subfield code=\"a\">84.2</subfield><subfield code=\"2\">ykl</subfield></datafield><datafield tag=\"100\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Louis, Édouard,</subfield><subfield code=\"e\">kirjoittaja.</subfield><subfield code=\"0\">(FI-ASTERI-N)000233160</subfield></datafield><datafield tag=\"240\" ind1=\"1\" ind2=\"0\"><subfield code=\"a\">Histoire de la violence.</subfield><subfield code=\"l\">Suomi</subfield><subfield code=\"s\">(Toivanen).</subfield><subfield code=\"h\">Puhe</subfield><subfield code=\"s\">(Niemelä)</subfield></datafield><datafield tag=\"245\" ind1=\"1\" ind2=\"0\"><subfield code=\"a\">Väkivallan historia.</subfield></datafield><datafield tag=\"264\" ind1=\" \" ind2=\"1\"><subfield code=\"a\">Helsinki :</subfield><subfield code=\"b\">Tammi,</subfield><subfield code=\"c\">2020.</subfield></datafield><datafield tag=\"300\" ind1=\" \" ind2=\" \"><subfield code=\"a\">1 verkkoaineisto (6 h 12 min)</subfield></datafield><datafield tag=\"306\" ind1=\" \" ind2=\" \"><subfield code=\"a\">061200</subfield></datafield><datafield tag=\"336\" ind1=\" \" ind2=\" \"><subfield code=\"a\">puhe</subfield><subfield code=\"b\">spw</subfield><subfield code=\"2\">rdacontent</subfield></datafield><datafield tag=\"337\" ind1=\" \" ind2=\" \"><subfield code=\"a\">tietokonekäyttöinen</subfield><subfield code=\"b\">c</subfield><subfield code=\"2\">rdamedia</subfield></datafield><datafield tag=\"338\" ind1=\" \" ind2=\" \"><subfield code=\"a\">verkkoaineisto</subfield><subfield code=\"b\">cr</subfield><subfield code=\"2\">rdacarrier</subfield></datafield><datafield tag=\"341\" ind1=\" \" ind2=\" \"><subfield code=\"a\">auditory</subfield><subfield code=\"2\">sapdv</subfield></datafield><datafield tag=\"344\" ind1=\" \" ind2=\" \"><subfield code=\"a\">digitaalinen</subfield></datafield><datafield tag=\"347\" ind1=\" \" ind2=\" \"><subfield code=\"a\">äänitiedosto</subfield><subfield code=\"b\">MP3</subfield></datafield><datafield tag=\"490\" ind1=\"0\" ind2=\" \"><subfield code=\"a\">Keltainen kirjasto</subfield></datafield><datafield tag=\"500\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Koneellisesti tuotettu tietue.</subfield></datafield><datafield tag=\"506\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Aineisto on käytettävissä vapaakappaletyöasemilla.</subfield><subfield code=\"f\">Online access with authorization</subfield><subfield code=\"2\">star</subfield></datafield><datafield tag=\"511\" ind1=\"0\" ind2=\" \"><subfield code=\"a\">Lukija: Ville-Veikko Niemelä.</subfield></datafield><datafield tag=\"540\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Aineisto on käytettävissä tutkimus- ja muihin tarkoituksiin;</subfield><subfield code=\"b\">Kansalliskirjasto;</subfield><subfield code=\"c\">Laki kulttuuriaineistojen tallettamisesta ja säilyttämisestä</subfield><subfield code=\"u\">http://www.finlex.fi/fi/laki/ajantasa/2007/20071433</subfield></datafield><datafield tag=\"600\" ind1=\"1\" ind2=\"4\"><subfield code=\"a\">Louis, Édouard,</subfield><subfield code=\"d\">1992-</subfield><subfield code=\"0\">(FI-ASTERI-N)000233160</subfield></datafield><datafield tag=\"653\" ind1=\" \" ind2=\" \"><subfield code=\"a\">homoseksuaalisuus</subfield><subfield code=\"g\">ENNAKKOTIETO</subfield></datafield><datafield tag=\"653\" ind1=\" \" ind2=\" \"><subfield code=\"a\">homoseksuaalit</subfield><subfield code=\"g\">ENNAKKOTIETO</subfield></datafield><datafield tag=\"653\" ind1=\" \" ind2=\" \"><subfield code=\"a\">miehet</subfield><subfield code=\"g\">ENNAKKOTIETO</subfield></datafield><datafield tag=\"653\" ind1=\" \" ind2=\" \"><subfield code=\"a\">omaelämäkerrallisuus</subfield><subfield code=\"g\">ENNAKKOTIETO</subfield></datafield><datafield tag=\"653\" ind1=\" \" ind2=\" \"><subfield code=\"a\">raiskaus</subfield><subfield code=\"g\">ENNAKKOTIETO</subfield></datafield><datafield tag=\"653\" ind1=\" \" ind2=\" \"><subfield code=\"a\">traumat</subfield><subfield code=\"g\">ENNAKKOTIETO</subfield></datafield><datafield tag=\"653\" ind1=\" \" ind2=\" \"><subfield code=\"a\">uhrit</subfield><subfield code=\"g\">ENNAKKOTIETO</subfield></datafield><datafield tag=\"653\" ind1=\" \" ind2=\" \"><subfield code=\"a\">väkivalta</subfield><subfield code=\"g\">ENNAKKOTIETO</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">äänikirjat</subfield><subfield code=\"2\">slm/fin</subfield><subfield code=\"0\">http://urn.fi/URN:NBN:fi:au:slm:s579</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">käännökset</subfield><subfield code=\"2\">slm/fin</subfield><subfield code=\"0\">http://urn.fi/URN:NBN:fi:au:slm:s1044</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">psykologiset romaanit</subfield><subfield code=\"2\">slm/fin</subfield><subfield code=\"0\">http://urn.fi/URN:NBN:fi:au:slm:s604</subfield></datafield><datafield tag=\"700\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Toivanen, Lotta,</subfield><subfield code=\"e\">kääntäjä.</subfield><subfield code=\"0\">(FI-ASTERI-N)000116517</subfield></datafield><datafield tag=\"700\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Niemelä, Ville-Veikko,</subfield><subfield code=\"e\">lukija.</subfield><subfield code=\"0\">(FI-ASTERI-N)000233696</subfield></datafield><datafield tag=\"710\" ind1=\"2\" ind2=\" \"><subfield code=\"a\">Tammi (yhtiö),</subfield><subfield code=\"e\">kustantaja,</subfield><subfield code=\"e\">julkaisija.</subfield><subfield code=\"0\">(FI-ASTERI-N)000038407</subfield></datafield><datafield tag=\"776\" ind1=\"0\" ind2=\" \"><subfield code=\"z\">978-952-04-1065-0</subfield></datafield><datafield tag=\"776\" ind1=\"0\" ind2=\" \"><subfield code=\"z\">978-952-04-1254-8</subfield></datafield><datafield tag=\"776\" ind1=\"0\" ind2=\" \"><subfield code=\"z\">978-952-04-4422-8</subfield></datafield><datafield tag=\"856\" ind1=\"4\" ind2=\"0\"><subfield code=\"u\">https://urn.fi/URN:ISBN:978-952-04-1253-1</subfield><subfield code=\"z\">Käytettävissä vapaakappaletyöasemilla</subfield></datafield><datafield tag=\"999\" ind1=\" \" ind2=\" \"><subfield code=\"c\">2296282</subfield><subfield code=\"d\">2296282</subfield></datafield></record></collection>\n"
+    }
+  ],
+  "status": "OK"
+}

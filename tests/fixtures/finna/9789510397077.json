@@ -1,0 +1,1679 @@
+{
+  "resultCount": 4,
+  "records": [
+    {
+      "id": "eepos.2281661",
+      "recordPage": "/Record/eepos.2281661",
+      "formats": [
+        {
+          "value": "0/Book/",
+          "translated": "Kirja"
+        },
+        {
+          "value": "1/Book/Book/",
+          "translated": "Kirja"
+        }
+      ],
+      "title": "Hytti nro 6",
+      "shortTitle": "Hytti nro 6",
+      "uniformTitles": [],
+      "authors": {
+        "primary": {
+          "Liksom, Rosa": {
+            "role": [
+              "-"
+            ]
+          }
+        },
+        "secondary": [],
+        "corporate": {
+          "Werner Söderström osakeyhtiö, kustantaja": {
+            "role": [
+              "kustantaja"
+            ]
+          }
+        }
+      },
+      "primaryAuthors": [
+        "Liksom, Rosa"
+      ],
+      "nonPresenterAuthors": [
+        {
+          "name": "Liksom, Rosa",
+          "date": "1958-",
+          "id": "(FI-ASTERI-N)000050819",
+          "type": "Personal Name"
+        }
+      ],
+      "secondaryAuthors": [],
+      "corporateAuthors": [
+        "Werner Söderström osakeyhtiö, kustantaja"
+      ],
+      "isbns": [
+        "978-951-0-39707-7 pehmeäkantinen"
+      ],
+      "cleanIsbn": "9510397075",
+      "languages": [
+        "fin"
+      ],
+      "originalLanguages": [],
+      "publishers": [
+        "WSOY"
+      ],
+      "publicationDates": [
+        "2012"
+      ],
+      "placesOfPublication": [
+        "Helsinki :"
+      ],
+      "year": "2012",
+      "edition": "[Uusi painos]",
+      "physicalDescriptions": [
+        "200 s. ; 18 cm"
+      ],
+      "series": [
+        {
+          "name": "Bon"
+        },
+        {
+          "name": "WSOY pokkari"
+        },
+        {
+          "name": "Bon-pokkarit"
+        },
+        {
+          "name": "Bon"
+        }
+      ],
+      "subjects": [
+        [
+          "Tyttö",
+          "(fiktiivinen hahmo)"
+        ],
+        [
+          "Vadim",
+          "(fiktiivinen hahmo)"
+        ],
+        [
+          "kerronta"
+        ],
+        [
+          "yhteiskuntakuvaus",
+          "Neuvostoliitto",
+          "1980-luku"
+        ],
+        [
+          "kansanelämä",
+          "totalitarismi"
+        ],
+        [
+          "elämänhallinta"
+        ],
+        [
+          "kaipaus",
+          "ystävät"
+        ],
+        [
+          "kohtaaminen",
+          "vieraat"
+        ],
+        [
+          "antisankarit",
+          "miehet"
+        ],
+        [
+          "kansanihmiset",
+          "venäläiset"
+        ],
+        [
+          "nuoret aikuiset",
+          "naiset"
+        ],
+        [
+          "suomalaiset",
+          "naiset"
+        ],
+        [
+          "opiskelijat",
+          "arkeologia"
+        ],
+        [
+          "matkustajat"
+        ],
+        [
+          "matkat",
+          "junat",
+          "Moskova",
+          "Ulan Bator"
+        ],
+        [
+          "kirjallisuuspalkinnot",
+          "Finlandia-palkinto",
+          "2011"
+        ]
+      ],
+      "subjectsExtended": [
+        {
+          "heading": [
+            "Tyttö",
+            "(fiktiivinen hahmo)"
+          ],
+          "type": "personal name",
+          "source": "unknown",
+          "authType": "Personal Name"
+        },
+        {
+          "heading": [
+            "Vadim",
+            "(fiktiivinen hahmo)"
+          ],
+          "type": "personal name",
+          "source": "unknown",
+          "authType": "Personal Name"
+        },
+        {
+          "heading": [
+            "kerronta"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "yhteiskuntakuvaus",
+            "Neuvostoliitto",
+            "1980-luku"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "kansanelämä",
+            "totalitarismi"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "elämänhallinta"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "kaipaus",
+            "ystävät"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "kohtaaminen",
+            "vieraat"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "antisankarit",
+            "miehet"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "kansanihmiset",
+            "venäläiset"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "nuoret aikuiset",
+            "naiset"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "suomalaiset",
+            "naiset"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "opiskelijat",
+            "arkeologia"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "matkustajat"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "matkat",
+            "junat",
+            "Moskova",
+            "Ulan Bator"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "kirjallisuuspalkinnot",
+            "Finlandia-palkinto",
+            "2011"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        }
+      ],
+      "genres": [
+        "kaunokirjallisuus",
+        "romaanit",
+        "pienoisromaanit",
+        "aikakausiromaanit"
+      ],
+      "majorGenres": [
+        "fiction"
+      ],
+      "classifications": {
+        "ykl": [
+          "84.2"
+        ]
+      },
+      "images": [],
+      "imagesExtended": [],
+      "summary": [],
+      "sectors": [
+        {
+          "value": "0/lib/",
+          "translated": "Kirjasto"
+        },
+        {
+          "value": "1/lib/pub/",
+          "translated": "Yleinen"
+        }
+      ],
+      "dedupIds": [
+        "eepos.2281661",
+        "helmet.2081485",
+        "jykdok.1258804",
+        "fikka.4169687",
+        "lastu.208307",
+        "lumme.1703047",
+        "oy.9912081503906252",
+        "outi.1327487",
+        "piki.3406579",
+        "ratamo.412343",
+        "rutakko.d69ceaf6-9408-4382-947d-6da1ddd116fc",
+        "utu.9915905265405971",
+        "vaarakirjastot.459724",
+        "vaasa.632fe7d1-fd42-4ace-b917-a2b320dce521",
+        "vaski.2806581",
+        "abo.9911496133405972"
+      ],
+      "fullRecord": "<?xml version=\"1.0\"?>\n<collection xmlns=\"http://www.loc.gov/MARC21/slim\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd\"><record><leader>00000nam a22000004i 4500</leader><controlfield tag=\"001\">2281661</controlfield><controlfield tag=\"003\">ANDL100007</controlfield><controlfield tag=\"005\">20241031082824.1</controlfield><controlfield tag=\"008\">130115s2012    fi ||||      |00| f|fin| </controlfield><datafield tag=\"020\" ind1=\" \" ind2=\" \"><subfield code=\"a\">978-951-0-39707-7</subfield><subfield code=\"q\">pehmeäkantinen</subfield></datafield><datafield tag=\"035\" ind1=\" \" ind2=\" \"><subfield code=\"a\">(FI-KV)0beab1a4249645d5bac9ad9061dd4645</subfield></datafield><datafield tag=\"035\" ind1=\" \" ind2=\" \"><subfield code=\"a\">(FI-MELINDA)006117408</subfield></datafield><datafield tag=\"040\" ind1=\" \" ind2=\" \"><subfield code=\"a\">FI-NL</subfield><subfield code=\"b\">fin</subfield></datafield><datafield tag=\"041\" ind1=\"0\" ind2=\" \"><subfield code=\"a\">fin</subfield></datafield><datafield tag=\"042\" ind1=\" \" ind2=\" \"><subfield code=\"a\">finb</subfield></datafield><datafield tag=\"084\" ind1=\" \" ind2=\" \"><subfield code=\"a\">84.2</subfield><subfield code=\"2\">ykl</subfield></datafield><datafield tag=\"100\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Liksom, Rosa,</subfield><subfield code=\"d\">1958-</subfield><subfield code=\"0\">(FI-ASTERI-N)000050819</subfield></datafield><datafield tag=\"245\" ind1=\"1\" ind2=\"0\"><subfield code=\"a\">Hytti nro 6 /</subfield><subfield code=\"c\">Rosa Liksom.</subfield></datafield><datafield tag=\"246\" ind1=\"3\" ind2=\" \"><subfield code=\"a\">Hytti numero kuusi</subfield></datafield><datafield tag=\"250\" ind1=\" \" ind2=\" \"><subfield code=\"a\">[Uusi painos]</subfield></datafield><datafield tag=\"260\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Helsinki :</subfield><subfield code=\"b\">WSOY,</subfield><subfield code=\"c\">[2012]</subfield><subfield code=\"e\">(painettu EU:ssa)</subfield></datafield><datafield tag=\"300\" ind1=\" \" ind2=\" \"><subfield code=\"a\">200 s. ;</subfield><subfield code=\"c\">18 cm</subfield></datafield><datafield tag=\"336\" ind1=\" \" ind2=\" \"><subfield code=\"a\">teksti</subfield><subfield code=\"b\">txt</subfield><subfield code=\"2\">rdacontent</subfield></datafield><datafield tag=\"337\" ind1=\" \" ind2=\" \"><subfield code=\"a\">käytettävissä ilman laitetta</subfield><subfield code=\"b\">n</subfield><subfield code=\"2\">rdamedia</subfield></datafield><datafield tag=\"338\" ind1=\" \" ind2=\" \"><subfield code=\"a\">nide</subfield><subfield code=\"b\">nc</subfield><subfield code=\"2\">rdacarrier</subfield></datafield><datafield tag=\"490\" ind1=\"0\" ind2=\" \"><subfield code=\"a\">WSOY pokkari</subfield></datafield><datafield tag=\"490\" ind1=\"0\" ind2=\" \"><subfield code=\"a\">Bon-pokkarit</subfield></datafield><datafield tag=\"490\" ind1=\"0\" ind2=\" \"><subfield code=\"a\">Bon</subfield></datafield><datafield tag=\"500\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Ensimmäinen painos ilmestyi 2011.</subfield></datafield><datafield tag=\"500\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Kannessa myös: Juna kiitää kohti itää ja kaikki odottavat aamua.</subfield></datafield><datafield tag=\"586\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Finlandia-palkinto, 2011</subfield></datafield><datafield tag=\"600\" ind1=\"0\" ind2=\"4\"><subfield code=\"a\">Tyttö</subfield><subfield code=\"c\">(fiktiivinen hahmo)</subfield></datafield><datafield tag=\"600\" ind1=\"0\" ind2=\"4\"><subfield code=\"a\">Vadim</subfield><subfield code=\"c\">(fiktiivinen hahmo)</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kerronta</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">yhteiskuntakuvaus</subfield><subfield code=\"z\">Neuvostoliitto</subfield><subfield code=\"y\">1980-luku</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kansanelämä</subfield><subfield code=\"x\">totalitarismi</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">elämänhallinta</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kaipaus</subfield><subfield code=\"x\">ystävät</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kohtaaminen</subfield><subfield code=\"x\">vieraat</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">antisankarit</subfield><subfield code=\"x\">miehet</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kansanihmiset</subfield><subfield code=\"x\">venäläiset</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">nuoret aikuiset</subfield><subfield code=\"x\">naiset</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">suomalaiset</subfield><subfield code=\"x\">naiset</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">opiskelijat</subfield><subfield code=\"x\">arkeologia</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">matkustajat</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">matkat</subfield><subfield code=\"x\">junat</subfield><subfield code=\"z\">Moskova</subfield><subfield code=\"z\">Ulan Bator</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kirjallisuuspalkinnot</subfield><subfield code=\"x\">Finlandia-palkinto</subfield><subfield code=\"y\">2011</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kaunokirjallisuus</subfield><subfield code=\"2\">slm/fin</subfield><subfield code=\"0\">http://urn.fi/URN:NBN:fi:au:slm:s975</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">romaanit</subfield><subfield code=\"2\">slm/fin</subfield><subfield code=\"0\">http://urn.fi/URN:NBN:fi:au:slm:s518</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">pienoisromaanit</subfield><subfield code=\"2\">slm/fin</subfield><subfield code=\"0\">http://urn.fi/URN:NBN:fi:au:slm:s388</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">aikakausiromaanit</subfield><subfield code=\"2\">slm/fin</subfield><subfield code=\"0\">http://urn.fi/URN:NBN:fi:au:slm:s848</subfield></datafield><datafield tag=\"710\" ind1=\"2\" ind2=\" \"><subfield code=\"a\">Werner Söderström osakeyhtiö,</subfield><subfield code=\"e\">kustantaja.</subfield><subfield code=\"0\">(FI-ASTERI-N)000006477</subfield></datafield><datafield tag=\"830\" ind1=\" \" ind2=\"0\"><subfield code=\"a\">Bon.</subfield></datafield><datafield tag=\"852\" ind1=\" \" ind2=\" \"><subfield code=\"a\">31</subfield><subfield code=\"b\">406</subfield><subfield code=\"c\">1</subfield></datafield><datafield tag=\"856\" ind1=\"4\" ind2=\"2\"><subfield code=\"q\">image/jpeg</subfield><subfield code=\"u\">http://data.kirjavalitys.fi/data/servlets/ProductRequestServlet?action=getimage&amp;ISBN=9789510397077</subfield><subfield code=\"z\">Kansikuva</subfield></datafield><datafield tag=\"856\" ind1=\"4\" ind2=\"2\"><subfield code=\"q\">text/html</subfield><subfield code=\"u\">http://data.kirjavalitys.fi/data/servlets/ProductRequestServlet?action=showreferat&amp;ISBN=9789510397077</subfield><subfield code=\"z\">Kuvaus</subfield></datafield></record></collection>\n"
+    },
+    {
+      "id": "anders.9637a3e3-0ced-4171-b86c-a223b3b601a0",
+      "recordPage": "/Record/anders.9637a3e3-0ced-4171-b86c-a223b3b601a0",
+      "formats": [
+        {
+          "value": "0/Book/",
+          "translated": "Kirja"
+        },
+        {
+          "value": "1/Book/Book/",
+          "translated": "Kirja"
+        }
+      ],
+      "title": "Hytti nro 6 / kertomus",
+      "shortTitle": "Hytti nro 6",
+      "subTitle": "kertomus",
+      "uniformTitles": [],
+      "authors": {
+        "primary": {
+          "Liksom, Rosa": {
+            "role": [
+              "författare"
+            ]
+          }
+        },
+        "secondary": {
+          "Ликсом, Роза, 1958-": {
+            "role": [
+              "-"
+            ]
+          },
+          "Liksoma, Roza, 1958-": {
+            "role": [
+              "-"
+            ]
+          },
+          "Ylävaara, Anni, 1958-": {
+            "role": [
+              "-"
+            ]
+          }
+        },
+        "corporate": []
+      },
+      "primaryAuthors": [
+        "Liksom, Rosa"
+      ],
+      "nonPresenterAuthors": [
+        {
+          "name": "Liksom, Rosa",
+          "date": "1958-",
+          "role": "författare",
+          "id": "000050819",
+          "type": "Personal Name"
+        }
+      ],
+      "secondaryAuthors": [
+        "Ликсом, Роза, 1958-",
+        "Liksoma, Roza, 1958-",
+        "Ylävaara, Anni, 1958-"
+      ],
+      "corporateAuthors": [],
+      "isbns": [
+        "978-951-0-38274-5"
+      ],
+      "cleanIsbn": "9510382744",
+      "languages": [
+        "fin"
+      ],
+      "originalLanguages": [],
+      "publishers": [
+        "WSOY"
+      ],
+      "publicationDates": [
+        "2011"
+      ],
+      "placesOfPublication": [
+        "Helsinki"
+      ],
+      "year": "2011",
+      "physicalDescriptions": [
+        "186 s."
+      ],
+      "series": [],
+      "subjects": [
+        [
+          "Tyttö"
+        ],
+        [
+          "Vadim"
+        ],
+        [
+          "1980-luku"
+        ],
+        [
+          "suomenkielinen kirjallisuus"
+        ],
+        [
+          "suomen kieli"
+        ],
+        [
+          "matkustajat"
+        ],
+        [
+          "junat"
+        ],
+        [
+          "junamatkailu"
+        ],
+        [
+          "naiset"
+        ],
+        [
+          "suomalaiset"
+        ],
+        [
+          "miehet"
+        ],
+        [
+          "antisankarit"
+        ],
+        [
+          "venäläiset"
+        ],
+        [
+          "kohtaaminen"
+        ],
+        [
+          "kansanelämä"
+        ],
+        [
+          "yhteiskuntakuvaus"
+        ],
+        [
+          "kaunokirjallisuus"
+        ],
+        [
+          "totalitarismi"
+        ],
+        [
+          "elämänhallinta"
+        ],
+        [
+          "kaipaus"
+        ],
+        [
+          "ystävät"
+        ],
+        [
+          "nuoret aikuiset"
+        ],
+        [
+          "matkat"
+        ],
+        [
+          "opiskelijat"
+        ],
+        [
+          "aikakausiromaanit"
+        ],
+        [
+          "pienoisromaanit"
+        ],
+        [
+          "äänikirjat"
+        ],
+        [
+          "kerronta"
+        ],
+        [
+          "yhteiskuntakuvaus",
+          "1980-luku",
+          "Neuvostoliitto"
+        ],
+        [
+          "kansanelämä",
+          "totalitarismi"
+        ],
+        [
+          "kaipaus",
+          "ystävät"
+        ],
+        [
+          "kohtaaminen",
+          "vieraat"
+        ],
+        [
+          "antisankarit",
+          "miehet"
+        ],
+        [
+          "kansanihmiset",
+          "venäläiset"
+        ],
+        [
+          "nuoret aikuiset",
+          "naiset"
+        ],
+        [
+          "suomalaiset",
+          "naiset"
+        ],
+        [
+          "opiskelijat",
+          "arkeologia"
+        ],
+        [
+          "matkat",
+          "junat",
+          "Moskova",
+          "Ulan Bator"
+        ],
+        [
+          "kirjallisuuspalkinnot",
+          "2011",
+          "Finlandia-palkinto"
+        ],
+        [
+          "vieraat"
+        ],
+        [
+          "kansanihmiset"
+        ],
+        [
+          "arkeologia"
+        ],
+        [
+          "1980-talet"
+        ],
+        [
+          "berättande"
+        ],
+        [
+          "samhällsskildring"
+        ],
+        [
+          "folkliv"
+        ],
+        [
+          "totalitarism"
+        ],
+        [
+          "livskompetens"
+        ],
+        [
+          "längtan"
+        ],
+        [
+          "vänner"
+        ],
+        [
+          "mötande"
+        ],
+        [
+          "främlingar"
+        ],
+        [
+          "antihjältar"
+        ],
+        [
+          "män"
+        ],
+        [
+          "män och kvinnor av folket"
+        ],
+        [
+          "ryssar"
+        ],
+        [
+          "unga vuxna"
+        ],
+        [
+          "kvinnor"
+        ],
+        [
+          "finländare"
+        ],
+        [
+          "studerande"
+        ],
+        [
+          "resenärer"
+        ],
+        [
+          "resor"
+        ],
+        [
+          "tåg"
+        ],
+        [
+          "Neuvostoliitto"
+        ],
+        [
+          "Moskova"
+        ],
+        [
+          "Ulan Bator"
+        ],
+        [
+          "Sovjetunionen"
+        ],
+        [
+          "Moskva"
+        ],
+        [
+          "Mongoliet"
+        ]
+      ],
+      "subjectsExtended": [
+        {
+          "heading": [
+            "Tyttö"
+          ],
+          "type": "personal name",
+          "source": "unknown",
+          "authType": "Personal Name"
+        },
+        {
+          "heading": [
+            "Vadim"
+          ],
+          "type": "personal name",
+          "source": "unknown",
+          "authType": "Personal Name"
+        },
+        {
+          "heading": [
+            "1980-luku"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p6198061989"
+        },
+        {
+          "heading": [
+            "suomenkielinen kirjallisuus"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p16810"
+        },
+        {
+          "heading": [
+            "suomen kieli"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p8856"
+        },
+        {
+          "heading": [
+            "matkustajat"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p16047"
+        },
+        {
+          "heading": [
+            "junat"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p5483"
+        },
+        {
+          "heading": [
+            "junamatkailu"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p1416"
+        },
+        {
+          "heading": [
+            "naiset"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p16991"
+        },
+        {
+          "heading": [
+            "suomalaiset"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p3180"
+        },
+        {
+          "heading": [
+            "miehet"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p8173"
+        },
+        {
+          "heading": [
+            "antisankarit"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p21016"
+        },
+        {
+          "heading": [
+            "venäläiset"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p1208"
+        },
+        {
+          "heading": [
+            "kohtaaminen"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p22700"
+        },
+        {
+          "heading": [
+            "kansanelämä"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p3687"
+        },
+        {
+          "heading": [
+            "yhteiskuntakuvaus"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p4187"
+        },
+        {
+          "heading": [
+            "kaunokirjallisuus"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p4"
+        },
+        {
+          "heading": [
+            "totalitarismi"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p8526"
+        },
+        {
+          "heading": [
+            "elämänhallinta"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p4357"
+        },
+        {
+          "heading": [
+            "kaipaus"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p12790"
+        },
+        {
+          "heading": [
+            "ystävät"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p20879"
+        },
+        {
+          "heading": [
+            "nuoret aikuiset"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p15979"
+        },
+        {
+          "heading": [
+            "matkat"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p366"
+        },
+        {
+          "heading": [
+            "opiskelijat"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p16486"
+        },
+        {
+          "heading": [
+            "aikakausiromaanit"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "pienoisromaanit"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "äänikirjat"
+          ],
+          "type": "topic",
+          "source": "kaunokki",
+          "id": "http://www.yso.fi/onto/kauno/p757"
+        },
+        {
+          "heading": [
+            "kerronta"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "yhteiskuntakuvaus",
+            "1980-luku",
+            "Neuvostoliitto"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "kansanelämä",
+            "totalitarismi"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "elämänhallinta"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "kaipaus",
+            "ystävät"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "kohtaaminen",
+            "vieraat"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "antisankarit",
+            "miehet"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "kansanihmiset",
+            "venäläiset"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "nuoret aikuiset",
+            "naiset"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "suomalaiset",
+            "naiset"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "opiskelijat",
+            "arkeologia"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "matkustajat"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "matkat",
+            "junat",
+            "Moskova",
+            "Ulan Bator"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "kirjallisuuspalkinnot",
+            "2011",
+            "Finlandia-palkinto"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "kerronta"
+          ],
+          "type": "topic",
+          "source": "kauno/fin",
+          "id": "http://www.yso.fi/onto/kauno/p5514"
+        },
+        {
+          "heading": [
+            "yhteiskuntakuvaus"
+          ],
+          "type": "topic",
+          "source": "kauno/fin",
+          "id": "http://www.yso.fi/onto/kauno/p6574"
+        },
+        {
+          "heading": [
+            "kansanelämä"
+          ],
+          "type": "topic",
+          "source": "kauno/fin",
+          "id": "http://www.yso.fi/onto/kauno/p3822"
+        },
+        {
+          "heading": [
+            "totalitarismi"
+          ],
+          "type": "topic",
+          "source": "kauno/fin",
+          "id": "http://www.yso.fi/onto/kauno/p559"
+        },
+        {
+          "heading": [
+            "elämänhallinta"
+          ],
+          "type": "topic",
+          "source": "kauno/fin",
+          "id": "http://www.yso.fi/onto/kauno/p382"
+        },
+        {
+          "heading": [
+            "kaipaus"
+          ],
+          "type": "topic",
+          "source": "kauno/fin",
+          "id": "http://www.yso.fi/onto/kauno/p2538"
+        },
+        {
+          "heading": [
+            "ystävät"
+          ],
+          "type": "topic",
+          "source": "kauno/fin",
+          "id": "http://www.yso.fi/onto/kauno/p2191"
+        },
+        {
+          "heading": [
+            "kohtaaminen"
+          ],
+          "type": "topic",
+          "source": "kauno/fin",
+          "id": "http://www.yso.fi/onto/kauno/p2746"
+        },
+        {
+          "heading": [
+            "vieraat"
+          ],
+          "type": "topic",
+          "source": "kauno/fin",
+          "id": "http://www.yso.fi/onto/kauno/p3906"
+        },
+        {
+          "heading": [
+            "antisankarit"
+          ],
+          "type": "topic",
+          "source": "kauno/fin",
+          "id": "http://www.yso.fi/onto/kauno/p2734"
+        },
+        {
+          "heading": [
+            "miehet"
+          ],
+          "type": "topic",
+          "source": "kauno/fin",
+          "id": "http://www.yso.fi/onto/kauno/p3104"
+        },
+        {
+          "heading": [
+            "kansanihmiset"
+          ],
+          "type": "topic",
+          "source": "kauno/fin",
+          "id": "http://www.yso.fi/onto/kauno/p5045"
+        },
+        {
+          "heading": [
+            "venäläiset"
+          ],
+          "type": "topic",
+          "source": "kauno/fin",
+          "id": "http://www.yso.fi/onto/yso/p1208"
+        },
+        {
+          "heading": [
+            "nuoret aikuiset"
+          ],
+          "type": "topic",
+          "source": "kauno/fin",
+          "id": "http://www.yso.fi/onto/kauno/p3419"
+        },
+        {
+          "heading": [
+            "naiset"
+          ],
+          "type": "topic",
+          "source": "kauno/fin",
+          "id": "http://www.yso.fi/onto/kauno/p3043"
+        },
+        {
+          "heading": [
+            "suomalaiset"
+          ],
+          "type": "topic",
+          "source": "kauno/fin",
+          "id": "http://www.yso.fi/onto/kauno/p2838"
+        },
+        {
+          "heading": [
+            "opiskelijat"
+          ],
+          "type": "topic",
+          "source": "kauno/fin",
+          "id": "http://www.yso.fi/onto/kauno/p702"
+        },
+        {
+          "heading": [
+            "arkeologia"
+          ],
+          "type": "topic",
+          "source": "kauno/fin",
+          "id": "http://www.yso.fi/onto/yso/p1265"
+        },
+        {
+          "heading": [
+            "matkustajat"
+          ],
+          "type": "topic",
+          "source": "kauno/fin",
+          "id": "http://www.yso.fi/onto/yso/p16047"
+        },
+        {
+          "heading": [
+            "matkat"
+          ],
+          "type": "topic",
+          "source": "kauno/fin",
+          "id": "http://www.yso.fi/onto/kauno/p3013"
+        },
+        {
+          "heading": [
+            "junat"
+          ],
+          "type": "topic",
+          "source": "kauno/fin",
+          "id": "http://www.yso.fi/onto/kauno/p5173"
+        },
+        {
+          "heading": [
+            "1980-talet"
+          ],
+          "type": "topic",
+          "source": "yso/swe",
+          "id": "http://www.yso.fi/onto/yso/p6198061989"
+        },
+        {
+          "heading": [
+            "berättande"
+          ],
+          "type": "topic",
+          "source": "kauno/swe",
+          "id": "http://www.yso.fi/onto/kauno/p5514"
+        },
+        {
+          "heading": [
+            "samhällsskildring"
+          ],
+          "type": "topic",
+          "source": "kauno/swe",
+          "id": "http://www.yso.fi/onto/yso/p4187"
+        },
+        {
+          "heading": [
+            "folkliv"
+          ],
+          "type": "topic",
+          "source": "kauno/swe",
+          "id": "http://www.yso.fi/onto/kauno/p3822"
+        },
+        {
+          "heading": [
+            "totalitarism"
+          ],
+          "type": "topic",
+          "source": "kauno/swe",
+          "id": "http://www.yso.fi/onto/kauno/p559"
+        },
+        {
+          "heading": [
+            "livskompetens"
+          ],
+          "type": "topic",
+          "source": "kauno/swe",
+          "id": "http://www.yso.fi/onto/kauno/p382"
+        },
+        {
+          "heading": [
+            "längtan"
+          ],
+          "type": "topic",
+          "source": "kauno/swe",
+          "id": "http://www.yso.fi/onto/kauno/p2538"
+        },
+        {
+          "heading": [
+            "vänner"
+          ],
+          "type": "topic",
+          "source": "kauno/swe",
+          "id": "http://www.yso.fi/onto/kauno/p2191"
+        },
+        {
+          "heading": [
+            "mötande"
+          ],
+          "type": "topic",
+          "source": "kauno/swe",
+          "id": "http://www.yso.fi/onto/kauno/p2746"
+        },
+        {
+          "heading": [
+            "främlingar"
+          ],
+          "type": "topic",
+          "source": "kauno/swe",
+          "id": "http://www.yso.fi/onto/kauno/p1786"
+        },
+        {
+          "heading": [
+            "antihjältar"
+          ],
+          "type": "topic",
+          "source": "kauno/swe",
+          "id": "http://www.yso.fi/onto/kauno/p2734"
+        },
+        {
+          "heading": [
+            "män"
+          ],
+          "type": "topic",
+          "source": "kauno/swe",
+          "id": "http://www.yso.fi/onto/kauno/p3104"
+        },
+        {
+          "heading": [
+            "män och kvinnor av folket"
+          ],
+          "type": "topic",
+          "source": "kauno/swe",
+          "id": "http://www.yso.fi/onto/kauno/p5045"
+        },
+        {
+          "heading": [
+            "ryssar"
+          ],
+          "type": "topic",
+          "source": "kauno/swe",
+          "id": "http://www.yso.fi/onto/yso/p1208"
+        },
+        {
+          "heading": [
+            "unga vuxna"
+          ],
+          "type": "topic",
+          "source": "kauno/swe",
+          "id": "http://www.yso.fi/onto/kauno/p3419"
+        },
+        {
+          "heading": [
+            "kvinnor"
+          ],
+          "type": "topic",
+          "source": "kauno/swe",
+          "id": "http://www.yso.fi/onto/kauno/p3043"
+        },
+        {
+          "heading": [
+            "finländare"
+          ],
+          "type": "topic",
+          "source": "kauno/swe",
+          "id": "http://www.yso.fi/onto/kauno/p2838"
+        },
+        {
+          "heading": [
+            "studerande"
+          ],
+          "type": "topic",
+          "source": "kauno/swe",
+          "id": "http://www.yso.fi/onto/kauno/p702"
+        },
+        {
+          "heading": [
+            "resenärer"
+          ],
+          "type": "topic",
+          "source": "kauno/swe",
+          "id": "http://www.yso.fi/onto/yso/p16047"
+        },
+        {
+          "heading": [
+            "resor"
+          ],
+          "type": "topic",
+          "source": "kauno/swe",
+          "id": "http://www.yso.fi/onto/kauno/p3013"
+        },
+        {
+          "heading": [
+            "tåg"
+          ],
+          "type": "topic",
+          "source": "kauno/swe",
+          "id": "http://www.yso.fi/onto/kauno/p5173"
+        },
+        {
+          "heading": [
+            "Neuvostoliitto"
+          ],
+          "type": "geographic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p94304"
+        },
+        {
+          "heading": [
+            "Moskova"
+          ],
+          "type": "geographic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p94292"
+        },
+        {
+          "heading": [
+            "Ulan Bator"
+          ],
+          "type": "geographic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p186644"
+        },
+        {
+          "heading": [
+            "Sovjetunionen"
+          ],
+          "type": "geographic",
+          "source": "yso/swe",
+          "id": "http://www.yso.fi/onto/yso/p94304"
+        },
+        {
+          "heading": [
+            "Moskva"
+          ],
+          "type": "geographic",
+          "source": "yso/swe",
+          "id": "http://www.yso.fi/onto/yso/p94292"
+        },
+        {
+          "heading": [
+            "Mongoliet"
+          ],
+          "type": "geographic",
+          "source": "yso/swe",
+          "id": "http://www.yso.fi/onto/yso/p105251"
+        }
+      ],
+      "genres": [
+        "kaunokirjallisuus",
+        "romaanit",
+        "pienoisromaanit",
+        "kertomukset",
+        "aikakausiromaanit",
+        "suomenkielinen kirjallisuus",
+        "tidsskildringar (romaner)",
+        "kortromaner",
+        "romaner",
+        "skönlitteratur",
+        "översättningar",
+        "finsk litteratur"
+      ],
+      "majorGenres": [
+        "fiction"
+      ],
+      "classifications": {
+        "ykl": [
+          "84.23",
+          "84.2",
+          "84.31"
+        ]
+      },
+      "images": [],
+      "imagesExtended": [],
+      "summary": [
+        "En kylig nordost bar på balalajkans syrliga toner. På rälsen vilade utmattade och tysta lokomotiv. Den mjölkvita himlen, som hastigt ramlade ner, började slänga en kylig snömodd över marken som piskats av den vintriga vinden, hela rymden var fylld av en nedslående tristess.En arkitektstuderande ung kvinna tar Transsibiriska järnvägen mot Ulan Bator för att studera grottmålningar. Hon delar kupé med en vodkapimplande buse på väg till ett bygge. I den lilla trånga kupén möter öst väst och under den flera veckor långa resan berättar den manschauvinistiske mördaren hårresande historier om sitt liv och om sitt land, Sovjet.Kupé nr 6 är en kompakt, poetisk och mångbottnad historia om en tågresa genom 1980-talets Sovjetunionen.Humorn som föds ur Rosa Liksoms tillspetsningar och snabba vändningar är skoningslös och absurd. Med till synes enkla penseldrag får Liksom fram enskilda människoöden och ett helt lands historia, stod det i motiveringen när Rosa Liksom fick Finlands största litterära pris, det prestigefulla Finlandiapriset 2011 för Kupé nr 6."
+      ],
+      "sectors": [
+        {
+          "value": "0/lib/",
+          "translated": "Kirjasto"
+        },
+        {
+          "value": "1/lib/pub/",
+          "translated": "Yleinen"
+        }
+      ],
+      "dedupIds": [
+        "anders.9637a3e3-0ced-4171-b86c-a223b3b601a0",
+        "blanka.05efc88e-a448-466c-a847-07c84923439f",
+        "eepos.355337",
+        "heili.ec58cbd3-d176-4f0d-ab60-4e7ad900c622",
+        "helka.9923103653506253",
+        "helle.673216",
+        "helmet.2009221",
+        "hurma.58534",
+        "uef.997708913705966",
+        "tiekko.238595",
+        "jykdok.1188563",
+        "kaakkuri.140708",
+        "kainet.400541",
+        "kangasniemi.921a1286-99f5-48d5-8247-42b5939c0676",
+        "fikka.4143411",
+        "keski.521417",
+        "kirkes.387296",
+        "korsnas.a2bafa4b-f277-450f-8c33-decc277c96d4",
+        "rise.42530",
+        "kristinestad.a30608b3-3bde-4514-9434-6cd47db898a0",
+        "kronoby.ecaf87f5-e417-429a-b65e-d26f6554f585",
+        "kuopio.190885",
+        "kyyti.631717",
+        "lapinkirjasto.994775",
+        "luc.993022613806246",
+        "lastu.287898",
+        "lep.11445",
+        "louna.2d1cd1b7-808d-4d55-81e0-3f46f5a0c316",
+        "lukki.69480",
+        "lumme.386816",
+        "larsmo.00b536ca-0ca6-444f-88d0-b5dee6eeac12",
+        "lut.991272283906254",
+        "taisto.119242",
+        "narpes.d0eac4b8-ff49-4702-bc0f-5483d932ebe9",
+        "oy.9911592573906252",
+        "outi.1040946",
+        "pedersore.9cad7b59-58c0-4f13-9407-705202c6db4e",
+        "jakobstad.bd8c38f8-9215-434e-bb87-f09220db0c72",
+        "piki.3114682",
+        "polamk.16520",
+        "ratamo.384167",
+        "rutakko.d98d48e5-0616-4a0b-9abb-dbe32b14f4c6",
+        "satakirjastot.368334",
+        "seamk.99994386805969",
+        "siilinjarvi.149277",
+        "somero.c98fbbdb-83bb-4f6a-8d0a-dba2bc61af3b",
+        "tuni.995707254205973",
+        "turkuamk_finna.992006157205970",
+        "utu.9915451035405971",
+        "nykarleby.7faab743-e3c6-46ac-b289-5edee2c25416",
+        "vaarakirjastot.443135",
+        "vaasa.20ff8304-179a-4f65-8ea0-a4af8e6a09e7",
+        "vanamo.5728b947-de8c-42c7-8787-ea14566e2a88",
+        "vaari.1429891",
+        "vaski.698334",
+        "vora.4d04aa35-0ed9-4ab3-a211-34486dd546f9",
+        "abo.9911078763405972"
+      ],
+      "fullRecord": "<?xml version=\"1.0\"?>\n<collection xmlns=\"http://www.loc.gov/MARC21/slim\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd\"><record><leader>00000 am  22000001  0000</leader><controlfield tag=\"001\">9637a3e3-0ced-4171-b86c-a223b3b601a0</controlfield><controlfield tag=\"003\">38ce7306-5873-4a96-8ad7-d42bf004dbec</controlfield><controlfield tag=\"008\">000000s2011       ||||g     |00| 1|fin||</controlfield><datafield tag=\"035\" ind1=\" \" ind2=\" \"><subfield code=\"a\">(FI-Anders)1211167</subfield></datafield><datafield tag=\"035\" ind1=\" \" ind2=\" \"><subfield code=\"a\">(FI-BTJ)1591963</subfield></datafield><datafield tag=\"035\" ind1=\" \" ind2=\" \"><subfield code=\"a\">(FI-MELINDA)005932916</subfield></datafield><datafield tag=\"020\" ind1=\" \" ind2=\" \"><subfield code=\"a\">978-951-0-38274-5</subfield></datafield><datafield tag=\"084\" ind1=\" \" ind2=\" \"><subfield code=\"a\">84.23</subfield><subfield code=\"2\">ykl</subfield></datafield><datafield tag=\"084\" ind1=\" \" ind2=\" \"><subfield code=\"a\">84.2</subfield><subfield code=\"2\">ykl</subfield></datafield><datafield tag=\"084\" ind1=\" \" ind2=\" \"><subfield code=\"a\">84.31</subfield><subfield code=\"2\">ykl</subfield></datafield><datafield tag=\"100\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Liksom, Rosa</subfield><subfield code=\"d\">1958-</subfield><subfield code=\"e\">författare</subfield><subfield code=\"0\">000050819</subfield><subfield code=\"2\">FI-ASTERI-N</subfield></datafield><datafield tag=\"245\" ind1=\" \" ind2=\"0\"><subfield code=\"a\">Hytti nro 6 /</subfield><subfield code=\"b\">kertomus</subfield><subfield code=\"c\">Rosa Liksom</subfield></datafield><datafield tag=\"260\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Helsinki</subfield><subfield code=\"b\">WSOY</subfield><subfield code=\"c\">2011</subfield></datafield><datafield tag=\"300\" ind1=\" \" ind2=\" \"><subfield code=\"a\">186 s.</subfield></datafield><datafield tag=\"336\" ind1=\" \" ind2=\" \"><subfield code=\"b\">txt</subfield></datafield><datafield tag=\"337\" ind1=\" \" ind2=\" \"><subfield code=\"b\">n</subfield></datafield><datafield tag=\"338\" ind1=\" \" ind2=\" \"><subfield code=\"b\">nc</subfield></datafield><datafield tag=\"500\" ind1=\" \" ind2=\" \"><subfield code=\"a\">nidottu</subfield></datafield><datafield tag=\"500\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Julkaistu myös verkkoaineistona</subfield></datafield><datafield tag=\"500\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Finlandia-palkinto 2011.</subfield></datafield><datafield tag=\"600\" ind1=\"0\" ind2=\"4\"><subfield code=\"a\">Tyttö</subfield></datafield><datafield tag=\"600\" ind1=\"0\" ind2=\"4\"><subfield code=\"a\">Vadim</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">1980-luku</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p6198061989</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">suomenkielinen kirjallisuus</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p16810</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p23674</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">suomen kieli</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p8856</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">matkustajat</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p16047</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">junat</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p5483</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">junamatkailu</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p1416</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">naiset</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p16991</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">suomalaiset</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p3180</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">miehet</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p8173</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">antisankarit</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p21016</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">venäläiset</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p1208</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kohtaaminen</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p22700</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kansanelämä</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p3687</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">yhteiskuntakuvaus</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p4187</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kaunokirjallisuus</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p4</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">totalitarismi</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p8526</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">elämänhallinta</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p4357</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kaipaus</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p12790</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">ystävät</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p20879</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p2191</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">nuoret aikuiset</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p15979</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">matkat</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p366</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p11784</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">opiskelijat</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p16486</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">aikakausiromaanit</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">pienoisromaanit</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">äänikirjat</subfield><subfield code=\"2\">kaunokki</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p757</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kerronta</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">yhteiskuntakuvaus</subfield><subfield code=\"2\">kaunokki</subfield><subfield code=\"y\">1980-luku</subfield><subfield code=\"z\">Neuvostoliitto</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kansanelämä</subfield><subfield code=\"2\">kaunokki</subfield><subfield code=\"x\">totalitarismi</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">elämänhallinta</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kaipaus</subfield><subfield code=\"2\">kaunokki</subfield><subfield code=\"x\">ystävät</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kohtaaminen</subfield><subfield code=\"2\">kaunokki</subfield><subfield code=\"x\">vieraat</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">antisankarit</subfield><subfield code=\"2\">kaunokki</subfield><subfield code=\"x\">miehet</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kansanihmiset</subfield><subfield code=\"2\">kaunokki</subfield><subfield code=\"x\">venäläiset</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">nuoret aikuiset</subfield><subfield code=\"2\">kaunokki</subfield><subfield code=\"x\">naiset</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">suomalaiset</subfield><subfield code=\"2\">kaunokki</subfield><subfield code=\"x\">naiset</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">opiskelijat</subfield><subfield code=\"2\">kaunokki</subfield><subfield code=\"x\">arkeologia</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">matkustajat</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">matkat</subfield><subfield code=\"2\">kaunokki</subfield><subfield code=\"x\">junat</subfield><subfield code=\"z\">Moskova</subfield><subfield code=\"z\">Ulan Bator</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kirjallisuuspalkinnot</subfield><subfield code=\"2\">kaunokki</subfield><subfield code=\"y\">2011</subfield><subfield code=\"x\">Finlandia-palkinto</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kerronta</subfield><subfield code=\"2\">kauno/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p5514</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p551</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">yhteiskuntakuvaus</subfield><subfield code=\"2\">kauno/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p6574</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p4187</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kansanelämä</subfield><subfield code=\"2\">kauno/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p3822</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">totalitarismi</subfield><subfield code=\"2\">kauno/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p559</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">elämänhallinta</subfield><subfield code=\"2\">kauno/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p382</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kaipaus</subfield><subfield code=\"2\">kauno/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p2538</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">ystävät</subfield><subfield code=\"2\">kauno/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p2191</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p20879</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p1589</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kohtaaminen</subfield><subfield code=\"2\">kauno/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p2746</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">vieraat</subfield><subfield code=\"2\">kauno/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p3906</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">antisankarit</subfield><subfield code=\"2\">kauno/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p2734</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">miehet</subfield><subfield code=\"2\">kauno/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p3104</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kansanihmiset</subfield><subfield code=\"2\">kauno/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p5045</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">venäläiset</subfield><subfield code=\"2\">kauno/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p1208</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">nuoret aikuiset</subfield><subfield code=\"2\">kauno/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p3419</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p15979</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">naiset</subfield><subfield code=\"2\">kauno/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p3043</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p16991</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p3043P-</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p304</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">suomalaiset</subfield><subfield code=\"2\">kauno/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p2838</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p4527</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">opiskelijat</subfield><subfield code=\"2\">kauno/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p702</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">arkeologia</subfield><subfield code=\"2\">kauno/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p1265</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">matkustajat</subfield><subfield code=\"2\">kauno/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p16047</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">matkat</subfield><subfield code=\"2\">kauno/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p3013</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p366</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p3780</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">junat</subfield><subfield code=\"2\">kauno/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p5173</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p5483</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">1980-talet</subfield><subfield code=\"2\">yso/swe</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p6198061989</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">berättande</subfield><subfield code=\"2\">kauno/swe</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p5514</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">samhällsskildring</subfield><subfield code=\"2\">kauno/swe</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p4187</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p6574</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">folkliv</subfield><subfield code=\"2\">kauno/swe</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p3822</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">totalitarism</subfield><subfield code=\"2\">kauno/swe</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p559</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">livskompetens</subfield><subfield code=\"2\">kauno/swe</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p382</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">längtan</subfield><subfield code=\"2\">kauno/swe</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p2538</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p766</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">vänner</subfield><subfield code=\"2\">kauno/swe</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p2191</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">mötande</subfield><subfield code=\"2\">kauno/swe</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p2746</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">främlingar</subfield><subfield code=\"2\">kauno/swe</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p1786</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">antihjältar</subfield><subfield code=\"2\">kauno/swe</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p2734</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">män</subfield><subfield code=\"2\">kauno/swe</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p3104</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">män och kvinnor av folket</subfield><subfield code=\"2\">kauno/swe</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p5045</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">ryssar</subfield><subfield code=\"2\">kauno/swe</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p1208</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">unga vuxna</subfield><subfield code=\"2\">kauno/swe</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p3419</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kvinnor</subfield><subfield code=\"2\">kauno/swe</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p3043</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p6365</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p16991</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p3043za</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">finländare</subfield><subfield code=\"2\">kauno/swe</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p2838</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">studerande</subfield><subfield code=\"2\">kauno/swe</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p702</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">resenärer</subfield><subfield code=\"2\">kauno/swe</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p16047</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">resor</subfield><subfield code=\"2\">kauno/swe</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p3013</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">tåg</subfield><subfield code=\"2\">kauno/swe</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p5173</subfield></datafield><datafield tag=\"651\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">Neuvostoliitto</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p94304</subfield></datafield><datafield tag=\"651\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">Moskova</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p94292</subfield></datafield><datafield tag=\"651\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">Ulan Bator</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p186644</subfield></datafield><datafield tag=\"651\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">Sovjetunionen</subfield><subfield code=\"2\">yso/swe</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p94304</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p94479</subfield></datafield><datafield tag=\"651\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">Moskva</subfield><subfield code=\"2\">yso/swe</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p94292</subfield></datafield><datafield tag=\"651\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">Mongoliet</subfield><subfield code=\"2\">yso/swe</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p105251</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kaunokirjallisuus</subfield><subfield code=\"2\">slm/fin</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">romaanit</subfield><subfield code=\"2\">slm/fin</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">pienoisromaanit</subfield><subfield code=\"2\">slm/fin</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kertomukset</subfield><subfield code=\"2\">slm/fin</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">aikakausiromaanit</subfield><subfield code=\"2\">slm/fin</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">suomenkielinen kirjallisuus</subfield><subfield code=\"2\">local</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">tidsskildringar (romaner)</subfield><subfield code=\"2\">slm/swe</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kortromaner</subfield><subfield code=\"2\">slm/swe</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">romaner</subfield><subfield code=\"2\">slm/swe</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">skönlitteratur</subfield><subfield code=\"2\">slm/swe</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">översättningar</subfield><subfield code=\"2\">slm/swe</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">finsk litteratur</subfield><subfield code=\"2\">local</subfield></datafield><datafield tag=\"852\" ind1=\" \" ind2=\" \"><subfield code=\"a\">ef8c7d9f-16d3-4546-924e-fd4f58d4ce68</subfield><subfield code=\"b\">a9969e8e-6553-4308-9040-7f41ac52d3bd</subfield><subfield code=\"c\">f9093a86-9eb8-4c92-806f-c7a0e55082d3</subfield></datafield><datafield tag=\"852\" ind1=\" \" ind2=\" \"><subfield code=\"a\">d984d9ac-4606-4c09-8c18-d8c31cb8506a</subfield><subfield code=\"b\">91a20927-50ba-4203-b27d-3359d02ab8fc</subfield><subfield code=\"c\">8b4b8fbc-d5ee-41e2-af7e-da3ed060e18f</subfield></datafield><datafield tag=\"852\" ind1=\" \" ind2=\" \"><subfield code=\"a\">d984d9ac-4606-4c09-8c18-d8c31cb8506a</subfield><subfield code=\"b\">8f8b0d98-60ef-4345-8d75-dc357a85fe99</subfield><subfield code=\"c\">04c731fa-6498-4017-8121-e8d3c13e593e</subfield></datafield><datafield tag=\"852\" ind1=\" \" ind2=\" \"><subfield code=\"a\">d984d9ac-4606-4c09-8c18-d8c31cb8506a</subfield><subfield code=\"b\">8dcbee81-c1ac-4565-a950-7a4b7dfaa467</subfield><subfield code=\"c\">0a2716a6-0a1d-4a40-a5db-fd0702bcc392</subfield></datafield><datafield tag=\"852\" ind1=\" \" ind2=\" \"><subfield code=\"a\">d984d9ac-4606-4c09-8c18-d8c31cb8506a</subfield><subfield code=\"b\">80feb530-6c53-446f-9e77-a4a04c175b8a</subfield><subfield code=\"c\">f673c43d-4039-428d-8708-cb8c20b2ea86</subfield></datafield><datafield tag=\"852\" ind1=\" \" ind2=\" \"><subfield code=\"a\">d984d9ac-4606-4c09-8c18-d8c31cb8506a</subfield><subfield code=\"b\">3674ec3f-3b40-43b5-92ab-59c649177928</subfield><subfield code=\"c\">6c57d024-5445-4622-8d57-ad3277f49fb8</subfield></datafield><datafield tag=\"852\" ind1=\" \" ind2=\" \"><subfield code=\"a\">8bf5b262-9883-4f4d-8652-2cb507b27135</subfield><subfield code=\"b\">1800201b-fd3a-4e7e-a3f7-d2a1dae0c63d</subfield><subfield code=\"c\">03dbce9e-43cb-4600-b4e8-8591ee5ab747</subfield></datafield><datafield tag=\"852\" ind1=\" \" ind2=\" \"><subfield code=\"a\">5c42fd73-5eee-4ae7-a679-92099a9a982a</subfield><subfield code=\"b\">cc75b551-dc4b-430f-9da9-64469370647a</subfield><subfield code=\"c\">d6a3ddd9-ee66-43a9-a3a3-5fe4329d126b</subfield></datafield><datafield tag=\"852\" ind1=\" \" ind2=\" \"><subfield code=\"a\">5c42fd73-5eee-4ae7-a679-92099a9a982a</subfield><subfield code=\"b\">b32e4dae-2a38-4465-81e5-2a587dcfc1cf</subfield><subfield code=\"c\">a84ecfc8-7f1e-4f15-9cef-3a0e5114a6dd</subfield></datafield><datafield tag=\"852\" ind1=\" \" ind2=\" \"><subfield code=\"a\">3b03b314-ee48-4102-8353-2f7f757b928c</subfield><subfield code=\"b\">a6345b60-a671-4d1f-9902-53c2b9772982</subfield><subfield code=\"c\">9a7e4362-0bb6-4580-a83f-bd73eaa84954</subfield></datafield><datafield tag=\"852\" ind1=\" \" ind2=\" \"><subfield code=\"a\">30cc8835-356a-4db5-b350-7e22231b4bbb</subfield><subfield code=\"b\">94225df6-6aed-48ed-9181-e8172678f545</subfield><subfield code=\"c\">487bd788-3e5e-49d6-9f4a-f94f65586ec7</subfield></datafield><datafield tag=\"900\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Ликсом, Роза, 1958-</subfield><subfield code=\"a\">Liksoma, Roza, 1958-</subfield><subfield code=\"a\">Ylävaara, Anni, 1958-</subfield></datafield></record></collection>\n"
+    },
+    {
+      "id": "fikka.4307483",
+      "recordPage": "/Record/fikka.4307483",
+      "formats": [
+        {
+          "value": "0/Book/",
+          "translated": "Kirja"
+        },
+        {
+          "value": "1/Book/AudioBook/",
+          "translated": "Äänikirja"
+        },
+        {
+          "value": "2/Book/AudioBook/Online/",
+          "translated": "E-äänikirja"
+        }
+      ],
+      "title": "Hytti nro 6 : Kohtaamisia junassa",
+      "shortTitle": "Hytti nro 6",
+      "subTitle": "Kohtaamisia junassa",
+      "uniformTitles": [
+        "Hytti nro 6. Suomi"
+      ],
+      "authors": {
+        "primary": {
+          "Liksom, Rosa": {
+            "role": [
+              "kirjoittaja"
+            ]
+          },
+          "Sveholm, Pertti": {
+            "role": [
+              "-"
+            ]
+          }
+        },
+        "secondary": {
+          "Sveholm, Pertti, lukija": {
+            "role": [
+              "lukija"
+            ]
+          }
+        },
+        "corporate": {
+          "WSOY, kustantaja": {
+            "role": [
+              "kustantaja"
+            ]
+          }
+        }
+      },
+      "primaryAuthors": [
+        "Liksom, Rosa",
+        "Sveholm, Pertti"
+      ],
+      "nonPresenterAuthors": [
+        {
+          "name": "Liksom, Rosa",
+          "role": "kirjoittaja",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Sveholm, Pertti",
+          "role": "lukija",
+          "type": "Personal Name"
+        }
+      ],
+      "secondaryAuthors": [
+        "Sveholm, Pertti, lukija"
+      ],
+      "corporateAuthors": [
+        "WSOY, kustantaja"
+      ],
+      "isbns": [
+        "978-951-0-39264-5 MP3"
+      ],
+      "cleanIsbn": "9510392642",
+      "languages": [
+        "fin"
+      ],
+      "originalLanguages": [],
+      "publishers": [
+        "WSOY"
+      ],
+      "publicationDates": [
+        "2011"
+      ],
+      "placesOfPublication": [
+        "Helsinki :"
+      ],
+      "year": "2011",
+      "physicalDescriptions": [
+        "1 verkkoaineisto (6 h 50 min)"
+      ],
+      "series": [],
+      "subjects": [],
+      "genres": [
+        "äänikirjat"
+      ],
+      "majorGenres": [],
+      "classifications": [],
+      "images": [],
+      "imagesExtended": [],
+      "summary": [],
+      "sectors": [
+        {
+          "value": "0/lib/",
+          "translated": "Kirjasto"
+        },
+        {
+          "value": "1/lib/uni/",
+          "translated": "Yliopisto"
+        }
+      ],
+      "fullRecord": "<?xml version=\"1.0\"?>\n<collection xmlns=\"http://www.loc.gov/MARC21/slim\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd\"><record><leader>00000cim a22000008i 4500</leader><controlfield tag=\"001\">1155394</controlfield><controlfield tag=\"003\">FI-NL</controlfield><controlfield tag=\"005\">20251129031827.0</controlfield><controlfield tag=\"006\">m|||||o||h||||||||</controlfield><controlfield tag=\"007\">sr|uunnnnnuneu</controlfield><controlfield tag=\"007\">cr|nnannnuuuuu</controlfield><controlfield tag=\"008\">230102s2011    fi |||||o||||||f |||fin||</controlfield><datafield tag=\"020\" ind1=\" \" ind2=\" \"><subfield code=\"a\">978-951-0-39264-5</subfield><subfield code=\"q\">MP3</subfield></datafield><datafield tag=\"035\" ind1=\" \" ind2=\" \"><subfield code=\"a\">FCC015300611</subfield></datafield><datafield tag=\"040\" ind1=\" \" ind2=\" \"><subfield code=\"a\">FI-KV</subfield><subfield code=\"b\">fin</subfield><subfield code=\"e\">rda</subfield><subfield code=\"d\">FI-NL</subfield></datafield><datafield tag=\"041\" ind1=\"0\" ind2=\" \"><subfield code=\"d\">fin</subfield></datafield><datafield tag=\"042\" ind1=\" \" ind2=\" \"><subfield code=\"a\">finb</subfield></datafield><datafield tag=\"100\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Liksom, Rosa,</subfield><subfield code=\"e\">kirjoittaja.</subfield></datafield><datafield tag=\"240\" ind1=\"1\" ind2=\"0\"><subfield code=\"a\">Hytti nro 6.</subfield><subfield code=\"l\">Suomi</subfield></datafield><datafield tag=\"245\" ind1=\"1\" ind2=\"0\"><subfield code=\"a\">Hytti nro 6 :</subfield><subfield code=\"b\">Kohtaamisia junassa.</subfield></datafield><datafield tag=\"264\" ind1=\" \" ind2=\"1\"><subfield code=\"a\">Helsinki :</subfield><subfield code=\"b\">WSOY,</subfield><subfield code=\"c\">2011.</subfield></datafield><datafield tag=\"300\" ind1=\" \" ind2=\" \"><subfield code=\"a\">1 verkkoaineisto (6 h 50 min)</subfield></datafield><datafield tag=\"336\" ind1=\" \" ind2=\" \"><subfield code=\"a\">puhe</subfield><subfield code=\"b\">spw</subfield><subfield code=\"2\">rdacontent</subfield></datafield><datafield tag=\"337\" ind1=\" \" ind2=\" \"><subfield code=\"a\">tietokonekäyttöinen</subfield><subfield code=\"b\">c</subfield><subfield code=\"2\">rdamedia</subfield></datafield><datafield tag=\"338\" ind1=\" \" ind2=\" \"><subfield code=\"a\">verkkoaineisto</subfield><subfield code=\"b\">cr</subfield><subfield code=\"2\">rdacarrier</subfield></datafield><datafield tag=\"341\" ind1=\" \" ind2=\" \"><subfield code=\"a\">kuuloon perustuva</subfield><subfield code=\"2\">mts/fin</subfield></datafield><datafield tag=\"344\" ind1=\" \" ind2=\" \"><subfield code=\"a\">digitaalinen</subfield></datafield><datafield tag=\"347\" ind1=\" \" ind2=\" \"><subfield code=\"a\">äänitiedosto</subfield><subfield code=\"b\">MP3</subfield></datafield><datafield tag=\"511\" ind1=\"0\" ind2=\" \"><subfield code=\"a\">Lukija: Pertti Sveholm.</subfield></datafield><datafield tag=\"594\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Tarkistettu ennakkotieto / Storia</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">äänikirjat</subfield><subfield code=\"2\">slm/fin</subfield><subfield code=\"0\">http://urn.fi/URN:NBN:fi:au:slm:s579</subfield></datafield><datafield tag=\"700\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Sveholm, Pertti,</subfield><subfield code=\"e\">lukija.</subfield></datafield><datafield tag=\"710\" ind1=\"2\" ind2=\" \"><subfield code=\"a\">WSOY,</subfield><subfield code=\"e\">kustantaja.</subfield></datafield><datafield tag=\"776\" ind1=\"0\" ind2=\" \"><subfield code=\"z\">978-951-0-38274-5</subfield></datafield><datafield tag=\"776\" ind1=\"0\" ind2=\" \"><subfield code=\"z\">978-951-0-38643-9</subfield></datafield><datafield tag=\"776\" ind1=\"0\" ind2=\" \"><subfield code=\"z\">978-951-0-39707-7</subfield></datafield><datafield tag=\"776\" ind1=\"0\" ind2=\" \"><subfield code=\"z\">978-951-0-39265-2</subfield></datafield><datafield tag=\"901\" ind1=\" \" ind2=\" \"><subfield code=\"b\">FENNICA_PREPUB</subfield></datafield><datafield tag=\"901\" ind1=\" \" ind2=\" \"><subfield code=\"b\">084. 586</subfield></datafield><datafield tag=\"901\" ind1=\" \" ind2=\" \"><subfield code=\"b\">042</subfield></datafield><datafield tag=\"901\" ind1=\" \" ind2=\" \"><subfield code=\"b\">084,884</subfield></datafield><datafield tag=\"901\" ind1=\" \" ind2=\" \"><subfield code=\"b\">655</subfield></datafield><datafield tag=\"974\" ind1=\" \" ind2=\" \"><subfield code=\"a\">KV</subfield><subfield code=\"b\">TT0011643</subfield></datafield><datafield tag=\"999\" ind1=\" \" ind2=\" \"><subfield code=\"c\">4307483</subfield><subfield code=\"d\">4307483</subfield></datafield></record></collection>\n"
+    },
+    {
+      "id": "jykdok.2292376",
+      "recordPage": "/Record/jykdok.2292376",
+      "formats": [
+        {
+          "value": "0/Book/",
+          "translated": "Kirja"
+        },
+        {
+          "value": "1/Book/eBook/",
+          "translated": "E-kirja"
+        }
+      ],
+      "title": "Hytti nro 6 : kertomus",
+      "shortTitle": "Hytti nro 6",
+      "subTitle": "kertomus",
+      "uniformTitles": [],
+      "authors": {
+        "primary": {
+          "Liksom, Rosa": {
+            "role": [
+              "kirjoittaja"
+            ]
+          }
+        },
+        "secondary": [],
+        "corporate": {
+          "Werner Söderström osakeyhtiö, kustantaja": {
+            "role": [
+              "kustantaja"
+            ]
+          }
+        }
+      },
+      "primaryAuthors": [
+        "Liksom, Rosa"
+      ],
+      "nonPresenterAuthors": [
+        {
+          "name": "Liksom, Rosa",
+          "role": "kirjoittaja",
+          "id": "(FI-ASTERI-N)000050819",
+          "type": "Personal Name"
+        }
+      ],
+      "secondaryAuthors": [],
+      "corporateAuthors": [
+        "Werner Söderström osakeyhtiö, kustantaja"
+      ],
+      "isbns": [
+        "978-951-0-38643-9 EPUB"
+      ],
+      "cleanIsbn": "951038643X",
+      "languages": [
+        "fin"
+      ],
+      "originalLanguages": [],
+      "publishers": [
+        "WSOY"
+      ],
+      "publicationDates": [
+        "2011"
+      ],
+      "placesOfPublication": [
+        "Helsinki :"
+      ],
+      "year": "2011",
+      "edition": "Versio 1.0.",
+      "physicalDescriptions": [
+        "1 EPUB-tiedosto (151 sivua)",
+        "Julkaistu myös painettuna"
+      ],
+      "series": [],
+      "subjects": [],
+      "genres": [],
+      "majorGenres": [
+        "fiction"
+      ],
+      "classifications": {
+        "udkf": [
+          "894.541-3"
+        ],
+        "ykl": [
+          "84.2"
+        ]
+      },
+      "images": [],
+      "imagesExtended": [],
+      "summary": [],
+      "sectors": [
+        {
+          "value": "0/lib/",
+          "translated": "Kirjasto"
+        },
+        {
+          "value": "1/lib/uni/",
+          "translated": "Yliopisto"
+        }
+      ],
+      "dedupIds": [
+        "jykdok.2292376",
+        "fikka.4215771"
+      ],
+      "fullRecord": "<?xml version=\"1.0\"?>\n<collection xmlns=\"http://www.loc.gov/MARC21/slim\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd\"><record><leader>00000cam a2200000 i 4500</leader><controlfield tag=\"001\">006838706</controlfield><controlfield tag=\"003\">FI-MELINDA</controlfield><controlfield tag=\"005\">20260512214941.0</controlfield><controlfield tag=\"006\">m|||||o||d||||||||</controlfield><controlfield tag=\"007\">cr || ||||||||</controlfield><controlfield tag=\"008\">140902s2011    fi |||| o|||||00| f fin| </controlfield><datafield tag=\"020\" ind1=\" \" ind2=\" \"><subfield code=\"a\">978-951-0-38643-9</subfield><subfield code=\"q\">EPUB</subfield></datafield><datafield tag=\"035\" ind1=\" \" ind2=\" \"><subfield code=\"a\">FCC006838706</subfield></datafield><datafield tag=\"040\" ind1=\" \" ind2=\" \"><subfield code=\"a\">FI-NL</subfield><subfield code=\"b\">fin</subfield><subfield code=\"e\">rda</subfield><subfield code=\"d\">FI-KV</subfield></datafield><datafield tag=\"041\" ind1=\"0\" ind2=\" \"><subfield code=\"a\">fin</subfield></datafield><datafield tag=\"080\" ind1=\" \" ind2=\" \"><subfield code=\"a\">894.541</subfield><subfield code=\"x\">-3</subfield><subfield code=\"2\">1974/fin/fennica</subfield></datafield><datafield tag=\"084\" ind1=\" \" ind2=\" \"><subfield code=\"a\">84.2</subfield><subfield code=\"2\">ykl</subfield></datafield><datafield tag=\"100\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Liksom, Rosa,</subfield><subfield code=\"e\">kirjoittaja.</subfield><subfield code=\"0\">(FI-ASTERI-N)000050819</subfield></datafield><datafield tag=\"245\" ind1=\"1\" ind2=\"0\"><subfield code=\"a\">Hytti nro 6 :</subfield><subfield code=\"b\">kertomus /</subfield><subfield code=\"c\">Rosa Liksom.</subfield></datafield><datafield tag=\"250\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Versio 1.0.</subfield></datafield><datafield tag=\"264\" ind1=\" \" ind2=\"1\"><subfield code=\"a\">Helsinki :</subfield><subfield code=\"b\">WSOY,</subfield><subfield code=\"c\">2011.</subfield></datafield><datafield tag=\"300\" ind1=\" \" ind2=\" \"><subfield code=\"a\">1 EPUB-tiedosto (151 sivua)</subfield></datafield><datafield tag=\"336\" ind1=\" \" ind2=\" \"><subfield code=\"a\">teksti</subfield><subfield code=\"b\">txt</subfield><subfield code=\"2\">rdacontent</subfield></datafield><datafield tag=\"337\" ind1=\" \" ind2=\" \"><subfield code=\"a\">tietokonekäyttöinen</subfield><subfield code=\"b\">c</subfield><subfield code=\"2\">rdamedia</subfield></datafield><datafield tag=\"338\" ind1=\" \" ind2=\" \"><subfield code=\"a\">verkkoaineisto</subfield><subfield code=\"b\">cr</subfield><subfield code=\"2\">rdacarrier</subfield></datafield><datafield tag=\"341\" ind1=\" \" ind2=\" \"><subfield code=\"a\">textual</subfield><subfield code=\"2\">sapdv</subfield></datafield><datafield tag=\"347\" ind1=\" \" ind2=\" \"><subfield code=\"a\">tekstitiedosto</subfield><subfield code=\"b\">EPUB</subfield></datafield><datafield tag=\"506\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Aineisto on käytettävissä vapaakappaletyöasemilla.</subfield><subfield code=\"f\">Online access with authorization</subfield><subfield code=\"2\">star</subfield></datafield><datafield tag=\"530\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Julkaistu myös painettuna.</subfield></datafield><datafield tag=\"540\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Aineisto on käytettävissä tutkimus- ja muihin tarkoituksiin;</subfield><subfield code=\"b\">Kansalliskirjasto;</subfield><subfield code=\"c\">Laki kulttuuriaineistojen tallettamisesta ja säilyttämisestä</subfield><subfield code=\"u\">http://www.finlex.fi/fi/laki/ajantasa/2007/20071433</subfield></datafield><datafield tag=\"586\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Finlandia-palkinto, 2011</subfield></datafield><datafield tag=\"588\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Nimeke nimiösivulta.</subfield></datafield><datafield tag=\"710\" ind1=\"2\" ind2=\" \"><subfield code=\"a\">Werner Söderström osakeyhtiö,</subfield><subfield code=\"e\">kustantaja.</subfield><subfield code=\"0\">(FI-ASTERI-N)000006477</subfield></datafield><datafield tag=\"776\" ind1=\"0\" ind2=\"8\"><subfield code=\"i\">Painettu (sidottu):</subfield><subfield code=\"z\">978-951-0-38274-5</subfield></datafield><datafield tag=\"776\" ind1=\"0\" ind2=\" \"><subfield code=\"z\">978-951-0-39264-5</subfield></datafield><datafield tag=\"776\" ind1=\"0\" ind2=\" \"><subfield code=\"z\">978-951-0-39707-7</subfield></datafield><datafield tag=\"776\" ind1=\"0\" ind2=\" \"><subfield code=\"z\">978-951-0-39265-2</subfield></datafield><datafield tag=\"856\" ind1=\"4\" ind2=\"0\"><subfield code=\"u\">https://urn.fi/URN:ISBN:978-951-0-38643-9</subfield><subfield code=\"z\">Käytettävissä vapaakappaletyöasemilla</subfield></datafield><datafield tag=\"999\" ind1=\" \" ind2=\" \"><subfield code=\"c\">2292376</subfield><subfield code=\"d\">2292376</subfield></datafield></record></collection>\n"
+    }
+  ],
+  "status": "OK"
+}

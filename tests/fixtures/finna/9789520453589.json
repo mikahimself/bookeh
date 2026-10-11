@@ -1,0 +1,422 @@
+{
+  "resultCount": 2,
+  "records": [
+    {
+      "id": "helle.1656664",
+      "recordPage": "/Record/helle.1656664",
+      "formats": [
+        {
+          "value": "0/Book/",
+          "translated": "Kirja"
+        },
+        {
+          "value": "1/Book/Book/",
+          "translated": "Kirja"
+        }
+      ],
+      "title": "Ole luonani aina",
+      "shortTitle": "Ole luonani aina",
+      "uniformTitles": [
+        "Never let me go. Suomi"
+      ],
+      "authors": {
+        "primary": {
+          "Ishiguro, Kazuo": {
+            "role": [
+              "kirjoittaja"
+            ]
+          },
+          "Bützow, Helene": {
+            "role": [
+              "-"
+            ]
+          }
+        },
+        "secondary": {
+          "Bützow, Helene, kääntäjä": {
+            "role": [
+              "kääntäjä"
+            ]
+          }
+        },
+        "corporate": []
+      },
+      "primaryAuthors": [
+        "Ishiguro, Kazuo",
+        "Bützow, Helene"
+      ],
+      "nonPresenterAuthors": [
+        {
+          "name": "Ishiguro, Kazuo",
+          "role": "kirjoittaja",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Bützow, Helene",
+          "role": "kääntäjä",
+          "id": "(FI-ASTERI-N)000113261",
+          "type": "Personal Name"
+        }
+      ],
+      "secondaryAuthors": [
+        "Bützow, Helene, kääntäjä"
+      ],
+      "corporateAuthors": [],
+      "isbns": [
+        "9789520453589 pehmeäkantinen"
+      ],
+      "cleanIsbn": "952045358X",
+      "languages": [
+        "fin"
+      ],
+      "originalLanguages": [
+        "eng"
+      ],
+      "publishers": [
+        "Tammi"
+      ],
+      "publicationDates": [
+        "2023"
+      ],
+      "placesOfPublication": [
+        "Helsinki :"
+      ],
+      "year": "2023",
+      "physicalDescriptions": [
+        "394 sivua ; 18 cm"
+      ],
+      "series": [
+        {
+          "name": "Keltainen pokkari"
+        },
+        {
+          "name": "Keltainen kirjasto",
+          "additional": "367"
+        }
+      ],
+      "subjects": [
+        [
+          "muistot"
+        ],
+        [
+          "eristys (eristäminen muista)"
+        ],
+        [
+          "valheet"
+        ],
+        [
+          "totuus"
+        ],
+        [
+          "ihmisarvo"
+        ],
+        [
+          "kloonaus"
+        ],
+        [
+          "elimenluovutus"
+        ],
+        [
+          "kloonit"
+        ],
+        [
+          "oppilaat"
+        ],
+        [
+          "sisäoppilaitokset"
+        ],
+        [
+          "Iso-Britannia"
+        ]
+      ],
+      "subjectsExtended": [
+        {
+          "heading": [
+            "muistot"
+          ],
+          "type": "topic",
+          "source": "kauno/fin",
+          "id": "http://www.yso.fi/onto/kauno/p1655"
+        },
+        {
+          "heading": [
+            "eristys (eristäminen muista)"
+          ],
+          "type": "topic",
+          "source": "kauno/fin",
+          "id": "http://www.yso.fi/onto/kauno/p2088"
+        },
+        {
+          "heading": [
+            "valheet"
+          ],
+          "type": "topic",
+          "source": "kauno/fin",
+          "id": "http://www.yso.fi/onto/kauno/p450"
+        },
+        {
+          "heading": [
+            "totuus"
+          ],
+          "type": "topic",
+          "source": "kauno/fin",
+          "id": "http://www.yso.fi/onto/kauno/p2468"
+        },
+        {
+          "heading": [
+            "ihmisarvo"
+          ],
+          "type": "topic",
+          "source": "kauno/fin",
+          "id": "http://www.yso.fi/onto/kauno/p317"
+        },
+        {
+          "heading": [
+            "kloonaus"
+          ],
+          "type": "topic",
+          "source": "kauno/fin",
+          "id": "http://www.yso.fi/onto/kauno/p608"
+        },
+        {
+          "heading": [
+            "elimenluovutus"
+          ],
+          "type": "topic",
+          "source": "kauno/fin",
+          "id": "http://www.yso.fi/onto/yso/p11990"
+        },
+        {
+          "heading": [
+            "kloonit"
+          ],
+          "type": "topic",
+          "source": "kauno/fin",
+          "id": "http://www.yso.fi/onto/kauno/p765"
+        },
+        {
+          "heading": [
+            "oppilaat"
+          ],
+          "type": "topic",
+          "source": "kauno/fin",
+          "id": "http://www.yso.fi/onto/kauno/p2714"
+        },
+        {
+          "heading": [
+            "sisäoppilaitokset"
+          ],
+          "type": "topic",
+          "source": "kauno/fin",
+          "id": "http://www.yso.fi/onto/kauno/p592"
+        },
+        {
+          "heading": [
+            "Iso-Britannia"
+          ],
+          "type": "geographic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p104990"
+        }
+      ],
+      "genres": [
+        "tieteiskirjallisuus",
+        "dystopiat",
+        "psykologiset romaanit",
+        "romaanit",
+        "kaunokirjallisuus",
+        "käännökset",
+        "englanninkielinen kirjallisuus"
+      ],
+      "majorGenres": [
+        "fiction"
+      ],
+      "classifications": {
+        "udkf": [
+          "820-3"
+        ],
+        "ykl": [
+          "84.2",
+          "Scifi"
+        ]
+      },
+      "images": [],
+      "imagesExtended": [],
+      "summary": [],
+      "sectors": [
+        {
+          "value": "0/lib/",
+          "translated": "Kirjasto"
+        },
+        {
+          "value": "1/lib/pub/",
+          "translated": "Yleinen"
+        }
+      ],
+      "dedupIds": [
+        "helle.1656664",
+        "helmet.2530900",
+        "fikka.5590684",
+        "kuopio.1606962",
+        "louna.c91c84fc-8233-4c22-8af4-6580d7eca922",
+        "outi.2279348",
+        "piki.5133312",
+        "ratamo.1955454",
+        "vaski.4284247"
+      ],
+      "fullRecord": "<?xml version=\"1.0\"?>\n<collection xmlns=\"http://www.loc.gov/MARC21/slim\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd\"><record><leader>00000cam a22000004i 4500</leader><controlfield tag=\"001\">7326901</controlfield><controlfield tag=\"003\">FI-BTJ</controlfield><controlfield tag=\"005\">20250313123426.0</controlfield><controlfield tag=\"008\">230111t20232005fi ||||       |0| f|fin|c</controlfield><datafield tag=\"020\" ind1=\" \" ind2=\" \"><subfield code=\"a\">9789520453589</subfield><subfield code=\"q\">pehmeäkantinen</subfield></datafield><datafield tag=\"035\" ind1=\" \" ind2=\" \"><subfield code=\"a\">(FI-BTJ)7326901</subfield></datafield><datafield tag=\"040\" ind1=\" \" ind2=\" \"><subfield code=\"a\">FI-BTJ</subfield><subfield code=\"b\">fin</subfield><subfield code=\"e\">rda</subfield><subfield code=\"d\">FI-NL</subfield></datafield><datafield tag=\"041\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">fin</subfield><subfield code=\"h\">eng</subfield></datafield><datafield tag=\"080\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">820</subfield><subfield code=\"x\">-3</subfield><subfield code=\"2\">1974/fin/fennica</subfield></datafield><datafield tag=\"084\" ind1=\" \" ind2=\" \"><subfield code=\"a\">84.2</subfield><subfield code=\"2\">ykl</subfield></datafield><datafield tag=\"084\" ind1=\"9\" ind2=\" \"><subfield code=\"a\">Scifi</subfield><subfield code=\"2\">ykl</subfield></datafield><datafield tag=\"100\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Ishiguro, Kazuo,</subfield><subfield code=\"e\">kirjoittaja.</subfield></datafield><datafield tag=\"240\" ind1=\"1\" ind2=\"0\"><subfield code=\"a\">Never let me go.</subfield><subfield code=\"l\">Suomi</subfield></datafield><datafield tag=\"245\" ind1=\"1\" ind2=\"0\"><subfield code=\"a\">Ole luonani aina /</subfield><subfield code=\"c\">Kazuo Ishiguro ; suomentanut Helene Bützow.</subfield></datafield><datafield tag=\"264\" ind1=\" \" ind2=\"1\"><subfield code=\"a\">Helsinki :</subfield><subfield code=\"b\">Tammi,</subfield><subfield code=\"c\">[2023]</subfield></datafield><datafield tag=\"264\" ind1=\" \" ind2=\"3\"><subfield code=\"a\">EU:ssa</subfield></datafield><datafield tag=\"264\" ind1=\" \" ind2=\"4\"><subfield code=\"c\">©2005</subfield></datafield><datafield tag=\"300\" ind1=\" \" ind2=\" \"><subfield code=\"a\">394 sivua ;</subfield><subfield code=\"c\">18 cm</subfield></datafield><datafield tag=\"336\" ind1=\" \" ind2=\" \"><subfield code=\"a\">teksti</subfield><subfield code=\"b\">txt</subfield><subfield code=\"2\">rdacontent</subfield></datafield><datafield tag=\"337\" ind1=\" \" ind2=\" \"><subfield code=\"a\">käytettävissä ilman laitetta</subfield><subfield code=\"b\">n</subfield><subfield code=\"2\">rdamedia</subfield></datafield><datafield tag=\"338\" ind1=\" \" ind2=\" \"><subfield code=\"a\">nide</subfield><subfield code=\"b\">nc</subfield><subfield code=\"2\">rdacarrier</subfield></datafield><datafield tag=\"490\" ind1=\"0\" ind2=\" \"><subfield code=\"a\">Keltainen pokkari</subfield></datafield><datafield tag=\"490\" ind1=\"0\" ind2=\" \"><subfield code=\"a\">Keltainen kirjasto ;</subfield><subfield code=\"v\">367</subfield></datafield><datafield tag=\"500\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Kannessa myös: Nobel.</subfield></datafield><datafield tag=\"500\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Ensimmäinen suomenkielinen painos ilmestyi vuonna 2005.</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">muistot</subfield><subfield code=\"2\">kauno/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p1655</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">eristys (eristäminen muista)</subfield><subfield code=\"2\">kauno/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p2088</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">valheet</subfield><subfield code=\"2\">kauno/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p450</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">totuus</subfield><subfield code=\"2\">kauno/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p2468</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">ihmisarvo</subfield><subfield code=\"2\">kauno/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p317</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kloonaus</subfield><subfield code=\"2\">kauno/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p608</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">elimenluovutus</subfield><subfield code=\"2\">kauno/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p11990</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kloonit</subfield><subfield code=\"2\">kauno/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p765</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">oppilaat</subfield><subfield code=\"2\">kauno/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p2714</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">sisäoppilaitokset</subfield><subfield code=\"2\">kauno/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p592</subfield></datafield><datafield tag=\"651\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">Iso-Britannia</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p104990</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">tieteiskirjallisuus</subfield><subfield code=\"2\">slm/fin</subfield><subfield code=\"0\">http://urn.fi/URN:NBN:fi:au:slm:s418</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">dystopiat</subfield><subfield code=\"2\">slm/fin</subfield><subfield code=\"0\">http://urn.fi/URN:NBN:fi:au:slm:s1011</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">psykologiset romaanit</subfield><subfield code=\"2\">slm/fin</subfield><subfield code=\"0\">http://urn.fi/URN:NBN:fi:au:slm:s604</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">romaanit</subfield><subfield code=\"2\">slm/fin</subfield><subfield code=\"0\">http://urn.fi/URN:NBN:fi:au:slm:s518</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kaunokirjallisuus</subfield><subfield code=\"2\">slm/fin</subfield><subfield code=\"0\">http://urn.fi/URN:NBN:fi:au:slm:s975</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">käännökset</subfield><subfield code=\"2\">slm/fin</subfield><subfield code=\"0\">http://urn.fi/URN:NBN:fi:au:slm:s1044</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">englanninkielinen kirjallisuus</subfield><subfield code=\"2\">local</subfield></datafield><datafield tag=\"700\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Bützow, Helene,</subfield><subfield code=\"e\">kääntäjä.</subfield><subfield code=\"0\">(FI-ASTERI-N)000113261</subfield></datafield><datafield tag=\"942\" ind1=\" \" ind2=\" \"><subfield code=\"2\">YKL</subfield><subfield code=\"c\">KIRJA</subfield></datafield><datafield tag=\"999\" ind1=\" \" ind2=\" \"><subfield code=\"c\">1656664</subfield><subfield code=\"d\">1656664</subfield></datafield><datafield tag=\"952\" ind1=\" \" ind2=\" \"><subfield code=\"b\">ZPRVLIL</subfield><subfield code=\"c\">KOULU</subfield><subfield code=\"o\">84.2 ISH</subfield><subfield code=\"8\">SCIFI</subfield></datafield></record></collection>\n"
+    },
+    {
+      "id": "jykdok.2233801",
+      "recordPage": "/Record/jykdok.2233801",
+      "formats": [
+        {
+          "value": "0/Book/",
+          "translated": "Kirja"
+        },
+        {
+          "value": "1/Book/AudioBook/",
+          "translated": "Äänikirja"
+        },
+        {
+          "value": "2/Book/AudioBook/Online/",
+          "translated": "E-äänikirja"
+        }
+      ],
+      "title": "Ole luonani aina",
+      "shortTitle": "Ole luonani aina",
+      "uniformTitles": [
+        "Never Let Me Go. Suomi"
+      ],
+      "authors": {
+        "primary": {
+          "Ishiguro, Kazuo": {
+            "role": [
+              "kirjoittaja"
+            ]
+          },
+          "Bützow, Helene": {
+            "role": [
+              "-"
+            ]
+          },
+          "Saksman, Anna": {
+            "role": [
+              "-"
+            ]
+          }
+        },
+        "secondary": {
+          "Bützow, Helene, kääntäjä": {
+            "role": [
+              "kääntäjä"
+            ]
+          },
+          "Saksman, Anna, lukija": {
+            "role": [
+              "lukija"
+            ]
+          }
+        },
+        "corporate": {
+          "Tammi, kustantaja": {
+            "role": [
+              "kustantaja"
+            ]
+          }
+        }
+      },
+      "primaryAuthors": [
+        "Ishiguro, Kazuo",
+        "Bützow, Helene",
+        "Saksman, Anna"
+      ],
+      "nonPresenterAuthors": [
+        {
+          "name": "Ishiguro, Kazuo",
+          "role": "kirjoittaja",
+          "id": "(FI-ASTERI-N)000227339",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Bützow, Helene",
+          "role": "kääntäjä",
+          "id": "https://isni.org/isni/0000000076349517",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Saksman, Anna",
+          "role": "lukija",
+          "id": "https://isni.org/isni/0000000484063921",
+          "type": "Personal Name"
+        }
+      ],
+      "secondaryAuthors": [
+        "Bützow, Helene, kääntäjä",
+        "Saksman, Anna, lukija"
+      ],
+      "corporateAuthors": [
+        "Tammi, kustantaja"
+      ],
+      "isbns": [
+        "978-952-04-0095-8 MP3"
+      ],
+      "cleanIsbn": "9520400958",
+      "languages": [
+        "fin"
+      ],
+      "originalLanguages": [
+        "eng"
+      ],
+      "publishers": [
+        "Tammi"
+      ],
+      "publicationDates": [
+        "2017"
+      ],
+      "placesOfPublication": [
+        "Helsinki :"
+      ],
+      "year": "2017",
+      "physicalDescriptions": [
+        "1 verkkoaineisto (10 h 45 min)"
+      ],
+      "series": [
+        {
+          "name": "Keltainen kirjasto"
+        }
+      ],
+      "subjects": [],
+      "genres": [
+        "äänikirjat"
+      ],
+      "majorGenres": [
+        "fiction"
+      ],
+      "classifications": {
+        "ykl": [
+          "84.2"
+        ]
+      },
+      "images": [],
+      "imagesExtended": [],
+      "summary": [],
+      "sectors": [
+        {
+          "value": "0/lib/",
+          "translated": "Kirjasto"
+        },
+        {
+          "value": "1/lib/uni/",
+          "translated": "Yliopisto"
+        }
+      ],
+      "dedupIds": [
+        "jykdok.2233801",
+        "fikka.4307007"
+      ],
+      "fullRecord": "<?xml version=\"1.0\"?>\n<collection xmlns=\"http://www.loc.gov/MARC21/slim\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd\"><record><leader>00000cim a22000002i 4500</leader><controlfield tag=\"001\">015300135</controlfield><controlfield tag=\"003\">FI-MELINDA</controlfield><controlfield tag=\"005\">20260509183630.0</controlfield><controlfield tag=\"006\">m|||||o||h||||||||</controlfield><controlfield tag=\"007\">sr uunnnnnuneu</controlfield><controlfield tag=\"007\">cr nnannnuuuuu</controlfield><controlfield tag=\"008\">230102s2017    fi |||||o||||||f |||fin||</controlfield><datafield tag=\"020\" ind1=\" \" ind2=\" \"><subfield code=\"a\">978-952-04-0095-8</subfield><subfield code=\"q\">MP3</subfield></datafield><datafield tag=\"035\" ind1=\" \" ind2=\" \"><subfield code=\"a\">FCC015300135</subfield></datafield><datafield tag=\"040\" ind1=\" \" ind2=\" \"><subfield code=\"a\">FI-KV</subfield><subfield code=\"b\">fin</subfield><subfield code=\"e\">rda</subfield><subfield code=\"d\">FI-NL</subfield></datafield><datafield tag=\"041\" ind1=\"1\" ind2=\" \"><subfield code=\"d\">fin</subfield><subfield code=\"h\">eng</subfield></datafield><datafield tag=\"084\" ind1=\" \" ind2=\" \"><subfield code=\"a\">84.2</subfield><subfield code=\"2\">ykl</subfield></datafield><datafield tag=\"100\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Ishiguro, Kazuo,</subfield><subfield code=\"e\">kirjoittaja.</subfield><subfield code=\"0\">(FI-ASTERI-N)000227339</subfield></datafield><datafield tag=\"240\" ind1=\"1\" ind2=\"0\"><subfield code=\"a\">Never Let Me Go.</subfield><subfield code=\"l\">Suomi</subfield></datafield><datafield tag=\"245\" ind1=\"1\" ind2=\"0\"><subfield code=\"a\">Ole luonani aina.</subfield></datafield><datafield tag=\"264\" ind1=\" \" ind2=\"1\"><subfield code=\"a\">Helsinki :</subfield><subfield code=\"b\">Tammi,</subfield><subfield code=\"c\">2017.</subfield></datafield><datafield tag=\"300\" ind1=\" \" ind2=\" \"><subfield code=\"a\">1 verkkoaineisto (10 h 45 min)</subfield></datafield><datafield tag=\"306\" ind1=\" \" ind2=\" \"><subfield code=\"a\">104500</subfield></datafield><datafield tag=\"336\" ind1=\" \" ind2=\" \"><subfield code=\"a\">puhe</subfield><subfield code=\"b\">spw</subfield><subfield code=\"2\">rdacontent</subfield></datafield><datafield tag=\"337\" ind1=\" \" ind2=\" \"><subfield code=\"a\">tietokonekäyttöinen</subfield><subfield code=\"b\">c</subfield><subfield code=\"2\">rdamedia</subfield></datafield><datafield tag=\"338\" ind1=\" \" ind2=\" \"><subfield code=\"a\">verkkoaineisto</subfield><subfield code=\"b\">cr</subfield><subfield code=\"2\">rdacarrier</subfield></datafield><datafield tag=\"341\" ind1=\" \" ind2=\" \"><subfield code=\"a\">auditory</subfield><subfield code=\"2\">sapdv</subfield></datafield><datafield tag=\"344\" ind1=\" \" ind2=\" \"><subfield code=\"a\">digitaalinen</subfield></datafield><datafield tag=\"347\" ind1=\" \" ind2=\" \"><subfield code=\"a\">äänitiedosto</subfield><subfield code=\"b\">MP3</subfield></datafield><datafield tag=\"490\" ind1=\"0\" ind2=\" \"><subfield code=\"a\">Keltainen kirjasto</subfield></datafield><datafield tag=\"500\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Koneellisesti tuotettu tietue.</subfield></datafield><datafield tag=\"506\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Aineisto on käytettävissä vapaakappaletyöasemilla.</subfield><subfield code=\"f\">Online access with authorization</subfield><subfield code=\"2\">star</subfield></datafield><datafield tag=\"511\" ind1=\"0\" ind2=\" \"><subfield code=\"a\">Lukija: Anna Saksman.</subfield></datafield><datafield tag=\"540\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Aineisto on käytettävissä tutkimus- ja muihin tarkoituksiin;</subfield><subfield code=\"b\">Kansalliskirjasto;</subfield><subfield code=\"c\">Laki kulttuuriaineistojen tallettamisesta ja säilyttämisestä</subfield><subfield code=\"u\">http://www.finlex.fi/fi/laki/ajantasa/2007/20071433</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">äänikirjat</subfield><subfield code=\"2\">slm/fin</subfield><subfield code=\"0\">http://urn.fi/URN:NBN:fi:au:slm:s579</subfield></datafield><datafield tag=\"700\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Bützow, Helene,</subfield><subfield code=\"e\">kääntäjä.</subfield><subfield code=\"0\">https://isni.org/isni/0000000076349517</subfield></datafield><datafield tag=\"700\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Saksman, Anna,</subfield><subfield code=\"e\">lukija.</subfield><subfield code=\"0\">https://isni.org/isni/0000000484063921</subfield></datafield><datafield tag=\"710\" ind1=\"2\" ind2=\" \"><subfield code=\"a\">Tammi,</subfield><subfield code=\"e\">kustantaja.</subfield></datafield><datafield tag=\"776\" ind1=\"0\" ind2=\" \"><subfield code=\"z\">978-951-31-3195-1</subfield></datafield><datafield tag=\"776\" ind1=\"0\" ind2=\" \"><subfield code=\"z\">978-952-04-0455-0</subfield></datafield><datafield tag=\"776\" ind1=\"0\" ind2=\" \"><subfield code=\"z\">978-952-04-5358-9</subfield></datafield><datafield tag=\"776\" ind1=\"0\" ind2=\" \"><subfield code=\"z\">978-951-31-6066-1</subfield></datafield><datafield tag=\"856\" ind1=\"4\" ind2=\"0\"><subfield code=\"u\">https://urn.fi/URN:ISBN:978-952-04-0095-8</subfield><subfield code=\"z\">Käytettävissä vapaakappaletyöasemilla</subfield></datafield><datafield tag=\"999\" ind1=\" \" ind2=\" \"><subfield code=\"c\">2233801</subfield><subfield code=\"d\">2233801</subfield></datafield></record></collection>\n"
+    }
+  ],
+  "status": "OK"
+}

@@ -1,0 +1,606 @@
+{
+  "resultCount": 2,
+  "records": [
+    {
+      "id": "anders.7052dbbe-39de-4c5b-8536-807be72636fb",
+      "recordPage": "/Record/anders.7052dbbe-39de-4c5b-8536-807be72636fb",
+      "formats": [
+        {
+          "value": "0/Book/",
+          "translated": "Kirja"
+        },
+        {
+          "value": "1/Book/Book/",
+          "translated": "Kirja"
+        }
+      ],
+      "title": "A storm of swords / Part two Blood and gold",
+      "shortTitle": "A storm of swords",
+      "subTitle": "Part two Blood and gold",
+      "titleSection": "Part two Blood and gold",
+      "uniformTitles": [
+        "A Storm of Swords"
+      ],
+      "authors": {
+        "primary": {
+          "Martin, George R. R.": {
+            "role": [
+              "kirjoittaja"
+            ]
+          }
+        },
+        "secondary": {
+          "Martin, George Raymond Richard": {
+            "role": [
+              "-"
+            ]
+          }
+        },
+        "corporate": []
+      },
+      "primaryAuthors": [
+        "Martin, George R. R."
+      ],
+      "nonPresenterAuthors": [
+        {
+          "name": "Martin, George R. R.",
+          "role": "kirjoittaja",
+          "type": "Personal Name"
+        }
+      ],
+      "secondaryAuthors": [
+        "Martin, George Raymond Richard"
+      ],
+      "corporateAuthors": [],
+      "isbns": [
+        "978-0-00-744785-5"
+      ],
+      "cleanIsbn": "000744785X",
+      "languages": [
+        "eng"
+      ],
+      "originalLanguages": [],
+      "publishers": [
+        "Harper Voyager"
+      ],
+      "publicationDates": [
+        "2011"
+      ],
+      "placesOfPublication": [
+        "LONDON"
+      ],
+      "year": "2011",
+      "edition": "[New ed.]",
+      "physicalDescriptions": [
+        "607 sivua : karttoja"
+      ],
+      "series": [
+        {
+          "name": "A song of ice and fire",
+          "additional": "book 3"
+        },
+        {
+          "name": "A song of ice and fire",
+          "additional": "book 3."
+        }
+      ],
+      "subjects": [
+        [
+          "Stark"
+        ],
+        [
+          "Lannister"
+        ],
+        [
+          "Daenerys Myrskysyntyinen"
+        ],
+        [
+          "Stark,"
+        ],
+        [
+          "maktkamp"
+        ],
+        [
+          "hämnd"
+        ],
+        [
+          "riddare"
+        ],
+        [
+          "drakar"
+        ],
+        [
+          "medeltiden"
+        ],
+        [
+          "kungadömen"
+        ],
+        [
+          "valtataistelu"
+        ],
+        [
+          "kosto"
+        ],
+        [
+          "ritarit"
+        ],
+        [
+          "lohikäärmeet"
+        ],
+        [
+          "kuningaskunnat",
+          "Seitsemän kuningaskuntaa"
+        ],
+        [
+          "fantasiakirjallisuus"
+        ],
+        [
+          "keskiaika"
+        ],
+        [
+          "ljudböcker"
+        ],
+        [
+          "fantasylitteratur"
+        ]
+      ],
+      "subjectsExtended": [
+        {
+          "heading": [
+            "Stark"
+          ],
+          "type": "personal name",
+          "source": "unknown",
+          "authType": "Personal Name"
+        },
+        {
+          "heading": [
+            "Lannister"
+          ],
+          "type": "personal name",
+          "source": "unknown",
+          "authType": "Personal Name"
+        },
+        {
+          "heading": [
+            "Daenerys Myrskysyntyinen"
+          ],
+          "type": "personal name",
+          "source": "unknown",
+          "authType": "Personal Name"
+        },
+        {
+          "heading": [
+            "Stark,"
+          ],
+          "type": "personal name",
+          "source": "unknown",
+          "authType": "Personal Name"
+        },
+        {
+          "heading": [
+            "maktkamp"
+          ],
+          "type": "topic",
+          "source": "kauno/swe",
+          "id": "http://www.yso.fi/onto/kauno/p4487"
+        },
+        {
+          "heading": [
+            "hämnd"
+          ],
+          "type": "topic",
+          "source": "kauno/swe",
+          "id": "http://www.yso.fi/onto/kauno/p3326"
+        },
+        {
+          "heading": [
+            "riddare"
+          ],
+          "type": "topic",
+          "source": "kauno/swe",
+          "id": "http://www.yso.fi/onto/kauno/p54"
+        },
+        {
+          "heading": [
+            "drakar"
+          ],
+          "type": "topic",
+          "source": "kauno/swe",
+          "id": "http://www.yso.fi/onto/yso/p18214"
+        },
+        {
+          "heading": [
+            "medeltiden"
+          ],
+          "type": "topic",
+          "source": "kauno/swe",
+          "id": "http://www.yso.fi/onto/kauno/p2402"
+        },
+        {
+          "heading": [
+            "kungadömen"
+          ],
+          "type": "topic",
+          "source": "kauno/swe",
+          "id": "http://www.yso.fi/onto/kauno/p1858"
+        },
+        {
+          "heading": [
+            "valtataistelu"
+          ],
+          "type": "topic",
+          "source": "kaunokki",
+          "id": "http://urn.fi/URN:NBN:fi:au:kaunokki:46663"
+        },
+        {
+          "heading": [
+            "kosto"
+          ],
+          "type": "topic",
+          "source": "kaunokki",
+          "id": "http://urn.fi/URN:NBN:fi:au:kaunokki:42593"
+        },
+        {
+          "heading": [
+            "ritarit"
+          ],
+          "type": "topic",
+          "source": "kaunokki",
+          "id": "http://urn.fi/URN:NBN:fi:au:kaunokki:44760"
+        },
+        {
+          "heading": [
+            "lohikäärmeet"
+          ],
+          "type": "topic",
+          "source": "kaunokki",
+          "id": "http://urn.fi/URN:NBN:fi:au:kaunokki:44488"
+        },
+        {
+          "heading": [
+            "kuningaskunnat",
+            "Seitsemän kuningaskuntaa"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "fantasiakirjallisuus"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "keskiaika"
+          ],
+          "type": "topic",
+          "source": "kaunokki",
+          "id": "http://urn.fi/URN:NBN:fi:au:kaunokki:44337"
+        },
+        {
+          "heading": [
+            "ljudböcker"
+          ],
+          "type": "topic",
+          "source": "bella"
+        },
+        {
+          "heading": [
+            "fantasylitteratur"
+          ],
+          "type": "topic",
+          "source": "bella"
+        }
+      ],
+      "genres": [
+        "fantasylitteratur",
+        "romaner",
+        "skönlitteratur",
+        "översättningar",
+        "engelsk litteratur",
+        "fantasiakirjallisuus"
+      ],
+      "majorGenres": [
+        "fiction"
+      ],
+      "classifications": {
+        "ykl": [
+          "84.5",
+          "Fantasy",
+          "84.31",
+          "Fantasia",
+          "84.2"
+        ]
+      },
+      "images": [],
+      "imagesExtended": [],
+      "summary": [],
+      "sectors": [
+        {
+          "value": "0/lib/",
+          "translated": "Kirjasto"
+        },
+        {
+          "value": "1/lib/pub/",
+          "translated": "Yleinen"
+        }
+      ],
+      "dedupIds": [
+        "anders.7052dbbe-39de-4c5b-8536-807be72636fb",
+        "eepos.1032644",
+        "heili.e32d7aaa-8f76-4061-8810-1beb1c5abbad",
+        "helle.1654080",
+        "helmet.1397240",
+        "tiekko.930133",
+        "kainet.430206",
+        "kangasniemi.a2f30094-046e-4122-89a4-998a7cc52428",
+        "keski.253581",
+        "kirkes.396549",
+        "kuopio.166413",
+        "kyyti.679761",
+        "lapinkirjasto.1027649",
+        "lastu.299301",
+        "lep.284623",
+        "lumme.419314",
+        "narpes.13b1dbb9-b042-4153-8eb0-2162ce49e361",
+        "outi.1943666",
+        "piki.3183220",
+        "satakirjastot.370368",
+        "vaarakirjastot.447070",
+        "vaasa.a7db1f92-74f4-4439-90c5-d3fb4b271bc9",
+        "vaari.1298259",
+        "vaski.651741"
+      ],
+      "fullRecord": "<?xml version=\"1.0\"?>\n<collection xmlns=\"http://www.loc.gov/MARC21/slim\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd\"><record><leader>00000 am  22000001  0000</leader><controlfield tag=\"001\">7052dbbe-39de-4c5b-8536-807be72636fb</controlfield><controlfield tag=\"003\">38ce7306-5873-4a96-8ad7-d42bf004dbec</controlfield><controlfield tag=\"008\">000000s2011       ||||g     |00| 1|eng||</controlfield><datafield tag=\"035\" ind1=\" \" ind2=\" \"><subfield code=\"a\">(FI-Anders)1241798</subfield></datafield><datafield tag=\"035\" ind1=\" \" ind2=\" \"><subfield code=\"a\">(FI-BTJ)1640083</subfield></datafield><datafield tag=\"035\" ind1=\" \" ind2=\" \"><subfield code=\"a\">(FI-MELINDA)006071625</subfield></datafield><datafield tag=\"020\" ind1=\" \" ind2=\" \"><subfield code=\"a\">978-0-00-744785-5</subfield></datafield><datafield tag=\"084\" ind1=\" \" ind2=\" \"><subfield code=\"a\">84.5</subfield><subfield code=\"2\">ykl</subfield></datafield><datafield tag=\"084\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Fantasy</subfield><subfield code=\"2\">ykl</subfield></datafield><datafield tag=\"084\" ind1=\" \" ind2=\" \"><subfield code=\"a\">84.31</subfield><subfield code=\"2\">ykl</subfield></datafield><datafield tag=\"084\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Fantasia</subfield><subfield code=\"2\">ykl</subfield></datafield><datafield tag=\"084\" ind1=\" \" ind2=\" \"><subfield code=\"a\">84.2</subfield><subfield code=\"2\">ykl</subfield></datafield><datafield tag=\"100\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Martin, George R. R.</subfield><subfield code=\"e\">kirjoittaja</subfield></datafield><datafield tag=\"240\" ind1=\"1\" ind2=\"0\"><subfield code=\"a\">A Storm of Swords</subfield></datafield><datafield tag=\"245\" ind1=\" \" ind2=\"0\"><subfield code=\"a\">A storm of swords /</subfield><subfield code=\"n\">Part two</subfield><subfield code=\"p\">Blood and gold</subfield><subfield code=\"c\">George R. R. Martin</subfield></datafield><datafield tag=\"246\" ind1=\"1\" ind2=\"2\"><subfield code=\"a\">Blood and gold</subfield></datafield><datafield tag=\"250\" ind1=\" \" ind2=\" \"><subfield code=\"a\">[New ed.].</subfield></datafield><datafield tag=\"260\" ind1=\" \" ind2=\" \"><subfield code=\"a\">LONDON</subfield><subfield code=\"b\">Harper Voyager</subfield><subfield code=\"c\">2011</subfield></datafield><datafield tag=\"300\" ind1=\" \" ind2=\" \"><subfield code=\"a\">607 sivua : karttoja</subfield></datafield><datafield tag=\"336\" ind1=\" \" ind2=\" \"><subfield code=\"b\">txt</subfield></datafield><datafield tag=\"337\" ind1=\" \" ind2=\" \"><subfield code=\"b\">n</subfield></datafield><datafield tag=\"338\" ind1=\" \" ind2=\" \"><subfield code=\"b\">nc</subfield></datafield><datafield tag=\"490\" ind1=\"0\" ind2=\" \"><subfield code=\"a\">A song of ice and fire</subfield><subfield code=\"v\">book 3</subfield></datafield><datafield tag=\"490\" ind1=\"0\" ind2=\" \"><subfield code=\"a\">A song of ice and fire</subfield><subfield code=\"v\">book 3.</subfield></datafield><datafield tag=\"500\" ind1=\" \" ind2=\" \"><subfield code=\"a\">nidottu</subfield></datafield><datafield tag=\"600\" ind1=\"0\" ind2=\"4\"><subfield code=\"a\">Stark</subfield></datafield><datafield tag=\"600\" ind1=\"0\" ind2=\"4\"><subfield code=\"a\">Lannister</subfield></datafield><datafield tag=\"600\" ind1=\"0\" ind2=\"4\"><subfield code=\"a\">Stark</subfield></datafield><datafield tag=\"600\" ind1=\"0\" ind2=\"4\"><subfield code=\"a\">Lannister</subfield></datafield><datafield tag=\"600\" ind1=\"0\" ind2=\"4\"><subfield code=\"a\">Daenerys Myrskysyntyinen</subfield></datafield><datafield tag=\"600\" ind1=\"0\" ind2=\"4\"><subfield code=\"a\">Stark,</subfield></datafield><datafield tag=\"600\" ind1=\"0\" ind2=\"4\"><subfield code=\"a\">Lannister</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">maktkamp</subfield><subfield code=\"2\">kauno/swe</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p4487</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">hämnd</subfield><subfield code=\"2\">kauno/swe</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p3326</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">riddare</subfield><subfield code=\"2\">kauno/swe</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p54</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">drakar</subfield><subfield code=\"2\">kauno/swe</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p18214</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">medeltiden</subfield><subfield code=\"2\">kauno/swe</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p2402</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kungadömen</subfield><subfield code=\"2\">kauno/swe</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p1858</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">valtataistelu</subfield><subfield code=\"2\">kaunokki</subfield><subfield code=\"0\">http://urn.fi/URN:NBN:fi:au:kaunokki:46663</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kosto</subfield><subfield code=\"2\">kaunokki</subfield><subfield code=\"0\">http://urn.fi/URN:NBN:fi:au:kaunokki:42593</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">ritarit</subfield><subfield code=\"2\">kaunokki</subfield><subfield code=\"0\">http://urn.fi/URN:NBN:fi:au:kaunokki:44760</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p54</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">lohikäärmeet</subfield><subfield code=\"2\">kaunokki</subfield><subfield code=\"0\">http://urn.fi/URN:NBN:fi:au:kaunokki:44488</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kuningaskunnat</subfield><subfield code=\"2\">kaunokki</subfield><subfield code=\"z\">Seitsemän kuningaskuntaa</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">fantasiakirjallisuus</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">keskiaika</subfield><subfield code=\"2\">kaunokki</subfield><subfield code=\"0\">http://urn.fi/URN:NBN:fi:au:kaunokki:44337</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">ljudböcker</subfield><subfield code=\"2\">bella</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">fantasylitteratur</subfield><subfield code=\"2\">bella</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">fantasylitteratur</subfield><subfield code=\"2\">slm/swe</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">romaner</subfield><subfield code=\"2\">slm/swe</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">skönlitteratur</subfield><subfield code=\"2\">slm/swe</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">översättningar</subfield><subfield code=\"2\">slm/swe</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">engelsk litteratur</subfield><subfield code=\"2\">local</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">fantasiakirjallisuus</subfield><subfield code=\"2\">slm/fin</subfield></datafield><datafield tag=\"852\" ind1=\" \" ind2=\" \"><subfield code=\"a\">d984d9ac-4606-4c09-8c18-d8c31cb8506a</subfield><subfield code=\"b\">91a20927-50ba-4203-b27d-3359d02ab8fc</subfield><subfield code=\"c\">8b4b8fbc-d5ee-41e2-af7e-da3ed060e18f</subfield></datafield><datafield tag=\"900\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Martin, George Raymond Richard</subfield></datafield></record></collection>\n"
+    },
+    {
+      "id": "helle.691753",
+      "recordPage": "/Record/helle.691753",
+      "formats": [
+        {
+          "value": "0/Book/",
+          "translated": "Kirja"
+        },
+        {
+          "value": "1/Book/Book/",
+          "translated": "Kirja"
+        }
+      ],
+      "title": "A storm of swords. Part two, Blood and gold",
+      "shortTitle": "A storm of swords",
+      "subTitle": "Part two, Blood and gold",
+      "titleSection": "Part two, Blood and gold /",
+      "uniformTitles": [],
+      "authors": {
+        "primary": {
+          "Martin, George R. R.": {
+            "role": [
+              "-"
+            ]
+          }
+        },
+        "secondary": [],
+        "corporate": []
+      },
+      "primaryAuthors": [
+        "Martin, George R. R."
+      ],
+      "nonPresenterAuthors": [
+        {
+          "name": "Martin, George R. R.",
+          "type": "Personal Name"
+        }
+      ],
+      "secondaryAuthors": [],
+      "corporateAuthors": [],
+      "isbns": [
+        "9780007447855 pehmeäkantinen"
+      ],
+      "cleanIsbn": "000744785X",
+      "languages": [
+        "eng"
+      ],
+      "originalLanguages": [],
+      "publishers": [
+        "Harper Voyager"
+      ],
+      "publicationDates": [
+        "2011"
+      ],
+      "placesOfPublication": [
+        "London :"
+      ],
+      "year": "2011",
+      "edition": "[New ed.]",
+      "physicalDescriptions": [
+        "607 sivua : karttoja ; 20 cm"
+      ],
+      "series": [
+        {
+          "name": "A song of ice and fire",
+          "additional": "book 3"
+        },
+        {
+          "name": "A song of ice and fire",
+          "additional": "book 3"
+        }
+      ],
+      "subjects": [
+        [
+          "Stark,",
+          "suku, (fiktiivinen hahmo)."
+        ],
+        [
+          "Lannister,",
+          "suku, (fiktiivinen hahmo)."
+        ],
+        [
+          "fantasiakirjallisuus"
+        ],
+        [
+          "valtataistelu"
+        ],
+        [
+          "taistelut"
+        ],
+        [
+          "juonittelu"
+        ],
+        [
+          "kosto"
+        ],
+        [
+          "petos"
+        ],
+        [
+          "ritarit"
+        ],
+        [
+          "lohikäärmeet"
+        ],
+        [
+          "sisällissodat"
+        ],
+        [
+          "kuningaskunnat"
+        ],
+        [
+          "maanosat",
+          "Westeros"
+        ]
+      ],
+      "subjectsExtended": [
+        {
+          "heading": [
+            "Stark,",
+            "suku, (fiktiivinen hahmo)."
+          ],
+          "type": "personal name",
+          "source": "unknown",
+          "authType": "Personal Name"
+        },
+        {
+          "heading": [
+            "Lannister,",
+            "suku, (fiktiivinen hahmo)."
+          ],
+          "type": "personal name",
+          "source": "unknown",
+          "authType": "Personal Name"
+        },
+        {
+          "heading": [
+            "fantasiakirjallisuus"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "valtataistelu"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "taistelut"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "juonittelu"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "kosto"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "petos"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "ritarit"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "lohikäärmeet"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "sisällissodat"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "kuningaskunnat"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "maanosat",
+            "Westeros"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        }
+      ],
+      "genres": [],
+      "majorGenres": [
+        "fiction"
+      ],
+      "classifications": {
+        "ykl": [
+          "84.5"
+        ]
+      },
+      "images": [],
+      "imagesExtended": [],
+      "summary": [],
+      "sectors": [
+        {
+          "value": "0/lib/",
+          "translated": "Kirjasto"
+        },
+        {
+          "value": "1/lib/pub/",
+          "translated": "Yleinen"
+        }
+      ],
+      "dedupIds": [
+        "helle.691753",
+        "helmet.2593446",
+        "outi.1448691",
+        "piki.3207962",
+        "vaarakirjastot.11512431"
+      ],
+      "fullRecord": "<?xml version=\"1.0\"?>\n<collection xmlns=\"http://www.loc.gov/MARC21/slim\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd\"><record><leader>00000cam a22000004i 4500</leader><controlfield tag=\"001\">360489</controlfield><controlfield tag=\"003\">BTJ01</controlfield><controlfield tag=\"005\">20250827141957.0</controlfield><controlfield tag=\"008\">110902s2011    xxk|||||||||| ||||f|eng|c</controlfield><datafield tag=\"020\" ind1=\" \" ind2=\" \"><subfield code=\"a\">9780007447855</subfield><subfield code=\"q\">pehmeäkantinen</subfield></datafield><datafield tag=\"040\" ind1=\" \" ind2=\" \"><subfield code=\"b\">fin</subfield><subfield code=\"c\">FI-Helle</subfield></datafield><datafield tag=\"041\" ind1=\"0\" ind2=\" \"><subfield code=\"a\">eng</subfield></datafield><datafield tag=\"084\" ind1=\" \" ind2=\" \"><subfield code=\"a\">84.5</subfield><subfield code=\"2\">ykl</subfield></datafield><datafield tag=\"100\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Martin, George R. R.</subfield></datafield><datafield tag=\"245\" ind1=\"1\" ind2=\"2\"><subfield code=\"a\">A storm of swords.</subfield><subfield code=\"n\">Part two,</subfield><subfield code=\"p\">Blood and gold /</subfield><subfield code=\"c\">George R. R. Martin.</subfield></datafield><datafield tag=\"250\" ind1=\" \" ind2=\" \"><subfield code=\"a\">[New ed.]</subfield></datafield><datafield tag=\"260\" ind1=\" \" ind2=\" \"><subfield code=\"a\">London :</subfield><subfield code=\"b\">Harper Voyager,</subfield><subfield code=\"c\">2011.</subfield></datafield><datafield tag=\"300\" ind1=\" \" ind2=\" \"><subfield code=\"a\">607 sivua :</subfield><subfield code=\"b\">karttoja ;</subfield><subfield code=\"c\">20 cm</subfield></datafield><datafield tag=\"336\" ind1=\" \" ind2=\" \"><subfield code=\"a\">teksti</subfield><subfield code=\"b\">txt</subfield><subfield code=\"2\">rdacontent</subfield></datafield><datafield tag=\"337\" ind1=\" \" ind2=\" \"><subfield code=\"a\">käytettävissä ilman laitetta</subfield><subfield code=\"b\">n</subfield><subfield code=\"2\">rdamedia</subfield></datafield><datafield tag=\"338\" ind1=\" \" ind2=\" \"><subfield code=\"a\">nide</subfield><subfield code=\"b\">nc</subfield><subfield code=\"2\">rdacarrier</subfield></datafield><datafield tag=\"490\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">A song of ice and fire ;</subfield><subfield code=\"v\">book 3</subfield></datafield><datafield tag=\"600\" ind1=\"1\" ind2=\"4\"><subfield code=\"a\">Stark,</subfield><subfield code=\"c\">suku, (fiktiivinen hahmo).</subfield></datafield><datafield tag=\"600\" ind1=\"1\" ind2=\"4\"><subfield code=\"a\">Lannister,</subfield><subfield code=\"c\">suku, (fiktiivinen hahmo).</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">fantasiakirjallisuus</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">valtataistelu</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">taistelut</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">juonittelu</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kosto</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">petos</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">ritarit</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">lohikäärmeet</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">sisällissodat</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kuningaskunnat</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">maanosat</subfield><subfield code=\"z\">Westeros</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"740\" ind1=\"0\" ind2=\" \"><subfield code=\"a\">Blood and gold.</subfield></datafield><datafield tag=\"830\" ind1=\" \" ind2=\"2\"><subfield code=\"a\">A song of ice and fire ;</subfield><subfield code=\"v\">book 3</subfield><subfield code=\"9\">385521</subfield></datafield><datafield tag=\"856\" ind1=\" \" ind2=\" \"><subfield code=\"u\">http://armas.btj.fi/btjcgi/arvo/get_add_info.cgi?type=PRES&amp;key=2099412637547027</subfield><subfield code=\"x\">Kuvaus</subfield></datafield><datafield tag=\"942\" ind1=\" \" ind2=\" \"><subfield code=\"c\">KIRJA</subfield><subfield code=\"0\">5</subfield></datafield><datafield tag=\"972\" ind1=\" \" ind2=\" \"><subfield code=\"a\">A1640083</subfield></datafield><datafield tag=\"999\" ind1=\" \" ind2=\" \"><subfield code=\"c\">691753</subfield><subfield code=\"d\">691753</subfield></datafield><datafield tag=\"952\" ind1=\" \" ind2=\" \"><subfield code=\"b\">SIPSK</subfield><subfield code=\"c\">A</subfield><subfield code=\"o\">84.5 MAR</subfield><subfield code=\"8\">FANTASIA</subfield><subfield code=\"9\">1</subfield></datafield><datafield tag=\"952\" ind1=\" \" ind2=\" \"><subfield code=\"b\">INKPK</subfield><subfield code=\"c\">A</subfield><subfield code=\"o\">84.5 MAR</subfield><subfield code=\"8\">FANTASIA</subfield><subfield code=\"9\">1</subfield></datafield></record></collection>\n"
+    }
+  ],
+  "status": "OK"
+}

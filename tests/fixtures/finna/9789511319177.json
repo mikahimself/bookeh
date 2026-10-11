@@ -1,0 +1,1205 @@
+{
+  "resultCount": 4,
+  "records": [
+    {
+      "id": "jykdok.2298866",
+      "recordPage": "/Record/jykdok.2298866",
+      "formats": [
+        {
+          "value": "0/Book/",
+          "translated": "Kirja"
+        },
+        {
+          "value": "1/Book/AudioBook/",
+          "translated": "Äänikirja"
+        },
+        {
+          "value": "2/Book/AudioBook/Online/",
+          "translated": "E-äänikirja"
+        }
+      ],
+      "title": "Taivaanpallo",
+      "shortTitle": "Taivaanpallo",
+      "uniformTitles": [],
+      "authors": {
+        "primary": {
+          "Jalonen, Olli": {
+            "role": [
+              "kirjoittaja"
+            ]
+          },
+          "Laitinen, Aku": {
+            "role": [
+              "-"
+            ]
+          }
+        },
+        "secondary": {
+          "Laitinen, Aku, lukija": {
+            "role": [
+              "lukija"
+            ]
+          }
+        },
+        "corporate": {
+          "Otava, kustannusosakeyhtiö, kustantaja": {
+            "role": [
+              "kustantaja"
+            ]
+          }
+        }
+      },
+      "primaryAuthors": [
+        "Jalonen, Olli",
+        "Laitinen, Aku"
+      ],
+      "nonPresenterAuthors": [
+        {
+          "name": "Jalonen, Olli",
+          "role": "kirjoittaja",
+          "id": "(FI-ASTERI-N)000045561",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Laitinen, Aku",
+          "role": "lukija",
+          "type": "Personal Name"
+        }
+      ],
+      "secondaryAuthors": [
+        "Laitinen, Aku, lukija"
+      ],
+      "corporateAuthors": [
+        "Otava, kustannusosakeyhtiö, kustantaja"
+      ],
+      "isbns": [
+        "978-951-1-32595-6 MP3"
+      ],
+      "cleanIsbn": "9511325957",
+      "languages": [
+        "fin"
+      ],
+      "originalLanguages": [],
+      "publishers": [
+        "Otava"
+      ],
+      "publicationDates": [
+        "2018"
+      ],
+      "placesOfPublication": [
+        "Helsinki :"
+      ],
+      "year": "2018",
+      "physicalDescriptions": [
+        "1 verkkoaineisto (13 h)",
+        "Julkaistu myös painettuna"
+      ],
+      "series": [
+        {
+          "name": "Otavan äänikirja"
+        }
+      ],
+      "subjects": [
+        [
+          "Angus",
+          "(fiktiivinen hahmo)"
+        ],
+        [
+          "Halley, Edmond",
+          "fiktio."
+        ],
+        [
+          "merimatkat"
+        ],
+        [
+          "tiede",
+          "uskonto"
+        ],
+        [
+          "usko",
+          "järki"
+        ],
+        [
+          "ristiriidat",
+          "uuden ajan alku"
+        ],
+        [
+          "sisäinen maailma",
+          "minäkertoja"
+        ],
+        [
+          "oppipojat",
+          "tähtitieteilijät"
+        ],
+        [
+          "valtataistelu",
+          "saaret",
+          "Saint Helena"
+        ],
+        [
+          "kaupungit",
+          "Lontoo",
+          "1600-luku"
+        ]
+      ],
+      "subjectsExtended": [
+        {
+          "heading": [
+            "Angus",
+            "(fiktiivinen hahmo)"
+          ],
+          "type": "personal name",
+          "source": "unknown",
+          "authType": "Personal Name"
+        },
+        {
+          "heading": [
+            "Halley, Edmond",
+            "fiktio."
+          ],
+          "type": "personal name",
+          "source": "unknown",
+          "authType": "Personal Name"
+        },
+        {
+          "heading": [
+            "merimatkat"
+          ],
+          "type": "topic",
+          "source": "kauno/fin",
+          "id": "http://www.yso.fi/onto/kauno/p2692"
+        },
+        {
+          "heading": [
+            "tiede",
+            "uskonto"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "usko",
+            "järki"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "ristiriidat",
+            "uuden ajan alku"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "sisäinen maailma",
+            "minäkertoja"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "oppipojat",
+            "tähtitieteilijät"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "valtataistelu",
+            "saaret",
+            "Saint Helena"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "kaupungit",
+            "Lontoo",
+            "1600-luku"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        }
+      ],
+      "genres": [
+        "äänikirjat",
+        "historialliset romaanit",
+        "aateromaanit",
+        "seikkailukirjallisuus",
+        "kehitysromaanit",
+        "romaanit",
+        "kaunokirjallisuus suomenkielinen kirjallisuus"
+      ],
+      "majorGenres": [
+        "fiction"
+      ],
+      "classifications": {
+        "ykl": [
+          "84.2",
+          "Historia"
+        ]
+      },
+      "images": [],
+      "imagesExtended": [],
+      "summary": [],
+      "sectors": [
+        {
+          "value": "0/lib/",
+          "translated": "Kirjasto"
+        },
+        {
+          "value": "1/lib/uni/",
+          "translated": "Yliopisto"
+        }
+      ],
+      "fullRecord": "<?xml version=\"1.0\"?>\n<collection xmlns=\"http://www.loc.gov/MARC21/slim\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd\"><record><leader>00000cim a22000004i 4500</leader><controlfield tag=\"001\">012203197</controlfield><controlfield tag=\"003\">FI-MELINDA</controlfield><controlfield tag=\"005\">20260513190052.0</controlfield><controlfield tag=\"006\">m|||||o||h| ||||||</controlfield><controlfield tag=\"007\">sr uunnnnnuneu</controlfield><controlfield tag=\"007\">cr nnannnuuuun</controlfield><controlfield tag=\"008\">180405s2018    fi |||ngo||||||f||||fin| </controlfield><datafield tag=\"020\" ind1=\" \" ind2=\" \"><subfield code=\"a\">978-951-1-32595-6</subfield><subfield code=\"q\">MP3</subfield></datafield><datafield tag=\"035\" ind1=\" \" ind2=\" \"><subfield code=\"a\">FCC012203197</subfield></datafield><datafield tag=\"040\" ind1=\" \" ind2=\" \"><subfield code=\"a\">FI-NL</subfield><subfield code=\"b\">fin</subfield><subfield code=\"e\">rda</subfield><subfield code=\"d\">FI-Piki</subfield><subfield code=\"d\">FI-Eepos</subfield></datafield><datafield tag=\"041\" ind1=\"0\" ind2=\" \"><subfield code=\"d\">fin</subfield></datafield><datafield tag=\"084\" ind1=\" \" ind2=\" \"><subfield code=\"a\">84.2</subfield><subfield code=\"2\">ykl</subfield></datafield><datafield tag=\"084\" ind1=\"9\" ind2=\" \"><subfield code=\"a\">Historia</subfield><subfield code=\"2\">ykl</subfield></datafield><datafield tag=\"100\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Jalonen, Olli,</subfield><subfield code=\"e\">kirjoittaja.</subfield><subfield code=\"0\">(FI-ASTERI-N)000045561</subfield></datafield><datafield tag=\"245\" ind1=\"1\" ind2=\"0\"><subfield code=\"a\">Taivaanpallo /</subfield><subfield code=\"c\">Olli Jalonen.</subfield></datafield><datafield tag=\"264\" ind1=\" \" ind2=\"1\"><subfield code=\"a\">Helsinki :</subfield><subfield code=\"b\">Otava,</subfield><subfield code=\"c\">2018.</subfield></datafield><datafield tag=\"300\" ind1=\" \" ind2=\" \"><subfield code=\"a\">1 verkkoaineisto (13 h)</subfield></datafield><datafield tag=\"306\" ind1=\" \" ind2=\" \"><subfield code=\"a\">130000</subfield></datafield><datafield tag=\"336\" ind1=\" \" ind2=\" \"><subfield code=\"a\">puhe</subfield><subfield code=\"b\">spw</subfield><subfield code=\"2\">rdacontent</subfield></datafield><datafield tag=\"337\" ind1=\" \" ind2=\" \"><subfield code=\"a\">tietokonekäyttöinen</subfield><subfield code=\"b\">c</subfield><subfield code=\"2\">rdamedia</subfield></datafield><datafield tag=\"338\" ind1=\" \" ind2=\" \"><subfield code=\"a\">verkkoaineisto</subfield><subfield code=\"b\">cr</subfield><subfield code=\"2\">rdacarrier</subfield></datafield><datafield tag=\"341\" ind1=\" \" ind2=\" \"><subfield code=\"a\">auditory</subfield><subfield code=\"2\">sapdv</subfield></datafield><datafield tag=\"344\" ind1=\" \" ind2=\" \"><subfield code=\"a\">digitaalinen</subfield></datafield><datafield tag=\"347\" ind1=\" \" ind2=\" \"><subfield code=\"a\">äänitiedosto</subfield><subfield code=\"b\">MP3</subfield></datafield><datafield tag=\"490\" ind1=\"0\" ind2=\" \"><subfield code=\"a\">Otavan äänikirja</subfield></datafield><datafield tag=\"506\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Aineisto on käytettävissä vapaakappaletyöasemilla.</subfield><subfield code=\"f\">Online access with authorization</subfield><subfield code=\"2\">star</subfield></datafield><datafield tag=\"506\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Käytettävissä lisenssin hankkineissa organisaatioissa.</subfield><subfield code=\"f\">Online access with authorization</subfield><subfield code=\"2\">star</subfield></datafield><datafield tag=\"511\" ind1=\"0\" ind2=\" \"><subfield code=\"a\">Lukija: Aku Laitinen.</subfield></datafield><datafield tag=\"530\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Julkaistu myös painettuna.</subfield></datafield><datafield tag=\"540\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Aineisto on käytettävissä tutkimus- ja muihin tarkoituksiin;</subfield><subfield code=\"b\">Kansalliskirjasto;</subfield><subfield code=\"c\">Laki kulttuuriaineistojen tallettamisesta ja säilyttämisestä</subfield><subfield code=\"u\">http://www.finlex.fi/fi/laki/ajantasa/2007/20071433</subfield></datafield><datafield tag=\"600\" ind1=\"0\" ind2=\"4\"><subfield code=\"a\">Angus</subfield><subfield code=\"c\">(fiktiivinen hahmo)</subfield></datafield><datafield tag=\"600\" ind1=\"1\" ind2=\"4\"><subfield code=\"a\">Halley, Edmond</subfield><subfield code=\"v\">fiktio.</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">merimatkat</subfield><subfield code=\"2\">kauno/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p2692</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">tiede</subfield><subfield code=\"x\">uskonto</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">usko</subfield><subfield code=\"x\">järki</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">ristiriidat</subfield><subfield code=\"x\">uuden ajan alku</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">sisäinen maailma</subfield><subfield code=\"x\">minäkertoja</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">oppipojat</subfield><subfield code=\"x\">tähtitieteilijät</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">valtataistelu</subfield><subfield code=\"x\">saaret</subfield><subfield code=\"z\">Saint Helena</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kaupungit</subfield><subfield code=\"z\">Lontoo</subfield><subfield code=\"y\">1600-luku</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">äänikirjat</subfield><subfield code=\"2\">slm/fin</subfield><subfield code=\"0\">http://urn.fi/URN:NBN:fi:au:slm:s579</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">historialliset romaanit</subfield><subfield code=\"2\">slm/fin</subfield><subfield code=\"0\">http://urn.fi/URN:NBN:fi:au:slm:s445</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">aateromaanit</subfield><subfield code=\"2\">slm/fin</subfield><subfield code=\"0\">http://urn.fi/URN:NBN:fi:au:slm:s119</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">seikkailukirjallisuus</subfield><subfield code=\"2\">slm/fin</subfield><subfield code=\"0\">http://urn.fi/URN:NBN:fi:au:slm:s905</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kehitysromaanit</subfield><subfield code=\"2\">slm/fin</subfield><subfield code=\"0\">http://urn.fi/URN:NBN:fi:au:slm:s665</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">romaanit</subfield><subfield code=\"2\">slm/fin</subfield><subfield code=\"0\">http://urn.fi/URN:NBN:fi:au:slm:s518</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kaunokirjallisuus</subfield><subfield code=\"x\">suomenkielinen kirjallisuus</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"700\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Laitinen, Aku,</subfield><subfield code=\"e\">lukija.</subfield></datafield><datafield tag=\"710\" ind1=\"2\" ind2=\" \"><subfield code=\"a\">Otava, kustannusosakeyhtiö,</subfield><subfield code=\"e\">kustantaja.</subfield><subfield code=\"0\">(FI-ASTERI-N)000039084</subfield></datafield><datafield tag=\"776\" ind1=\"0\" ind2=\"8\"><subfield code=\"i\">Painettu:</subfield><subfield code=\"z\">9789511319177</subfield></datafield><datafield tag=\"856\" ind1=\"4\" ind2=\"0\"><subfield code=\"u\">https://urn.fi/URN:ISBN:978-951-1-32595-6</subfield><subfield code=\"z\">Käytettävissä vapaakappaletyöasemilla</subfield></datafield><datafield tag=\"999\" ind1=\" \" ind2=\" \"><subfield code=\"c\">2298866</subfield><subfield code=\"d\">2298866</subfield></datafield></record></collection>\n"
+    },
+    {
+      "id": "3amk.92038",
+      "recordPage": "/Record/3amk.92038",
+      "formats": [
+        {
+          "value": "0/Book/",
+          "translated": "Kirja"
+        },
+        {
+          "value": "1/Book/Book/",
+          "translated": "Kirja"
+        }
+      ],
+      "title": "Taivaanpallo",
+      "shortTitle": "Taivaanpallo",
+      "uniformTitles": [],
+      "authors": {
+        "primary": {
+          "Jalonen, Olli": {
+            "role": [
+              "kirjoittaja"
+            ]
+          }
+        },
+        "secondary": [],
+        "corporate": []
+      },
+      "primaryAuthors": [
+        "Jalonen, Olli"
+      ],
+      "nonPresenterAuthors": [
+        {
+          "name": "Jalonen, Olli",
+          "role": "kirjoittaja",
+          "id": "(FIN11)000045561",
+          "type": "Personal Name"
+        }
+      ],
+      "secondaryAuthors": [],
+      "corporateAuthors": [],
+      "isbns": [
+        "978-951-1-31917-7 kovakantinen"
+      ],
+      "cleanIsbn": "9511319175",
+      "languages": [
+        "fin"
+      ],
+      "originalLanguages": [],
+      "publishers": [
+        "Kustannusosakeyhtiö Otava"
+      ],
+      "publicationDates": [
+        "2018"
+      ],
+      "placesOfPublication": [
+        "Helsingissä :"
+      ],
+      "year": "2018",
+      "physicalDescriptions": [
+        "461 sivua ; 21 cm"
+      ],
+      "series": [],
+      "subjects": [
+        [
+          "Angus,",
+          "(fiktiivinen hahmo)",
+          "fiktio."
+        ],
+        [
+          "Halley, Edmond",
+          "fiktio."
+        ],
+        [
+          "1600-luku"
+        ],
+        [
+          "tiede"
+        ],
+        [
+          "uskonto (uskominen)"
+        ],
+        [
+          "usko"
+        ],
+        [
+          "järki"
+        ],
+        [
+          "ristiriidat"
+        ],
+        [
+          "uuden ajan alku"
+        ],
+        [
+          "minäkertoja"
+        ],
+        [
+          "tähtitieteilijät"
+        ],
+        [
+          "oppilaat"
+        ],
+        [
+          "merimatkat"
+        ],
+        [
+          "valtataistelu"
+        ],
+        [
+          "saaret"
+        ],
+        [
+          "kaupungit"
+        ],
+        [
+          "tiede",
+          "uskonto"
+        ],
+        [
+          "usko",
+          "järki"
+        ],
+        [
+          "ristiriidat",
+          "uuden ajan alku"
+        ],
+        [
+          "sisäinen maailma",
+          "minäkertoja"
+        ],
+        [
+          "oppipojat",
+          "tähtitieteilijät"
+        ],
+        [
+          "valtataistelu",
+          "saaret",
+          "Saint Helena"
+        ],
+        [
+          "kaupungit",
+          "Lontoo",
+          "1600-luku"
+        ],
+        [
+          "Saint Helena"
+        ],
+        [
+          "Lontoo"
+        ]
+      ],
+      "subjectsExtended": [
+        {
+          "heading": [
+            "Angus,",
+            "(fiktiivinen hahmo)",
+            "fiktio."
+          ],
+          "type": "personal name",
+          "source": "unknown",
+          "authType": "Personal Name"
+        },
+        {
+          "heading": [
+            "Halley, Edmond",
+            "fiktio."
+          ],
+          "type": "personal name",
+          "source": "unknown",
+          "authType": "Personal Name"
+        },
+        {
+          "heading": [
+            "1600-luku"
+          ],
+          "type": "chronological",
+          "source": "yso/fin"
+        },
+        {
+          "heading": [
+            "tiede"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p2240"
+        },
+        {
+          "heading": [
+            "uskonto (uskominen)"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p6415"
+        },
+        {
+          "heading": [
+            "usko"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p1726"
+        },
+        {
+          "heading": [
+            "järki"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p4490"
+        },
+        {
+          "heading": [
+            "ristiriidat"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p2187"
+        },
+        {
+          "heading": [
+            "uuden ajan alku"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p25293"
+        },
+        {
+          "heading": [
+            "minäkertoja"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p26983"
+        },
+        {
+          "heading": [
+            "tähtitieteilijät"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p19215"
+        },
+        {
+          "heading": [
+            "oppilaat"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p8131"
+        },
+        {
+          "heading": [
+            "merimatkat"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p1921"
+        },
+        {
+          "heading": [
+            "valtataistelu"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p27392"
+        },
+        {
+          "heading": [
+            "saaret"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p17016"
+        },
+        {
+          "heading": [
+            "kaupungit"
+          ],
+          "type": "topic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p1688"
+        },
+        {
+          "heading": [
+            "tiede",
+            "uskonto"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "usko",
+            "järki"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "ristiriidat",
+            "uuden ajan alku"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "sisäinen maailma",
+            "minäkertoja"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "oppipojat",
+            "tähtitieteilijät"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "merimatkat"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "valtataistelu",
+            "saaret",
+            "Saint Helena"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "kaupungit",
+            "Lontoo",
+            "1600-luku"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "Saint Helena"
+          ],
+          "type": "geographic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p151150"
+        },
+        {
+          "heading": [
+            "Lontoo"
+          ],
+          "type": "geographic",
+          "source": "yso/fin",
+          "id": "http://www.yso.fi/onto/yso/p104995"
+        }
+      ],
+      "genres": [
+        "kaunokirjallisuus",
+        "historialliset romaanit",
+        "romaanit",
+        "aateromaanit",
+        "seikkailukirjallisuus",
+        "kehitysromaanit",
+        "kaunokirjallisuus suomenkielinen kirjallisuus"
+      ],
+      "majorGenres": [
+        "fiction"
+      ],
+      "classifications": {
+        "ykl": [
+          "84.2",
+          "Historia"
+        ]
+      },
+      "images": [],
+      "imagesExtended": [],
+      "summary": [
+        "Tähtitieteilijän oppipojan tie vie Saint Helenan saarelta 1600-luvun Lontooseen. Loisteliaassa romaanissa tiede ja usko kamppailevat valistuksen sarastaessa. Angus tahtoo silmistään purjeneulanterävät, ja kehittää näköään merkitsemällä öisin tähtien asentoja. Hän haaveilee Lontoosta ja pääsystä saarella käyneen Edmond Halleyn oppipojaksi. Lamaannuttava väkivallanteko kohdistuu pojan perheeseen, ja epävarmuuden ja levottomuuden ajat alkavat. Salakatolilaiset vehkeilevät ja itsevaltias kuvernööri pelaa omaan pussiinsa. Viesti saarelta on saatava emämaa Englantiin, ja Angus soudetaan jänikseksi purjelaivaan. Hänen uusi elämänsä alkaa märssykorin korkeuksissa, ja kaikki entinen jää taakse."
+      ],
+      "sectors": [
+        {
+          "value": "0/lib/",
+          "translated": "Kirjasto"
+        },
+        {
+          "value": "1/lib/poly/",
+          "translated": "AMK"
+        }
+      ],
+      "dedupIds": [
+        "3amk.92038",
+        "anders.81bb9643-f652-48aa-99df-e7e1b483c196",
+        "blanka.06e74985-5862-477b-8cab-f1665999fb20",
+        "diana.115294",
+        "eepos.2381757",
+        "heili.759676d7-6764-4f6e-8fcd-90679e76d321",
+        "helka.9931332113506253",
+        "helle.923122",
+        "helmet.2329163",
+        "hurma.74328",
+        "tiekko.631303",
+        "jykdok.1871454",
+        "kainet.1111836",
+        "kangasniemi.44751b0e-3261-44ae-a551-c67b34279237",
+        "fikka.4277767",
+        "keski.2884745",
+        "kirkes.1273409",
+        "korsnas.1bb04f11-238a-40b6-86d3-8dcbab67ba55",
+        "kristinestad.b10bf113-6345-4bd5-9539-b4d095660d2d",
+        "kronoby.3e2f2511-738f-4275-b980-69cfc20c743e",
+        "kuopio.1321486",
+        "kyyti.1320873",
+        "lapinkirjasto.1732039",
+        "lastu.278807",
+        "lep.302799",
+        "louna.88c52b03-2677-4f3c-8d90-ab9a09e3f0d8",
+        "lukki.743836",
+        "lumme.2953658",
+        "malax.42d09e96-8ed4-485e-bcf4-7a4a494988cb",
+        "korsholm.e8c05d62-f855-4fda-8850-07e5fc7c8e67",
+        "narpes.adf4d3d4-4ac6-4629-8a39-3d94c6d54645",
+        "oy.9916178323906252",
+        "outi.1904972",
+        "jakobstad.355afbbf-9037-4c89-a855-33ac3cccd381",
+        "piki.4129540",
+        "polamk.24003",
+        "ratamo.1449149",
+        "rutakko.a538fb1b-8c4e-48f8-9adb-b5fcdaab6385",
+        "satakirjastot.348272",
+        "seamk.991147366805969",
+        "siilinjarvi.536691",
+        "somero.29d40545-572b-459b-81a9-db0b83459003",
+        "tuni.9910303824205973",
+        "utu.9920013165405971",
+        "nykarleby.d2cec326-230f-42c3-af86-f8fff5fe46ed",
+        "vaarakirjastot.11475924",
+        "vaasa.4420b980-5210-471b-be3d-c45a621d2b85",
+        "vanamo.80ce80e0-a2b7-4170-b699-061af1691ae8",
+        "vaari.1982702",
+        "vaski.3656730",
+        "vora.c9f98873-0b20-498d-9abb-d58963685304",
+        "abo.9913228433405972"
+      ],
+      "fullRecord": "<?xml version=\"1.0\"?>\n<collection xmlns=\"http://www.loc.gov/MARC21/slim\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd\"><record><leader>00000cam a2200000 i 4500</leader><controlfield tag=\"001\">92038</controlfield><controlfield tag=\"003\">FI-Laure</controlfield><controlfield tag=\"005\">20250409164449.0</controlfield><controlfield tag=\"008\">171003t20182018fi ||||| |||| |0||f|fin|</controlfield><datafield tag=\"020\" ind1=\" \" ind2=\" \"><subfield code=\"a\">978-951-1-31917-7</subfield><subfield code=\"q\">kovakantinen</subfield></datafield><datafield tag=\"024\" ind1=\"3\" ind2=\" \"><subfield code=\"a\">9789511319177</subfield></datafield><datafield tag=\"035\" ind1=\" \" ind2=\" \"><subfield code=\"a\">FCC011508899</subfield></datafield><datafield tag=\"035\" ind1=\" \" ind2=\" \"><subfield code=\"a\">(FI-Laure)92038</subfield></datafield><datafield tag=\"040\" ind1=\" \" ind2=\" \"><subfield code=\"a\">FI-NL</subfield><subfield code=\"b\">fin</subfield><subfield code=\"e\">rda</subfield><subfield code=\"d\">FI-Piki</subfield></datafield><datafield tag=\"041\" ind1=\"0\" ind2=\" \"><subfield code=\"a\">fin</subfield></datafield><datafield tag=\"042\" ind1=\" \" ind2=\" \"><subfield code=\"a\">finb</subfield></datafield><datafield tag=\"084\" ind1=\" \" ind2=\" \"><subfield code=\"a\">84.2</subfield><subfield code=\"2\">ykl</subfield></datafield><datafield tag=\"084\" ind1=\"9\" ind2=\" \"><subfield code=\"a\">Historia</subfield><subfield code=\"2\">ykl</subfield></datafield><datafield tag=\"100\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Jalonen, Olli,</subfield><subfield code=\"e\">kirjoittaja.</subfield><subfield code=\"0\">(FIN11)000045561</subfield></datafield><datafield tag=\"245\" ind1=\"1\" ind2=\"0\"><subfield code=\"a\">Taivaanpallo /</subfield><subfield code=\"c\">Olli Jalonen.</subfield></datafield><datafield tag=\"264\" ind1=\" \" ind2=\"1\"><subfield code=\"a\">Helsingissä :</subfield><subfield code=\"b\">Kustannusosakeyhtiö Otava,</subfield><subfield code=\"c\">[2018]</subfield></datafield><datafield tag=\"264\" ind1=\" \" ind2=\"3\"><subfield code=\"b\">Otava kirjapaino.</subfield></datafield><datafield tag=\"264\" ind1=\" \" ind2=\"4\"><subfield code=\"c\">©2018</subfield></datafield><datafield tag=\"300\" ind1=\" \" ind2=\" \"><subfield code=\"a\">461 sivua ;</subfield><subfield code=\"c\">21 cm.</subfield></datafield><datafield tag=\"336\" ind1=\" \" ind2=\" \"><subfield code=\"a\">teksti</subfield><subfield code=\"b\">txt</subfield><subfield code=\"2\">rdacontent</subfield></datafield><datafield tag=\"337\" ind1=\" \" ind2=\" \"><subfield code=\"a\">käytettävissä ilman laitetta</subfield><subfield code=\"b\">n</subfield><subfield code=\"2\">rdamedia</subfield></datafield><datafield tag=\"338\" ind1=\" \" ind2=\" \"><subfield code=\"a\">nide</subfield><subfield code=\"b\">nc</subfield><subfield code=\"2\">rdacarrier</subfield></datafield><datafield tag=\"586\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Finlandia-palkinto 2018.</subfield></datafield><datafield tag=\"600\" ind1=\"0\" ind2=\"4\"><subfield code=\"a\">Angus,</subfield><subfield code=\"c\">(fiktiivinen hahmo)</subfield><subfield code=\"v\">fiktio.</subfield></datafield><datafield tag=\"600\" ind1=\"1\" ind2=\"4\"><subfield code=\"a\">Halley, Edmond</subfield><subfield code=\"v\">fiktio.</subfield></datafield><datafield tag=\"648\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">1600-luku</subfield><subfield code=\"2\">yso/fin</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">tiede</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p2240</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">uskonto (uskominen)</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p6415</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">usko</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p1726</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">järki</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p4490</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">ristiriidat</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p2187</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">uuden ajan alku</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p25293</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">minäkertoja</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p26983</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">tähtitieteilijät</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p19215</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">oppilaat</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p8131</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">merimatkat</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p1921</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">valtataistelu</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p27392</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">saaret</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p17016</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kaupungit</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p1688</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">tiede</subfield><subfield code=\"x\">uskonto</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">usko</subfield><subfield code=\"x\">järki</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">ristiriidat</subfield><subfield code=\"x\">uuden ajan alku</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">sisäinen maailma</subfield><subfield code=\"x\">minäkertoja</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">oppipojat</subfield><subfield code=\"x\">tähtitieteilijät</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">merimatkat</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">valtataistelu</subfield><subfield code=\"x\">saaret</subfield><subfield code=\"z\">Saint Helena</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kaupungit</subfield><subfield code=\"z\">Lontoo</subfield><subfield code=\"y\">1600-luku</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"651\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">Saint Helena</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p151150</subfield></datafield><datafield tag=\"651\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">Lontoo</subfield><subfield code=\"2\">yso/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/yso/p104995</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kaunokirjallisuus</subfield><subfield code=\"2\">slm/fin</subfield><subfield code=\"0\">http://urn.fi/URN:NBN:fi:au:slm:s975</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">historialliset romaanit</subfield><subfield code=\"2\">slm/fin</subfield><subfield code=\"0\">http://urn.fi/URN:NBN:fi:au:slm:s445</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">romaanit</subfield><subfield code=\"2\">slm/fin</subfield><subfield code=\"0\">http://urn.fi/URN:NBN:fi:au:slm:s518</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">historialliset romaanit</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">aateromaanit</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">seikkailukirjallisuus</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kehitysromaanit</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">romaanit</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kaunokirjallisuus</subfield><subfield code=\"x\">suomenkielinen kirjallisuus</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"856\" ind1=\"4\" ind2=\"2\"><subfield code=\"u\">http://data.kirjavalitys.fi/data/servlets/ProductRequestServlet?action=getimage&amp;ISBN=9789511319177</subfield><subfield code=\"z\">Kansikuva</subfield></datafield><datafield tag=\"856\" ind1=\"4\" ind2=\"2\"><subfield code=\"u\">http://data.kirjavalitys.fi/data/servlets/ProductRequestServlet?action=showreferat&amp;ISBN=9789511319177</subfield><subfield code=\"z\">Kuvaus</subfield></datafield><datafield tag=\"999\" ind1=\" \" ind2=\" \"><subfield code=\"c\">92038</subfield><subfield code=\"d\">92038</subfield></datafield><datafield tag=\"952\" ind1=\" \" ind2=\" \"><subfield code=\"b\">LAUTIK</subfield><subfield code=\"c\">YLEIS</subfield><subfield code=\"o\">Lounge 84.2 JALONEN, Olli</subfield><subfield code=\"8\">LAU</subfield><subfield code=\"9\">1</subfield></datafield></record></collection>\n"
+    },
+    {
+      "id": "jykdok.2293073",
+      "recordPage": "/Record/jykdok.2293073",
+      "formats": [
+        {
+          "value": "0/Book/",
+          "translated": "Kirja"
+        },
+        {
+          "value": "1/Book/eBook/",
+          "translated": "E-kirja"
+        }
+      ],
+      "title": "Taivaanpallo",
+      "shortTitle": "Taivaanpallo",
+      "uniformTitles": [],
+      "authors": {
+        "primary": {
+          "Jalonen, Olli": {
+            "role": [
+              "kirjoittaja"
+            ]
+          }
+        },
+        "secondary": [],
+        "corporate": {
+          "Otava, kustannusosakeyhtiö, kustantaja": {
+            "role": [
+              "kustantaja"
+            ]
+          }
+        }
+      },
+      "primaryAuthors": [
+        "Jalonen, Olli"
+      ],
+      "nonPresenterAuthors": [
+        {
+          "name": "Jalonen, Olli",
+          "role": "kirjoittaja",
+          "id": "(FI-ASTERI-N)000045561",
+          "type": "Personal Name"
+        }
+      ],
+      "secondaryAuthors": [],
+      "corporateAuthors": [
+        "Otava, kustannusosakeyhtiö, kustantaja"
+      ],
+      "isbns": [
+        "978-951-1-32254-2 EPUB"
+      ],
+      "cleanIsbn": "9511322540",
+      "languages": [
+        "fin"
+      ],
+      "originalLanguages": [],
+      "publishers": [
+        "Kustannusosakeyhtiö Otava"
+      ],
+      "publicationDates": [
+        "2018"
+      ],
+      "placesOfPublication": [
+        "Helsingissä :"
+      ],
+      "year": "2018",
+      "physicalDescriptions": [
+        "1 verkkoaineisto (461 sivua)",
+        "Julkaistu myös painettuna"
+      ],
+      "series": [],
+      "subjects": [
+        [
+          "Angus",
+          "(fiktiivinen hahmo)"
+        ],
+        [
+          "Halley, Edmond",
+          "fiktio."
+        ],
+        [
+          "merimatkat"
+        ],
+        [
+          "tiede",
+          "uskonto"
+        ],
+        [
+          "usko",
+          "järki"
+        ],
+        [
+          "ristiriidat",
+          "uuden ajan alku"
+        ],
+        [
+          "sisäinen maailma",
+          "minäkertoja"
+        ],
+        [
+          "oppipojat",
+          "tähtitieteilijät"
+        ],
+        [
+          "valtataistelu",
+          "saaret",
+          "Saint Helena"
+        ],
+        [
+          "kaupungit",
+          "Lontoo",
+          "1600-luku"
+        ]
+      ],
+      "subjectsExtended": [
+        {
+          "heading": [
+            "Angus",
+            "(fiktiivinen hahmo)"
+          ],
+          "type": "personal name",
+          "source": "unknown",
+          "authType": "Personal Name"
+        },
+        {
+          "heading": [
+            "Halley, Edmond",
+            "fiktio."
+          ],
+          "type": "personal name",
+          "source": "unknown",
+          "authType": "Personal Name"
+        },
+        {
+          "heading": [
+            "merimatkat"
+          ],
+          "type": "topic",
+          "source": "kauno/fin",
+          "id": "http://www.yso.fi/onto/kauno/p2692"
+        },
+        {
+          "heading": [
+            "tiede",
+            "uskonto"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "usko",
+            "järki"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "ristiriidat",
+            "uuden ajan alku"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "sisäinen maailma",
+            "minäkertoja"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "oppipojat",
+            "tähtitieteilijät"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "valtataistelu",
+            "saaret",
+            "Saint Helena"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "kaupungit",
+            "Lontoo",
+            "1600-luku"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        }
+      ],
+      "genres": [
+        "historialliset romaanit",
+        "aateromaanit",
+        "seikkailukirjallisuus",
+        "kehitysromaanit",
+        "romaanit",
+        "kaunokirjallisuus suomenkielinen kirjallisuus"
+      ],
+      "majorGenres": [
+        "fiction"
+      ],
+      "classifications": {
+        "ykl": [
+          "84.2",
+          "Historia"
+        ]
+      },
+      "images": [],
+      "imagesExtended": [],
+      "summary": [],
+      "sectors": [
+        {
+          "value": "0/lib/",
+          "translated": "Kirjasto"
+        },
+        {
+          "value": "1/lib/uni/",
+          "translated": "Yliopisto"
+        }
+      ],
+      "fullRecord": "<?xml version=\"1.0\"?>\n<collection xmlns=\"http://www.loc.gov/MARC21/slim\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd\"><record><leader>00000cam a22000004i 4500</leader><controlfield tag=\"001\">012208737</controlfield><controlfield tag=\"003\">FI-MELINDA</controlfield><controlfield tag=\"005\">20260512222702.0</controlfield><controlfield tag=\"006\">m|||||o||d||||||||</controlfield><controlfield tag=\"007\">cr |||||||||||</controlfield><controlfield tag=\"008\">180328s2018    fi |||||o|||||||||f|fin| </controlfield><datafield tag=\"020\" ind1=\" \" ind2=\" \"><subfield code=\"a\">978-951-1-32254-2</subfield><subfield code=\"q\">EPUB</subfield></datafield><datafield tag=\"035\" ind1=\" \" ind2=\" \"><subfield code=\"a\">FCC012208737</subfield></datafield><datafield tag=\"040\" ind1=\" \" ind2=\" \"><subfield code=\"a\">FI-NL</subfield><subfield code=\"b\">fin</subfield><subfield code=\"e\">rda</subfield><subfield code=\"d\">FI-Eepos</subfield></datafield><datafield tag=\"041\" ind1=\"0\" ind2=\" \"><subfield code=\"a\">fin</subfield></datafield><datafield tag=\"084\" ind1=\" \" ind2=\" \"><subfield code=\"a\">84.2</subfield><subfield code=\"2\">ykl</subfield></datafield><datafield tag=\"084\" ind1=\"9\" ind2=\" \"><subfield code=\"a\">Historia</subfield><subfield code=\"2\">ykl</subfield></datafield><datafield tag=\"100\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Jalonen, Olli,</subfield><subfield code=\"e\">kirjoittaja.</subfield><subfield code=\"0\">(FI-ASTERI-N)000045561</subfield></datafield><datafield tag=\"245\" ind1=\"1\" ind2=\"0\"><subfield code=\"a\">Taivaanpallo /</subfield><subfield code=\"c\">Olli Jalonen.</subfield></datafield><datafield tag=\"264\" ind1=\" \" ind2=\"1\"><subfield code=\"a\">Helsingissä :</subfield><subfield code=\"b\">Kustannusosakeyhtiö Otava,</subfield><subfield code=\"c\">[2018]</subfield></datafield><datafield tag=\"264\" ind1=\" \" ind2=\"4\"><subfield code=\"c\">©2018</subfield></datafield><datafield tag=\"300\" ind1=\" \" ind2=\" \"><subfield code=\"a\">1 verkkoaineisto (461 sivua)</subfield></datafield><datafield tag=\"336\" ind1=\" \" ind2=\" \"><subfield code=\"a\">teksti</subfield><subfield code=\"b\">txt</subfield><subfield code=\"2\">rdacontent</subfield></datafield><datafield tag=\"337\" ind1=\" \" ind2=\" \"><subfield code=\"a\">tietokonekäyttöinen</subfield><subfield code=\"b\">c</subfield><subfield code=\"2\">rdamedia</subfield></datafield><datafield tag=\"338\" ind1=\" \" ind2=\" \"><subfield code=\"a\">verkkoaineisto</subfield><subfield code=\"b\">cr</subfield><subfield code=\"2\">rdacarrier</subfield></datafield><datafield tag=\"341\" ind1=\" \" ind2=\" \"><subfield code=\"a\">textual</subfield><subfield code=\"2\">sapdv</subfield></datafield><datafield tag=\"347\" ind1=\" \" ind2=\" \"><subfield code=\"a\">tekstitiedosto</subfield><subfield code=\"b\">EPUB</subfield></datafield><datafield tag=\"506\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Aineisto on käytettävissä vapaakappaletyöasemilla.</subfield><subfield code=\"f\">Online access with authorization</subfield><subfield code=\"2\">star</subfield></datafield><datafield tag=\"506\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Käytettävissä lisenssin hankkineissa organisaatioissa.</subfield><subfield code=\"f\">Online access with authorization</subfield><subfield code=\"2\">star</subfield></datafield><datafield tag=\"530\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Julkaistu myös painettuna.</subfield></datafield><datafield tag=\"540\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Aineisto on käytettävissä tutkimus- ja muihin tarkoituksiin;</subfield><subfield code=\"b\">Kansalliskirjasto;</subfield><subfield code=\"c\">Laki kulttuuriaineistojen tallettamisesta ja säilyttämisestä</subfield><subfield code=\"u\">http://www.finlex.fi/fi/laki/ajantasa/2007/20071433</subfield></datafield><datafield tag=\"588\" ind1=\"0\" ind2=\" \"><subfield code=\"a\">Nimeke nimiönäytöltä 14.05.2018.</subfield></datafield><datafield tag=\"600\" ind1=\"0\" ind2=\"4\"><subfield code=\"a\">Angus</subfield><subfield code=\"c\">(fiktiivinen hahmo)</subfield></datafield><datafield tag=\"600\" ind1=\"1\" ind2=\"4\"><subfield code=\"a\">Halley, Edmond</subfield><subfield code=\"v\">fiktio.</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">merimatkat</subfield><subfield code=\"2\">kauno/fin</subfield><subfield code=\"0\">http://www.yso.fi/onto/kauno/p2692</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">tiede</subfield><subfield code=\"x\">uskonto</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">usko</subfield><subfield code=\"x\">järki</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">ristiriidat</subfield><subfield code=\"x\">uuden ajan alku</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">sisäinen maailma</subfield><subfield code=\"x\">minäkertoja</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">oppipojat</subfield><subfield code=\"x\">tähtitieteilijät</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">valtataistelu</subfield><subfield code=\"x\">saaret</subfield><subfield code=\"z\">Saint Helena</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kaupungit</subfield><subfield code=\"z\">Lontoo</subfield><subfield code=\"y\">1600-luku</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">historialliset romaanit</subfield><subfield code=\"2\">slm/fin</subfield><subfield code=\"0\">http://urn.fi/URN:NBN:fi:au:slm:s445</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">aateromaanit</subfield><subfield code=\"2\">slm/fin</subfield><subfield code=\"0\">http://urn.fi/URN:NBN:fi:au:slm:s119</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">seikkailukirjallisuus</subfield><subfield code=\"2\">slm/fin</subfield><subfield code=\"0\">http://urn.fi/URN:NBN:fi:au:slm:s905</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kehitysromaanit</subfield><subfield code=\"2\">slm/fin</subfield><subfield code=\"0\">http://urn.fi/URN:NBN:fi:au:slm:s665</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">romaanit</subfield><subfield code=\"2\">slm/fin</subfield><subfield code=\"0\">http://urn.fi/URN:NBN:fi:au:slm:s518</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kaunokirjallisuus</subfield><subfield code=\"x\">suomenkielinen kirjallisuus</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"710\" ind1=\"2\" ind2=\" \"><subfield code=\"a\">Otava, kustannusosakeyhtiö,</subfield><subfield code=\"e\">kustantaja.</subfield><subfield code=\"0\">(FI-ASTERI-N)000039084</subfield></datafield><datafield tag=\"776\" ind1=\"0\" ind2=\"8\"><subfield code=\"i\">Painettu:</subfield><subfield code=\"z\">9789511319177</subfield></datafield><datafield tag=\"856\" ind1=\"4\" ind2=\"0\"><subfield code=\"u\">https://urn.fi/URN:ISBN:978-951-1-32254-2</subfield><subfield code=\"z\">Käytettävissä vapaakappaletyöasemilla</subfield></datafield><datafield tag=\"999\" ind1=\" \" ind2=\" \"><subfield code=\"c\">2293073</subfield><subfield code=\"d\">2293073</subfield></datafield></record></collection>\n"
+    },
+    {
+      "id": "eepos.2477955",
+      "recordPage": "/Record/eepos.2477955",
+      "formats": [
+        {
+          "value": "0/Book/",
+          "translated": "Kirja"
+        },
+        {
+          "value": "1/Book/AudioBook/",
+          "translated": "Äänikirja"
+        },
+        {
+          "value": "2/Book/AudioBook/Daisy/",
+          "translated": "Celia-äänikirja"
+        }
+      ],
+      "title": "Taivaanpallo",
+      "shortTitle": "Taivaanpallo",
+      "uniformTitles": [],
+      "authors": {
+        "primary": {
+          "Jalonen, Olli": {
+            "role": [
+              "kirjoittaja"
+            ]
+          },
+          "Laitinen, Aku": {
+            "role": [
+              "-"
+            ]
+          }
+        },
+        "secondary": {
+          "Laitinen, Aku, lukija": {
+            "role": [
+              "lukija"
+            ]
+          }
+        },
+        "corporate": []
+      },
+      "primaryAuthors": [
+        "Jalonen, Olli",
+        "Laitinen, Aku"
+      ],
+      "nonPresenterAuthors": [
+        {
+          "name": "Jalonen, Olli",
+          "role": "kirjoittaja",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Laitinen, Aku",
+          "role": "lukija",
+          "type": "Personal Name"
+        }
+      ],
+      "secondaryAuthors": [
+        "Laitinen, Aku, lukija"
+      ],
+      "corporateAuthors": [],
+      "isbns": [],
+      "languages": [
+        "fin"
+      ],
+      "originalLanguages": [],
+      "publishers": [
+        "Celia"
+      ],
+      "publicationDates": [
+        "2018"
+      ],
+      "placesOfPublication": [
+        "[Helsinki] :"
+      ],
+      "year": "2018",
+      "physicalDescriptions": [
+        "1 CD-levy (Daisy) (13 h  2 min)"
+      ],
+      "series": [],
+      "subjects": [
+        [
+          "Angus,",
+          "(fiktiivinen hahmo)",
+          "fiktio."
+        ],
+        [
+          "Halley, Edmond",
+          "fiktio."
+        ],
+        [
+          "tiede",
+          "uskonto"
+        ],
+        [
+          "usko",
+          "järki"
+        ],
+        [
+          "ristiriidat",
+          "uuden ajan alku"
+        ],
+        [
+          "sisäinen maailma",
+          "minäkertoja"
+        ],
+        [
+          "oppipojat",
+          "tähtitieteilijät"
+        ],
+        [
+          "merimatkat"
+        ],
+        [
+          "valtataistelu",
+          "saaret",
+          "Saint Helena"
+        ],
+        [
+          "kaupungit",
+          "Lontoo",
+          "1600-luku"
+        ]
+      ],
+      "subjectsExtended": [
+        {
+          "heading": [
+            "Angus,",
+            "(fiktiivinen hahmo)",
+            "fiktio."
+          ],
+          "type": "personal name",
+          "source": "unknown",
+          "authType": "Personal Name"
+        },
+        {
+          "heading": [
+            "Halley, Edmond",
+            "fiktio."
+          ],
+          "type": "personal name",
+          "source": "unknown",
+          "authType": "Personal Name"
+        },
+        {
+          "heading": [
+            "tiede",
+            "uskonto"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "usko",
+            "järki"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "ristiriidat",
+            "uuden ajan alku"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "sisäinen maailma",
+            "minäkertoja"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "oppipojat",
+            "tähtitieteilijät"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "merimatkat"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "valtataistelu",
+            "saaret",
+            "Saint Helena"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        },
+        {
+          "heading": [
+            "kaupungit",
+            "Lontoo",
+            "1600-luku"
+          ],
+          "type": "topic",
+          "source": "kaunokki"
+        }
+      ],
+      "genres": [
+        "historialliset romaanit",
+        "aateromaanit",
+        "seikkailukirjallisuus",
+        "kehitysromaanit",
+        "romaanit",
+        "kaunokirjallisuus suomenkielinen kirjallisuus",
+        "äänikirjat",
+        "Daisy-kirjat"
+      ],
+      "majorGenres": [
+        "fiction"
+      ],
+      "classifications": {
+        "ykl": [
+          "84.2"
+        ]
+      },
+      "images": [],
+      "imagesExtended": [],
+      "summary": [],
+      "sectors": [
+        {
+          "value": "0/lib/",
+          "translated": "Kirjasto"
+        },
+        {
+          "value": "1/lib/pub/",
+          "translated": "Yleinen"
+        }
+      ],
+      "dedupIds": [
+        "eepos.2477955",
+        "heili.d20426ea-b7ca-4b27-91cf-86554f66222e",
+        "tiekko.673214",
+        "kainet.1479663",
+        "keski.2932686",
+        "kuopio.1380811",
+        "lastu.1532423",
+        "louna.5d8689a7-655b-412d-8aea-9b3bd9b5eb0c"
+      ],
+      "fullRecord": "<?xml version=\"1.0\"?>\n<collection xmlns=\"http://www.loc.gov/MARC21/slim\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:schemaLocation=\"http://www.loc.gov/MARC21/slim http://www.loc.gov/standards/marcxml/schema/MARC21slim.xsd\"><record><leader>00000nim_a22000004i 4500</leader><controlfield tag=\"001\">2477955</controlfield><controlfield tag=\"003\">ANDL100007</controlfield><controlfield tag=\"005\">20190924155600.2</controlfield><controlfield tag=\"007\">co|||a||||||||</controlfield><controlfield tag=\"008\">190108s2018    fi ||||f|||||||f||||fin|c</controlfield><datafield tag=\"028\" ind1=\"0\" ind2=\"1\"><subfield code=\"b\">Celia</subfield><subfield code=\"a\">349389</subfield></datafield><datafield tag=\"035\" ind1=\" \" ind2=\" \"><subfield code=\"a\">(FI-Eepos)0002477955</subfield></datafield><datafield tag=\"040\" ind1=\" \" ind2=\" \"><subfield code=\"a\">FI-Eepos</subfield><subfield code=\"b\">fin</subfield><subfield code=\"e\">rda</subfield></datafield><datafield tag=\"041\" ind1=\"0\" ind2=\" \"><subfield code=\"d\">fin</subfield></datafield><datafield tag=\"084\" ind1=\" \" ind2=\" \"><subfield code=\"a\">84.2</subfield><subfield code=\"2\">ykl</subfield></datafield><datafield tag=\"100\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Jalonen, Olli,</subfield><subfield code=\"e\">kirjoittaja.</subfield></datafield><datafield tag=\"245\" ind1=\"1\" ind2=\"0\"><subfield code=\"a\">Taivaanpallo /</subfield><subfield code=\"c\">Olli Jalonen.</subfield></datafield><datafield tag=\"264\" ind1=\" \" ind2=\"1\"><subfield code=\"a\">[Helsinki] :</subfield><subfield code=\"b\">Celia,</subfield><subfield code=\"c\">2018.</subfield></datafield><datafield tag=\"300\" ind1=\" \" ind2=\" \"><subfield code=\"a\">1 CD-levy (Daisy) (13 h  2 min)</subfield></datafield><datafield tag=\"336\" ind1=\" \" ind2=\" \"><subfield code=\"a\">puhe</subfield><subfield code=\"b\">spw</subfield><subfield code=\"2\">rdacontent</subfield></datafield><datafield tag=\"337\" ind1=\" \" ind2=\" \"><subfield code=\"a\">audio</subfield><subfield code=\"b\">s</subfield><subfield code=\"2\">rdamedia</subfield></datafield><datafield tag=\"338\" ind1=\" \" ind2=\" \"><subfield code=\"a\">äänilevy</subfield><subfield code=\"b\">sd</subfield><subfield code=\"2\">rdacarrier</subfield></datafield><datafield tag=\"344\" ind1=\" \" ind2=\" \"><subfield code=\"a\">digitaalinen</subfield><subfield code=\"b\">optinen</subfield></datafield><datafield tag=\"347\" ind1=\" \" ind2=\" \"><subfield code=\"a\">äänitiedosto</subfield><subfield code=\"b\">MP3</subfield><subfield code=\"b\">Daisy</subfield></datafield><datafield tag=\"506\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Vain lukemisesteisten käyttöön.</subfield></datafield><datafield tag=\"511\" ind1=\"0\" ind2=\" \"><subfield code=\"a\">Lukija: Aku Laitinen.</subfield></datafield><datafield tag=\"538\" ind1=\" \" ind2=\" \"><subfield code=\"a\">Daisy-lukulaite, MP3-tiedostoja toistava laite tai tietokone.</subfield></datafield><datafield tag=\"600\" ind1=\"0\" ind2=\"4\"><subfield code=\"a\">Angus,</subfield><subfield code=\"c\">(fiktiivinen hahmo)</subfield><subfield code=\"v\">fiktio.</subfield></datafield><datafield tag=\"600\" ind1=\"1\" ind2=\"4\"><subfield code=\"a\">Halley, Edmond</subfield><subfield code=\"v\">fiktio.</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">tiede</subfield><subfield code=\"x\">uskonto</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">usko</subfield><subfield code=\"x\">järki</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">ristiriidat</subfield><subfield code=\"x\">uuden ajan alku</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">sisäinen maailma</subfield><subfield code=\"x\">minäkertoja</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">oppipojat</subfield><subfield code=\"x\">tähtitieteilijät</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">merimatkat</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">valtataistelu</subfield><subfield code=\"x\">saaret</subfield><subfield code=\"z\">Saint Helena</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"650\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kaupungit</subfield><subfield code=\"z\">Lontoo</subfield><subfield code=\"y\">1600-luku</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">historialliset romaanit</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">aateromaanit</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">seikkailukirjallisuus</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kehitysromaanit</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">romaanit</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">kaunokirjallisuus</subfield><subfield code=\"x\">suomenkielinen kirjallisuus</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">äänikirjat</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"655\" ind1=\" \" ind2=\"7\"><subfield code=\"a\">Daisy-kirjat</subfield><subfield code=\"2\">kaunokki</subfield></datafield><datafield tag=\"700\" ind1=\"1\" ind2=\" \"><subfield code=\"a\">Laitinen, Aku,</subfield><subfield code=\"e\">lukija.</subfield></datafield><datafield tag=\"776\" ind1=\"0\" ind2=\"8\"><subfield code=\"i\">Painettu (sidottu)</subfield><subfield code=\"z\">9789511319177</subfield></datafield><datafield tag=\"776\" ind1=\"0\" ind2=\"8\"><subfield code=\"i\">Verkkoaineisto (EPUB)</subfield><subfield code=\"z\">9789511322542</subfield></datafield><datafield tag=\"776\" ind1=\"0\" ind2=\"8\"><subfield code=\"i\">Verkkoaineisto (MP3)</subfield><subfield code=\"z\">9789511325956</subfield></datafield><datafield tag=\"852\" ind1=\" \" ind2=\" \"><subfield code=\"a\">1</subfield><subfield code=\"b\">017</subfield><subfield code=\"c\">1</subfield></datafield><datafield tag=\"852\" ind1=\" \" ind2=\" \"><subfield code=\"a\">29</subfield><subfield code=\"b\">205</subfield><subfield code=\"c\">1</subfield></datafield><datafield tag=\"852\" ind1=\" \" ind2=\" \"><subfield code=\"a\">31</subfield><subfield code=\"b\">300</subfield><subfield code=\"c\">1</subfield></datafield><datafield tag=\"852\" ind1=\" \" ind2=\" \"><subfield code=\"a\">48</subfield><subfield code=\"b\">400</subfield><subfield code=\"c\">1</subfield></datafield><datafield tag=\"908\" ind1=\" \" ind2=\" \"><subfield code=\"a\">fi</subfield></datafield></record></collection>\n"
+    }
+  ],
+  "status": "OK"
+}
