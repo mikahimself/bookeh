@@ -90,3 +90,6 @@
   summary: Make sign-in take the same time whether or not the account exists or is locked.
   evidence: Payload skips password hashing for unknown and locked accounts, so response time reveals which emails have accounts.
   decided: Accepted for Phase 1 in the Epic 1 retrospective (Mika, 2026-10-10): v1 is tailnet only with one user. Revisit with NFR-5 if Phase 2 opens bookeh to others.
+- source_spec: `_bmad-output/implementation-artifacts/spec-2-3-k4-nightly-backups.md`
+  summary: backup.sh's failure branches (empty-DB refusal, pg_restore self-verification, .failed rename, prune-only-after-success) have no repeatable verification.
+  evidence: Verification-gap reviewer — only a one-time local rehearsal plus `sh -n` cover them; CI never touches deploy/, so dropping the `pg_restore --list` line or breaking the trap ships green. Deferred per the deploy-artifact pattern (story 2.2) and tests-at-a-functional-minimum; cheap partial close is committing the rehearsal as a rerunnable script under deploy/, worth revisiting when story 5.37 consumes last-backup.json.

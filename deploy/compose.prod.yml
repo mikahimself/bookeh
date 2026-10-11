@@ -18,6 +18,11 @@ services:
       # Media uploads on the NAS; the directory must be owned by uid 1001
       # (the image's nextjs user) — see README.
       - ${BOOKEH_MEDIA_DIR}:/app/media
+      # Backup status: backup.sh (story 2.3) writes last-backup.json here;
+      # the app only ever reads it (Settings surface, story 5.37).
+      # Defaulted (mirroring backup.sh) so a pre-story-2.3 .env still brings
+      # the stack up on the documented update path.
+      - ${BOOKEH_STATUS_DIR:-/mnt/nas/bookeh/backup-status}:/app/backup-status:ro
     environment:
       DATABASE_URL: postgres://bookeh:${POSTGRES_PASSWORD}@postgres:5432/bookeh
       PAYLOAD_SECRET: ${PAYLOAD_SECRET}

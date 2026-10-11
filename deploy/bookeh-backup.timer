@@ -1,0 +1,14 @@
+# Fires bookeh-backup.service nightly. Install as
+# /etc/systemd/system/bookeh-backup.timer and enable with
+# `systemctl enable --now bookeh-backup.timer` (see README.md).
+# Persistent=true catches up a run missed while the LXC was down.
+
+[Unit]
+Description=Nightly bookeh backup
+
+[Timer]
+OnCalendar=*-*-* 03:30
+Persistent=true
+
+[Install]
+WantedBy=timers.target

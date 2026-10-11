@@ -169,6 +169,22 @@ chown 100070 /mnt/nas/bookeh/postgres/data   # 70 in a privileged container
 chown 101001 /mnt/nas/bookeh/media           # 1001 in a privileged container
 ```
 
+The backup script (step 7) needs two more directories. The backup directory
+is operator-only; the status directory is 755 so its 644 `last-backup.json`
+is readable by the app user (uid 1001 → 101001) through the read-only mount:
+
+```sh
+mkdir -p /mnt/nas/bookeh/backups /mnt/nas/bookeh/backup-status
+chown 100000 /mnt/nas/bookeh/backups         # 0 (LXC root) in a privileged container
+chown 100000 /mnt/nas/bookeh/backup-status
+chmod 700 /mnt/nas/bookeh/backups
+chmod 755 /mnt/nas/bookeh/backup-status
+```
+
+`backup.sh` deliberately never creates `/mnt/nas/bookeh/backups` itself: a
+missing directory means a missing NAS mount, and the run must fail rather
+than back up to a local directory.
+
 - **The marker file** exists only on the real NAS. The Postgres container
   checks it on **every** start (entrypoint wrapper) and exits with an error
   instead of initdb-ing a fresh cluster when the mount is missing.
@@ -188,12 +204,13 @@ no identity inside — and harmless wherever the mode is 755.)
 
 ### 4. Copy the deploy files to the LXC — [dev]
 
-The LXC has no checkout; the four files in `deploy/` travel by hand, now
+The LXC has no checkout; the seven files in `deploy/` travel by hand, now
 and after every change to them (see "Updating the deploy files"):
 
 ```sh
 cd <repo>/deploy
 scp compose.prod.yml postgres-entrypoint.sh .env.example bookeh.service \
+  backup.sh bookeh-backup.service bookeh-backup.timer \
   root@<lxc>:/root/
 ```
 
@@ -207,6 +224,7 @@ does the same.)
 mkdir -p /opt/bookeh
 cd /root
 cp compose.prod.yml postgres-entrypoint.sh /opt/bookeh/
+install -m 700 backup.sh /opt/bookeh/backup.sh
 cp .env.example /opt/bookeh/.env
 ```
 
@@ -217,7 +235,8 @@ file), then lock it down:
 chmod 600 /opt/bookeh/.env
 ```
 
-`bookeh.service` is installed in step 7, not under `/opt/bookeh`.
+`bookeh.service`, `bookeh-backup.service` and `bookeh-backup.timer` are
+installed in step 7, not under `/opt/bookeh`.
 
 ### 6. Log in to GHCR — [lxc]
 
@@ -236,18 +255,24 @@ sed -n 's/^GHCR_TOKEN=//p' .env | docker login ghcr.io \
 **GHCR token expiry:** `__________` *(fill in when minting the token; mint
 a new one before this date).*
 
-### 7. Install and start the systemd unit — [lxc]
+### 7. Install and start the systemd units — [lxc]
 
 ```sh
-cp /root/bookeh.service /etc/systemd/system/bookeh.service
+cp /root/bookeh.service /root/bookeh-backup.service /root/bookeh-backup.timer \
+  /etc/systemd/system/
 systemctl daemon-reload
 systemctl enable --now bookeh
+systemctl enable --now bookeh-backup.timer
 ```
 
 First start on an empty database: the app applies the migrations
 (`prodMigrations`; schema push is disabled in production) and seeds the
 first admin user from `SEED_EMAIL`/`SEED_PASSWORD`. **Clear both seed
 variables from `.env` once that account exists.**
+
+The timer runs `backup.sh` nightly at 03:30 (`Persistent=true` catches up a
+night the LXC was down); only the timer is enabled — `bookeh-backup.service`
+is started by it, or by hand (see Backups below).
 
 ### 8. Expose over the tailnet — [lxc]
 
@@ -284,8 +309,52 @@ The files in `/opt/bookeh` are copies. After changing `compose.prod.yml` or
 cd /opt/bookeh && docker compose -f compose.prod.yml up -d
 ```
 
-A change to `bookeh.service` also needs a re-copy to
-`/etc/systemd/system/bookeh.service` followed by `systemctl daemon-reload`.
+A changed `backup.sh` is re-installed the same way
+(`install -m 700 /root/backup.sh /opt/bookeh/backup.sh`). A change to
+`bookeh.service`, `bookeh-backup.service` or `bookeh-backup.timer` needs a
+re-copy to `/etc/systemd/system/` followed by `systemctl daemon-reload`.
+
+When a change introduces new variables (compare the new `.env.example`),
+add them to `/opt/bookeh/.env` by hand — this story added the three
+`BOOKEH_BACKUP_*` lines.
+
+## Backups — [lxc]
+
+`bookeh-backup.timer` runs `/opt/bookeh/backup.sh` nightly at 03:30. Each
+run writes a dated directory under `BOOKEH_BACKUP_DIR`
+(`/mnt/nas/bookeh/backups`) holding `bookeh.dump` — a custom-format
+`pg_dump`, verified with `pg_restore --list` before the run counts as a
+success — and `media/`, a full copy of the media directory. Configuration
+lives in `/opt/bookeh/.env` (`BOOKEH_BACKUP_DIR`, `BOOKEH_STATUS_DIR`,
+`BOOKEH_BACKUP_RETENTION_DAYS`).
+
+- **Retention is 30 days** (`BOOKEH_BACKUP_RETENTION_DAYS`): dated
+  directories older than that are pruned, but only after a fully successful
+  backup — a failing run never deletes anything.
+- **Guards:** the script refuses when the backup directory is missing (NAS
+  unmounted) and when the `users` table is empty (a fresh or wrong database
+  must not overwrite the impression that backups are fine).
+- **Failed runs** stay visible as `<timestamp>.failed` directories — never
+  mistakable for a restorable backup — and age out with the retention.
+- **Status:** every run, success or failure, atomically rewrites
+  `BOOKEH_STATUS_DIR/last-backup.json` (`time`, `outcome`,
+  `dumpSizeBytes`); the app container mounts the directory read-only at
+  `/app/backup-status` (consumed by the Settings surface, story 5.37).
+  The file lives on the NAS, so the failures it exists to surface (NAS
+  outage, the unit blocked before the script runs) leave it stale at the
+  previous success — a stale `time` must itself be treated as a failure
+  (story 5.37 flags a backup older than 48 h).
+
+Manual run and logs (always go through systemd — it serializes a manual run
+against the timer; running `backup.sh` directly can overlap a timer run):
+
+```sh
+systemctl start bookeh-backup.service
+journalctl -u bookeh-backup             # every run's output
+systemctl list-timers bookeh-backup.timer
+```
+
+To restore from `bookeh.dump`, read "Collation and restore" below first.
 
 ## Collation and restore (read before any restore)
 
@@ -367,3 +436,20 @@ purpose — `bookeh_test` is a dev/CI artifact.
       cookie is `Secure`).
 - [ ] `curl http://<lxc-lan-ip>:3000` from another machine fails — the port
       is loopback-only.
+- [ ] Manual backup run verified: `systemctl start bookeh-backup.service`
+      exits cleanly, a fresh dated directory under
+      `/mnt/nas/bookeh/backups` holds `bookeh.dump` and `media/`,
+      `journalctl -u bookeh-backup` shows the run, and
+      `cat /mnt/nas/bookeh/backup-status/last-backup.json` reports
+      `success` with a plausible `dumpSizeBytes`.
+- [ ] Backup permissions: `ls -ln /mnt/nas/bookeh` shows `backups` mode 700
+      and `backup-status` mode 755; inside the run directory the dump is
+      root-only (0600), and `last-backup.json` is 644.
+- [ ] `systemctl list-timers bookeh-backup.timer` shows the timer with a
+      next-run time.
+- [ ] Status mount: `docker compose -f compose.prod.yml exec app cat
+      /app/backup-status/last-backup.json` prints the status JSON from
+      inside the app container.
+
+(The empty-database refusal is proven in the local rehearsal on the dev
+stack, not on production — see the story's verification notes.)

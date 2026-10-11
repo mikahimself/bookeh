@@ -1,0 +1,23 @@
+# bookeh nightly backup (story 2.3). Install as
+# /etc/systemd/system/bookeh-backup.service next to bookeh-backup.timer, with
+# backup.sh and the .env in /opt/bookeh (see README.md). Started by the timer;
+# `systemctl start bookeh-backup.service` runs a backup by hand. Output lands
+# in the journal: `journalctl -u bookeh-backup`.
+#
+# RequiresMountsFor keeps a run from starting while the NAS is unmounted;
+# backup.sh refuses on its own too (the backup directory must already exist).
+
+[Unit]
+Description=bookeh nightly backup (pg_dump + media copy)
+# Ordered after the stack: a Persistent=true catch-up run at boot must not
+# fire before the compose stack is up, or `docker compose exec` fails and
+# the caught-up backup is lost.
+Wants=docker.service
+After=bookeh.service docker.service
+RequiresMountsFor=/mnt/nas/bookeh
+
+[Service]
+Type=oneshot
+EnvironmentFile=/opt/bookeh/.env
+WorkingDirectory=/opt/bookeh
+ExecStart=/opt/bookeh/backup.sh
