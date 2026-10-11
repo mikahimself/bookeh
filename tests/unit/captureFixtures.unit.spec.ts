@@ -4,10 +4,11 @@ import { join } from 'node:path'
 
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
+import { finnaMatches } from '@/lib/metadata/sources/finna'
+
 import {
   buildReport,
   capture,
-  finnaMatches,
   GOOGLE_HEALTH_ISBN,
   readIsbnList,
   type FetchFn,

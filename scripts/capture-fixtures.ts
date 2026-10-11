@@ -7,44 +7,7 @@ import { join } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 
 import { toIsbn13 } from '@/fields/isbn'
-
-export const FINNA_FIELDS = [
-  'id',
-  'recordPage',
-  'formats',
-  'title',
-  'shortTitle',
-  'subTitle',
-  'titleSection',
-  'uniformTitles',
-  'authors',
-  'primaryAuthors',
-  'nonPresenterAuthors',
-  'secondaryAuthors',
-  'corporateAuthors',
-  'isbns',
-  'cleanIsbn',
-  'languages',
-  'originalLanguages',
-  'publishers',
-  'publicationDates',
-  'placesOfPublication',
-  'year',
-  'edition',
-  'physicalDescriptions',
-  'series',
-  'subjects',
-  'subjectsExtended',
-  'genres',
-  'majorGenres',
-  'classifications',
-  'images',
-  'imagesExtended',
-  'summary',
-  'sectors',
-  'dedupIds',
-  'fullRecord',
-] as const
+import { FINNA_FIELDS, finnaMatches, finnaUrl } from '@/lib/metadata/sources/finna'
 
 export const SOURCES = ['finna', 'google'] as const
 export type Source = (typeof SOURCES)[number]
@@ -84,16 +47,6 @@ export function readIsbnList(text: string): ListedIsbn[] {
 }
 
 // --- Requests ----------------------------------------------------------------------------
-
-export function finnaUrl(isbn13: string): string {
-  const params = new URLSearchParams({
-    lookfor: `isbn:"${isbn13}"`,
-    type: 'AllFields',
-    limit: '100',
-  })
-  for (const field of FINNA_FIELDS) params.append('field[]', field)
-  return `https://api.finna.fi/api/v1/search?${params}`
-}
 
 export function googleUrl(isbn13: string, key: string): string {
   const params = new URLSearchParams({ q: `isbn:${isbn13}`, key })
@@ -256,20 +209,6 @@ function list(value: unknown): unknown[] {
 
 function strings(value: unknown): string[] {
   return list(value).filter((v): v is string => typeof v === 'string')
-}
-
-/** Finna `isbns` entries carry binding text after a space: `978-952-04-0805-3 kovakantinen`. */
-function finnaIsbn(entry: string): string | null {
-  const token = entry.trim().split(/\s+/)[0] ?? ''
-  return toIsbn13(token)
-}
-
-/** The records whose `isbns` normalise to the ISBN asked for. Finna also returns other editions. */
-export function finnaMatches(body: unknown, isbn13: string): Json[] {
-  if (!isObject(body)) return []
-  return list(body.records)
-    .filter(isObject)
-    .filter((record) => strings(record.isbns).some((entry) => finnaIsbn(entry) === isbn13))
 }
 
 /** The volumes whose industry identifiers normalise to the ISBN asked for. */

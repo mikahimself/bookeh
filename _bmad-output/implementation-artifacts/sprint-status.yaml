@@ -74,7 +74,7 @@ development_status:
   3-2-c9-real-book-fixture-capture: in-progress
   3-3-b1-isbn-and-name-key-fields: done
   3-4-c1-source-contract-and-merge: done
-  3-5-c2-finna-adapter-core-fields: backlog
+  3-5-c2-finna-adapter-core-fields: done
   3-6-c10-finna-adapter-series-themes-and-author-sort-names: backlog
   3-7-c3-google-books-adapter: backlog
   3-8-a24-in-process-state-helper: backlog

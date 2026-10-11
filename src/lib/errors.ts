@@ -32,13 +32,13 @@ export class DomainError extends Error {
 // `payload.logger` is out of reach here (this file imports nothing from the
 // project). With no `logger` in the config, Payload's logger is this same
 // `pino(defaultLoggerOptions)`. Built on first use: importing has no side effect.
-let logger: Logger | undefined
-const log = (): Logger => (logger ??= pino(defaultLoggerOptions))
+let instance: Logger | undefined
+export const logger = (): Logger => (instance ??= pino(defaultLoggerOptions))
 
 function toFailure(err: unknown, where: 'action' | 'route'): Failure {
   const failure = mapError(err)
   if (failure.code === 'INTERNAL') {
-    log().error({ err }, `Unexpected error in ${where === 'action' ? 'runAction' : 'runRoute'}`)
+    logger().error({ err }, `Unexpected error in ${where === 'action' ? 'runAction' : 'runRoute'}`)
   }
   return failure
 }
