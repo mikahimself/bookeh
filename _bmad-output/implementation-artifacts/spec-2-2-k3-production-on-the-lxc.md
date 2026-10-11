@@ -33,6 +33,14 @@ deferred:
     location: >-
       deploy/README.md (acceptance checklist)
     severity: medium (unverified)
+    resolution: >-
+      Resolved 2026-10-11: the operator deployed on the LXC and ran the full
+      acceptance checklist — all items passed (marker refusal, migrations +
+      seed on first start, tailscale serve, phone sign-in over tailnet HTTPS,
+      loopback-only port). Getting there required one deploy-artifact change
+      (compose runs Postgres as `user: postgres`, commit bfbf686: container
+      root is a nobody over NFS from an unprivileged LXC) and the NFS/uid-
+      shift findings now recorded in deploy/README.md.
 ---
 
 <intent-contract>
@@ -114,6 +122,14 @@ deferred:
 - Given `deploy/README.md`, when read, then it contains the `tailscale serve` command, the GHCR token expiry line, the collation/restore note, and the operator acceptance checklist (phone reaches the sign-in page over tailnet HTTPS).
 
 ## Spec Change Log
+
+- 2026-10-11 — On-LXC acceptance performed by the operator; the deferred
+  item is resolved (see frontmatter). The deploy differed from the rehearsals
+  in one way the review had flagged as a risk area: on NFS from an
+  unprivileged LXC the Postgres entrypoint's root phase gets EPERM, fixed by
+  `user: postgres` in compose.prod.yml (bfbf686) plus host-side ownership
+  with the 100000 uid shift. README rewritten as a per-machine runbook with
+  the NFS findings (vers=3, Synology squash/subfolder rules, DSM 000 modes).
 
 ## Review Triage Log
 
