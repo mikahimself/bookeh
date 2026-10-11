@@ -4,7 +4,7 @@ import { pino, type Logger } from 'pino'
 
 /** Spine, Errors convention. The message key for a code is `errors.<CODE>`. */
 export type ErrorCode =
-  'UNAUTHENTICATED' | 'WRONG_CREDENTIALS' | 'NOT_FOUND' | 'VALIDATION' | 'INTERNAL'
+  'UNAUTHENTICATED' | 'WRONG_CREDENTIALS' | 'NOT_FOUND' | 'VALIDATION' | 'INVALID_ISBN' | 'INTERNAL'
 
 export type ActionResult<T> =
   | { ok: true; data: T }

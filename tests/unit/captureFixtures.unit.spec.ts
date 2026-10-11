@@ -10,7 +10,6 @@ import {
   finnaMatches,
   GOOGLE_HEALTH_ISBN,
   readIsbnList,
-  toIsbn13,
   type FetchFn,
 } from '../../scripts/capture-fixtures'
 
@@ -30,7 +29,6 @@ afterEach(async () => {
 
 describe('ISBN list', () => {
   it('turns an ISBN-10 with hyphens into its ISBN-13', () => {
-    expect(toIsbn13('951-578-275-9')).toBe('9789515782755')
     expect(readIsbnList('# shelf\n951-578-275-9\n\n')).toEqual([
       { listed: '951-578-275-9', isbn13: '9789515782755' },
     ])

@@ -6,6 +6,8 @@ import { mkdir, readFile, rm, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 
+import { toIsbn13 } from '@/fields/isbn'
+
 export const FINNA_FIELDS = [
   'id',
   'recordPage',
@@ -67,30 +69,6 @@ const BACKOFF_MS = [2_000, 4_000, 8_000]
 const REQUEST_GAP_MS = 1_000
 
 // --- ISBNs -------------------------------------------------------------------------------
-
-function isbn13CheckDigit(first12: string): number {
-  let sum = 0
-  for (let i = 0; i < 12; i++) sum += Number(first12[i]) * (i % 2 === 0 ? 1 : 3)
-  return (10 - (sum % 10)) % 10
-}
-
-/** ISBN-10 or ISBN-13, hyphens and spaces allowed, to ISBN-13; null when invalid. */
-export function toIsbn13(text: string): string | null {
-  const compact = text.replace(/[\s-]/g, '').toUpperCase()
-  if (/^97[89]\d{10}$/.test(compact)) {
-    return isbn13CheckDigit(compact.slice(0, 12)) === Number(compact[12]) ? compact : null
-  }
-  if (/^\d{9}[\dX]$/.test(compact)) {
-    let sum = 0
-    for (let i = 0; i < 10; i++) {
-      sum += (compact[i] === 'X' ? 10 : Number(compact[i])) * (10 - i)
-    }
-    if (sum % 11 !== 0) return null
-    const first12 = `978${compact.slice(0, 9)}`
-    return `${first12}${isbn13CheckDigit(first12)}`
-  }
-  return null
-}
 
 /** Parses isbns.txt: one ISBN per line, blank lines and `#` comments skipped. */
 export function readIsbnList(text: string): ListedIsbn[] {

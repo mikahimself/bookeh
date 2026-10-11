@@ -65,6 +65,7 @@
     "WRONG_CREDENTIALS": "Väärä sähköposti tai salasana.",
     "NOT_FOUND": "Ei löytynyt.",
     "VALIDATION": "Tarkista merkityt kentät.",
+    "INVALID_ISBN": "Ei ISBN-tunnus. Kolmetoista numeroa tai kymmenen.",
     "INTERNAL": "Ei onnistunut. Yritä uudelleen."
   }
 }
