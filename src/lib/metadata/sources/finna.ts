@@ -1,4 +1,4 @@
-// Finna, the first source (FR-11, AD-9). Core fields only; series and themes are Story 3.6.
+// Finna, the first source (FR-11, AD-9): core fields, series, themes (FR-17a) and author sort names.
 import { toIsbn13 } from '@/fields/isbn'
 import { logger } from '@/lib/errors'
 
@@ -104,11 +104,27 @@ export function finnaMatches(body: unknown, isbn13: string): Json[] {
 
 const AUTHOR_ROLES = new Set(['kirjoittaja', 'tekijä', 'författare', 'author', 'aut'])
 
+const QUALIFIER = /\s*\([^)]*\)\s*$/
+
+/** `Family, Given (qualifier)` split into its parts, the qualifier dropped. */
+function nameParts(name: string): { family: string; given: string } {
+  const [family = '', given = ''] = name
+    .replace(QUALIFIER, '')
+    .split(',')
+    .map((part) => part.trim())
+  return { family, given }
+}
+
 /** `Family, Given (qualifier)` to `Given Family`; a name without a comma is kept. */
 function displayName(name: string): string | undefined {
-  const bare = name.replace(/\s*\([^)]*\)\s*$/, '')
-  const [family = '', given = ''] = bare.split(',').map((part) => part.trim())
+  const { family, given } = nameParts(name)
   return clean(given ? `${given} ${family}` : family)
+}
+
+/** `Family, Given (qualifier)` to `Family, Given`; nothing for a name that is not inverted. */
+function sortName(name: string): string | undefined {
+  const { family, given } = nameParts(name)
+  return family && given ? clean(`${family}, ${given}`) : undefined
 }
 
 /**
@@ -119,18 +135,60 @@ function authors(record: Json): SourceResult['authors'] {
   const persons = list(record.nonPresenterAuthors)
     .filter(isObject)
     .filter((entry) => entry.type == null || entry.type === 'Personal Name')
-  const names = persons.flatMap((person, index) => {
+  const byName = new Map<string, SourceResult['authors'][number]>()
+  persons.forEach((person, index) => {
     const name = clean(person.name)
-    if (!name) return []
+    if (!name) return
     const roles = (clean(person.role) ?? '')
       .split(',')
       .map((role) => role.trim().toLowerCase())
       .filter(Boolean)
     const isAuthor = roles.length === 0 ? index === 0 : roles.some((r) => AUTHOR_ROLES.has(r))
     const display = isAuthor ? displayName(name) : undefined
-    return display ? [display] : []
+    if (!display || byName.has(display)) return
+    const sort = sortName(name)
+    byName.set(display, sort ? { name: display, sortName: sort } : { name: display })
   })
-  return [...new Set(names)].map((name) => ({ name }))
+  return [...byName.values()]
+}
+
+const SERIES_NUMBER = /\d+(?:[.,]\d+)?/
+/** As `QUALIFIER`, also before a closing full stop: `Keltainen kirjasto (sarja).` */
+const SERIES_QUALIFIER = /\s*\([^)]*\)\.?\s*$/
+
+/**
+ * The first entry with a number, else the first entry: an unnumbered entry ahead of a numbered
+ * one is usually a paperback imprint (`Keltainen pokkari`). `book 5.` gives 5, `2,5` gives 2.5.
+ */
+function series(record: Json): Pick<SourceResult, 'series' | 'seriesIndex'> {
+  const entries = list(record.series)
+    .filter(isObject)
+    .flatMap((entry) => {
+      const name = cleanIsbd(cleanIsbd(entry.name)?.replace(SERIES_QUALIFIER, ''))
+      if (!name) return []
+      const number =
+        typeof entry.additional === 'string' ? SERIES_NUMBER.exec(entry.additional) : null
+      return [{ name, index: number ? Number(number[0].replace(',', '.')) : undefined }]
+    })
+  const pick = entries.find(({ index }) => index !== undefined) ?? entries[0]
+  return pick ? { series: pick.name, seriesIndex: pick.index } : {}
+}
+
+/**
+ * Each `subjects` heading as given, joined with a space after dropping the MARC separator that
+ * closes each part. A `(qualifier)` inside a part counts as a part of its own, so
+ * `["Stark,", "suku, (fiktiivinen hahmo)."]` gives `Stark suku (fiktiivinen hahmo).`.
+ */
+function themes(record: Json): string[] {
+  const headings = list(record.subjects).flatMap((heading) => {
+    const parts = strings(heading)
+      .flatMap((part) => part.split(/\s+(?=\()/))
+      .flatMap((part) => cleanIsbd(part) ?? [])
+      // Preliminary (CIP) records mark every heading with this part.
+      .filter((part) => part !== 'ENNAKKOTIETO')
+    return clean(parts.join(' ')) ?? []
+  })
+  return [...new Set(headings)]
 }
 
 function year(record: Json): number | undefined {
@@ -186,13 +244,14 @@ function toResult(record: Json, isbn13: string, body: unknown): SourceResult | u
     title,
     subtitle: cleanIsbd(record.subTitle),
     authors: authors(record),
+    ...series(record),
     publisher: cleanIsbd(strings(record.publishers)[0]),
     year: year(record),
     language: language(record),
     pages: pages(record),
     description: clean(strings(record.summary)[0]),
     subjects: [],
-    themes: [],
+    themes: themes(record),
     binding: binding(record, isbn13),
     coverUrl: coverUrl(record),
     source: 'finna',
@@ -256,11 +315,11 @@ export const finna: Source = {
       const result = toResult(record, isbn13, body)
       if (!result) return []
       const cover = result.coverUrl ? 1 : 0
-      const subjects = list(record.subjects).length > 0 ? 1 : 0
-      return [{ result, cover, subjects }]
+      const themed = result.themes.length > 0 ? 1 : 0
+      return [{ result, cover, themed }]
     })
     // Stable: ties keep Finna's order.
-    scored.sort((a, b) => b.cover - a.cover || b.subjects - a.subjects)
+    scored.sort((a, b) => b.cover - a.cover || b.themed - a.themed)
     return scored.map(({ result }) => result)
   },
 }
