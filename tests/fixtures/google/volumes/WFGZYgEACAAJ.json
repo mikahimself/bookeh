@@ -1,0 +1,62 @@
+{
+  "kind": "books#volume",
+  "id": "WFGZYgEACAAJ",
+  "etag": "Wv4b6LDA+zM",
+  "selfLink": "https://www.googleapis.com/books/v1/volumes/WFGZYgEACAAJ",
+  "volumeInfo": {
+    "title": "Uhoan voimaa",
+    "authors": [
+      "Stewart Home"
+    ],
+    "publisher": "Like",
+    "publishedDate": "1995",
+    "industryIdentifiers": [
+      {
+        "type": "ISBN_10",
+        "identifier": "9515782171"
+      },
+      {
+        "type": "ISBN_13",
+        "identifier": "9789515782175"
+      }
+    ],
+    "readingModes": {
+      "text": false,
+      "image": false
+    },
+    "pageCount": 207,
+    "printedPageCount": 207,
+    "dimensions": {
+      "height": "20.00 cm"
+    },
+    "printType": "BOOK",
+    "maturityRating": "NOT_MATURE",
+    "allowAnonLogging": false,
+    "contentVersion": "preview-1.0.0",
+    "language": "fi",
+    "previewLink": "http://books.google.fi/books?id=WFGZYgEACAAJ&hl=&source=gbs_api",
+    "infoLink": "https://play.google.com/store/books/details?id=WFGZYgEACAAJ&source=gbs_api",
+    "canonicalVolumeLink": "https://play.google.com/store/books/details?id=WFGZYgEACAAJ"
+  },
+  "saleInfo": {
+    "country": "FI",
+    "saleability": "NOT_FOR_SALE",
+    "isEbook": false
+  },
+  "accessInfo": {
+    "country": "FI",
+    "viewability": "NO_PAGES",
+    "embeddable": false,
+    "publicDomain": false,
+    "textToSpeechPermission": "ALLOWED",
+    "epub": {
+      "isAvailable": false
+    },
+    "pdf": {
+      "isAvailable": false
+    },
+    "webReaderLink": "http://play.google.com/books/reader?id=WFGZYgEACAAJ&hl=&source=gbs_api",
+    "accessViewStatus": "NONE",
+    "quoteSharingAllowed": false
+  }
+}

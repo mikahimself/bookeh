@@ -1,0 +1,83 @@
+{
+  "kind": "books#volume",
+  "id": "zlwlTfBeiSoC",
+  "etag": "6ZO50Tj2fws",
+  "selfLink": "https://www.googleapis.com/books/v1/volumes/zlwlTfBeiSoC",
+  "volumeInfo": {
+    "title": "A Clash of Kings",
+    "authors": [
+      "George R. R. Martin"
+    ],
+    "publisher": "Harper Voyager",
+    "publishedDate": "2011",
+    "description": "Reissued for September 2011 in B format. George R. R. Martin's superb fantasy epic continues in consummate style as bloodshed and alchemy lay waste the Seven Kingdoms in the second volume of A Song of Ice and Fire. Reissued for September 2011 in B format. George R. R. Martin's superb fantasy epic continues in consummate style as bloodshed and alchemy lay waste the Seven Kingdoms in the second volume of A Song of Ice and Fire. The Iron Throne once united the Sunset Lands, but King Robert is dead, his widow is a traitor to his memory, and his surviving brothers are set on a path of war amongst themselves. At King's Landing, the head of Lord Eddard Stark rots on a spike for all to see. His daughter Sansa is betrothed still to his killer's son Joffrey -- Queen Cersei's son, though not the son of her late husband Robert. Even so, Joffrey is now a boy-king, Cersei is his regent, and war is inevitable. In Dragonstone, Robert's brother Stannis has declared himself king, while his other brother Renly proclaims himself king at Storm's End -- and Eddard Stark's fifteen year old son Robb wears the crown of the north at Winterfell. A comet in the night sky, red and malevolent, the colour of blood and flame, can only be an omen of murder and war. Stannis's child Princess Shireen dreams of dragons waking from stone. And a white raven has brought word from the Citadel itself, foretelling summer's end. It has been the longest summer in living memory, lasting ten years, and the smallfolk say it means an even longer winter to come! The first rule of war is never give the enemy his wish. But winter will be the biggest enemy. From beyond the Wall the undead and Others clamour for freedom, and from beyond the sea the long-dead Dragon King's daughter hatches her revenge. Robb Stark will be exceedingly lucky to reach adulthood.",
+    "industryIdentifiers": [
+      {
+        "type": "ISBN_10",
+        "identifier": "0007447833"
+      },
+      {
+        "type": "ISBN_13",
+        "identifier": "9780007447831"
+      }
+    ],
+    "readingModes": {
+      "text": false,
+      "image": false
+    },
+    "pageCount": 913,
+    "printedPageCount": 930,
+    "dimensions": {
+      "height": "20.00 cm",
+      "width": "13.00 cm",
+      "thickness": "5.00 cm"
+    },
+    "printType": "BOOK",
+    "categories": [
+      "Fiction / Action & Adventure",
+      "Fiction / Fantasy / General",
+      "Fiction / Fantasy / Epic",
+      "Fiction / Fantasy / Dark Fantasy",
+      "Fiction / Fantasy / Action & Adventure",
+      "Fiction / Fantasy / Dragons & Mythical Creatures"
+    ],
+    "averageRating": 4,
+    "ratingsCount": 3,
+    "maturityRating": "NOT_MATURE",
+    "allowAnonLogging": false,
+    "contentVersion": "0.3.2.0.preview.0",
+    "panelizationSummary": {
+      "containsEpubBubbles": false,
+      "containsImageBubbles": false
+    },
+    "imageLinks": {
+      "smallThumbnail": "http://books.google.com/books/content?id=zlwlTfBeiSoC&printsec=frontcover&img=1&zoom=5&imgtk=AFLRE73Aii00EzNaR0IiH4AW0fN288Y8TcEb1CXwHDtb2ANaj0GNqJXzq0qTb96YfMpbMr9TaagyB8JltKEXhvQzSRLwfZvStPL0LpJsQ95ST38lvag0wqz89pgbAX48_nYtP_tGSHLt&source=gbs_api",
+      "thumbnail": "http://books.google.com/books/content?id=zlwlTfBeiSoC&printsec=frontcover&img=1&zoom=1&imgtk=AFLRE73em1RMGzbk2Gas8pDLDMNsmpfelFqmHGCrIu-Lg7U4rkb9MEng94823t9_rSWgOLKbyqHviBqIQ19TfHGv3cV8OcFd2lyuJ0Xf-54LXI5uUJuKn5rFzLUp8ClNuO9QgondFKIh&source=gbs_api"
+    },
+    "language": "en",
+    "previewLink": "http://books.google.fi/books?id=zlwlTfBeiSoC&hl=&source=gbs_api",
+    "infoLink": "https://play.google.com/store/books/details?id=zlwlTfBeiSoC&source=gbs_api",
+    "canonicalVolumeLink": "https://play.google.com/store/books/details?id=zlwlTfBeiSoC"
+  },
+  "saleInfo": {
+    "country": "FI",
+    "saleability": "NOT_FOR_SALE",
+    "isEbook": false
+  },
+  "accessInfo": {
+    "country": "FI",
+    "viewability": "NO_PAGES",
+    "embeddable": false,
+    "publicDomain": false,
+    "textToSpeechPermission": "ALLOWED",
+    "epub": {
+      "isAvailable": false
+    },
+    "pdf": {
+      "isAvailable": true
+    },
+    "webReaderLink": "http://play.google.com/books/reader?id=zlwlTfBeiSoC&hl=&source=gbs_api",
+    "accessViewStatus": "NONE",
+    "quoteSharingAllowed": false
+  }
+}

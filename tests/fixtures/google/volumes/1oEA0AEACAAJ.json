@@ -1,0 +1,67 @@
+{
+  "kind": "books#volume",
+  "id": "1oEA0AEACAAJ",
+  "etag": "kXkz27s+1Fg",
+  "selfLink": "https://www.googleapis.com/books/v1/volumes/1oEA0AEACAAJ",
+  "volumeInfo": {
+    "title": "Erään kissan tutkimuksia",
+    "authors": [
+      "Katja Kettu"
+    ],
+    "publisher": "Kustannusosakeyhtiö Otava",
+    "publishedDate": "2023",
+    "description": "\"Kirjailija saa keskenmenon ja menettää kykynsä puhua ja kirjoittaa. Paikalle lähetetään Taivaiden Tutkimustoimistosta Etsivä, mutta jokin menee pieleen, ja tuvan nurkkaan ilmestyykin Kissa, joka käy tutkimaan vintin lattialuukusta löytynyttä Isoisoäidin päiväkirjaa. Kun uusi elämä on menetetty, kääntää Kirjailija katseensa menneisyyteen ja ikiaikaisiin syntysanoihin. Niiden taitajalla, Isoisoäidillä, on suomen kielen väessä ja voimassa parantajien mahti. Voiko menneestä löytää lohdun ja tarkoituksen elämälle, kun tulevaisuutta ei ole?\"--Publisher",
+    "industryIdentifiers": [
+      {
+        "type": "ISBN_10",
+        "identifier": "9511463780"
+      },
+      {
+        "type": "ISBN_13",
+        "identifier": "9789511463788"
+      }
+    ],
+    "readingModes": {
+      "text": false,
+      "image": false
+    },
+    "pageCount": 355,
+    "printedPageCount": 355,
+    "dimensions": {
+      "height": "21.00 cm"
+    },
+    "printType": "BOOK",
+    "maturityRating": "NOT_MATURE",
+    "allowAnonLogging": false,
+    "contentVersion": "preview-1.0.0",
+    "panelizationSummary": {
+      "containsEpubBubbles": false,
+      "containsImageBubbles": false
+    },
+    "language": "fi",
+    "previewLink": "http://books.google.fi/books?id=1oEA0AEACAAJ&hl=&source=gbs_api",
+    "infoLink": "https://play.google.com/store/books/details?id=1oEA0AEACAAJ&source=gbs_api",
+    "canonicalVolumeLink": "https://play.google.com/store/books/details?id=1oEA0AEACAAJ"
+  },
+  "saleInfo": {
+    "country": "FI",
+    "saleability": "NOT_FOR_SALE",
+    "isEbook": false
+  },
+  "accessInfo": {
+    "country": "FI",
+    "viewability": "NO_PAGES",
+    "embeddable": false,
+    "publicDomain": false,
+    "textToSpeechPermission": "ALLOWED",
+    "epub": {
+      "isAvailable": false
+    },
+    "pdf": {
+      "isAvailable": false
+    },
+    "webReaderLink": "http://play.google.com/books/reader?id=1oEA0AEACAAJ&hl=&source=gbs_api",
+    "accessViewStatus": "NONE",
+    "quoteSharingAllowed": false
+  }
+}

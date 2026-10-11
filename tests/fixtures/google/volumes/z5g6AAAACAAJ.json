@@ -1,0 +1,62 @@
+{
+  "kind": "books#volume",
+  "id": "z5g6AAAACAAJ",
+  "etag": "xTP7MfEls+M",
+  "selfLink": "https://www.googleapis.com/books/v1/volumes/z5g6AAAACAAJ",
+  "volumeInfo": {
+    "title": "Oppi tulee idästä",
+    "authors": [
+      "Stewart Home"
+    ],
+    "publisher": "Like",
+    "publishedDate": "1996",
+    "industryIdentifiers": [
+      {
+        "type": "ISBN_10",
+        "identifier": "9515782759"
+      },
+      {
+        "type": "ISBN_13",
+        "identifier": "9789515782755"
+      }
+    ],
+    "readingModes": {
+      "text": false,
+      "image": false
+    },
+    "pageCount": 231,
+    "printedPageCount": 231,
+    "dimensions": {
+      "height": "20.00 cm"
+    },
+    "printType": "BOOK",
+    "maturityRating": "NOT_MATURE",
+    "allowAnonLogging": false,
+    "contentVersion": "preview-1.0.0",
+    "language": "fi",
+    "previewLink": "http://books.google.fi/books?id=z5g6AAAACAAJ&hl=&source=gbs_api",
+    "infoLink": "https://play.google.com/store/books/details?id=z5g6AAAACAAJ&source=gbs_api",
+    "canonicalVolumeLink": "https://play.google.com/store/books/details?id=z5g6AAAACAAJ"
+  },
+  "saleInfo": {
+    "country": "FI",
+    "saleability": "NOT_FOR_SALE",
+    "isEbook": false
+  },
+  "accessInfo": {
+    "country": "FI",
+    "viewability": "NO_PAGES",
+    "embeddable": false,
+    "publicDomain": false,
+    "textToSpeechPermission": "ALLOWED",
+    "epub": {
+      "isAvailable": false
+    },
+    "pdf": {
+      "isAvailable": false
+    },
+    "webReaderLink": "http://play.google.com/books/reader?id=z5g6AAAACAAJ&hl=&source=gbs_api",
+    "accessViewStatus": "NONE",
+    "quoteSharingAllowed": false
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "kind": "books#volume",
+  "id": "xT19tgEACAAJ",
+  "etag": "slsjRpBmpHI",
+  "selfLink": "https://www.googleapis.com/books/v1/volumes/xT19tgEACAAJ",
+  "volumeInfo": {
+    "title": "Taivaanpallo",
+    "authors": [
+      "Olli Jalonen"
+    ],
+    "publisher": "Kustannusosakeyhtiö Otava",
+    "publishedDate": "2018",
+    "industryIdentifiers": [
+      {
+        "type": "ISBN_10",
+        "identifier": "9511319175"
+      },
+      {
+        "type": "ISBN_13",
+        "identifier": "9789511319177"
+      }
+    ],
+    "readingModes": {
+      "text": false,
+      "image": false
+    },
+    "pageCount": 461,
+    "printedPageCount": 461,
+    "dimensions": {
+      "height": "21.00 cm"
+    },
+    "printType": "BOOK",
+    "maturityRating": "NOT_MATURE",
+    "allowAnonLogging": false,
+    "contentVersion": "preview-1.0.0",
+    "panelizationSummary": {
+      "containsEpubBubbles": false,
+      "containsImageBubbles": false
+    },
+    "language": "fi",
+    "previewLink": "http://books.google.fi/books?id=xT19tgEACAAJ&hl=&source=gbs_api",
+    "infoLink": "https://play.google.com/store/books/details?id=xT19tgEACAAJ&source=gbs_api",
+    "canonicalVolumeLink": "https://play.google.com/store/books/details?id=xT19tgEACAAJ"
+  },
+  "saleInfo": {
+    "country": "FI",
+    "saleability": "NOT_FOR_SALE",
+    "isEbook": false
+  },
+  "accessInfo": {
+    "country": "FI",
+    "viewability": "NO_PAGES",
+    "embeddable": false,
+    "publicDomain": false,
+    "textToSpeechPermission": "ALLOWED",
+    "epub": {
+      "isAvailable": false
+    },
+    "pdf": {
+      "isAvailable": false
+    },
+    "webReaderLink": "http://play.google.com/books/reader?id=xT19tgEACAAJ&hl=&source=gbs_api",
+    "accessViewStatus": "NONE",
+    "quoteSharingAllowed": false
+  }
+}

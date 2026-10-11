@@ -1,0 +1,83 @@
+{
+  "kind": "books#volume",
+  "id": "GzENB4wePpEC",
+  "etag": "EJN/bqRvzE8",
+  "selfLink": "https://www.googleapis.com/books/v1/volumes/GzENB4wePpEC",
+  "volumeInfo": {
+    "title": "A Storm of Swords",
+    "subtitle": "Blood and Gold",
+    "authors": [
+      "George R. R. Martin"
+    ],
+    "publisher": "Harper Voyager",
+    "publishedDate": "2011",
+    "description": "\u003cp\u003eHBO's hit series A GAME OF THRONES is based on George R R Martin's internationally bestselling series A SONG OF ICE AND FIRE, the greatest fantasy epic of the modern age.\u003c/p\u003e \u003cp\u003eA STORM OF SWORDS: BLOOD AND GOLD is the SECOND part of the third volume in the series.\u003c/p\u003e \u003cp\u003e'Colossal, staggering . . . one of the greats' SFX\u003c/p\u003e \u003cbr\u003e \u003cbr\u003e \u003cp\u003eThe Starks are scattered.\u003c/p\u003e \u003cp\u003eRobb Stark may be King in the North, but he must bend to the will of the old tyrant Walder Frey if he is to hold his crown. And while his youngest sister, Arya, has escaped the clutches of the depraved Cersei Lannister and her son, the capricious boy-king Joffrey, Sansa Stark remains their captive.\u003c/p\u003e \u003cp\u003eMeanwhile, across the ocean, Daenerys Stormborn, the last heir of the Dragon King, delivers death to the slave-trading cities of Astapor and Yunkai as she approaches Westeros with vengeance in her heart.\u003c/p\u003e",
+    "industryIdentifiers": [
+      {
+        "type": "ISBN_10",
+        "identifier": "000744785X"
+      },
+      {
+        "type": "ISBN_13",
+        "identifier": "9780007447855"
+      }
+    ],
+    "readingModes": {
+      "text": false,
+      "image": false
+    },
+    "pageCount": 607,
+    "printedPageCount": 626,
+    "dimensions": {
+      "height": "20.00 cm",
+      "width": "13.00 cm",
+      "thickness": "3.80 cm"
+    },
+    "printType": "BOOK",
+    "categories": [
+      "Fiction / Action & Adventure",
+      "Fiction / Fantasy / General",
+      "Fiction / Fantasy / Epic",
+      "Fiction / Fantasy / Dark Fantasy",
+      "Fiction / Fantasy / Action & Adventure",
+      "Fiction / Fantasy / Dragons & Mythical Creatures",
+      "Fiction / Literary"
+    ],
+    "maturityRating": "NOT_MATURE",
+    "allowAnonLogging": false,
+    "contentVersion": "0.3.2.0.preview.0",
+    "panelizationSummary": {
+      "containsEpubBubbles": false,
+      "containsImageBubbles": false
+    },
+    "imageLinks": {
+      "smallThumbnail": "http://books.google.com/books/content?id=GzENB4wePpEC&printsec=frontcover&img=1&zoom=5&imgtk=AFLRE70UyYsj0vkJepUdyfvPaafTEWFB7UPhd88-149rQ6U0jDzlnNRqstB01ZrWzCgbQGTW5lIy4IS0_PvxP2ScY-xUleSj79JVejJpuni-osUZtvG6pwvuPSLxfbgwVGHYWortHkIX&source=gbs_api",
+      "thumbnail": "http://books.google.com/books/content?id=GzENB4wePpEC&printsec=frontcover&img=1&zoom=1&imgtk=AFLRE73aNiRkMz_IyC27hiYQeJMx1p5rmp0NZqDt4J-ZwtJb0yUGWGcIBT0qzbYLbyGPbtzPjkKiRFJPH_1emeAha5I7Woza7vkCjjZR4TUO7Y0_vkdfhWHb-XUsuigdMyKQopRrKIoh&source=gbs_api"
+    },
+    "language": "en",
+    "previewLink": "http://books.google.fi/books?id=GzENB4wePpEC&hl=&source=gbs_api",
+    "infoLink": "https://play.google.com/store/books/details?id=GzENB4wePpEC&source=gbs_api",
+    "canonicalVolumeLink": "https://play.google.com/store/books/details?id=GzENB4wePpEC"
+  },
+  "saleInfo": {
+    "country": "FI",
+    "saleability": "NOT_FOR_SALE",
+    "isEbook": false
+  },
+  "accessInfo": {
+    "country": "FI",
+    "viewability": "NO_PAGES",
+    "embeddable": false,
+    "publicDomain": false,
+    "textToSpeechPermission": "ALLOWED",
+    "epub": {
+      "isAvailable": false
+    },
+    "pdf": {
+      "isAvailable": true
+    },
+    "webReaderLink": "http://play.google.com/books/reader?id=GzENB4wePpEC&hl=&source=gbs_api",
+    "accessViewStatus": "NONE",
+    "quoteSharingAllowed": false
+  }
+}

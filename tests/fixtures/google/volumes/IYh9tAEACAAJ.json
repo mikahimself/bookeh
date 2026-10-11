@@ -1,0 +1,66 @@
+{
+  "kind": "books#volume",
+  "id": "IYh9tAEACAAJ",
+  "etag": "CFTJg9cRXCM",
+  "selfLink": "https://www.googleapis.com/books/v1/volumes/IYh9tAEACAAJ",
+  "volumeInfo": {
+    "title": "Röyhkeys",
+    "authors": [
+      "Ossi Nyman"
+    ],
+    "publisher": "Kustannusosakeyhtiö Teos",
+    "publishedDate": "2017",
+    "industryIdentifiers": [
+      {
+        "type": "ISBN_10",
+        "identifier": "9518517592"
+      },
+      {
+        "type": "ISBN_13",
+        "identifier": "9789518517590"
+      }
+    ],
+    "readingModes": {
+      "text": false,
+      "image": false
+    },
+    "pageCount": 188,
+    "printedPageCount": 188,
+    "dimensions": {
+      "height": "22.00 cm"
+    },
+    "printType": "BOOK",
+    "maturityRating": "NOT_MATURE",
+    "allowAnonLogging": false,
+    "contentVersion": "preview-1.0.0",
+    "panelizationSummary": {
+      "containsEpubBubbles": false,
+      "containsImageBubbles": false
+    },
+    "language": "fi",
+    "previewLink": "http://books.google.fi/books?id=IYh9tAEACAAJ&hl=&source=gbs_api",
+    "infoLink": "https://play.google.com/store/books/details?id=IYh9tAEACAAJ&source=gbs_api",
+    "canonicalVolumeLink": "https://play.google.com/store/books/details?id=IYh9tAEACAAJ"
+  },
+  "saleInfo": {
+    "country": "FI",
+    "saleability": "NOT_FOR_SALE",
+    "isEbook": false
+  },
+  "accessInfo": {
+    "country": "FI",
+    "viewability": "NO_PAGES",
+    "embeddable": false,
+    "publicDomain": false,
+    "textToSpeechPermission": "ALLOWED",
+    "epub": {
+      "isAvailable": false
+    },
+    "pdf": {
+      "isAvailable": false
+    },
+    "webReaderLink": "http://play.google.com/books/reader?id=IYh9tAEACAAJ&hl=&source=gbs_api",
+    "accessViewStatus": "NONE",
+    "quoteSharingAllowed": false
+  }
+}

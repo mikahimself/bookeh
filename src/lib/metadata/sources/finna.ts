@@ -1,8 +1,18 @@
 // Finna, the first source (FR-11, AD-9): core fields, series, themes (FR-17a) and author sort names.
 import { toIsbn13 } from '@/fields/isbn'
-import { logger } from '@/lib/errors'
 
 import type { Source, SourceResult } from '../source'
+import {
+  clean,
+  compact,
+  getJson,
+  isObject,
+  isoLanguage,
+  list,
+  lookupFailed,
+  strings,
+  type Json,
+} from './shared'
 
 export const FINNA_FIELDS = [
   'id',
@@ -43,7 +53,7 @@ export const FINNA_FIELDS = [
 ] as const
 
 const ORIGIN = 'https://api.finna.fi'
-const TIMEOUT_MS = 10_000
+const LABEL = 'Finna'
 
 export function finnaUrl(isbn13: string): string {
   const params = new URLSearchParams({
@@ -56,26 +66,6 @@ export function finnaUrl(isbn13: string): string {
 }
 
 // --- Guards ------------------------------------------------------------------------------
-
-type Json = Record<string, unknown>
-
-function isObject(value: unknown): value is Json {
-  return typeof value === 'object' && value !== null && !Array.isArray(value)
-}
-
-function list(value: unknown): unknown[] {
-  return Array.isArray(value) ? value : []
-}
-
-function strings(value: unknown): string[] {
-  return list(value).filter((v): v is string => typeof v === 'string')
-}
-
-/** NFC and trimmed; undefined for anything that is not a non-empty string. */
-function clean(value: unknown): string | undefined {
-  if (typeof value !== 'string') return undefined
-  return value.normalize('NFC').trim() || undefined
-}
 
 /** `clean`, then trailing ISBD punctuation (`/ : ; = ,`) dropped: `Bazar :` gives `Bazar`. */
 function cleanIsbd(value: unknown): string | undefined {
@@ -198,18 +188,9 @@ function year(record: Json): number | undefined {
   return digits ? Number(digits[0]) : undefined
 }
 
-const NO_LANGUAGE = new Set(['und', 'mul', 'zxx', 'mis'])
-
 /** MARC codes to BCP 47: `fin` gives `fi`, the bibliographic `ger` gives `de`. */
 function language(record: Json): string | undefined {
-  const code = clean(strings(record.languages)[0])
-  if (!code) return undefined
-  try {
-    const tag = new Intl.Locale(code).language
-    return tag && !NO_LANGUAGE.has(tag) ? tag : undefined
-  } catch {
-    return undefined
-  }
+  return isoLanguage(strings(record.languages)[0])
 }
 
 const PAGE_WORD = /(?<!\p{L})(?:sivua|sivu|sidor|sid\.|pages|s\.|p\.)(?!\p{L})/iu
@@ -257,52 +238,25 @@ function toResult(record: Json, isbn13: string, body: unknown): SourceResult | u
     source: 'finna',
     raw: { finna: body },
   }
-  // A field the record does not have is left out, not sent as undefined.
-  return Object.fromEntries(
-    Object.entries(result).filter(([, value]) => value !== undefined),
-  ) as SourceResult
+  return compact(result)
 }
 
 // --- Request -----------------------------------------------------------------------------
 
-const timedOut = (err: unknown): boolean => err instanceof Error && err.name === 'TimeoutError'
-
 /** The response body when it is a usable answer; undefined after logging why not. */
 async function fetchBody(isbn13: string): Promise<Json | undefined> {
-  const fail = (reason: string, err?: unknown, details?: Json): undefined => {
-    logger().warn({ err, isbn13, ...details }, `Finna lookup failed: ${reason}`)
-    return undefined
-  }
-  let response: Response
-  try {
-    response = await fetch(finnaUrl(isbn13), {
-      headers: { Accept: 'application/json' },
-      signal: AbortSignal.timeout(TIMEOUT_MS),
-    })
-  } catch (err) {
-    return fail(timedOut(err) ? 'timeout' : 'network error', err)
-  }
-  if (!response.ok) {
-    await response.body?.cancel().catch(() => {})
-    return fail(`HTTP ${response.status}`)
-  }
-  let body: unknown
-  try {
-    body = await response.json()
-  } catch (err) {
-    // The timeout signal also covers reading the body.
-    return fail(timedOut(err) ? 'timeout' : 'response is not JSON', err)
-  }
+  const body = await getJson(LABEL, finnaUrl(isbn13), isbn13)
+  if (body === undefined) return undefined
   if (!isObject(body) || body.status !== 'OK') {
     const answer: Json = isObject(body) ? body : {}
-    return fail('status is not OK', undefined, {
+    return lookupFailed(LABEL, isbn13, 'status is not OK', {
       status: answer.status,
       statusMessage: answer.statusMessage,
     })
   }
   // Finna leaves `records` out when nothing matched.
   if (body.records === undefined && body.resultCount === 0) return body
-  if (!Array.isArray(body.records)) return fail('records is not an array')
+  if (!Array.isArray(body.records)) return lookupFailed(LABEL, isbn13, 'records is not an array')
   return body
 }
 

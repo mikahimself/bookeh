@@ -1,0 +1,67 @@
+{
+  "kind": "books#volume",
+  "id": "Rq0hzwEACAAJ",
+  "etag": "gw9FPcDQrWE",
+  "selfLink": "https://www.googleapis.com/books/v1/volumes/Rq0hzwEACAAJ",
+  "volumeInfo": {
+    "title": "Lihan loppu",
+    "authors": [
+      "Suvi Auvinen"
+    ],
+    "publisher": "Kosmos",
+    "publishedDate": "2020",
+    "description": "Ruokatrendit tulevat ja menevät, mutta yksi on jatkanut kasvuaan vuodesta toiseen: kasvissyönti. Viime vuosina lihansyönnin vähentäminen on noussut globaalisti merkittäväksi tekijäksi, joka muuttaa jo talouden rakenteita. Miksi näin on tapahtunut, ja mitä se merkitsee tulevaisuudessa? Lihantuotannon päästöjen vuoksi ilmastonmuutoksen maailmassa kasvissyöntiin siirtyminen saattaa olla jopa väistämätöntä. Mutta mitä lihan loppu tarkoittaa maatalouden, politiikan, terveyden, liiketoiminnan tai yhteiskunnan eläinkuvan kannalta? Tapahtuuko merkittävä muutos teknologian avulla vai asennemaailmassamme? Lihan loppu etsii ratkaisuja aikamme kiireellisimpään kysymykseen: mitä syömme huomenna?",
+    "industryIdentifiers": [
+      {
+        "type": "ISBN_10",
+        "identifier": "9523520660"
+      },
+      {
+        "type": "ISBN_13",
+        "identifier": "9789523520660"
+      }
+    ],
+    "readingModes": {
+      "text": false,
+      "image": false
+    },
+    "pageCount": 257,
+    "printedPageCount": 257,
+    "dimensions": {
+      "height": "18.00 cm"
+    },
+    "printType": "BOOK",
+    "maturityRating": "NOT_MATURE",
+    "allowAnonLogging": false,
+    "contentVersion": "preview-1.0.0",
+    "panelizationSummary": {
+      "containsEpubBubbles": false,
+      "containsImageBubbles": false
+    },
+    "language": "fi",
+    "previewLink": "http://books.google.fi/books?id=Rq0hzwEACAAJ&hl=&source=gbs_api",
+    "infoLink": "https://play.google.com/store/books/details?id=Rq0hzwEACAAJ&source=gbs_api",
+    "canonicalVolumeLink": "https://play.google.com/store/books/details?id=Rq0hzwEACAAJ"
+  },
+  "saleInfo": {
+    "country": "FI",
+    "saleability": "NOT_FOR_SALE",
+    "isEbook": false
+  },
+  "accessInfo": {
+    "country": "FI",
+    "viewability": "NO_PAGES",
+    "embeddable": false,
+    "publicDomain": false,
+    "textToSpeechPermission": "ALLOWED",
+    "epub": {
+      "isAvailable": false
+    },
+    "pdf": {
+      "isAvailable": false
+    },
+    "webReaderLink": "http://play.google.com/books/reader?id=Rq0hzwEACAAJ&hl=&source=gbs_api",
+    "accessViewStatus": "NONE",
+    "quoteSharingAllowed": false
+  }
+}

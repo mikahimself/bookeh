@@ -1,0 +1,62 @@
+{
+  "kind": "books#volume",
+  "id": "HXJzAAAACAAJ",
+  "etag": "stKBzM339ko",
+  "selfLink": "https://www.googleapis.com/books/v1/volumes/HXJzAAAACAAJ",
+  "volumeInfo": {
+    "title": "Käkimassaa",
+    "authors": [
+      "Stewart Home"
+    ],
+    "publisher": "Like",
+    "publishedDate": "1994",
+    "industryIdentifiers": [
+      {
+        "type": "ISBN_10",
+        "identifier": "9515781841"
+      },
+      {
+        "type": "ISBN_13",
+        "identifier": "9789515781840"
+      }
+    ],
+    "readingModes": {
+      "text": false,
+      "image": false
+    },
+    "pageCount": 231,
+    "printedPageCount": 231,
+    "dimensions": {
+      "height": "21.00 cm"
+    },
+    "printType": "BOOK",
+    "maturityRating": "NOT_MATURE",
+    "allowAnonLogging": false,
+    "contentVersion": "preview-1.0.0",
+    "language": "fi",
+    "previewLink": "http://books.google.fi/books?id=HXJzAAAACAAJ&hl=&source=gbs_api",
+    "infoLink": "https://play.google.com/store/books/details?id=HXJzAAAACAAJ&source=gbs_api",
+    "canonicalVolumeLink": "https://play.google.com/store/books/details?id=HXJzAAAACAAJ"
+  },
+  "saleInfo": {
+    "country": "FI",
+    "saleability": "NOT_FOR_SALE",
+    "isEbook": false
+  },
+  "accessInfo": {
+    "country": "FI",
+    "viewability": "NO_PAGES",
+    "embeddable": false,
+    "publicDomain": false,
+    "textToSpeechPermission": "ALLOWED",
+    "epub": {
+      "isAvailable": false
+    },
+    "pdf": {
+      "isAvailable": false
+    },
+    "webReaderLink": "http://play.google.com/books/reader?id=HXJzAAAACAAJ&hl=&source=gbs_api",
+    "accessViewStatus": "NONE",
+    "quoteSharingAllowed": false
+  }
+}
