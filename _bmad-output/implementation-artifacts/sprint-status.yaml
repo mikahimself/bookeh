@@ -29,7 +29,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 10-06-2026 17:50
-last_updated: 10-11-2026 14:05
+last_updated: 10-11-2026 15:00
 project: bookeh
 project_key: NOKEY
 tracking_system: file-system
@@ -253,7 +253,8 @@ action_items:
       on read) and pin it with a round-trip test; must land before Epic 3 scan-save
       adopts flashToast()'
     owner: 'Mika'
-    status: open
+    status: done
+    resolution: '2026-10-11: story 3.54. flashToast() sets plain JSON and Next percent-encodes once; pinned by a round trip through ResponseCookies into takeFlash().'
     ref: '_bmad-output/implementation-artifacts/epic-1-retro-2026-10-10.md'
   - id: 'epic-1-retro-item-2-fix-the-settings-switch-revert-race-them'
     epic: 1
@@ -294,7 +295,8 @@ action_items:
     action: 'Default e2e seed users to the user role; opt into admin only where /admin
       is tested'
     owner: 'Mika'
-    status: open
+    status: done
+    resolution: '2026-10-11: story 3.54 removed the Epic 1 e2e specs and their seed helpers (retro: closes with 3.54).'
     ref: '_bmad-output/implementation-artifacts/epic-1-retro-2026-10-10.md'
   - id: 'epic-1-retro-item-8-harden-the-ci-migration-drift-check-to-a'
     epic: 1
