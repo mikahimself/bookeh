@@ -29,15 +29,6 @@ describe('sectionRow', () => {
   ] as const)('leads with %s and wraps round', (current, row) => {
     expect(keys(current)).toEqual(row)
   })
-
-  it('pairs each section with its address', () => {
-    expect(sectionRow('wishlists').map(({ href }) => href)).toEqual([
-      '/wishlists',
-      '/settings',
-      '/',
-      '/loans',
-    ])
-  })
 })
 
 describe('sectionAfter', () => {

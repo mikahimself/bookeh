@@ -2,17 +2,13 @@ import { describe, expect, it, vi } from 'vitest'
 
 vi.mock('next/navigation', () => ({ usePathname: () => '/', useRouter: () => ({ push: vi.fn() }) }))
 
-const { SWIPE_EDGE_PX, SWIPE_MIN_PX, suspendSwipe, swipeDirection, swipeSuspended, swipeTarget } =
+const { suspendSwipe, swipeDirection, swipeSuspended, swipeTarget } =
   await import('@/app/(frontend)/components/swipe')
 
 const PHONE = 390
 const y = 400
 
 describe('swipeDirection', () => {
-  it('names the thresholds', () => {
-    expect([SWIPE_EDGE_PX, SWIPE_MIN_PX]).toEqual([24, 48])
-  })
-
   it.each([
     ['left is next', { x: 300, y }, { x: 100, y: y + 10 }, PHONE, 'next'],
     ['right is prev', { x: 100, y }, { x: 300, y }, PHONE, 'prev'],

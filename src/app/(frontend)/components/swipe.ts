@@ -6,9 +6,9 @@ import { useEffect } from 'react'
 import { sectionAfter, sectionOf } from './sections'
 
 /** A swipe starting this close to either edge is the device's (its back gesture). */
-export const SWIPE_EDGE_PX = 24
+const SWIPE_EDGE_PX = 24
 /** The least sideways travel that counts as a swipe. */
-export const SWIPE_MIN_PX = 48
+const SWIPE_MIN_PX = 48
 /** From the `wide` breakpoint up there is no swiping: every heading is on screen. */
 export const SWIPE_WIDE_PX = 900
 

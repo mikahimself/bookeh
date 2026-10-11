@@ -97,6 +97,8 @@ jobs:
             exit 1
           fi
       - run: npx playwright install --with-deps chromium
+        # No browser until a spec needs one (Story 3.52); the run itself stays.
+        if: hashFiles('tests/e2e/**/*.spec.ts') != ''
       - run: npm run test:e2e
 
       - uses: actions/upload-artifact@v7

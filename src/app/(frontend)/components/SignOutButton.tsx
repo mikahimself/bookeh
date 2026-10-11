@@ -2,25 +2,25 @@
 
 import { useTranslations } from 'next-intl'
 import { useRouter } from 'next/navigation'
-import { useState, useTransition } from 'react'
+import { useTransition } from 'react'
 
-import type { ActionResult, ErrorCode } from '@/lib/errors'
+import type { ActionResult } from '@/lib/errors'
 
 import { signOutAction } from '../actions/account'
 import { Button } from './Button'
-import { ErrorMessage } from './ErrorMessage'
+import { useToast } from './toast/ToastProvider'
 
-/** Ends the session and goes to `/login`, also when the session was already gone. */
+/**
+ * Ends the session and goes to `/login`, also when the session was already
+ * gone. A failure is an error toast, like every other failed action.
+ */
 export function SignOutButton() {
   const t = useTranslations()
   const router = useRouter()
+  const { show } = useToast()
   const [pending, startTransition] = useTransition()
-  const [failed, setFailed] = useState<ErrorCode | null>(null)
 
   const signOut = () => {
-    // Cleared at once, outside the transition, so a repeated failure remounts
-    // the alert and is announced again.
-    setFailed(null)
     startTransition(async () => {
       // A rejected call (the network dropped) is a failure, not an error boundary.
       const result = await signOutAction().catch((): ActionResult<null> => ({
@@ -31,16 +31,13 @@ export function SignOutButton() {
         router.replace('/login')
         return
       }
-      setFailed(result.code)
+      show({ kind: 'error', code: result.code })
     })
   }
 
   return (
-    <div className="flex flex-wrap items-center gap-4">
-      <Button variant="secondary" onClick={signOut} disabled={pending}>
-        {t('signOut.submit')}
-      </Button>
-      {failed && <ErrorMessage>{t(`errors.${failed}`)}</ErrorMessage>}
-    </div>
+    <Button variant="secondary" onClick={signOut} disabled={pending}>
+      {t('signOut.submit')}
+    </Button>
   )
 }
