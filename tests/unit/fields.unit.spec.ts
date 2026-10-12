@@ -1,6 +1,7 @@
-import type { FieldHook, FieldHookArgs, TextField, Validate } from 'payload'
+import type { Field, FieldHook, FieldHookArgs, TextField, Validate } from 'payload'
 import { describe, expect, it } from 'vitest'
 
+import { bookFields, OVERRIDABLE_BOOK_FIELDS, overrideFields } from '@/fields/bookFields'
 import { isbnField, normaliseIsbn, toIsbn13 } from '@/fields/isbn'
 import { nameKeyField, toNameKey } from '@/fields/nameKey'
 import { deriveSortName, sortNameField } from '@/fields/sortName'
@@ -221,5 +222,32 @@ describe('sortNameField', () => {
     ['missing', {}],
   ])('gives null for a %s name without throwing', (_, siblingData) => {
     expect(callHook(field, { siblingData, operation: 'create' })).toBeNull()
+  })
+})
+
+describe('bookFields', () => {
+  const names = (fields: Field[]) => fields.map((field) => ('name' in field ? field.name : null))
+
+  it('declares the overridable set, in order', () => {
+    expect(OVERRIDABLE_BOOK_FIELDS).toEqual([
+      'title',
+      'subtitle',
+      'authors',
+      'series',
+      'seriesIndex',
+      'publisher',
+      'year',
+      'language',
+      'pages',
+      'description',
+    ])
+  })
+
+  it('builds the override fields from exactly that set', () => {
+    expect(names(overrideFields())).toEqual([...OVERRIDABLE_BOOK_FIELDS])
+  })
+
+  it('builds the Book fields from that set plus cover, genres and themes', () => {
+    expect(names(bookFields())).toEqual([...OVERRIDABLE_BOOK_FIELDS, 'cover', 'genres', 'themes'])
   })
 })
