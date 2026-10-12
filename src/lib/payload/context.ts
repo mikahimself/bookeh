@@ -10,9 +10,11 @@ import { PATH_HEADER } from './pathHeader'
 
 /**
  * Spine, AD-16: the signed-in user and the request every gateway call runs
- * in. `req.user` is `user`. Never kept beyond its request.
+ * in. `req.user` is `user`. Never kept beyond its request. `transactionID` is
+ * set only on the context `withTransaction()` hands its `fn`: the transaction
+ * it opened on that context's own `req`.
  */
-export type Context = { req: PayloadRequest; user: TypedUser }
+export type Context = { req: PayloadRequest; user: TypedUser; transactionID?: number | string }
 
 /**
  * The signed-in user of the current request, or `null`, through Payload's own

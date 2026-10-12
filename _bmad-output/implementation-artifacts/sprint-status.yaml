@@ -79,7 +79,7 @@ development_status:
   3-7-c3-google-books-adapter: done
   3-8-a24-in-process-state-helper: done
   3-9-c4-lookup-across-sources: done
-  3-10-a11-transactions-and-the-drizzle-helper: backlog
+  3-10-a11-transactions-and-the-drizzle-helper: done
   3-11-a12-owner-and-relation-fields: backlog
   3-12-a18-media: backlog
   3-13-b10-author-sort-names: backlog
