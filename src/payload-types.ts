@@ -68,6 +68,7 @@ export interface Config {
   blocks: {};
   collections: {
     authors: Author;
+    genres: Genre;
     media: Media;
     series: Series;
     users: User;
@@ -79,6 +80,7 @@ export interface Config {
   collectionsJoins: {};
   collectionsSelect: {
     authors: AuthorsSelect<false> | AuthorsSelect<true>;
+    genres: GenresSelect<false> | GenresSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     series: SeriesSelect<false> | SeriesSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
@@ -168,6 +170,18 @@ export interface User {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "genres".
+ */
+export interface Genre {
+  id: number;
+  name: string;
+  nameFi?: string | null;
+  nameKey: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "media".
  */
 export interface Media {
@@ -225,6 +239,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'authors';
         value: number | Author;
+      } | null)
+    | ({
+        relationTo: 'genres';
+        value: number | Genre;
       } | null)
     | ({
         relationTo: 'media';
@@ -290,6 +308,17 @@ export interface AuthorsSelect<T extends boolean = true> {
   sortName?: T;
   visibility?: T;
   createdBy?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "genres_select".
+ */
+export interface GenresSelect<T extends boolean = true> {
+  name?: T;
+  nameFi?: T;
+  nameKey?: T;
   updatedAt?: T;
   createdAt?: T;
 }

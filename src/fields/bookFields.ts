@@ -2,9 +2,6 @@ import type { CollectionSlug, Field } from 'payload'
 
 import { readableRelation } from '@/fields/relation'
 
-// The generated `CollectionSlug` gains this with B5 (story 3.17).
-const GENRES = 'genres' as CollectionSlug
-
 /** Spine, AD-6: the Book fields a user may override on `user-books`, in display order. */
 export const OVERRIDABLE_BOOK_FIELDS = [
   'title',
@@ -28,12 +25,20 @@ type RelationOptions = { name: string; hasMany?: boolean }
  * relations are checked against the request user. `books` is not private and
  * takes plain relationship fields; which targets a Book may reference (a
  * shared Book only shared records, AD-4/AD-5) is enforced by `lib/catalogue`,
- * not by the field.
+ * not by the field. `hasMany` is narrowed to a literal as in `readableRelation`:
+ * spread as `boolean` against a `CollectionSlug` union of more than eight
+ * slugs, it exceeds tsc's 25-combination limit for discriminated unions.
  */
-const relation = (override: boolean, slug: CollectionSlug, options: RelationOptions): Field =>
-  override
-    ? readableRelation(slug, options)
-    : { type: 'relationship', relationTo: slug, ...options }
+const relation = (
+  override: boolean,
+  slug: CollectionSlug,
+  { name, hasMany }: RelationOptions,
+): Field => {
+  if (override) return readableRelation(slug, { name, hasMany })
+  return hasMany
+    ? { name, type: 'relationship', relationTo: slug, hasMany: true }
+    : { name, type: 'relationship', relationTo: slug }
+}
 
 /**
  * The single declaration of the overridable fields and their limits. An
@@ -60,7 +65,7 @@ const overridable = (override: boolean): Field[] => [
 export const bookFields = (): Field[] => [
   ...overridable(false),
   { name: 'cover', type: 'upload', relationTo: 'media' },
-  { name: 'genres', type: 'relationship', relationTo: GENRES, hasMany: true },
+  { name: 'genres', type: 'relationship', relationTo: 'genres', hasMany: true },
   { name: 'themes', type: 'text', hasMany: true },
 ]
 

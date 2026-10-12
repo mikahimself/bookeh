@@ -25,3 +25,17 @@ export const catalogueAccess = {
   update: adminOnly,
   delete: adminOnly,
 } satisfies Record<'read' | 'create' | 'update' | 'delete', Access>
+
+const signedIn: Access = ({ req: { user } }) => Boolean(user)
+
+/**
+ * Access for `genres`: shared system genres only (D-2, AD-4), read by anyone
+ * signed in; the admin writes through this access, `lib/catalogue` with
+ * system privileges.
+ */
+export const genreAccess = {
+  read: signedIn,
+  create: adminOnly,
+  update: adminOnly,
+  delete: adminOnly,
+} satisfies Record<'read' | 'create' | 'update' | 'delete', Access>

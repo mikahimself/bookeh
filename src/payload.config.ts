@@ -6,6 +6,7 @@ import sharp from 'sharp'
 
 import { Authors } from './collections/Authors'
 import { nameKeyIndexes } from './collections/catalogueIndexes'
+import { Genres } from './collections/Genres'
 import { Series } from './collections/Series'
 import { Users } from './collections/Users'
 import { Media } from './collections/Media'
@@ -22,7 +23,7 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
   },
-  collections: [Authors, Media, Series, Users],
+  collections: [Authors, Genres, Media, Series, Users],
   graphQL: { disable: true },
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {
