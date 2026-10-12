@@ -18,11 +18,11 @@ import appConfig from '@/payload.config'
 
 // Throwaway collections on a second, keyed Payload instance in its own
 // Postgres schema, as in fieldHelpers.int.spec.ts. The relation targets carry
-// the slugs `bookFields.ts` names; none of them exists in the app yet.
+// the slugs `bookFields.ts` names; `series` and `genres` are not in the app yet.
 const schemaName = 'book_fields_test'
 const books = 'field-test-books' as CollectionSlug
 const overrides = 'field-test-overrides' as CollectionSlug
-const authors = 'authors' as CollectionSlug
+const authors = 'authors'
 const series = 'series' as CollectionSlug
 const genres = 'genres' as CollectionSlug
 

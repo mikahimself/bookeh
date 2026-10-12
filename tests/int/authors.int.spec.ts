@@ -20,7 +20,8 @@ import { contextFor, createUser } from '../helpers/harness'
 // `authors`, AD-4/AD-5/AD-19: shared rows for everyone signed in, private rows
 // for their creator and the admin; writes for the admin only; `nameKey`
 // unique among shared rows and per creator among private ones. The shared
-// index is global and rows are never cleaned up, so every name is unique per run.
+// index is global and rows are never cleaned up, so shared names carry a
+// per-run suffix; private names are safe because each run creates fresh users.
 
 const unique = (name: string) => `${name} ${randomUUID().slice(0, 8)}`
 
@@ -143,6 +144,22 @@ describe('authors', () => {
     )
     const unchanged = await payload.findByID({ collection: 'authors', id: own.id })
     expect(unchanged.name).toBe(own.name)
+  })
+
+  it('lets the admin update and delete through access', async () => {
+    const author = await systemCreate(a, unique('Admin Edited Author'), 'private')
+    const ctx = await contextFor(admin)
+    const name = unique('Admin Renamed Author')
+    const renamed = await gateway.updateByID(ctx, {
+      collection: 'authors',
+      id: author.id,
+      data: { name },
+    })
+    expect(renamed.name).toBe(name)
+    await gateway.deleteByID(ctx, { collection: 'authors', id: author.id })
+    expect(
+      await payload.count({ collection: 'authors', where: { id: { equals: author.id } } }),
+    ).toEqual({ totalDocs: 0 })
   })
 
   it('keeps nameKey unique among shared rows and per creator among private rows', async () => {

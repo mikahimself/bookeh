@@ -25,7 +25,7 @@ const createdByFromRequest: FieldHook<VisibilityData, unknown, VisibilitySibling
 
 /**
  * Spine, AD-4: the `visibility` / `createdBy` pair of every catalogue
- * collection (`authors`, `series`, `books`). `visibility` has no default, so
+ * collection (`authors`, `series`, `books`, `media`). `visibility` has no default, so
  * no caller gets a shared row by leaving it out. Spread after the
  * collection's own fields.
  */

@@ -17,6 +17,7 @@ export const Authors: CollectionConfig = {
   admin: {
     group: 'Catalogue',
     useAsTitle: 'name',
+    defaultColumns: ['name', 'visibility', 'createdBy'],
   },
   fields: [
     { name: 'name', type: 'text', required: true, maxLength: 200 },

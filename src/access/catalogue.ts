@@ -16,8 +16,8 @@ const adminOnly: Access = ({ req: { user } }) => isAdmin(user)
 
 /**
  * Access for the catalogue collections with `visibilityFields()` (`authors`,
- * `series`, `books`). Users never write them; other writes come only from
- * `lib/catalogue` with system privileges.
+ * `series`, `books`, `media`). Users never write them; the admin writes
+ * through this access (AD-5), `lib/catalogue` with system privileges.
  */
 export const catalogueAccess = {
   read: sharedOrOwnPrivate,
