@@ -2,8 +2,7 @@ import type { CollectionSlug, Field } from 'payload'
 
 import { readableRelation } from '@/fields/relation'
 
-// The generated `CollectionSlug` gains these with B3–B5 (stories 3.15–3.17).
-const AUTHORS = 'authors' as CollectionSlug
+// The generated `CollectionSlug` gains these with B4–B5 (stories 3.16–3.17).
 const SERIES = 'series' as CollectionSlug
 const GENRES = 'genres' as CollectionSlug
 
@@ -44,7 +43,7 @@ const relation = (override: boolean, slug: CollectionSlug, options: RelationOpti
 const overridable = (override: boolean): Field[] => [
   { name: 'title', type: 'text', required: !override, maxLength: 500 },
   { name: 'subtitle', type: 'text', maxLength: 500 },
-  relation(override, AUTHORS, { name: 'authors', hasMany: true }),
+  relation(override, 'authors', { name: 'authors', hasMany: true }),
   relation(override, SERIES, { name: 'series' }),
   { name: 'seriesIndex', type: 'number' },
   { name: 'publisher', type: 'text' },

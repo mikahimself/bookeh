@@ -4,6 +4,8 @@ import { buildConfig } from 'payload'
 import { fileURLToPath } from 'url'
 import sharp from 'sharp'
 
+import { Authors } from './collections/Authors'
+import { nameKeyIndexes } from './collections/catalogueIndexes'
 import { Users } from './collections/Users'
 import { Media } from './collections/Media'
 import { seedFirstUser } from './lib/account/seedFirstUser'
@@ -19,7 +21,7 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
   },
-  collections: [Media, Users],
+  collections: [Authors, Media, Users],
   graphQL: { disable: true },
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {
@@ -34,6 +36,7 @@ export default buildConfig({
     // Applied only when NODE_ENV=production, where the adapter disables push
     // (AD-13): the production container migrates at start, never pushes.
     prodMigrations: migrations,
+    afterSchemaInit: [nameKeyIndexes('authors')],
   }),
   sharp,
   plugins: [],

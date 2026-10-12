@@ -1,5 +1,6 @@
 import * as migration_20261009_092900_users from './20261009_092900_users';
 import * as migration_20261010_095151_visibility from './20261010_095151_visibility';
+import * as migration_20261012_173948_authors from './20261012_173948_authors';
 
 export const migrations = [
   {
@@ -10,6 +11,11 @@ export const migrations = [
   {
     up: migration_20261010_095151_visibility.up,
     down: migration_20261010_095151_visibility.down,
-    name: '20261010_095151_visibility'
+    name: '20261010_095151_visibility',
+  },
+  {
+    up: migration_20261012_173948_authors.up,
+    down: migration_20261012_173948_authors.down,
+    name: '20261012_173948_authors'
   },
 ];
