@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 
 import { isbnField, normaliseIsbn, toIsbn13 } from '@/fields/isbn'
 import { nameKeyField, toNameKey } from '@/fields/nameKey'
+import { deriveSortName, sortNameField } from '@/fields/sortName'
 import { runAction } from '@/lib/errors'
 
 const t = (key: string): string => key
@@ -133,5 +134,92 @@ describe('nameKeyField', () => {
       callHook(field, { siblingData: { name: null }, previousSiblingDoc, operation: 'update' }),
     )
     expect(result).toEqual({ ok: false, code: 'VALIDATION', fields: { name: 'VALIDATION' } })
+  })
+})
+
+describe('deriveSortName', () => {
+  it.each([
+    ['two-word name', 'Tove Jansson', 'Jansson, Tove'],
+    ['Finnish name', 'Aleksis Kivi', 'Kivi, Aleksis'],
+    ['particle name', 'Ludwig van Beethoven', 'Beethoven, Ludwig van'],
+    ['single name', 'Homeros', 'Homeros'],
+    ['already inverted', 'Jansson, Tove', 'Jansson, Tove'],
+    ['messy whitespace', '  Väinö   Linna ', 'Linna, Väinö'],
+    ['decomposed accents', 'Va\u0308ino\u0308 Linna', 'Linna, Väinö'],
+    [
+      'corporate name (wrong, accepted)',
+      'Werner Söderström Osakeyhtiö',
+      'Osakeyhtiö, Werner Söderström',
+    ],
+    ['blank name', '   ', null],
+  ])('%s', (_, input, expected) => {
+    expect(deriveSortName(input)).toBe(expected)
+  })
+})
+
+describe('sortNameField', () => {
+  const field = sortNameField()
+
+  it('keeps a passed-in sortName that differs from the derived one, trimmed', () => {
+    const siblingData = { name: 'Aleksis Kivi', sortName: ' Stenvall, Alexis ' }
+    expect(callHook(field, { value: ' Stenvall, Alexis ', siblingData, operation: 'create' })).toBe(
+      'Stenvall, Alexis',
+    )
+  })
+
+  it.each([
+    ['inner whitespace', 'Kivi,  Aleksis', 'Kivi, Aleksis'],
+    ['decomposed accents', 'Linna, Va\u0308ino\u0308', 'Linna, Väinö'],
+  ])('normalises a kept sortName with %s', (_, value, expected) => {
+    expect(callHook(field, { value, siblingData: { name: 'X Y' }, operation: 'create' })).toBe(
+      expected,
+    )
+  })
+
+  it.each([
+    ['blank', '   '],
+    ['null', null],
+    ['missing', undefined],
+  ])('derives from name when sortName is %s', (_, value) => {
+    const siblingData = { name: 'Aleksis Kivi', sortName: value }
+    expect(callHook(field, { value, siblingData, operation: 'create' })).toBe('Kivi, Aleksis')
+  })
+
+  it('keeps the stored sortName when name changes', () => {
+    const previousSiblingDoc = { name: 'Kivi', sortName: 'Stenvall, Alexis' }
+    expect(
+      callHook(field, {
+        value: 'Stenvall, Alexis',
+        siblingData: { name: 'Aleksis Kivi' },
+        previousSiblingDoc,
+        operation: 'update',
+      }),
+    ).toBe('Stenvall, Alexis')
+  })
+
+  it('derives from the new name when the stored sortName is empty', () => {
+    const previousSiblingDoc = { name: 'Kivi', sortName: null }
+    expect(
+      callHook(field, {
+        value: null,
+        siblingData: { name: 'Aleksis Kivi' },
+        previousSiblingDoc,
+        operation: 'update',
+      }),
+    ).toBe('Kivi, Aleksis')
+  })
+
+  it('derives from the stored name on an update without one', () => {
+    const previousSiblingDoc = { name: 'Aleksis Kivi', sortName: null }
+    expect(
+      callHook(field, { value: null, siblingData: {}, previousSiblingDoc, operation: 'update' }),
+    ).toBe('Kivi, Aleksis')
+  })
+
+  it.each([
+    ['blank', { name: '   ' }],
+    ['missing', {}],
+  ])('gives null for a %s name without throwing', (_, siblingData) => {
+    expect(callHook(field, { siblingData, operation: 'create' })).toBeNull()
   })
 })
