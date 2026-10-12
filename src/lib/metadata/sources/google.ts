@@ -158,7 +158,7 @@ export const google: Source = {
   id: 'google',
   async lookupByIsbn(isbn13) {
     const body = await fetchBody(isbn13)
-    if (!body) return []
+    if (!body) return undefined
     const results = list(body.items)
       .filter(isObject)
       .filter((volume) => isObject(volume.volumeInfo) && hasIsbn(volume.volumeInfo, isbn13))

@@ -43,7 +43,8 @@ const fake = (id: string, records: SourceResult[]): Source => ({
   lookupByIsbn: async () => records,
 })
 
-const lookup = (sources: Source[]) => Promise.all(sources.map((s) => s.lookupByIsbn(ISBN)))
+const lookup = (sources: Source[]) =>
+  Promise.all(sources.map(async (s) => (await s.lookupByIsbn(ISBN)) ?? []))
 
 describe('mergeResults', () => {
   it('fills each field from the first source that has it', async () => {

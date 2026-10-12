@@ -264,7 +264,7 @@ export const finna: Source = {
   id: 'finna',
   async lookupByIsbn(isbn13) {
     const body = await fetchBody(isbn13)
-    if (!body) return []
+    if (!body) return undefined
     const scored = finnaMatches(body, isbn13).flatMap((record) => {
       const result = toResult(record, isbn13, body)
       if (!result) return []

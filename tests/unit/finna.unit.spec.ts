@@ -3,6 +3,7 @@ import { readFileSync, readdirSync } from 'node:fs'
 import { afterEach, beforeEach, describe, expect, it, vi, type MockInstance } from 'vitest'
 
 import { logger } from '@/lib/errors'
+import type { SourceResult } from '@/lib/metadata/source'
 import { finna } from '@/lib/metadata/sources/finna'
 
 const FIXTURES = new URL('../fixtures/finna/', import.meta.url)
@@ -39,6 +40,13 @@ function serveFixtures(edit: (body: Body) => void = () => {}): void {
   )
 }
 
+/** The records of an answered lookup; fails the test when the source reports a failure. */
+async function lookup(isbn13: string): Promise<SourceResult[]> {
+  const results = await finna.lookupByIsbn(isbn13)
+  if (results === undefined) throw new Error(`finna lookup of ${isbn13} failed`)
+  return results
+}
+
 let warn: MockInstance
 
 beforeEach(() => {
@@ -54,7 +62,7 @@ describe('finna.lookupByIsbn', () => {
   beforeEach(() => serveFixtures())
 
   it('keeps only the record with the ISBN asked for, among other editions', async () => {
-    const results = await finna.lookupByIsbn('9789524035699')
+    const results = await lookup('9789524035699')
 
     expect(results).toStrictEqual([
       {
@@ -87,7 +95,7 @@ describe('finna.lookupByIsbn', () => {
   })
 
   it('orders several matches best first', async () => {
-    const results = await finna.lookupByIsbn('9780007466061')
+    const results = await lookup('9780007466061')
 
     expect(results).toHaveLength(2)
     expect(results[0].coverUrl).toContain('id=kirkes.399381')
@@ -99,7 +107,7 @@ describe('finna.lookupByIsbn', () => {
   it('puts a record with a cover first whatever Finna’s order', async () => {
     serveFixtures((body) => body.records.reverse())
 
-    const [best] = await finna.lookupByIsbn('9780007466061')
+    const [best] = await lookup('9780007466061')
 
     expect(best.coverUrl).toContain('id=kirkes.399381')
   })
@@ -110,7 +118,7 @@ describe('finna.lookupByIsbn', () => {
       body.records.find(({ id }) => id.startsWith('heili.'))!.subjects = []
     })
 
-    const results = await finna.lookupByIsbn('9789515789631')
+    const results = await lookup('9789515789631')
 
     expect(results.map(({ binding }) => binding)).toEqual(['nidottu', undefined])
   })
@@ -120,13 +128,13 @@ describe('finna.lookupByIsbn', () => {
     ['9789523521957', ['Veikka Lahtinen', 'Pontus Purokuru']], // afterword writer left out
     ['9780007448036', ['George R. R. Martin']], // "författare"
   ])('reads the author roles of %s', async (isbn13, names) => {
-    const [result] = await finna.lookupByIsbn(isbn13)
+    const [result] = await lookup(isbn13)
 
     expect(result.authors.map(({ name }) => name)).toEqual(names)
   })
 
   it('leaves out a role-less translator and reads pages from the extent', async () => {
-    const results = await finna.lookupByIsbn('9789515789631')
+    const results = await lookup('9789515789631')
 
     expect(results.length).toBeGreaterThan(0)
     for (const result of results) {
@@ -136,13 +144,13 @@ describe('finna.lookupByIsbn', () => {
   })
 
   it('reads the older "s." page abbreviation', async () => {
-    const [result] = await finna.lookupByIsbn('9789510397077')
+    const [result] = await lookup('9789510397077')
 
     expect(result.pages).toBe(200)
   })
 
   it("takes the description from the record's first summary", async () => {
-    const [result] = await finna.lookupByIsbn('9789511319177')
+    const [result] = await lookup('9789511319177')
 
     expect(result.description).toMatch(/^Tähtitieteilijän oppipojan tie .* jää taakse\.$/)
   })
@@ -152,20 +160,20 @@ describe('finna.lookupByIsbn', () => {
     ['9789520453589', 'Keltainen kirjasto', 367], // numbered entry after `Keltainen pokkari`
     ['9789518581041', 'Kirjokansi', 223], // `223.`
   ])('reads the series of %s', async (isbn13, series, seriesIndex) => {
-    const [result] = await finna.lookupByIsbn(isbn13)
+    const [result] = await lookup(isbn13)
 
     expect(result).toMatchObject({ series, seriesIndex })
   })
 
   it('takes the first series when no entry has a number', async () => {
-    const [result] = await finna.lookupByIsbn('9789510397077')
+    const [result] = await lookup('9789510397077')
 
     expect(result.series).toBe('Bon')
     expect(result).not.toHaveProperty('seriesIndex')
   })
 
   it('leaves series out when the record has none', async () => {
-    const [result] = await finna.lookupByIsbn('9789524035699')
+    const [result] = await lookup('9789524035699')
 
     expect(result).not.toHaveProperty('series')
     expect(result).not.toHaveProperty('seriesIndex')
@@ -190,14 +198,14 @@ describe('finna.lookupByIsbn', () => {
       record(body, 'helle.1637236').series = entries
     })
 
-    const [result] = await finna.lookupByIsbn('9789524035699')
+    const [result] = await lookup('9789524035699')
 
     expect(result.series).toBe(series)
     expect(result.seriesIndex).toBe(seriesIndex)
   })
 
   it("reads themes from the record's subject headings, in order", async () => {
-    const [result] = await finna.lookupByIsbn('9780007447831')
+    const [result] = await lookup('9780007447831')
 
     expect(result.themes).toEqual([
       'Stark (fiktiivinen suku)',
@@ -217,7 +225,7 @@ describe('finna.lookupByIsbn', () => {
   })
 
   it('joins a multi-part heading and drops repeats that differ only by a closing comma', async () => {
-    const [result] = await finna.lookupByIsbn('9780007447848')
+    const [result] = await lookup('9780007447848')
 
     expect(result.themes).toContain('kuningaskunnat Seitsemän kuningaskuntaa')
     expect(result.themes.filter((theme) => theme === 'Stark')).toHaveLength(1)
@@ -225,7 +233,7 @@ describe('finna.lookupByIsbn', () => {
   })
 
   it('drops the comma before a qualifier', async () => {
-    const results = await finna.lookupByIsbn('9789515789631')
+    const results = await lookup('9789515789631')
 
     const eepos = results.find(({ binding }) => binding === 'nidottu')
     expect(eepos?.themes).toContain('minä (fiktiivinen hahmo)')
@@ -233,19 +241,19 @@ describe('finna.lookupByIsbn', () => {
 
   it('drops the comma before a qualifier inside one part', async () => {
     // kirkes.399381: ["Stark,", "suku, (fiktiivinen hahmo)"]
-    const [result] = await finna.lookupByIsbn('9780007466061')
+    const [result] = await lookup('9780007466061')
 
     expect(result.themes).toContain('Stark suku (fiktiivinen hahmo)')
   })
 
   it('keeps the trailing full stop Finna gives', async () => {
-    const [result] = await finna.lookupByIsbn('9789520408053')
+    const [result] = await lookup('9789520408053')
 
     expect(result.themes).toContain('Poverty.')
   })
 
   it('reads no genre terms and leaves subjects and the raw body alone', async () => {
-    const [result] = await finna.lookupByIsbn('9789510397077')
+    const [result] = await lookup('9789510397077')
 
     expect(result.themes).not.toContain('pienoisromaanit')
     expect(result.subjects).toEqual([])
@@ -257,7 +265,7 @@ describe('finna.lookupByIsbn', () => {
       record(body, 'helle.1637236').subjects = [['Ranska', 'ENNAKKOTIETO']]
     })
 
-    const [result] = await finna.lookupByIsbn('9789524035699')
+    const [result] = await lookup('9789524035699')
 
     expect(result.themes).toEqual(['Ranska'])
   })
@@ -267,7 +275,7 @@ describe('finna.lookupByIsbn', () => {
       for (const entry of body.records) delete entry.subjects
     })
 
-    const [result] = await finna.lookupByIsbn('9789524035699')
+    const [result] = await lookup('9789524035699')
 
     expect(result.themes).toEqual([])
   })
@@ -284,7 +292,7 @@ describe('finna.lookupByIsbn', () => {
       record(body, 'helle.1637236').nonPresenterAuthors![0].name = name
     })
 
-    const [result] = await finna.lookupByIsbn('9789524035699')
+    const [result] = await lookup('9789524035699')
 
     expect(result.authors).toStrictEqual([author])
   })
@@ -294,7 +302,7 @@ describe('finna.lookupByIsbn', () => {
     .map((file) => file.replace(/\.json$/, ''))
 
   it.each(isbns)('maps %s within the contract', async (isbn13) => {
-    const results = await finna.lookupByIsbn(isbn13)
+    const results = await lookup(isbn13)
 
     expect(results.length).toBeGreaterThan(0)
     for (const result of results) {
@@ -342,10 +350,10 @@ describe('finna.lookupByIsbn without a usable answer', () => {
     ['body is not JSON', async () => new Response('not json')],
     ['status is not OK', async () => Response.json({ status: 'ERROR' })],
     ['records is not an array', async () => Response.json({ status: 'OK', records: {} })],
-  ])('answers nothing when %s, logging once', async (_, impl) => {
+  ])('reports a failure when %s, logging once', async (_, impl) => {
     stubFetch(impl)
 
-    await expect(finna.lookupByIsbn('9789524035699')).resolves.toEqual([])
+    await expect(finna.lookupByIsbn('9789524035699')).resolves.toBeUndefined()
     expect(warn).toHaveBeenCalledOnce()
   })
 })

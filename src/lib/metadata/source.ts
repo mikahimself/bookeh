@@ -44,10 +44,11 @@ export type RawMetadata = {
  * One metadata source (AD-9). Adding a source is one adapter file and one
  * entry in `sources/index.ts`.
  *
- * - `lookupByIsbn` resolves the source's matching records best first, and `[]`
- *   when it has none.
- * - Neither method ever throws or rejects: a failure is logged and the caller
- *   sees no records.
+ * - `lookupByIsbn` resolves the source's matching records best first, `[]`
+ *   when the source answered and has none, and `undefined` when it failed
+ *   (logged), so an outage is never read as "no such book".
+ * - Neither method ever throws or rejects: a failure is logged. The `undefined`
+ *   failure signal is `lookupByIsbn`'s only; `search` still resolves a list.
  * - Each result's `isbn13` is the ISBN asked for, never another ISBN found in
  *   the record. `source` is the adapter's own `id`; `raw` is
  *   `{ [id]: completeResponse }`.
@@ -57,6 +58,6 @@ export type RawMetadata = {
  */
 export type Source = {
   id: SourceId
-  lookupByIsbn(isbn13: string): Promise<SourceResult[]>
+  lookupByIsbn(isbn13: string): Promise<SourceResult[] | undefined>
   search?(query: string): Promise<SearchHit[]>
 }

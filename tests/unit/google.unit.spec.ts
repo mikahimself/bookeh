@@ -3,6 +3,7 @@ import { readFileSync, readdirSync } from 'node:fs'
 import { afterEach, beforeEach, describe, expect, it, vi, type MockInstance } from 'vitest'
 
 import { logger } from '@/lib/errors'
+import type { SourceResult } from '@/lib/metadata/source'
 import { google } from '@/lib/metadata/sources/google'
 
 const FIXTURES = new URL('../fixtures/google/', import.meta.url)
@@ -40,6 +41,13 @@ const serve = (body: unknown) => fetchMock(async () => Response.json(body))
 const requested = (mock: ReturnType<typeof fetchMock>): URL[] =>
   mock.mock.calls.map((call) => new URL(String((call as unknown[])[0])))
 
+/** The records of an answered lookup; fails the test when the source reports a failure. */
+async function lookup(isbn13: string): Promise<SourceResult[]> {
+  const results = await google.lookupByIsbn(isbn13)
+  if (results === undefined) throw new Error(`google lookup of ${isbn13} failed`)
+  return results
+}
+
 let warn: MockInstance
 
 beforeEach(() => {
@@ -59,7 +67,7 @@ describe('google.lookupByIsbn', () => {
     const body = searchBody([full])
     serve(body)
 
-    const results = await google.lookupByIsbn('9780007448036')
+    const results = await lookup('9780007448036')
 
     expect(results).toStrictEqual([
       {
@@ -92,7 +100,7 @@ describe('google.lookupByIsbn', () => {
   it('maps a Finnish volume without cover or categories', async () => {
     serve(searchBody([volume('MF11zQEACAAJ')]))
 
-    const [result] = await google.lookupByIsbn('9789518581041')
+    const [result] = await lookup('9789518581041')
 
     expect(result).toMatchObject({ language: 'fi', pages: 413, subjects: [] })
     expect(result).not.toHaveProperty('coverUrl')
@@ -101,7 +109,7 @@ describe('google.lookupByIsbn', () => {
   it('leaves out what a sparse volume lacks', async () => {
     serve(searchBody([volume('D-Py0AEACAAJ')]))
 
-    const [result] = await google.lookupByIsbn('9789523521957')
+    const [result] = await lookup('9789523521957')
 
     expect(result).not.toHaveProperty('description')
     expect(result).not.toHaveProperty('pages')
@@ -110,7 +118,7 @@ describe('google.lookupByIsbn', () => {
   it('keeps the subtitle', async () => {
     serve(searchBody([volume('DWvlNEkUDPUC')]))
 
-    const [result] = await google.lookupByIsbn('9780007447848')
+    const [result] = await lookup('9780007447848')
 
     expect(result.subtitle).toBe('Steel and Snow')
   })
@@ -118,7 +126,7 @@ describe('google.lookupByIsbn', () => {
   it('turns an HTML description into paragraphs', async () => {
     serve(searchBody([volume('GzENB4wePpEC')]))
 
-    const [{ description }] = await google.lookupByIsbn('9780007447855')
+    const [{ description }] = await lookup('9780007447855')
 
     expect(description).not.toContain('<')
     expect(description).toMatch(/^HBO's hit series/)
@@ -139,7 +147,7 @@ describe('google.lookupByIsbn', () => {
     edited.volumeInfo.description = text
     serve(searchBody([edited]))
 
-    const [{ description }] = await google.lookupByIsbn('9780007448036')
+    const [{ description }] = await lookup('9780007448036')
 
     expect(description).toBe(expected)
   })
@@ -147,7 +155,7 @@ describe('google.lookupByIsbn', () => {
   it('keeps only the volume with the ISBN asked for, among other editions', async () => {
     serve(searchBody([volume('GzENB4wePpEC'), volume('DWvlNEkUDPUC')]))
 
-    const results = await google.lookupByIsbn('9780007447848')
+    const results = await lookup('9780007447848')
 
     expect(results).toHaveLength(1)
     expect(results[0].subtitle).toBe('Steel and Snow')
@@ -160,7 +168,7 @@ describe('google.lookupByIsbn', () => {
     )
     serve(searchBody([only10]))
 
-    expect(await google.lookupByIsbn('9780007447848')).toHaveLength(1)
+    expect(await lookup('9780007447848')).toHaveLength(1)
   })
 
   it.each([
@@ -178,7 +186,7 @@ describe('google.lookupByIsbn', () => {
     inverted.volumeInfo.authors = ['Martin, George R. R.']
     serve(searchBody([inverted]))
 
-    const [result] = await google.lookupByIsbn('9780007448036')
+    const [result] = await lookup('9780007448036')
 
     expect(result.authors).toStrictEqual([
       { name: 'George R. R. Martin', sortName: 'Martin, George R. R.' },
@@ -193,7 +201,7 @@ describe('google.lookupByIsbn', () => {
     edited.volumeInfo.language = code
     serve(searchBody([edited]))
 
-    const [result] = await google.lookupByIsbn('9780007448036')
+    const [result] = await lookup('9780007448036')
 
     expect(result.language).toBe(expected)
     if (expected === undefined) expect(result).not.toHaveProperty('language')
@@ -205,7 +213,7 @@ describe('google.lookupByIsbn', () => {
     edited.volumeInfo.imageLinks = { smallThumbnail: `${small}&edge=curl` }
     serve(searchBody([edited]))
 
-    const [{ coverUrl }] = await google.lookupByIsbn('9780007448036')
+    const [{ coverUrl }] = await lookup('9780007448036')
     const url = new URL(coverUrl!)
 
     expect(url.protocol).toBe('https:')
@@ -220,7 +228,7 @@ describe('google.lookupByIsbn', () => {
     edited.volumeInfo.imageLinks = { thumbnail: 'data:image/png;base64,AAAA' }
     serve(searchBody([edited]))
 
-    const [result] = await google.lookupByIsbn('9780007448036')
+    const [result] = await lookup('9780007448036')
 
     expect(result).not.toHaveProperty('coverUrl')
   })
@@ -231,7 +239,7 @@ describe('google.lookupByIsbn', () => {
     delete withoutCover.volumeInfo.imageLinks
     serve(searchBody([withoutCover, withCover]))
 
-    const results = await google.lookupByIsbn('9780007447848')
+    const results = await lookup('9780007447848')
 
     expect(results).toHaveLength(2)
     expect(results[0]).toHaveProperty('coverUrl')
@@ -242,9 +250,9 @@ describe('google.lookupByIsbn', () => {
     const mock = serve(searchBody([]))
 
     vi.stubEnv('GOOGLE_BOOKS_API_KEY', 'test-key')
-    await google.lookupByIsbn('9780007448036')
+    await lookup('9780007448036')
     vi.stubEnv('GOOGLE_BOOKS_API_KEY', '')
-    await google.lookupByIsbn('9780007448036')
+    await lookup('9780007448036')
 
     const [keyed, keyless] = requested(mock)
     expect(keyed.searchParams.get('key')).toBe('test-key')
@@ -264,11 +272,11 @@ describe('google.lookupByIsbn without a usable answer', () => {
     ['fetch rejects', () => Promise.reject(new TypeError('fetch failed'))],
     ['body is not JSON', async () => new Response('not json')],
     ['items is not an array', async () => Response.json({ totalItems: 1, items: {} })],
-  ])('answers nothing when %s, logging once without the key', async (_, impl) => {
+  ])('reports a failure when %s, logging once without the key', async (_, impl) => {
     vi.stubEnv('GOOGLE_BOOKS_API_KEY', 'secret-key-123')
     fetchMock(impl)
 
-    await expect(google.lookupByIsbn('9780007448036')).resolves.toEqual([])
+    await expect(google.lookupByIsbn('9780007448036')).resolves.toBeUndefined()
     expect(warn).toHaveBeenCalledOnce()
     expect(logged(warn.mock.calls)).not.toContain('secret-key-123')
   })
@@ -304,7 +312,7 @@ describe('google.lookupByIsbn over every recorded response', () => {
   it.each([...searches, ...volumes])('$name', async ({ isbn13, body, matches }) => {
     serve(body)
 
-    const results = await google.lookupByIsbn(isbn13)
+    const results = await lookup(isbn13)
 
     if (matches) expect(results.length).toBeGreaterThan(0)
     for (const result of results) {
