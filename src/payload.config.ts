@@ -6,6 +6,7 @@ import sharp from 'sharp'
 
 import { Authors } from './collections/Authors'
 import { nameKeyIndexes } from './collections/catalogueIndexes'
+import { Series } from './collections/Series'
 import { Users } from './collections/Users'
 import { Media } from './collections/Media'
 import { seedFirstUser } from './lib/account/seedFirstUser'
@@ -21,7 +22,7 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
   },
-  collections: [Authors, Media, Users],
+  collections: [Authors, Media, Series, Users],
   graphQL: { disable: true },
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {
@@ -36,7 +37,7 @@ export default buildConfig({
     // Applied only when NODE_ENV=production, where the adapter disables push
     // (AD-13): the production container migrates at start, never pushes.
     prodMigrations: migrations,
-    afterSchemaInit: [nameKeyIndexes('authors')],
+    afterSchemaInit: [nameKeyIndexes('authors'), nameKeyIndexes('series')],
   }),
   sharp,
   plugins: [],

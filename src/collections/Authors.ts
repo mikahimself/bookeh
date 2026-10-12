@@ -7,9 +7,9 @@ import { visibilityFields } from '@/fields/visibility'
 
 /**
  * Spine, AD-4/AD-5: shared authors, plus private ones a user typed for a
- * private Book, readable only by their creator and the admin. Users never
- * write here; `lib/catalogue` does with system privileges. `nameKey` is
- * unique per scope (AD-19, `nameKeyIndexes` in `payload.config.ts`).
+ * private Book or an override, readable only by their creator and the admin.
+ * Users never write here; `lib/catalogue` does with system privileges.
+ * `nameKey` is unique per scope (AD-19, `nameKeyIndexes` in `payload.config.ts`).
  */
 export const Authors: CollectionConfig = {
   slug: 'authors',

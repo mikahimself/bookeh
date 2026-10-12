@@ -2,8 +2,7 @@ import type { CollectionSlug, Field } from 'payload'
 
 import { readableRelation } from '@/fields/relation'
 
-// The generated `CollectionSlug` gains these with B4–B5 (stories 3.16–3.17).
-const SERIES = 'series' as CollectionSlug
+// The generated `CollectionSlug` gains this with B5 (story 3.17).
 const GENRES = 'genres' as CollectionSlug
 
 /** Spine, AD-6: the Book fields a user may override on `user-books`, in display order. */
@@ -44,7 +43,7 @@ const overridable = (override: boolean): Field[] => [
   { name: 'title', type: 'text', required: !override, maxLength: 500 },
   { name: 'subtitle', type: 'text', maxLength: 500 },
   relation(override, 'authors', { name: 'authors', hasMany: true }),
-  relation(override, SERIES, { name: 'series' }),
+  relation(override, 'series', { name: 'series' }),
   { name: 'seriesIndex', type: 'number' },
   { name: 'publisher', type: 'text' },
   { name: 'year', type: 'number' },
