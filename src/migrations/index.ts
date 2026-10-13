@@ -3,6 +3,7 @@ import * as migration_20261010_095151_visibility from './20261010_095151_visibil
 import * as migration_20261012_173948_authors from './20261012_173948_authors'
 import * as migration_20261012_184054_series from './20261012_184054_series'
 import * as migration_20261013_122124_genres from './20261013_122124_genres'
+import * as migration_20261013_123727_books from './20261013_123727_books'
 
 export const migrations = [
   {
@@ -29,5 +30,10 @@ export const migrations = [
     up: migration_20261013_122124_genres.up,
     down: migration_20261013_122124_genres.down,
     name: '20261013_122124_genres',
+  },
+  {
+    up: migration_20261013_123727_books.up,
+    down: migration_20261013_123727_books.down,
+    name: '20261013_123727_books',
   },
 ]

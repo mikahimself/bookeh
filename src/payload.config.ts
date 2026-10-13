@@ -5,7 +5,8 @@ import { fileURLToPath } from 'url'
 import sharp from 'sharp'
 
 import { Authors } from './collections/Authors'
-import { nameKeyIndexes } from './collections/catalogueIndexes'
+import { Books } from './collections/Books'
+import { isbnIndexes, nameKeyIndexes } from './collections/catalogueIndexes'
 import { Genres } from './collections/Genres'
 import { Series } from './collections/Series'
 import { Users } from './collections/Users'
@@ -23,7 +24,7 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
   },
-  collections: [Authors, Genres, Media, Series, Users],
+  collections: [Authors, Books, Genres, Media, Series, Users],
   graphQL: { disable: true },
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {
@@ -38,7 +39,7 @@ export default buildConfig({
     // Applied only when NODE_ENV=production, where the adapter disables push
     // (AD-13): the production container migrates at start, never pushes.
     prodMigrations: migrations,
-    afterSchemaInit: [nameKeyIndexes('authors'), nameKeyIndexes('series')],
+    afterSchemaInit: [nameKeyIndexes('authors'), nameKeyIndexes('series'), isbnIndexes],
   }),
   sharp,
   plugins: [],

@@ -68,6 +68,7 @@ export interface Config {
   blocks: {};
   collections: {
     authors: Author;
+    books: Book;
     genres: Genre;
     media: Media;
     series: Series;
@@ -80,6 +81,7 @@ export interface Config {
   collectionsJoins: {};
   collectionsSelect: {
     authors: AuthorsSelect<false> | AuthorsSelect<true>;
+    books: BooksSelect<false> | BooksSelect<true>;
     genres: GenresSelect<false> | GenresSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     series: SeriesSelect<false> | SeriesSelect<true>;
@@ -170,13 +172,51 @@ export interface User {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "genres".
+ * via the `definition` "books".
  */
-export interface Genre {
+export interface Book {
+  id: number;
+  isbn13?: string | null;
+  title: string;
+  subtitle?: string | null;
+  authors?: (number | Author)[] | null;
+  series?: (number | null) | Series;
+  seriesIndex?: number | null;
+  publisher?: string | null;
+  year?: number | null;
+  language?: string | null;
+  pages?: number | null;
+  description?: string | null;
+  cover?: (number | null) | Media;
+  genres?: (number | Genre)[] | null;
+  themes?: string[] | null;
+  source?: string | null;
+  rawMetadata?: {
+    v: 1;
+    fetchedAt: string;
+    sources: {
+      [k: string]: unknown;
+    };
+    subjects: {
+      [k: string]: string[];
+    };
+    coverUrl: string | null;
+  } | null;
+  visibility: 'shared' | 'private';
+  createdBy?: (number | null) | User;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "series".
+ */
+export interface Series {
   id: number;
   name: string;
-  nameFi?: string | null;
   nameKey: string;
+  visibility: 'shared' | 'private';
+  createdBy?: (number | null) | User;
   updatedAt: string;
   createdAt: string;
 }
@@ -201,14 +241,13 @@ export interface Media {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "series".
+ * via the `definition` "genres".
  */
-export interface Series {
+export interface Genre {
   id: number;
   name: string;
+  nameFi?: string | null;
   nameKey: string;
-  visibility: 'shared' | 'private';
-  createdBy?: (number | null) | User;
   updatedAt: string;
   createdAt: string;
 }
@@ -239,6 +278,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'authors';
         value: number | Author;
+      } | null)
+    | ({
+        relationTo: 'books';
+        value: number | Book;
       } | null)
     | ({
         relationTo: 'genres';
@@ -306,6 +349,32 @@ export interface AuthorsSelect<T extends boolean = true> {
   name?: T;
   nameKey?: T;
   sortName?: T;
+  visibility?: T;
+  createdBy?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "books_select".
+ */
+export interface BooksSelect<T extends boolean = true> {
+  isbn13?: T;
+  title?: T;
+  subtitle?: T;
+  authors?: T;
+  series?: T;
+  seriesIndex?: T;
+  publisher?: T;
+  year?: T;
+  language?: T;
+  pages?: T;
+  description?: T;
+  cover?: T;
+  genres?: T;
+  themes?: T;
+  source?: T;
+  rawMetadata?: T;
   visibility?: T;
   createdBy?: T;
   updatedAt?: T;
