@@ -69,6 +69,7 @@ export interface Config {
   collections: {
     authors: Author;
     books: Book;
+    copies: Copy;
     genres: Genre;
     media: Media;
     series: Series;
@@ -83,6 +84,7 @@ export interface Config {
   collectionsSelect: {
     authors: AuthorsSelect<false> | AuthorsSelect<true>;
     books: BooksSelect<false> | BooksSelect<true>;
+    copies: CopiesSelect<false> | CopiesSelect<true>;
     genres: GenresSelect<false> | GenresSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     series: SeriesSelect<false> | SeriesSelect<true>;
@@ -255,6 +257,19 @@ export interface Genre {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "copies".
+ */
+export interface Copy {
+  id: number;
+  owner: number | User;
+  book: number | Book;
+  status: 'ordered' | 'owned';
+  notes?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "user-books".
  */
 export interface UserBook {
@@ -322,6 +337,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'books';
         value: number | Book;
+      } | null)
+    | ({
+        relationTo: 'copies';
+        value: number | Copy;
       } | null)
     | ({
         relationTo: 'genres';
@@ -421,6 +440,18 @@ export interface BooksSelect<T extends boolean = true> {
   rawMetadata?: T;
   visibility?: T;
   createdBy?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "copies_select".
+ */
+export interface CopiesSelect<T extends boolean = true> {
+  owner?: T;
+  book?: T;
+  status?: T;
+  notes?: T;
   updatedAt?: T;
   createdAt?: T;
 }

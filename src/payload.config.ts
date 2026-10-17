@@ -7,6 +7,7 @@ import sharp from 'sharp'
 import { Authors } from './collections/Authors'
 import { Books } from './collections/Books'
 import { isbnIndexes, nameKeyIndexes } from './collections/catalogueIndexes'
+import { Copies } from './collections/Copies'
 import { Genres } from './collections/Genres'
 import { Series } from './collections/Series'
 import { UserBooks } from './collections/UserBooks'
@@ -25,7 +26,7 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
   },
-  collections: [Authors, Books, Genres, Media, Series, UserBooks, Users],
+  collections: [Authors, Books, Copies, Genres, Media, Series, UserBooks, Users],
   graphQL: { disable: true },
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {
