@@ -1,28 +1,16 @@
-import { randomInt } from 'node:crypto'
-
 import { Forbidden, getPayload, NotFound, type Payload, ValidationError } from 'payload'
 import { beforeAll, describe, expect, it } from 'vitest'
 
-import { toIsbn13 } from '@/fields/isbn'
 import * as gateway from '@/lib/payload/gateway'
 import config from '@/payload.config'
 import type { Book, User } from '@/payload-types'
 
 import { contextFor, createUser } from '../helpers/harness'
+import { randomIsbn } from '../helpers/isbn'
 
 // `books`, AD-4/AD-5/AD-19: read scoping, admin-only `rawMetadata`, refused
 // user writes and the per-scope ISBN indexes. The shared index is global and
 // test rows stay, so every ISBN is a fresh random one.
-
-/** A random valid 978 ISBN-13. */
-const randomIsbn = (): string => {
-  const first12 = `978${String(randomInt(1e9)).padStart(9, '0')}`
-  for (let digit = 0; digit < 10; digit++) {
-    const isbn = toIsbn13(`${first12}${digit}`)
-    if (isbn) return isbn
-  }
-  throw new Error('unreachable: one check digit always fits')
-}
 
 /** The ISBN-10 form of a 978 ISBN-13. */
 const toIsbn10 = (isbn13: string): string => {

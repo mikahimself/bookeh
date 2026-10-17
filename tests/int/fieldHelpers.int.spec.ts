@@ -5,7 +5,6 @@ import {
   buildConfig,
   createLocalReq,
   getPayload,
-  ValidationError,
   type Access,
   type CollectionSlug,
   type Payload,
@@ -19,6 +18,8 @@ import { ownerField } from '@/fields/owner'
 import { ownedRelation, readableRelation } from '@/fields/relation'
 import { withTransaction } from '@/lib/payload/transaction'
 import appConfig from '@/payload.config'
+
+import { rejectedPaths } from '../helpers/validation'
 
 // Throwaway collections on a second, keyed Payload instance in its own
 // Postgres schema: nothing reaches payload.config.ts, migrations or types.
@@ -98,15 +99,6 @@ async function createUser(): Promise<TypedUser> {
 }
 
 const noteOf = (user: TypedUser, data: Data = {}) => create(notes, user, { title: 'note', ...data })
-
-async function rejectedPaths(promise: Promise<unknown>): Promise<string[]> {
-  const err: unknown = await promise.then(
-    () => null,
-    (e: unknown) => e,
-  )
-  expect(err).toBeInstanceOf(ValidationError)
-  return (err as ValidationError).data.errors.map((e) => e.path)
-}
 
 async function countPins(where: Where): Promise<number> {
   return (await payload.count({ collection: pins, where, overrideAccess: true })).totalDocs

@@ -72,6 +72,7 @@ export interface Config {
     genres: Genre;
     media: Media;
     series: Series;
+    'user-books': UserBook;
     users: User;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
@@ -85,6 +86,7 @@ export interface Config {
     genres: GenresSelect<false> | GenresSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     series: SeriesSelect<false> | SeriesSelect<true>;
+    'user-books': UserBooksSelect<false> | UserBooksSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -253,6 +255,44 @@ export interface Genre {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "user-books".
+ */
+export interface UserBook {
+  id: number;
+  owner: number | User;
+  book: number | Book;
+  title?: string | null;
+  subtitle?: string | null;
+  authors?: (number | Author)[] | null;
+  series?: (number | null) | Series;
+  seriesIndex?: number | null;
+  publisher?: string | null;
+  year?: number | null;
+  language?: string | null;
+  pages?: number | null;
+  description?: string | null;
+  overridden?:
+    | (
+        | 'title'
+        | 'subtitle'
+        | 'authors'
+        | 'series'
+        | 'seriesIndex'
+        | 'publisher'
+        | 'year'
+        | 'language'
+        | 'pages'
+        | 'description'
+      )[]
+    | null;
+  read?: boolean | null;
+  rating?: number | null;
+  ratedAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -294,6 +334,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'series';
         value: number | Series;
+      } | null)
+    | ({
+        relationTo: 'user-books';
+        value: number | UserBook;
       } | null)
     | ({
         relationTo: 'users';
@@ -418,6 +462,30 @@ export interface SeriesSelect<T extends boolean = true> {
   nameKey?: T;
   visibility?: T;
   createdBy?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "user-books_select".
+ */
+export interface UserBooksSelect<T extends boolean = true> {
+  owner?: T;
+  book?: T;
+  title?: T;
+  subtitle?: T;
+  authors?: T;
+  series?: T;
+  seriesIndex?: T;
+  publisher?: T;
+  year?: T;
+  language?: T;
+  pages?: T;
+  description?: T;
+  overridden?: T;
+  read?: T;
+  rating?: T;
+  ratedAt?: T;
   updatedAt?: T;
   createdAt?: T;
 }

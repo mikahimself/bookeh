@@ -1,4 +1,4 @@
-import type { CollectionSlug, Field } from 'payload'
+import type { CollectionSlug, Field, JSONField } from 'payload'
 
 import { readableRelation } from '@/fields/relation'
 
@@ -71,3 +71,32 @@ export const bookFields = (): Field[] => [
 
 /** Spine, AD-6: the override fields for `user-books`, spread beside `overridden`. */
 export const overrideFields = (): Field[] => overridable(true)
+
+const isOverridable = (value: unknown): value is OverridableBookField =>
+  typeof value === 'string' && (OVERRIDABLE_BOOK_FIELDS as readonly string[]).includes(value)
+
+/**
+ * Spine, AD-6: the names of the fields a `user-books` row overrides, each a
+ * member of `OVERRIDABLE_BOOK_FIELDS` once. What the list means (a listed
+ * field's stored value is the override, empty meaning cleared) will stay with
+ * its reader `EffectiveBook` (B8) and its writer `upsertUserBook()` (B9); the
+ * field only keeps a back-office edit from storing a name that reader would
+ * never apply. Not `required`: Payload's json validator counts `[]` as empty.
+ */
+export const overriddenField = (): JSONField => ({
+  name: 'overridden',
+  type: 'json',
+  defaultValue: [],
+  validate: (value: unknown, options) => {
+    if (value === undefined || value === null) return true
+    const valid =
+      Array.isArray(value) && value.every(isOverridable) && new Set(value).size === value.length
+    return valid ? true : options.req.t('validation:invalidInput')
+  },
+  typescriptSchema: [
+    () => ({
+      type: ['array', 'null'],
+      items: { type: 'string', enum: [...OVERRIDABLE_BOOK_FIELDS] },
+    }),
+  ],
+})
