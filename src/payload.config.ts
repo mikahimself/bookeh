@@ -9,6 +9,7 @@ import { Books } from './collections/Books'
 import { isbnIndexes, nameKeyIndexes } from './collections/catalogueIndexes'
 import { Copies } from './collections/Copies'
 import { Genres } from './collections/Genres'
+import { Locations } from './collections/Locations'
 import { Series } from './collections/Series'
 import { UserBooks } from './collections/UserBooks'
 import { Users } from './collections/Users'
@@ -26,7 +27,7 @@ export default buildConfig({
       baseDir: path.resolve(dirname),
     },
   },
-  collections: [Authors, Books, Copies, Genres, Media, Series, UserBooks, Users],
+  collections: [Authors, Books, Copies, Genres, Locations, Media, Series, UserBooks, Users],
   graphQL: { disable: true },
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {

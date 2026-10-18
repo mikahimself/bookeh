@@ -71,6 +71,7 @@ export interface Config {
     books: Book;
     copies: Copy;
     genres: Genre;
+    locations: UserLocation;
     media: Media;
     series: Series;
     'user-books': UserBook;
@@ -86,6 +87,7 @@ export interface Config {
     books: BooksSelect<false> | BooksSelect<true>;
     copies: CopiesSelect<false> | CopiesSelect<true>;
     genres: GenresSelect<false> | GenresSelect<true>;
+    locations: LocationsSelect<false> | LocationsSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     series: SeriesSelect<false> | SeriesSelect<true>;
     'user-books': UserBooksSelect<false> | UserBooksSelect<true>;
@@ -154,6 +156,7 @@ export interface User {
   language: 'en' | 'fi';
   profileVisibility: 'public' | 'hidden';
   collectionVisibility: 'open' | 'closed';
+  defaultLocation?: (number | null) | UserLocation;
   updatedAt: string;
   createdAt: string;
   email: string;
@@ -173,6 +176,18 @@ export interface User {
     | null;
   password?: string | null;
   collection: 'users';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "locations".
+ */
+export interface UserLocation {
+  id: number;
+  owner: number | User;
+  name: string;
+  nameKey: string;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -264,6 +279,7 @@ export interface Copy {
   owner: number | User;
   book: number | Book;
   status: 'ordered' | 'owned';
+  location?: (number | null) | UserLocation;
   notes?: string | null;
   updatedAt: string;
   createdAt: string;
@@ -345,6 +361,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'genres';
         value: number | Genre;
+      } | null)
+    | ({
+        relationTo: 'locations';
+        value: number | UserLocation;
       } | null)
     | ({
         relationTo: 'media';
@@ -451,6 +471,7 @@ export interface CopiesSelect<T extends boolean = true> {
   owner?: T;
   book?: T;
   status?: T;
+  location?: T;
   notes?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -462,6 +483,17 @@ export interface CopiesSelect<T extends boolean = true> {
 export interface GenresSelect<T extends boolean = true> {
   name?: T;
   nameFi?: T;
+  nameKey?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "locations_select".
+ */
+export interface LocationsSelect<T extends boolean = true> {
+  owner?: T;
+  name?: T;
   nameKey?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -530,6 +562,7 @@ export interface UsersSelect<T extends boolean = true> {
   language?: T;
   profileVisibility?: T;
   collectionVisibility?: T;
+  defaultLocation?: T;
   updatedAt?: T;
   createdAt?: T;
   email?: T;
