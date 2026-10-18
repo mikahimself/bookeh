@@ -80,9 +80,9 @@ const isOverridable = (value: unknown): value is OverridableBookField =>
  * member of `OVERRIDABLE_BOOK_FIELDS` once. What the list means (a listed
  * field's stored value is the override, empty meaning cleared) stays with its
  * reader `getEffectiveBooks()` in `lib/books` and its writer `upsertUserBook()`
- * (B9, not yet written); the field only keeps a back-office edit from storing
- * a name that reader would never apply. Not `required`: Payload's json
- * validator counts `[]` as empty.
+ * there; the field only keeps a back-office edit from storing a name that
+ * reader would never apply. Not `required`: Payload's json validator counts
+ * `[]` as empty.
  */
 export const overriddenField = (): JSONField => ({
   name: 'overridden',

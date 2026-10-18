@@ -20,9 +20,9 @@ const wholeNumber: NumberFieldValidation = (value, options) => {
  * value applies, an empty one meaning cleared), the read flag and the rating.
  * `book` is any Book the owner can read, a shared one or their own private
  * one. `getEffectiveBooks()` in `lib/books` reads it, laying the overrides
- * over the Book; `upsertUserBook()` there (B9) will be its single writer,
- * keeping `rating` and `ratedAt` in step (AD-18), and does not exist yet. The
- * `(owner, book)` unique index is in the first migration (AD-19).
+ * over the Book; `upsertUserBook()` there is its single writer, keeping
+ * `overridden` in step with the stored values and `rating` with `ratedAt`
+ * (AD-18). The `(owner, book)` unique index is in the first migration (AD-19).
  */
 export const UserBooks: CollectionConfig = {
   slug: 'user-books',
