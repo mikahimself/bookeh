@@ -6,6 +6,8 @@ import type { SourceId, SourceResult } from '@/lib/metadata/source'
 import type { Context } from '@/lib/payload/context'
 import * as gateway from '@/lib/payload/gateway'
 
+import { findByName, type NamedCollection } from './findOrCreateByName'
+
 // Spine, Structural Seed (Shared shapes, `src/lib/catalogue`) and AD-9.
 
 /**
@@ -22,15 +24,27 @@ export type Draft = Omit<SourceResult, 'raw' | 'coverUrl'> & { hasCover: boolean
 export type LookupTarget = { isbn: string; pick?: number }
 
 /**
+ * A name of the picked candidate and the shared row a save would link it to;
+ * `id: null` means the save would create it, which the Answer marks "New
+ * author" or "New series" (FR-13).
+ */
+export type Match = { name: string; id: number | null }
+
+/**
  * What an ISBN is (AD-9, FR-11): a Book the viewer can already read, with
- * what they hold of it; the sources' candidates with the picked index; no
- * source knows it; or the sources could not be asked. `rawMetadata` and `raw`
- * never appear in any kind. The spine's `matches` on the `source` kind
- * arrives with story 3.29 (C11).
+ * what they hold of it; the sources' candidates with the picked index and the
+ * picked one's author and series matches; no source knows it; or the sources
+ * could not be asked. `rawMetadata` and `raw` never appear in any kind. The
+ * spine's `genres` in `matches` arrives with `mapSubjectsToGenres` (Epic 9).
  */
 export type LookupResult =
   | { kind: 'existing'; book: EffectiveBook; mine: Holdings }
-  | { kind: 'source'; candidates: Draft[]; pick: number }
+  | {
+      kind: 'source'
+      candidates: Draft[]
+      pick: number
+      matches: { authors: Match[]; series: Match | null }
+    }
   | { kind: 'none' }
   | { kind: 'unavailable'; failed: SourceId[] }
 
@@ -42,6 +56,19 @@ const toDraft = ({ raw: _raw, coverUrl, ...rest }: SourceResult): Draft => ({
 /** `pick` when it indexes a candidate; otherwise the best one (AD-9). */
 const pickIndex = (pick: number | undefined, length: number): number =>
   pick !== undefined && Number.isInteger(pick) && pick >= 0 && pick < length ? pick : 0
+
+/**
+ * AD-5, AD-9 and FR-13: the shared row a save of `name` would link to. A
+ * `source` answer exists only when the viewer reads no Book with the ISBN, so
+ * its save creates a shared Book, whose authors and series match among
+ * shared rows only: the viewer's own private rows and anyone else's do not
+ * count.
+ */
+const sharedMatch = async (
+  ctx: Context,
+  collection: NamedCollection,
+  name: string,
+): Promise<Match> => ({ name, id: (await findByName(ctx, collection, 'shared', name))?.id ?? null })
 
 /**
  * Spine, AD-9 and FR-11: the Answer's one data call. Normalises the ISBN
@@ -93,8 +120,20 @@ export async function lookupBook(ctx: Context, target: LookupTarget): Promise<Lo
     case 'unavailable':
       return { kind: 'unavailable', failed: outcome.failed }
     case 'found': {
-      const candidates = outcome.candidates.map(toDraft)
-      return { kind: 'source', candidates, pick: pickIndex(target.pick, candidates.length) }
+      const pick = pickIndex(target.pick, outcome.candidates.length)
+      // `found` always carries a candidate, and `pickIndex` stays in range.
+      const best = outcome.candidates[pick]!
+      // One after the other: calls on one context never run concurrently (AD-16).
+      const authors: Match[] = []
+      for (const { name } of best.authors) authors.push(await sharedMatch(ctx, 'authors', name))
+      const series =
+        best.series === undefined ? null : await sharedMatch(ctx, 'series', best.series)
+      return {
+        kind: 'source',
+        candidates: outcome.candidates.map(toDraft),
+        pick,
+        matches: { authors, series },
+      }
     }
   }
 }

@@ -3,7 +3,10 @@ import { randomUUID } from 'node:crypto'
 import { getPayload, type Payload } from 'payload'
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { toNameKey } from '@/fields/nameKey'
+import { normaliseName } from '@/fields/sortName'
 import type { Named } from '@/lib/books/effectiveBook'
+import { findOrCreateByName } from '@/lib/catalogue/findOrCreateByName'
 import { lookupBook } from '@/lib/catalogue/lookupBook'
 import { DomainError } from '@/lib/errors'
 import { lookupSources } from '@/lib/metadata/lookup'
@@ -34,10 +37,14 @@ function hyphenatedIsbn10(isbn13: string): string {
   return `${core.slice(0, 1)}-${core.slice(1, 4)}-${core.slice(4)}-${check === 10 ? 'X' : check}`
 }
 
+// Shared names are global across runs, so the default author is run-unique
+// and matches no row unless a test seeds it.
+const defaultAuthor = unique('Väinö Linna')
+
 const candidate = (isbn13: string, title: string, extra: Partial<SourceResult> = {}): SourceResult => ({
   isbn13,
   title,
-  authors: [{ name: 'Väinö Linna' }],
+  authors: [{ name: defaultAuthor }],
   subjects: [],
   themes: [],
   source: 'finna',
@@ -174,6 +181,7 @@ describe('lookupBook', () => {
           { ...first, hasCover: true },
           { ...second, hasCover: false },
         ],
+        matches: { authors: [{ name: defaultAuthor, id: null }], series: null },
       })
       if (result.kind !== 'source') throw new Error('unreachable')
       for (const draft of result.candidates) {
@@ -199,6 +207,89 @@ describe('lookupBook', () => {
       vi.mocked(lookupSources).mockResolvedValue({ kind: 'unavailable', failed: ['finna'] })
       expect(await lookupBook(asA, { isbn })).toEqual({ kind: 'unavailable', failed: ['finna'] })
       expect(await booksWithIsbn(isbn)).toBe(0)
+    })
+  })
+
+  describe('matches', () => {
+    const isbn = randomIsbn()
+    const found = (...candidates: SourceResult[]) =>
+      vi.mocked(lookupSources).mockResolvedValue({
+        kind: 'found',
+        candidates,
+        raw: { v: 1, fetchedAt: '2026-10-19T00:00:00.000Z', sources: {}, subjects: {}, coverUrl: null },
+      })
+
+    const rowsWithName = async (collection: 'authors' | 'series', name: string) =>
+      (
+        await payload.count({
+          collection,
+          where: { nameKey: { equals: toNameKey(normaliseName(name)) } },
+          overrideAccess: true,
+        })
+      ).totalDocs
+
+    const matchesOf = async (target: { isbn: string; pick?: number }) => {
+      const result = await lookupBook(asA, target)
+      if (result.kind !== 'source') throw new Error(`expected a source answer, got ${result.kind}`)
+      return result.matches
+    }
+
+    it('links an existing shared author and series, case and spacing aside', async () => {
+      const author = unique('Tove Jansson')
+      const seriesName = unique('Muumi')
+      const sharedAuthor = await findOrCreateByName(asB, 'authors', 'shared', { name: author })
+      const sharedSeries = await findOrCreateByName(asB, 'series', 'shared', { name: seriesName })
+      const given = ` ${author.replace('Tove Jansson', 'tove  JANSSON')} `
+      found(candidate(isbn, 'Muumipeikko', { authors: [{ name: given }], series: seriesName.toUpperCase() }))
+
+      expect(await matchesOf({ isbn })).toEqual({
+        authors: [{ name: given, id: sharedAuthor.id }],
+        series: { name: seriesName.toUpperCase(), id: sharedSeries.id },
+      })
+    })
+
+    it('marks unknown authors and series as new and creates nothing', async () => {
+      const first = unique('Uusi Kirjailija')
+      const second = unique('Toinen Kirjailija')
+      const seriesName = unique('Uusi sarja')
+      found(
+        candidate(isbn, 'Uutuus', {
+          authors: [{ name: first }, { name: second, sortName: 'Kirjailija, Toinen' }],
+          series: seriesName,
+        }),
+      )
+
+      expect(await matchesOf({ isbn })).toEqual({
+        authors: [
+          { name: first, id: null },
+          { name: second, id: null },
+        ],
+        series: { name: seriesName, id: null },
+      })
+      expect(await rowsWithName('authors', first)).toBe(0)
+      expect(await rowsWithName('authors', second)).toBe(0)
+      expect(await rowsWithName('series', seriesName)).toBe(0)
+      expect(await booksWithIsbn(isbn)).toBe(0)
+    })
+
+    it('ignores the viewer’s and other users’ private authors', async () => {
+      const author = unique('Yksityinen Kirjailija')
+      await findOrCreateByName(asA, 'authors', 'private', { name: author })
+      await findOrCreateByName(asB, 'authors', 'private', { name: author })
+      found(candidate(isbn, 'Yksityinen', { authors: [{ name: author }] }))
+
+      expect(await matchesOf({ isbn })).toEqual({ authors: [{ name: author, id: null }], series: null })
+      expect(await rowsWithName('authors', author)).toBe(2)
+    })
+
+    it('follows the picked candidate', async () => {
+      const other = unique('Toisen Painoksen Kirjailija')
+      found(candidate(isbn, 'First'), candidate(isbn, 'Second', { authors: [{ name: other }] }))
+
+      expect(await matchesOf({ isbn, pick: 1 })).toEqual({
+        authors: [{ name: other, id: null }],
+        series: null,
+      })
     })
   })
 })

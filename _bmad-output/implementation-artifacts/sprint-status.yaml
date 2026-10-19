@@ -98,7 +98,7 @@ development_status:
   3-26-u2-undo-on-the-toast: done
   3-27-c5-name-matching-for-authors-and-series: done
   3-28-c6-look-up-a-book-by-isbn: done
-  3-29-c11-new-authors-and-series-on-the-lookup-result: backlog
+  3-29-c11-new-authors-and-series-on-the-lookup-result: done
   3-30-c7-lookup-rate-limit: backlog
   3-31-d1-ensure-a-shared-book: backlog
   3-32-d2-cover-download: backlog

@@ -22,14 +22,55 @@ export type NameInput<C extends NamedCollection> = C extends 'authors'
 export type FoundOrCreated = { id: number; created: boolean }
 
 /**
- * Spine, AD-5 and AD-18: the one matcher of `authors` and `series`. Matches
- * the normalised name by `nameKey` equality (no accent folding, no fuzzy
- * matching) in `scope` and creates the row there when none matches: a
- * `'shared'` scope sees shared rows only; a `'private'` scope sees shared
- * rows first, then the caller's own private rows, never another user's (the
- * admin included), and creates a private row with the caller as `createdBy`.
- * Runs with system privileges inside the caller's transaction or one of its
- * own (AD-3, AD-16), so a save that lists one author twice gets one row.
+ * Spine, AD-5 and FR-13: the read half of `findOrCreateByName()`, which lookup
+ * and save both call. Returns the row a save in `scope` would link `name` to,
+ * or `undefined` when it would create one: `nameKey` equality on the
+ * normalised name (no accent folding, no fuzzy matching), shared rows first,
+ * then in the `'private'` scope the caller's own private rows, never another
+ * user's (the admin included). Reads with system privileges on `ctx.req`;
+ * writes nothing and opens no transaction. A blank name matches no row.
+ */
+export async function findByName(
+  ctx: Context,
+  collection: NamedCollection,
+  scope: NameScope,
+  name: string,
+): Promise<Author | Series | undefined> {
+  const key = toNameKey(normaliseName(name))
+
+  const match = async (where: Where): Promise<Author | Series | undefined> => {
+    assertLive(ctx)
+    const { docs } = await ctx.req.payload.find({
+      collection,
+      where,
+      limit: 1,
+      pagination: false,
+      req: ctx.req,
+      overrideAccess: true,
+      depth: 0,
+    })
+    return docs[0]
+  }
+
+  const shared: Where = {
+    and: [{ visibility: { equals: 'shared' } }, { nameKey: { equals: key } }],
+  }
+  const own: Where = {
+    and: [
+      { visibility: { equals: 'private' } },
+      { createdBy: { equals: ctx.user.id } },
+      { nameKey: { equals: key } },
+    ],
+  }
+  return (await match(shared)) ?? (scope === 'private' ? await match(own) : undefined)
+}
+
+/**
+ * Spine, AD-5 and AD-18: the one writer of `authors` and `series`. Matches
+ * through `findByName()` and creates the row in `scope` when none matches,
+ * a private row with the caller as `createdBy`. Runs with system privileges
+ * inside the caller's transaction or one of its own (AD-3, AD-16), so a save
+ * that lists one author twice gets one row.
  *
  * An author's `sortName` from the source is stored on create. On a match it
  * replaces a stored `sortName` that is empty or still the one derived from
@@ -53,7 +94,6 @@ export async function findOrCreateByName<C extends NamedCollection>(
 ): Promise<FoundOrCreated> {
   const name = normaliseName(input.name)
   if (name === '') throw new DomainError('VALIDATION', { fields: { name: 'VALIDATION' } })
-  const key = toNameKey(name)
   const sortName =
     collection === 'authors' && 'sortName' in input && typeof input.sortName === 'string'
       ? normaliseName(input.sortName)
@@ -62,30 +102,7 @@ export async function findOrCreateByName<C extends NamedCollection>(
   return withTransaction(ctx, async (tx) => {
     const { payload } = tx.req
     const system = { req: tx.req, overrideAccess: true, depth: 0 } as const
-
-    const match = async (where: Where): Promise<Author | Series | undefined> => {
-      assertLive(tx)
-      const { docs } = await payload.find({
-        collection,
-        where,
-        limit: 1,
-        pagination: false,
-        ...system,
-      })
-      return docs[0]
-    }
-
-    const shared: Where = {
-      and: [{ visibility: { equals: 'shared' } }, { nameKey: { equals: key } }],
-    }
-    const own: Where = {
-      and: [
-        { visibility: { equals: 'private' } },
-        { createdBy: { equals: tx.user.id } },
-        { nameKey: { equals: key } },
-      ],
-    }
-    const row = (await match(shared)) ?? (scope === 'private' ? await match(own) : undefined)
+    const row = await findByName(tx, collection, scope, name)
 
     if (row) {
       if (collection === 'authors' && sortName !== '') {
