@@ -38,7 +38,9 @@
     }
   },
   "toast": {
-    "close": "Sulje"
+    "close": "Sulje",
+    "undo": "Kumoa",
+    "undone": "Kumottu"
   },
   "sections": {
     "label": "Osiot",

@@ -38,7 +38,9 @@
     }
   },
   "toast": {
-    "close": "Close"
+    "close": "Close",
+    "undo": "Undo",
+    "undone": "Undone"
   },
   "sections": {
     "label": "Sections",

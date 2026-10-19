@@ -37,6 +37,10 @@ describe('flashToast', () => {
   it.each<[string, ToastInput]>([
     ['a success', { kind: 'success', message: 'Saved to Tampere; "ä" 100%' }],
     ['a held success', { kind: 'success', message: 'Saved', hold: true }],
+    [
+      'a held success with undo',
+      { kind: 'success', message: 'Saved', hold: true, undo: { token: 'tok', seconds: 1800 } },
+    ],
     ['an error', { kind: 'error', code: 'INTERNAL' }],
   ])(
     'round-trips %s through the wire: Next encodes once, the client decodes once',
@@ -77,6 +81,18 @@ describe('decodeFlash', () => {
 
   it('drops a forged non-boolean hold', () => {
     expect(decodeFlash(wire({ kind: 'success', message: 'x', hold: 'yes' }))).toEqual({
+      kind: 'success',
+      message: 'x',
+    })
+  })
+
+  it.each([
+    ['a non-object undo', 'x'],
+    ['a non-string token', { token: 1, seconds: 5 }],
+    ['a missing seconds', { token: 'tok' }],
+    ['seconds as a string', { token: 'tok', seconds: '5' }],
+  ])('drops a forged undo with %s', (_, undo) => {
+    expect(decodeFlash(wire({ kind: 'success', message: 'x', undo }))).toEqual({
       kind: 'success',
       message: 'x',
     })

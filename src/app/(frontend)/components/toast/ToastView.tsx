@@ -1,8 +1,12 @@
+import type { ReactNode } from 'react'
+
 import { CloseButton } from '../CloseButton'
 
 export type ToastViewProps = {
   kind: 'success' | 'error'
   message: string
+  /** DESIGN.md, Toast: actions as Links, between the message and the X. */
+  actions?: ReactNode
   closeLabel: string
   onClose: () => void
 }
@@ -15,7 +19,7 @@ export type ToastViewProps = {
  * provider's persistent `role="status"` region, into which the provider
  * inserts this box keyed per show, so a repeated message is re-announced.
  */
-export function ToastView({ kind, message, closeLabel, onClose }: ToastViewProps) {
+export function ToastView({ kind, message, actions, closeLabel, onClose }: ToastViewProps) {
   return (
     <div
       {...(kind === 'error' && { role: 'alert' })}
@@ -23,6 +27,7 @@ export function ToastView({ kind, message, closeLabel, onClose }: ToastViewProps
     >
       {kind === 'error' && <span aria-hidden="true" className="size-2 shrink-0 bg-danger" />}
       <span className="mr-auto">{message}</span>
+      {actions}
       <CloseButton label={closeLabel} onClick={onClose} />
     </div>
   )

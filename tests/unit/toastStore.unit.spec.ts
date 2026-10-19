@@ -130,6 +130,50 @@ describe('createToastStore', () => {
     expect(store.getState()).toBeNull()
   })
 
+  it('keeps the undo token for its seconds, then drops it and leaves the toast as it is', () => {
+    const store = createToastStore()
+    const held = { ...success, hold: true, undo: { token: 'tok', seconds: 5 } }
+    store.show(held)
+    expect(store.getState()).toMatchObject({ input: held, undoToken: 'tok', leaving: false })
+
+    vi.advanceTimersByTime(4999)
+    expect(store.getState()).toMatchObject({ undoToken: 'tok' })
+    vi.advanceTimersByTime(1)
+    expect(store.getState()).toMatchObject({ input: held, undoToken: null, leaving: false })
+
+    // Still held: the expiry touched only the token.
+    vi.advanceTimersByTime(10 * 60 * 1000)
+    expect(store.getState()).toMatchObject({ input: held, undoToken: null, leaving: false })
+  })
+
+  it('drops the undo token the moment the toast starts to leave', () => {
+    const store = createToastStore()
+    store.show({ ...success, hold: true, undo: { token: 'tok', seconds: 1800 } })
+    store.dismiss()
+    expect(store.getState()).toMatchObject({ leaving: true, undoToken: null })
+  })
+
+  it('has no undo token for zero seconds, no undo, or an error', () => {
+    const store = createToastStore()
+    store.show({ ...success, undo: { token: 'tok', seconds: 0 } })
+    expect(store.getState()).toMatchObject({ undoToken: null })
+    store.show(success)
+    expect(store.getState()).toMatchObject({ undoToken: null })
+    store.show(error)
+    expect(store.getState()).toMatchObject({ undoToken: null })
+  })
+
+  it('cancels the undo timer when the toast is replaced', () => {
+    const store = createToastStore()
+    store.show({ ...success, hold: true, undo: { token: 'old', seconds: 5 } })
+    store.show({ ...success, hold: true, undo: { token: 'new', seconds: 60 } })
+    vi.advanceTimersByTime(5000)
+    // The old 5 s expiry did not strip the new token.
+    expect(store.getState()).toMatchObject({ undoToken: 'new' })
+    vi.advanceTimersByTime(55_000)
+    expect(store.getState()).toMatchObject({ undoToken: null })
+  })
+
   it('increments id per show', () => {
     const store = createToastStore()
     store.show(success)

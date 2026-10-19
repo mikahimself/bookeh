@@ -70,10 +70,10 @@ describe('message catalogues', () => {
     }
   })
 
-  // Consumed dynamically by the toast provider's t('toast.close').
-  it('has toast.close in both languages', () => {
+  // Consumed by the toast provider: the X, the Undo Link and the "Undone" toast.
+  it.each(['toast.close', 'toast.undo', 'toast.undone'])('has %s in both languages', (key) => {
     for (const catalogue of [en, fi]) {
-      const label = lookup(catalogue, 'toast.close')
+      const label = lookup(catalogue, key)
       expect(typeof label).toBe('string')
       expect(label).not.toBe('')
     }

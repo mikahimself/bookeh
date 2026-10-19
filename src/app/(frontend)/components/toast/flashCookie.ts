@@ -47,6 +47,15 @@ export function takeFlash(jar: {
   return decodeFlash(raw)
 }
 
+/** A well-formed `undo` (string token, finite seconds) or nothing: a forged one is dropped, like a forged `hold`. */
+function decodeUndo(value: unknown): { token: string; seconds: number } | null {
+  if (typeof value !== 'object' || value === null) return null
+  const { token, seconds } = value as Record<string, unknown>
+  return typeof token === 'string' && typeof seconds === 'number' && Number.isFinite(seconds)
+    ? { token, seconds }
+    : null
+}
+
 /**
  * Decodes a raw `document.cookie` value (percent-encoded JSON, as Next wrote
  * it) back into a `ToastInput`. The cookie is not HttpOnly, so anything
@@ -64,9 +73,11 @@ export function decodeFlash(raw: string | undefined): ToastInput | null {
   if (typeof parsed !== 'object' || parsed === null) return null
   const value = parsed as Record<string, unknown>
   if (value.kind === 'success' && typeof value.message === 'string') {
-    return value.hold === true
-      ? { kind: 'success', message: value.message, hold: true }
-      : { kind: 'success', message: value.message }
+    const input: ToastInput = { kind: 'success', message: value.message }
+    if (value.hold === true) input.hold = true
+    const undo = decodeUndo(value.undo)
+    if (undo) input.undo = undo
+    return input
   }
   if (value.kind === 'error' && isErrorCode(value.code)) {
     return { kind: 'error', code: value.code }
