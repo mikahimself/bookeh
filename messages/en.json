@@ -66,6 +66,7 @@
     "NOT_FOUND": "Not found.",
     "VALIDATION": "Check the marked fields.",
     "INVALID_ISBN": "Not an ISBN. Thirteen digits, or ten.",
-    "INTERNAL": "Didn't work. Try again."
+    "INTERNAL": "Didn't work. Try again.",
+    "UNDO_FAILED": "Couldn't undo."
   }
 }

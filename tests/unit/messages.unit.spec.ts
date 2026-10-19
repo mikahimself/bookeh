@@ -59,6 +59,7 @@ describe('message catalogues', () => {
     VALIDATION: true,
     INVALID_ISBN: true,
     INTERNAL: true,
+    UNDO_FAILED: true,
   } satisfies Record<ErrorCode, true>) as ErrorCode[]
 
   it.each(codes)('has errors.%s in both languages', (code) => {

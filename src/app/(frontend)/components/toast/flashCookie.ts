@@ -21,6 +21,7 @@ const codes = Object.keys({
   VALIDATION: true,
   INVALID_ISBN: true,
   INTERNAL: true,
+  UNDO_FAILED: true,
 } satisfies Record<ErrorCode, true>)
 
 const isErrorCode = (value: unknown): value is ErrorCode =>
