@@ -60,6 +60,7 @@ describe('message catalogues', () => {
     INVALID_ISBN: true,
     INTERNAL: true,
     UNDO_FAILED: true,
+    RATE_LIMITED: true,
   } satisfies Record<ErrorCode, true>) as ErrorCode[]
 
   it.each(codes)('has errors.%s in both languages', (code) => {

@@ -22,6 +22,7 @@ const codes = Object.keys({
   INVALID_ISBN: true,
   INTERNAL: true,
   UNDO_FAILED: true,
+  RATE_LIMITED: true,
 } satisfies Record<ErrorCode, true>)
 
 const isErrorCode = (value: unknown): value is ErrorCode =>

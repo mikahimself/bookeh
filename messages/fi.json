@@ -69,6 +69,7 @@
     "VALIDATION": "Tarkista merkityt kentät.",
     "INVALID_ISBN": "Ei ISBN-tunnus. Kolmetoista numeroa tai kymmenen.",
     "INTERNAL": "Ei onnistunut. Yritä uudelleen.",
-    "UNDO_FAILED": "Kumoaminen ei onnistunut."
+    "UNDO_FAILED": "Kumoaminen ei onnistunut.",
+    "RATE_LIMITED": "Liikaa hakuja. Odota hetki."
   }
 }

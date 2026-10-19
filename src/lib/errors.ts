@@ -11,6 +11,7 @@ export type ErrorCode =
   | 'INVALID_ISBN'
   | 'INTERNAL'
   | 'UNDO_FAILED'
+  | 'RATE_LIMITED'
 
 export type ActionResult<T> =
   | { ok: true; data: T }

@@ -8,6 +8,7 @@ import { normaliseName } from '@/fields/sortName'
 import type { Named } from '@/lib/books/effectiveBook'
 import { findOrCreateByName } from '@/lib/catalogue/findOrCreateByName'
 import { lookupBook } from '@/lib/catalogue/lookupBook'
+import { LOOKUP_LIMIT, LOOKUP_WINDOW_MS } from '@/lib/catalogue/lookupLimit'
 import { DomainError } from '@/lib/errors'
 import { lookupSources } from '@/lib/metadata/lookup'
 import type { SourceResult } from '@/lib/metadata/source'
@@ -291,5 +292,34 @@ describe('lookupBook', () => {
         series: null,
       })
     })
+  })
+
+  // Own users: the counter is in process and shared by every test in the run.
+  it('limits each user to LOOKUP_LIMIT lookups per window, then resets', async () => {
+    const asC = await contextFor(await createUser({ displayName: 'Lookup User C' }))
+    const asD = await contextFor(await createUser({ displayName: 'Lookup User D' }))
+    const isbn = randomIsbn()
+    vi.mocked(lookupSources).mockResolvedValue({ kind: 'none' })
+    vi.useFakeTimers({ toFake: ['Date'] })
+    const t0 = Date.now()
+    try {
+      for (let i = 0; i < LOOKUP_LIMIT; i++) {
+        expect(await lookupBook(asC, { isbn })).toEqual({ kind: 'none' })
+      }
+      // Refused at the window's last instant: it must not move the reset.
+      vi.setSystemTime(t0 + LOOKUP_WINDOW_MS - 1)
+      await expect(lookupBook(asC, { isbn })).rejects.toMatchObject(new DomainError('RATE_LIMITED'))
+      expect(lookupSources).toHaveBeenCalledTimes(LOOKUP_LIMIT)
+
+      expect(await lookupBook(asD, { isbn })).toEqual({ kind: 'none' })
+      await expect(lookupBook(asC, { isbn: '12345' })).rejects.toMatchObject(
+        new DomainError('INVALID_ISBN'),
+      )
+
+      vi.setSystemTime(t0 + LOOKUP_WINDOW_MS)
+      expect(await lookupBook(asC, { isbn })).toEqual({ kind: 'none' })
+    } finally {
+      vi.useRealTimers()
+    }
   })
 })

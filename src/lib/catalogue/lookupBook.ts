@@ -7,6 +7,7 @@ import type { Context } from '@/lib/payload/context'
 import * as gateway from '@/lib/payload/gateway'
 
 import { findByName, type NamedCollection } from './findOrCreateByName'
+import { limitLookups } from './lookupLimit'
 
 // Spine, Structural Seed (Shared shapes, `src/lib/catalogue`) and AD-9.
 
@@ -83,9 +84,11 @@ const sharedMatch = async (
  * the viewer's private Book, the sources are asked as well and the outcome
  * discarded: it warms the in-process cache so the next save can auto-share
  * (AD-5). A shared Book never calls the sources.
+ * Rate-limited per user after normalising (`limitLookups`, AD-9): a refused call reads nothing.
  */
 export async function lookupBook(ctx: Context, target: LookupTarget): Promise<LookupResult> {
   const isbn13 = normaliseIsbn(target.isbn)
+  limitLookups(ctx)
 
   // At most one shared and one own private row (`isbnIndexes`, AD-19).
   const { docs } = await gateway.find(ctx, {
