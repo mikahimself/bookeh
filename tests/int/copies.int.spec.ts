@@ -17,8 +17,8 @@ import { rejectedPaths } from '../helpers/validation'
 
 // `copies`, AD-1/AD-8/AD-17: owner from the request, owner-scoped access that
 // binds the admin too, a `book` that must be readable by the request user and
-// the two-value `status`. Writes go through the gateway as a user: until 3.33
-// that is the only sanctioned path.
+// the two-value `status`. This file tests the collection directly, writing
+// through the gateway as a user; services create copies through `createCopy()`.
 
 const ownerId = (copy: Copy): number =>
   typeof copy.owner === 'number' ? copy.owner : copy.owner.id
