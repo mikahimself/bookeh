@@ -1,0 +1,204 @@
+import { randomUUID } from 'node:crypto'
+
+import { getPayload, type Payload } from 'payload'
+import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
+
+import type { Named } from '@/lib/books/effectiveBook'
+import { lookupBook } from '@/lib/catalogue/lookupBook'
+import { DomainError } from '@/lib/errors'
+import { lookupSources } from '@/lib/metadata/lookup'
+import type { SourceResult } from '@/lib/metadata/source'
+import type { Context } from '@/lib/payload/context'
+import * as gateway from '@/lib/payload/gateway'
+import config from '@/payload.config'
+import type { Book, Copy, User } from '@/payload-types'
+
+import { contextFor, createUser } from '../helpers/harness'
+import { randomIsbn } from '../helpers/isbn'
+
+// `lookupBook()`, AD-9/FR-11: the ISBN as entered answers a shared Book, the
+// viewer's own private Book, or what the sources know; another user's private
+// Book is never returned, the admin included; nothing is written. The sources
+// are faked at the service's dependency, so no cache or adapter is involved.
+
+vi.mock('@/lib/metadata/lookup', () => ({ lookupSources: vi.fn() }))
+
+const unique = (name: string) => `${name} ${randomUUID().slice(0, 8)}`
+
+/** The ISBN-10 of a 978 ISBN-13, hyphenated as printed in a book. */
+function hyphenatedIsbn10(isbn13: string): string {
+  const core = isbn13.slice(3, 12)
+  let sum = 0
+  for (let i = 0; i < 9; i++) sum += Number(core[i]) * (10 - i)
+  const check = (11 - (sum % 11)) % 11
+  return `${core.slice(0, 1)}-${core.slice(1, 4)}-${core.slice(4)}-${check === 10 ? 'X' : check}`
+}
+
+const candidate = (isbn13: string, title: string, extra: Partial<SourceResult> = {}): SourceResult => ({
+  isbn13,
+  title,
+  authors: [{ name: 'Väinö Linna' }],
+  subjects: [],
+  themes: [],
+  source: 'finna',
+  raw: { finna: { title } },
+  ...extra,
+})
+
+describe('lookupBook', () => {
+  let payload: Payload
+  let a: User
+  let asA: Context
+  let asB: Context
+  let asAdmin: Context
+  let x: Book
+  let p: Book
+  let q: Book
+  let sharedTwin: Book
+  let shelf: Named
+  let copyOfX: Copy
+
+  /** A system write, as `lib/catalogue` makes it, with `user` on the request. */
+  const systemBook = async (user: User, visibility: Book['visibility'], isbn13 = randomIsbn()) =>
+    payload.create({
+      collection: 'books',
+      data: { title: 'Tuntematon sotilas', isbn13, visibility },
+      overrideAccess: true,
+      depth: 0,
+      req: (await contextFor(user)).req,
+    })
+
+  const booksWithIsbn = async (isbn13: string) =>
+    (await payload.count({ collection: 'books', where: { isbn13: { equals: isbn13 } } })).totalDocs
+
+  beforeAll(async () => {
+    payload = await getPayload({ config })
+    a = await createUser({ displayName: 'Lookup User A' })
+    const b = await createUser({ displayName: 'Lookup User B' })
+    const admin = await createUser({ displayName: 'Lookup Admin', roles: ['admin'] })
+    asA = await contextFor(a)
+    asB = await contextFor(b)
+    asAdmin = await contextFor(admin)
+
+    x = await systemBook(a, 'shared')
+    p = await systemBook(a, 'private')
+    // The private row is the newer one, so the preference is not the default sort.
+    const twinIsbn = randomIsbn()
+    sharedTwin = await systemBook(a, 'shared', twinIsbn)
+    q = await systemBook(a, 'private', twinIsbn)
+
+    const location = await gateway.create(asA, {
+      collection: 'locations',
+      data: { owner: a.id, name: unique('Hylly'), nameKey: 'ignored' },
+      depth: 0,
+    })
+    shelf = { id: location.id, name: location.name }
+    copyOfX = await gateway.create(asA, {
+      collection: 'copies',
+      data: { owner: a.id, book: x.id, status: 'owned', location: shelf.id },
+      depth: 0,
+    })
+  })
+
+  beforeEach(() => {
+    vi.mocked(lookupSources).mockReset()
+  })
+
+  it('rejects an invalid ISBN before asking anything', async () => {
+    await expect(lookupBook(asA, { isbn: '12345' })).rejects.toMatchObject(
+      new DomainError('INVALID_ISBN'),
+    )
+    expect(lookupSources).not.toHaveBeenCalled()
+  })
+
+  it('answers a shared Book, with the viewer’s copy, from the ISBN as entered', async () => {
+    const result = await lookupBook(asA, { isbn: hyphenatedIsbn10(x.isbn13!) })
+    expect(result).toMatchObject({
+      kind: 'existing',
+      book: { bookId: x.id, isbn13: x.isbn13, visibility: 'shared', title: 'Tuntematon sotilas' },
+      mine: {
+        copies: [{ copyId: copyOfX.id, status: 'owned', location: shelf, note: null, loan: null }],
+        entries: [],
+      },
+    })
+    expect(result).not.toHaveProperty('book.rawMetadata')
+    expect(lookupSources).not.toHaveBeenCalled()
+  })
+
+  it('answers the viewer’s own private Book and warms the sources', async () => {
+    vi.mocked(lookupSources).mockResolvedValue({ kind: 'none' })
+    const result = await lookupBook(asA, { isbn: p.isbn13! })
+    expect(result).toMatchObject({
+      kind: 'existing',
+      book: { bookId: p.id, visibility: 'private' },
+      mine: { copies: [], entries: [] },
+    })
+    expect(lookupSources).toHaveBeenCalledTimes(1)
+    expect(lookupSources).toHaveBeenCalledWith(p.isbn13)
+  })
+
+  it('never answers another user’s private Book, not even to the admin', async () => {
+    vi.mocked(lookupSources).mockResolvedValue({ kind: 'none' })
+    expect(await lookupBook(asB, { isbn: p.isbn13! })).toEqual({ kind: 'none' })
+    expect(await lookupBook(asAdmin, { isbn: p.isbn13! })).toEqual({ kind: 'none' })
+  })
+
+  it('prefers the shared Book over the viewer’s private one with the same ISBN', async () => {
+    const result = await lookupBook(asA, { isbn: q.isbn13! })
+    expect(result).toMatchObject({
+      kind: 'existing',
+      book: { bookId: sharedTwin.id, visibility: 'shared' },
+    })
+    expect(lookupSources).not.toHaveBeenCalled()
+  })
+
+  describe('with no readable Book', () => {
+    const isbn = randomIsbn()
+
+    it('maps found candidates to drafts and keeps a valid pick', async () => {
+      vi.mocked(lookupSources).mockResolvedValue({
+        kind: 'found',
+        candidates: [
+          candidate(isbn, 'First', { coverUrl: 'https://covers.example/first.jpg' }),
+          candidate(isbn, 'Second', { source: 'google', raw: { google: {} } }),
+        ],
+        raw: { v: 1, fetchedAt: '2026-10-19T00:00:00.000Z', sources: {}, subjects: {}, coverUrl: null },
+      })
+      const result = await lookupBook(asA, { isbn, pick: 1 })
+      const { raw: _first, ...first } = candidate(isbn, 'First')
+      const { raw: _second, ...second } = candidate(isbn, 'Second', { source: 'google' })
+      expect(result).toEqual({
+        kind: 'source',
+        pick: 1,
+        candidates: [
+          { ...first, hasCover: true },
+          { ...second, hasCover: false },
+        ],
+      })
+      if (result.kind !== 'source') throw new Error('unreachable')
+      for (const draft of result.candidates) {
+        expect(draft).not.toHaveProperty('raw')
+        expect(draft).not.toHaveProperty('coverUrl')
+      }
+      expect(lookupSources).toHaveBeenCalledWith(isbn)
+      expect(await booksWithIsbn(isbn)).toBe(0)
+    })
+
+    it.each([5, -1, 0.5, undefined])('falls back to the best candidate for pick %s', async (pick) => {
+      vi.mocked(lookupSources).mockResolvedValue({
+        kind: 'found',
+        candidates: [candidate(isbn, 'First'), candidate(isbn, 'Second')],
+        raw: { v: 1, fetchedAt: '2026-10-19T00:00:00.000Z', sources: {}, subjects: {}, coverUrl: null },
+      })
+      expect(await lookupBook(asA, { isbn, pick })).toMatchObject({ kind: 'source', pick: 0 })
+    })
+
+    it('passes none and unavailable through', async () => {
+      vi.mocked(lookupSources).mockResolvedValue({ kind: 'none' })
+      expect(await lookupBook(asA, { isbn })).toEqual({ kind: 'none' })
+      vi.mocked(lookupSources).mockResolvedValue({ kind: 'unavailable', failed: ['finna'] })
+      expect(await lookupBook(asA, { isbn })).toEqual({ kind: 'unavailable', failed: ['finna'] })
+      expect(await booksWithIsbn(isbn)).toBe(0)
+    })
+  })
+})
