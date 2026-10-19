@@ -7,7 +7,7 @@ import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest'
 import type { Context } from '@/lib/payload/context'
 import { drizzleFor } from '@/lib/payload/drizzle'
 import * as gateway from '@/lib/payload/gateway'
-import { withTransaction } from '@/lib/payload/transaction'
+import { onRollback, withTransaction } from '@/lib/payload/transaction'
 import config from '@/payload.config'
 
 import { contextFor, createUser } from '../helpers/harness'
@@ -151,5 +151,30 @@ describe('withTransaction', () => {
     const fn = vi.fn(async () => 'never')
     await expect(withTransaction(admin, fn)).rejects.toThrow(/did not open a transaction/)
     expect(fn).not.toHaveBeenCalled()
+  })
+
+  it('runs every rollback callback when one fails and rethrows the error of fn', async () => {
+    const e = new Error('boom')
+    let ran = false
+    await expect(
+      withTransaction(admin, async (tx) => {
+        onRollback(tx, async () => {
+          throw new Error('cleanup failed')
+        })
+        onRollback(tx, async () => {
+          ran = true
+        })
+        throw e
+      }),
+    ).rejects.toBe(e)
+    expect(ran).toBe(true)
+  })
+
+  it('never runs a rollback callback on commit', async () => {
+    const callback = vi.fn(async () => {})
+    await withTransaction(admin, async (tx) => {
+      onRollback(tx, callback)
+    })
+    expect(callback).not.toHaveBeenCalled()
   })
 })

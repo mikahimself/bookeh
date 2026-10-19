@@ -1,11 +1,11 @@
 import { readdir } from 'node:fs/promises'
-import path from 'node:path'
 
 import { REST_GET } from '@payloadcms/next/routes'
-import { Forbidden, getPayload, type Payload, ValidationError } from 'payload'
+import { Forbidden, getPayload, MissingFile, type Payload, ValidationError } from 'payload'
 import sharp from 'sharp'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
+import { mediaDir } from '@/lib/catalogue/covers'
 import * as gateway from '@/lib/payload/gateway'
 import config from '@/payload.config'
 import type { Media, User } from '@/payload-types'
@@ -15,7 +15,6 @@ import { contextFor, createUser } from '../helpers/harness'
 // `media`, AD-14: read for any signed-in user (files included), writes for the
 // admin only; other writes are system writes. Every stored name is random.
 
-const mediaDir = path.resolve('media')
 const randomName = /^[0-9a-f-]{36}\.png$/
 
 const png = async (name: string) => {
@@ -27,14 +26,14 @@ const png = async (name: string) => {
   return { data, mimetype: 'image/png', name, size: data.length }
 }
 
-const filesInMedia = async () => (await readdir(mediaDir).catch(() => [])).sort()
-
 describe('media', () => {
   let payload: Payload
   let user: User
   let admin: User
   let cover: Media
   const created: number[] = []
+
+  const filesInMedia = async () => (await readdir(mediaDir(payload)).catch(() => [])).sort()
 
   const systemCreate = async (name: string) => {
     const doc = await payload.create({
@@ -155,6 +154,19 @@ describe('media', () => {
       { totalDocs: 0 },
     )
     expect(await filesInMedia()).not.toContain(replaced.filename)
+  })
+
+  it('refuses an admin create without a file', async () => {
+    const ctx = await contextFor(admin)
+    const before = await payload.count({ collection: 'media' })
+    await expect(gateway.create(ctx, { collection: 'media', data: {} })).rejects.toThrow(
+      MissingFile,
+    )
+    // Payload drops a submitted `filename` from a create without `overrideAccess`.
+    await expect(
+      gateway.create(ctx, { collection: 'media', data: { filename: 'chosen.png' } }),
+    ).rejects.toThrow(MissingFile)
+    expect(await payload.count({ collection: 'media' })).toEqual(before)
   })
 
   it('refuses a file that is not an image', async () => {

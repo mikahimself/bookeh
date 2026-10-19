@@ -2,8 +2,9 @@ import { normaliseIsbn } from '@/fields/isbn'
 import { DomainError } from '@/lib/errors'
 import { lookupSources } from '@/lib/metadata/lookup'
 import type { Context } from '@/lib/payload/context'
-import { assertLive, withTransaction } from '@/lib/payload/transaction'
+import { assertLive, onRollback, withTransaction } from '@/lib/payload/transaction'
 
+import { attachCover, discardCover, type DownloadedCover } from './covers'
 import { findOrCreateByName, type FoundOrCreated } from './findOrCreateByName'
 import { mapSubjectsToGenres } from './mapSubjectsToGenres'
 
@@ -21,12 +22,22 @@ import { mapSubjectsToGenres } from './mapSubjectsToGenres'
  * in the caller's transaction or one of its own (AD-16). A lost race between
  * two concurrent creates surfaces as the unique index's `ValidationError`,
  * unchanged (AD-19).
+ *
+ * `cover` is the file `downloadCover()` stored before the transaction opened
+ * (AD-14): a created Book gets its `media` row in this transaction. The file
+ * is removed when the transaction rolls back, and at once when a shared Book
+ * already exists.
  */
-export async function ensureSharedBook(ctx: Context, isbn13: string): Promise<FoundOrCreated> {
+export async function ensureSharedBook(
+  ctx: Context,
+  isbn13: string,
+  cover?: DownloadedCover,
+): Promise<FoundOrCreated> {
   const isbn = normaliseIsbn(isbn13)
 
   return withTransaction(ctx, async (tx) => {
     const { payload } = tx.req
+    if (cover) onRollback(tx, () => discardCover(payload, cover))
     const system = { req: tx.req, overrideAccess: true, depth: 0 } as const
 
     assertLive(tx)
@@ -38,7 +49,10 @@ export async function ensureSharedBook(ctx: Context, isbn13: string): Promise<Fo
       pagination: false,
       ...system,
     })
-    if (docs[0]) return { id: docs[0].id, created: false }
+    if (docs[0]) {
+      if (cover) await discardCover(payload, cover)
+      return { id: docs[0].id, created: false }
+    }
 
     const outcome = await lookupSources(isbn)
     if (outcome.kind === 'none') throw new DomainError('NOT_FOUND')
@@ -60,6 +74,7 @@ export async function ensureSharedBook(ctx: Context, isbn13: string): Promise<Fo
         ? undefined
         : (await findOrCreateByName(tx, 'series', 'shared', { name: best.series })).id
     const genres = await mapSubjectsToGenres(tx, outcome.raw)
+    const coverId = cover === undefined ? undefined : await attachCover(tx, cover)
 
     assertLive(tx)
     const book = await payload.create({
@@ -76,6 +91,7 @@ export async function ensureSharedBook(ctx: Context, isbn13: string): Promise<Fo
         ...(best.language !== undefined && { language: best.language }),
         ...(best.pages !== undefined && { pages: best.pages }),
         ...(best.description !== undefined && { description: best.description }),
+        ...(coverId !== undefined && { cover: coverId }),
         themes: best.themes,
         genres,
         source: best.source,

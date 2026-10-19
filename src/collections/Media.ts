@@ -1,7 +1,12 @@
 import { randomUUID } from 'node:crypto'
 import path from 'node:path'
 
-import type { Access, CollectionBeforeOperationHook, CollectionConfig } from 'payload'
+import {
+  MissingFile,
+  type Access,
+  type CollectionBeforeOperationHook,
+  type CollectionConfig,
+} from 'payload'
 
 import { isAdmin } from '@/access/roles'
 
@@ -24,6 +29,18 @@ const randomFilename: CollectionBeforeOperationHook = ({ args, operation, req })
 }
 
 /**
+ * `filesRequiredOnCreate: false` lets `lib/catalogue` record a cover it wrote
+ * itself: a system create with `data.filename` and no file stores the row and
+ * writes nothing (AD-14). Everyone else still needs a file: Payload strips
+ * `filename` from a create without `overrideAccess` before this hook runs.
+ */
+const requireFile: CollectionBeforeOperationHook = ({ args, operation, req }) => {
+  const { data } = args as { data?: { filename?: unknown } }
+  if (operation === 'create' && !req.file && !data?.filename) throw new MissingFile(req.t)
+  return args
+}
+
+/**
  * Spine, AD-14: any signed-in user reads media rows and their files (the file
  * route runs `access.read` too); only the admin creates, updates or deletes.
  * Other writes come only from `lib/catalogue` with system privileges. Per-Book
@@ -41,7 +58,7 @@ export const Media: CollectionConfig = {
     group: 'Catalogue',
   },
   hooks: {
-    beforeOperation: [randomFilename],
+    beforeOperation: [requireFile, randomFilename],
   },
   fields: [
     {
@@ -52,6 +69,8 @@ export const Media: CollectionConfig = {
     },
   ],
   upload: {
+    staticDir: process.env.MEDIA_DIR || 'media',
+    filesRequiredOnCreate: false,
     mimeTypes: ['image/jpeg', 'image/png', 'image/webp'],
   },
 }

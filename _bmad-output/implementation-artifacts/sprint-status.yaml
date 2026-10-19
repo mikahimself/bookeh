@@ -101,7 +101,7 @@ development_status:
   3-29-c11-new-authors-and-series-on-the-lookup-result: done
   3-30-c7-lookup-rate-limit: done
   3-31-d1-ensure-a-shared-book: done
-  3-32-d2-cover-download: backlog
+  3-32-d2-cover-download: done
   3-33-d3-create-a-copy: backlog
   3-34-f2-default-location-on-new-copies: backlog
   3-35-d4-save-a-copy: backlog

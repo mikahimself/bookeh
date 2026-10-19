@@ -15,6 +15,7 @@ import { UserBooks } from './collections/UserBooks'
 import { Users } from './collections/Users'
 import { Media } from './collections/Media'
 import { seedFirstUser } from './lib/account/seedFirstUser'
+import { sweepOrphanMedia } from './lib/catalogue/covers'
 import { migrations } from './migrations'
 
 const filename = fileURLToPath(import.meta.url)
@@ -46,5 +47,8 @@ export default buildConfig({
   }),
   sharp,
   plugins: [],
-  onInit: seedFirstUser,
+  onInit: async (payload) => {
+    await seedFirstUser(payload)
+    await sweepOrphanMedia(payload)
+  },
 })

@@ -3,7 +3,6 @@ import { randomUUID } from 'node:crypto'
 import { getPayload, type Payload } from 'payload'
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest'
 
-import { seedFirstUser } from '@/lib/account/seedFirstUser'
 import config from '@/payload.config'
 import { createUser } from '../helpers/harness'
 
@@ -18,10 +17,6 @@ describe('first-user seed', () => {
 
   afterEach(() => {
     vi.unstubAllEnvs()
-  })
-
-  it('runs as onInit', () => {
-    expect(payload.config.onInit).toBe(seedFirstUser)
   })
 
   it('runs without the SEED_* variables from .env', () => {

@@ -1,10 +1,20 @@
-import { commitTransaction, createLocalReq, initTransaction, killTransaction } from 'payload'
+import {
+  commitTransaction,
+  createLocalReq,
+  initTransaction,
+  killTransaction,
+  type PayloadRequest,
+} from 'payload'
 
 import type { Context } from './context'
 
 // Outer contexts while their opener's `fn` runs: a call on one would run on
 // another pooled connection, outside the transaction or blocked by its locks.
 const suspended = new WeakSet<Context>()
+
+// Callbacks registered by `onRollback()`, per transaction `req`; a joined call
+// has the opener's `req`, so the opener sees every callback.
+const rollbackCallbacks = new WeakMap<PayloadRequest, (() => Promise<void>)[]>()
 
 /**
  * Throws when `ctx` carries a transaction that has ended, or is the outer
@@ -56,9 +66,41 @@ export async function withTransaction<T>(
     await commitTransaction(req)
     return result
   } catch (err) {
-    await killTransaction(req)
+    try {
+      await killTransaction(req)
+    } finally {
+      await runRollbackCallbacks(req)
+    }
     throw err
   } finally {
+    rollbackCallbacks.delete(req)
     suspended.delete(ctx)
+  }
+}
+
+/**
+ * Registers `fn` to run after the transaction `ctx` carries rolls back, for
+ * work outside the database (a file written before the transaction opened).
+ * The opener runs the callbacks in order after the rollback; one that throws
+ * is logged and the others still run. They never run on commit.
+ */
+export function onRollback(ctx: Context, fn: () => Promise<void>): void {
+  if (ctx.transactionID === undefined) {
+    throw new Error('onRollback needs a transaction context')
+  }
+  const callbacks = rollbackCallbacks.get(ctx.req)
+  if (callbacks) callbacks.push(fn)
+  else rollbackCallbacks.set(ctx.req, [fn])
+}
+
+async function runRollbackCallbacks(req: PayloadRequest): Promise<void> {
+  const callbacks = rollbackCallbacks.get(req) ?? []
+  rollbackCallbacks.delete(req)
+  for (const fn of callbacks) {
+    try {
+      await fn()
+    } catch (err) {
+      req.payload.logger.error({ err }, 'A rollback callback failed')
+    }
   }
 }
