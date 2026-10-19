@@ -1,7 +1,8 @@
 import type { FieldHook, TextField, TypeWithID } from 'payload'
 
 /** `toNameKey` without the lower-casing: NFC, trimmed, whitespace runs collapsed. */
-const normaliseName = (name: string): string => name.normalize('NFC').trim().replace(/\s+/g, ' ')
+export const normaliseName = (name: string): string =>
+  name.normalize('NFC').trim().replace(/\s+/g, ' ')
 
 /**
  * Spine AD-4: an author's `sortName` is "Family, Given", derived from `name`
