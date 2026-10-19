@@ -3,13 +3,27 @@ title: 'Story 3.25: [U1] Undo receipts'
 type: 'feature'
 created: '2026-10-19'
 baseline_revision: '898053707ae1e6a57e785d9e2a89f4055ef61edd'
-status: 'in-progress'
+status: 'done'
 review_loop_iteration: 0
 followup_review_recommended: false
 context:
   - '_bmad-output/implementation-artifacts/epic-3-context.md'
 warnings: ['oversized']
-deferred: []
+deferred:
+  - summary: >-
+      A failed COMMIT is swallowed by the Payload Drizzle adapter, so withTransaction()
+      resolves and withUndo() records a receipt for a change that never persisted.
+    evidence: |-
+      node_modules/@payloadcms/drizzle/dist/transactions/commitTransaction.js awaits
+      session.resolve(), which returns the drizzle transaction promise `done`; `done`
+      carries a .catch() that calls transactionFailed(), the already-settled "ready"
+      rejecter, so a COMMIT error resolves `done` and commitTransaction returns normally.
+      Pre-existing in src/lib/payload/transaction.ts (story 3.10) for every write in the
+      app, not caused by this story. Surfacing it means checking the session's outcome
+      after commitTransaction(req), or an upstream Payload fix.
+    location: >-
+      src/lib/payload/transaction.ts:60
+    severity: medium
 ---
 
 <intent-contract>
@@ -83,6 +97,31 @@ deferred: []
 
 ## Review Triage Log
 
+### 2026-10-19 — Review pass
+- verdicts: 21 findings — high 0, medium 1, low 11, false 9, maybe-false 0
+- findings:
+  - `[low]` `[reject]` blind: `undo()` has no guard against a context that already carries a transaction; `withTransaction` would join and a throwing restore could leave the opener's transaction half-written while the receipt is spent. Verified: real, but reachable only by a programming mistake; AD-20 fixes the single caller as `undoAction` with the request's context, and no service calls `undo()`. Adding a guard for a situation no caller reaches is more than a direct correction. Recorded under residual risks.
+  - `[low]` `[reject]` blind: the catch in `undo()` maps programming errors from `withTransaction` (`assertLive`, adapter without a transaction) to `UNDO_FAILED` at `warn`, not `INTERNAL` at `error`; `userId` missing from the log. Verified: real; the cause and stack are logged either way and "Couldn't undo." is the right toast in both cases. Separating error kinds adds branches; one user in Phase 1.
+  - `[false]` `[reject]` blind: the spine's Deferred line "Undo store size. Set in the `lib/undo` story" is stale. The line is a pointer to where the decision lives and remains true: `RECEIPT_STORE_SIZE = 500` in `undo.ts` and this spec; editing a planning artifact would also invalidate the cached epic contexts. The cross-user eviction consequence it raises is recorded under residual risks.
+  - `[low]` `[patch]` blind: the eviction test's `{ timeout: 120_000 }` is two orders of magnitude over its sub-second run, so a hung transaction stalls the suite two minutes. Patched: `20_000`.
+  - `[low]` `[patch]` blind: `undoSeconds` asserted twice (computed in `toEqual`, then literal `1800`). Patched: the literal `1800` inside `toEqual`, the second line deleted.
+  - `[low]` `[reject]` blind: `sprint-status.yaml` says `done` while the committed spec says `in-progress`/`in-review`. The implementer set and committed `done` early; finalization writes `done` to the spec in the closing commit, and nothing reads the pair in between.
+  - `[low]` `[reject]` blind: `{ ...data, undoToken, undoSeconds }` would overwrite a `data` key of the same name, and `T extends object` admits arrays. Verified at the type level; no service's data carries those keys and the spine fixes `Undoable<T>`'s shape. A tighter bound is a guard for a case no caller produces.
+  - `[low]` `[reject]` edge: `withUndo` called with the outer context while that context's `withTransaction` fn is running opens an independent transaction (`withTransaction` checks `suspended` only for a context carrying a transaction). Verified; pre-existing shape of `withTransaction` (3.10) and a programming mistake the gateway already refuses for writes. More guards than a correction.
+  - `[low]` `[reject]` edge: `undo()` inside a transaction. Same root cause as the first blind row; same disposition.
+  - `[medium]` `[defer]` edge: a failed COMMIT is swallowed by the Drizzle adapter, so `withTransaction` resolves and `withUndo` records a receipt for a change that never persisted. Verified in `@payloadcms/drizzle/dist/transactions/commitTransaction.js`: `session.resolve()` returns the transaction promise whose `.catch` calls the already-settled ready-rejecter, so a COMMIT error resolves. Pre-existing in `src/lib/payload/transaction.ts` for every write in the app, not caused by this story. Deferred in frontmatter.
+  - `[low]` `[reject]` edge: `data` with `undoToken`/`undoSeconds` keys overwritten. Same root cause as the blind type-level row; same disposition.
+  - `[low]` `[reject]` verification-gap (observation, filed as no gap): `JSON.stringify(warn.mock.calls)` cannot see a token inside an `Error` message. The assertion covers the shape the spec forbids (`{ err, token }`); a token in the restore's own error text is the restore author's, not the logger's.
+  - `[false]` `[reject]` intent (a): "returns `UNDO_FAILED`" is met at the exception surface, not an `ActionResult`. The Errors convention makes `DomainError(code)` the service form of a code and `runAction()` the result form; `undoAction` is U2 (3.26).
+  - `[false]` `[reject]` intent (b): keyed by token with the user checked on use, not a composite key. Observably identical for every AC case; the AC names no key shape, and the user check leaves the owner's receipt intact.
+  - `[false]` `[reject]` intent (c): "after restart" covered by the never-issued token. The store lives in the process (AD-12); after a restart every old token is an unknown one, the same code path.
+  - `[false]` `[reject]` intent (d): record-after-commit ordering not asserted directly. `withTransaction` resolves only after `commitTransaction`; the fn-throws test pins that a rollback leaves no receipt.
+  - `[false]` `[reject]` intent (e): `undoSeconds` is always 1800 at this surface. The AC asks for a relative value on the result so clock skew does not matter; the spine's toast counts it down client-side.
+  - `[false]` `[reject]` intent (f): `withUndo<T extends object>` adds a constraint the spine's alias lacks. `T & { undoToken; undoSeconds }` is only meaningful for an object `T`; every spine result shape is one.
+  - `[false]` `[reject]` intent (g): the in-transaction guard, the warn log, leaving another user's receipt and spend-before-restore are beyond the five ACs. Each traces to AD-20's Prevents list or EXPERIENCE.md → Undo failed, which the story cites; none contradicts an AC.
+  - `[false]` `[reject]` intent (h): integration tests only, no unit test with a faked transaction. The spine's Tests convention requires integration tests for a service story; the fake undoable function writes real rows.
+  - `[low]` `[reject]` intent (i): spec and sprint statuses disagree mid-review. Same root cause as the blind bookkeeping row; same disposition.
+
 ## Design Notes
 
 The token is the Map key and the user is checked on use, not part of the key: a token is a 122-bit random UUID, so the user check guards against a leaked or replayed token, not against collisions. Receipts of another user are not spent by a wrong user's attempt.
@@ -107,3 +146,37 @@ export async function undo(ctx: Context, token: string): Promise<void> {
 - `npm run typecheck` -- expected: clean.
 - `npm run test:unit` -- expected: all pass (`messages` now lists `UNDO_FAILED`).
 - `npm run test:int` -- expected: all pass, `undo` included (needs the Postgres on `DATABASE_URL`; the bounded-store row opens 501 transactions and may take a few seconds).
+
+## Auto Run Result
+
+**Summary.** `lib/undo` exists: `src/lib/undo/undo.ts` holds the spine's `Restore`, `Undone<T>` and `Undoable<T>` shapes, `RECEIPT_TTL_MS` (30 minutes) and `RECEIPT_STORE_SIZE` (500, set here), one `processState('undo.receipts')` Map keyed by a `randomUUID()` token with the user id on the receipt, `withUndo(ctx, fn)` as the only recorder (opens the transaction through `withTransaction`, records after it resolves, returns `{ ...data, undoToken, undoSeconds: 1800 }`, refuses a context that already carries a transaction, rethrows `fn`'s error unchanged with nothing recorded) and `undo(ctx, token)` as the only entry point (unknown, expired, another user's: `DomainError('UNDO_FAILED')`, the owner's receipt untouched by a wrong user; otherwise the receipt is spent first and the restore runs inside `withTransaction`; a throwing restore rolls back, logs `warn({ err })` once and fails with `UNDO_FAILED`). Recording sweeps expired receipts and evicts the oldest so the store holds at most 500. `UNDO_FAILED` joins `ErrorCode` with messages in both languages.
+
+**Files changed.**
+- `src/lib/undo/undo.ts` -- new: shapes, constants, store, `withUndo`, `undo`.
+- `src/lib/errors.ts` -- `UNDO_FAILED` in `ErrorCode`.
+- `messages/en.json`, `messages/fi.json` -- `errors.UNDO_FAILED` ("Couldn't undo." / "Kumoaminen ei onnistunut.").
+- `src/app/(frontend)/components/toast/flashCookie.ts`, `tests/unit/messages.unit.spec.ts` -- the exhaustive code lists.
+- `tests/int/undo.int.spec.ts` -- new: 8 tests covering the 9 matrix rows (the first test covers "Record and undo" and "Used token").
+- `_bmad-output/implementation-artifacts/sprint-status.yaml` -- 3.25 done.
+
+**Review.** 21 findings (medium 1, low 11, false 9). Patched 2 entries, both low: the eviction test's timeout override lowered from 120 s to 20 s; the duplicated `undoSeconds` assertion reduced to the literal `1800` inside `toEqual`. Deferred 1 (medium, pre-existing): the Drizzle adapter swallows a failed COMMIT, so `withTransaction` resolves and a receipt is recorded for a change that never persisted; belongs to `src/lib/payload/transaction.ts`, not this story. Rejected:
+- `undo()` without a guard against a context carrying a transaction (two rows): reachable only by a programming mistake; AD-20 fixes the one caller as `undoAction` with the request context. Residual risk below.
+- Programming errors inside `undo()` mapped to `UNDO_FAILED` at `warn`: the cause is logged either way and the toast text is right in both cases; separating error kinds adds branches.
+- The spine's Deferred line on the store size: a pointer to this story, still true; editing planning artifacts would invalidate the cached epic contexts.
+- Spec and sprint statuses disagreeing mid-review (two rows): the implementer committed `done` early; finalization sets the spec to `done` in the closing commit.
+- Spread overwriting `undoToken`/`undoSeconds` keys in `data`, `T extends object` admitting arrays (two rows): no caller produces such data; the spine fixes the shape.
+- `withUndo` with a suspended outer context: pre-existing shape of `withTransaction`; the gateway refuses writes on that context.
+- The log assertion not seeing a token inside an `Error` message: the assertion covers the forbidden `{ err, token }` shape.
+- Intent audit rows (exception vs result surface, key shape, restart by unknown token, ordering by consequence, constant 1800, the `T extends object` bound, spine-grounded additions, integration tests only): no bad outcome; each follows the Errors and Tests conventions, AD-12 or AD-20.
+
+**Follow-up review:** not recommended. Patched entries: high 0, medium 0, low 2.
+
+**Verification** (main checkout, Postgres on `DATABASE_URL`, after the patches).
+- `npx eslint src tests`: 0 errors (36 pre-existing warnings in generated migrations).
+- `npm run typecheck`: clean.
+- `npm run test:unit`: 29 files, 501 passed.
+- `npm run test:int`: 28 files passed, 1 skipped (`migrationSchema`, push on); `undo` 8/8 in under a second, the 501-transaction eviction row included.
+- Matrix audit: every row has a passing test in `tests/int/undo.int.spec.ts`.
+- Playwright not run (service story, no UI).
+
+**Residual risks.** `undo()` called with a context that already carries a transaction joins it and does not roll back on its own; only `undoAction` (U2) may call it, with the request's context. The store bound is shared by all users: one user's burst of 500 actions evicts another user's live receipts (one user in Phase 1). A swallowed COMMIT failure (deferred, pre-existing) would leave a receipt for a change that never persisted. The implementer committed before review and amended the commit with the patches; the spec is committed separately at finalization.
