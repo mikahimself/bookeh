@@ -19,6 +19,11 @@ import {
 import { toNameKey } from '@/fields/nameKey'
 import { mediaDir } from '@/lib/catalogue/covers'
 import { saveCopy, type SaveInput } from '@/lib/catalogue/saveCopy'
+import {
+  oncePerRequest,
+  REQUEST_MEMORY_SIZE,
+  REQUEST_WINDOW_MS,
+} from '@/lib/catalogue/saveRequests'
 import { DomainError } from '@/lib/errors'
 import { lookupSources } from '@/lib/metadata/lookup'
 import type { SourcesOutcome } from '@/lib/metadata/source'
@@ -360,5 +365,137 @@ describe('saveCopy', () => {
     ).toBe(0)
     expect(await filesInMedia()).not.toContain(filename)
     expect(await copiesOf(created)).toEqual([])
+  })
+
+  // AD-11/AD-12: the memory is in process and shared by every test in the run,
+  // so each test uses its own users and ids.
+  describe('repeated requestId', () => {
+    /** Records the cover of the Book `bookId` for cleanup. */
+    const trackCover = async (bookId: number) => {
+      const book = await payload.findByID({
+        collection: 'books',
+        id: bookId,
+        overrideAccess: true,
+        depth: 0,
+      })
+      if (typeof book.cover !== 'number') return
+      mediaIds.push(book.cover)
+      const media = await payload.findByID({ collection: 'media', id: book.cover, depth: 0 })
+      filenames.push(media.filename!)
+    }
+
+    it('returns the first result on a sequential repeat and writes nothing', async () => {
+      const { user, ctx } = await freshUser()
+      const isbn = randomIsbn()
+      vi.mocked(lookupSources).mockResolvedValue(
+        found(isbn, { author: unique('Juhani Aho'), series: unique('Lastuja') }),
+      )
+      const input = inputFor(isbn)
+
+      const first = await saveCopy(ctx, input)
+      await trackCover(first.bookId)
+      const asked = vi.mocked(lookupSources).mock.calls.length
+      const again = await saveCopy(ctx, input)
+
+      expect(again).toEqual(first)
+      expect((await copiesOf(user)).map((copy) => copy.id)).toEqual([first.copyId])
+      expect(lookupSources).toHaveBeenCalledTimes(asked)
+      expect(fetchSpy).toHaveBeenCalledTimes(1)
+    })
+
+    it('shares one save between concurrent repeats', async () => {
+      const { user, ctx } = await freshUser()
+      const isbn = randomIsbn()
+      vi.mocked(lookupSources).mockResolvedValue(
+        found(isbn, { author: unique('Eino Leino'), series: unique('Helkavirsiä') }),
+      )
+      const input = inputFor(isbn)
+
+      const [a, b] = await Promise.all([saveCopy(ctx, input), saveCopy(ctx, input)])
+      await trackCover(a.bookId)
+
+      expect(b).toEqual(a)
+      expect(await booksWithIsbn(isbn)).toHaveLength(1)
+      expect((await copiesOf(user)).map((copy) => copy.id)).toEqual([a.copyId])
+    })
+
+    it("keeps each user's ids apart", async () => {
+      const a = await freshUser()
+      const b = await freshUser()
+      const isbn = randomIsbn()
+      await bookFor(undefined, isbn, 'shared')
+      const input = inputFor(isbn)
+
+      const ofA = await saveCopy(a.ctx, input)
+      const ofB = await saveCopy(b.ctx, input)
+
+      expect(ofB.copyId).not.toBe(ofA.copyId)
+      expect((await copiesOf(b.user)).map((copy) => copy.id)).toEqual([ofB.copyId])
+      expect((await copiesOf(a.user)).map((copy) => copy.id)).toEqual([ofA.copyId])
+    })
+
+    it('forgets a failed save, so a retry runs again', async () => {
+      const { user, ctx } = await freshUser()
+      const isbn = randomIsbn()
+      vi.mocked(lookupSources).mockResolvedValue({ kind: 'none' })
+      const input = inputFor(isbn)
+
+      await expect(saveCopy(ctx, input)).rejects.toMatchObject(new DomainError('NOT_FOUND'))
+      vi.mocked(lookupSources).mockResolvedValue(
+        found(isbn, { author: unique('Maria Jotuni'), series: unique('Huojuva talo') }),
+      )
+      const retry = await saveCopy(ctx, input)
+      await trackCover(retry.bookId)
+
+      expect((await copiesOf(user)).map((copy) => copy.id)).toEqual([retry.copyId])
+    })
+
+    it('runs again once REQUEST_WINDOW_MS has passed', async () => {
+      const { user, ctx } = await freshUser()
+      const isbn = randomIsbn()
+      await bookFor(undefined, isbn, 'shared')
+      const input = inputFor(isbn)
+      vi.useFakeTimers({ toFake: ['Date'] })
+      try {
+        const t0 = Date.now()
+        const first = await saveCopy(ctx, input)
+        vi.setSystemTime(t0 + REQUEST_WINDOW_MS)
+        const later = await saveCopy(ctx, input)
+
+        expect(later.copyId).not.toBe(first.copyId)
+        expect(await copiesOf(user)).toHaveLength(2)
+      } finally {
+        vi.useRealTimers()
+      }
+    })
+
+    it('forgets the oldest id past REQUEST_MEMORY_SIZE', async () => {
+      const { ctx } = await freshUser()
+      const ids = Array.from({ length: REQUEST_MEMORY_SIZE + 1 }, () => randomUUID())
+      for (const [i, id] of ids.entries()) await oncePerRequest(ctx, id, async () => i)
+      const run = vi.fn(async () => -1)
+
+      expect(await oncePerRequest(ctx, ids.at(-1)!, run)).toBe(REQUEST_MEMORY_SIZE)
+      expect(await oncePerRequest(ctx, ids[1]!, run)).toBe(1)
+      expect(run).not.toHaveBeenCalled()
+      expect(await oncePerRequest(ctx, ids[0]!, run)).toBe(-1)
+      expect(run).toHaveBeenCalledTimes(1)
+    })
+
+    it.each([
+      ['empty', ''],
+      ['65 characters', 'x'.repeat(65)],
+    ])('rejects an %s requestId before any read', async (_, requestId) => {
+      const { user, ctx } = await freshUser()
+      const find = vi.spyOn(payload, 'find')
+
+      await expect(saveCopy(ctx, { ...inputFor(randomIsbn()), requestId })).rejects.toMatchObject(
+        new DomainError('VALIDATION'),
+      )
+      expect(find).not.toHaveBeenCalled()
+      expect(lookupSources).not.toHaveBeenCalled()
+      expect(fetchSpy).not.toHaveBeenCalled()
+      expect(await copiesOf(user)).toEqual([])
+    })
   })
 })

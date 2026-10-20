@@ -8,11 +8,12 @@ import { withTransaction } from '@/lib/payload/transaction'
 import { downloadCover } from './covers'
 import { ensureSharedBook } from './ensureSharedBook'
 import { findBookByIsbn } from './findBookByIsbn'
+import { oncePerRequest } from './saveRequests'
 
 // Spine, Structural Seed (Shared shapes, `src/lib/catalogue`), narrowed to
 // what exists now: the `{ bookId }` target arrives with `requireOwnBook()`
-// (Story 4.1), `{ manual }` with 3.38, `pick` with 3.53, wishlist entries with
-// Epic 7, and `requestId` handling with 3.36.
+// (Story 4.1), `{ manual }` with 3.38, `pick` with 3.53, and wishlist entries
+// with Epic 7.
 
 export type SaveInput = {
   requestId: string
@@ -34,13 +35,23 @@ export type SaveResult = { bookId: number; copyId: number; savedTo: Named | null
  * is the cover downloaded, before the transaction opens (AD-14); an existing
  * Book gets no download and no source call.
  *
+ * A repeat of a recent `requestId` by the same user returns the first result
+ * and writes nothing, even with another `target`: the id identifies the press
+ * (AD-11, AD-12, `oncePerRequest()`). A failed save is not remembered, so a
+ * retry runs again. A `requestId` that is not 1–64 characters fails with
+ * `VALIDATION` before any read.
+ *
  * `saveCopy` opens the transaction itself and cannot be called inside one:
  * `downloadCover()` refuses. Errors pass through unchanged (`NOT_FOUND`, a
  * plain `Error` when the sources are unavailable, `createCopy()`'s
  * `ValidationError`); a rollback removes every row written and the
  * downloaded cover file.
  */
-export async function saveCopy(ctx: Context, input: SaveInput): Promise<SaveResult> {
+export function saveCopy(ctx: Context, input: SaveInput): Promise<SaveResult> {
+  return oncePerRequest(ctx, input.requestId, () => save(ctx, input))
+}
+
+async function save(ctx: Context, input: SaveInput): Promise<SaveResult> {
   const isbn13 = normaliseIsbn(input.target.isbn13)
 
   const held = await findBookByIsbn(ctx, isbn13)
