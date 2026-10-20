@@ -4,8 +4,8 @@ import { getHoldings, type Holdings } from '@/lib/books/holdings'
 import { lookupSources } from '@/lib/metadata/lookup'
 import type { SourceId, SourceResult } from '@/lib/metadata/source'
 import type { Context } from '@/lib/payload/context'
-import * as gateway from '@/lib/payload/gateway'
 
+import { findBookByIsbn } from './findBookByIsbn'
 import { findByName, type NamedCollection } from './findOrCreateByName'
 import { limitLookups } from './lookupLimit'
 
@@ -77,35 +77,19 @@ const sharedMatch = async (
  * that ISBN, the viewer's own private Book, then `lookupSources`. Lookup is
  * read-only: nothing is created here, a Book only on save.
  *
- * The read scopes the Book explicitly to shared or the viewer's own private
- * row: the admin's read access reaches every private Book (AD-4), and this
- * answer is never someone else's. A shared row wins over the viewer's private
- * one when both exist (AD-5's auto-share has not run yet). When the answer is
- * the viewer's private Book, the sources are asked as well and the outcome
- * discarded: it warms the in-process cache so the next save can auto-share
- * (AD-5). A shared Book never calls the sources.
+ * The Book comes from `findBookByIsbn`: never someone else's private row, and
+ * a shared row wins over the viewer's private one when both exist (AD-5's
+ * auto-share has not run yet). When the answer is the viewer's private Book,
+ * the sources are asked as well and the outcome discarded: it warms the
+ * in-process cache so the next save can auto-share (AD-5). A shared Book never
+ * calls the sources.
  * Rate-limited per user after normalising (`limitLookups`, AD-9): a refused call reads nothing.
  */
 export async function lookupBook(ctx: Context, target: LookupTarget): Promise<LookupResult> {
   const isbn13 = normaliseIsbn(target.isbn)
   limitLookups(ctx)
 
-  // At most one shared and one own private row (`isbnIndexes`, AD-19).
-  const { docs } = await gateway.find(ctx, {
-    collection: 'books',
-    where: {
-      and: [
-        { isbn13: { equals: isbn13 } },
-        { or: [{ visibility: { equals: 'shared' } }, { createdBy: { equals: ctx.user.id } }] },
-      ],
-    },
-    select: { visibility: true },
-    depth: 0,
-    limit: 2,
-    pagination: false,
-  })
-
-  const existing = docs.find((book) => book.visibility === 'shared') ?? docs[0]
+  const existing = await findBookByIsbn(ctx, isbn13)
   if (existing) {
     if (existing.visibility === 'private') await lookupSources(isbn13)
     // One after the other: calls on one context never run concurrently (AD-16).
