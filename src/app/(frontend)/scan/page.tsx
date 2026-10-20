@@ -9,8 +9,9 @@ import { DismissToast } from '../components/toast/DismissToast'
 import { RaiseToast } from '../components/toast/RaiseToast'
 
 import { InLibraryAnswer } from './InLibraryAnswer'
+import { NotFoundAnswer } from './NotFoundAnswer'
 import { NotInLibraryAnswer } from './NotInLibraryAnswer'
-import { answerFor, type ScanOutcome } from './answer'
+import { answerFor, scanParams, type ScanOutcome } from './answer'
 import { ScanScreen } from './ScanScreen'
 
 /**
@@ -22,8 +23,11 @@ import { ScanScreen } from './ScanScreen'
  *
  * `?isbn=` is the Answer's address: the lookup runs here, on the server, with
  * the text as typed. An invalid ISBN or the rate limit keeps Scan with the
- * text in the field; so do the Answers still to come (not found, couldn't
- * look it up, on wishlist).
+ * text in the field; so do the Answers still to come (couldn't look it up,
+ * on wishlist). An ISBN no source knows opens Not found with it.
+ *
+ * `?title=` with no `isbn` (or a blank one) is the Not found Answer with no
+ * ISBN and the text in its Title field (`scanParams()`).
  */
 export default async function ScanPage({
   searchParams,
@@ -32,12 +36,13 @@ export default async function ScanPage({
 }) {
   const ctx = await requireUser()
   const t = await getTranslations()
-  const { isbn } = await searchParams
-  const param = Array.isArray(isbn) ? isbn[0] : isbn
-  // Go on an empty field is no submission.
-  const text = param?.trim() ? param : undefined
+  const { isbn: text, title } = scanParams(await searchParams)
   const outcome: ScanOutcome =
-    text === undefined ? { kind: 'scan' } : await answerFor(() => lookupBook(ctx, { isbn: text }))
+    text !== undefined
+      ? await answerFor(text, (isbn) => lookupBook(ctx, { isbn }))
+      : title !== undefined
+        ? { kind: 'notFound', isbn13: null, title }
+        : { kind: 'scan' }
 
   return (
     <ViewTransition enter="task-enter" exit="task-exit" default="none">
@@ -56,8 +61,10 @@ export default async function ScanPage({
         <FullScreenTask title={t(`answer.${outcome.kind}`)}>
           {outcome.kind === 'inLibrary' ? (
             <InLibraryAnswer answer={outcome.answer} />
-          ) : (
+          ) : outcome.kind === 'notInLibrary' ? (
             <NotInLibraryAnswer answer={outcome.answer} />
+          ) : (
+            <NotFoundAnswer isbn13={outcome.isbn13} title={outcome.title} />
           )}
           {/* The next Answer removes the toast on screen, the held save toast included. */}
           <DismissToast />

@@ -1,3 +1,4 @@
+import { normaliseIsbn } from '@/fields/isbn'
 import { coverUrl } from '@/lib/books/coverUrl'
 import type { LookupResult } from '@/lib/catalogue/lookupBook'
 import { DomainError } from '@/lib/errors'
@@ -147,20 +148,46 @@ export function copyLines(copies: AnswerCopy[], text: CopyText): string[] {
   )
 }
 
+/**
+ * What `/scan` was asked for: `isbn`, the text as typed when it is not blank
+ * (Go on an empty field is no submission), else `title` when the key is
+ * present, even empty (Add without ISBN opens `?title=`). With an `isbn`,
+ * `title` is ignored. A repeated key counts by its first value.
+ */
+export function scanParams(params: Record<string, string | string[] | undefined>): {
+  isbn?: string
+  title?: string
+} {
+  const isbn = first(params.isbn)
+  if (isbn?.trim()) return { isbn }
+  const title = first(params.title)
+  return title === undefined ? {} : { title }
+}
+
+const first = (value: string | string[] | undefined): string | undefined =>
+  Array.isArray(value) ? value[0] : value
+
 export type ScanOutcome =
   | { kind: 'inLibrary'; answer: InLibrary }
   | { kind: 'notInLibrary'; answer: AnswerBook }
+  | { kind: 'notFound'; isbn13: string | null; title: string }
   | { kind: 'scan'; error?: 'INVALID_ISBN' | 'RATE_LIMITED' }
 
 /**
- * What `/scan?isbn=` renders: the In library Answer, the Not in library
- * Answer, or Scan, with the field error or rate-limit toast the lookup
- * refused with. Any other error propagates to Next's error handling.
+ * What `/scan?isbn=` renders for `isbn`, the text as typed: the In library
+ * Answer, the Not in library Answer, the Not found Answer when no source
+ * knows the ISBN (with it in 13 digits: the lookup has accepted the text), or
+ * Scan, with the field error or rate-limit toast the lookup refused with.
+ * Sources that could not answer keep Scan until Story 3.50. Any other error
+ * propagates to Next's error handling.
  */
-export async function answerFor(lookup: () => Promise<LookupResult>): Promise<ScanOutcome> {
+export async function answerFor(
+  isbn: string,
+  lookup: (isbn: string) => Promise<LookupResult>,
+): Promise<ScanOutcome> {
   let result: LookupResult
   try {
-    result = await lookup()
+    result = await lookup(isbn)
   } catch (err) {
     if (
       err instanceof DomainError &&
@@ -170,6 +197,7 @@ export async function answerFor(lookup: () => Promise<LookupResult>): Promise<Sc
     }
     throw err
   }
+  if (result.kind === 'none') return { kind: 'notFound', isbn13: normaliseIsbn(isbn), title: '' }
   const held = inLibrary(result)
   if (held) return { kind: 'inLibrary', answer: held }
   const answer = notInLibrary(result)

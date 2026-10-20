@@ -59,7 +59,8 @@
     "heading": "Scan",
     "cameraHint": "Point the camera at the barcode",
     "isbn": "Or type an ISBN",
-    "noCamera": "No camera. Type the ISBN."
+    "noCamera": "No camera. Type the ISBN.",
+    "addWithoutIsbn": "Add without ISBN"
   },
   "answer": {
     "notInLibrary": "Not in library",
@@ -72,7 +73,13 @@
     "newAuthor": "New author · {name}",
     "newSeries": "New series · {name}",
     "pages": "{pages, plural, one {# page} other {# pages}}",
-    "back": "Back"
+    "back": "Back",
+    "notFound": "Not found",
+    "noSource": "No source has {isbn}.",
+    "title": "Title",
+    "author": "Author",
+    "titleRequired": "Enter the title.",
+    "authorRequired": "Enter the author."
   },
   "sources": {
     "finna": "Finna",

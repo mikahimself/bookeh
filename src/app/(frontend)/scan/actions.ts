@@ -1,7 +1,7 @@
 'use server'
 
 import { saveCopy, type SaveResult } from '@/lib/catalogue/saveCopy'
-import { DomainError, logger, runAction, type ActionResult } from '@/lib/errors'
+import { DomainError, logger, runAction, type ActionResult, type ErrorCode } from '@/lib/errors'
 import { requireUserOrThrow } from '@/lib/payload/context'
 import type { Undoable } from '@/lib/undo/undo'
 
@@ -31,4 +31,53 @@ function isSaveInput(input: unknown): input is { requestId: string; isbn13: stri
   if (typeof input !== 'object' || input === null) return false
   const { requestId, isbn13 } = input as Record<string, unknown>
   return typeof requestId === 'string' && typeof isbn13 === 'string'
+}
+
+/**
+ * Add to library on the Not found Answer (FR-12, FR-22): an owned copy of a
+ * Book typed by hand, with the ISBN when there is one, at the default
+ * location. The text goes as typed; `saveCopy()` checks it. Anything but
+ * `{ requestId, title, author }` strings with an optional `isbn13` string is
+ * `VALIDATION`. A `VALIDATION` naming `title` or `authors` comes back with
+ * only those fields, for the messages under them; every other failure but a
+ * signed-out session reads as `SAVE_FAILED` and is logged as in
+ * `saveCopyAction`: nothing on screen could be marked.
+ */
+export async function saveManualAction(
+  input: unknown,
+): Promise<ActionResult<Undoable<SaveResult>>> {
+  const result = await runAction(async () => {
+    const ctx = await requireUserOrThrow()
+    if (!isManualInput(input)) throw new DomainError('VALIDATION')
+    const { requestId, isbn13, title, author } = input
+    return saveCopy(ctx, {
+      requestId,
+      target: { manual: { isbn: isbn13, title, authors: [author] } },
+      save: { kind: 'copy' },
+    })
+  })
+  if (result.ok || result.code === 'UNAUTHENTICATED') return result
+  if (result.code === 'VALIDATION' && result.fields) {
+    const { title, authors } = result.fields
+    const fields: Record<string, ErrorCode> = {
+      ...(title === undefined ? {} : { title }),
+      ...(authors === undefined ? {} : { authors }),
+    }
+    if (Object.keys(fields).length > 0) return { ok: false, code: 'VALIDATION', fields }
+  }
+  if (result.code !== 'INTERNAL') logger().warn({ code: result.code }, 'saveManualAction failed')
+  return { ok: false, code: 'SAVE_FAILED' }
+}
+
+function isManualInput(
+  input: unknown,
+): input is { requestId: string; title: string; author: string; isbn13?: string } {
+  if (typeof input !== 'object' || input === null) return false
+  const { requestId, title, author, isbn13 } = input as Record<string, unknown>
+  return (
+    typeof requestId === 'string' &&
+    typeof title === 'string' &&
+    typeof author === 'string' &&
+    (isbn13 === undefined || typeof isbn13 === 'string')
+  )
 }

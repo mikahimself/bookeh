@@ -6,6 +6,7 @@ import {
   copyLines,
   inLibrary,
   notInLibrary,
+  scanParams,
   type AnswerBook,
   type AnswerText,
 } from '@/app/(frontend)/scan/answer'
@@ -13,6 +14,8 @@ import type { EffectiveBook } from '@/lib/books/effectiveBook'
 import type { CopyLine, Holdings } from '@/lib/books/holdings'
 import type { Draft, LookupResult } from '@/lib/catalogue/lookupBook'
 import { DomainError } from '@/lib/errors'
+
+const ISBN = '9789510396358'
 
 const draft = (over: Partial<Draft> = {}): Draft => ({
   isbn13: '9789510396358',
@@ -266,26 +269,62 @@ describe('answerLines', () => {
   })
 })
 
+describe('scanParams', () => {
+  it.each([
+    ['an ISBN', { isbn: '951-0-39707-5' }, { isbn: '951-0-39707-5' }],
+    ['Add without ISBN (an empty title)', { title: '' }, { title: '' }],
+    ['a title', { title: 'Kotiseutu' }, { title: 'Kotiseutu' }],
+    ['an ISBN with a title', { isbn: ISBN, title: 'x' }, { isbn: ISBN }],
+    ['a blank ISBN with a title', { isbn: '  ', title: 'x' }, { title: 'x' }],
+    ['a blank ISBN', { isbn: '' }, {}],
+    ['nothing', {}, {}],
+    ['repeated keys', { title: ['a', 'b'] }, { title: 'a' }],
+  ])('reads %s', (_, params, expected) => {
+    expect(scanParams(params)).toEqual(expected)
+  })
+})
+
 describe('answerFor', () => {
   it('answers In library for a held copy, Not in library for nothing held, else Scan', async () => {
     await expect(
-      answerFor(async () => ({ kind: 'existing', book, mine: { copies: [copy()], entries: [] } })),
+      answerFor(ISBN, async () => ({
+        kind: 'existing',
+        book,
+        mine: { copies: [copy()], entries: [] },
+      })),
     ).resolves.toMatchObject({
       kind: 'inLibrary',
       answer: { title: 'Tuntematon sotilas', copies: [{ location: null, status: 'owned' }] },
     })
     await expect(
-      answerFor(async () => ({ kind: 'existing', book, mine: nothing })),
+      answerFor(ISBN, async () => ({ kind: 'existing', book, mine: nothing })),
     ).resolves.toMatchObject({ kind: 'notInLibrary', answer: { title: 'Tuntematon sotilas' } })
     await expect(
-      answerFor(async () => ({ kind: 'existing', book, mine: { copies: [], entries: [entry] } })),
+      answerFor(ISBN, async () => ({
+        kind: 'existing',
+        book,
+        mine: { copies: [], entries: [entry] },
+      })),
     ).resolves.toEqual({ kind: 'scan' })
-    await expect(answerFor(async () => ({ kind: 'none' }))).resolves.toEqual({ kind: 'scan' })
+  })
+
+  it('answers Not found with the ISBN in 13 digits when no source knows it', async () => {
+    await expect(answerFor('951-0-39707-5', async () => ({ kind: 'none' }))).resolves.toEqual({
+      kind: 'notFound',
+      isbn13: '9789510397077',
+      title: '',
+    })
+  })
+
+  it('keeps Scan when a source could not answer', async () => {
+    await expect(
+      answerFor(ISBN, async () => ({ kind: 'unavailable', failed: ['finna'] })),
+    ).resolves.toEqual({ kind: 'scan' })
   })
 
   it.each(['INVALID_ISBN', 'RATE_LIMITED'] as const)('keeps Scan with %s', async (code) => {
     await expect(
-      answerFor(async () => {
+      answerFor(ISBN, async () => {
         throw new DomainError(code)
       }),
     ).resolves.toEqual({ kind: 'scan', error: code })
@@ -294,12 +333,12 @@ describe('answerFor', () => {
   it('rethrows anything else', async () => {
     const internal = new DomainError('INTERNAL')
     await expect(
-      answerFor(async () => {
+      answerFor(ISBN, async () => {
         throw internal
       }),
     ).rejects.toBe(internal)
     await expect(
-      answerFor(async () => {
+      answerFor(ISBN, async () => {
         throw new Error('db down')
       }),
     ).rejects.toThrow('db down')

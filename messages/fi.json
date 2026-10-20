@@ -59,7 +59,8 @@
     "heading": "Skannaa",
     "cameraHint": "Osoita kameralla viivakoodia",
     "isbn": "Tai kirjoita ISBN",
-    "noCamera": "Ei kameraa. Kirjoita ISBN."
+    "noCamera": "Ei kameraa. Kirjoita ISBN.",
+    "addWithoutIsbn": "Lisää ilman ISBN:ää"
   },
   "answer": {
     "notInLibrary": "Ei kirjastossa",
@@ -72,7 +73,13 @@
     "newAuthor": "Uusi kirjailija · {name}",
     "newSeries": "Uusi sarja · {name}",
     "pages": "{pages, plural, one {# sivu} other {# sivua}}",
-    "back": "Takaisin"
+    "back": "Takaisin",
+    "notFound": "Ei löytynyt",
+    "noSource": "Mikään lähde ei tunne ISBN:ää {isbn}.",
+    "title": "Nimeke",
+    "author": "Tekijä",
+    "titleRequired": "Kirjoita nimeke.",
+    "authorRequired": "Kirjoita tekijä."
   },
   "sources": {
     "finna": "Finna",
