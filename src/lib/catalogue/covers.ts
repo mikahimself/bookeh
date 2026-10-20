@@ -105,6 +105,52 @@ async function imageOf(bytes: Buffer) {
   return { ...known, width, height }
 }
 
+/** A checked cover image: its bytes, type, file extension and size in pixels. */
+export type FetchedCover = {
+  bytes: Buffer
+  mimeType: DownloadedCover['mimeType']
+  ext: string
+  width: number
+  height: number
+}
+
+/**
+ * The outcome of `fetchCover()`. `host` is the URL's host once it parses, for
+ * the caller's log line; `err` is present when the failure was an unexpected
+ * error rather than a failed check.
+ */
+export type CoverFetch =
+  | ({ ok: true; host: string } & FetchedCover)
+  | { ok: false; host: string | undefined; reason: string; err?: unknown }
+
+/**
+ * Spine, AD-14: the one network call for a source's cover, shared by
+ * `downloadCover()` and the cover preview. Requests `coverUrl` only when it
+ * parses and `policy` allows it; no redirects, a 2xx answer within the time
+ * and size limits, a JPEG, PNG or WebP image. Never throws: a failure is the
+ * reason to log.
+ */
+export async function fetchCover(coverUrl: string, policy: CoverPolicy): Promise<CoverFetch> {
+  let host: string | undefined
+  try {
+    if (!URL.canParse(coverUrl)) throw new CoverFailure('invalid URL')
+    const url = new URL(coverUrl)
+    host = url.host
+    if (!policy.allows(url)) throw new CoverFailure('URL not allowed')
+
+    const bytes = await fetchBytes(url, policy)
+    const image = await imageOf(bytes)
+    return { ok: true, host, bytes, ...image }
+  } catch (err) {
+    return {
+      ok: false,
+      host,
+      reason: reasonOf(err, 'fetch'),
+      ...(!(err instanceof CoverFailure) && { err }),
+    }
+  }
+}
+
 /**
  * Spine, AD-14: the best candidate's cover for a new shared Book, stored in
  * the media directory before the save's transaction opens. `undefined` with
@@ -149,19 +195,20 @@ export async function downloadCover(
   const coverUrl = outcome.candidates[0]?.coverUrl
   if (!coverUrl) return undefined
 
-  let host: string | undefined
+  const fetched = await fetchCover(coverUrl, policy)
+  const { host } = fetched
+  if (!fetched.ok) {
+    payload.logger.warn(
+      { isbn13: isbn, host, ...('err' in fetched && { err: fetched.err }) },
+      `Cover download failed: ${fetched.reason}`,
+    )
+    return undefined
+  }
+
+  const { bytes, ext, mimeType, width, height } = fetched
   let tmp: string | undefined
-  let stage = 'fetch'
+  let stage = 'write'
   try {
-    if (!URL.canParse(coverUrl)) throw new CoverFailure('invalid URL')
-    const url = new URL(coverUrl)
-    host = url.host
-    if (!policy.allows(url)) throw new CoverFailure('URL not allowed')
-
-    const bytes = await fetchBytes(url, policy)
-    const image = await imageOf(bytes)
-
-    stage = 'write'
     const dir = mediaDir(payload)
     await fs.mkdir(dir, { recursive: true })
     const id = randomUUID()
@@ -169,15 +216,14 @@ export async function downloadCover(
     await fs.writeFile(tmp, bytes, { flag: 'wx' })
 
     stage = 'rename'
-    const filename = `${id}.${image.ext}`
+    const filename = `${id}.${ext}`
     await fs.rename(tmp, path.join(dir, filename))
     tmp = undefined
 
-    const { mimeType, width, height } = image
     return { filename, mimeType, filesize: bytes.length, width, height }
   } catch (err) {
     payload.logger.warn(
-      { isbn13: isbn, host, ...(!(err instanceof CoverFailure) && { err }) },
+      { isbn13: isbn, host, err },
       `Cover download failed: ${reasonOf(err, stage)}`,
     )
     // A leftover the sweep would remove anyway, so a failed unlink is not reported.

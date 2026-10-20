@@ -5,6 +5,7 @@ import { lookupSources } from '@/lib/metadata/lookup'
 import type { SourceId, SourceResult } from '@/lib/metadata/source'
 import type { Context } from '@/lib/payload/context'
 
+import { recordCoverPreview } from './coverPreview'
 import { findBookByIsbn } from './findBookByIsbn'
 import { findByName, type NamedCollection } from './findOrCreateByName'
 import { limitLookups } from './lookupLimit'
@@ -110,6 +111,8 @@ export async function lookupBook(ctx: Context, target: LookupTarget): Promise<Lo
       const pick = pickIndex(target.pick, outcome.candidates.length)
       // `found` always carries a candidate, and `pickIndex` stays in range.
       const best = outcome.candidates[pick]!
+      // The preview shows the picked edition's cover (AD-10), or none.
+      recordCoverPreview(ctx, isbn13, best.coverUrl)
       // One after the other: calls on one context never run concurrently (AD-16).
       const authors: Match[] = []
       for (const { name } of best.authors) authors.push(await sharedMatch(ctx, 'authors', name))

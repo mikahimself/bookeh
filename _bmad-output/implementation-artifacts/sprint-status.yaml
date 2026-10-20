@@ -112,7 +112,7 @@ development_status:
   3-40-a20-dialog-and-sheet-wrappers: backlog
   3-41-a23-base-ui-and-the-combobox-menu-and-picker-wrappers: backlog
   3-42-k11-default-location-in-settings: backlog
-  3-43-d10-cover-component-and-cover-preview: backlog
+  3-43-d10-cover-component-and-cover-preview: done
   3-44-a25-client-helper-for-actions-and-data-requests: backlog
   3-45-d16-answer-not-in-library: backlog
   3-46-d17-add-to-library: backlog
