@@ -297,6 +297,15 @@
 }
 
 /*
+ * DESIGN.md, Selection bar: a `stroke-selection` accent bar on the left edge
+ * of the highlighted or open row, which is not tinted. An inset shadow, so it
+ * takes no space; the theme's shadows are cleared, so it lives here.
+ */
+@utility selection-bar {
+  box-shadow: inset var(--spacing-stroke-selection) 0 0 var(--color-accent);
+}
+
+/*
  * Overlay motion (components/ui). Base UI marks an entering overlay
  * `data-starting-style` and a leaving one `data-ending-style`, and unmounts it
  * once the transition ends. The backdrop and the dialog fade; the sheet

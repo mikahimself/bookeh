@@ -22,6 +22,8 @@ export type SheetProps = {
   /** Names the sheet for assistive technology; the content draws its own heading. */
   label: string
   children?: ReactNode
+  /** Runs once per close, after the sheet's history entry is gone (`useCloseOnBack`). */
+  onClosed?: () => void
 }
 
 /**
@@ -32,7 +34,7 @@ export type SheetProps = {
  * Back closes it. Modal, and the list underneath keeps its scroll position.
  * Every open starts half open.
  */
-export function Sheet({ open, onOpenChange, label, children }: SheetProps) {
+export function Sheet({ open, onOpenChange, label, children, onClosed }: SheetProps) {
   const t = useTranslations('overlay')
   const layer = useOverlayLayer('sheet')
   const [snapPoint, setSnapPoint] = useState<Drawer.Root.SnapPoint | null>(HALF_OPEN)
@@ -42,7 +44,7 @@ export function Sheet({ open, onOpenChange, label, children }: SheetProps) {
     if (open) setSnapPoint(HALF_OPEN)
   }
   useSuspendSwipe(open)
-  useCloseOnBack(open, () => onOpenChange(false))
+  useCloseOnBack(open, () => onOpenChange(false), onClosed)
 
   return layer(
     <Drawer.Root

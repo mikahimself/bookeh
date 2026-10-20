@@ -1,6 +1,14 @@
 'use client'
 
-import { createContext, use, useEffect, useEffectEvent, useRef, type ReactNode } from 'react'
+import {
+  createContext,
+  use,
+  useEffect,
+  useEffectEvent,
+  useRef,
+  useSyncExternalStore,
+  type ReactNode,
+} from 'react'
 
 import { OVERLAY_TOKENS_KEY } from '../navigation'
 
@@ -57,17 +65,27 @@ function tokensOf(state: unknown): string[] {
  * other close pops the entry, but only while it is the current one, so a
  * close after a navigation never undoes the navigation.
  *
+ * `onClosed` runs once per close, after this overlay's entry is gone: on the
+ * `popstate` of its own `back()`, or at once when no `back()` was needed
+ * (Back already left the entry, or it is no longer the current one). A
+ * caller that navigates on a choice does it there, so the navigation lands
+ * on the entry from before the open.
+ *
  * The push and pop effect has no cleanup and checks the ref, so StrictMode's
  * re-run neither pushes twice nor pops. Unmounting while open leaves the
  * entry; Back over it then changes nothing on screen.
  */
-export function useCloseOnBack(open: boolean, close: () => void): void {
+export function useCloseOnBack(open: boolean, close: () => void, onClosed?: () => void): void {
   const token = useRef<string | null>(null)
+  /** Back left this overlay's entry; the close that follows needs no `back()`. */
+  const left = useRef(false)
   const onBack = useEffectEvent(close)
+  const closed = useEffectEvent(() => onClosed?.())
 
   useEffect(() => {
     if (open) {
       if (token.current) return
+      left.current = false
       token.current = `${LOAD}-${++opens}`
       const state: unknown = window.history.state
       window.history.pushState(
@@ -79,10 +97,21 @@ export function useCloseOnBack(open: boolean, close: () => void): void {
       )
       return
     }
+    if (left.current) {
+      left.current = false
+      closed()
+      return
+    }
     const pushed = token.current
     if (!pushed) return
     token.current = null
-    if (tokensOf(window.history.state).at(-1) === pushed) window.history.back()
+    if (tokensOf(window.history.state).at(-1) === pushed) {
+      // The listener below is gone by the time this pop lands: it went with `open`.
+      window.addEventListener('popstate', () => closed(), { once: true })
+      window.history.back()
+    } else {
+      closed()
+    }
   }, [open])
 
   useEffect(() => {
@@ -91,9 +120,34 @@ export function useCloseOnBack(open: boolean, close: () => void): void {
       const pushed = token.current
       if (!pushed || tokensOf(window.history.state).includes(pushed)) return
       token.current = null
+      left.current = true
       onBack()
     }
     window.addEventListener('popstate', onPopState)
     return () => window.removeEventListener('popstate', onPopState)
   }, [open])
+}
+
+/**
+ * The wide layout's media query. Must equal `--breakpoint-wide` in
+ * styles.css, so the overlay chosen here matches the `wide:` styles.
+ */
+const WIDE_QUERY = '(min-width: 900px)'
+
+function subscribeWide(onChange: () => void): () => void {
+  const query = window.matchMedia(WIDE_QUERY)
+  query.addEventListener('change', onChange)
+  return () => query.removeEventListener('change', onChange)
+}
+
+/**
+ * Whether the screen is at least `wide` (900px): the Picker's Dialog rather
+ * than its Sheet. `false` on the server and during hydration.
+ */
+export function useWide(): boolean {
+  return useSyncExternalStore(
+    subscribeWide,
+    () => window.matchMedia(WIDE_QUERY).matches,
+    () => false,
+  )
 }

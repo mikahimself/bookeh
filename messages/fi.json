@@ -65,6 +65,10 @@
     "cancel": "Peruuta",
     "expand": "Avaa kokonaan"
   },
+  "combobox": {
+    "create": "Uusi: {name}",
+    "clear": "Tyhjennä"
+  },
   "progress": {
     "loading": "Ladataan"
   },

@@ -65,6 +65,10 @@
     "cancel": "Cancel",
     "expand": "Open fully"
   },
+  "combobox": {
+    "create": "New: {name}",
+    "clear": "Clear"
+  },
   "progress": {
     "loading": "Loading"
   },
