@@ -31,7 +31,7 @@ import { rejectedPaths } from '../helpers/validation'
 // user already holds for the typed ISBN. The sources are faked at
 // `lookupSources` and must never be asked by a save; `fetch` likewise.
 
-vi.mock('@/lib/metadata/lookup', () => ({ lookupSources: vi.fn() }))
+vi.mock('@/lib/metadata/lookup', () => ({ lookupSources: vi.fn(), heldOutcome: vi.fn() }))
 
 const unique = (name: string) => `${name} ${randomUUID().slice(0, 8)}`
 

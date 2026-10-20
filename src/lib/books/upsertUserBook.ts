@@ -35,7 +35,9 @@ export type UserBookChanges = {
 }
 
 /** What one write stores: the override fields, `overridden`, the flag, the rating and its time. */
-type RowData = Partial<Pick<UserBook, OverridableBookField | 'overridden' | 'read' | 'rating' | 'ratedAt'>>
+type RowData = Partial<
+  Pick<UserBook, OverridableBookField | 'overridden' | 'read' | 'rating' | 'ratedAt'>
+>
 type Stored = BookOverrides[OverridableBookField]
 
 /**
@@ -155,5 +157,66 @@ export async function upsertUserBook(
         depth: 0,
       })
     }
+  })
+}
+
+/**
+ * Spine, AD-5, AD-6 and D-8: moves the viewer's `user-books` row from a Book
+ * that is going away to the Book replacing it, in the caller's transaction or
+ * one of its own (AD-16); used when a private Book merges into the shared
+ * Book with its ISBN (FR-12). Reaches only the viewer's own rows.
+ *
+ * Without a row on `toBookId`, the row on `fromBookId` is re-pointed to it.
+ * With a row on both, the target's row stays: it takes `read: true` if either
+ * row has it, and the moved row's `rating` and `ratedAt` when it has no
+ * rating; the `from` row is then deleted. Then `overrides` are written
+ * through `upsertUserBook()` for the fields the target row does not already
+ * override, so the target must already be shared.
+ */
+export async function mergeUserBook(
+  ctx: Context,
+  fromBookId: number,
+  toBookId: number,
+  overrides: BookOverrides,
+): Promise<void> {
+  await withTransaction(ctx, async (tx) => {
+    // `user-books` access already scopes the find to the viewer (AD-6).
+    const { docs } = await gateway.find(tx, {
+      collection: 'user-books',
+      where: { book: { in: [fromBookId, toBookId] } },
+      depth: 0,
+      limit: 2,
+      pagination: false,
+    })
+    const bookOf = (row: UserBook) => (typeof row.book === 'number' ? row.book : row.book.id)
+    const from = docs.find((row) => bookOf(row) === fromBookId)
+    const to = docs.find((row) => bookOf(row) === toBookId)
+
+    if (from && !to) {
+      await gateway.updateByID(tx, {
+        collection: 'user-books',
+        id: from.id,
+        data: { book: toBookId },
+        depth: 0,
+      })
+    } else if (from && to) {
+      const data: RowData = {}
+      if (from.read && !to.read) data.read = true
+      if (to.rating == null && from.rating != null) {
+        data.rating = from.rating
+        data.ratedAt = from.ratedAt ?? null
+      }
+      await gateway.deleteByID(tx, { collection: 'user-books', id: from.id, depth: 0 })
+      if (Object.keys(data).length > 0) {
+        await gateway.updateByID(tx, { collection: 'user-books', id: to.id, data, depth: 0 })
+      }
+    }
+
+    const kept = new Set<OverridableBookField>(to?.overridden ?? [])
+    // `fromEntries` loses the key-to-value pairing; the picked keys keep it.
+    const fresh = Object.fromEntries(
+      OVERRIDABLE_BOOK_FIELDS.filter((key) => !kept.has(key)).map((key) => [key, overrides[key]]),
+    ) as BookOverrides
+    await upsertUserBook(tx, toBookId, { overrides: fresh })
   })
 }

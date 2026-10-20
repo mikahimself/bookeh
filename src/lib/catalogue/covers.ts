@@ -195,11 +195,34 @@ export async function downloadCover(
   const coverUrl = outcome.candidates[0]?.coverUrl
   if (!coverUrl) return undefined
 
+  return storeCover(ctx, isbn, coverUrl, policy)
+}
+
+/**
+ * Spine, AD-14: the fetch-and-write half of `downloadCover()`, for a cover
+ * URL taken from the server-held source outcome: `fetchCover()`, then the
+ * file in the media directory under a temporary name renamed into place, so
+ * a partial file never carries a final name. Runs before the save's
+ * transaction opens (a plain `Error` inside one). Every download or write
+ * failure is one logged warning and `undefined`.
+ */
+export async function storeCover(
+  ctx: Context,
+  isbn13: string,
+  coverUrl: string,
+  policy: CoverPolicy = coverPolicy,
+): Promise<DownloadedCover | undefined> {
+  if (ctx.transactionID !== undefined) {
+    throw new Error('storeCover runs before the transaction opens (AD-14)')
+  }
+  assertLive(ctx)
+  const { payload } = ctx.req
+
   const fetched = await fetchCover(coverUrl, policy)
   const { host } = fetched
   if (!fetched.ok) {
     payload.logger.warn(
-      { isbn13: isbn, host, ...('err' in fetched && { err: fetched.err }) },
+      { isbn13, host, ...('err' in fetched && { err: fetched.err }) },
       `Cover download failed: ${fetched.reason}`,
     )
     return undefined
@@ -222,10 +245,7 @@ export async function downloadCover(
 
     return { filename, mimeType, filesize: bytes.length, width, height }
   } catch (err) {
-    payload.logger.warn(
-      { isbn13: isbn, host, err },
-      `Cover download failed: ${reasonOf(err, stage)}`,
-    )
+    payload.logger.warn({ isbn13, host, err }, `Cover download failed: ${reasonOf(err, stage)}`)
     // A leftover the sweep would remove anyway, so a failed unlink is not reported.
     if (tmp) await fs.unlink(tmp).catch(() => {})
     return undefined

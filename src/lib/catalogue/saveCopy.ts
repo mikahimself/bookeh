@@ -10,6 +10,7 @@ import { createPrivateBook, type ManualEntry, normaliseManual } from './createPr
 import { ensureSharedBook } from './ensureSharedBook'
 import { findBookByIsbn } from './findBookByIsbn'
 import { oncePerRequest } from './saveRequests'
+import { prepareShare, settleHeldBook } from './sharePrivateBook'
 
 // Spine, Structural Seed (Shared shapes, `src/lib/catalogue`), narrowed to
 // what exists now: the `{ bookId }` target arrives with `requireOwnBook()`
@@ -31,9 +32,19 @@ export type SaveResult = { bookId: number; copyId: number; savedTo: Named | null
  * An `{ isbn13 }` target is normalised first (`INVALID_ISBN` before any
  * read). The Book is the shared Book with the ISBN, else the user's own
  * private Book with it, else a shared Book `ensureSharedBook()` creates from
- * the server-held source outcome. Another user's private Book is never used.
- * Only in that last case is the cover downloaded, before the transaction
- * opens (AD-14); an existing Book gets no download and no source call.
+ * the server-held source outcome, its cover downloaded before the
+ * transaction opens (AD-14). Another user's private Book is never used.
+ *
+ * A held Book goes through `settleHeldBook()` in the save's transaction
+ * (FR-12, AD-4, AD-5, D-8). The user's private Book is shared in place when
+ * the in-process cache holds a `found` outcome for the ISBN
+ * (`prepareShare()`, which also stores the candidate's cover beforehand when
+ * the Book has none): it keeps its id and takes the best candidate's values.
+ * When a shared Book with the ISBN exists and the user also has a private
+ * one, the private Book merges into it: its copies and the user's row move,
+ * and it is deleted. Either way the user's differing hand-entered values
+ * become their overrides; an admin's are dropped. Otherwise the held Book
+ * gets the copy unchanged. A held Book's save never asks the sources.
  *
  * A `{ manual }` target (FR-12, FR-22, AD-4, AD-5) is normalised first by
  * `normaliseManual()` (`VALIDATION` on `title` and `authors`, then
@@ -61,10 +72,11 @@ export type SaveResult = { bookId: number; copyId: number; savedTo: Named | null
  * the token deletes the copy, then the rows `ensureSharedBook()` or
  * `createPrivateBook()` created that no row of any user references any more.
  * A Book that existed before the save stays, even when nothing references
- * it. A repeat of the `requestId` records no second receipt: it returns the
- * first token with the seconds left now. An Undo keeps the `requestId`
- * remembered, so a retry within the window returns the undone result and
- * saves nothing.
+ * it, and a share or a merge is not undone: the Book stays shared, and the
+ * moved copies, the row and the overrides stay. A repeat of the `requestId`
+ * records no second receipt: it returns the first token with the seconds
+ * left now. An Undo keeps the `requestId` remembered, so a retry within the
+ * window returns the undone result and saves nothing.
  */
 export async function saveCopy(ctx: Context, input: SaveInput): Promise<Undoable<SaveResult>> {
   const { result, storedAt } = await oncePerRequest(ctx, input.requestId, async () => {
@@ -90,13 +102,22 @@ async function save(ctx: Context, input: SaveInput): Promise<Undoable<SaveResult
   const isbn13 = normaliseIsbn(target.isbn13)
 
   const held = await findBookByIsbn(ctx, isbn13)
-  const cover = held ? undefined : await downloadCover(ctx, isbn13)
+  if (!held) {
+    const cover = await downloadCover(ctx, isbn13)
+    return withUndo(ctx, async (tx) => {
+      // A shared Book created between the read and here is found again by
+      // `ensureSharedBook()`, which then discards the cover.
+      const book = await ensureSharedBook(tx, isbn13, cover)
+      return saveOwnedCopy(tx, book.data.id, book)
+    })
+  }
 
+  // FR-12, D-8: a held private Book may be shared, or merged into a shared Book.
+  const pending = await prepareShare(ctx, isbn13, held)
   return withUndo(ctx, async (tx) => {
-    // A shared Book created between the read and here is found again by
-    // `ensureSharedBook()`, which then discards the cover.
-    const book = held ? undefined : await ensureSharedBook(tx, isbn13, cover)
-    return saveOwnedCopy(tx, held ? held.id : book!.data.id, book)
+    const bookId = await settleHeldBook(tx, isbn13, pending)
+    // No Book restore: a shared or merged Book stays shared after an Undo.
+    return saveOwnedCopy(tx, bookId, undefined)
   })
 }
 

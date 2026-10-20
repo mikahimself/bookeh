@@ -36,6 +36,17 @@ function cached(isbn13: string): SourcesOutcome | undefined {
   return entry.outcome
 }
 
+/**
+ * Spine, AD-5: the server-held outcome for a normalised ISBN-13, read from the
+ * in-process cache alone: `undefined` on a miss or an expired entry, and never
+ * a source call; a hit refreshes the entry's recency, as a lookup's does. Only `found` and `none` are ever cached, so those are the
+ * only kinds it returns. The save path reads it to share a private Book
+ * (FR-12, D-8) without asking the sources.
+ */
+export function heldOutcome(isbn13: string): SourcesOutcome | undefined {
+  return cached(isbn13)
+}
+
 function remember(isbn13: string, outcome: SourcesOutcome, ttl: number): void {
   const entries = cache()
   entries.delete(isbn13)

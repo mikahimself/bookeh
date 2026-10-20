@@ -40,7 +40,7 @@ import { rejectedPaths } from '../helpers/validation'
 // cover, and saves an owned copy at the default location in one transaction.
 // The sources are faked at `lookupSources`, the cover host at `fetch`.
 
-vi.mock('@/lib/metadata/lookup', () => ({ lookupSources: vi.fn() }))
+vi.mock('@/lib/metadata/lookup', () => ({ lookupSources: vi.fn(), heldOutcome: vi.fn() }))
 
 const unique = (name: string) => `${name} ${randomUUID().slice(0, 8)}`
 

@@ -6,6 +6,7 @@ import {
   BREAKER_FAILURES,
   CACHE_SIZE,
   FOUND_TTL_MS,
+  heldOutcome,
   lookupSources,
   NONE_TTL_MS,
   SOURCE_TIMEOUT_MS,
@@ -265,5 +266,24 @@ describe('lookupSources cache', () => {
     expect(a).toHaveBeenCalledTimes(CACHE_SIZE + 1)
     await lookupSources(isbn(1))
     expect(a).toHaveBeenCalledTimes(CACHE_SIZE + 2)
+  })
+})
+
+describe('heldOutcome', () => {
+  it('returns undefined on a miss without asking a source', () => {
+    const [a] = serve([rec('A', 'a1')])
+
+    expect(heldOutcome(ISBN)).toBeUndefined()
+    expect(a).not.toHaveBeenCalled()
+  })
+
+  it('returns a cached found outcome until it expires, without asking a source', async () => {
+    const [a] = serve([rec('A', 'a1')])
+    const outcome = await lookupSources(ISBN)
+
+    expect(heldOutcome(ISBN)).toEqual(outcome)
+    vi.advanceTimersByTime(FOUND_TTL_MS)
+    expect(heldOutcome(ISBN)).toBeUndefined()
+    expect(a).toHaveBeenCalledOnce()
   })
 })
