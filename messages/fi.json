@@ -79,7 +79,10 @@
     "title": "Nimeke",
     "author": "Tekijä",
     "titleRequired": "Kirjoita nimeke.",
-    "authorRequired": "Kirjoita tekijä."
+    "authorRequired": "Kirjoita tekijä.",
+    "editionsFound": "{n} painosta löytyi",
+    "editions": "Painokset",
+    "unnamedEdition": "Painos {n}"
   },
   "sources": {
     "finna": "Finna",

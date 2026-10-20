@@ -4,10 +4,27 @@ import type { LookupResult } from '@/lib/catalogue/lookupBook'
 import { DomainError } from '@/lib/errors'
 
 /**
+ * One source candidate in the edition picker (EXPERIENCE.md, Answer, Several
+ * editions; D-7), each part `null` when the candidate has none. `cover` is
+ * its pre-save preview, `title` its own title for the cover placeholder.
+ */
+export type AnswerEdition = {
+  title: string
+  binding: string | null
+  year: number | null
+  publisher: string | null
+  pages: number | null
+  cover: string | null
+}
+
+/**
  * The Book an Answer shows (EXPERIENCE.md, Answer). `source` is the source
  * id, `null` for a shared Book; `newAuthors` and `newSeries` are the rows a
  * save would create; `isbn13` is what Add to library and Add another copy
- * save. Nothing here comes from a user record.
+ * save, with `pick`, the source candidate shown when there are several
+ * (`undefined` for one candidate or a Book that exists). `editions` lists
+ * every candidate in order when there are two or more, else it is empty.
+ * Nothing here comes from a user record.
  */
 export type AnswerBook = {
   isbn13: string
@@ -20,6 +37,8 @@ export type AnswerBook = {
   source: string | null
   newAuthors: string[]
   newSeries: string | null
+  pick: number | undefined
+  editions: AnswerEdition[]
 }
 
 /** One of the viewer's copies on the In library Answer: its location's name, if any, and status. */
@@ -42,6 +61,8 @@ const existingBook = (book: ExistingResult['book'], isbn13: string): AnswerBook 
   source: null,
   newAuthors: [],
   newSeries: null,
+  pick: undefined,
+  editions: [],
 })
 
 /**
@@ -58,20 +79,36 @@ export function notInLibrary(result: LookupResult): AnswerBook | null {
       return existingBook(book, book.isbn13)
     }
     case 'source': {
-      const draft = result.candidates[result.pick]
+      const { candidates, pick } = result
+      const draft = candidates[pick]
       if (!draft) return null
       const { series } = result.matches
+      // Every candidate carries the ISBN asked for (the `Source` contract).
+      const { isbn13 } = draft
+      // With one candidate there is nothing to pick: the save sends none.
+      const several = candidates.length > 1
       return {
-        isbn13: draft.isbn13,
+        isbn13,
         title: draft.title,
         authors: draft.authors.map(({ name }) => name),
         publisher: draft.publisher ?? null,
         year: draft.year ?? null,
         pages: draft.pages ?? null,
-        cover: draft.hasCover ? coverUrl({ isbn13: draft.isbn13 }) : null,
+        cover: draft.hasCover ? coverUrl(several ? { isbn13, pick } : { isbn13 }) : null,
         source: draft.source,
         newAuthors: result.matches.authors.filter(({ id }) => id === null).map(({ name }) => name),
         newSeries: series !== null && series.id === null ? series.name : null,
+        pick: several ? pick : undefined,
+        editions: !several
+          ? []
+          : candidates.map((candidate, i) => ({
+              title: candidate.title,
+              binding: candidate.binding ?? null,
+              year: candidate.year ?? null,
+              publisher: candidate.publisher ?? null,
+              pages: candidate.pages ?? null,
+              cover: candidate.hasCover ? coverUrl({ isbn13, pick: i }) : null,
+            })),
       }
     }
     default:
@@ -135,6 +172,40 @@ export function answerLines(
   return { authors: answer.authors.join(', '), edition, notes }
 }
 
+/** The catalogue strings an edition's line is built from. */
+export type EditionText = {
+  pages: (pages: number) => string
+  unnamed: (n: number) => string
+}
+
+/**
+ * The edition picker's row for candidate `index`: the parts that exist
+ * (binding, year, publisher, pages) joined " · ", or its number from 1 when
+ * it has none, so every row can still be told apart.
+ */
+export function editionLine(edition: AnswerEdition, index: number, text: EditionText): string {
+  const line = [
+    edition.binding,
+    edition.year === null ? null : String(edition.year),
+    edition.publisher,
+    edition.pages === null ? null : text.pages(edition.pages),
+  ]
+    .filter((part) => part)
+    .join(' · ')
+  return line || text.unnamed(index + 1)
+}
+
+/**
+ * The edition picker's rows in order: each `editionLine()`, and a line that
+ * another row also has gets its number appended, so no two rows read the same.
+ */
+export function editionLines(editions: AnswerEdition[], text: EditionText): string[] {
+  const lines = editions.map((edition, index) => editionLine(edition, index, text))
+  return lines.map((line, index) =>
+    lines.indexOf(line) === lines.lastIndexOf(line) ? line : `${line} · ${text.unnamed(index + 1)}`,
+  )
+}
+
 /** The catalogue strings the In library Answer's copy lines are built from. */
 export type CopyText = {
   copy: (status: AnswerCopy['status']) => string
@@ -152,14 +223,19 @@ export function copyLines(copies: AnswerCopy[], text: CopyText): string[] {
  * What `/scan` was asked for: `isbn`, the text as typed when it is not blank
  * (Go on an empty field is no submission), else `title` when the key is
  * present, even empty (Add without ISBN opens `?title=`). With an `isbn`,
- * `title` is ignored. A repeated key counts by its first value.
+ * `title` is ignored. With an `isbn`, `pick` is the edition picked (D-7)
+ * when it is digits, else left out. A repeated key counts by its first value.
  */
 export function scanParams(params: Record<string, string | string[] | undefined>): {
   isbn?: string
   title?: string
+  pick?: number
 } {
   const isbn = first(params.isbn)
-  if (isbn?.trim()) return { isbn }
+  if (isbn?.trim()) {
+    const pick = first(params.pick)
+    return pick !== undefined && /^\d+$/.test(pick) ? { isbn, pick: Number(pick) } : { isbn }
+  }
   const title = first(params.title)
   return title === undefined ? {} : { title }
 }

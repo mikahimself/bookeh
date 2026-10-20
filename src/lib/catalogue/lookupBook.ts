@@ -9,6 +9,7 @@ import { recordCoverPreview } from './coverPreview'
 import { findBookByIsbn } from './findBookByIsbn'
 import { findByName, type NamedCollection } from './findOrCreateByName'
 import { limitLookups } from './lookupLimit'
+import { pickIndex } from './pick'
 
 // Spine, Structural Seed (Shared shapes, `src/lib/catalogue`) and AD-9.
 
@@ -54,10 +55,6 @@ const toDraft = ({ raw: _raw, coverUrl, ...rest }: SourceResult): Draft => ({
   ...rest,
   hasCover: coverUrl !== undefined,
 })
-
-/** `pick` when it indexes a candidate; otherwise the best one (AD-9). */
-const pickIndex = (pick: number | undefined, length: number): number =>
-  pick !== undefined && Number.isInteger(pick) && pick >= 0 && pick < length ? pick : 0
 
 /**
  * AD-5, AD-9 and FR-13: the shared row a save of `name` would link to. A
@@ -110,14 +107,18 @@ export async function lookupBook(ctx: Context, target: LookupTarget): Promise<Lo
     case 'found': {
       const pick = pickIndex(target.pick, outcome.candidates.length)
       // `found` always carries a candidate, and `pickIndex` stays in range.
-      const best = outcome.candidates[pick]!
-      // The preview shows the picked edition's cover (AD-10), or none.
-      recordCoverPreview(ctx, isbn13, best.coverUrl)
+      const picked = outcome.candidates[pick]!
+      // Every candidate's cover, so the edition picker shows them all (AD-10).
+      recordCoverPreview(
+        ctx,
+        isbn13,
+        outcome.candidates.map(({ coverUrl }) => coverUrl),
+      )
       // One after the other: calls on one context never run concurrently (AD-16).
       const authors: Match[] = []
-      for (const { name } of best.authors) authors.push(await sharedMatch(ctx, 'authors', name))
+      for (const { name } of picked.authors) authors.push(await sharedMatch(ctx, 'authors', name))
       const series =
-        best.series === undefined ? null : await sharedMatch(ctx, 'series', best.series)
+        picked.series === undefined ? null : await sharedMatch(ctx, 'series', picked.series)
       return {
         kind: 'source',
         candidates: outcome.candidates.map(toDraft),

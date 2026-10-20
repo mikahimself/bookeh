@@ -1,4 +1,5 @@
 import { randomUUID } from 'node:crypto'
+import { readFileSync } from 'node:fs'
 
 import { cookies, headers } from 'next/headers'
 import { getPayload, type Payload } from 'payload'
@@ -126,6 +127,56 @@ describe('saveCopyAction', () => {
   ])('answers SAVE_FAILED for %s and writes nothing', async (_, input) => {
     expect(await saveCopyAction(input)).toEqual({ ok: false, code: 'SAVE_FAILED' })
     expect(await copies()).toEqual([])
+  })
+
+  it('ignores pick once a shared Book holds the ISBN', async () => {
+    expect(await saveCopyAction({ requestId: randomUUID(), isbn13, pick: 1 })).toMatchObject({
+      ok: true,
+    })
+    expect(await copies()).toMatchObject([{ status: 'owned', location: location.id }])
+  })
+
+  it.each(['1', -1, 1.5])('answers SAVE_FAILED for pick %s and writes nothing', async (pick) => {
+    expect(await saveCopyAction({ requestId: randomUUID(), isbn13, pick })).toEqual({
+      ok: false,
+      code: 'SAVE_FAILED',
+    })
+    expect(await copies()).toEqual([])
+  })
+
+  it("creates the Book from the picked edition's values", async () => {
+    // Finna's two records for a fresh ISBN; the second has no cover.
+    const fresh = randomIsbn()
+    const body = readFileSync(
+      new URL('../fixtures/finna/9780007466061.json', import.meta.url),
+      'utf8',
+    )
+      .replaceAll('9780007466061', fresh)
+      .replaceAll('978-0-00-746606-1', fresh)
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (input: string | URL) => {
+        const url = new URL(String(input))
+        if (url.hostname === 'api.finna.fi' && url.pathname.endsWith('/v1/search')) {
+          return new Response(body, { headers: { 'Content-Type': 'application/json' } })
+        }
+        if (url.hostname === 'www.googleapis.com') return Response.json({ totalItems: 0 })
+        return new Response(null, { status: 404 })
+      }),
+    )
+    try {
+      const result = await saveCopyAction({ requestId: randomUUID(), isbn13: fresh, pick: 1 })
+      if (!result.ok) throw new Error(`save failed: ${result.code}`)
+      const book = await payload.findByID({
+        collection: 'books',
+        id: result.data.bookId,
+        overrideAccess: true,
+        depth: 0,
+      })
+      expect(book).toMatchObject({ isbn13: fresh, rawMetadata: { coverUrl: null } })
+    } finally {
+      vi.unstubAllGlobals()
+    }
   })
 
   it('answers UNAUTHENTICATED without a session', async () => {

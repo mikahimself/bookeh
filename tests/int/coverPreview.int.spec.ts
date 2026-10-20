@@ -23,9 +23,9 @@ import config from '@/payload.config'
 import { contextFor, createUser } from '../helpers/harness'
 import { randomIsbn } from '../helpers/isbn'
 
-// The pre-save cover preview, AD-10/AD-14: `lookupBook` records the picked
-// candidate's cover URL per user; `/data/cover/[isbn13]` fetches it with the
-// cover download's checks. The source is a local fixture server, which the
+// The pre-save cover preview, AD-10/AD-14: `lookupBook` records every
+// candidate's cover URL per user; `/data/cover/[isbn13]?pick=` fetches one
+// with the cover download's checks. The source is a local fixture server, which the
 // mocked `coverPolicy` allows; `lookupSources` is faked.
 
 const fixture = vi.hoisted(() => ({ origin: '' }))
@@ -74,6 +74,7 @@ describe('cover preview', () => {
   let cookieA: string
   let server: Server
   let jpeg: Buffer
+  let png: Buffer
   const hits = new Map<string, number>()
 
   const totalHits = () => [...hits.values()].reduce((a, b) => a + b, 0)
@@ -89,9 +90,9 @@ describe('cover preview', () => {
     return isbn
   }
 
-  const get = (isbn13: string, cookie?: string) => {
+  const get = (isbn13: string, cookie?: string, query = '') => {
     requestHeaders = new Headers(cookie ? { cookie } : {})
-    return GET(new Request(`http://localhost/data/cover/${isbn13}`), {
+    return GET(new Request(`http://localhost/data/cover/${isbn13}${query}`), {
       params: Promise.resolve({ isbn13 }),
     })
   }
@@ -112,6 +113,11 @@ describe('cover preview', () => {
     })
       .jpeg()
       .toBuffer()
+    png = await sharp({
+      create: { width: 4, height: 6, channels: 3, background: { r: 160, g: 90, b: 20 } },
+    })
+      .png()
+      .toBuffer()
 
     server = createServer((req, res) => {
       const route = req.url ?? ''
@@ -119,6 +125,9 @@ describe('cover preview', () => {
       switch (route) {
         case '/cover.jpg':
           res.writeHead(200, { 'Content-Type': 'image/jpeg' }).end(jpeg)
+          return
+        case '/other.png':
+          res.writeHead(200, { 'Content-Type': 'image/png' }).end(png)
           return
         case '/page.html':
           res.writeHead(200, { 'Content-Type': 'text/html' }).end('<html><body>Hi</body></html>')
@@ -187,12 +196,21 @@ describe('cover preview', () => {
     expect(totalHits()).toBe(before)
   })
 
-  it('follows the picked candidate, which may have no cover', async () => {
-    const isbn = await lookUp(asA, [at('/cover.jpg'), undefined], 0)
-    expect(await fetchCoverPreview(asA, isbn)).toMatchObject({ mimeType: 'image/jpeg' })
-    await lookupBook(asA, { isbn, pick: 1 })
+  it("serves each candidate's cover by its index, whichever was picked", async () => {
+    const isbn = await lookUp(asA, [at('/cover.jpg'), at('/other.png'), undefined], 2)
+
+    const second = await get(isbn, cookieA, '?pick=1')
+    expect(second.status).toBe(200)
+    expect(Buffer.from(await second.arrayBuffer()).equals(png)).toBe(true)
+    // No `pick`, or one out of range, is the best candidate's.
+    expect((await get(isbn, cookieA)).headers.get('content-type')).toBe('image/jpeg')
+    expect((await get(isbn, cookieA, '?pick=7')).headers.get('content-type')).toBe('image/jpeg')
+
     const before = totalHits()
-    expect(await fetchCoverPreview(asA, isbn)).toBeUndefined()
+    expect(await fetchCoverPreview(asA, isbn, coverPolicy, 2)).toBeUndefined()
+    for (const query of ['?pick=abc', '?pick=-1', '?pick=1.5']) {
+      expect((await get(isbn, cookieA, query)).status).toBe(404)
+    }
     expect(totalHits()).toBe(before)
   })
 
@@ -210,7 +228,7 @@ describe('cover preview', () => {
 
   it('drops the oldest record past PREVIEW_SIZE', async () => {
     const isbns = Array.from({ length: PREVIEW_SIZE + 1 }, () => randomIsbn())
-    for (const isbn of isbns) recordCoverPreview(asA, isbn, at('/cover.jpg'))
+    for (const isbn of isbns) recordCoverPreview(asA, isbn, [at('/cover.jpg')])
     const before = totalHits()
     expect(await fetchCoverPreview(asA, isbns[0]!)).toBeUndefined()
     expect(totalHits()).toBe(before)

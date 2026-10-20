@@ -79,7 +79,10 @@
     "title": "Title",
     "author": "Author",
     "titleRequired": "Enter the title.",
-    "authorRequired": "Enter the author."
+    "authorRequired": "Enter the author.",
+    "editionsFound": "{n} editions found",
+    "editions": "Editions",
+    "unnamedEdition": "Edition {n}"
   },
   "sources": {
     "finna": "Finna",

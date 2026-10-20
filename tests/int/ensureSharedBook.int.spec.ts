@@ -146,7 +146,11 @@ describe('ensureSharedBook', () => {
       source: 'finna',
       visibility: 'shared',
     })
-    expect(book.rawMetadata).toEqual(outcome.raw)
+    // The record names the cover of the candidate the Book was made from.
+    expect(book.rawMetadata).toEqual({
+      ...outcome.raw,
+      coverUrl: 'https://covers.example/muumi.jpg',
+    })
     expect(book.createdBy ?? null).toBeNull()
     expect(book.genres ?? []).toEqual([])
 

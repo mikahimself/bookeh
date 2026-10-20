@@ -11,6 +11,8 @@ import { lookupSources } from '@/lib/metadata/lookup'
 import type { Context } from '@/lib/payload/context'
 import { assertLive } from '@/lib/payload/transaction'
 
+import { pickIndex } from './pick'
+
 /** Spine, AD-14: the hosts a cover is downloaded from. */
 export const COVER_HOSTS: readonly string[] = ['api.finna.fi', 'books.google.com']
 
@@ -152,14 +154,15 @@ export async function fetchCover(coverUrl: string, policy: CoverPolicy): Promise
 }
 
 /**
- * Spine, AD-14: the best candidate's cover for a new shared Book, stored in
- * the media directory before the save's transaction opens. `undefined` with
- * no request when a shared Book with the ISBN exists, no source knows the
- * ISBN or the candidate has no cover. The URL comes only from the server-held
- * source outcome and is fetched only when `policy` allows it: no redirects,
- * a 2xx answer within the time and size limits, a JPEG, PNG or WebP image.
- * The file is written under a temporary name and renamed into place, so a
- * partial file never carries a final name.
+ * Spine, AD-14: candidate `pick`'s cover for a new shared Book
+ * (`pickIndex()`: none or out of range is the best), stored in the media
+ * directory before the save's transaction opens. `undefined` with no request
+ * when a shared Book with the ISBN exists, no source knows the ISBN or the
+ * candidate has no cover. The URL comes only from the server-held source
+ * outcome and is fetched only when `policy` allows it: no redirects, a 2xx
+ * answer within the time and size limits, a JPEG, PNG or WebP image. The file
+ * is written under a temporary name and renamed into place, so a partial file
+ * never carries a final name.
  *
  * Every download or write failure is one logged warning and `undefined`: a
  * Book is saved without a cover rather than not at all. Throws a plain
@@ -169,6 +172,7 @@ export async function downloadCover(
   ctx: Context,
   isbn13: string,
   policy: CoverPolicy = coverPolicy,
+  pick?: number,
 ): Promise<DownloadedCover | undefined> {
   if (ctx.transactionID !== undefined) {
     throw new Error('downloadCover runs before the transaction opens (AD-14)')
@@ -192,7 +196,8 @@ export async function downloadCover(
 
   const outcome = await lookupSources(isbn)
   if (outcome.kind !== 'found') return undefined
-  const coverUrl = outcome.candidates[0]?.coverUrl
+  const { candidates } = outcome
+  const coverUrl = candidates[pickIndex(pick, candidates.length)]?.coverUrl
   if (!coverUrl) return undefined
 
   return storeCover(ctx, isbn, coverUrl, policy)

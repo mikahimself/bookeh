@@ -69,6 +69,7 @@ describe('covers', () => {
   let origin: string
   let policy: CoverPolicy
   let jpeg: Buffer
+  let png: Buffer
   const hits = new Map<string, number>()
   const mediaIds: number[] = []
   const filenames: string[] = []
@@ -114,6 +115,11 @@ describe('covers', () => {
     })
       .jpeg()
       .toBuffer()
+    png = await sharp({
+      create: { width: WIDTH, height: HEIGHT, channels: 3, background: { r: 160, g: 90, b: 20 } },
+    })
+      .png()
+      .toBuffer()
 
     server = createServer((req, res) => {
       const route = req.url ?? ''
@@ -121,6 +127,9 @@ describe('covers', () => {
       switch (route) {
         case '/cover.jpg':
           res.writeHead(200, { 'Content-Type': 'image/jpeg' }).end(jpeg)
+          return
+        case '/other.png':
+          res.writeHead(200, { 'Content-Type': 'image/png' }).end(png)
           return
         case '/missing.jpg':
           res.writeHead(404).end('Not found')
@@ -206,6 +215,16 @@ describe('covers', () => {
       height: HEIGHT,
     })
     expect(await filesInMedia()).toContain(cover!.filename)
+  })
+
+  it("downloads the picked candidate's cover", async () => {
+    const isbn = randomIsbn()
+    const outcome = found(isbn, at('/cover.jpg'))
+    outcome.candidates.push({ ...outcome.candidates[0]!, coverUrl: at('/other.png') })
+    vi.mocked(lookupSources).mockResolvedValue(outcome)
+    const cover = await downloadCover(asA, isbn, policy, 1)
+    if (cover) filenames.push(cover.filename)
+    expect(cover).toMatchObject({ mimeType: 'image/png', filesize: png.length })
   })
 
   it('requests nothing without a cover URL, for another outcome or a known Book', async () => {

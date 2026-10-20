@@ -14,11 +14,11 @@ import { prepareShare, settleHeldBook } from './sharePrivateBook'
 
 // Spine, Structural Seed (Shared shapes, `src/lib/catalogue`), narrowed to
 // what exists now: the `{ bookId }` target arrives with `requireOwnBook()`
-// (Story 4.1), `pick` with 3.53, and wishlist entries with Epic 7.
+// (Story 4.1), and wishlist entries with Epic 7.
 
 export type SaveInput = {
   requestId: string
-  target: { isbn13: string } | { manual: ManualEntry }
+  target: { isbn13: string; pick?: number } | { manual: ManualEntry }
   save: { kind: 'copy' }
 }
 
@@ -34,6 +34,10 @@ export type SaveResult = { bookId: number; copyId: number; savedTo: Named | null
  * private Book with it, else a shared Book `ensureSharedBook()` creates from
  * the server-held source outcome, its cover downloaded before the
  * transaction opens (AD-14). Another user's private Book is never used.
+ * `pick` is the index of the source candidate that Book is made from (D-7):
+ * `downloadCover()` and `ensureSharedBook()` apply `pickIndex()`, so none or
+ * one out of range is the best, and the Book keeps the ISBN asked for. Only
+ * that creation reads it: a Book found, held, shared or merged ignores it.
  *
  * A held Book goes through `settleHeldBook()` in the save's transaction
  * (FR-12, AD-4, AD-5, D-8). The user's private Book is shared in place when
@@ -103,11 +107,11 @@ async function save(ctx: Context, input: SaveInput): Promise<Undoable<SaveResult
 
   const held = await findBookByIsbn(ctx, isbn13)
   if (!held) {
-    const cover = await downloadCover(ctx, isbn13)
+    const cover = await downloadCover(ctx, isbn13, undefined, target.pick)
     return withUndo(ctx, async (tx) => {
       // A shared Book created between the read and here is found again by
-      // `ensureSharedBook()`, which then discards the cover.
-      const book = await ensureSharedBook(tx, isbn13, cover)
+      // `ensureSharedBook()`, which then discards the cover and ignores `pick`.
+      const book = await ensureSharedBook(tx, isbn13, cover, target.pick)
       return saveOwnedCopy(tx, book.data.id, book)
     })
   }

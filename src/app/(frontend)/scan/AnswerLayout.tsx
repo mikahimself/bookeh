@@ -9,16 +9,19 @@ import { answerLines, type AnswerBook } from './answer'
  * An Answer's body (EXPERIENCE.md, Answer; DESIGN.md, Detail panel
  * composition): the cover beside the title, the author and edition lines
  * under it, then `lines` (the viewer's copies), then where the record comes
- * from and what a save would create, and at the foot `children`, the
- * Answer's buttons. A line with nothing to show is left out.
+ * from and what a save would create, then `editions` (the edition picker's
+ * Link), and at the foot `children`, the Answer's buttons. A line with
+ * nothing to show is left out.
  */
 export async function AnswerLayout({
   book,
   lines = [],
+  editions,
   children,
 }: {
   book: AnswerBook
   lines?: string[]
+  editions?: ReactNode
   children: ReactNode
 }) {
   const t = await getTranslations()
@@ -64,6 +67,7 @@ export async function AnswerLayout({
           ))}
         </div>
       )}
+      {editions}
       <div className="flex flex-col gap-2">{children}</div>
     </div>
   )

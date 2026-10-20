@@ -28,6 +28,9 @@ import { ScanScreen } from './ScanScreen'
  *
  * `?title=` with no `isbn` (or a blank one) is the Not found Answer with no
  * ISBN and the text in its Title field (`scanParams()`).
+ *
+ * `&pick=` is the edition picked (D-7); `lookupBook` falls back to the best
+ * for one out of range.
  */
 export default async function ScanPage({
   searchParams,
@@ -36,10 +39,10 @@ export default async function ScanPage({
 }) {
   const ctx = await requireUser()
   const t = await getTranslations()
-  const { isbn: text, title } = scanParams(await searchParams)
+  const { isbn: text, title, pick } = scanParams(await searchParams)
   const outcome: ScanOutcome =
     text !== undefined
-      ? await answerFor(text, (isbn) => lookupBook(ctx, { isbn }))
+      ? await answerFor(text, (isbn) => lookupBook(ctx, { isbn, pick }))
       : title !== undefined
         ? { kind: 'notFound', isbn13: null, title }
         : { kind: 'scan' }

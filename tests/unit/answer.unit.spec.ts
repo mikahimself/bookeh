@@ -4,6 +4,9 @@ import {
   answerFor,
   answerLines,
   copyLines,
+  editionLine,
+  editionLines,
+  type AnswerEdition,
   inLibrary,
   notInLibrary,
   scanParams,
@@ -63,11 +66,11 @@ const copy = (over: Partial<CopyLine> = {}): CopyLine => ({
 const entry = { entryId: 1, wishlist: { id: 2, name: 'Toiveet' }, forPerson: null }
 
 describe('notInLibrary', () => {
-  it('shows the picked candidate, its preview cover and what a save would create', () => {
+  it('shows the picked candidate, its preview cover, what a save would create and the editions', () => {
     const result: LookupResult = {
       kind: 'source',
       candidates: [
-        draft({ title: 'Other edition' }),
+        draft({ title: 'Other edition', binding: 'nidottu', hasCover: false }),
         draft({ publisher: 'WSOY', year: 2014, pages: 480 }),
       ],
       pick: 1,
@@ -83,10 +86,29 @@ describe('notInLibrary', () => {
       publisher: 'WSOY',
       year: 2014,
       pages: 480,
-      cover: '/data/cover/9789510396358',
+      cover: '/data/cover/9789510396358?pick=1',
       source: 'finna',
       newAuthors: ['Väinö Linna'],
       newSeries: null,
+      pick: 1,
+      editions: [
+        {
+          title: 'Other edition',
+          binding: 'nidottu',
+          year: null,
+          publisher: null,
+          pages: null,
+          cover: null,
+        },
+        {
+          title: 'Tuntematon sotilas',
+          binding: null,
+          year: 2014,
+          publisher: 'WSOY',
+          pages: 480,
+          cover: '/data/cover/9789510396358?pick=1',
+        },
+      ],
     })
   })
 
@@ -105,6 +127,9 @@ describe('notInLibrary', () => {
       source: 'fixture',
       newAuthors: [],
       newSeries: 'Uusi',
+      // One candidate: nothing about editions, and no pick to send.
+      pick: undefined,
+      editions: [],
     })
   })
 
@@ -126,6 +151,8 @@ describe('notInLibrary', () => {
       source: null,
       newAuthors: [],
       newSeries: null,
+      pick: undefined,
+      editions: [],
     })
   })
 
@@ -163,6 +190,8 @@ describe('inLibrary', () => {
       source: null,
       newAuthors: [],
       newSeries: null,
+      pick: undefined,
+      editions: [],
       copies: [
         { location: 'Tampere', status: 'owned' },
         { location: null, status: 'owned' },
@@ -231,6 +260,8 @@ describe('answerLines', () => {
     source: 'finna',
     newAuthors: ['Kristiina Kivivuori'],
     newSeries: 'Muumit',
+    pick: 0,
+    editions: [],
     ...over,
   })
 
@@ -279,8 +310,55 @@ describe('scanParams', () => {
     ['a blank ISBN', { isbn: '' }, {}],
     ['nothing', {}, {}],
     ['repeated keys', { title: ['a', 'b'] }, { title: 'a' }],
+    ['an ISBN with a pick', { isbn: ISBN, pick: '1' }, { isbn: ISBN, pick: 1 }],
+    ['a pick that is not digits', { isbn: ISBN, pick: '-1' }, { isbn: ISBN }],
+    ['a pick without an ISBN', { title: 'x', pick: '1' }, { title: 'x' }],
   ])('reads %s', (_, params, expected) => {
     expect(scanParams(params)).toEqual(expected)
+  })
+})
+
+describe('editionLine', () => {
+  const text = {
+    pages: (pages: number) => `${pages} pages`,
+    unnamed: (n: number) => `Edition ${n}`,
+  }
+  const edition = (over: Partial<AnswerEdition>): AnswerEdition => ({
+    title: 'A Game of Thrones',
+    binding: null,
+    year: null,
+    publisher: null,
+    pages: null,
+    cover: null,
+    ...over,
+  })
+
+  it('joins the parts that exist, binding first', () => {
+    expect(
+      editionLine(
+        edition({ binding: 'nidottu', year: 2012, publisher: 'Otava', pages: 690 }),
+        0,
+        text,
+      ),
+    ).toBe('nidottu · 2012 · Otava · 690 pages')
+    expect(editionLine(edition({ year: 2012, pages: 690 }), 0, text)).toBe('2012 · 690 pages')
+  })
+
+  it('names an edition with no parts by its number', () => {
+    expect(editionLine(edition({ cover: '/c' }), 1, text)).toBe('Edition 2')
+  })
+
+  it('numbers the rows whose lines would read the same', () => {
+    expect(
+      editionLines(
+        [
+          edition({ year: 2012, pages: 690 }),
+          edition({ binding: 'nidottu', year: 2012 }),
+          edition({ year: 2012, pages: 690 }),
+        ],
+        text,
+      ),
+    ).toEqual(['2012 · 690 pages · Edition 1', 'nidottu · 2012', '2012 · 690 pages · Edition 3'])
   })
 })
 

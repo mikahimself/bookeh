@@ -9,12 +9,16 @@ import { attachCover, discardCover, type DownloadedCover } from './covers'
 import { findOrCreateByName, type FoundOrCreated } from './findOrCreateByName'
 import { isUnreferenced } from './isUnreferenced'
 import { mapSubjectsToGenres } from './mapSubjectsToGenres'
+import { pickIndex } from './pick'
 
 /**
  * Spine, AD-5 and FR-18: the shared Book for an ISBN, created from the
  * server-held source outcome when there is none. Values come only from
  * `lookupSources()` (the in-process cache, the sources again on a miss),
- * never from the client; the best candidate is always used. An existing
+ * never from the client, which sends at most the index `pick` of the
+ * candidate to use (`pickIndex()`: none or out of range is the best). The
+ * Book keeps the ISBN asked for, and its `rawMetadata` is the outcome's with
+ * the picked candidate's cover URL. An existing
  * shared Book is returned as it is: no source call, no write (re-fetch is
  * admin-only, FR-19). Authors and series are matched or created among shared
  * rows only, so a shared Book references shared records only (AD-4).
@@ -44,6 +48,7 @@ export async function ensureSharedBook(
   ctx: Context,
   isbn13: string,
   cover?: DownloadedCover,
+  pick?: number,
 ): Promise<Undone<FoundOrCreated>> {
   const isbn = normaliseIsbn(isbn13)
 
@@ -71,22 +76,22 @@ export async function ensureSharedBook(
     if (outcome.kind === 'unavailable') {
       throw new Error(`Sources unavailable: ${outcome.failed.join(', ')}`)
     }
-    // `found` always holds at least one candidate.
-    const best = outcome.candidates[0]!
+    // `found` always holds at least one candidate, and `pickIndex` stays in range.
+    const picked = outcome.candidates[pickIndex(pick, outcome.candidates.length)]!
 
     // One after the other: calls on one context never run concurrently (AD-16).
     const authors: number[] = []
     const createdAuthors: number[] = []
-    for (const { name, sortName } of best.authors) {
+    for (const { name, sortName } of picked.authors) {
       const input = sortName === undefined ? { name } : { name, sortName }
       const { id, created } = await findOrCreateByName(tx, 'authors', 'shared', input)
       if (!authors.includes(id)) authors.push(id)
       if (created) createdAuthors.push(id)
     }
     const matchedSeries =
-      best.series === undefined
+      picked.series === undefined
         ? undefined
-        : await findOrCreateByName(tx, 'series', 'shared', { name: best.series })
+        : await findOrCreateByName(tx, 'series', 'shared', { name: picked.series })
     const series = matchedSeries?.id
     const createdSeries = matchedSeries?.created ? matchedSeries.id : undefined
     const genres = await mapSubjectsToGenres(tx, outcome.raw)
@@ -97,21 +102,22 @@ export async function ensureSharedBook(
       collection: 'books',
       data: {
         isbn13: isbn,
-        title: best.title,
-        ...(best.subtitle !== undefined && { subtitle: best.subtitle }),
+        title: picked.title,
+        ...(picked.subtitle !== undefined && { subtitle: picked.subtitle }),
         authors,
         ...(series !== undefined && { series }),
-        ...(best.seriesIndex !== undefined && { seriesIndex: best.seriesIndex }),
-        ...(best.publisher !== undefined && { publisher: best.publisher }),
-        ...(best.year !== undefined && { year: best.year }),
-        ...(best.language !== undefined && { language: best.language }),
-        ...(best.pages !== undefined && { pages: best.pages }),
-        ...(best.description !== undefined && { description: best.description }),
+        ...(picked.seriesIndex !== undefined && { seriesIndex: picked.seriesIndex }),
+        ...(picked.publisher !== undefined && { publisher: picked.publisher }),
+        ...(picked.year !== undefined && { year: picked.year }),
+        ...(picked.language !== undefined && { language: picked.language }),
+        ...(picked.pages !== undefined && { pages: picked.pages }),
+        ...(picked.description !== undefined && { description: picked.description }),
         ...(coverId !== undefined && { cover: coverId }),
-        themes: best.themes,
+        themes: picked.themes,
         genres,
-        source: best.source,
-        rawMetadata: outcome.raw,
+        source: picked.source,
+        // Only the cover differs per Finna candidate: the record names the one saved.
+        rawMetadata: { ...outcome.raw, coverUrl: picked.coverUrl ?? null },
         visibility: 'shared',
       },
       ...system,

@@ -66,6 +66,19 @@ describe('AddToLibrary', () => {
     expect(saveCopyAction).toHaveBeenCalledWith({ requestId: expect.any(String), isbn13: ISBN })
   })
 
+  it('sends the picked edition', async () => {
+    saveCopyAction.mockResolvedValue(saved(null))
+    render(createElement(AddToLibrary, { isbn13: ISBN, pick: 1 }))
+    fireEvent.click(button())
+
+    await waitFor(() => expect(back).toHaveBeenCalledTimes(1))
+    expect(saveCopyAction).toHaveBeenCalledWith({
+      requestId: expect.any(String),
+      isbn13: ISBN,
+      pick: 1,
+    })
+  })
+
   it('makes one call for a double tap', async () => {
     const call = deferred()
     saveCopyAction.mockReturnValue(call.promise)

@@ -14,10 +14,21 @@ import { useAddToLibrary } from './useAddToLibrary'
  * to Scan. A failure is reported and leaves the Answer as it was. The press
  * semantics (latch, `requestId`, unmount) are `useAddToLibrary()`'s.
  *
+ * `pick` is the source candidate shown, sent so the server builds the Book
+ * from it (D-7); left out for a Book that exists.
+ *
  * `another` makes it Add another copy on the In library Answer: the same
  * save, toast and return, as a secondary button.
  */
-export function AddToLibrary({ isbn13, another = false }: { isbn13: string; another?: boolean }) {
+export function AddToLibrary({
+  isbn13,
+  pick,
+  another = false,
+}: {
+  isbn13: string
+  pick?: number
+  another?: boolean
+}) {
   const t = useTranslations()
   const { pending, add } = useAddToLibrary()
 
@@ -26,7 +37,11 @@ export function AddToLibrary({ isbn13, another = false }: { isbn13: string; anot
       {pending && <ProgressLine label={t('progress.loading')} />}
       <Button
         variant={another ? 'secondary' : 'primary'}
-        onClick={() => add((requestId) => saveCopyAction({ requestId, isbn13 }))}
+        onClick={() =>
+          add((requestId) =>
+            saveCopyAction({ requestId, isbn13, ...(pick !== undefined && { pick }) }),
+          )
+        }
         disabled={pending}
       >
         {t(another ? 'answer.addAnotherCopy' : 'answer.addToLibrary')}
