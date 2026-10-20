@@ -92,19 +92,19 @@ describe('createCopy', () => {
   })
 
   it('creates an owned copy for the context user', async () => {
-    const id = await createCopy(asA, { bookId: shared.id, status: 'owned' })
+    const { data: id } = await createCopy(asA, { bookId: shared.id, status: 'owned' })
     expectCopy(await systemRead(id), a, shared, 'owned')
   })
 
   it('creates an ordered copy', async () => {
-    const id = await createCopy(asA, { bookId: shared.id, status: 'ordered' })
+    const { data: id } = await createCopy(asA, { bookId: shared.id, status: 'ordered' })
     expectCopy(await systemRead(id), a, shared, 'ordered')
   })
 
   it("adds a second copy of the user's own private Book", async () => {
     const book = await bookFor(a, 'private')
-    const first = await createCopy(asA, { bookId: book.id, status: 'owned' })
-    const second = await createCopy(asA, { bookId: book.id, status: 'owned' })
+    const { data: first } = await createCopy(asA, { bookId: book.id, status: 'owned' })
+    const { data: second } = await createCopy(asA, { bookId: book.id, status: 'owned' })
     expect(second).not.toBe(first)
     expectCopy(await systemRead(first), a, book, 'owned')
     expectCopy(await systemRead(second), a, book, 'owned')
@@ -125,7 +125,7 @@ describe('createCopy', () => {
     let seen: number | undefined
     await expect(
       withTransaction(asA, (tx) =>
-        createCopy(tx, { bookId: shared.id, status: 'owned' }).then((id) => {
+        createCopy(tx, { bookId: shared.id, status: 'owned' }).then(({ data: id }) => {
           seen = id
           throw failure
         }),
@@ -137,38 +137,49 @@ describe('createCopy', () => {
 
   it("places an owned copy at the user's default location", async () => {
     const { ctx, location } = await userWithDefault()
-    const id = await createCopy(ctx, { bookId: shared.id, status: 'owned' })
+    const { data: id } = await createCopy(ctx, { bookId: shared.id, status: 'owned' })
     expect((await systemRead(id)).location).toBe(location.id)
   })
 
   it('leaves an owned copy without a location when the user has no default', async () => {
     const user = await createUser({ displayName: 'Create Copy No Default' })
-    const id = await createCopy(await contextFor(user), { bookId: shared.id, status: 'owned' })
+    const { data: id } = await createCopy(await contextFor(user), {
+      bookId: shared.id,
+      status: 'owned',
+    })
     expectCopy(await systemRead(id), user, shared, 'owned')
   })
 
   it('places no location on `location: null` despite a default', async () => {
     const { ctx, user } = await userWithDefault()
-    const id = await createCopy(ctx, { bookId: shared.id, status: 'owned', location: null })
+    const { data: id } = await createCopy(ctx, {
+      bookId: shared.id,
+      status: 'owned',
+      location: null,
+    })
     expectCopy(await systemRead(id), user, shared, 'owned')
   })
 
   it('places no location on an ordered copy despite a default', async () => {
     const { ctx, user } = await userWithDefault()
-    const id = await createCopy(ctx, { bookId: shared.id, status: 'ordered' })
+    const { data: id } = await createCopy(ctx, { bookId: shared.id, status: 'ordered' })
     expectCopy(await systemRead(id), user, shared, 'ordered')
   })
 
   it('places an owned copy at a location given by id over the default', async () => {
     const { ctx, user } = await userWithDefault()
     const second = await locationFor(user, 'Mökki')
-    const id = await createCopy(ctx, { bookId: shared.id, status: 'owned', location: second.id })
+    const { data: id } = await createCopy(ctx, {
+      bookId: shared.id,
+      status: 'owned',
+      location: second.id,
+    })
     expect((await systemRead(id)).location).toBe(second.id)
   })
 
   it('creates a named location inline and places the copy there', async () => {
     const user = await createUser({ displayName: 'Create Copy Inline' })
-    const id = await createCopy(await contextFor(user), {
+    const { data: id } = await createCopy(await contextFor(user), {
       bookId: shared.id,
       status: 'owned',
       location: { create: '  Mökki ' },
@@ -186,7 +197,7 @@ describe('createCopy', () => {
   it('matches an existing location by name, case-insensitively', async () => {
     const user = await createUser({ displayName: 'Create Copy Match' })
     const existing = await locationFor(user, 'Mökki')
-    const id = await createCopy(await contextFor(user), {
+    const { data: id } = await createCopy(await contextFor(user), {
       bookId: shared.id,
       status: 'owned',
       location: { create: 'MÖKKI' },

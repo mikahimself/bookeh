@@ -188,7 +188,7 @@ describe('covers', () => {
     expect(files).toContain(cover!.filename)
     expect(files.filter((name) => name.endsWith('.tmp'))).toEqual([])
 
-    const result = await ensureSharedBook(asA, isbn, cover)
+    const { data: result } = await ensureSharedBook(asA, isbn, cover)
     expect(result.created).toBe(true)
     const book = await payload.findByID({
       collection: 'books',
@@ -318,7 +318,10 @@ describe('covers', () => {
       depth: 0,
     })
 
-    expect(await ensureSharedBook(asA, isbn, cover)).toEqual({ id: existing.id, created: false })
+    expect((await ensureSharedBook(asA, isbn, cover)).data).toEqual({
+      id: existing.id,
+      created: false,
+    })
     expect(await filesInMedia()).not.toContain(cover!.filename)
     expect(await mediaNamed(cover!.filename)).toBe(0)
     const [book] = await booksWithIsbn(isbn)

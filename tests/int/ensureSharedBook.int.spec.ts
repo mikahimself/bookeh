@@ -122,7 +122,7 @@ describe('ensureSharedBook', () => {
     const outcome = found(best, candidate(isbn, 'Second', { source: 'google' }))
     vi.mocked(lookupSources).mockResolvedValue(outcome)
 
-    const result = await ensureSharedBook(asA, isbn)
+    const { data: result } = await ensureSharedBook(asA, isbn)
     expect(result.created).toBe(true)
     expect(lookupSources).toHaveBeenCalledWith(isbn)
 
@@ -184,7 +184,10 @@ describe('ensureSharedBook', () => {
       depth: 0,
     })
     const hyphenated = `${isbn.slice(0, 3)}-${isbn.slice(3, 5)}-${isbn.slice(5, 9)}-${isbn.slice(9, 12)}-${isbn.slice(12)}`
-    expect(await ensureSharedBook(asA, hyphenated)).toEqual({ id: existing.id, created: false })
+    expect((await ensureSharedBook(asA, hyphenated)).data).toEqual({
+      id: existing.id,
+      created: false,
+    })
     expect(lookupSources).not.toHaveBeenCalled()
     expect((await booksWithIsbn(isbn)).totalDocs).toBe(1)
   })
@@ -200,7 +203,7 @@ describe('ensureSharedBook', () => {
     })
     vi.mocked(lookupSources).mockResolvedValue(found(candidate(isbn, 'Lähteen kirja')))
 
-    const result = await ensureSharedBook(asA, isbn)
+    const { data: result } = await ensureSharedBook(asA, isbn)
     expect(result.created).toBe(true)
     expect(result.id).not.toBe(privateBook.id)
     const book = await payload.findByID({
@@ -264,7 +267,7 @@ describe('ensureSharedBook', () => {
       ensureSharedBook(asB, isbn),
     ])
 
-    const fulfilled = settled.flatMap((r) => (r.status === 'fulfilled' ? [r.value] : []))
+    const fulfilled = settled.flatMap((r) => (r.status === 'fulfilled' ? [r.value.data] : []))
     expect(fulfilled.some((r) => r.created)).toBe(true)
     expect(new Set(fulfilled.map((r) => r.id)).size).toBe(1)
     for (const r of settled) {

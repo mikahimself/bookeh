@@ -3,7 +3,7 @@ import type { Named } from '@/lib/books/effectiveBook'
 import { createCopy } from '@/lib/copies/createCopy'
 import type { Context } from '@/lib/payload/context'
 import * as gateway from '@/lib/payload/gateway'
-import { withTransaction } from '@/lib/payload/transaction'
+import { type Undoable, withUndo } from '@/lib/undo/undo'
 
 import { downloadCover } from './covers'
 import { ensureSharedBook } from './ensureSharedBook'
@@ -46,34 +46,57 @@ export type SaveResult = { bookId: number; copyId: number; savedTo: Named | null
  * plain `Error` when the sources are unavailable, `createCopy()`'s
  * `ValidationError`); a rollback removes every row written and the
  * downloaded cover file.
+ *
+ * Undo (AD-11, AD-20): the transaction is `withUndo()`'s, so the result
+ * carries an `undoToken` and the whole seconds left on it, and `undo()` with
+ * the token deletes the copy, then the rows `ensureSharedBook()` created that
+ * no row of any user references any more. A Book that existed before the
+ * save stays, even when nothing references it. A repeat of the `requestId`
+ * records no second receipt: it returns the first token with the seconds left
+ * now. An Undo keeps the `requestId` remembered, so a retry within the window
+ * returns the undone result and saves nothing.
  */
-export function saveCopy(ctx: Context, input: SaveInput): Promise<SaveResult> {
-  return oncePerRequest(ctx, input.requestId, () => save(ctx, input))
+export async function saveCopy(ctx: Context, input: SaveInput): Promise<Undoable<SaveResult>> {
+  const { result, storedAt } = await oncePerRequest(ctx, input.requestId, async () => {
+    const saved = await save(ctx, input)
+    return { result: saved, storedAt: Date.now() }
+  })
+  const elapsed = Math.floor((Date.now() - storedAt) / 1000)
+  return { ...result, undoSeconds: Math.max(0, result.undoSeconds - elapsed) }
 }
 
-async function save(ctx: Context, input: SaveInput): Promise<SaveResult> {
+async function save(ctx: Context, input: SaveInput): Promise<Undoable<SaveResult>> {
   const isbn13 = normaliseIsbn(input.target.isbn13)
 
   const held = await findBookByIsbn(ctx, isbn13)
   const cover = held ? undefined : await downloadCover(ctx, isbn13)
 
-  return withTransaction(ctx, async (tx) => {
+  return withUndo(ctx, async (tx) => {
     // A shared Book created between the read and here is found again by
     // `ensureSharedBook()`, which then discards the cover.
-    const bookId = held ? held.id : (await ensureSharedBook(tx, isbn13, cover)).id
-    const copyId = await createCopy(tx, { bookId, status: 'owned' })
-    const copy = await gateway.findByID(tx, {
+    const book = held ? undefined : await ensureSharedBook(tx, isbn13, cover)
+    const bookId = held ? held.id : book!.data.id
+    const copy = await createCopy(tx, { bookId, status: 'owned' })
+    const copyId = copy.data
+    const row = await gateway.findByID(tx, {
       collection: 'copies',
       id: copyId,
       depth: 1,
       select: { location: true },
       populate: { locations: { name: true } },
     })
-    const { location } = copy
+    const { location } = row
     const savedTo =
       typeof location === 'object' && location !== null
         ? { id: location.id, name: location.name }
         : null
-    return { bookId, copyId, savedTo }
+    return {
+      data: { bookId, copyId, savedTo },
+      // The copy first, so the Book it referenced can be found unreferenced.
+      restore: async (rtx) => {
+        await copy.restore(rtx)
+        await book?.restore(rtx)
+      },
+    }
   })
 }

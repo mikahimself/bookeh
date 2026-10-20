@@ -27,6 +27,7 @@ import {
 import { DomainError } from '@/lib/errors'
 import { lookupSources } from '@/lib/metadata/lookup'
 import type { SourcesOutcome } from '@/lib/metadata/source'
+import { undo } from '@/lib/undo/undo'
 import config from '@/payload.config'
 import type { Book, User, UserLocation } from '@/payload-types'
 
@@ -219,6 +220,8 @@ describe('saveCopy', () => {
       bookId: result.bookId,
       copyId: result.copyId,
       savedTo: { id: location.id, name: 'Kirjahylly' },
+      undoToken: expect.any(String),
+      undoSeconds: expect.any(Number),
     })
   })
 
@@ -495,6 +498,140 @@ describe('saveCopy', () => {
       expect(find).not.toHaveBeenCalled()
       expect(lookupSources).not.toHaveBeenCalled()
       expect(fetchSpy).not.toHaveBeenCalled()
+      expect(await copiesOf(user)).toEqual([])
+    })
+  })
+
+  // AD-11/AD-20: Undo deletes the copy and the rows the save created that
+  // nothing references any more. Rows are checked by ISBN, unique name and id,
+  // never by global counts: other files write in parallel.
+  describe('undo', () => {
+    const mediaCount = async (id: number) =>
+      (
+        await payload.count({
+          collection: 'media',
+          where: { id: { equals: id } },
+          overrideAccess: true,
+        })
+      ).totalDocs
+
+    /** The created Book's cover row, recorded for cleanup. */
+    const coverOf = async (bookId: number) => {
+      const book = await payload.findByID({
+        collection: 'books',
+        id: bookId,
+        overrideAccess: true,
+        depth: 1,
+      })
+      const media = book.cover
+      if (typeof media !== 'object' || media === null) throw new Error('Book has no cover row')
+      mediaIds.push(media.id)
+      filenames.push(media.filename!)
+      return media
+    }
+
+    it('deletes the copy and every row the save created', async () => {
+      const { user, ctx } = await freshUser()
+      const isbn = randomIsbn()
+      const names = { author: unique('Volter Kilpi'), series: unique('Alastalon salissa') }
+      vi.mocked(lookupSources).mockResolvedValue(found(isbn, names))
+
+      const result = await saveCopy(ctx, inputFor(isbn))
+      const media = await coverOf(result.bookId)
+      expect(result.undoSeconds).toBeGreaterThan(0)
+
+      await undo(ctx, result.undoToken)
+
+      expect(await copiesOf(user)).toEqual([])
+      expect(await booksWithIsbn(isbn)).toEqual([])
+      expect(await countByName('authors', names.author)).toBe(0)
+      expect(await countByName('series', names.series)).toBe(0)
+      expect(await mediaCount(media.id)).toBe(0)
+    })
+
+    it('keeps the author and series the save matched rather than created', async () => {
+      const { user, ctx } = await freshUser()
+      const isbn = randomIsbn()
+      const names = { author: unique('Juhani Aho'), series: unique('Lastuja') }
+      const system = { overrideAccess: true, depth: 0 } as const
+      await payload.create({
+        collection: 'authors',
+        data: { name: names.author, nameKey: '', visibility: 'shared' },
+        ...system,
+      })
+      await payload.create({
+        collection: 'series',
+        data: { name: names.series, nameKey: '', visibility: 'shared' },
+        ...system,
+      })
+      vi.mocked(lookupSources).mockResolvedValue(found(isbn, names))
+
+      const result = await saveCopy(ctx, inputFor(isbn))
+      await coverOf(result.bookId)
+      await undo(ctx, result.undoToken)
+
+      expect(await copiesOf(user)).toEqual([])
+      expect(await booksWithIsbn(isbn)).toEqual([])
+      expect(await countByName('authors', names.author)).toBe(1)
+      expect(await countByName('series', names.series)).toBe(1)
+    })
+
+    it('keeps a created Book and its rows that another user holds', async () => {
+      const a = await freshUser()
+      const b = await freshUser()
+      const isbn = randomIsbn()
+      const names = { author: unique('Joel Lehtonen'), series: unique('Putkinotko') }
+      vi.mocked(lookupSources).mockResolvedValue(found(isbn, names))
+
+      const ofA = await saveCopy(a.ctx, inputFor(isbn))
+      const media = await coverOf(ofA.bookId)
+      const ofB = await saveCopy(b.ctx, inputFor(isbn))
+      expect(ofB.bookId).toBe(ofA.bookId)
+
+      await undo(a.ctx, ofA.undoToken)
+
+      expect(await copiesOf(a.user)).toEqual([])
+      expect((await booksWithIsbn(isbn)).map((book) => book.id)).toEqual([ofA.bookId])
+      expect(await countByName('authors', names.author)).toBe(1)
+      expect(await countByName('series', names.series)).toBe(1)
+      expect(await mediaCount(media.id)).toBe(1)
+      expect((await copiesOf(b.user)).map((copy) => copy.id)).toEqual([ofB.copyId])
+    })
+
+    it('keeps a Book that existed before the save, even unreferenced', async () => {
+      const { user, ctx } = await freshUser()
+      const isbn = randomIsbn()
+      const shared = await bookFor(undefined, isbn, 'shared')
+
+      const result = await saveCopy(ctx, inputFor(isbn))
+      await undo(ctx, result.undoToken)
+
+      expect(await copiesOf(user)).toEqual([])
+      expect((await booksWithIsbn(isbn)).map((book) => book.id)).toEqual([shared.id])
+    })
+
+    it('returns the same token with fewer seconds on a repeat, and its Undo removes the copy', async () => {
+      const { user, ctx } = await freshUser()
+      const isbn = randomIsbn()
+      await bookFor(undefined, isbn, 'shared')
+      const input = inputFor(isbn)
+      let first: Awaited<ReturnType<typeof saveCopy>>
+      let again: Awaited<ReturnType<typeof saveCopy>>
+      vi.useFakeTimers({ toFake: ['Date'] })
+      try {
+        const t0 = Date.now()
+        first = await saveCopy(ctx, input)
+        vi.setSystemTime(t0 + 60_000)
+        again = await saveCopy(ctx, input)
+      } finally {
+        vi.useRealTimers()
+      }
+
+      expect(again.undoToken).toBe(first.undoToken)
+      expect(again.undoSeconds).toBe(first.undoSeconds - 60)
+      expect(again.copyId).toBe(first.copyId)
+
+      await undo(ctx, again.undoToken)
       expect(await copiesOf(user)).toEqual([])
     })
   })

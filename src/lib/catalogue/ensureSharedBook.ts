@@ -3,9 +3,11 @@ import { DomainError } from '@/lib/errors'
 import { lookupSources } from '@/lib/metadata/lookup'
 import type { Context } from '@/lib/payload/context'
 import { assertLive, onRollback, withTransaction } from '@/lib/payload/transaction'
+import type { Restore, Undone } from '@/lib/undo/undo'
 
 import { attachCover, discardCover, type DownloadedCover } from './covers'
 import { findOrCreateByName, type FoundOrCreated } from './findOrCreateByName'
+import { isUnreferenced } from './isUnreferenced'
 import { mapSubjectsToGenres } from './mapSubjectsToGenres'
 
 /**
@@ -27,12 +29,22 @@ import { mapSubjectsToGenres } from './mapSubjectsToGenres'
  * (AD-14): a created Book gets its `media` row in this transaction. The file
  * is removed when the transaction rolls back, and at once when a shared Book
  * already exists.
+ *
+ * Undo (AD-11, AD-20): the restore of a found Book does nothing. The restore
+ * of a created one deletes, in this order and each only when `isUnreferenced()`
+ * finds no row of any user referencing it, the Book, the authors and the
+ * series this call created, and the cover's `media` row; rows that were
+ * matched are never deleted. The `media` row goes through `payload.db`, which
+ * deletes the row and leaves the file: Payload unlinks an upload's file before
+ * its delete and outside the transaction, so a restore that rolls back would
+ * leave the row without its file. `sweepOrphanMedia()` removes the file on the
+ * next start.
  */
 export async function ensureSharedBook(
   ctx: Context,
   isbn13: string,
   cover?: DownloadedCover,
-): Promise<FoundOrCreated> {
+): Promise<Undone<FoundOrCreated>> {
   const isbn = normaliseIsbn(isbn13)
 
   return withTransaction(ctx, async (tx) => {
@@ -51,7 +63,7 @@ export async function ensureSharedBook(
     })
     if (docs[0]) {
       if (cover) await discardCover(payload, cover)
-      return { id: docs[0].id, created: false }
+      return { data: { id: docs[0].id, created: false }, restore: async () => {} }
     }
 
     const outcome = await lookupSources(isbn)
@@ -64,15 +76,19 @@ export async function ensureSharedBook(
 
     // One after the other: calls on one context never run concurrently (AD-16).
     const authors: number[] = []
+    const createdAuthors: number[] = []
     for (const { name, sortName } of best.authors) {
       const input = sortName === undefined ? { name } : { name, sortName }
-      const { id } = await findOrCreateByName(tx, 'authors', 'shared', input)
+      const { id, created } = await findOrCreateByName(tx, 'authors', 'shared', input)
       if (!authors.includes(id)) authors.push(id)
+      if (created) createdAuthors.push(id)
     }
-    const series =
+    const matchedSeries =
       best.series === undefined
         ? undefined
-        : (await findOrCreateByName(tx, 'series', 'shared', { name: best.series })).id
+        : await findOrCreateByName(tx, 'series', 'shared', { name: best.series })
+    const series = matchedSeries?.id
+    const createdSeries = matchedSeries?.created ? matchedSeries.id : undefined
     const genres = await mapSubjectsToGenres(tx, outcome.raw)
     const coverId = cover === undefined ? undefined : await attachCover(tx, cover)
 
@@ -100,6 +116,46 @@ export async function ensureSharedBook(
       },
       ...system,
     })
-    return { id: book.id, created: true }
+    const bookId = book.id
+    const restore: Restore = async (rtx) => {
+      if (await isUnreferenced(rtx, 'books', bookId)) await deleteRow(rtx, 'books', bookId)
+      for (const id of createdAuthors) {
+        if (await isUnreferenced(rtx, 'authors', id)) await deleteRow(rtx, 'authors', id)
+      }
+      if (createdSeries !== undefined && (await isUnreferenced(rtx, 'series', createdSeries))) {
+        await deleteRow(rtx, 'series', createdSeries)
+      }
+      if (coverId !== undefined && (await isUnreferenced(rtx, 'media', coverId))) {
+        assertLive(rtx)
+        await rtx.req.payload.db.deleteMany({
+          collection: 'media',
+          where: { id: { equals: coverId } },
+          req: rtx.req,
+        })
+      }
+    }
+    return { data: { id: bookId, created: true }, restore }
   })
+}
+
+// By `where`, not by id: a row already gone matches nothing, where a failed
+// `deleteByID` (`NotFound`) would end the transaction.
+async function deleteRow(
+  tx: Context,
+  collection: 'books' | 'authors' | 'series',
+  id: number,
+): Promise<void> {
+  assertLive(tx)
+  const { errors } = await tx.req.payload.delete({
+    collection,
+    where: { id: { equals: id } },
+    overrideAccess: true,
+    req: tx.req,
+    depth: 0,
+  })
+  if (errors.length > 0) {
+    throw new Error(
+      `Could not delete ${collection} ${id}: ${errors.map((e) => e.message).join('; ')}`,
+    )
+  }
 }
