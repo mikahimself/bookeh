@@ -4,10 +4,9 @@ import { useTranslations } from 'next-intl'
 import { useRouter } from 'next/navigation'
 import { useTransition } from 'react'
 
-import type { ActionResult } from '@/lib/errors'
-
 import { signOutAction } from '../actions/account'
 import { Button } from './Button'
+import { settleAction } from './request'
 import { useToast } from './toast/ToastProvider'
 
 /**
@@ -22,11 +21,7 @@ export function SignOutButton() {
 
   const signOut = () => {
     startTransition(async () => {
-      // A rejected call (the network dropped) is a failure, not an error boundary.
-      const result = await signOutAction().catch((): ActionResult<null> => ({
-        ok: false,
-        code: 'INTERNAL',
-      }))
+      const result = await settleAction(signOutAction())
       if (result.ok || result.code === 'UNAUTHENTICATED') {
         router.replace('/login')
         return

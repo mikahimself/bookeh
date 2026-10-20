@@ -156,6 +156,10 @@ jobs:
           push: false
           load: true
           tags: bookeh:smoke
+          # Per-build NEXT_DEPLOYMENT_ID (Dockerfile; bundled Next.js docs,
+          # deploymentId.md). The push build passes the same args, so it
+          # stays a cache hit.
+          build-args: DEPLOYMENT_ID=${{ github.sha }}
 
       # The image that builds but cannot serve must not ship: start it against
       # the EMPTY service Postgres — the container itself must apply the
@@ -177,6 +181,8 @@ jobs:
           done
           page="$(curl -fsS http://localhost:3000/login)" || { docker logs smoke; exit 1; }
           grep -qi bookeh <<<"$page"
+          grep -qF 'data-dpl-id="${{ github.sha }}"' <<<"$page" \
+            || { echo "page does not carry the deployment id"; docker logs smoke; exit 1; }
           asset="$(grep -o '/_next/static/[^"]*' <<<"$page" | head -1)"
           test -n "$asset"
           curl -fsS -o /dev/null "http://localhost:3000$asset"
@@ -201,6 +207,7 @@ jobs:
         with:
           context: .
           push: true
+          build-args: DEPLOYMENT_ID=${{ github.sha }}
           tags: |
             ghcr.io/mikahimself/bookeh:${{ github.sha }}
             ghcr.io/mikahimself/bookeh:latest

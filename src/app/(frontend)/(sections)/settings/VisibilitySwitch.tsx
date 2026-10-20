@@ -7,7 +7,7 @@ import type { User } from '@/payload-types'
 
 import { updateProfileAction } from '../../actions/account'
 import { TextSwitch } from '../../components/TextSwitch'
-import { settled, useReportFailure } from './report'
+import { settleAction, useReportFailure } from '../../components/request'
 
 type Visibility = User['profileVisibility'] | User['collectionVisibility']
 
@@ -39,7 +39,7 @@ export function VisibilitySwitch<F extends 'profileVisibility' | 'collectionVisi
     const previous = value
     setValue(next)
     startTransition(async () => {
-      const result = await settled(updateProfileAction({ [field]: next }))
+      const result = await settleAction(updateProfileAction({ [field]: next }))
       if (result.ok) return
       setValue(previous)
       report(result.code)

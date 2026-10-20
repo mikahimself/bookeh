@@ -23,6 +23,8 @@ const codes = Object.keys({
   INTERNAL: true,
   UNDO_FAILED: true,
   RATE_LIMITED: true,
+  NO_CONNECTION: true,
+  APP_UPDATED: true,
 } satisfies Record<ErrorCode, true>)
 
 const isErrorCode = (value: unknown): value is ErrorCode =>

@@ -5,7 +5,7 @@ import { useState, useTransition, type KeyboardEvent } from 'react'
 
 import { updateProfileAction } from '../../actions/account'
 import { TextField } from '../../components/TextField'
-import { settled, useReportFailure } from './report'
+import { settleAction, useReportFailure } from '../../components/request'
 
 /** The service's normalisation, repeated only to tell an unchanged name from a changed one. */
 const normalise = (value: string) => value.trim().normalize('NFC')
@@ -29,7 +29,7 @@ export function DisplayNameField({ initial }: { initial: string }) {
     if (normalise(value) === saved) return
     const sent = value
     startTransition(async () => {
-      const result = await settled(updateProfileAction({ displayName: sent }))
+      const result = await settleAction(updateProfileAction({ displayName: sent }))
       if (result.ok) {
         const stored = result.data.displayName
         setSaved(stored)

@@ -8,7 +8,9 @@ import type { ActionResult } from '@/lib/errors'
 
 import { Button } from '../components/Button'
 import { ErrorMessage } from '../components/ErrorMessage'
+import { settleAction } from '../components/request'
 import { TextField } from '../components/TextField'
+import { useToast } from '../components/toast/ToastProvider'
 import { signInAction } from './actions'
 
 type State = ActionResult<{ to: string }> | null
@@ -16,14 +18,20 @@ type State = ActionResult<{ to: string }> | null
 export function LoginForm({ next }: { next: string | undefined }) {
   const t = useTranslations()
   const router = useRouter()
+  const { show, dismiss } = useToast()
   const [state, formAction, pending] = useActionState(
     async (_: State, formData: FormData): Promise<State> => {
-      // A rejected call (the network dropped) is a failure, not an error boundary.
-      const result = await signInAction(formData).catch((): State => ({
-        ok: false,
-        code: 'INTERNAL',
-      }))
-      if (result?.ok) router.replace(result.data.to)
+      const result = await settleAction(signInAction(formData))
+      // Transport failures are toasts, as everywhere; every other code stays inline.
+      if (!result.ok && (result.code === 'NO_CONNECTION' || result.code === 'APP_UPDATED')) {
+        show({ kind: 'error', code: result.code })
+        return null
+      }
+      if (result.ok) {
+        // An earlier attempt's transport toast must not follow us into the app.
+        dismiss()
+        router.replace(result.data.to)
+      }
       return result
     },
     null,

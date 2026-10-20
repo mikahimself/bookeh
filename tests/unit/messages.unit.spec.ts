@@ -61,6 +61,8 @@ describe('message catalogues', () => {
     INTERNAL: true,
     UNDO_FAILED: true,
     RATE_LIMITED: true,
+    NO_CONNECTION: true,
+    APP_UPDATED: true,
   } satisfies Record<ErrorCode, true>) as ErrorCode[]
 
   it.each(codes)('has errors.%s in both languages', (code) => {
@@ -71,12 +73,15 @@ describe('message catalogues', () => {
     }
   })
 
-  // Consumed by the toast provider: the X, the Undo Link and the "Undone" toast.
-  it.each(['toast.close', 'toast.undo', 'toast.undone'])('has %s in both languages', (key) => {
-    for (const catalogue of [en, fi]) {
-      const label = lookup(catalogue, key)
-      expect(typeof label).toBe('string')
-      expect(label).not.toBe('')
-    }
-  })
+  // Consumed by the toast provider: the X, the Undo and Reload Links and the "Undone" toast.
+  it.each(['toast.close', 'toast.undo', 'toast.undone', 'toast.reload'])(
+    'has %s in both languages',
+    (key) => {
+      for (const catalogue of [en, fi]) {
+        const label = lookup(catalogue, key)
+        expect(typeof label).toBe('string')
+        expect(label).not.toBe('')
+      }
+    },
+  )
 })

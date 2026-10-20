@@ -13,10 +13,9 @@ import {
   type ReactNode,
 } from 'react'
 
-import type { ActionResult } from '@/lib/errors'
-
 import { undoAction } from '../../actions/undo'
 import { ActionLink } from '../Link'
+import { reportFailure, settleAction } from '../request'
 import { takeFlash } from './flashCookie'
 import { createToastStore, toastMessage, type ToastInput } from './store'
 import { ToastView } from './ToastView'
@@ -52,31 +51,29 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   /**
    * EXPERIENCE.md, Feedback: Undo becomes "Undone" for a moment (a timed
    * success, also on Scan: the hold is for Edit and Undo, which "Undone"
-   * offers neither of) or "Couldn't undo."; a signed-out session goes to
-   * sign in and comes back here. Nothing else on the screen changes.
+   * offers neither of) or "Couldn't undo."; any other failure is reported
+   * like every action's (`reportFailure`, with this store: the provider sits
+   * outside its own context). Nothing else on the screen changes.
    */
   const undoToken = state?.undoToken ?? null
   const runUndo = () => {
     if (undoToken === null) return
     startUndo(async () => {
-      // A rejected call (the network dropped) is a failure, not an error boundary.
-      const result = await undoAction(undoToken).catch((): ActionResult<null> => ({
-        ok: false,
-        code: 'INTERNAL',
-      }))
+      const result = await settleAction(undoAction(undoToken))
       if (result.ok) {
         store.show({ kind: 'success', message: t('toast.undone') })
         return
       }
-      if (result.code === 'UNAUTHENTICATED') {
-        // The provider wraps /login too: the stale toast would follow us there.
-        store.dismiss()
-        router.replace(`/login?next=${encodeURIComponent(pathname)}`)
-        return
-      }
-      store.show({ kind: 'error', code: result.code })
+      reportFailure(result.code, {
+        show: store.show,
+        dismiss: store.dismiss,
+        replace: (href) => router.replace(href),
+      })
     })
   }
+
+  // An action from an older build: it did not happen, and a reload fixes it.
+  const appUpdated = state?.input.kind === 'error' && state.input.code === 'APP_UPDATED'
 
   useEffect(() => {
     const input = takeFlash({
@@ -115,10 +112,16 @@ export function ToastProvider({ children }: { children: ReactNode }) {
               kind={state.input.kind}
               message={toastMessage(state.input, t)}
               actions={
-                undoToken !== null && (
+                undoToken !== null ? (
                   <ActionLink onClick={runUndo} disabled={undoPending}>
                     {t('toast.undo')}
                   </ActionLink>
+                ) : (
+                  appUpdated && (
+                    <ActionLink onClick={() => window.location.reload()}>
+                      {t('toast.reload')}
+                    </ActionLink>
+                  )
                 )
               }
               closeLabel={t('toast.close')}

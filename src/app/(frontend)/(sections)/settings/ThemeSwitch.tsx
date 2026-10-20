@@ -6,7 +6,7 @@ import { useState, useTransition } from 'react'
 import { setDevicePrefsAction } from '../../actions/prefs'
 import { TextSwitch } from '../../components/TextSwitch'
 import type { DevicePrefs } from '../../prefs'
-import { settled, useReportFailure } from './report'
+import { settleAction, useReportFailure } from '../../components/request'
 
 /**
  * Theme (UX-DR50): a device preference, never on the profile. The client
@@ -33,7 +33,7 @@ export function ThemeSwitch({
     document.documentElement.dataset.theme = next
     setTheme(next)
     startTransition(async () => {
-      const result = await settled(setDevicePrefsAction({ theme: next }))
+      const result = await settleAction(setDevicePrefsAction({ theme: next }))
       if (result.ok) return
       document.documentElement.dataset.theme = previous
       setTheme(previous)

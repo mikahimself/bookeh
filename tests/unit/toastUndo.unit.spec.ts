@@ -9,7 +9,8 @@ const replace = vi.fn()
 const undoAction = vi.fn()
 
 vi.mock('next-intl', () => ({ useTranslations: () => (key: string) => key }))
-vi.mock('next/navigation', () => ({
+vi.mock('next/navigation', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('next/navigation')>()),
   useRouter: () => ({ replace }),
   usePathname: () => '/scan',
 }))
@@ -43,6 +44,7 @@ describe('Undo on the toast', () => {
     cleanup()
     vi.resetAllMocks()
     vi.useRealTimers()
+    vi.unstubAllGlobals()
   })
 
   it('calls undoAction with the token once and becomes "Undone" without an Undo Link', async () => {
@@ -59,7 +61,11 @@ describe('Undo on the toast', () => {
 
   it.each([
     ['a failed undo', () => Promise.resolve({ ok: false, code: 'UNDO_FAILED' }), 'UNDO_FAILED'],
-    ['a rejected call', () => Promise.reject(new Error('offline')), 'INTERNAL'],
+    [
+      'a dropped connection',
+      () => Promise.reject(new TypeError('Failed to fetch')),
+      'NO_CONNECTION',
+    ],
   ])('shows an error toast for %s', async (_, call, code) => {
     undoAction.mockImplementation(call)
     mount(saved)
@@ -69,11 +75,14 @@ describe('Undo on the toast', () => {
     expect(replace).not.toHaveBeenCalled()
   })
 
-  it('goes to sign in and back here when the session is gone', async () => {
+  it('goes to sign in and back here, query included, when the session is gone', async () => {
+    history.replaceState(null, '', '/scan?isbn=9789510000000')
     undoAction.mockResolvedValue({ ok: false, code: 'UNAUTHENTICATED' })
     mount(saved)
     fireEvent.click(undoLink()!)
-    await waitFor(() => expect(replace).toHaveBeenCalledWith('/login?next=%2Fscan'))
+    await waitFor(() =>
+      expect(replace).toHaveBeenCalledWith('/login?next=%2Fscan%3Fisbn%3D9789510000000'),
+    )
     expect(screen.queryByRole('alert')).toBeNull()
     // Dismissed: the provider wraps /login too, so the Link must not follow us there.
     expect(undoLink()).toBeNull()
@@ -101,6 +110,14 @@ describe('Undo on the toast', () => {
     await waitFor(() => expect(screen.getByText('toast.undone')).toBeTruthy())
   })
 
+  it('offers Reload on an APP_UPDATED error, which reloads the page', () => {
+    const reload = vi.fn()
+    vi.stubGlobal('location', { ...window.location, reload })
+    mount({ kind: 'error', code: 'APP_UPDATED' })
+    fireEvent.click(screen.getByRole('button', { name: 'toast.reload' }))
+    expect(reload).toHaveBeenCalledTimes(1)
+  })
+
   it.each<[string, ToastInput]>([
     ['a success without undo', { kind: 'success', message: 'Saved', hold: true }],
     ['an error', { kind: 'error', code: 'INTERNAL' }],
@@ -108,5 +125,6 @@ describe('Undo on the toast', () => {
     mount(input)
     expect(screen.getByRole('button', { name: 'toast.close' })).toBeTruthy()
     expect(undoLink()).toBeNull()
+    expect(screen.queryByRole('button', { name: 'toast.reload' })).toBeNull()
   })
 })

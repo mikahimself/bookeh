@@ -12,6 +12,10 @@ export type ErrorCode =
   | 'INTERNAL'
   | 'UNDO_FAILED'
   | 'RATE_LIMITED'
+  // Client-only: no server code returns these. `components/request.ts` maps
+  // a dropped connection and a stale action (an older build's tab) to them.
+  | 'NO_CONNECTION'
+  | 'APP_UPDATED'
 
 export type ActionResult<T> =
   | { ok: true; data: T }

@@ -22,7 +22,11 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
-RUN npm run build
+# Per-build deployment id (node_modules/next/dist/docs/01-app/03-api-reference/
+# 05-config/01-next-config-js/deploymentId.md): CI passes the commit SHA; a
+# build without one gets its timestamp, so no two image builds share an id.
+ARG DEPLOYMENT_ID
+RUN NEXT_DEPLOYMENT_ID="${DEPLOYMENT_ID:-$(date -u +%Y%m%d%H%M%S)}" npm run build
 
 FROM base AS runner
 WORKDIR /app

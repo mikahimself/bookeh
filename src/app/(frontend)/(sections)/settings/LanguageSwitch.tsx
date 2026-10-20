@@ -9,7 +9,7 @@ import type { Profile } from '@/lib/account/profile'
 
 import { updateProfileAction } from '../../actions/account'
 import { TextSwitch } from '../../components/TextSwitch'
-import { settled, useReportFailure } from './report'
+import { settleAction, useReportFailure } from '../../components/request'
 
 /**
  * Interface language (FR-51, AD-15): on the profile, so it follows the user
@@ -28,7 +28,7 @@ export function LanguageSwitch({ initial }: { initial: Profile['language'] }) {
     const previous = language
     setLanguage(next)
     startTransition(async () => {
-      const result = await settled(updateProfileAction({ language: next }))
+      const result = await settleAction(updateProfileAction({ language: next }))
       if (result.ok) {
         router.refresh()
         return

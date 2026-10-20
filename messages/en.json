@@ -40,7 +40,8 @@
   "toast": {
     "close": "Close",
     "undo": "Undo",
-    "undone": "Undone"
+    "undone": "Undone",
+    "reload": "Reload"
   },
   "sections": {
     "label": "Sections",
@@ -70,6 +71,8 @@
     "INVALID_ISBN": "Not an ISBN. Thirteen digits, or ten.",
     "INTERNAL": "Didn't work. Try again.",
     "UNDO_FAILED": "Couldn't undo.",
-    "RATE_LIMITED": "Too many lookups. Wait a moment."
+    "RATE_LIMITED": "Too many lookups. Wait a moment.",
+    "NO_CONNECTION": "No connection.",
+    "APP_UPDATED": "bookeh was updated."
   }
 }

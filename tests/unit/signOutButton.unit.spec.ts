@@ -8,7 +8,10 @@ const show = vi.fn()
 const signOutAction = vi.fn()
 
 vi.mock('next-intl', () => ({ useTranslations: () => (key: string) => key }))
-vi.mock('next/navigation', () => ({ useRouter: () => ({ replace }) }))
+vi.mock('next/navigation', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('next/navigation')>()),
+  useRouter: () => ({ replace }),
+}))
 vi.mock('@/app/(frontend)/actions/account', () => ({ signOutAction }))
 vi.mock('@/app/(frontend)/components/toast/ToastProvider', () => ({
   useToast: () => ({ show, dismiss: vi.fn() }),
@@ -28,14 +31,18 @@ describe('SignOutButton', () => {
   })
 
   it.each([
-    ['a failed action', () => Promise.resolve({ ok: false, code: 'INTERNAL' })],
-    ['a rejected call', () => Promise.reject(new Error('offline'))],
+    ['a failed action', () => Promise.resolve({ ok: false, code: 'INTERNAL' }), 'INTERNAL'],
+    [
+      'a dropped connection',
+      () => Promise.reject(new TypeError('Failed to fetch')),
+      'NO_CONNECTION',
+    ],
   ])(
     'shows an error toast for %s, not an inline message, and stays on the page',
-    async (_, call) => {
+    async (_, call, code) => {
       signOutAction.mockImplementation(call)
       press()
-      await waitFor(() => expect(show).toHaveBeenCalledWith({ kind: 'error', code: 'INTERNAL' }))
+      await waitFor(() => expect(show).toHaveBeenCalledWith({ kind: 'error', code }))
       expect(replace).not.toHaveBeenCalled()
       expect(screen.queryByRole('alert')).toBeNull()
       await waitFor(() =>
