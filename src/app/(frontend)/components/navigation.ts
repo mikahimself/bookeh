@@ -6,6 +6,12 @@ import { useCallback, useEffect } from 'react'
 /** The key stamped on every history state this tab writes. */
 const DEPTH_KEY = '__bookehDepth'
 
+/**
+ * The key carrying the tokens of the overlays open on a history entry,
+ * outermost first (components/ui/overlay.tsx).
+ */
+export const OVERLAY_TOKENS_KEY = '__bookehOverlays'
+
 /** In-app entries pushed above the one this tab loaded; module state, like `holds` in swipe.ts. */
 let depth = 0
 let installed = false
@@ -33,6 +39,27 @@ export function stampPush(state: unknown, depth: number): object {
   return { ...base, [DEPTH_KEY]: depth }
 }
 
+/**
+ * `state` with the current entry's overlay tokens carried onto it when the
+ * replace keeps the URL. Next replaces the entry with a fresh state after
+ * every soft navigation, refresh or revalidating server action; without this
+ * an open overlay would lose its token and a later close could not pop its
+ * entry. A replace that changes the URL, or brings tokens of its own, is
+ * left as it is.
+ */
+function keepOverlayTokens(state: unknown, url: string | URL | null | undefined): unknown {
+  const current: unknown = window.history.state
+  const tokens =
+    typeof current === 'object' && current !== null
+      ? (current as Record<string, unknown>)[OVERLAY_TOKENS_KEY]
+      : undefined
+  if (tokens === undefined) return state
+  const base = typeof state === 'object' && state !== null ? state : {}
+  if (OVERLAY_TOKENS_KEY in base) return state
+  if (url != null && new URL(url, window.location.href).href !== window.location.href) return state
+  return { ...base, [OVERLAY_TOKENS_KEY]: tokens }
+}
+
 /** Whether history back stays in the app: an in-app entry was pushed above the loaded one. */
 export function canGoBackInApp(): boolean {
   return depth > 0
@@ -40,10 +67,11 @@ export function canGoBackInApp(): boolean {
 
 /**
  * Wraps `history.pushState` / `replaceState` once per tab so every entry
- * carries its depth (push: one more; replace: the same), and follows
- * traversals through `popstate`. Reads the current entry's stamp first, so a
- * reload keeps its depth. `history.length` is never read: browsers cap it at
- * 50, which a long scanning session reaches.
+ * carries its depth (push: one more; replace: the same), a same-URL replace
+ * keeps the open overlays' tokens, and traversals are followed through
+ * `popstate`. Reads the current entry's stamp first, so a reload keeps its
+ * depth. `history.length` is never read: browsers cap it at 50, which a long
+ * scanning session reaches.
  */
 export function installNavigationTracking(): void {
   if (installed) return
@@ -57,7 +85,7 @@ export function installNavigationTracking(): void {
     depth += 1
   }
   window.history.replaceState = (state, unused, url) =>
-    replace(stampPush(state, depth), unused, url)
+    replace(stampPush(keepOverlayTokens(state, url), depth), unused, url)
   window.addEventListener('popstate', (event) => {
     depth = depthOf(event.state)
   })

@@ -326,6 +326,27 @@ const eslintConfig = defineConfig([
       'react/jsx-no-literals': ['error', { noStrings: true, ignoreProps: true }],
     },
   },
+  {
+    // Spine, UI primitives: Base UI is wrapped once in components/ui. Core
+    // no-restricted-imports, as a later block's options for the typescript
+    // rule would replace the (frontend) block's above.
+    files: ['src/**'],
+    ignores: ['src/app/(frontend)/components/ui/**'],
+    rules: {
+      'no-restricted-imports': [
+        'error',
+        {
+          patterns: [
+            {
+              group: ['@base-ui/react', '@base-ui/react/*'],
+              message:
+                'Spine, UI primitives: import the wrappers in src/app/(frontend)/components/ui, never @base-ui/react.',
+            },
+          ],
+        },
+      ],
+    },
+  },
   globalIgnores([
     '.next/**',
     'media/**',

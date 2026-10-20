@@ -60,6 +60,11 @@
   "task": {
     "close": "Sulje"
   },
+  "overlay": {
+    "close": "Sulje",
+    "cancel": "Peruuta",
+    "expand": "Avaa kokonaan"
+  },
   "progress": {
     "loading": "Ladataan"
   },

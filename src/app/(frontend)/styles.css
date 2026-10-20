@@ -91,6 +91,11 @@
   /* A full-screen task's column on wide screens: a large phone
      (EXPERIENCE.md, Responsive). */
   --spacing-task-width: 430px;
+  /* DESIGN.md, Dialog: at most 400px wide. */
+  --spacing-dialog-width: 400px;
+  /* The bottom sheet fully open (snap point 1): nearly the whole screen,
+     with a strip of the dimmed list above it. */
+  --spacing-sheet-height: 94dvh;
 
   /* Wide layout from 900px (EXPERIENCE.md); `max-wide:` is the phone. */
   --breakpoint-wide: 900px;
@@ -289,4 +294,69 @@
 /* Lowercase for headings, buttons and switches (DESIGN.md, Lowercase). */
 @utility ui-case {
   text-transform: lowercase;
+}
+
+/*
+ * Overlay motion (components/ui). Base UI marks an entering overlay
+ * `data-starting-style` and a leaving one `data-ending-style`, and unmounts it
+ * once the transition ends. The backdrop and the dialog fade; the sheet
+ * slides up to its snap point. A finger dragging the sheet moves it at once
+ * (`data-swiping`), and a flick ends the close faster
+ * (`--drawer-swipe-strength`, 0.1 to 1; unset on a Dialog). The backdrop
+ * ignores `--drawer-swipe-progress`: with snap points it reaches 1 at half
+ * open, which would leave the half-open sheet over an undimmed list. Under
+ * reduce motion nothing transitions: overlays appear and go at once.
+ */
+@utility overlay-fade {
+  transition: opacity var(--default-transition-duration) var(--default-transition-timing-function);
+
+  &[data-starting-style],
+  &[data-ending-style] {
+    opacity: 0;
+  }
+
+  &[data-ending-style] {
+    transition-duration: calc(var(--drawer-swipe-strength, 1) * var(--default-transition-duration));
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    &,
+    &[data-ending-style] {
+      transition: none;
+    }
+  }
+}
+
+/*
+ * The sheet's Popup is the full `sheet-height` and is moved down by the snap
+ * point offset, so snap point 1 is fully open. The bottom padding matches the
+ * offset, keeping the end of the content on screen when the sheet is half
+ * open (Base UI's snap point example).
+ */
+@utility sheet-motion {
+  --sheet-offset: calc(var(--drawer-snap-point-offset, 0px) + var(--drawer-swipe-movement-y, 0px));
+  transform: translateY(var(--sheet-offset));
+  padding-bottom: max(0px, var(--sheet-offset));
+  transition: transform var(--default-transition-duration) var(--default-transition-timing-function);
+
+  &[data-starting-style],
+  &[data-ending-style] {
+    transform: translateY(100%);
+    padding-bottom: 0px;
+  }
+
+  &[data-swiping] {
+    transition-duration: 0ms;
+  }
+
+  &[data-ending-style] {
+    transition-duration: calc(var(--drawer-swipe-strength, 1) * var(--default-transition-duration));
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    &,
+    &[data-ending-style] {
+      transition: none;
+    }
+  }
 }

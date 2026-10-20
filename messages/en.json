@@ -60,6 +60,11 @@
   "task": {
     "close": "Close"
   },
+  "overlay": {
+    "close": "Close",
+    "cancel": "Cancel",
+    "expand": "Open fully"
+  },
   "progress": {
     "loading": "Loading"
   },
