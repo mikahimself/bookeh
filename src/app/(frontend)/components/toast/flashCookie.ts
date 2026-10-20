@@ -22,6 +22,7 @@ const codes = Object.keys({
   INVALID_ISBN: true,
   INTERNAL: true,
   UNDO_FAILED: true,
+  SAVE_FAILED: true,
   RATE_LIMITED: true,
   NO_CONNECTION: true,
   APP_UPDATED: true,

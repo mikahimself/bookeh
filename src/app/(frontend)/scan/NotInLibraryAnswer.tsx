@@ -2,6 +2,7 @@ import { getTranslations } from 'next-intl/server'
 
 import { Cover } from '../components/Cover'
 
+import { AddToLibrary } from './AddToLibrary'
 import { answerLines, type NotInLibrary } from './answer'
 import { AnswerBack } from './AnswerBack'
 
@@ -9,7 +10,8 @@ import { AnswerBack } from './AnswerBack'
  * The Not in library Answer (EXPERIENCE.md, Answer; DESIGN.md, Detail panel
  * composition): the cover beside the title, the author and edition lines
  * under it, then where the record comes from and what a save would create,
- * and Back. A line with nothing to show is left out.
+ * and at the foot Add to library, the one primary, above Back. A line with
+ * nothing to show is left out.
  */
 export async function NotInLibraryAnswer({ answer }: { answer: NotInLibrary }) {
   const t = await getTranslations()
@@ -46,7 +48,10 @@ export async function NotInLibraryAnswer({ answer }: { answer: NotInLibrary }) {
           ))}
         </div>
       )}
-      <AnswerBack label={t('answer.back')} />
+      <div className="flex flex-col gap-2">
+        <AddToLibrary isbn13={answer.isbn13} />
+        <AnswerBack label={t('answer.back')} />
+      </div>
     </div>
   )
 }

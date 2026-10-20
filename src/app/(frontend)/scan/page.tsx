@@ -5,6 +5,7 @@ import { lookupBook } from '@/lib/catalogue/lookupBook'
 import { requireUser } from '@/lib/payload/context'
 
 import { FullScreenTask } from '../components/FullScreenTask'
+import { DismissToast } from '../components/toast/DismissToast'
 import { RaiseToast } from '../components/toast/RaiseToast'
 
 import { NotInLibraryAnswer } from './NotInLibraryAnswer'
@@ -42,6 +43,8 @@ export default async function ScanPage({
       {outcome.kind === 'answer' ? (
         <FullScreenTask title={t('answer.notInLibrary')}>
           <NotInLibraryAnswer answer={outcome.answer} />
+          {/* The next Answer removes the toast on screen, the held save toast included. */}
+          <DismissToast />
         </FullScreenTask>
       ) : (
         <FullScreenTask title={t('scan.heading')}>

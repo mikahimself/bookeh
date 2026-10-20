@@ -11,6 +11,7 @@ export type ErrorCode =
   | 'INVALID_ISBN'
   | 'INTERNAL'
   | 'UNDO_FAILED'
+  | 'SAVE_FAILED'
   | 'RATE_LIMITED'
   // Client-only: no server code returns these. `components/request.ts` maps
   // a dropped connection and a stale action (an older build's tab) to them.

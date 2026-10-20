@@ -41,6 +41,8 @@
   },
   "toast": {
     "close": "Sulje",
+    "savedTo": "Tallennettu · {location}",
+    "saved": "Tallennettu",
     "undo": "Kumoa",
     "undone": "Kumottu",
     "reload": "Lataa uudelleen"
@@ -61,6 +63,7 @@
   },
   "answer": {
     "notInLibrary": "Ei kirjastossa",
+    "addToLibrary": "Lisää kirjastoon",
     "from": "Lähde: {source}",
     "newAuthor": "Uusi kirjailija · {name}",
     "newSeries": "Uusi sarja · {name}",
@@ -94,6 +97,7 @@
     "INVALID_ISBN": "Ei ISBN-tunnus. Kolmetoista numeroa tai kymmenen.",
     "INTERNAL": "Ei onnistunut. Yritä uudelleen.",
     "UNDO_FAILED": "Kumoaminen ei onnistunut.",
+    "SAVE_FAILED": "Tallennus ei onnistunut. Yritä uudelleen.",
     "RATE_LIMITED": "Liikaa hakuja. Odota hetki.",
     "NO_CONNECTION": "Ei yhteyttä.",
     "APP_UPDATED": "bookeh päivittyi."

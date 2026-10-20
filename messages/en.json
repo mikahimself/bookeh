@@ -41,6 +41,8 @@
   },
   "toast": {
     "close": "Close",
+    "savedTo": "Saved to {location}",
+    "saved": "Saved",
     "undo": "Undo",
     "undone": "Undone",
     "reload": "Reload"
@@ -61,6 +63,7 @@
   },
   "answer": {
     "notInLibrary": "Not in library",
+    "addToLibrary": "Add to library",
     "from": "From {source}",
     "newAuthor": "New author · {name}",
     "newSeries": "New series · {name}",
@@ -94,6 +97,7 @@
     "INVALID_ISBN": "Not an ISBN. Thirteen digits, or ten.",
     "INTERNAL": "Didn't work. Try again.",
     "UNDO_FAILED": "Couldn't undo.",
+    "SAVE_FAILED": "Couldn't save. Try again.",
     "RATE_LIMITED": "Too many lookups. Wait a moment.",
     "NO_CONNECTION": "No connection.",
     "APP_UPDATED": "bookeh was updated."

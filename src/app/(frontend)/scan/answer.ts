@@ -5,9 +5,11 @@ import { DomainError } from '@/lib/errors'
 /**
  * What the Not in library Answer shows (EXPERIENCE.md, Answer). `source` is
  * the source id, `null` for a shared Book; `newAuthors` and `newSeries` are
- * the rows a save would create. Nothing here comes from a user record.
+ * the rows a save would create; `isbn13` is what Add to library saves.
+ * Nothing here comes from a user record.
  */
 export type NotInLibrary = {
+  isbn13: string
   title: string
   authors: string[]
   publisher: string | null
@@ -23,13 +25,15 @@ export type NotInLibrary = {
  * The Not in library Answer for a lookup, or `null` when another Answer
  * applies: the picked source candidate, or a Book the viewer can read and
  * holds nothing of. Epic 8's `answerFacts` takes over heading precedence.
+ * A Book with no ISBN has none: the lookup found it by its ISBN.
  */
 export function notInLibrary(result: LookupResult): NotInLibrary | null {
   switch (result.kind) {
     case 'existing': {
       const { book, mine } = result
-      if (mine.copies.length > 0 || mine.entries.length > 0) return null
+      if (book.isbn13 === null || mine.copies.length > 0 || mine.entries.length > 0) return null
       return {
+        isbn13: book.isbn13,
         title: book.title,
         authors: book.authors.map(({ name }) => name),
         publisher: book.publisher,
@@ -46,6 +50,7 @@ export function notInLibrary(result: LookupResult): NotInLibrary | null {
       if (!draft) return null
       const { series } = result.matches
       return {
+        isbn13: draft.isbn13,
         title: draft.title,
         authors: draft.authors.map(({ name }) => name),
         publisher: draft.publisher ?? null,

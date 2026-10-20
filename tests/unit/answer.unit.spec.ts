@@ -61,6 +61,7 @@ describe('notInLibrary', () => {
       },
     }
     expect(notInLibrary(result)).toEqual({
+      isbn13: '9789510396358',
       title: 'Tuntematon sotilas',
       authors: ['Väinö Linna'],
       publisher: 'WSOY',
@@ -99,6 +100,7 @@ describe('notInLibrary', () => {
         mine: nothing,
       }),
     ).toEqual({
+      isbn13: '9789510396358',
       title: 'Tuntematon sotilas',
       authors: ['Väinö Linna'],
       publisher: 'WSOY',
@@ -116,6 +118,10 @@ describe('notInLibrary', () => {
     expect(
       notInLibrary({ kind: 'existing', book, mine: { copies: [copy], entries: [] } }),
     ).toBeNull()
+    // The lookup found the Book by its ISBN, so this cannot happen.
+    expect(
+      notInLibrary({ kind: 'existing', book: { ...book, isbn13: null }, mine: nothing }),
+    ).toBeNull()
     expect(notInLibrary({ kind: 'none' })).toBeNull()
     expect(notInLibrary({ kind: 'unavailable', failed: ['finna'] })).toBeNull()
   })
@@ -130,6 +136,7 @@ describe('answerLines', () => {
     newSeries: (name) => `New series · ${name}`,
   }
   const answer = (over: Partial<NotInLibrary> = {}): NotInLibrary => ({
+    isbn13: '9789510396358',
     title: 'Muumipeikko ja pyrstötähti',
     authors: ['Tove Jansson', 'Kristiina Kivivuori'],
     publisher: 'WSOY',
