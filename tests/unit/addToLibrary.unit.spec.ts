@@ -57,7 +57,12 @@ describe('AddToLibrary', () => {
     fireEvent.click(button())
 
     await waitFor(() => expect(back).toHaveBeenCalledTimes(1))
-    expect(show).toHaveBeenCalledWith({ kind: 'success', message, hold: true })
+    expect(show).toHaveBeenCalledWith({
+      kind: 'success',
+      message,
+      hold: true,
+      undo: { token: 'token', seconds: 1800 },
+    })
     expect(saveCopyAction).toHaveBeenCalledWith({ requestId: expect.any(String), isbn13: ISBN })
   })
 
@@ -144,7 +149,12 @@ describe('AddToLibrary', () => {
 
     call.resolve(saved(null))
     await waitFor(() =>
-      expect(show).toHaveBeenCalledWith({ kind: 'success', message: 'toast.saved', hold: true }),
+      expect(show).toHaveBeenCalledWith({
+        kind: 'success',
+        message: 'toast.saved',
+        hold: true,
+        undo: { token: 'token', seconds: 1800 },
+      }),
     )
     expect(back).not.toHaveBeenCalled()
   })

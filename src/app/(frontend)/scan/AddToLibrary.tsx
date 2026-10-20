@@ -13,8 +13,8 @@ import { saveCopyAction } from './actions'
 
 /**
  * Add to library (EXPERIENCE.md, Answer): saves an owned copy as fetched,
- * raises the held "Saved to {location}" toast and returns to Scan. A failure
- * is reported and leaves the Answer as it was.
+ * raises the held "Saved to {location}" toast with the save's Undo and returns
+ * to Scan. A failure is reported and leaves the Answer as it was.
  *
  * One `requestId` per series of presses: made on the first tap, sent again on
  * every retry after a failure (a save whose answer was lost returns the first
@@ -59,11 +59,12 @@ export function AddToLibrary({ isbn13 }: { isbn13: string }) {
         }
         saved = true
         requestId.current = null
-        const { savedTo } = result.data
+        const { savedTo, undoToken, undoSeconds } = result.data
         show({
           kind: 'success',
           message: savedTo ? t('toast.savedTo', { location: savedTo.name }) : t('toast.saved'),
           hold: true,
+          undo: { token: undoToken, seconds: undoSeconds },
         })
         if (mounted.current) back()
       } finally {

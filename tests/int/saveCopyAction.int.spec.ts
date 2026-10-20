@@ -4,6 +4,7 @@ import { cookies, headers } from 'next/headers'
 import { getPayload, type Payload } from 'payload'
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { undoAction } from '@/app/(frontend)/actions/undo'
 import { saveCopyAction } from '@/app/(frontend)/scan/actions'
 import config from '@/payload.config'
 import type { User, UserLocation } from '@/payload-types'
@@ -94,6 +95,15 @@ describe('saveCopyAction', () => {
       data: { copyId: result.ok ? result.data.copyId : -1 },
     })
     expect(await copies()).toHaveLength(1)
+  })
+
+  it('undoes the save with its token once', async () => {
+    const result = await saveCopyAction({ requestId: randomUUID(), isbn13 })
+    if (!result.ok) throw new Error(`save failed: ${result.code}`)
+
+    expect(await undoAction(result.data.undoToken)).toEqual({ ok: true, data: null })
+    expect(await copies()).toEqual([])
+    expect(await undoAction(result.data.undoToken)).toEqual({ ok: false, code: 'UNDO_FAILED' })
   })
 
   it.each([
