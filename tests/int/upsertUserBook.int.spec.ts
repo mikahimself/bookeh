@@ -202,10 +202,13 @@ describe('upsertUserBook', () => {
     const settled = await Promise.allSettled(
       contexts.map((ctx, index) => upsertUserBook(ctx, book.id, { rating: index + 1 })),
     )
-    const statuses = settled.map((result) => result.status).sort()
-    expect(statuses).toEqual(['fulfilled', 'rejected'])
-    const rejected = settled.find((result) => result.status === 'rejected')
-    expect(rejected?.reason).toBeInstanceOf(ValidationError)
+    // Which interleaving happens is up to the pool: when both finds run before
+    // either commit, the later insert loses on the unique index; when one
+    // transaction commits first, the other finds its row and updates it.
+    expect(settled.some((result) => result.status === 'fulfilled')).toBe(true)
+    for (const result of settled) {
+      if (result.status === 'rejected') expect(result.reason).toBeInstanceOf(ValidationError)
+    }
     expect(await countOf(a, book)).toBe(1)
   })
 })
