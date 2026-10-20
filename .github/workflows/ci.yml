@@ -88,18 +88,19 @@ jobs:
       - run: npm run test:int
         env:
           DATABASE_PUSH: 'false'
+      - run: npx playwright install --with-deps chromium
+      # Its own `next dev` on bookeh_test (playwright.config.ts): migrate (a
+      # no-op here), seed, then the fixture source with push off.
+      - run: npm run test:e2e
       # A dev push writes a batch -1 row; there must be none, or push was on.
       - name: Check push stayed off
+        if: ${{ !cancelled() }}
         run: |
           pushes="$(docker exec ${{ job.services.postgres.id }} psql -U bookeh -d bookeh_test -tAc "select count(*) from payload_migrations where batch = -1")"
           if [ "$pushes" != "0" ]; then
-            echo "::error::bookeh_test was schema-pushed during test:int (DATABASE_PUSH not honoured)."
+            echo "::error::bookeh_test was schema-pushed during test:int or test:e2e (DATABASE_PUSH not honoured)."
             exit 1
           fi
-      - run: npx playwright install --with-deps chromium
-        # No browser until a spec needs one (Story 3.52); the run itself stays.
-        if: hashFiles('tests/e2e/**/*.spec.ts') != ''
-      - run: npm run test:e2e
 
       - uses: actions/upload-artifact@v7
         if: failure()

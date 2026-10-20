@@ -8,6 +8,8 @@ const __filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(__filename)
 
 const nextConfig: NextConfig = {
+  // The e2e lane runs its own `next dev` beside the usual one (Next locks `<distDir>/dev`).
+  distDir: process.env.NEXT_DIST_DIR || '.next',
   // Emits .next/standalone for the production Docker image (see Dockerfile).
   output: 'standalone',
   images: {

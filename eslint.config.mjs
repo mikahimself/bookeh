@@ -349,6 +349,7 @@ const eslintConfig = defineConfig([
   },
   globalIgnores([
     '.next/**',
+    '.next-e2e/**',
     'media/**',
     'test-results/**',
     'playwright-report/**',

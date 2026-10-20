@@ -10,3 +10,16 @@ export function testDatabaseUrl(url: string | undefined): string {
   parsed.pathname = '/bookeh_test'
   return parsed.toString()
 }
+
+/**
+ * Throws unless `url` names the `bookeh_test` database, so a script that
+ * deletes rows never runs on the dev database.
+ */
+export function assertTestDatabase(url: string | undefined): void {
+  const pathname = url && URL.canParse(url) ? new URL(url).pathname : undefined
+  if (pathname !== '/bookeh_test') {
+    throw new Error(
+      `Refusing to run: DATABASE_URL must name bookeh_test, not ${pathname ?? 'nothing'}`,
+    )
+  }
+}

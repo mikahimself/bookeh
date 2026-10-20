@@ -241,12 +241,16 @@ function toResult(record: Json, isbn13: string, body: unknown): SourceResult | u
   return compact(result)
 }
 
-// --- Request -----------------------------------------------------------------------------
+// --- Parsing -----------------------------------------------------------------------------
 
-/** The response body when it is a usable answer; undefined after logging why not. */
-async function fetchBody(isbn13: string): Promise<Json | undefined> {
-  const body = await getJson(LABEL, finnaUrl(isbn13), isbn13)
-  if (body === undefined) return undefined
+/**
+ * The results of a Finna response body for `isbn13`, best first: records with
+ * a cover, then records with themes, ties in Finna's order. `undefined`, after
+ * one logged warning, when the body is not a usable answer (status not `OK`,
+ * or `records` neither an array nor left out for no match). Shared with the
+ * fixture source, which serves captured Finna responses.
+ */
+export function finnaResults(body: unknown, isbn13: string): SourceResult[] | undefined {
   if (!isObject(body) || body.status !== 'OK') {
     const answer: Json = isObject(body) ? body : {}
     return lookupFailed(LABEL, isbn13, 'status is not OK', {
@@ -255,25 +259,27 @@ async function fetchBody(isbn13: string): Promise<Json | undefined> {
     })
   }
   // Finna leaves `records` out when nothing matched.
-  if (body.records === undefined && body.resultCount === 0) return body
-  if (!Array.isArray(body.records)) return lookupFailed(LABEL, isbn13, 'records is not an array')
-  return body
+  const noMatch = body.records === undefined && body.resultCount === 0
+  if (!noMatch && !Array.isArray(body.records)) {
+    return lookupFailed(LABEL, isbn13, 'records is not an array')
+  }
+  const scored = finnaMatches(body, isbn13).flatMap((record) => {
+    const result = toResult(record, isbn13, body)
+    if (!result) return []
+    const cover = result.coverUrl ? 1 : 0
+    const themed = result.themes.length > 0 ? 1 : 0
+    return [{ result, cover, themed }]
+  })
+  // Stable: ties keep Finna's order.
+  scored.sort((a, b) => b.cover - a.cover || b.themed - a.themed)
+  return scored.map(({ result }) => result)
 }
 
 export const finna: Source = {
   id: 'finna',
   async lookupByIsbn(isbn13) {
-    const body = await fetchBody(isbn13)
-    if (!body) return undefined
-    const scored = finnaMatches(body, isbn13).flatMap((record) => {
-      const result = toResult(record, isbn13, body)
-      if (!result) return []
-      const cover = result.coverUrl ? 1 : 0
-      const themed = result.themes.length > 0 ? 1 : 0
-      return [{ result, cover, themed }]
-    })
-    // Stable: ties keep Finna's order.
-    scored.sort((a, b) => b.cover - a.cover || b.themed - a.themed)
-    return scored.map(({ result }) => result)
+    const body = await getJson(LABEL, finnaUrl(isbn13), isbn13)
+    if (body === undefined) return undefined
+    return finnaResults(body, isbn13)
   },
 }

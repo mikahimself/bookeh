@@ -1,31 +1,29 @@
 import { defineConfig, devices } from '@playwright/test'
 
-/**
- * Read environment variables from file.
- * https://github.com/motdotla/dotenv
- */
 import 'dotenv/config'
 
+import { testDatabaseUrl } from './tests/helpers/testDatabase'
+
+const PORT = 3100
+const baseURL = `http://localhost:${PORT}`
+
 /**
- * See https://playwright.dev/docs/test-configuration.
+ * Spine, Tests: Playwright runs its own `next dev` on bookeh_test, beside any
+ * dev server on :3000: port 3100, its own `distDir` (Next locks
+ * `<distDir>/dev`), migrations applied and push off, the fixture source in
+ * place of the real ones, then a seed for the one known user. Not a
+ * production server: the fixture source is refused there.
  */
 export default defineConfig({
   testDir: './tests/e2e',
-  /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
-  /* Retry on CI only */
-  retries: process.env.CI ? 2 : 0,
-  /* Opt out of parallel tests on CI. */
+  // No retries: the seed runs once per server, so a retry after a save meets that Book.
+  retries: 0,
   workers: process.env.CI ? 1 : undefined,
-  /* Reporter to use. See https://playwright.dev/docs/test-reporters */
   reporter: 'html',
-  /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
-    /* Base URL to use in actions like `await page.goto('/')`. */
-    // baseURL: 'http://localhost:3000',
-
-    /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
-    trace: 'on-first-retry',
+    baseURL,
+    trace: 'retain-on-failure',
   },
   projects: [
     {
@@ -34,9 +32,22 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: 'npm run dev',
-    reuseExistingServer: true,
+    // stdin closed, as in CI: a Payload prompt reads EOF instead of hanging.
+    command:
+      'npm run payload -- migrate </dev/null && npm run payload -- run tests/e2e/seed.ts </dev/null && npm run dev',
+    env: {
+      DATABASE_URL: testDatabaseUrl(process.env.DATABASE_URL),
+      DATABASE_PUSH: 'false',
+      BOOKEH_SOURCES: 'fixture',
+      PORT: String(PORT),
+      NEXT_DIST_DIR: '.next-e2e',
+      MEDIA_DIR: 'media-test',
+      SEED_EMAIL: '',
+      SEED_PASSWORD: '',
+      NEXT_TELEMETRY_DISABLED: '1',
+    },
+    reuseExistingServer: false,
     timeout: 180_000,
-    url: 'http://localhost:3000',
+    url: `${baseURL}/login`,
   },
 })

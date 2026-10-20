@@ -7,6 +7,7 @@ import sharp from 'sharp'
 
 import { normaliseIsbn } from '@/fields/isbn'
 import { lookupSources } from '@/lib/metadata/lookup'
+import { fixtureOrigin, usesFixtureSources, type SourceEnv } from '@/lib/metadata/sources/fixture'
 // A type only: `payload.config` imports this file and `context.ts` imports `payload.config`.
 import type { Context } from '@/lib/payload/context'
 import { assertLive } from '@/lib/payload/transaction'
@@ -18,8 +19,18 @@ export const COVER_HOSTS: readonly string[] = ['api.finna.fi', 'books.google.com
 
 export type CoverPolicy = { allows(url: URL): boolean; maxBytes: number; timeoutMs: number }
 
+/**
+ * Whether a cover may be downloaded from `url`: https from `COVER_HOSTS`, and
+ * under `BOOKEH_SOURCES=fixture` (never production) the app's own origin,
+ * which serves the fixture covers.
+ */
+export function allowsCoverUrl(url: URL, env: SourceEnv = process.env): boolean {
+  if (url.protocol === 'https:' && COVER_HOSTS.includes(url.hostname)) return true
+  return usesFixtureSources(env) && url.origin === fixtureOrigin(env)
+}
+
 export const coverPolicy: CoverPolicy = {
-  allows: (url) => url.protocol === 'https:' && COVER_HOSTS.includes(url.hostname),
+  allows: (url) => allowsCoverUrl(url),
   maxBytes: 5 * 1024 * 1024,
   timeoutMs: 5000,
 }

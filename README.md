@@ -48,8 +48,19 @@ creates on first start. CI mirrors this with the same image and init args and a
 **Tests.** `npm run test:unit` runs `tests/unit/**/*.unit.spec.ts` with no
 database (a unit spec must import nothing that opens one). `npm run test:int`
 runs `tests/int/**/*.int.spec.ts` on `bookeh_test` on the server named by
-`DATABASE_URL`, never the dev `bookeh` database. `npm run test:e2e` still uses
-the dev server and its database until Story 3.52.
+`DATABASE_URL`, never the dev `bookeh` database.
+
+**End-to-end.** `npm run test:e2e` starts its own `next dev` on :3100 (build
+directory `.next-e2e`, so a dev server on :3000 can keep running) against
+`bookeh_test` with push off and `BOOKEH_SOURCES=fixture`: lookups answer from
+`tests/fixtures/finna/`, no network. Before the server starts it runs
+`payload migrate` and `tests/e2e/seed.ts`, which signs up the e2e user and
+removes the previous run's Book. `bookeh_test` must be migration-built: if the
+int lane has pushed to it, `payload migrate` stops quietly or fails with
+"already exists". Reset it (below), migrate it with
+`DATABASE_URL=postgres://bookeh:bookeh@localhost:5432/bookeh_test npm run payload -- migrate`,
+and run the int lane with `DATABASE_PUSH=false npm run test:int` from then on.
+Once per machine: `npx playwright install chromium`.
 
 **Existing dev volume.** Init args only apply to an empty data directory. A
 `bookeh_pgdata` volume created before this change keeps its libc locale, and
