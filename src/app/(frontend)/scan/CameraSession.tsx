@@ -11,6 +11,8 @@ import {
   type ReactNode,
 } from 'react'
 
+import { createReadGate, type ReadGate } from './readGate'
+
 export type CameraState = 'idle' | 'starting' | 'on' | 'off'
 
 type Camera = {
@@ -19,6 +21,8 @@ type Camera = {
   stream: MediaStream | null
   /** Requests the camera once; later calls do nothing. */
   start: () => void
+  /** Which camera reads to act on; one per scan task, so it outlives each Answer. */
+  gate: ReadGate
 }
 
 const CameraContext = createContext<Camera | null>(null)
@@ -30,6 +34,10 @@ const CameraContext = createContext<Camera | null>(null)
  * changes and stops the tracks only when the segment unmounts. Nothing
  * touches the camera until `start()`; a refusal, a missing camera, an
  * insecure context or a track ending all land in `off`.
+ *
+ * It also holds the read gate: `ScanScreen` unmounts for every Answer, and
+ * the ISBN it last handled has to be remembered across Answer and Back, then
+ * forgotten when the task closes.
  */
 export function CameraSession({ children }: { children: ReactNode }) {
   const [state, setState] = useState<CameraState>('idle')
@@ -40,6 +48,7 @@ export function CameraSession({ children }: { children: ReactNode }) {
   // Mode's extra mount/unmount pass does not strand the first request.
   const alive = useRef(false)
   const current = useRef<MediaStream | null>(null)
+  const [gate] = useState(() => createReadGate())
 
   useEffect(() => {
     alive.current = true
@@ -76,7 +85,7 @@ export function CameraSession({ children }: { children: ReactNode }) {
       .catch(() => setState('off'))
   }, [])
 
-  const value = useMemo(() => ({ state, stream, start }), [state, stream, start])
+  const value = useMemo(() => ({ state, stream, start, gate }), [state, stream, start, gate])
 
   return <CameraContext.Provider value={value}>{children}</CameraContext.Provider>
 }
