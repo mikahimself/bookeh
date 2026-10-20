@@ -17,6 +17,11 @@ let depth = 0
 let installed = false
 /** A hand-started exit is in flight; a second tap on the X is a no-op until it settles. */
 let closing = false
+/**
+ * The depth of the open task's first entry, recorded by `TaskBase` while the
+ * task's layout is mounted; `null` outside such a task.
+ */
+let taskBase: number | null = null
 
 /** How long a hand-started exit waits for the traversal before it lets go. */
 const EXIT_TIMEOUT_MS = 1000
@@ -99,9 +104,49 @@ export function NavigationTracker() {
 }
 
 /**
- * Closes a full-screen task (spine, Navigation and history): history back
- * when this tab has pushed an in-app entry above the loaded one, otherwise
- * `/`, replacing. While a back is in flight a second tap does nothing.
+ * Records the depth of a task's first entry. Mounted in a task's layout,
+ * which persists across its search-param changes (Scan → Answer and back),
+ * so the X can leave from any depth of the task and Back inside it knows
+ * where the task starts. A reload records the entry it reloads. Renders
+ * nothing.
+ */
+export function TaskBase() {
+  useEffect(() => {
+    // `depth` is already the new entry's: Next's `HistoryUpdater` pushes in
+    // `useInsertionEffect` (next/dist/client/components/app-router.js), which
+    // runs before passive effects such as this one.
+    taskBase = depth
+    return () => {
+      taskBase = null
+    }
+  }, [])
+
+  return null
+}
+
+/**
+ * Runs `traverse` (a history back) with `closing` already set by the caller,
+ * and lets go a frame after the `popstate`, or after a safety timeout when
+ * none comes; then calls `settled`. Until then a second tap does nothing.
+ */
+function traverseBack(traverse: () => void, settled: () => void): void {
+  const done = () => {
+    window.removeEventListener('popstate', onPopState)
+    clearTimeout(timeout)
+    closing = false
+    settled()
+  }
+  const onPopState = () => requestAnimationFrame(done)
+  const timeout = setTimeout(done, EXIT_TIMEOUT_MS)
+  window.addEventListener('popstate', onPopState, { once: true })
+  traverse()
+}
+
+/**
+ * Closes a full-screen task (spine, Navigation and history): history back to
+ * the entry below the task's first one (`TaskBase`; without one, the current
+ * entry is the task's first) when that entry is in-app, otherwise `/`,
+ * replacing. While a back is in flight a second tap does nothing.
  *
  * React renders a history traversal synchronously, with no view transition,
  * so the back branch starts one itself: the task, marked
@@ -116,26 +161,21 @@ export function useCloseTask(): (task: HTMLElement | null) => void {
   return useCallback(
     (task) => {
       if (closing) return
-      if (!canGoBackInApp()) {
+      const base = taskBase ?? depth
+      if (base === 0) {
         router.replace('/')
         return
       }
+      const steps = Math.max(1, depth - base + 1)
 
       // Set before any branching: the view-transition branch runs `back()`
       // from a deferred callback, and a second tap must not get in first.
       closing = true
-      const back = (settled: () => void) => {
-        const done = () => {
-          window.removeEventListener('popstate', onPopState)
-          clearTimeout(timeout)
-          closing = false
-          settled()
-        }
-        const onPopState = () => requestAnimationFrame(done)
-        const timeout = setTimeout(done, EXIT_TIMEOUT_MS)
-        window.addEventListener('popstate', onPopState, { once: true })
-        router.back()
-      }
+      const back = (settled: () => void) =>
+        traverseBack(() => {
+          if (steps === 1) router.back()
+          else window.history.go(-steps)
+        }, settled)
 
       if (
         !task ||
@@ -155,4 +195,24 @@ export function useCloseTask(): (task: HTMLElement | null) => void {
     },
     [router],
   )
+}
+
+/**
+ * Back inside a task (EXPERIENCE.md, Answer): history back while the task
+ * has an entry below the current one, otherwise `fallback`, replacing (an
+ * Answer opened directly). While a back is in flight a second tap does
+ * nothing, as on the X.
+ */
+export function useTaskBack(fallback: string): () => void {
+  const router = useRouter()
+  return useCallback(() => {
+    if (closing) return
+    if (depth > (taskBase ?? 0)) {
+      closing = true
+      traverseBack(
+        () => router.back(),
+        () => undefined,
+      )
+    } else router.replace(fallback)
+  }, [router, fallback])
 }

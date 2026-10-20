@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
-import { act, cleanup, render, screen, waitFor } from '@testing-library/react'
-import { createElement, type ReactNode } from 'react'
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { createElement } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 const push = vi.fn()
@@ -18,17 +18,6 @@ const EAN_8 = 6
 
 vi.mock('next-intl', () => ({ useTranslations: () => (key: string) => key }))
 vi.mock('next/navigation', () => ({ useRouter: () => ({ push, replace }) }))
-vi.mock('next/form', () => ({
-  default: ({
-    action,
-    replace,
-    children,
-  }: {
-    action: string
-    replace?: boolean
-    children: ReactNode
-  }) => createElement('form', { action, 'data-replace': replace ? '' : undefined }, children),
-}))
 vi.mock('@zxing/library', () => ({
   BarcodeFormat: { EAN_13, [EAN_13]: 'EAN_13', EAN_8, [EAN_8]: 'EAN_8' },
   DecodeHintType: { POSSIBLE_FORMATS: 2 },
@@ -60,10 +49,12 @@ const result = (format: number, text: string): Result => ({
   getText: () => text,
 })
 
-const tree = (submitted?: string) =>
-  createElement(CameraSession, null, createElement(ScanScreen, { submitted }))
+type Props = { isbn?: string; error?: string }
 
-const renderScan = (submitted?: string) => render(tree(submitted))
+const tree = (props: Props = {}) =>
+  createElement(CameraSession, null, createElement(ScanScreen, props))
+
+const renderScan = (props?: Props) => render(tree(props))
 
 /** The decode callback once the loop is running. */
 const decoder = async (): Promise<Callback> => {
@@ -71,7 +62,13 @@ const decoder = async (): Promise<Callback> => {
   return scan.mock.calls[0][1]
 }
 
-const form = () => screen.getByLabelText('isbn').closest('form')!
+const input = () => screen.getByLabelText<HTMLInputElement>('scan.isbn')
+
+/** Types `text` into the field and presses Go. */
+const submit = (text: string) => {
+  fireEvent.change(input(), { target: { value: text } })
+  fireEvent.submit(input().closest('form')!)
+}
 
 describe('ScanScreen', () => {
   beforeEach(() => {
@@ -94,19 +91,18 @@ describe('ScanScreen', () => {
       video: { facingMode: { ideal: 'environment' } },
       audio: false,
     })
-    expect(screen.getByText('noCamera')).toBeTruthy()
-    expect(document.activeElement).not.toBe(screen.getByLabelText('isbn'))
+    expect(screen.getByText('scan.noCamera')).toBeTruthy()
+    expect(document.activeElement).not.toBe(screen.getByLabelText('scan.isbn'))
 
     await act(async () => grant(fakeStream().stream))
-    expect(screen.queryByText('noCamera')).toBeNull()
-    expect(screen.getByLabelText('cameraHint')).toBeInstanceOf(HTMLVideoElement)
+    expect(screen.queryByText('scan.noCamera')).toBeNull()
+    expect(screen.getByLabelText('scan.cameraHint')).toBeInstanceOf(HTMLVideoElement)
   })
 
   it('pushes the Answer address on an ISBN barcode, once, and ignores other codes', async () => {
     getUserMedia.mockResolvedValue(fakeStream().stream)
     renderScan()
     const decode = await decoder()
-    expect(form().hasAttribute('data-replace')).toBe(false)
 
     act(() => decode(undefined))
     act(() => decode(result(EAN_8, '97812345')))
@@ -122,25 +118,52 @@ describe('ScanScreen', () => {
 
   it('ignores reads while an isbn is in the address and reads again when it leaves', async () => {
     getUserMedia.mockResolvedValue(fakeStream().stream)
-    const view = renderScan('9789510123456')
+    const view = renderScan({ isbn: '9789510123456' })
     const decode = await decoder()
-    expect(screen.getByText('9789510123456')).toBeTruthy()
-    expect(form().hasAttribute('data-replace')).toBe(true)
+    expect(input().value).toBe('9789510123456')
 
     act(() => decode(result(EAN_13, '9789510123457')))
     expect(push).not.toHaveBeenCalled()
     expect(replace).not.toHaveBeenCalled()
 
     view.rerender(tree())
+    expect(input().value).toBe('')
     act(() => decode(result(EAN_13, '9789510123457')))
     expect(push).toHaveBeenCalledWith('/scan?isbn=9789510123457')
+  })
+
+  it('pushes the typed text as is on Go, then ignores reads; an empty field goes nowhere', async () => {
+    getUserMedia.mockResolvedValue(fakeStream().stream)
+    renderScan()
+    const decode = await decoder()
+
+    submit('  ')
+    expect(push).not.toHaveBeenCalled()
+
+    submit('951-0 4123&x')
+    expect(push).toHaveBeenCalledWith('/scan?isbn=951-0%204123%26x')
+    act(() => decode(result(EAN_13, '9789510123457')))
+    expect(push).toHaveBeenCalledTimes(1)
+    expect(replace).not.toHaveBeenCalled()
+  })
+
+  it('replaces a corrected entry and shows the error under the field', () => {
+    getUserMedia.mockReturnValue(new Promise<MediaStream>(() => undefined))
+    renderScan({ isbn: '978-951-0-4123', error: 'Not an ISBN.' })
+    expect(input().value).toBe('978-951-0-4123')
+    expect(input().getAttribute('aria-invalid')).toBe('true')
+    expect(screen.getByText('Not an ISBN.').id).toBe(input().getAttribute('aria-describedby'))
+
+    submit('9789510412345')
+    expect(replace).toHaveBeenCalledWith('/scan?isbn=9789510412345')
+    expect(push).not.toHaveBeenCalled()
   })
 
   it('shows the no-camera message and focuses the field when the camera is refused', async () => {
     getUserMedia.mockRejectedValue(new DOMException('denied', 'NotAllowedError'))
     renderScan()
-    await waitFor(() => expect(document.activeElement).toBe(screen.getByLabelText('isbn')))
-    expect(screen.getByText('noCamera')).toBeTruthy()
+    await waitFor(() => expect(document.activeElement).toBe(screen.getByLabelText('scan.isbn')))
+    expect(screen.getByText('scan.noCamera')).toBeTruthy()
     expect(scan).not.toHaveBeenCalled()
   })
 
@@ -149,13 +172,13 @@ describe('ScanScreen', () => {
     getUserMedia.mockResolvedValue(stream)
     renderScan()
     await decoder()
-    expect(screen.queryByText('noCamera')).toBeNull()
+    expect(screen.queryByText('scan.noCamera')).toBeNull()
 
     act(() => {
       track.dispatchEvent(new Event('ended'))
     })
-    await screen.findByText('noCamera')
-    expect(document.activeElement).toBe(screen.getByLabelText('isbn'))
+    await screen.findByText('scan.noCamera')
+    expect(document.activeElement).toBe(screen.getByLabelText('scan.isbn'))
     expect(stop).toHaveBeenCalled()
   })
 

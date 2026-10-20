@@ -83,6 +83,8 @@
   --spacing-stroke-control: 2px;
   --spacing-stroke-selection: 4px;
   --spacing-panel-width: 360px;
+  /* The cover beside a Book's title, 72 × 108px at 2:3 (DESIGN.md, Detail panel). */
+  --spacing-cover-detail: 72px;
   /* Minimum control height on the phone (DESIGN.md, Tap area). */
   --spacing-tap: 44px;
   /* The pinned bottom bar (Scan book on the phone): a tap-high control with

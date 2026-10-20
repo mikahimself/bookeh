@@ -1,5 +1,6 @@
 // @vitest-environment jsdom
-import { renderHook } from '@testing-library/react'
+import { cleanup, render, renderHook } from '@testing-library/react'
+import { createElement } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 const back = vi.fn()
@@ -7,8 +8,15 @@ const replace = vi.fn()
 
 vi.mock('next/navigation', () => ({ useRouter: () => ({ back, replace }) }))
 
-const { canGoBackInApp, depthOf, installNavigationTracking, stampPush, useCloseTask } =
-  await import('@/app/(frontend)/components/navigation')
+const {
+  canGoBackInApp,
+  depthOf,
+  installNavigationTracking,
+  stampPush,
+  TaskBase,
+  useCloseTask,
+  useTaskBack,
+} = await import('@/app/(frontend)/components/navigation')
 
 /** navigation.ts's safety timeout. */
 const EXIT_TIMEOUT_MS = 1000
@@ -107,6 +115,64 @@ describe('useCloseTask', () => {
     vi.advanceTimersByTime(1)
     tap(null)
     expect(back).toHaveBeenCalledTimes(2)
+  })
+})
+
+describe('a task with a recorded base', () => {
+  beforeEach(() => {
+    installNavigationTracking()
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'requestAnimationFrame'] })
+  })
+  afterEach(() => {
+    // Leave every exit settled, and the task unmounted (its base cleared).
+    vi.runAllTimers()
+    vi.useRealTimers()
+    cleanup()
+    vi.restoreAllMocks()
+    vi.clearAllMocks()
+  })
+
+  /** Opens the task at `base`, then lands `above` entries higher, as Scan → Answer does. */
+  const openTask = (base: number, above: number) => {
+    traverseTo(stampPush({}, base))
+    render(createElement(TaskBase))
+    traverseTo(stampPush({}, base + above))
+  }
+
+  it('closes past all of its entries in one go', () => {
+    const go = vi.spyOn(window.history, 'go').mockImplementation(() => undefined)
+    openTask(1, 1)
+    renderHook(() => useCloseTask()).result.current(null)
+    expect(go).toHaveBeenCalledWith(-2)
+    expect(back).not.toHaveBeenCalled()
+  })
+
+  it('replaces to / when the task was the first entry', () => {
+    openTask(0, 1)
+    renderHook(() => useCloseTask()).result.current(null)
+    expect(replace).toHaveBeenCalledWith('/')
+    expect(back).not.toHaveBeenCalled()
+  })
+
+  it('Back goes back above the base and replaces at it', () => {
+    openTask(1, 1)
+    renderHook(() => useTaskBack('/scan')).result.current()
+    expect(back).toHaveBeenCalledTimes(1)
+
+    traverseTo(stampPush({}, 1))
+    vi.advanceTimersToNextFrame()
+    renderHook(() => useTaskBack('/scan')).result.current()
+    expect(back).toHaveBeenCalledTimes(1)
+    expect(replace).toHaveBeenCalledWith('/scan')
+  })
+
+  it('Back goes back once for two taps', () => {
+    openTask(1, 1)
+    const tap = renderHook(() => useTaskBack('/scan')).result.current
+    tap()
+    tap()
+    expect(back).toHaveBeenCalledTimes(1)
+    expect(replace).not.toHaveBeenCalled()
   })
 })
 

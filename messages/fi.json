@@ -57,6 +57,18 @@
     "isbn": "Tai kirjoita ISBN",
     "noCamera": "Ei kameraa. Kirjoita ISBN."
   },
+  "answer": {
+    "notInLibrary": "Ei kirjastossa",
+    "from": "Lähde: {source}",
+    "newAuthor": "Uusi kirjailija · {name}",
+    "newSeries": "Uusi sarja · {name}",
+    "pages": "{pages, plural, one {# sivu} other {# sivua}}",
+    "back": "Takaisin"
+  },
+  "sources": {
+    "finna": "Finna",
+    "google": "Google Books"
+  },
   "task": {
     "close": "Sulje"
   },

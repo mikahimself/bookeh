@@ -2,10 +2,10 @@
 
 import type { IScannerControls } from '@zxing/browser'
 import { useTranslations } from 'next-intl'
-import Form from 'next/form'
 import { useRouter } from 'next/navigation'
-import { useEffect, useRef } from 'react'
+import { useEffect, useEffectEvent, useRef, useTransition, type FormEvent } from 'react'
 
+import { ProgressLine } from '../components/ProgressLine'
 import { TextField } from '../components/TextField'
 
 import { isbnFromBarcode } from './barcode'
@@ -18,26 +18,44 @@ const SCAN_SUCCESS_MS = 500
 /**
  * The Scan screen (EXPERIENCE.md, Scan): the camera frame reading ISBN
  * barcodes, and the ISBN field under it. A read goes straight to
- * `/scan?isbn=` with no tap; the field submits on Go as a GET form, so the
- * browser never normalises what is typed. Reading is ignored while an
- * `isbn` is in the address, and after a read until the address changes.
- * Until the camera is on (permission pending, refused, or none) the frame
- * gives way to the no-camera message; once the camera is refused or lost,
- * the field takes focus. zxing is imported lazily, so it is only loaded here.
+ * `/scan?isbn=` with no tap; the field submits on Go. Both navigate in a
+ * transition, with the progress line while the server looks the ISBN up, and
+ * replace when the address already carries an `isbn` (a corrected entry). The
+ * text goes as typed: the browser never normalises it. Without JS the field
+ * still submits as a GET form. Reading is ignored while an `isbn` is in the
+ * address, and after a read or submit until the address changes.
+ *
+ * `isbn` is the text in the address, kept in the field; `error` the message
+ * under it. Until the camera is on (permission pending, refused, or none)
+ * the frame gives way to the no-camera message; once the camera is refused
+ * or lost, the field takes focus. zxing is imported lazily, so it is only
+ * loaded here.
  */
-export function ScanScreen({ submitted }: { submitted?: string }) {
-  const t = useTranslations('scan')
+export function ScanScreen({ isbn, error }: { isbn?: string; error?: string }) {
+  const t = useTranslations()
   const router = useRouter()
   const { state, stream, start } = useCamera()
   const video = useRef<HTMLVideoElement>(null)
   const field = useRef<HTMLInputElement>(null)
-  const handled = useRef(submitted !== undefined)
+  const handled = useRef(isbn !== undefined)
+  const [pending, startTransition] = useTransition()
+
+  const go = (text: string) => {
+    handled.current = true
+    const href = `/scan?isbn=${encodeURIComponent(text)}`
+    startTransition(() => {
+      if (isbn !== undefined) router.replace(href)
+      else router.push(href)
+    })
+  }
+  // The decode loop outlives renders; it reads the current address through this.
+  const onRead = useEffectEvent(go)
 
   useEffect(() => start(), [start])
 
   useEffect(() => {
-    handled.current = submitted !== undefined
-  }, [submitted])
+    handled.current = isbn !== undefined
+  }, [isbn])
 
   useEffect(() => {
     if (state === 'off') field.current?.focus()
@@ -69,10 +87,8 @@ export function ScanScreen({ submitted }: { submitted?: string }) {
       // `scan()` only loops over the element; its stop leaves the stream alone.
       controls = reader.scan(element, (result) => {
         if (!result || handled.current) return
-        const isbn = isbnFromBarcode(BarcodeFormat[result.getBarcodeFormat()], result.getText())
-        if (!isbn) return
-        handled.current = true
-        router.push(`/scan?isbn=${isbn}`)
+        const read = isbnFromBarcode(BarcodeFormat[result.getBarcodeFormat()], result.getText())
+        if (read) onRead(read)
       })
     }
     void run()
@@ -82,12 +98,22 @@ export function ScanScreen({ submitted }: { submitted?: string }) {
       controls?.stop()
       element.srcObject = null
     }
-  }, [state, stream, router])
+  }, [state, stream])
+
+  const submit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    // One lookup at a time: a second Go waits for the first.
+    if (pending) return
+    const text = field.current?.value ?? ''
+    // Go on an empty field is no submission.
+    if (text.trim()) go(text)
+  }
 
   return (
     <>
+      {pending && <ProgressLine label={t('progress.loading')} />}
       {state !== 'on' ? (
-        <p className="text-control text-text">{t('noCamera')}</p>
+        <p className="text-control text-text">{t('scan.noCamera')}</p>
       ) : (
         <div className="flex flex-col gap-2">
           <div className="relative aspect-[4/3] border-2 border-text">
@@ -96,7 +122,7 @@ export function ScanScreen({ submitted }: { submitted?: string }) {
               autoPlay
               playsInline
               muted
-              aria-label={t('cameraHint')}
+              aria-label={t('scan.cameraHint')}
               className="size-full object-cover"
             />
             <div
@@ -104,26 +130,26 @@ export function ScanScreen({ submitted }: { submitted?: string }) {
               className="absolute inset-x-[14%] top-1/2 h-stroke-control -translate-y-1/2 bg-accent"
             />
           </div>
-          <p className="text-meta text-text-muted">{t('cameraHint')}</p>
+          <p className="text-meta text-text-muted">{t('scan.cameraHint')}</p>
         </div>
       )}
-      <Form
-        action="/scan"
-        replace={submitted !== undefined}
-        prefetch={false}
-        className="flex flex-col gap-2"
-      >
+      <form action="/scan" onSubmit={submit} className="flex flex-col gap-2">
         <TextField
+          // A new address resets the field to its text.
+          key={isbn ?? ''}
           ref={field}
           name="isbn"
-          label={t('isbn')}
+          label={t('scan.isbn')}
+          defaultValue={isbn}
+          error={error}
+          // The field is a new element after Go; keep the keyboard up to correct it.
+          autoFocus={error !== undefined}
           enterKeyHint="go"
           autoComplete="off"
           autoCapitalize="off"
           autoCorrect="off"
         />
-        {submitted !== undefined && <p className="text-meta text-text-muted">{submitted}</p>}
-      </Form>
+      </form>
     </>
   )
 }

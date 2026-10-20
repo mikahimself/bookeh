@@ -1,0 +1,209 @@
+import { describe, expect, it } from 'vitest'
+
+import {
+  answerFor,
+  answerLines,
+  notInLibrary,
+  type AnswerText,
+  type NotInLibrary,
+} from '@/app/(frontend)/scan/answer'
+import type { EffectiveBook } from '@/lib/books/effectiveBook'
+import type { Holdings } from '@/lib/books/holdings'
+import type { Draft, LookupResult } from '@/lib/catalogue/lookupBook'
+import { DomainError } from '@/lib/errors'
+
+const draft = (over: Partial<Draft> = {}): Draft => ({
+  isbn13: '9789510396358',
+  title: 'Tuntematon sotilas',
+  authors: [{ name: 'Väinö Linna', sortName: 'Linna, Väinö' }],
+  subjects: [],
+  themes: [],
+  source: 'finna',
+  hasCover: true,
+  ...over,
+})
+
+const book: EffectiveBook = {
+  bookId: 7,
+  isbn13: '9789510396358',
+  visibility: 'shared',
+  source: 'finna',
+  title: 'Tuntematon sotilas',
+  subtitle: null,
+  authors: [{ id: 3, name: 'Väinö Linna' }],
+  series: null,
+  seriesIndex: null,
+  genres: [],
+  themes: [],
+  publisher: 'WSOY',
+  year: 2014,
+  language: 'fi',
+  pages: 480,
+  description: null,
+  coverUrl: null,
+  overridden: [],
+}
+
+const nothing: Holdings = { copies: [], entries: [] }
+
+describe('notInLibrary', () => {
+  it('shows the picked candidate, its preview cover and what a save would create', () => {
+    const result: LookupResult = {
+      kind: 'source',
+      candidates: [
+        draft({ title: 'Other edition' }),
+        draft({ publisher: 'WSOY', year: 2014, pages: 480 }),
+      ],
+      pick: 1,
+      matches: {
+        authors: [{ name: 'Väinö Linna', id: null }],
+        series: { name: 'Sotaromaanit', id: 4 },
+      },
+    }
+    expect(notInLibrary(result)).toEqual({
+      title: 'Tuntematon sotilas',
+      authors: ['Väinö Linna'],
+      publisher: 'WSOY',
+      year: 2014,
+      pages: 480,
+      cover: '/data/cover/9789510396358',
+      source: 'finna',
+      newAuthors: ['Väinö Linna'],
+      newSeries: null,
+    })
+  })
+
+  it('leaves out a missing cover and edition parts, and names a new series', () => {
+    const answer = notInLibrary({
+      kind: 'source',
+      candidates: [draft({ hasCover: false, year: 2014, pages: 1, source: 'fixture' })],
+      pick: 0,
+      matches: { authors: [{ name: 'Väinö Linna', id: 3 }], series: { name: 'Uusi', id: null } },
+    })
+    expect(answer).toMatchObject({
+      cover: null,
+      publisher: null,
+      year: 2014,
+      pages: 1,
+      source: 'fixture',
+      newAuthors: [],
+      newSeries: 'Uusi',
+    })
+  })
+
+  it('answers a Book the viewer holds nothing of, with no source line or notes', () => {
+    expect(
+      notInLibrary({
+        kind: 'existing',
+        book: { ...book, coverUrl: '/api/media/file/c.jpg' },
+        mine: nothing,
+      }),
+    ).toEqual({
+      title: 'Tuntematon sotilas',
+      authors: ['Väinö Linna'],
+      publisher: 'WSOY',
+      year: 2014,
+      pages: 480,
+      cover: '/api/media/file/c.jpg',
+      source: null,
+      newAuthors: [],
+      newSeries: null,
+    })
+  })
+
+  it('is not the answer for a held Book or the other kinds', () => {
+    const copy = { copyId: 1, status: 'owned' as const, location: null, note: null, loan: null }
+    expect(
+      notInLibrary({ kind: 'existing', book, mine: { copies: [copy], entries: [] } }),
+    ).toBeNull()
+    expect(notInLibrary({ kind: 'none' })).toBeNull()
+    expect(notInLibrary({ kind: 'unavailable', failed: ['finna'] })).toBeNull()
+  })
+})
+
+describe('answerLines', () => {
+  const text: AnswerText = {
+    source: (id) => ({ finna: 'Finna', google: 'Google Books' })[id],
+    from: (source) => `From ${source}`,
+    pages: (pages) => `${pages} ${pages === 1 ? 'page' : 'pages'}`,
+    newAuthor: (name) => `New author · ${name}`,
+    newSeries: (name) => `New series · ${name}`,
+  }
+  const answer = (over: Partial<NotInLibrary> = {}): NotInLibrary => ({
+    title: 'Muumipeikko ja pyrstötähti',
+    authors: ['Tove Jansson', 'Kristiina Kivivuori'],
+    publisher: 'WSOY',
+    year: 2014,
+    pages: 180,
+    cover: null,
+    source: 'finna',
+    newAuthors: ['Kristiina Kivivuori'],
+    newSeries: 'Muumit',
+    ...over,
+  })
+
+  it('names the source and each record a save would create', () => {
+    expect(answerLines(answer(), text)).toEqual({
+      authors: 'Tove Jansson, Kristiina Kivivuori',
+      edition: 'WSOY · 2014 · 180 pages',
+      notes: ['From Finna', 'New author · Kristiina Kivivuori', 'New series · Muumit'],
+    })
+  })
+
+  it('skips missing edition parts and shows an unlabelled source by its id', () => {
+    const lines = answerLines(
+      answer({ publisher: null, pages: 1, source: 'fixture', newAuthors: [], newSeries: null }),
+      text,
+    )
+    expect(lines.edition).toBe('2014 · 1 page')
+    expect(lines.notes).toEqual(['From fixture'])
+  })
+
+  it('has no source line or notes for a Book, and empty lines for missing parts', () => {
+    expect(
+      answerLines(
+        answer({
+          authors: [],
+          publisher: null,
+          year: null,
+          pages: null,
+          source: null,
+          newAuthors: [],
+          newSeries: null,
+        }),
+        text,
+      ),
+    ).toEqual({ authors: '', edition: '', notes: [] })
+  })
+})
+
+describe('answerFor', () => {
+  it('answers, or keeps Scan when another Answer applies', async () => {
+    await expect(
+      answerFor(async () => ({ kind: 'existing', book, mine: nothing })),
+    ).resolves.toMatchObject({ kind: 'answer', answer: { title: 'Tuntematon sotilas' } })
+    await expect(answerFor(async () => ({ kind: 'none' }))).resolves.toEqual({ kind: 'scan' })
+  })
+
+  it.each(['INVALID_ISBN', 'RATE_LIMITED'] as const)('keeps Scan with %s', async (code) => {
+    await expect(
+      answerFor(async () => {
+        throw new DomainError(code)
+      }),
+    ).resolves.toEqual({ kind: 'scan', error: code })
+  })
+
+  it('rethrows anything else', async () => {
+    const internal = new DomainError('INTERNAL')
+    await expect(
+      answerFor(async () => {
+        throw internal
+      }),
+    ).rejects.toBe(internal)
+    await expect(
+      answerFor(async () => {
+        throw new Error('db down')
+      }),
+    ).rejects.toThrow('db down')
+  })
+})

@@ -1,37 +1,60 @@
 import { getTranslations } from 'next-intl/server'
 import { ViewTransition } from 'react'
 
+import { lookupBook } from '@/lib/catalogue/lookupBook'
 import { requireUser } from '@/lib/payload/context'
 
 import { FullScreenTask } from '../components/FullScreenTask'
+import { RaiseToast } from '../components/toast/RaiseToast'
 
+import { NotInLibraryAnswer } from './NotInLibraryAnswer'
+import { answerFor, type ScanOutcome } from './answer'
 import { ScanScreen } from './ScanScreen'
 
 /**
- * Scan, a full-screen task. The wrapper sits in the page, not a layout, so
- * it mounts and unmounts with the route: the task slides in on the way in,
- * and away when a push or replace leaves it. A history traversal runs with
- * no view transition, so the X going back slides the task away by hand
- * (navigation.ts); browser Back swaps at once. `?isbn=` is the Answer's
- * address (Story 3.45); until then the screen shows the submitted text.
+ * Scan and its Answer, a full-screen task. The wrapper sits in the page, not
+ * a layout, so it mounts and unmounts with the route: the task slides in on
+ * the way in, and away when a push or replace leaves it. A history traversal
+ * runs with no view transition, so the X going back slides the task away by
+ * hand (navigation.ts); browser Back swaps at once.
+ *
+ * `?isbn=` is the Answer's address: the lookup runs here, on the server, with
+ * the text as typed. An invalid ISBN or the rate limit keeps Scan with the
+ * text in the field; so do the Answers still to come (in library, not found,
+ * couldn't look it up).
  */
 export default async function ScanPage({
   searchParams,
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>
 }) {
-  await requireUser()
-  const t = await getTranslations('scan')
+  const ctx = await requireUser()
+  const t = await getTranslations()
   const { isbn } = await searchParams
-  const text = Array.isArray(isbn) ? isbn[0] : isbn
+  const param = Array.isArray(isbn) ? isbn[0] : isbn
   // Go on an empty field is no submission.
-  const submitted = text?.trim() ? text : undefined
+  const text = param?.trim() ? param : undefined
+  const outcome: ScanOutcome =
+    text === undefined ? { kind: 'scan' } : await answerFor(() => lookupBook(ctx, { isbn: text }))
 
   return (
     <ViewTransition enter="task-enter" exit="task-exit" default="none">
-      <FullScreenTask title={t('heading')}>
-        <ScanScreen submitted={submitted} />
-      </FullScreenTask>
+      {outcome.kind === 'answer' ? (
+        <FullScreenTask title={t('answer.notInLibrary')}>
+          <NotInLibraryAnswer answer={outcome.answer} />
+        </FullScreenTask>
+      ) : (
+        <FullScreenTask title={t('scan.heading')}>
+          <ScanScreen
+            isbn={text}
+            error={outcome.error === 'INVALID_ISBN' ? t('errors.INVALID_ISBN') : undefined}
+          />
+          {outcome.error === 'RATE_LIMITED' && (
+            // Fresh per render, so a repeated submit raises it again.
+            <RaiseToast key={crypto.randomUUID()} input={{ kind: 'error', code: 'RATE_LIMITED' }} />
+          )}
+        </FullScreenTask>
+      )}
     </ViewTransition>
   )
 }
