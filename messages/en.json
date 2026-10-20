@@ -63,6 +63,10 @@
   },
   "answer": {
     "notInLibrary": "Not in library",
+    "inLibrary": "In library",
+    "addAnotherCopy": "Add another copy",
+    "copy": "{status, select, ordered {Ordered} other {Owned}}",
+    "copyAt": "{location} · {status, select, ordered {ordered} other {owned}}",
     "addToLibrary": "Add to library",
     "from": "From {source}",
     "newAuthor": "New author · {name}",

@@ -3,12 +3,14 @@ import { describe, expect, it } from 'vitest'
 import {
   answerFor,
   answerLines,
+  copyLines,
+  inLibrary,
   notInLibrary,
+  type AnswerBook,
   type AnswerText,
-  type NotInLibrary,
 } from '@/app/(frontend)/scan/answer'
 import type { EffectiveBook } from '@/lib/books/effectiveBook'
-import type { Holdings } from '@/lib/books/holdings'
+import type { CopyLine, Holdings } from '@/lib/books/holdings'
 import type { Draft, LookupResult } from '@/lib/catalogue/lookupBook'
 import { DomainError } from '@/lib/errors'
 
@@ -45,6 +47,17 @@ const book: EffectiveBook = {
 }
 
 const nothing: Holdings = { copies: [], entries: [] }
+
+const copy = (over: Partial<CopyLine> = {}): CopyLine => ({
+  copyId: 1,
+  status: 'owned',
+  location: null,
+  note: null,
+  loan: null,
+  ...over,
+})
+
+const entry = { entryId: 1, wishlist: { id: 2, name: 'Toiveet' }, forPerson: null }
 
 describe('notInLibrary', () => {
   it('shows the picked candidate, its preview cover and what a save would create', () => {
@@ -114,9 +127,11 @@ describe('notInLibrary', () => {
   })
 
   it('is not the answer for a held Book or the other kinds', () => {
-    const copy = { copyId: 1, status: 'owned' as const, location: null, note: null, loan: null }
     expect(
-      notInLibrary({ kind: 'existing', book, mine: { copies: [copy], entries: [] } }),
+      notInLibrary({ kind: 'existing', book, mine: { copies: [copy()], entries: [] } }),
+    ).toBeNull()
+    expect(
+      notInLibrary({ kind: 'existing', book, mine: { copies: [], entries: [entry] } }),
     ).toBeNull()
     // The lookup found the Book by its ISBN, so this cannot happen.
     expect(
@@ -124,6 +139,73 @@ describe('notInLibrary', () => {
     ).toBeNull()
     expect(notInLibrary({ kind: 'none' })).toBeNull()
     expect(notInLibrary({ kind: 'unavailable', failed: ['finna'] })).toBeNull()
+  })
+})
+
+describe('inLibrary', () => {
+  it('lists each copy in Holdings order, with its location name and status', () => {
+    const copies = [
+      copy({ copyId: 4, location: { id: 9, name: 'Tampere' } }),
+      copy({ copyId: 2 }),
+      copy({ copyId: 3, status: 'ordered' }),
+    ]
+    expect(inLibrary({ kind: 'existing', book, mine: { copies, entries: [] } })).toEqual({
+      isbn13: '9789510396358',
+      title: 'Tuntematon sotilas',
+      authors: ['Väinö Linna'],
+      publisher: 'WSOY',
+      year: 2014,
+      pages: 480,
+      cover: null,
+      source: null,
+      newAuthors: [],
+      newSeries: null,
+      copies: [
+        { location: 'Tampere', status: 'owned' },
+        { location: null, status: 'owned' },
+        { location: null, status: 'ordered' },
+      ],
+    })
+  })
+
+  it('is not the answer without a copy, without an ISBN, or for the other kinds', () => {
+    expect(inLibrary({ kind: 'existing', book, mine: nothing })).toBeNull()
+    expect(inLibrary({ kind: 'existing', book, mine: { copies: [], entries: [entry] } })).toBeNull()
+    expect(
+      inLibrary({
+        kind: 'existing',
+        book: { ...book, isbn13: null },
+        mine: { copies: [copy()], entries: [] },
+      }),
+    ).toBeNull()
+    expect(
+      inLibrary({
+        kind: 'source',
+        candidates: [draft()],
+        pick: 0,
+        matches: { authors: [], series: null },
+      }),
+    ).toBeNull()
+    expect(inLibrary({ kind: 'none' })).toBeNull()
+    expect(inLibrary({ kind: 'unavailable', failed: ['finna'] })).toBeNull()
+  })
+})
+
+describe('copyLines', () => {
+  it('gives a line per copy in order, with the location only when there is one', () => {
+    expect(
+      copyLines(
+        [
+          { location: 'Tampere', status: 'owned' },
+          { location: null, status: 'owned' },
+          { location: null, status: 'ordered' },
+        ],
+        {
+          copy: (status) => status,
+          copyAt: (location, status) => `${location} · ${status}`,
+        },
+      ),
+    ).toEqual(['Tampere · owned', 'owned', 'ordered'])
   })
 })
 
@@ -135,7 +217,7 @@ describe('answerLines', () => {
     newAuthor: (name) => `New author · ${name}`,
     newSeries: (name) => `New series · ${name}`,
   }
-  const answer = (over: Partial<NotInLibrary> = {}): NotInLibrary => ({
+  const answer = (over: Partial<AnswerBook> = {}): AnswerBook => ({
     isbn13: '9789510396358',
     title: 'Muumipeikko ja pyrstötähti',
     authors: ['Tove Jansson', 'Kristiina Kivivuori'],
@@ -185,10 +267,19 @@ describe('answerLines', () => {
 })
 
 describe('answerFor', () => {
-  it('answers, or keeps Scan when another Answer applies', async () => {
+  it('answers In library for a held copy, Not in library for nothing held, else Scan', async () => {
+    await expect(
+      answerFor(async () => ({ kind: 'existing', book, mine: { copies: [copy()], entries: [] } })),
+    ).resolves.toMatchObject({
+      kind: 'inLibrary',
+      answer: { title: 'Tuntematon sotilas', copies: [{ location: null, status: 'owned' }] },
+    })
     await expect(
       answerFor(async () => ({ kind: 'existing', book, mine: nothing })),
-    ).resolves.toMatchObject({ kind: 'answer', answer: { title: 'Tuntematon sotilas' } })
+    ).resolves.toMatchObject({ kind: 'notInLibrary', answer: { title: 'Tuntematon sotilas' } })
+    await expect(
+      answerFor(async () => ({ kind: 'existing', book, mine: { copies: [], entries: [entry] } })),
+    ).resolves.toEqual({ kind: 'scan' })
     await expect(answerFor(async () => ({ kind: 'none' }))).resolves.toEqual({ kind: 'scan' })
   })
 

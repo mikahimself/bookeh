@@ -63,6 +63,10 @@
   },
   "answer": {
     "notInLibrary": "Ei kirjastossa",
+    "inLibrary": "Kirjastossa",
+    "addAnotherCopy": "Lisää uusi kappale",
+    "copy": "{status, select, ordered {Tilattu} other {Oma}}",
+    "copyAt": "{location} · {status, select, ordered {tilattu} other {oma}}",
     "addToLibrary": "Lisää kirjastoon",
     "from": "Lähde: {source}",
     "newAuthor": "Uusi kirjailija · {name}",

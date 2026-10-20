@@ -6,13 +6,14 @@ import { requireUserOrThrow } from '@/lib/payload/context'
 import type { Undoable } from '@/lib/undo/undo'
 
 /**
- * Add to library on the Not in library Answer (FR-21): an owned copy of the
- * ISBN's Book at the default location. The input comes from the client, so
- * anything but `{ requestId, isbn13 }` strings is `VALIDATION` before
- * `saveCopy()` sees it. Every failure but a signed-out session reads as
- * `SAVE_FAILED`: to the person scanning they all mean "try again". The
- * `runAction()` log line for an unexpected error still happens; any other
- * code is logged here as a warning, so the folded code leaves a trace.
+ * Add to library on the Not in library Answer (FR-21) and Add another copy on
+ * the In library Answer (FR-20): an owned copy of the ISBN's Book at the
+ * default location. The input comes from the client, so anything but
+ * `{ requestId, isbn13 }` strings is `VALIDATION` before `saveCopy()` sees
+ * it. Every failure but a signed-out session reads as `SAVE_FAILED`: to the
+ * person scanning they all mean "try again". The `runAction()` log line for
+ * an unexpected error still happens; any other code is logged here as a
+ * warning, so the folded code leaves a trace.
  */
 export async function saveCopyAction(input: unknown): Promise<ActionResult<Undoable<SaveResult>>> {
   const result = await runAction(async () => {

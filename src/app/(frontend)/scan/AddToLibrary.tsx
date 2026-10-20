@@ -25,8 +25,11 @@ import { saveCopyAction } from './actions'
  * revived instance saves again. When the Answer has already been left (Back,
  * X), the toast still shows and nothing navigates. The progress line runs
  * while a save is in flight (EXPERIENCE.md, Progress line).
+ *
+ * `another` makes it Add another copy on the In library Answer: the same
+ * save, toast and return, as a secondary button.
  */
-export function AddToLibrary({ isbn13 }: { isbn13: string }) {
+export function AddToLibrary({ isbn13, another = false }: { isbn13: string; another?: boolean }) {
   const t = useTranslations()
   const { show } = useToast()
   const reportFailure = useReportFailure()
@@ -78,8 +81,8 @@ export function AddToLibrary({ isbn13 }: { isbn13: string }) {
   return (
     <>
       {pending && <ProgressLine label={t('progress.loading')} />}
-      <Button variant="primary" onClick={add} disabled={pending}>
-        {t('answer.addToLibrary')}
+      <Button variant={another ? 'secondary' : 'primary'} onClick={add} disabled={pending}>
+        {t(another ? 'answer.addAnotherCopy' : 'answer.addToLibrary')}
       </Button>
     </>
   )

@@ -1,3 +1,4 @@
+import { createTranslator } from 'next-intl'
 import { describe, expect, it } from 'vitest'
 
 import type { ErrorCode } from '@/lib/errors'
@@ -85,4 +86,18 @@ describe('message catalogues', () => {
       }
     },
   )
+
+  // The In library Answer's copy lines: the status by select, after the location when there is one.
+  it.each([
+    ['en', en],
+    ['fi', fi],
+  ] as const)('formats a copy line with and without a location in %s', (locale, messages) => {
+    const t = createTranslator({ locale, messages, namespace: 'answer' })
+    expect(t('copyAt', { location: 'Tampere', status: 'owned' })).toContain('Tampere')
+    const owned = t('copy', { status: 'owned' })
+    const ordered = t('copy', { status: 'ordered' })
+    expect(owned).not.toBe('')
+    expect(ordered).not.toBe('')
+    expect(owned).not.toBe(ordered)
+  })
 })

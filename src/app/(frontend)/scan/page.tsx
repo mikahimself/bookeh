@@ -8,6 +8,7 @@ import { FullScreenTask } from '../components/FullScreenTask'
 import { DismissToast } from '../components/toast/DismissToast'
 import { RaiseToast } from '../components/toast/RaiseToast'
 
+import { InLibraryAnswer } from './InLibraryAnswer'
 import { NotInLibraryAnswer } from './NotInLibraryAnswer'
 import { answerFor, type ScanOutcome } from './answer'
 import { ScanScreen } from './ScanScreen'
@@ -21,8 +22,8 @@ import { ScanScreen } from './ScanScreen'
  *
  * `?isbn=` is the Answer's address: the lookup runs here, on the server, with
  * the text as typed. An invalid ISBN or the rate limit keeps Scan with the
- * text in the field; so do the Answers still to come (in library, not found,
- * couldn't look it up).
+ * text in the field; so do the Answers still to come (not found, couldn't
+ * look it up, on wishlist).
  */
 export default async function ScanPage({
   searchParams,
@@ -40,13 +41,7 @@ export default async function ScanPage({
 
   return (
     <ViewTransition enter="task-enter" exit="task-exit" default="none">
-      {outcome.kind === 'answer' ? (
-        <FullScreenTask title={t('answer.notInLibrary')}>
-          <NotInLibraryAnswer answer={outcome.answer} />
-          {/* The next Answer removes the toast on screen, the held save toast included. */}
-          <DismissToast />
-        </FullScreenTask>
-      ) : (
+      {outcome.kind === 'scan' ? (
         <FullScreenTask title={t('scan.heading')}>
           <ScanScreen
             isbn={text}
@@ -56,6 +51,16 @@ export default async function ScanPage({
             // Fresh per render, so a repeated submit raises it again.
             <RaiseToast key={crypto.randomUUID()} input={{ kind: 'error', code: 'RATE_LIMITED' }} />
           )}
+        </FullScreenTask>
+      ) : (
+        <FullScreenTask title={t(`answer.${outcome.kind}`)}>
+          {outcome.kind === 'inLibrary' ? (
+            <InLibraryAnswer answer={outcome.answer} />
+          ) : (
+            <NotInLibraryAnswer answer={outcome.answer} />
+          )}
+          {/* The next Answer removes the toast on screen, the held save toast included. */}
+          <DismissToast />
         </FullScreenTask>
       )}
     </ViewTransition>

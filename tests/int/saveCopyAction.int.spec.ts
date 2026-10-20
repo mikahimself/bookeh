@@ -106,6 +106,19 @@ describe('saveCopyAction', () => {
     expect(await undoAction(result.data.undoToken)).toEqual({ ok: false, code: 'UNDO_FAILED' })
   })
 
+  it('adds another owned copy of a Book the user already holds', async () => {
+    expect(await saveCopyAction({ requestId: randomUUID(), isbn13 })).toMatchObject({ ok: true })
+
+    expect(await saveCopyAction({ requestId: randomUUID(), isbn13 })).toMatchObject({
+      ok: true,
+      data: { savedTo: { id: location.id, name: 'Tampere' } },
+    })
+    expect(await copies()).toMatchObject([
+      { status: 'owned', location: location.id },
+      { status: 'owned', location: location.id },
+    ])
+  })
+
   it.each([
     ['a malformed input', { isbn13: 5 }],
     ['no input', undefined],
