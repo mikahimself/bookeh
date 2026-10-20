@@ -2,6 +2,7 @@ import { normaliseIsbn } from '@/fields/isbn'
 import { coverUrl } from '@/lib/books/coverUrl'
 import type { LookupResult } from '@/lib/catalogue/lookupBook'
 import { DomainError } from '@/lib/errors'
+import type { SourceId } from '@/lib/metadata/source'
 
 /**
  * One source candidate in the edition picker (EXPERIENCE.md, Answer, Several
@@ -247,15 +248,17 @@ export type ScanOutcome =
   | { kind: 'inLibrary'; answer: InLibrary }
   | { kind: 'notInLibrary'; answer: AnswerBook }
   | { kind: 'notFound'; isbn13: string | null; title: string }
+  | { kind: 'unavailable'; isbn13: string; failed: SourceId[] }
   | { kind: 'scan'; error?: 'INVALID_ISBN' | 'RATE_LIMITED' }
 
 /**
  * What `/scan?isbn=` renders for `isbn`, the text as typed: the In library
  * Answer, the Not in library Answer, the Not found Answer when no source
- * knows the ISBN (with it in 13 digits: the lookup has accepted the text), or
- * Scan, with the field error or rate-limit toast the lookup refused with.
- * Sources that could not answer keep Scan until Story 3.50. Any other error
- * propagates to Next's error handling.
+ * knows the ISBN (with it in 13 digits: the lookup has accepted the text),
+ * Couldn't look it up when a source failed and none had it (with the ISBN
+ * likewise, and the failed sources in the lookup's order: AD-9), or Scan,
+ * with the field error or rate-limit toast the lookup refused with. Any other
+ * error propagates to Next's error handling.
  */
 export async function answerFor(
   isbn: string,
@@ -274,6 +277,9 @@ export async function answerFor(
     throw err
   }
   if (result.kind === 'none') return { kind: 'notFound', isbn13: normaliseIsbn(isbn), title: '' }
+  if (result.kind === 'unavailable') {
+    return { kind: 'unavailable', isbn13: normaliseIsbn(isbn), failed: result.failed }
+  }
   const held = inLibrary(result)
   if (held) return { kind: 'inLibrary', answer: held }
   const answer = notInLibrary(result)

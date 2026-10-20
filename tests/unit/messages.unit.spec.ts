@@ -100,4 +100,29 @@ describe('message catalogues', () => {
     expect(ordered).not.toBe('')
     expect(owned).not.toBe(ordered)
   })
+
+  // Couldn't look it up: the silent sources joined for the locale; Finnish verbs agree with the count.
+  it.each([
+    ['en', en, ['Finna'], "Finna didn't answer. 9789510397077 may still be known."],
+    [
+      'en',
+      en,
+      ['Finna', 'Google Books'],
+      "Finna and Google Books didn't answer. 9789510397077 may still be known.",
+    ],
+    ['fi', fi, ['Finna'], 'Finna ei vastannut. 9789510397077 voi silti löytyä.'],
+    [
+      'fi',
+      fi,
+      ['Finna', 'Google Books'],
+      'Finna ja Google Books eivät vastanneet. 9789510397077 voi silti löytyä.',
+    ],
+  ] as const)(
+    'names the sources that did not answer in %s: %j',
+    (locale, messages, names, text) => {
+      const t = createTranslator({ locale, messages, namespace: 'answer' })
+      const sources = new Intl.ListFormat(locale, { type: 'conjunction' }).format(names)
+      expect(t('noAnswer', { sources, count: names.length, isbn: '9789510397077' })).toBe(text)
+    },
+  )
 })

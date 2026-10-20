@@ -394,10 +394,17 @@ describe('answerFor', () => {
     })
   })
 
-  it('keeps Scan when a source could not answer', async () => {
+  it("answers Couldn't look it up with the ISBN in 13 digits and the failed sources in order", async () => {
     await expect(
-      answerFor(ISBN, async () => ({ kind: 'unavailable', failed: ['finna'] })),
-    ).resolves.toEqual({ kind: 'scan' })
+      answerFor('951-0-39707-5', async () => ({
+        kind: 'unavailable',
+        failed: ['google', 'finna'],
+      })),
+    ).resolves.toEqual({
+      kind: 'unavailable',
+      isbn13: '9789510397077',
+      failed: ['google', 'finna'],
+    })
   })
 
   it.each(['INVALID_ISBN', 'RATE_LIMITED'] as const)('keeps Scan with %s', async (code) => {

@@ -82,7 +82,11 @@
     "authorRequired": "Kirjoita tekijä.",
     "editionsFound": "{n} painosta löytyi",
     "editions": "Painokset",
-    "unnamedEdition": "Painos {n}"
+    "unnamedEdition": "Painos {n}",
+    "unavailable": "Haku ei onnistunut",
+    "noAnswer": "{count, plural, one {{sources} ei vastannut.} other {{sources} eivät vastanneet.}} {isbn} voi silti löytyä.",
+    "tryAgain": "Yritä uudelleen",
+    "addByHand": "Lisää käsin"
   },
   "sources": {
     "finna": "Finna",

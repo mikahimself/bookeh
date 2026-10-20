@@ -13,6 +13,7 @@ import { NotFoundAnswer } from './NotFoundAnswer'
 import { NotInLibraryAnswer } from './NotInLibraryAnswer'
 import { answerFor, scanParams, type ScanOutcome } from './answer'
 import { ScanScreen } from './ScanScreen'
+import { UnavailableAnswer } from './UnavailableAnswer'
 
 /**
  * Scan and its Answer, a full-screen task. The wrapper sits in the page, not
@@ -23,8 +24,10 @@ import { ScanScreen } from './ScanScreen'
  *
  * `?isbn=` is the Answer's address: the lookup runs here, on the server, with
  * the text as typed. An invalid ISBN or the rate limit keeps Scan with the
- * text in the field; so do the Answers still to come (couldn't look it up,
- * on wishlist). An ISBN no source knows opens Not found with it.
+ * text in the field; so does the Answer still to come (on wishlist). An ISBN
+ * no source knows opens Not found with it; one no source had while a source
+ * failed opens Couldn't look it up, whose Try again renders this address
+ * again.
  *
  * `?title=` with no `isbn` (or a blank one) is the Not found Answer with no
  * ISBN and the text in its Title field (`scanParams()`).
@@ -66,6 +69,8 @@ export default async function ScanPage({
             <InLibraryAnswer answer={outcome.answer} />
           ) : outcome.kind === 'notInLibrary' ? (
             <NotInLibraryAnswer answer={outcome.answer} />
+          ) : outcome.kind === 'unavailable' ? (
+            <UnavailableAnswer isbn13={outcome.isbn13} failed={outcome.failed} />
           ) : (
             <NotFoundAnswer isbn13={outcome.isbn13} title={outcome.title} />
           )}
