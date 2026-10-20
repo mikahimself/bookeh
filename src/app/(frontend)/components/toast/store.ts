@@ -30,6 +30,8 @@ export type ToastState = {
 export type ToastStore = {
   show: (input: ToastInput) => void
   dismiss: () => void
+  /** A held success starts the ordinary `successMs` timer; anything else is untouched. */
+  release: () => void
   subscribe: (listener: () => void) => () => void
   getState: () => ToastState
 }
@@ -37,7 +39,8 @@ export type ToastStore = {
 /**
  * Pure toast state, one toast at a time (DESIGN.md, Toast; spine, Toasts).
  * A success without `hold` leaves after `successMs`; errors and held
- * successes stay until dismissed or replaced. Leaving takes `leaveMs`, which
+ * successes stay until dismissed, replaced or released (`release()` gives a
+ * held success the usual timer). Leaving takes `leaveMs`, which
  * must equal `--default-transition-duration` in `styles.css`: the box fades
  * out for exactly as long as it is still mounted. A success with `undo`
  * keeps its token for `undo.seconds`, then drops it and stays as it is: the
@@ -105,6 +108,15 @@ export function createToastStore(leaveMs = 200, successMs = 8000): ToastStore {
     startLeaving()
   }
 
+  const release = () => {
+    if (!state || state.leaving || timer !== undefined) return
+    if (state.input.kind !== 'success' || !state.input.hold) return
+    timer = setTimeout(() => {
+      timer = undefined
+      startLeaving()
+    }, successMs)
+  }
+
   const subscribe = (listener: () => void) => {
     listeners.add(listener)
     return () => {
@@ -112,5 +124,5 @@ export function createToastStore(leaveMs = 200, successMs = 8000): ToastStore {
     }
   }
 
-  return { show, dismiss, subscribe, getState: () => state }
+  return { show, dismiss, release, subscribe, getState: () => state }
 }

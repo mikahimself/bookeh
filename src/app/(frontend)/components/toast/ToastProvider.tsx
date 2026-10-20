@@ -23,6 +23,7 @@ import { ToastView } from './ToastView'
 type ToastContextValue = {
   show: (input: ToastInput) => void
   dismiss: () => void
+  release: () => void
 }
 
 const ToastContext = createContext<ToastContextValue | null>(null)
@@ -46,7 +47,10 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   const pathname = usePathname()
   const router = useRouter()
   const [undoPending, startUndo] = useTransition()
-  const value = useMemo(() => ({ show: store.show, dismiss: store.dismiss }), [store])
+  const value = useMemo(
+    () => ({ show: store.show, dismiss: store.dismiss, release: store.release }),
+    [store],
+  )
 
   /**
    * EXPERIENCE.md, Feedback: Undo becomes "Undone" for a moment (a timed

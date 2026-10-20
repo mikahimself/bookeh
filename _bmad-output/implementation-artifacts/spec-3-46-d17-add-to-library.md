@@ -17,13 +17,6 @@ deferred:
     location: >-
       src/app/(frontend)/scan/page.tsx
     severity: low
-  - summary: >-
-      The held save toast stays with no timer after the user closes the scan task with X, on whatever section they land.
-    evidence: |-
-      EXPERIENCE.md (Toast) says a toast raised on Scan "stays until the next Answer opens". Read literally, leaving the task keeps it held. The toast has a close X, and with 3.47 it carries Undo, which may be worth keeping. Whether leaving the task should switch it to the 8 s timer is a UX decision for the owner. The fix needs a store API to re-time a toast.
-    location: >-
-      src/app/(frontend)/components/toast/store.ts
-    severity: low
 ---
 
 <intent-contract>
@@ -191,7 +184,7 @@ deferred:
   - a signed-out test at the button.
 - **Deferred, 2:**
   - page-wiring coverage, to 3.52's Playwright;
-  - the held toast after X closes the task, a UX call for the owner.
+  - the held toast after X closes the task, a UX call for the owner. Mika decided it on 2026-10-20: leaving Scan gives it the usual 8 s. Done in a follow-up commit: `release()` on the toast store, `ReleaseHeldToast` in the scan layout, and EXPERIENCE.md's Toast row amended.
 - **Rejected, with reasons in the triage log:**
   - waiting for the save before leaving (the AC requires it on failure);
   - the 20 s NFR (manual);
@@ -223,4 +216,3 @@ deferred:
   - the progress line;
   - the 20 s phone flow.
 - After a save, browser Forward can restore the stale Answer (rejected as rare).
-- The held toast stays on a section after X until it is closed (deferred).

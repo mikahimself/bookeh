@@ -63,6 +63,34 @@ describe('createToastStore', () => {
     expect(store.getState()).toBeNull()
   })
 
+  it('gives a released held success the 8 s timer, once', () => {
+    const store = createToastStore()
+    store.show({ ...success, hold: true })
+    vi.advanceTimersByTime(60_000)
+    store.release()
+    vi.advanceTimersByTime(4000)
+    // A second release does not restart the timer.
+    store.release()
+    vi.advanceTimersByTime(3999)
+    expect(store.getState()).toMatchObject({ leaving: false })
+    vi.advanceTimersByTime(1)
+    expect(store.getState()).toMatchObject({ leaving: true })
+  })
+
+  it('release leaves an error and a timed success as they are', () => {
+    const store = createToastStore()
+    store.show(error)
+    store.release()
+    vi.advanceTimersByTime(10 * 60 * 1000)
+    expect(store.getState()).toMatchObject({ input: error, leaving: false })
+
+    store.show(success)
+    vi.advanceTimersByTime(4000)
+    store.release()
+    vi.advanceTimersByTime(4000)
+    expect(store.getState()).toMatchObject({ leaving: true })
+  })
+
   it('never leaves an error on a timer', () => {
     const store = createToastStore()
     store.show(error)
