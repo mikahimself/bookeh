@@ -140,7 +140,7 @@ export async function ensureSharedBook(
 
 // By `where`, not by id: a row already gone matches nothing, where a failed
 // `deleteByID` (`NotFound`) would end the transaction.
-async function deleteRow(
+export async function deleteRow(
   tx: Context,
   collection: 'books' | 'authors' | 'series',
   id: number,
