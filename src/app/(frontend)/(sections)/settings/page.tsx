@@ -2,10 +2,12 @@ import { getTranslations } from 'next-intl/server'
 import type { ReactNode } from 'react'
 
 import { COLLECTION_VISIBILITIES, getProfile, PROFILE_VISIBILITIES } from '@/lib/account/profile'
+import { listLocations } from '@/lib/copies/locations'
 import { requireUser } from '@/lib/payload/context'
 
 import { SignOutButton } from '../../components/SignOutButton'
 import { devicePrefs, THEMES } from '../../prefs'
+import { DefaultLocationField } from './DefaultLocationField'
 import { DisplayNameField } from './DisplayNameField'
 import { LanguageSwitch } from './LanguageSwitch'
 import { ThemeSwitch } from './ThemeSwitch'
@@ -21,19 +23,19 @@ function Group({ heading, children }: { heading: string; children: ReactNode }) 
 }
 
 /**
- * Settings (EXPERIENCE.md, Settings): profile, language, theme, visibility
- * and Sign out in the first of two columns on wide screens, one column on the
- * phone.
- * Reads go through `getProfile()` and `devicePrefs()`; the controls write
- * through `updateProfileAction` and `setDevicePrefsAction`.
+ * Settings (EXPERIENCE.md, Settings): profile, language, theme, visibility,
+ * default location and Sign out in the first of two columns on wide screens,
+ * one column on the phone.
+ * Reads go through `getProfile()`, `listLocations()` and `devicePrefs()`; the
+ * controls write through `updateProfileAction`, `setDefaultLocationAction`
+ * and `setDevicePrefsAction`.
  */
 export default async function SettingsPage() {
   const ctx = await requireUser()
-  const [profile, { theme }, t] = await Promise.all([
-    getProfile(ctx),
-    devicePrefs(),
-    getTranslations('settings'),
-  ])
+  const [{ theme }, t] = await Promise.all([devicePrefs(), getTranslations('settings')])
+  // Gateway calls on one context run one after the other, never concurrently.
+  const profile = await getProfile(ctx)
+  const locations = await listLocations(ctx)
 
   return (
     <div className="px-page-margin-phone pt-7 pb-7 wide:grid wide:grid-cols-2 wide:gap-7 wide:px-page-margin">
@@ -65,6 +67,9 @@ export default async function SettingsPage() {
             initial={profile.collectionVisibility}
             options={COLLECTION_VISIBILITIES}
           />
+        </Group>
+        <Group heading={t('defaultLocation')}>
+          <DefaultLocationField initial={profile.defaultLocation} locations={locations} />
         </Group>
         <SignOutButton />
       </div>

@@ -35,7 +35,9 @@
       "hidden": "Hidden",
       "open": "Open",
       "closed": "Closed"
-    }
+    },
+    "defaultLocation": "Default location",
+    "defaultLocationLabel": "New copies go to"
   },
   "toast": {
     "close": "Close",

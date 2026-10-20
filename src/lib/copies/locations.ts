@@ -42,3 +42,22 @@ export async function resolveLocation(ctx: Context, ref: Ref): Promise<number> {
   })
   return created.id
 }
+
+/** A location as a picker lists it. */
+export type LocationOption = { id: number; name: string }
+
+/**
+ * Spine, AD-18: the context user's own locations, sorted by name in the
+ * database's collation (Finnish ICU). Owner access scopes the read, the
+ * admin included.
+ */
+export async function listLocations(ctx: Context): Promise<LocationOption[]> {
+  const { docs } = await gateway.find(ctx, {
+    collection: 'locations',
+    sort: 'name',
+    pagination: false,
+    depth: 0,
+    select: { name: true },
+  })
+  return docs.map(({ id, name }) => ({ id, name }))
+}

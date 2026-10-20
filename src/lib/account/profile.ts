@@ -3,15 +3,25 @@ import type { Context } from '@/lib/payload/context'
 import * as gateway from '@/lib/payload/gateway'
 import type { User } from '@/payload-types'
 
-/** The signed-in user's profile as Settings shows it. Email is shown, never edited. */
+/**
+ * The signed-in user's profile as Settings shows it. Email is shown, never
+ * edited. `defaultLocation` is always an id, never a populated row.
+ */
 export type Profile = Pick<
   User,
   'email' | 'displayName' | 'language' | 'profileVisibility' | 'collectionVisibility'
->
+> & { defaultLocation: number | null }
 
-/** What a user may change on their own profile. An absent or `undefined` key is left as is. */
+/**
+ * What a user may change on their own profile. An absent or `undefined` key
+ * is left as is. `defaultLocation` is passed to the write as given:
+ * `users.defaultLocation`'s `ownedRelation` rejects a foreign or missing id
+ * with a `ValidationError` on `defaultLocation`.
+ */
 export type ProfileChanges = Partial<
-  Pick<User, 'displayName' | 'language' | 'profileVisibility' | 'collectionVisibility'>
+  Pick<User, 'displayName' | 'language' | 'profileVisibility' | 'collectionVisibility'> & {
+    defaultLocation: number | null
+  }
 >
 
 /** Visibility towards friends (FR-4): stored now, read by nothing in Phase 1. */
@@ -24,12 +34,20 @@ const toProfile = ({
   language,
   profileVisibility,
   collectionVisibility,
+  defaultLocation,
 }: User): Profile => ({
   email,
   displayName,
   language,
   profileVisibility,
   collectionVisibility,
+  // Read with `depth: 0`, so a row here is never expected; the type allows one.
+  defaultLocation:
+    defaultLocation === null || defaultLocation === undefined
+      ? null
+      : typeof defaultLocation === 'number'
+        ? defaultLocation
+        : defaultLocation.id,
 })
 
 /**
@@ -37,7 +55,7 @@ const toProfile = ({
  * context user's own document.
  */
 export async function getProfile(ctx: Context): Promise<Profile> {
-  return toProfile(await gateway.findByID(ctx, { collection: 'users', id: ctx.user.id }))
+  return toProfile(await gateway.findByID(ctx, { collection: 'users', id: ctx.user.id, depth: 0 }))
 }
 
 /**
@@ -61,7 +79,10 @@ export async function updateProfile(ctx: Context, changes: ProfileChanges): Prom
   if (changes.profileVisibility !== undefined) data.profileVisibility = changes.profileVisibility
   if (changes.collectionVisibility !== undefined)
     data.collectionVisibility = changes.collectionVisibility
+  if (changes.defaultLocation !== undefined) data.defaultLocation = changes.defaultLocation
 
   if (Object.keys(data).length === 0) return getProfile(ctx)
-  return toProfile(await gateway.updateByID(ctx, { collection: 'users', id: ctx.user.id, data }))
+  return toProfile(
+    await gateway.updateByID(ctx, { collection: 'users', id: ctx.user.id, data, depth: 0 }),
+  )
 }

@@ -35,6 +35,7 @@ describe('profile service', () => {
       language: 'en',
       profileVisibility: 'hidden',
       collectionVisibility: 'closed',
+      defaultLocation: null,
     })
   })
 
@@ -61,6 +62,7 @@ describe('profile service', () => {
       language: 'fi',
       profileVisibility: 'hidden',
       collectionVisibility: 'closed',
+      defaultLocation: null,
     })
     const row = await stored(a.id)
     expect(row.language).toBe('fi')
@@ -75,6 +77,7 @@ describe('profile service', () => {
       language: 'en',
       profileVisibility: 'hidden',
       collectionVisibility: 'open',
+      defaultLocation: null,
     })
     const row = await stored(a.id)
     expect(row.collectionVisibility).toBe('open')
@@ -112,6 +115,7 @@ describe('profile service', () => {
       language: 'en',
       profileVisibility: 'hidden',
       collectionVisibility: 'closed',
+      defaultLocation: null,
     })
     expect(await updateProfile(ctx, {})).toStrictEqual(profile)
     expect((await stored(a.id)).updatedAt).toBe(a.updatedAt)

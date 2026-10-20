@@ -35,7 +35,9 @@
       "hidden": "Piilotettu",
       "open": "Avoin",
       "closed": "Suljettu"
-    }
+    },
+    "defaultLocation": "Oletussijainti",
+    "defaultLocationLabel": "Uusien kappaleiden sijainti"
   },
   "toast": {
     "close": "Sulje",
