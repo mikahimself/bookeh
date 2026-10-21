@@ -129,7 +129,7 @@ development_status:
   4-15-k16-conventions-for-tests-story-size-and-the-spine: done
   4-16-d34-save-failures-that-lead-somewhere: done
   4-17-d35-one-lookup-outcome-per-save: done
-  4-18-d36-lookup-limit-on-saves-and-cover-previews: backlog
+  4-18-d36-lookup-limit-on-saves-and-cover-previews: done
   4-19-d37-private-book-merge-clean-up-and-the-d-8-merge-rule: done
   4-20-c14-lean-finna-raw-data-and-the-source-order-check: done
   4-21-a27-one-helper-for-system-privileges: backlog

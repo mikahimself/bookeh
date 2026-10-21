@@ -20,6 +20,7 @@ import {
 import { toNameKey } from '@/fields/nameKey'
 import { mediaDir } from '@/lib/catalogue/covers'
 import { lookupBook } from '@/lib/catalogue/lookupBook'
+import { LOOKUP_LIMIT, limitLookups } from '@/lib/catalogue/lookupLimit'
 import { saveCopy, type SaveInput } from '@/lib/catalogue/saveCopy'
 import {
   oncePerRequest,
@@ -27,7 +28,7 @@ import {
   REQUEST_WINDOW_MS,
 } from '@/lib/catalogue/saveRequests'
 import { DomainError, logger } from '@/lib/errors'
-import { lookupSources } from '@/lib/metadata/lookup'
+import { heldOutcome, lookupSources } from '@/lib/metadata/lookup'
 import type { SourcesOutcome } from '@/lib/metadata/source'
 import { undo } from '@/lib/undo/undo'
 import config from '@/payload.config'
@@ -172,6 +173,7 @@ describe('saveCopy', () => {
 
   beforeEach(() => {
     vi.mocked(lookupSources).mockReset()
+    vi.mocked(heldOutcome).mockReset()
     fetchSpy = vi
       .spyOn(globalThis, 'fetch')
       .mockImplementation(
@@ -459,6 +461,45 @@ describe('saveCopy', () => {
     ).toBe(0)
     expect(await filesInMedia()).not.toContain(filename)
     expect(await copiesOf(created)).toEqual([])
+  })
+
+  // AD-9: only a save that asks the sources counts. The limit is in process,
+  // so the test has its own user.
+  it('counts a lookup only when no outcome is held, refusing past the limit', async () => {
+    const { user, ctx } = await freshUser()
+    for (let i = 0; i < LOOKUP_LIMIT; i++) limitLookups(ctx)
+    const held = randomIsbn()
+    const fresh = randomIsbn()
+    const outcome = found(held, { author: unique('Juhani Aho'), series: unique('Lastuja') })
+    vi.mocked(heldOutcome).mockImplementation((isbn13) => (isbn13 === held ? outcome : undefined))
+
+    const saved = await saveCopy(ctx, inputFor(held))
+    const book = await payload.findByID({
+      collection: 'books',
+      id: saved.bookId,
+      overrideAccess: true,
+      depth: 1,
+    })
+    if (typeof book.cover === 'object' && book.cover !== null) {
+      mediaIds.push(book.cover.id)
+      filenames.push(book.cover.filename!)
+    }
+    expect(book).toMatchObject({ isbn13: held, visibility: 'shared' })
+    // A held Book never asks the sources, so it counts nothing either.
+    const shelved = randomIsbn()
+    const existing = await bookFor(undefined, shelved, 'shared')
+    expect(await saveCopy(ctx, inputFor(shelved))).toMatchObject({ bookId: existing.id })
+
+    const covers = fetchSpy.mock.calls.length
+    await expect(saveCopy(ctx, inputFor(fresh))).rejects.toMatchObject(
+      new DomainError('RATE_LIMITED'),
+    )
+    expect(lookupSources).not.toHaveBeenCalled()
+    expect(fetchSpy).toHaveBeenCalledTimes(covers)
+    expect(await booksWithIsbn(fresh)).toEqual([])
+    expect((await copiesOf(user)).map((copy) => copy.book).sort()).toEqual(
+      [saved.bookId, existing.id].sort(),
+    )
   })
 
   // AD-11/AD-12: the memory is in process and shared by every test in the run,

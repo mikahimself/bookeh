@@ -15,6 +15,7 @@ import {
 } from '@/lib/catalogue/coverPreview'
 import { coverPolicy } from '@/lib/catalogue/covers'
 import { lookupBook } from '@/lib/catalogue/lookupBook'
+import { LOOKUP_LIMIT, limitLookups } from '@/lib/catalogue/lookupLimit'
 import { lookupSources } from '@/lib/metadata/lookup'
 import type { SourceResult, SourcesOutcome } from '@/lib/metadata/source'
 import type { Context } from '@/lib/payload/context'
@@ -23,10 +24,11 @@ import config from '@/payload.config'
 import { contextFor, createUser } from '../helpers/harness'
 import { randomIsbn } from '../helpers/isbn'
 
-// The pre-save cover preview, AD-10/AD-14: `lookupBook` records every
+// The pre-save cover preview, AD-9/AD-10/AD-14: `lookupBook` records every
 // candidate's cover URL per user; `/data/cover/[isbn13]?pick=` fetches one
-// with the cover download's checks. The source is a local fixture server, which the
-// mocked `coverPolicy` allows; `lookupSources` is faked.
+// with the cover download's checks, counting one lookup, and holds it. The
+// source is a local fixture server, which the mocked `coverPolicy` allows;
+// `lookupSources` is faked.
 
 const fixture = vi.hoisted(() => ({ origin: '' }))
 
@@ -98,16 +100,25 @@ describe('cover preview', () => {
     })
   }
 
+  /** A new signed-in user: its context and session cookie. */
+  const signedIn = async (displayName: string) => {
+    const user = await createUser({ password, displayName })
+    const login = await payload.login({
+      collection: 'users',
+      data: { email: user.email, password },
+    })
+    if (!login.token) throw new Error('login returned no token')
+    return { ctx: await contextFor(user), cookie: `payload-token=${login.token}` }
+  }
+
   beforeAll(async () => {
     payload = await getPayload({ config })
     vi.mocked(headers).mockImplementation(async () => requestHeaders as never)
 
-    const a = await createUser({ password, displayName: 'Preview User A' })
-    asA = await contextFor(a)
+    const a = await signedIn('Preview User A')
+    asA = a.ctx
+    cookieA = a.cookie
     asB = await contextFor(await createUser({ displayName: 'Preview User B' }))
-    const login = await payload.login({ collection: 'users', data: { email: a.email, password } })
-    if (!login.token) throw new Error('login returned no token')
-    cookieA = `payload-token=${login.token}`
 
     jpeg = await sharp({
       create: { width: 4, height: 6, channels: 3, background: { r: 20, g: 90, b: 160 } },
@@ -160,7 +171,7 @@ describe('cover preview', () => {
     await new Promise((resolve) => server.close(resolve))
   })
 
-  it('serves the looked-up cover to the same user, checked and uncached', async () => {
+  it('serves the looked-up cover to the same user, checked and not cached by the browser', async () => {
     const isbn = await lookUp(asA, [at('/cover.jpg')])
     const response = await get(isbn, cookieA)
     expect(response.status).toBe(200)
@@ -171,6 +182,57 @@ describe('cover preview', () => {
       'cache-control': 'private, no-store',
       'x-content-type-options': 'nosniff',
     })
+  })
+
+  // The limit is in process and shared by every test in the run, so the
+  // counting cases have their own users.
+  it('asks the source once per image, whichever pick points at it, across a re-lookup', async () => {
+    const { ctx, cookie } = await signedIn('Preview User Held')
+    const isbn = await lookUp(ctx, [at('/cover.jpg'), at('/other.png'), at('/cover.jpg')])
+    const before = hits.get('/cover.jpg') ?? 0
+
+    for (const query of ['', '', '?pick=2']) {
+      const response = await get(isbn, cookie, query)
+      expect(response.status).toBe(200)
+      expect(Buffer.from(await response.arrayBuffer()).equals(jpeg)).toBe(true)
+    }
+    expect(hits.get('/cover.jpg')).toBe(before + 1)
+
+    vi.mocked(lookupSources).mockResolvedValue(found(candidate(isbn, at('/cover.jpg'))))
+    await lookupBook(ctx, { isbn })
+    expect((await get(isbn, cookie)).status).toBe(200)
+    expect(hits.get('/cover.jpg')).toBe(before + 1)
+  })
+
+  it('answers 429 without a request past the lookup limit, and still serves a held cover', async () => {
+    const { ctx, cookie } = await signedIn('Preview User Limited')
+    const isbn = await lookUp(ctx, [at('/cover.jpg'), at('/other.png')])
+    expect((await get(isbn, cookie)).status).toBe(200)
+    // The lookup and the first fetch counted two.
+    for (let i = 2; i < LOOKUP_LIMIT; i++) limitLookups(ctx)
+    const before = totalHits()
+
+    const refused = await get(isbn, cookie, '?pick=1')
+    expect(refused.status).toBe(429)
+    expect(await refused.text()).toBe('')
+    const held = await get(isbn, cookie)
+    expect(held.status).toBe(200)
+    expect(Buffer.from(await held.arrayBuffer()).equals(jpeg)).toBe(true)
+    expect(totalHits()).toBe(before)
+  })
+
+  it('counts a failed fetch and does not hold it', async () => {
+    const { ctx, cookie } = await signedIn('Preview User Failed')
+    vi.spyOn(payload.logger, 'warn').mockImplementation(() => {})
+    const isbn = await lookUp(ctx, [at('/missing.jpg')])
+    const before = hits.get('/missing.jpg') ?? 0
+    expect((await get(isbn, cookie)).status).toBe(404)
+    expect((await get(isbn, cookie)).status).toBe(404)
+    expect(hits.get('/missing.jpg')).toBe(before + 2)
+    // The lookup and the two fetches counted three.
+    for (let i = 3; i < LOOKUP_LIMIT; i++) limitLookups(ctx)
+    expect((await get(isbn, cookie)).status).toBe(429)
+    expect(hits.get('/missing.jpg')).toBe(before + 2)
   })
 
   it('answers 404 without a request for an ISBN never looked up', async () => {

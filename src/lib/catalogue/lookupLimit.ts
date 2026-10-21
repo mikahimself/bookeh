@@ -3,9 +3,13 @@ import type { Context } from '@/lib/payload/context'
 import { processState } from '@/lib/processState'
 
 // Spine, AD-9, AD-12 and FR-11: one per-user limit on lookups, held in process.
-// `lookupBook` calls `limitLookups()`; `searchBooks` (I10) and `lookupAgain` must
-// call it too when they arrive, so a runaway client cannot ask Finna and Google
-// Books in the user's name unchecked.
+// Every lookup and preview fetch in the user's name calls `limitLookups()`:
+// `lookupBook`, `saveCopy` (only when no outcome is held for the ISBN) and
+// `fetchCoverPreview` (only for an image it does not hold). `searchBooks` (I10)
+// and `lookupAgain` must call it too when they arrive, so a runaway client
+// cannot ask Finna and Google Books in the user's name unchecked. Not counted:
+// the save's own cover download (`storeCover()`, from `saveCopy` and
+// `prepareShare`), one image per Book the save creates or shares.
 
 /** Lookups a user may make per window, every role included. */
 export const LOOKUP_LIMIT = 30
@@ -21,9 +25,12 @@ const windows = () => processState('catalogue.lookupLimit', () => new Map<number
 /**
  * AD-9, AD-12 and FR-11: counts one lookup for `ctx.user` and throws
  * `DomainError('RATE_LIMITED')` once the user is over `LOOKUP_LIMIT` in the
- * current window. A refused call does not move the window's reset. Called by
- * `lookupBook` before it reads or asks a source; `searchBooks` (I10) and
- * `lookupAgain` must call it the same way when they arrive.
+ * current window. A refused call does not move the window's reset. Called
+ * before a source is asked: by `lookupBook` before it reads anything, by
+ * `saveCopy` on a held-outcome miss before `lookupSources()`, and by
+ * `fetchCoverPreview` before it fetches an image it does not hold.
+ * `searchBooks` (I10) and `lookupAgain` must call it the same way when they
+ * arrive.
  */
 export function limitLookups(ctx: Context): void {
   const now = Date.now()

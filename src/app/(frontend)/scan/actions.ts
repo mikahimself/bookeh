@@ -17,12 +17,14 @@ import type { Undoable } from '@/lib/undo/undo'
  * (R5): no source knows the ISBN any more, the candidate shown has gone, or
  * the held Book is gone, and the client refreshes the Answer, which then
  * shows what the server holds now. When no source knows the ISBN, trying
- * again would fail the same way while the `none` stays cached. Every other
+ * again would fail the same way while the `none` stays cached. `RATE_LIMITED`
+ * also comes back as it is (AD-9): the save had to ask the sources and the
+ * user is at the lookup limit, so the toast names the cause. Every other
  * failure but a signed-out session reads as `SAVE_FAILED`: to the person
  * scanning they all mean "try again". The
  * `runAction()` log line for an unexpected error still happens; any other
- * failure, `NOT_FOUND` included, is logged here as a warning, so the code
- * leaves a trace.
+ * failure, `NOT_FOUND` and `RATE_LIMITED` included, is logged here as a
+ * warning, so the code leaves a trace.
  */
 export async function saveCopyAction(input: unknown): Promise<ActionResult<Undoable<SaveResult>>> {
   const result = await runAction(async () => {
@@ -43,7 +45,9 @@ export async function saveCopyAction(input: unknown): Promise<ActionResult<Undoa
   })
   if (result.ok || result.code === 'UNAUTHENTICATED') return result
   if (result.code !== 'INTERNAL') logger().warn({ code: result.code }, 'saveCopyAction failed')
-  return result.code === 'NOT_FOUND' ? result : { ok: false, code: 'SAVE_FAILED' }
+  return result.code === 'NOT_FOUND' || result.code === 'RATE_LIMITED'
+    ? result
+    : { ok: false, code: 'SAVE_FAILED' }
 }
 
 function isSaveInput(

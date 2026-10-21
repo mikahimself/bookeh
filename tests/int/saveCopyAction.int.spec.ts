@@ -7,6 +7,7 @@ import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { undoAction } from '@/app/(frontend)/actions/undo'
 import { saveCopyAction, saveManualAction } from '@/app/(frontend)/scan/actions'
+import { LOOKUP_LIMIT, limitLookups } from '@/lib/catalogue/lookupLimit'
 import config from '@/payload.config'
 import type { User, UserLocation } from '@/payload-types'
 
@@ -312,6 +313,23 @@ describe('saveCopyAction', () => {
     } finally {
       vi.unstubAllGlobals()
     }
+    expect(await copies()).toEqual([])
+  })
+
+  it('answers RATE_LIMITED, not SAVE_FAILED, at the lookup limit and asks no source', async () => {
+    const ctx = await contextFor(user)
+    for (let i = 0; i < LOOKUP_LIMIT; i++) limitLookups(ctx)
+    const sources = vi.fn(async () => new Response(null, { status: 503 }))
+    vi.stubGlobal('fetch', sources)
+    try {
+      expect(await saveCopyAction({ requestId: randomUUID(), isbn13: randomIsbn() })).toEqual({
+        ok: false,
+        code: 'RATE_LIMITED',
+      })
+    } finally {
+      vi.unstubAllGlobals()
+    }
+    expect(sources).not.toHaveBeenCalled()
     expect(await copies()).toEqual([])
   })
 

@@ -2,7 +2,7 @@ import { normaliseIsbn } from '@/fields/isbn'
 import type { Named } from '@/lib/books/effectiveBook'
 import { createCopy } from '@/lib/copies/createCopy'
 import { DomainError } from '@/lib/errors'
-import { lookupSources } from '@/lib/metadata/lookup'
+import { heldOutcome, lookupSources } from '@/lib/metadata/lookup'
 import type { Context } from '@/lib/payload/context'
 import * as gateway from '@/lib/payload/gateway'
 import { type Undoable, type Undone, withUndo } from '@/lib/undo/undo'
@@ -11,6 +11,7 @@ import { storeCover } from './covers'
 import { createPrivateBook, type ManualEntry, normaliseManual } from './createPrivateBook'
 import { ensureSharedBook } from './ensureSharedBook'
 import { findBookByIsbn } from './findBookByIsbn'
+import { limitLookups } from './lookupLimit'
 import { type CandidateId, chooseCandidate } from './pick'
 import { oncePerRequest } from './saveRequests'
 import { prepareShare, settleHeldBook } from './sharePrivateBook'
@@ -36,13 +37,14 @@ export type SaveResult = { bookId: number; copyId: number; savedTo: Named | null
  * read). The Book is the shared Book with the ISBN, else the user's own
  * private Book with it, else a shared Book `ensureSharedBook()` creates.
  * Another user's private Book is never used. For that creation the save
- * resolves the sources' outcome once, before the transaction opens:
- * `lookupSources()`, which answers from the in-process cache and asks the
- * sources only on a miss (AD-9, AD-11). No source is called inside the
- * transaction. `chooseCandidate()` takes the candidate (D-7): the one with
- * `candidate`'s `source` and `recordId`, or `NOT_FOUND` when the outcome
- * lacks it, never another one; without `candidate`, `pick` by `pickIndex()`
- * (none or out of range is the best). Its cover is stored by `storeCover()`
+ * resolves the sources' outcome once, before the transaction opens: the
+ * server-held outcome (`heldOutcome()`), else `lookupSources()` (AD-9,
+ * AD-11). Only that miss counts one lookup against the user's limit
+ * (`limitLookups()`, `RATE_LIMITED` before any source is asked). No source is
+ * called inside the transaction. `chooseCandidate()` takes the candidate
+ * (D-7): the one with `candidate`'s `source` and `recordId`, or `NOT_FOUND`
+ * when the outcome lacks it, never another one; without `candidate`, `pick`
+ * by `pickIndex()` (none or out of range is the best). Its cover is stored by `storeCover()`
  * before the transaction opens (AD-14), and the Book keeps the ISBN asked for.
  *
  * A held Book goes through `settleHeldBook()` in the save's transaction
@@ -78,7 +80,9 @@ export type SaveResult = { bookId: number; copyId: number; savedTo: Named | null
  * `saveCopy` opens the transaction itself and cannot be called inside one:
  * `withUndo()` refuses. Errors pass through unchanged (`NOT_FOUND` when no
  * source knows the ISBN or the candidate has gone, with nothing written and
- * no cover stored; a plain `Error` when the sources are unavailable;
+ * no cover stored; `RATE_LIMITED` when asking the sources would pass the
+ * user's lookup limit, with nothing written; a plain `Error` when the sources
+ * are unavailable;
  * `createCopy()`'s `ValidationError`); a rollback removes every row written
  * and the stored cover file.
  *
@@ -119,7 +123,12 @@ async function save(ctx: Context, input: SaveInput): Promise<Undoable<SaveResult
   const held = await findBookByIsbn(ctx, isbn13)
   if (!held) {
     // AD-11: the one outcome this save uses, resolved before the transaction.
-    const outcome = await lookupSources(isbn13)
+    // AD-9: asking the sources counts against the user's lookup limit.
+    let outcome = heldOutcome(isbn13)
+    if (!outcome) {
+      limitLookups(ctx)
+      outcome = await lookupSources(isbn13)
+    }
     if (outcome.kind === 'none') throw new DomainError('NOT_FOUND')
     if (outcome.kind === 'unavailable') {
       throw new Error(`Sources unavailable: ${outcome.failed.join(', ')}`)
