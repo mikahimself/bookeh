@@ -4,6 +4,7 @@ import { useTranslations } from 'next-intl'
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore, useTransition } from 'react'
 
 import type { Named } from '@/lib/books/effectiveBook'
+import type { LocationOption } from '@/lib/copies/locations'
 import type { ErrorCode } from '@/lib/errors'
 
 import { Button } from '../../../components/Button'
@@ -17,8 +18,10 @@ import { Dialog } from '../../../components/ui/Dialog'
 import { useCloseOnBack } from '../../../components/ui/overlay'
 
 import { editBookAction } from './actions'
+import { CopyFields, type CopyChange } from './CopyFields'
 import { clearDraft, isEmpty, readDraft, setEdit, writeDraft, type Draft } from './draft'
 import { MoreDetails, type EffectiveEdits, type OnEdit } from './MoreDetails'
+import type { SavedCopy } from './savedCopy'
 
 const subscribeNothing = () => () => undefined
 const onClient = () => true
@@ -29,16 +32,24 @@ const onServer = () => false
  * author and source lines under it, and Save pinned at the bottom, the one
  * primary.
  *
- * The draft is the sparse `BookEdits` of unsaved changes, restored from
- * `sessionStorage` once mounted (draft.ts) and state from the first edit on.
- * More details' fields change it with `setEdit(draft, key, value,
- * effective)`, so it holds only keys that differ from the `effective`
- * values, and every change is written through `writeDraft`; it drives
- * `dirty` and the guard. The fields show the `marks` a rejected Save left
- * under them; editing a field clears its mark.
+ * Opened for one of the viewer's copies (`copy`, from the save toast's
+ * Edit), the first screen shows that copy's Status and Location
+ * (CopyFields) between the header and More details.
  *
- * Save sends the draft (`editBookAction`): "Saved", the draft cleared and
- * the task closed (history back, `/` fallback), unless the task has already
+ * The draft is the sparse `BookEdits` of unsaved changes, with the copy's
+ * sparse change under `copy`, restored from `sessionStorage` once mounted
+ * (draft.ts; a restored `copy` for another copy is dropped) and state from
+ * the first edit on. More details' fields change it with `setEdit(draft,
+ * key, value, effective)`, so it holds only keys that differ from the
+ * `effective` values, the copy fields with `setEdit(draft, 'copy', change)`,
+ * and every change is written through `writeDraft`; it drives `dirty` and
+ * the guard. The fields show the `marks` a rejected Save left under them
+ * (the copy's `location` under its combobox); editing a field clears its
+ * mark.
+ *
+ * Save sends the draft (`editBookAction`), `copy` apart from the Book's
+ * `edits`: "Saved", the draft cleared and the task closed (history back, so
+ * Scan when opened from its toast; `/` fallback), unless the task has already
  * gone. A signed-out session goes to sign in and keeps the draft; with the
  * guard armed, only once its entry is gone, so sign in replaces the task's
  * own entry and the return lands on it; a `VALIDATION` naming fields keeps the marks;
@@ -63,6 +74,8 @@ export function EditBookScreen({
   genreOptions,
   genres,
   themes,
+  copy,
+  locations,
 }: {
   bookId: number
   title: string
@@ -78,6 +91,10 @@ export function EditBookScreen({
   genreOptions: Named[] | null
   genres: Named[]
   themes: string[]
+  /** The copy the screen was opened for (`?copy=`); `null` shows no copy fields. */
+  copy: SavedCopy | null
+  /** The viewer's locations, for the copy's Location. */
+  locations: readonly LocationOption[]
 }) {
   const t = useTranslations()
   const { show } = useToast()
@@ -86,7 +103,13 @@ export function EditBookScreen({
   const mounted = useSyncExternalStore(subscribeNothing, onClient, onServer)
   // Read once mounted: the server has no `sessionStorage`, and a hydrating
   // render must match its HTML.
-  const restored = useMemo<Draft>(() => (mounted ? readDraft(bookId) : {}), [mounted, bookId])
+  const restored = useMemo<Draft>(() => {
+    if (!mounted) return {}
+    const stored = readDraft(bookId)
+    if (stored.copy === undefined || stored.copy.id === copy?.id) return stored
+    const { copy: _other, ...rest } = stored
+    return rest
+  }, [mounted, bookId, copy?.id])
   const [edits, setEdits] = useState<Draft | null>(null)
   const draft = edits ?? restored
   // Per key, the code of a field Save had rejected.
@@ -112,16 +135,20 @@ export function EditBookScreen({
   }, [])
 
   const dirty = !isEmpty(draft)
+  const { copy: copyChange, ...bookEdits } = draft
 
-  const edit: OnEdit = (key, value) => {
-    const next = setEdit(draft, key, value, effective[key])
+  const update = (next: Draft, mark: string) => {
     setEdits(next)
     writeDraft(bookId, next)
-    if (marks[key] !== undefined) {
-      const { [key]: _cleared, ...rest } = marks
+    if (marks[mark] !== undefined) {
+      const { [mark]: _cleared, ...rest } = marks
       setMarks(rest)
     }
   }
+
+  const edit: OnEdit = (key, value) => update(setEdit(draft, key, value, effective[key]), key)
+  const editCopy = (change: CopyChange | undefined) =>
+    update(setEdit(draft, 'copy', change, undefined), 'location')
 
   const guarding = dirty && armed
   useCloseOnBack(
@@ -166,7 +193,9 @@ export function EditBookScreen({
     inFlight.current = true
     startTransition(async () => {
       try {
-        const result = await settleAction(editBookAction({ bookId, edits: draft }))
+        const result = await settleAction(
+          editBookAction({ bookId, edits: bookEdits, copy: copyChange }),
+        )
         if (!result.ok && result.code === 'UNAUTHENTICATED' && guarding) {
           leaving.current = true
           signedOut.current = true
@@ -212,9 +241,18 @@ export function EditBookScreen({
           {source !== null && <p className="text-meta text-text-muted">{source}</p>}
         </div>
       </div>
+      {copy !== null && (
+        <CopyFields
+          saved={copy}
+          locations={locations}
+          value={copyChange}
+          error={marks.location === undefined ? undefined : t('editBook.checkField')}
+          onChange={editCopy}
+        />
+      )}
       <MoreDetails
         effective={effective}
-        draft={draft}
+        draft={bookEdits}
         marks={marks}
         isbnEditable={isbnEditable}
         genreOptions={genreOptions}

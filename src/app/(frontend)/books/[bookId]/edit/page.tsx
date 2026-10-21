@@ -5,15 +5,14 @@ import { canEditShared } from '@/access/roles'
 import { getEffectiveBooks, type EffectiveBook } from '@/lib/books/effectiveBook'
 import { requireOwnBook } from '@/lib/books/requireOwnBook'
 import { listGenres } from '@/lib/catalogue/listGenres'
+import { listLocations } from '@/lib/copies/locations'
 import { DomainError } from '@/lib/errors'
 import { requireUser, type Context } from '@/lib/payload/context'
 
 import { EditBookScreen } from './EditBookScreen'
 import type { EffectiveEdits } from './MoreDetails'
 import { NotHeld } from './NotHeld'
-
-/** Postgres `integer`'s largest value, the widest id a Book can have. */
-const MAX_ID = 2147483647
+import { MAX_ID, savedCopy } from './savedCopy'
 
 /** The Book as the viewer sees it, or `undefined` when they do not hold it (AD-7). */
 async function heldBook(ctx: Context, bookId: number): Promise<EffectiveBook | undefined> {
@@ -52,11 +51,18 @@ function effectiveEdits(book: EffectiveBook): EffectiveEdits {
  * the viewer holds no copy of, or one they can no longer read is "not held":
  * the toast "Not in library" over the section.
  *
+ * With `?copy=` naming one of the viewer's copies of this Book (Edit on the
+ * save toast), the first screen also shows that copy's status and location,
+ * over the viewer's locations; any other `?copy=` is ignored, with no error.
+ *
  * The page decides what More details may change: the ISBN on the viewer's
  * own private Book; the system genres there and, for the admin, on a shared
  * Book, with every system genre as the options.
  */
-export default async function EditBookPage({ params }: PageProps<'/books/[bookId]/edit'>) {
+export default async function EditBookPage({
+  params,
+  searchParams,
+}: PageProps<'/books/[bookId]/edit'>) {
   const ctx = await requireUser()
   const { bookId: param } = await params
   // Above Postgres `integer` the count would fail rather than find nothing.
@@ -73,6 +79,8 @@ export default async function EditBookPage({ params }: PageProps<'/books/[bookId
   const isbnEditable = book.visibility === 'private'
   const genresEditable = isbnEditable || canEditShared(ctx.user)
   const genreOptions = genresEditable ? await listGenres(ctx) : null
+  const copy = await savedCopy(ctx, book.bookId, (await searchParams).copy)
+  const locations = copy ? await listLocations(ctx) : []
 
   return (
     <ViewTransition enter="task-enter" exit="task-exit" default="none">
@@ -87,6 +95,8 @@ export default async function EditBookPage({ params }: PageProps<'/books/[bookId
         genreOptions={genreOptions}
         genres={book.genres}
         themes={book.themes}
+        copy={copy}
+        locations={locations}
       />
     </ViewTransition>
   )

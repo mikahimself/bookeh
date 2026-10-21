@@ -12,6 +12,7 @@ const router = { back: vi.fn(() => window.history.back()), replace: vi.fn() }
 vi.mock('next-intl', () => ({
   useTranslations: (namespace?: string) => (key: string) =>
     namespace ? `${namespace}.${key}` : key,
+  useLocale: () => 'en',
 }))
 vi.mock('next/navigation', async (importOriginal) => ({
   ...(await importOriginal<typeof import('next/navigation')>()),
@@ -49,7 +50,8 @@ const effective = {
 type Details = Pick<
   ComponentProps<typeof EditBookScreen>,
   'effective' | 'isbnEditable' | 'genreOptions' | 'genres' | 'themes'
->
+> &
+  Partial<Pick<ComponentProps<typeof EditBookScreen>, 'copy' | 'locations'>>
 
 /** A shared Book seen by someone who is not the admin. */
 const shared: Details = {
@@ -73,6 +75,8 @@ const open = (draft?: object, details: Details = shared) => {
         authors: 'A. Kirjoittaja',
         source: 'From Finna',
         cover: null,
+        copy: null,
+        locations: [],
         ...details,
       }),
     ),
@@ -345,6 +349,79 @@ describe('EditBookScreen, More details', () => {
     fireEvent.click(fiction)
 
     expect(window.sessionStorage.getItem(KEY)).toBeNull()
+  })
+})
+
+describe('EditBookScreen, the copy', () => {
+  /** Copy 9, owned at Tampere, opened from the save toast. */
+  const owned: Details = {
+    ...shared,
+    copy: { id: 9, status: 'owned', location: 2 },
+    locations: [
+      { id: 4, name: 'Mökki' },
+      { id: 2, name: 'Tampere' },
+    ],
+  }
+  const status = (name: 'owned' | 'ordered') =>
+    screen.getByRole('button', { name: `editBook.${name}` })
+  const location = () => screen.queryByLabelText<HTMLInputElement>('editBook.location')
+
+  beforeEach(() => {
+    window.history.pushState({}, '', '/scan')
+    window.history.pushState({}, '', `${PATH}?copy=9`)
+    window.sessionStorage.clear()
+  })
+
+  afterEach(async () => {
+    cleanup()
+    vi.clearAllMocks()
+    await new Promise((resolve) => setTimeout(resolve, 50))
+  })
+
+  it('marks ordered: hides the location, saves only the status and returns to Scan', async () => {
+    editBookAction.mockResolvedValue({ ok: true, data: null })
+    open(undefined, owned)
+    expect(status('owned').getAttribute('aria-pressed')).toBe('true')
+    expect(location()!.value).toBe('Tampere')
+    fireEvent.click(status('ordered'))
+    expect(location()).toBeNull()
+    save()
+
+    await waitFor(() => expect(window.location.pathname).toBe('/scan'))
+    expect(editBookAction).toHaveBeenCalledWith({
+      bookId: 7,
+      edits: {},
+      copy: { id: 9, status: 'ordered' },
+    })
+    expect(show).toHaveBeenCalledWith({ kind: 'success', message: 'toast.saved' })
+  })
+
+  it('drops the copy from the draft after ordered and owned again, location kept', () => {
+    open(undefined, owned)
+    fireEvent.click(status('ordered'))
+    expect(window.sessionStorage.getItem(KEY)).toBe(
+      JSON.stringify({ copy: { id: 9, status: 'ordered' } }),
+    )
+    fireEvent.click(status('owned'))
+
+    expect(window.sessionStorage.getItem(KEY)).toBeNull()
+    expect(location()!.value).toBe('Tampere')
+  })
+
+  it('keeps a move in the draft and asks before the X discards it', async () => {
+    open(undefined, owned)
+    const input = location()!
+    act(() => input.focus())
+    fireEvent.input(input, { target: { value: 'Mök' }, inputType: 'insertText' })
+    fireEvent.click(await screen.findByRole('option', { name: 'Mökki' }))
+
+    expect(window.sessionStorage.getItem(KEY)).toBe(
+      JSON.stringify({ copy: { id: 9, location: 4 } }),
+    )
+    // The draft holds only the copy: More details stays folded.
+    expect(screen.getByRole('button', { name: 'editBook.moreDetails' })).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: 'task.close' }))
+    expect(await discardAsked()).toBeTruthy()
   })
 })
 

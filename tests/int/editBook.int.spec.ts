@@ -3,10 +3,12 @@ import { randomUUID } from 'node:crypto'
 import { getPayload, NotFound, type Payload } from 'payload'
 import { beforeAll, describe, expect, it } from 'vitest'
 
+import { savedCopy } from '@/app/(frontend)/books/[bookId]/edit/savedCopy'
 import { getEffectiveBooks } from '@/lib/books/effectiveBook'
 import { upsertUserBook } from '@/lib/books/upsertUserBook'
 import { type BookEdits, editBook } from '@/lib/catalogue/editBook'
 import { findOrCreateByName } from '@/lib/catalogue/findOrCreateByName'
+import { resolveLocation } from '@/lib/copies/locations'
 import { DomainError } from '@/lib/errors'
 import type { Context } from '@/lib/payload/context'
 import * as gateway from '@/lib/payload/gateway'
@@ -65,14 +67,13 @@ describe('editBook', () => {
       req: (await contextFor(user)).req,
     })
 
-  const holdCopy = async (ctx: Context, book: Book) => {
+  const holdCopy = async (ctx: Context, book: Book, location?: number) =>
     // `owner` only satisfies the create type.
-    await gateway.create(ctx, {
+    gateway.create(ctx, {
       collection: 'copies',
-      data: { owner: ctx.user.id, book: book.id, status: 'owned' },
+      data: { owner: ctx.user.id, book: book.id, status: 'owned', location },
       depth: 0,
     })
-  }
 
   /** Shared X, held by the admin and B; the admin overrides its title and language. */
   const sharedX = async () => {
@@ -273,6 +274,133 @@ describe('editBook', () => {
       ...(await named('authors', ghosts)),
       ...(await named('series', [ghostSeries])),
     ]).toEqual([])
+  })
+
+  // Story 4.9, FR-13/FR-28: the copy Edit book was opened for, in the Book edit's transaction.
+  describe('with a copy', () => {
+    const copyOf = async (ctx: Context, id: number) =>
+      gateway.findByID(ctx, { collection: 'copies', id, depth: 0 })
+
+    /** Shared X; B holds a copy of it at a location of B's. */
+    const heldAt = async () => {
+      const x = await systemBook(admin, 'shared')
+      const location = await resolveLocation(asB, { create: unique('Tampere') })
+      const copy = await holdCopy(asB, x, location)
+      return { x, copy, location }
+    }
+
+    /** Shared X; `ctx`'s user holds an ordered copy of it. */
+    const ordered = async (ctx: Context) => {
+      const x = await systemBook(admin, 'shared')
+      // `owner` only satisfies the create type.
+      const copy = await gateway.create(ctx, {
+        collection: 'copies',
+        data: { owner: ctx.user.id, book: x.id, status: 'ordered' },
+        depth: 0,
+      })
+      return { x, copy }
+    }
+
+    it('writes the title and marks the copy ordered, with no location', async () => {
+      const { x, copy } = await heldAt()
+      await editBook(asB, {
+        bookId: x.id,
+        edits: { title: 'Kalevala (B)' },
+        copy: { id: copy.id, status: 'ordered' },
+      })
+
+      expect(await seen(asB, x)).toMatchObject({ title: 'Kalevala (B)' })
+      expect(await copyOf(asB, copy.id)).toMatchObject({ status: 'ordered', location: null })
+    })
+
+    it('marks an ordered copy owned at the location shown', async () => {
+      const { x, copy } = await ordered(asB)
+      const location = await resolveLocation(asB, { create: unique('Tampere') })
+      await editBook(asB, {
+        bookId: x.id,
+        edits: {},
+        copy: { id: copy.id, status: 'owned', location },
+      })
+
+      expect(await copyOf(asB, copy.id)).toMatchObject({ status: 'owned', location })
+    })
+
+    it('moves an owned copy to a location created by name', async () => {
+      const { x, copy, location } = await heldAt()
+      const name = unique('Mökki')
+      await editBook(asB, {
+        bookId: x.id,
+        edits: {},
+        copy: { id: copy.id, location: { create: name } },
+      })
+
+      const moved = await copyOf(asB, copy.id)
+      expect(moved.status).toBe('owned')
+      expect(moved.location).not.toBe(location)
+      expect(moved.location).toBe(await resolveLocation(asB, { create: name }))
+    })
+
+    it('writes nothing when the copy is refused, the Book edit included', async () => {
+      const { x, copy, location } = await heldAt()
+      const before = await seen(asB, x)
+
+      await rejectsNaming(
+        editBook(asB, {
+          bookId: x.id,
+          edits: { title: 'X' },
+          copy: { id: copy.id, status: 'ordered', location },
+        }),
+        ['location'],
+      )
+      // Refused after the Book's write: another user's copy.
+      const other = await holdCopy(asAdmin, x)
+      await expect(
+        editBook(asB, {
+          bookId: x.id,
+          edits: { title: 'X' },
+          copy: { id: other.id, status: 'ordered' },
+        }),
+      ).rejects.toMatchObject(new DomainError('NOT_FOUND'))
+
+      expect(await seen(asB, x)).toEqual(before)
+      expect(await copyOf(asB, copy.id)).toMatchObject({ status: 'owned', location })
+    })
+
+    it("shows Edit book only the viewer's own copy of this Book (`?copy=`)", async () => {
+      const { x, copy, location } = await heldAt()
+      const other = await holdCopy(asAdmin, x)
+      const elsewhere = await holdCopy(asB, await systemBook(admin, 'shared'))
+
+      expect(await savedCopy(asB, x.id, String(copy.id))).toEqual({
+        id: copy.id,
+        status: 'owned',
+        location,
+      })
+      for (const param of [String(other.id), String(elsewhere.id), `${copy.id}x`, undefined]) {
+        expect(await savedCopy(asB, x.id, param)).toBeNull()
+      }
+    })
+
+    it('starts an ordered copy at the default location, what owned would give it', async () => {
+      const d = await createUser({ displayName: 'Edit User D' })
+      const home = await resolveLocation(await contextFor(d), { create: unique('Koti') })
+      const asD = await contextFor(
+        await payload.update({
+          collection: 'users',
+          id: d.id,
+          data: { defaultLocation: home },
+          overrideAccess: true,
+          depth: 0,
+        }),
+      )
+      const { x, copy } = await ordered(asD)
+
+      expect(await savedCopy(asD, x.id, String(copy.id))).toEqual({
+        id: copy.id,
+        status: 'ordered',
+        location: home,
+      })
+    })
   })
 
   // Story 4.4, FR-14/AD-5: a private Book's creator edits the Book itself.

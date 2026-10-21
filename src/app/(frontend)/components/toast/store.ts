@@ -7,6 +7,8 @@ export type ToastInput =
       hold?: boolean
       /** AD-20: the receipt token and the whole seconds it is still good for. */
       undo?: { token: string; seconds: number }
+      /** The href of an Edit Link, shown before Undo until the toast leaves. */
+      edit?: string
     }
   | { kind: 'error'; code: ErrorCode }
 

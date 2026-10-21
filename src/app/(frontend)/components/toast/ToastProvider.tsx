@@ -14,7 +14,7 @@ import {
 } from 'react'
 
 import { undoAction } from '../../actions/undo'
-import { ActionLink } from '../Link'
+import { ActionLink, TextLink } from '../Link'
 import { reportFailure, settleAction } from '../request'
 import { takeFlash } from './flashCookie'
 import { createToastStore, toastMessage, type ToastStore } from './store'
@@ -79,6 +79,10 @@ export function ToastProvider({ children }: { children: ReactNode }) {
 
   // An action from an older build: it did not happen, and a reload fixes it.
   const appUpdated = state?.input.kind === 'error' && state.input.code === 'APP_UPDATED'
+  // Edit goes with the first frame of leaving, as Undo does, and while Undo is
+  // in flight (the copy may be going); tapping it dismisses.
+  const edit =
+    state?.input.kind === 'success' && !state.leaving && !undoPending ? state.input.edit : undefined
 
   useEffect(() => {
     const input = takeFlash({
@@ -119,17 +123,24 @@ export function ToastProvider({ children }: { children: ReactNode }) {
               kind={state.input.kind}
               message={toastMessage(state.input, t)}
               actions={
-                undoToken !== null ? (
-                  <ActionLink onClick={runUndo} disabled={undoPending}>
-                    {t('toast.undo')}
-                  </ActionLink>
-                ) : (
-                  appUpdated && (
-                    <ActionLink onClick={() => window.location.reload()}>
-                      {t('toast.reload')}
+                <>
+                  {edit !== undefined && (
+                    <TextLink href={edit} onClick={store.dismiss}>
+                      {t('toast.edit')}
+                    </TextLink>
+                  )}
+                  {undoToken !== null ? (
+                    <ActionLink onClick={runUndo} disabled={undoPending}>
+                      {t('toast.undo')}
                     </ActionLink>
-                  )
-                )
+                  ) : (
+                    appUpdated && (
+                      <ActionLink onClick={() => window.location.reload()}>
+                        {t('toast.reload')}
+                      </ActionLink>
+                    )
+                  )}
+                </>
               }
               closeLabel={t('toast.close')}
               onClose={store.dismiss}

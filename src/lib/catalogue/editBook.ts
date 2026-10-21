@@ -5,9 +5,12 @@ import { OVERRIDABLE_BOOK_FIELDS, type OverridableBookField } from '@/fields/boo
 import { toIsbn13 } from '@/fields/isbn'
 import { requireOwnBook } from '@/lib/books/requireOwnBook'
 import { type BookOverrides, upsertUserBook } from '@/lib/books/upsertUserBook'
+import { moveCopies } from '@/lib/copies/moveCopies'
+import { setStatus } from '@/lib/copies/updateCopy'
 import { DomainError, type ErrorCode } from '@/lib/errors'
 import type { Context } from '@/lib/payload/context'
 import * as gateway from '@/lib/payload/gateway'
+import type { Ref } from '@/lib/payload/ref'
 import { assertLive, withTransaction } from '@/lib/payload/transaction'
 
 import { findOrCreateByName, type NameScope } from './findOrCreateByName'
@@ -33,7 +36,16 @@ export type BookEdits = Partial<{
   isbn13: string // private Books only; never removed
 }>
 
-export type EditBookInput = { bookId: number; edits: BookEdits }
+/**
+ * Spine, Shared shapes. `copy` is one of the viewer's copies and only what
+ * changes on it: a `status` (with `location` for owned), or a `location`
+ * alone.
+ */
+export type EditBookInput = {
+  bookId: number
+  edits: BookEdits
+  copy?: { id: number; status?: 'owned' | 'ordered'; location?: Ref | null }
+}
 
 type EditKey = keyof BookEdits
 
@@ -124,9 +136,22 @@ const isIsbnClash = (err: unknown): boolean =>
  * system privileges and drops their own override of each edited field;
  * anyone else's edit becomes their overrides (`upsertUserBook()`), and the
  * shared Book does not change. Field limits stay with the collections.
+ *
+ * `copy` (FR-13, FR-28) is written in the same transaction, after the Book's
+ * edits, so a failure in either leaves both unchanged. A `status` goes
+ * through `setStatus()` (owned without a `location` takes the default), a
+ * `location` alone through `moveCopies()`, whose restore is dropped; both
+ * refuse a copy that is not the viewer's with `NOT_FOUND`, and `moveCopies()`
+ * an ordered copy with `VALIDATION` on `location`. Ordered together with a
+ * `location` fails with `VALIDATION` on `location` before any read. An empty
+ * edit with a `copy` still writes the copy.
+ *
  * There is no Undo: no undo token, no restore.
  */
-export async function editBook(ctx: Context, { bookId, edits }: EditBookInput): Promise<void> {
+export async function editBook(
+  ctx: Context,
+  { bookId, edits, copy }: EditBookInput,
+): Promise<void> {
   const admin = canEditShared(ctx.user)
   const rejected = new Map<string, ErrorCode>()
   const changes: BookEdits = {}
@@ -152,83 +177,101 @@ export async function editBook(ctx: Context, { bookId, edits }: EditBookInput): 
       else Object.assign(changes, { [key]: stored })
     }
   }
+  if (copy?.status === 'ordered' && copy.location !== undefined)
+    rejected.set('location', 'VALIDATION')
   if (rejected.size > 0) {
     throw new DomainError('VALIDATION', { fields: Object.fromEntries(rejected) })
   }
 
-  const keys = EDIT_KEYS.filter((key) => changes[key] !== undefined)
-
   await withTransaction(ctx, async (tx) => {
     await requireOwnBook(tx, bookId)
-    if (keys.length === 0) return
-    const book = await gateway.findByID(tx, {
-      collection: 'books',
-      id: bookId,
-      select: { visibility: true, createdBy: true },
-      depth: 0,
-    })
-    const own = book.visibility !== 'shared'
-    if (own) {
-      const creator = typeof book.createdBy === 'object' ? book.createdBy?.id : book.createdBy
-      if (creator !== tx.user.id) throw new DomainError('NOT_FOUND')
-    } else {
-      const refused = keys.filter((key) => key === 'isbn13' || (key === 'genres' && !admin))
-      if (refused.length > 0) throw invalid(refused)
-    }
+    await writeBook(tx, bookId, changes, admin)
+    if (copy) await writeCopy(tx, copy)
+  })
+}
 
-    // One after the other: calls on one context never run concurrently (AD-16).
-    const scope: NameScope = admin && !own ? 'shared' : 'private'
-    const { authors: authorNames, series: seriesName, ...rest } = changes
-    const data: Resolved = rest
-    if (authorNames !== undefined) {
-      const authors: number[] = []
-      for (const name of authorNames) {
-        const { id } = await findOrCreateByName(tx, 'authors', scope, { name })
-        if (!authors.includes(id)) authors.push(id)
-      }
-      data.authors = authors
-    }
-    if (seriesName !== undefined) {
-      data.series =
-        seriesName === null
-          ? null
-          : (await findOrCreateByName(tx, 'series', scope, { name: seriesName })).id
-    }
+/** The Book's part of `editBook()`, in its transaction: nothing for an empty edit. */
+async function writeBook(
+  tx: Context,
+  bookId: number,
+  changes: BookEdits,
+  admin: boolean,
+): Promise<void> {
+  const keys = EDIT_KEYS.filter((key) => changes[key] !== undefined)
+  if (keys.length === 0) return
+  const book = await gateway.findByID(tx, {
+    collection: 'books',
+    id: bookId,
+    select: { visibility: true, createdBy: true },
+    depth: 0,
+  })
+  const own = book.visibility !== 'shared'
+  if (own) {
+    const creator = typeof book.createdBy === 'object' ? book.createdBy?.id : book.createdBy
+    if (creator !== tx.user.id) throw new DomainError('NOT_FOUND')
+  } else {
+    const refused = keys.filter((key) => key === 'isbn13' || (key === 'genres' && !admin))
+    if (refused.length > 0) throw invalid(refused)
+  }
 
-    if (own) {
-      assertLive(tx)
-      try {
-        await tx.req.payload.update({
-          collection: 'books',
-          id: bookId,
-          data,
-          ...system(tx),
-        })
-      } catch (err) {
-        if (changes.isbn13 !== undefined && isIsbnClash(err)) {
-          throw new DomainError('VALIDATION', { fields: { isbn13: 'VALIDATION' } })
-        }
-        throw err
-      }
-      return
+  // One after the other: calls on one context never run concurrently (AD-16).
+  const scope: NameScope = admin && !own ? 'shared' : 'private'
+  const { authors: authorNames, series: seriesName, ...rest } = changes
+  const data: Resolved = rest
+  if (authorNames !== undefined) {
+    const authors: number[] = []
+    for (const name of authorNames) {
+      const { id } = await findOrCreateByName(tx, 'authors', scope, { name })
+      if (!authors.includes(id)) authors.push(id)
     }
+    data.authors = authors
+  }
+  if (seriesName !== undefined) {
+    data.series =
+      seriesName === null
+        ? null
+        : (await findOrCreateByName(tx, 'series', scope, { name: seriesName })).id
+  }
 
-    const overridable = keys.filter(isOverridable)
-    if (admin) {
-      assertLive(tx)
+  if (own) {
+    assertLive(tx)
+    try {
       await tx.req.payload.update({
         collection: 'books',
         id: bookId,
         data,
         ...system(tx),
       })
-      await upsertUserBook(tx, bookId, { dropOverrides: overridable })
-    } else {
-      // `genres` and `isbn13` were refused above, so every key is an override field.
-      const overrides: BookOverrides = Object.fromEntries(
-        overridable.map((key) => [key, data[key]]),
-      )
-      await upsertUserBook(tx, bookId, { overrides })
+    } catch (err) {
+      if (changes.isbn13 !== undefined && isIsbnClash(err)) {
+        throw new DomainError('VALIDATION', { fields: { isbn13: 'VALIDATION' } })
+      }
+      throw err
     }
-  })
+    return
+  }
+
+  const overridable = keys.filter(isOverridable)
+  if (admin) {
+    assertLive(tx)
+    await tx.req.payload.update({
+      collection: 'books',
+      id: bookId,
+      data,
+      ...system(tx),
+    })
+    await upsertUserBook(tx, bookId, { dropOverrides: overridable })
+  } else {
+    // `genres` and `isbn13` were refused above, so every key is an override field.
+    const overrides: BookOverrides = Object.fromEntries(overridable.map((key) => [key, data[key]]))
+    await upsertUserBook(tx, bookId, { overrides })
+  }
+}
+
+/** The copy's part of `editBook()`, in its transaction. */
+async function writeCopy(tx: Context, copy: NonNullable<EditBookInput['copy']>): Promise<void> {
+  if (copy.status === 'ordered') await setStatus(tx, copy.id, { status: 'ordered' })
+  else if (copy.status === 'owned') {
+    await setStatus(tx, copy.id, { status: 'owned', location: copy.location })
+  } else if (copy.location !== undefined) await moveCopies(tx, [copy.id], copy.location)
 }

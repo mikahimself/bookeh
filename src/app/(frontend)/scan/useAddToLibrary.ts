@@ -22,7 +22,8 @@ export type OnRefused = (failure: SaveFailure) => boolean
 /**
  * The press behind every Add to library button (EXPERIENCE.md, Answer):
  * `add(call)` runs `call(requestId)`, the save, then raises the held
- * "Saved to {location}" toast with the save's Undo and returns to Scan. A
+ * "Saved to {location}" toast with the save's Edit (Edit book for the new
+ * copy) and Undo, and returns to Scan. A
  * failure goes to `onRefused` first, which returns `true` when it handled it
  * (a field message); otherwise it is reported. Either way the Answer stays
  * as it was.
@@ -73,12 +74,13 @@ export function useAddToLibrary(): {
         }
         saved = true
         requestId.current = null
-        const { savedTo, undoToken, undoSeconds } = result.data
+        const { bookId, copyId, savedTo, undoToken, undoSeconds } = result.data
         show({
           kind: 'success',
           message: savedTo ? t('toast.savedTo', { location: savedTo.name }) : t('toast.saved'),
           hold: true,
           undo: { token: undoToken, seconds: undoSeconds },
+          edit: `/books/${bookId}/edit?copy=${copyId}`,
         })
         if (mounted.current) back()
       } finally {

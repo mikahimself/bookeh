@@ -110,6 +110,17 @@ describe('Undo on the toast', () => {
     await waitFor(() => expect(screen.getByText('toast.undone')).toBeTruthy())
   })
 
+  it('links Edit before Undo, and tapping it dismisses the toast', async () => {
+    mount({ ...saved, message: 'Saved to Tampere', edit: '/books/7/edit?copy=9' })
+    const edit = screen.getByRole('link', { name: 'toast.edit' })
+    expect(edit.getAttribute('href')).toBe('/books/7/edit?copy=9')
+    expect(
+      edit.compareDocumentPosition(undoLink()!) & Node.DOCUMENT_POSITION_FOLLOWING,
+    ).toBeTruthy()
+    fireEvent.click(edit)
+    await waitFor(() => expect(screen.queryByText('Saved to Tampere')).toBeNull())
+  })
+
   it('offers Reload on an APP_UPDATED error, which reloads the page', () => {
     const reload = vi.fn()
     vi.stubGlobal('location', { ...window.location, reload })

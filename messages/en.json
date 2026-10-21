@@ -43,6 +43,7 @@
     "close": "Close",
     "savedTo": "Saved to {location}",
     "saved": "Saved",
+    "edit": "Edit",
     "undo": "Undo",
     "undone": "Undone",
     "reload": "Reload"
@@ -96,6 +97,10 @@
     "moreDetails": "More details",
     "addAuthor": "Add author",
     "checkField": "Check this field.",
+    "status": "Status",
+    "owned": "Owned",
+    "ordered": "Ordered",
+    "location": "Location",
     "field": {
       "title": "Title",
       "subtitle": "Subtitle",

@@ -63,6 +63,7 @@ describe('AddToLibrary', () => {
       message,
       hold: true,
       undo: { token: 'token', seconds: 1800 },
+      edit: '/books/1/edit?copy=2',
     })
     expect(saveCopyAction).toHaveBeenCalledWith({ requestId: expect.any(String), isbn13: ISBN })
   })
@@ -180,6 +181,7 @@ describe('AddToLibrary', () => {
         message: 'toast.saved',
         hold: true,
         undo: { token: 'token', seconds: 1800 },
+        edit: '/books/1/edit?copy=2',
       }),
     )
     expect(back).not.toHaveBeenCalled()

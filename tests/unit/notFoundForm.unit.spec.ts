@@ -70,6 +70,7 @@ describe('NotFoundForm', () => {
         message: 'toast.savedTo:Tampere',
         hold: true,
         undo: { token: 't', seconds: 1800 },
+        edit: '/books/1/edit?copy=2',
       })
     },
   )

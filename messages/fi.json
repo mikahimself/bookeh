@@ -43,6 +43,7 @@
     "close": "Sulje",
     "savedTo": "Tallennettu · {location}",
     "saved": "Tallennettu",
+    "edit": "Muokkaa",
     "undo": "Kumoa",
     "undone": "Kumottu",
     "reload": "Lataa uudelleen"
@@ -96,6 +97,10 @@
     "moreDetails": "Lisätiedot",
     "addAuthor": "Lisää tekijä",
     "checkField": "Tarkista tämä kenttä.",
+    "status": "Tila",
+    "owned": "Oma",
+    "ordered": "Tilattu",
+    "location": "Sijainti",
     "field": {
       "title": "Nimeke",
       "subtitle": "Alaotsikko",

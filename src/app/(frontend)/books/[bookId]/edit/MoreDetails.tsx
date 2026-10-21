@@ -11,7 +11,7 @@ import { ActionLink } from '../../../components/Link'
 import { TextAreaField, TextField } from '../../../components/TextField'
 import { markerSlotClass } from '../../../components/ui/classes'
 
-import { isEmpty, type Draft } from './draft'
+import { isEmpty } from './draft'
 
 /**
  * Every `BookEdits` key's value as the viewer sees the Book: author and
@@ -20,11 +20,12 @@ import { isEmpty, type Draft } from './draft'
  */
 export type EffectiveEdits = Required<Omit<BookEdits, 'isbn13'>> & Pick<BookEdits, 'isbn13'>
 
-export type OnEdit = <K extends keyof Draft>(key: K, value: Draft[K]) => void
+export type OnEdit = <K extends keyof BookEdits>(key: K, value: BookEdits[K]) => void
 
 type Props = {
   effective: EffectiveEdits
-  draft: Draft
+  /** The draft's Book edits, without its `copy`. */
+  draft: BookEdits
   /** Per key, the code of a field Save rejected. */
   marks: Record<string, ErrorCode>
   isbnEditable: boolean
@@ -110,7 +111,7 @@ function Fields({
     return value === null || value === undefined ? '' : String(value)
   }
 
-  const message = (key: keyof Draft): string | undefined => {
+  const message = (key: keyof BookEdits): string | undefined => {
     const code = marks[key]
     if (code === undefined) return undefined
     if (code === 'INVALID_ISBN') return t('errors.INVALID_ISBN')
