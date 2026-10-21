@@ -89,6 +89,7 @@ Arrows are the only allowed import directions, and ESLint `no-restricted-imports
 - **Prevents:** a convenience `overrideAccess: true` or raw query appearing in a feature story; hooks that read every user's rows
 - **Rule:**
   - System privileges are allowed in three places: `src/lib/catalogue`, for writes to `books`, `authors`, `series`, `genres` and `media`, and for `isUnreferenced()`, a read-only check that no row of any user references a catalogue record; `src/lib/shelf`, for read-only Drizzle queries (AD-7); and the first-user seed in `onInit`. Adding to this list is a spine change.
+  - In `src/lib/catalogue`, every Local API call with system privileges spreads `system(ctx)` from `src/lib/catalogue/system.ts` (`req`, `overrideAccess: true`, `depth: 0`; `system(null)` only outside any request, the `onInit` media sweep), setting another `depth` after the spread. Only `src/lib/catalogue` may import `system()`. Lint (`bookeh/system-privileges`) fails on that import from anywhere else, and on any `overrideAccess` property but `false` elsewhere in `src` but the first-user seed.
   - Each such function takes the context (AD-16) and scopes by its user explicitly. It resolves every client-supplied id through the gateway before using it.
   - Private collections are always written through the gateway, also from `lib/catalogue`.
   - Hooks and access functions query only through `asRequestUser(req)` from `src/access`, which passes `req`, `req.user` and `overrideAccess: false`. Hooks never write to another collection.

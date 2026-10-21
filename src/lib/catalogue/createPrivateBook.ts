@@ -10,6 +10,7 @@ import type { Restore, Undone } from '@/lib/undo/undo'
 import { deleteRow } from './ensureSharedBook'
 import { findOrCreateByName } from './findOrCreateByName'
 import { isUnreferenced } from './isUnreferenced'
+import { system } from './system'
 
 /** Spine, Structural Seed: a Book typed by hand, as the client sends it. */
 export type ManualEntry = { isbn?: string; title: string; authors: string[] }
@@ -77,7 +78,6 @@ export async function createPrivateBook(
 ): Promise<Undone<{ id: number }>> {
   return withTransaction(ctx, async (tx) => {
     const { payload } = tx.req
-    const system = { req: tx.req, overrideAccess: true, depth: 0 } as const
 
     const authors: number[] = []
     const createdAuthors: number[] = []
@@ -96,7 +96,7 @@ export async function createPrivateBook(
         ...(manual.isbn13 !== undefined && { isbn13: manual.isbn13 }),
         visibility: 'private',
       },
-      ...system,
+      ...system(tx),
     })
     const bookId = book.id
     const restore: Restore = async (rtx) => {

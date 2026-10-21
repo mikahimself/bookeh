@@ -8,6 +8,7 @@ import { findOrCreateByName, type FoundOrCreated } from './findOrCreateByName'
 import { isUnreferenced } from './isUnreferenced'
 import { mapSubjectsToGenres } from './mapSubjectsToGenres'
 import type { Chosen } from './pick'
+import { system } from './system'
 
 /**
  * Spine, AD-5 and FR-18: the shared Book for an ISBN, created from `chosen`
@@ -48,7 +49,6 @@ export async function ensureSharedBook(
   return withTransaction(ctx, async (tx) => {
     const { payload } = tx.req
     if (cover) onRollback(tx, () => discardCover(payload, cover))
-    const system = { req: tx.req, overrideAccess: true, depth: 0 } as const
 
     assertLive(tx)
     const { docs } = await payload.find({
@@ -57,7 +57,7 @@ export async function ensureSharedBook(
       select: { isbn13: true },
       limit: 1,
       pagination: false,
-      ...system,
+      ...system(tx),
     })
     if (docs[0]) {
       if (cover) await discardCover(payload, cover)
@@ -106,7 +106,7 @@ export async function ensureSharedBook(
         rawMetadata: raw,
         visibility: 'shared',
       },
-      ...system,
+      ...system(tx),
     })
     const bookId = book.id
     const restore: Restore = async (rtx) => {
@@ -136,9 +136,7 @@ export async function deleteRow(
   const { errors } = await tx.req.payload.delete({
     collection,
     where: { id: { equals: id } },
-    overrideAccess: true,
-    req: tx.req,
-    depth: 0,
+    ...system(tx),
   })
   if (errors.length > 0) {
     throw new Error(

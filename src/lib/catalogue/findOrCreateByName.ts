@@ -7,6 +7,8 @@ import type { Context } from '@/lib/payload/context'
 import { assertLive, withTransaction } from '@/lib/payload/transaction'
 import type { Author, Series } from '@/payload-types'
 
+import { system } from './system'
+
 export type NamedCollection = 'authors' | 'series'
 export type NameScope = 'shared' | 'private'
 
@@ -45,9 +47,7 @@ export async function findByName(
       where,
       limit: 1,
       pagination: false,
-      req: ctx.req,
-      overrideAccess: true,
-      depth: 0,
+      ...system(ctx),
     })
     return docs[0]
   }
@@ -101,7 +101,6 @@ export async function findOrCreateByName<C extends NamedCollection>(
 
   return withTransaction(ctx, async (tx) => {
     const { payload } = tx.req
-    const system = { req: tx.req, overrideAccess: true, depth: 0 } as const
     const row = await findByName(tx, collection, scope, name)
 
     if (row) {
@@ -113,7 +112,7 @@ export async function findOrCreateByName<C extends NamedCollection>(
             collection: 'authors',
             id: row.id,
             data: { sortName },
-            ...system,
+            ...system(tx),
           })
         }
       }
@@ -128,9 +127,9 @@ export async function findOrCreateByName<C extends NamedCollection>(
         ? await payload.create({
             collection: 'authors',
             data: sortName === '' ? data : { ...data, sortName },
-            ...system,
+            ...system(tx),
           })
-        : await payload.create({ collection: 'series', data, ...system })
+        : await payload.create({ collection: 'series', data, ...system(tx) })
     return { id: created.id, created: true }
   })
 }

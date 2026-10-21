@@ -3,6 +3,8 @@ import type { CollectionSlug } from 'payload'
 import type { Context } from '@/lib/payload/context'
 import { assertLive } from '@/lib/payload/transaction'
 
+import { system } from './system'
+
 /** The catalogue rows a restore or a share's clean-up may delete when nothing references them (AD-3, AD-11). */
 export type CatalogueCollection = 'books' | 'authors' | 'series' | 'genres' | 'media'
 
@@ -31,8 +33,7 @@ export async function isUnreferenced(
       const { totalDocs } = await payload.count({
         collection: config.slug as CollectionSlug,
         where: { [field.name]: { equals: id } },
-        overrideAccess: true,
-        req: ctx.req,
+        ...system(ctx),
       })
       if (totalDocs > 0) return false
     }

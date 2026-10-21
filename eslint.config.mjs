@@ -68,6 +68,18 @@ const importZones = [
   ...serviceZones,
 ]
 
+// The absolute path an `@/`, `src/` or relative import source names, or null.
+const resolveSource = (source, fileDir) => {
+  if (source.startsWith('@/')) return path.join(srcDir, source.slice(2))
+  if (source.startsWith('src/')) return path.join(rootDir, source)
+  if (source.startsWith('./') || source.startsWith('../')) return path.resolve(fileDir, source)
+  return null
+}
+
+const isTypeOnly = (node, kind) =>
+  node[kind] === 'type' ||
+  (node.specifiers?.length > 0 && node.specifiers.every((s) => s[kind] === 'type'))
+
 /**
  * Spine, Design Paradigm: client components import from `src/lib` only types
  * and `lib/shelf/query.ts`. A client component is a file whose directive
@@ -90,24 +102,13 @@ const clientLibImports = {
     const fileDir = path.dirname(filename)
     const shelfQuery = path.join(libDir, 'shelf', 'query')
 
-    const resolveSource = (source) => {
-      if (source.startsWith('@/')) return path.join(srcDir, source.slice(2))
-      if (source.startsWith('src/')) return path.join(rootDir, source)
-      if (source.startsWith('./') || source.startsWith('../')) return path.resolve(fileDir, source)
-      return null
-    }
-
     const isRestricted = (source) => {
-      const resolved = resolveSource(source)
+      const resolved = resolveSource(source, fileDir)
       if (!resolved || (resolved !== libDir && !resolved.startsWith(libDir + path.sep)))
         return false
       const withoutExt = resolved.replace(/\.(ts|tsx|js|jsx|mjs|cjs)$/, '')
       return withoutExt !== shelfQuery
     }
-
-    const isTypeOnly = (node, kind) =>
-      node[kind] === 'type' ||
-      (node.specifiers?.length > 0 && node.specifiers.every((s) => s[kind] === 'type'))
 
     let isClient = false
     const check = (node) => {
@@ -122,6 +123,71 @@ const clientLibImports = {
           (statement) =>
             statement.type === 'ExpressionStatement' && statement.directive === 'use client',
         )
+      },
+      ImportDeclaration(node) {
+        if (!isTypeOnly(node, 'importKind')) check(node)
+      },
+      ExportNamedDeclaration(node) {
+        if (node.source && !isTypeOnly(node, 'exportKind')) check(node)
+      },
+      ExportAllDeclaration(node) {
+        if (node.source && node.exportKind !== 'type') check(node)
+      },
+      ImportExpression(node) {
+        if (node.source.type === 'Literal' && typeof node.source.value === 'string') check(node)
+      },
+    }
+  },
+}
+
+/**
+ * Spine, AD-3: system privileges come only from `system()` in
+ * src/lib/catalogue/system.ts, and only src/lib/catalogue imports it. Reports
+ * every non-computed `overrideAccess` property (identifier or string key,
+ * shorthand included) whose value is not the literal `false`, and a value
+ * import of the helper from outside src/lib/catalogue.
+ */
+const systemPrivileges = {
+  meta: {
+    type: 'problem',
+    docs: {
+      description:
+        'overrideAccess other than false only in system(), imported only from src/lib/catalogue.',
+    },
+    schema: [],
+    messages: {
+      restricted:
+        'Spine, AD-3: system privileges are allowed only in src/lib/catalogue, through system() from ./system. Elsewhere use the gateway or asRequestUser(req).',
+      importOutside:
+        'Spine, AD-3: only src/lib/catalogue may import system() from src/lib/catalogue/system.ts.',
+    },
+  },
+  create(context) {
+    const filename = context.physicalFilename ?? context.filename
+    const fileDir = path.dirname(filename)
+    const catalogueDir = path.join(libDir, 'catalogue')
+    const helper = path.join(catalogueDir, 'system')
+    const inCatalogue = filename.startsWith(catalogueDir + path.sep)
+
+    const isOverrideKey = (key) =>
+      (key.type === 'Identifier' && key.name === 'overrideAccess') ||
+      (key.type === 'Literal' && key.value === 'overrideAccess')
+
+    const check = (node) => {
+      if (inCatalogue) return
+      const resolved = resolveSource(node.source.value, fileDir)
+      if (resolved?.replace(/\.(ts|js)$/, '') === helper) {
+        context.report({ node: node.source, messageId: 'importOutside' })
+      }
+    }
+
+    return {
+      Property(node) {
+        // A destructuring pattern reads the option; it grants nothing.
+        if (node.parent.type === 'ObjectPattern') return
+        if (node.computed || !isOverrideKey(node.key)) return
+        if (node.value.type === 'Literal' && node.value.value === false) return
+        context.report({ node, messageId: 'restricted' })
       },
       ImportDeclaration(node) {
         if (!isTypeOnly(node, 'importKind')) check(node)
@@ -199,11 +265,24 @@ const eslintConfig = defineConfig([
   {
     files: ['src/**'],
     plugins: {
-      bookeh: { rules: { 'client-lib-imports': clientLibImports } },
+      bookeh: {
+        rules: {
+          'client-lib-imports': clientLibImports,
+          'system-privileges': systemPrivileges,
+        },
+      },
     },
     rules: {
       'import/no-restricted-paths': ['error', { basePath: rootDir, zones: importZones }],
       'bookeh/client-lib-imports': 'error',
+      'bookeh/system-privileges': 'error',
+    },
+  },
+  {
+    // Spine, AD-3: the helper itself and the first-user seed.
+    files: ['src/lib/catalogue/system.ts', 'src/lib/account/seedFirstUser.ts'],
+    rules: {
+      'bookeh/system-privileges': 'off',
     },
   },
   {

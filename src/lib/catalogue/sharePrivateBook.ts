@@ -23,6 +23,7 @@ import { findOrCreateByName } from './findOrCreateByName'
 import { isUnreferenced } from './isUnreferenced'
 import { mapSubjectsToGenres } from './mapSubjectsToGenres'
 import { type CandidateId, type Chosen, chooseCandidate } from './pick'
+import { system } from './system'
 
 // FR-12, AD-4, AD-5 and D-8: a private Book is shared on its creator's next
 // save once a source knows its ISBN, or joins the shared Book with that ISBN.
@@ -230,13 +231,12 @@ async function readBook(tx: Context, id: number): Promise<BookValues> {
       description: true,
       cover: true,
     },
+    ...system(tx),
     depth: 1,
     populate: {
       authors: { name: true, visibility: true },
       series: { name: true, visibility: true },
     },
-    req: tx.req,
-    overrideAccess: true,
   })
 }
 
@@ -304,9 +304,7 @@ async function promote(tx: Context, bookId: number, pending: PendingShare): Prom
       rawMetadata: raw,
       visibility: 'shared',
     },
-    req: tx.req,
-    overrideAccess: true,
-    depth: 0,
+    ...system(tx),
   })
 
   // After the update: overrides exist only on shared Books.

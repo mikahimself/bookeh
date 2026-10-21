@@ -10,6 +10,8 @@ import { fixtureOrigin, usesFixtureSources, type SourceEnv } from '@/lib/metadat
 import type { Context } from '@/lib/payload/context'
 import { assertLive } from '@/lib/payload/transaction'
 
+import { system } from './system'
+
 /** Spine, AD-14: the hosts a cover is downloaded from. */
 export const COVER_HOSTS: readonly string[] = ['api.finna.fi', 'books.google.com']
 
@@ -226,9 +228,7 @@ export async function attachCover(tx: Context, cover: DownloadedCover): Promise<
   const doc = await tx.req.payload.create({
     collection: 'media',
     data: { filename, mimeType, filesize, width, height },
-    req: tx.req,
-    overrideAccess: true,
-    depth: 0,
+    ...system(tx),
   })
   return doc.id
 }
@@ -286,8 +286,7 @@ export async function sweepOrphanMedia(payload: Payload, now = Date.now()): Prom
         collection: 'media',
         select: { filename: true },
         pagination: false,
-        overrideAccess: true,
-        depth: 0,
+        ...system(null),
       })
       if (docs.length === 0) {
         payload.logger.warn('Media sweep skipped: files exist but the media table is empty.')
