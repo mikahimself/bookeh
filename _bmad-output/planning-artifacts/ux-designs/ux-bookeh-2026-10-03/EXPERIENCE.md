@@ -65,7 +65,7 @@ Mock-ups, in the final tokens. The spines win on any conflict with a mock-up.
 | [mockups/key-wishlists.html](mockups/key-wishlists.html) | The list of wishlists, one wishlist, an entry opened. |
 | [mockups/key-settings.html](mockups/key-settings.html) | Settings on wide and phone. |
 
-Not mocked, built from this spine alone: Sign in, Lookup, the Filter panel on the phone, pickers and dialogs, select mode on the phone, and sizes s and l. The Genres group in Settings and the Corner crop step are not mocked either; their stories start with a rendered mock-up choice. So do the tag picker, the Lend picker, creating a list from the wishlist picker when there is none and the admin's Re-fetch result. The app icon and theme colour are settled in DESIGN.md → App Icon & Theme Colour.
+Not mocked, built from this spine alone: Sign in, Lookup, the Filter panel on the phone, pickers and dialogs, select mode on the phone, and sizes s and l. The Genres group in Settings is not mocked either; its story starts with a rendered mock-up choice. So do the tag picker, the Lend picker, creating a list from the wishlist picker when there is none and the admin's Re-fetch result. The app icon and theme colour are settled in DESIGN.md → App Icon & Theme Colour, and the Corner crop in DESIGN.md → Components.
 
 ## Voice and Tone
 
@@ -121,7 +121,7 @@ Behaviour. Visual specs live in `DESIGN.md` → Components.
 | Close (X) | Scan, Lookup, Answer, Edit book; the sheet and the panel | Closes the whole task or overlay in one tap and returns to the section underneath. |
 | Progress line | Any wait | Shown while a lookup, save or next page is in flight. Nothing else blocks the screen. |
 | Camera frame | Scan | Live camera with a guide line. A read barcode goes straight to the Answer with no confirm tap. |
-| Corner crop | Cover upload on Edit book | A full-screen step: the photo with four corner handles joined by a 2px outline, starting as a 2:3 rectangle in the middle, the outside dimmed by the scrim, and the hint "Shoot it straight on". Drag each handle onto a corner of the cover; on wide screens Tab moves between handles and the arrow keys move the focused one. Use (primary) is disabled while the corners cross, fold or line up; Cancel returns nothing. Not mocked; its story starts with a rendered mock-up choice. |
+| Corner crop | Cover upload on Edit book | A full-screen step: the photo with four corner handles joined by a 2px outline, starting as a 2:3 rectangle in the middle, the outside dimmed, and the hint "Shoot it straight on". Drag each handle onto a corner of the cover; on wide screens Tab moves between handles and the arrow keys move the focused one. Use (primary) is disabled while the corners cross, fold or line up; Cancel returns nothing. The step is always dark (DESIGN.md → Corner crop, option B of `.working/corner-crop.html`). |
 
 ### Undo
 

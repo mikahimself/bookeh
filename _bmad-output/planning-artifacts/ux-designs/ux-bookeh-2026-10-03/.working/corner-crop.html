@@ -1,0 +1,399 @@
+<title>bookeh corner crop</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400&display=swap">
+<style>
+/* Mock-up page for Story 4.13 [D30]. Governed by DESIGN.md (Corner crop, Buttons, Focus ring, Disabled) and
+   EXPERIENCE.md (Corner crop, Edit book → Cover). Page chrome is neutral; each frame carries bookeh's own tokens. */
+:root{--page:#ECEEF0;--pfg:#1F2933;--pmu:#5F6B78;--pln:#C9CFD5;--pacc:#F0604F}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--page:#0E1115;--pfg:#E3E8EE;--pmu:#94A0AD;--pln:#2C343D;--pacc:#FF8E7F;color-scheme:dark}}
+:root[data-theme="dark"]{--page:#0E1115;--pfg:#E3E8EE;--pmu:#94A0AD;--pln:#2C343D;--pacc:#FF8E7F;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--page);color:var(--pfg);font:14px/1.45 'Open Sans',"Segoe UI","Helvetica Neue",sans-serif}
+main{max-width:1120px;margin:0 auto;padding-inline:16px;padding-block:28px 80px}
+h1{font-weight:300;font-size:38px;line-height:1.1;letter-spacing:-.015em;margin:0 0 8px;text-wrap:balance}
+h2{font-weight:300;font-size:26px;line-height:1.15;margin:44px 0 6px}
+.lede{max-width:68ch;color:var(--pmu);margin:0 0 6px}
+.own{display:flex;flex-wrap:wrap;gap:8px 16px;align-items:baseline;margin:14px 0 4px}
+.own label{border-bottom:2px solid var(--pacc);cursor:pointer}
+.own input{position:absolute;width:1px;height:1px;opacity:0}
+.own input:focus-visible+label{outline:2px solid var(--pfg);outline-offset:3px}
+.own .msg{color:var(--pmu);font-size:13px}.own .msg.err{color:#E0566F}
+.opts{display:flex;flex-wrap:wrap;gap:36px 32px;margin-top:22px}
+.opt{width:320px;max-width:100%;display:flex;flex-direction:column;gap:8px}
+.opt h3{font-weight:400;font-size:17px;margin:0}
+.opt h3 b{font-weight:400;display:inline-block;min-width:1.4em}
+.cap{font-size:13px;color:var(--pmu);margin:0}
+.cap strong{font-weight:400;color:var(--pfg)}
+.ctl{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:13px}
+.ctl button{all:unset;cursor:pointer;color:var(--pmu);padding:2px 0}
+.ctl button[aria-pressed="true"]{color:var(--pfg);box-shadow:inset 0 -2px 0 var(--pacc)}
+.ctl button:focus-visible{outline:2px solid var(--pfg);outline-offset:3px}
+.ctl .sep{width:1px;background:var(--pln)}
+
+/* Frame tokens: the app's light and dark palette, and the always-dark stage of B and C. */
+.L{--bg:#FFFFFF;--ink:#1F2933;--mu:#5F6B78;--dim:#87919C;--co:#F0604F;--rd:#9B1C31;--scrim:#00000033}
+.D,.K{--bg:#14181D;--ink:#E3E8EE;--mu:#94A0AD;--dim:#626B76;--co:#FF8E7F;--rd:#E0566F;--scrim:#00000066}
+.K{--bg:#0B0E12;--scrim:#00000099}
+.fr{background:var(--bg);color:var(--ink);display:flex;flex-direction:column;position:relative;overflow:hidden;user-select:none;-webkit-user-select:none}
+.ph{width:320px;max-width:100%;height:660px;border:2px solid #222;border-radius:30px}
+.desk{width:100%;height:600px;border:1px solid var(--pln)}
+.hint{margin:0;padding:22px 20px 10px;font-size:13px;color:var(--mu);text-transform:lowercase}
+.desk .hint{padding:18px 28px 10px}
+.stage{flex:1;min-height:0;position:relative}
+.stage canvas.pic{position:absolute}
+.stage svg{position:absolute;inset:0;width:100%;height:100%;touch-action:none;overflow:visible}
+.stage svg g.h{cursor:grab;outline:none}
+.stage svg g.h.drag{cursor:grabbing}
+.loupe{position:absolute;top:12px;width:104px;height:104px;border:2px solid var(--ink);background:var(--bg);pointer-events:none}
+.foot{display:flex;gap:10px;padding:12px 20px 18px;border-top:2px solid var(--ink);background:var(--bg)}
+.desk .foot{justify-content:flex-end;padding:12px 28px}
+.bt{all:unset;box-sizing:border-box;flex:1;border:2px solid var(--ink);padding:9px 16px;font-size:15px;line-height:1.3;text-transform:lowercase;text-align:center;cursor:pointer;color:var(--ink)}
+.desk .bt{flex:none;min-width:120px;padding:6px 16px}
+.bt.pr{border-color:var(--co)}
+.bt[aria-disabled="true"]{border-color:var(--dim);color:var(--dim);cursor:default}
+.bt:focus-visible{outline:2px solid var(--ink);outline-offset:3px}
+.res{position:absolute;inset:0;background:var(--bg);display:flex;flex-direction:column;gap:12px;padding:22px 20px;overflow:auto}
+.desk .res{padding:22px 28px}
+.res h4{margin:0;font-weight:300;font-size:26px;line-height:1.15;text-transform:lowercase}
+.res p{margin:0;font-size:13px;color:var(--mu)}
+.res code{font:12px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;color:var(--ink);white-space:pre}
+.res canvas{width:120px;height:180px;align-self:flex-start}
+.res .bt{flex:none;align-self:flex-start;padding:6px 16px}
+.wide-ctl{display:flex;flex-wrap:wrap;gap:4px 18px;align-items:baseline;margin:10px 0 10px;font-size:17px}
+.wide-ctl button{all:unset;cursor:pointer;color:var(--pmu);text-transform:lowercase}
+.wide-ctl button[aria-pressed="true"]{color:var(--pfg)}
+.wide-ctl button:focus-visible{outline:2px solid var(--pfg);outline-offset:3px}
+.keys{font-size:13px;color:var(--pmu);margin:8px 0 0}
+kbd{font:12px ui-monospace,Menlo,monospace;border:1px solid var(--pln);padding:0 4px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<main>
+  <h1>corner crop: pick one</h1>
+  <p class="lede">Story 4.13 starts with your pick. Each phone frame works: drag the corners onto the book, try both photos, and press Use to see the corner points and the straightened 2:3 result that Edit book would show. Use stays disabled while the corners cross, fold or line up.</p>
+  <div class="own">
+    <input type="file" id="own" accept="image/*">
+    <label for="own">Try your own photo</label>
+    <span class="msg" id="ownMsg">Decoded in the browser the way 4.13 will: orientation from the file, shrunk to 2000 px on the long side. Nothing is uploaded.</span>
+  </div>
+
+  <div class="opts" id="opts"></div>
+
+  <h2>on a wide screen</h2>
+  <p class="lede">The same step in a desk window. Click a handle or press <kbd>Tab</kbd> to reach it, then move it with the arrow keys (<kbd>Shift</kbd> moves ten times as far).</p>
+  <div class="wide-ctl" id="wideCtl"></div>
+  <div id="wide"></div>
+</main>
+
+<script>
+(() => {
+  // ---- geometry, the same rules as src/lib/catalogue/warpCover.ts ----
+  function squareToQuad([p0, p1, p2, p3]) {
+    const sx = p0.x - p1.x + p2.x - p3.x, sy = p0.y - p1.y + p2.y - p3.y
+    let g = 0, h = 0
+    if (sx !== 0 || sy !== 0) {
+      const dx1 = p1.x - p2.x, dx2 = p3.x - p2.x, dy1 = p1.y - p2.y, dy2 = p3.y - p2.y
+      const den = dx1 * dy2 - dx2 * dy1
+      g = (sx * dy2 - sy * dx2) / den
+      h = (dx1 * sy - dy1 * sx) / den
+    }
+    const a = p1.x - p0.x + g * p1.x, b = p3.x - p0.x + h * p3.x, c = p0.x
+    const d = p1.y - p0.y + g * p1.y, e = p3.y - p0.y + h * p3.y, f = p0.y
+    return (u, v) => { const w = g * u + h * v + 1; return { x: (a * u + b * v + c) / w, y: (d * u + e * v + f) / w } }
+  }
+  // Convex and clockwise, with every corner at least ~2° off a straight line ("three in a line").
+  function validCorners(q) {
+    return q.every((p, i) => {
+      const n = q[(i + 1) % 4], r = q[(i + 2) % 4]
+      const ax = n.x - p.x, ay = n.y - p.y, bx = r.x - n.x, by = r.y - n.y
+      const cross = ax * by - ay * bx
+      return cross > 0.035 * Math.hypot(ax, ay) * Math.hypot(bx, by)
+    })
+  }
+
+  // ---- sample photos, drawn once ----
+  function rng(seed) { return () => (seed = (seed * 1664525 + 1013904223) >>> 0) / 4294967296 }
+  function coverArt() {
+    const c = document.createElement('canvas'); c.width = 600; c.height = 900
+    const x = c.getContext('2d')
+    x.fillStyle = '#20515C'; x.fillRect(0, 0, 600, 900)
+    x.fillStyle = '#163B44'
+    const r = rng(7)
+    for (let i = 0; i < 26; i++) {
+      const cx = r() * 640 - 20, h = 140 + r() * 220, w = h * 0.42
+      x.beginPath(); x.moveTo(cx, 900 - h); x.lineTo(cx + w / 2, 900); x.lineTo(cx - w / 2, 900); x.fill()
+    }
+    x.strokeStyle = '#E9E1CF'; x.lineWidth = 3; x.strokeRect(34, 34, 532, 832)
+    x.fillStyle = '#E9E1CF'; x.textAlign = 'center'
+    x.font = '400 30px "Open Sans", sans-serif'; x.fillText('V Ä I N Ö   L I N N A', 300, 120)
+    x.font = '300 86px Georgia, "Times New Roman", serif'
+    x.fillText('Tuntematon', 300, 300); x.fillText('sotilas', 300, 392)
+    x.fillStyle = '#F0604F'; x.fillRect(270, 440, 60, 4)
+    return x.getImageData(0, 0, 600, 900)
+  }
+  function photo(kind) {
+    const W = 1200, H = 1600, c = document.createElement('canvas'); c.width = W; c.height = H
+    const x = c.getContext('2d'), r = rng(kind === 'dark' ? 11 : 23)
+    if (kind === 'dark') {
+      x.fillStyle = '#2A2521'; x.fillRect(0, 0, W, H)
+      for (let i = 0; i < 9000; i++) { x.fillStyle = `rgba(${r() < .5 ? '0,0,0' : '255,240,220'},${r() * .06})`; x.fillRect(r() * W, r() * H, 3, 3) }
+      x.fillStyle = '#1A1714'; x.fillRect(0, 1420, W, 180)
+    } else {
+      const g = x.createLinearGradient(0, 0, W, H); g.addColorStop(0, '#F1EFEB'); g.addColorStop(1, '#D9D5CE')
+      x.fillStyle = g; x.fillRect(0, 0, W, H)
+      x.save(); x.translate(980, 260); x.rotate(-0.5)
+      x.fillStyle = '#E8B93C'; x.fillRect(0, 0, 520, 26); x.fillStyle = '#E9C9A0'; x.fillRect(-60, 0, 60, 26); x.restore()
+    }
+    const Q = [{ x: 285, y: 350 }, { x: 935, y: 410 }, { x: 990, y: 1335 }, { x: 215, y: 1265 }]
+    x.save(); x.filter = 'blur(16px)'; x.fillStyle = 'rgba(0,0,0,.4)'; x.beginPath()
+    Q.forEach((p, i) => x[i ? 'lineTo' : 'moveTo'](p.x + 16, p.y + 22)); x.fill(); x.restore()
+    const art = coverArt(), img = x.getImageData(0, 0, W, H), m = squareToQuad(Q)
+    for (let v = 0; v < 1; v += 1 / 1500) for (let u = 0; u < 1; u += 1 / 1000) {
+      const p = m(u, v), di = ((p.y | 0) * W + (p.x | 0)) * 4, si = (((v * 900) | 0) * 600 + ((u * 600) | 0)) * 4
+      img.data[di] = art.data[si]; img.data[di + 1] = art.data[si + 1]; img.data[di + 2] = art.data[si + 2]
+    }
+    x.putImageData(img, 0, 0)
+    const gl = x.createRadialGradient(380, 420, 10, 380, 420, 700)
+    gl.addColorStop(0, 'rgba(255,255,255,.16)'); gl.addColorStop(1, 'rgba(255,255,255,0)')
+    x.fillStyle = gl; x.fillRect(0, 0, W, H)
+    return c
+  }
+  const photos = { light: null, dark: null, own: null }
+  const getPhoto = (k) => photos[k] || (photos[k] = photo(k))
+
+  // ---- one crop step ----
+  const NS = 'http://www.w3.org/2000/svg'
+  const el = (tag, attrs = {}, ns) => { const e = ns ? document.createElementNS(NS, tag) : document.createElement(tag); for (const k in attrs) e.setAttribute(k, attrs[k]); return e }
+  const NAMES = ['Top left corner', 'Top right corner', 'Bottom right corner', 'Bottom left corner']
+  const frames = []
+
+  function Crop(host, opts) {
+    const s = { variant: opts.variant, theme: opts.theme || 'L', photo: opts.photo || 'light', pts: null, active: -1, scale: 1, ox: 0, oy: 0 }
+    const root = el('div', { class: 'fr ' + (opts.wide ? 'desk' : 'ph') })
+    const hint = el('p', { class: 'hint' }); hint.textContent = 'Shoot it straight on'
+    const stage = el('div', { class: 'stage' })
+    const pic = el('canvas', { class: 'pic' })
+    const svg = el('svg', {}, true)
+    const loupe = el('canvas', { class: 'loupe', width: 208, height: 208, hidden: '' })
+    stage.append(pic, svg, loupe)
+    const foot = el('div', { class: 'foot' })
+    const cancel = el('button', { class: 'bt', type: 'button' }); cancel.textContent = 'Cancel'
+    const use = el('button', { class: 'bt pr', type: 'button' }); use.textContent = 'Use'
+    foot.append(cancel, use)
+    const res = el('div', { class: 'res', hidden: '' })
+    root.append(hint, stage, foot, res)
+    host.replaceChildren(root)
+
+    const dim = el('path', { 'fill-rule': 'evenodd' }, true)
+    const halo = el('polygon', { fill: 'none', 'stroke-width': 4, 'stroke-linejoin': 'miter' }, true)
+    const line = el('polygon', { fill: 'none', 'stroke-width': 2, 'stroke-linejoin': 'miter' }, true)
+    svg.append(dim, halo, line)
+    const hs = NAMES.map((name, i) => {
+      const g = el('g', { class: 'h', tabindex: 0, role: 'slider', 'aria-label': name }, true)
+      const hit = el('rect', { x: -22, y: -22, width: 44, height: 44, fill: 'transparent' }, true)
+      const ring = el('rect', { x: -13, y: -13, width: 26, height: 26, fill: 'none', 'stroke-width': 2, visibility: 'hidden' }, true)
+      const hb = el('path', { fill: 'none', 'stroke-width': 4, 'stroke-linecap': 'square' }, true)
+      const hv = el('path', { fill: 'none', 'stroke-width': 2, 'stroke-linecap': 'square' }, true)
+      g.append(hit, hb, hv, ring); svg.append(g)
+      g.addEventListener('pointerdown', (e) => { e.preventDefault(); g.focus(); g.setPointerCapture(e.pointerId); s.active = i; g.classList.add('drag'); move(i, e) })
+      g.addEventListener('pointermove', (e) => { if (s.active === i) move(i, e) })
+      const end = () => { if (s.active === i) { s.active = -1; g.classList.remove('drag'); loupe.hidden = true } }
+      g.addEventListener('pointerup', end); g.addEventListener('pointercancel', end)
+      g.addEventListener('focus', () => { ring.setAttribute('visibility', 'visible') })
+      g.addEventListener('blur', () => { ring.setAttribute('visibility', 'hidden'); if (s.active === -1) loupe.hidden = true })
+      g.addEventListener('keydown', (e) => {
+        const d = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] }[e.key]
+        if (!d) return
+        e.preventDefault()
+        const step = (e.shiftKey ? 10 : 1) / s.scale, img = getPhoto(s.photo), p = s.pts[i]
+        p.x = Math.min(img.width, Math.max(0, p.x + d[0] * step)); p.y = Math.min(img.height, Math.max(0, p.y + d[1] * step))
+        draw(); showLoupe(i)
+      })
+      return { g, ring, hb, hv }
+    })
+
+    function startRect() {
+      const { width: W, height: H } = getPhoto(s.photo)
+      const h = Math.min(H * 0.6, W * 0.6 * 1.5), w = h / 1.5, x0 = (W - w) / 2, y0 = (H - h) / 2
+      return [{ x: x0, y: y0 }, { x: x0 + w, y: y0 }, { x: x0 + w, y: y0 + h }, { x: x0, y: y0 + h }]
+    }
+    function move(i, e) {
+      const r = svg.getBoundingClientRect(), img = getPhoto(s.photo)
+      s.pts[i] = {
+        x: Math.min(img.width, Math.max(0, (e.clientX - r.left - s.ox) / s.scale)),
+        y: Math.min(img.height, Math.max(0, (e.clientY - r.top - s.oy) / s.scale)),
+      }
+      draw(); showLoupe(i)
+    }
+    function layout() {
+      const img = getPhoto(s.photo), sw = stage.clientWidth, sh = stage.clientHeight, pad = opts.wide ? 28 : 20
+      s.scale = Math.min((sw - 2 * pad) / img.width, (sh - 2 * pad) / img.height)
+      const dw = img.width * s.scale, dh = img.height * s.scale
+      s.ox = (sw - dw) / 2; s.oy = (sh - dh) / 2
+      const dpr = window.devicePixelRatio || 1
+      pic.width = Math.round(dw * dpr); pic.height = Math.round(dh * dpr)
+      Object.assign(pic.style, { left: s.ox + 'px', top: s.oy + 'px', width: dw + 'px', height: dh + 'px' })
+      pic.getContext('2d').drawImage(img, 0, 0, pic.width, pic.height)
+      svg.setAttribute('viewBox', `0 0 ${sw} ${sh}`)
+    }
+    const view = (p) => ({ x: s.ox + p.x * s.scale, y: s.oy + p.y * s.scale })
+    function draw() {
+      const v = s.pts.map(view), img = getPhoto(s.photo)
+      const L = s.ox, T = s.oy, R = L + img.width * s.scale, B = T + img.height * s.scale
+      dim.setAttribute('d', `M${L} ${T}H${R}V${B}H${L}Z M${v.map((p) => p.x + ' ' + p.y).join(' L')}Z`)
+      dim.setAttribute('fill', 'var(--scrim)')
+      const pts = v.map((p) => p.x + ',' + p.y).join(' ')
+      line.setAttribute('points', pts); line.setAttribute('stroke', 'var(--ink)')
+      halo.setAttribute('points', pts); halo.setAttribute('stroke', s.variant === 'a' ? 'none' : 'rgba(0,0,0,.55)')
+      v.forEach((p, i) => {
+        const h = hs[i]
+        h.g.setAttribute('transform', `translate(${p.x} ${p.y})`)
+        h.g.setAttribute('aria-valuetext', `${Math.round(s.pts[i].x)}, ${Math.round(s.pts[i].y)} px`)
+        let d
+        if (s.variant === 'c') {
+          // An L-shaped bracket along the two edges that meet here; the corner point itself stays visible.
+          const seg = (q) => { const dx = q.x - p.x, dy = q.y - p.y, n = Math.hypot(dx, dy) || 1; return `${(dx / n) * 16} ${(dy / n) * 16}` }
+          d = `M${seg(v[(i + 3) % 4])} L0 0 L${seg(v[(i + 1) % 4])}`
+        } else d = 'M-10 -10H10V10H-10Z'
+        h.hv.setAttribute('d', d); h.hv.setAttribute('stroke', 'var(--ink)')
+        h.hb.setAttribute('d', d); h.hb.setAttribute('stroke', s.variant === 'a' ? 'none' : 'rgba(0,0,0,.55)')
+        h.ring.setAttribute('stroke', 'var(--ink)')
+      })
+      const ok = validCorners(s.pts)
+      use.setAttribute('aria-disabled', String(!ok))
+    }
+    function showLoupe(i) {
+      if (s.variant !== 'c') return
+      const img = getPhoto(s.photo), p = s.pts[i], size = 208, z = 6 * s.scale, half = size / (2 * z)
+      const x = loupe.getContext('2d')
+      x.fillStyle = '#0B0E12'; x.fillRect(0, 0, size, size)
+      x.drawImage(img, p.x - half, p.y - half, 2 * half, 2 * half, 0, 0, size, size)
+      x.lineWidth = 2; x.strokeStyle = '#E3E8EE'
+      x.beginPath()
+      ;[(i + 3) % 4, (i + 1) % 4].forEach((j) => { x.moveTo(size / 2, size / 2); x.lineTo(size / 2 + (s.pts[j].x - p.x) * z, size / 2 + (s.pts[j].y - p.y) * z) })
+      x.stroke()
+      const left = view(p).x < stage.clientWidth / 2
+      loupe.style.left = left ? '' : '12px'; loupe.style.right = left ? '12px' : ''
+      loupe.hidden = false
+    }
+    function warpPreview(canvas) {
+      const img = getPhoto(s.photo), src = img.getContext('2d').getImageData(0, 0, img.width, img.height)
+      const W = 240, H = 360, out = new ImageData(W, H), m = squareToQuad(s.pts)
+      for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+        const p = m((x + 0.5) / W, (y + 0.5) / H)
+        const si = (Math.min(img.height - 1, p.y | 0) * img.width + Math.min(img.width - 1, p.x | 0)) * 4, di = (y * W + x) * 4
+        out.data[di] = src.data[si]; out.data[di + 1] = src.data[si + 1]; out.data[di + 2] = src.data[si + 2]; out.data[di + 3] = 255
+      }
+      canvas.width = W; canvas.height = H; canvas.getContext('2d').putImageData(out, 0, 0)
+    }
+    function showResult(used) {
+      res.replaceChildren()
+      const h = el('h4'); h.textContent = used ? 'use returns' : 'cancel returns nothing'
+      const back = el('button', { class: 'bt', type: 'button' }); back.textContent = 'Back to the crop'
+      back.addEventListener('click', () => { res.hidden = true })
+      if (used) {
+        const p = el('p'); p.textContent = 'Four corners in the decoded image’s pixels, clockwise from top left. Edit book shows this straightened preview in place of the cover until Save.'
+        const code = el('code'); code.textContent = JSON.stringify(s.pts.map((q) => ({ x: Math.round(q.x), y: Math.round(q.y) }))).replace(/\},/g, '},\n ')
+        const cv = el('canvas'); warpPreview(cv)
+        res.append(h, cv, code, p, back)
+      } else {
+        const p = el('p'); p.textContent = 'Back on Edit book with the cover unchanged.'
+        res.append(h, p, back)
+      }
+      res.hidden = false; back.focus()
+    }
+    use.addEventListener('click', () => { if (use.getAttribute('aria-disabled') !== 'true') showResult(true) })
+    cancel.addEventListener('click', () => showResult(false))
+
+    function apply() {
+      root.classList.remove('L', 'D', 'K')
+      root.classList.add(s.variant === 'a' ? s.theme : 'K')
+      if (!s.pts) s.pts = startRect()
+      layout(); draw()
+    }
+    const api = {
+      set(k, v) { s[k] = v; if (k === 'photo') s.pts = null; apply() },
+      reset() { s.pts = null; res.hidden = true; apply() },
+      cross() { s.pts = startRect(); const t = s.pts[1]; s.pts[1] = s.pts[2]; s.pts[2] = t; res.hidden = true; apply() },
+      get photo() { return s.photo },
+      relayout() { if (s.pts) { layout(); draw() } },
+    }
+    requestAnimationFrame(apply)
+    frames.push(api)
+    return api
+  }
+
+  // ---- the three options ----
+  const OPTIONS = [
+    { v: 'a', name: 'As written', cap: '<strong>DESIGN.md as it stands.</strong> Follows the app theme: ink outline and 20px outlined square handles, the normal scrim outside (20% light, 40% dark). On the dark photo in the light theme, the outline and handles nearly vanish. Same problem in reverse on the white table in the dark theme.' },
+    { v: 'b', name: 'Dark stage', cap: '<strong>Always dark, like a camera.</strong> Darker dim outside (60%), light outline and handles with a thin dark halo, so they show on any photo. The step stops following the app theme. DESIGN.md’s Corner crop row gains these stage colours.' },
+    { v: 'c', name: 'Dark stage, brackets and loupe', cap: '<strong>B plus two aids for placing corners precisely.</strong> L-brackets follow the edges and leave the corner point uncovered. While you drag, a square 3× loupe shows the spot under your finger, on the side away from it. More code: a second canvas redrawn on every move.' },
+  ]
+  const opts = document.getElementById('opts')
+  function controls(box) {
+    const ctl = box._ctl, st = box._state
+    ctl.replaceChildren()
+    const group = (items, key) => {
+      items.forEach(([label, val]) => {
+        const b = el('button', { type: 'button', 'aria-pressed': String(st[key] === val) }); b.textContent = label
+        b.addEventListener('click', () => { st[key] = val; box._crop.set(key, val); controls(box) })
+        ctl.append(b)
+      })
+      ctl.append(el('span', { class: 'sep' }))
+    }
+    if (box._v === 'a') group([['Light', 'L'], ['Dark', 'D']], 'theme')
+    group([['White table', 'light'], ['Dark sofa', 'dark']].concat(photos.own ? [['Yours', 'own']] : []), 'photo')
+    const x = el('button', { type: 'button' }); x.textContent = 'Cross the corners'; x.addEventListener('click', () => box._crop.cross())
+    const r = el('button', { type: 'button' }); r.textContent = 'Reset'; r.addEventListener('click', () => box._crop.reset())
+    ctl.append(x, r)
+  }
+  const boxes = OPTIONS.map((o, n) => {
+    const box = el('section', { class: 'opt' })
+    const h = el('h3'); h.innerHTML = `<b>${o.v.toUpperCase()}</b>${o.name}`
+    const frameHost = el('div')
+    box._ctl = el('div', { class: 'ctl' })
+    box.append(h, frameHost, box._ctl, Object.assign(el('p', { class: 'cap' }), { innerHTML: o.cap }))
+    opts.append(box)
+    box._v = o.v
+    box._state = { theme: 'L', photo: n === 0 ? 'dark' : 'light' }
+    box._crop = Crop(frameHost, { variant: o.v, photo: box._state.photo })
+    controls(box)
+    return box
+  })
+
+  // ---- wide screen ----
+  const wideHost = document.getElementById('wide'), wideCtl = document.getElementById('wideCtl')
+  let wideV = 'b'
+  let wide = Crop(wideHost, { variant: wideV, wide: true, photo: 'dark' })
+  const wbtns = OPTIONS.map((o) => {
+    const b = el('button', { type: 'button', 'aria-pressed': String(o.v === wideV) }); b.textContent = `${o.v} · ${o.name}`
+    b.addEventListener('click', () => {
+      wideV = o.v; wbtns.forEach((x) => x.setAttribute('aria-pressed', String(x === b)))
+      frames.splice(frames.indexOf(wide), 1)
+      wide = Crop(wideHost, { variant: wideV, wide: true, photo: photos.own ? 'own' : 'dark' })
+    })
+    wideCtl.append(b); return b
+  })
+  wideHost.insertAdjacentElement('afterend', Object.assign(el('p', { class: 'keys' }), { textContent: 'Tab order: top left, top right, bottom right, bottom left, then Cancel and Use.' }))
+
+  window.addEventListener('resize', () => frames.forEach((f) => f.relayout()))
+  if (document.fonts) document.fonts.ready.then(() => { photos.light = photos.dark = null; frames.forEach((f) => f.reset()) })
+
+  // ---- your own photo: the 4.13 decode path ----
+  const own = document.getElementById('own'), ownMsg = document.getElementById('ownMsg')
+  own.addEventListener('change', async () => {
+    const file = own.files && own.files[0]
+    if (!file) return
+    let bmp
+    try { bmp = await createImageBitmap(file, { imageOrientation: 'from-image' }) } catch {
+      ownMsg.textContent = 'Not an image.'; ownMsg.className = 'msg err'; return
+    }
+    const k = Math.min(1, 2000 / Math.max(bmp.width, bmp.height))
+    const c = document.createElement('canvas'); c.width = Math.round(bmp.width * k); c.height = Math.round(bmp.height * k)
+    c.getContext('2d').drawImage(bmp, 0, 0, c.width, c.height)
+    ownMsg.className = 'msg'; ownMsg.textContent = `Decoded ${bmp.width}×${bmp.height}, shown at ${c.width}×${c.height}.`
+    photos.own = c
+    boxes.forEach((box) => { box._state.photo = 'own'; box._crop.set('photo', 'own'); controls(box) })
+    wide.set('photo', 'own')
+  })
+})()
+</script>

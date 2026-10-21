@@ -24,6 +24,9 @@ colors:
   scrim-dark: '#00000066'
   danger-dark: '#E0566F'
   shadow-dark: '#00000073'
+  # Corner crop stage, the same in both themes
+  crop-dim: '#00000099'
+  crop-halo: '#0000008C'
 typography:
   heading-section:
     fontFamily: 'Open Sans'
@@ -236,6 +239,8 @@ Every colour has a light and a dark value. Dark tokens carry the `-dark` suffix 
 | `danger` | `#9B1C31` | `#E0566F` | Errors and destructive actions only: the destructive button's outline, the underline of a field with a mistake, the marker before an error message. |
 | `scrim` | `#00000033` | `#00000066` | Dims what is behind a bottom sheet or a dialog. |
 | `shadow` | `#1F293324` | `#00000073` | The detail panel's shadow, and nothing else. |
+| `crop-dim` | `#00000099` | `#00000099` | Dims the photo outside the four corners in the Corner crop, and nothing else. |
+| `crop-halo` | `#0000008C` | `#0000008C` | The 4px line under the Corner crop's outline and handles, so they show on any photo. Nothing else. |
 
 Rules for {colors.accent}:
 
@@ -364,7 +369,7 @@ Visual specs. Behaviour lives in `EXPERIENCE.md` → Component Patterns.
 | Progress line | [ASSUMPTION: a {spacing.stroke-control} {colors.accent} line moving across the top edge of the screen while something loads.] |
 | Close (X) | Two {spacing.stroke-control} {colors.text} strokes forming an X, in the top right corner. No circle and no box around it. |
 | Camera frame | A {spacing.stroke-control} {colors.text} rectangle around the camera view with a horizontal {colors.accent} guide line. |
-| Corner crop | The photo full screen under the {colors.scrim}; the quadrilateral inside the four handles is undimmed and outlined in {spacing.stroke-control} {colors.text}. Four square handles at the corners, outlined in {spacing.stroke-control} {colors.text}, each with a 44px tap area; the hint in {typography.meta} above; Use (primary) and Cancel at the foot. [ASSUMPTION: handles 20px, like the checkbox.] |
+| Corner crop | Always in the dark palette, whatever the theme: chosen 2026-10-21 from rendered options (`.working/corner-crop.html`, option B). The photo fills the screen on the dark {colors.background}. Outside the quadrilateral inside the four handles, {colors.crop-dim} dims the photo; inside, it is undimmed. The quadrilateral is outlined in {spacing.stroke-control} {colors.text} (dark value). Four 20px square handles sit at the corners, outlined the same way, each with a 44px tap area. The outline and the handles are drawn over a 4px {colors.crop-halo} line. The hint in {typography.meta} {colors.text-muted} above; Use (primary) and Cancel at the foot, over a {spacing.stroke-control} {colors.text} top edge. The focused handle carries the focus ring. Disabled Use follows Disabled. |
 
 States that apply to every control:
 
