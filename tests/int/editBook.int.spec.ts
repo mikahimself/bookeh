@@ -14,13 +14,15 @@ import config from '@/payload.config'
 import type { Author, Book, Genre, User } from '@/payload-types'
 
 import { contextFor, createUser } from '../helpers/harness'
-import { randomIsbn } from '../helpers/isbn'
+import { hyphenatedIsbn10, randomIsbn } from '../helpers/isbn'
 
 // `editBook()`, AD-5/AD-6 (D5): on a shared Book both the admin and B hold,
 // the admin's edit writes the Book and the user's becomes their overrides, so
 // B sees the admin's edit and the admin never sees B's. Author and series
 // names match or are created in the editor's scope (shared for the admin,
-// private for anyone else). Rejected edits write nothing, no name included.
+// private for anyone else). On a private Book only its creator edits, the
+// edit is the Book's own and names resolve privately. Rejected edits write
+// nothing, no name included.
 
 describe('editBook', () => {
   let payload: Payload
@@ -216,42 +218,48 @@ describe('editBook', () => {
     )
   })
 
-  it('rejects genres from a user, themes, a cleared title, a non-holder and a private Book', async () => {
+  /** Fails with `VALIDATION` naming exactly `keys`, each with `code`. */
+  const rejectsNaming = async (
+    call: Promise<void>,
+    keys: string[],
+    code: 'VALIDATION' | 'INVALID_ISBN' = 'VALIDATION',
+  ) => {
+    const err = await call.then(
+      () => undefined,
+      (error: unknown) => error,
+    )
+    expect(err).toMatchObject({ code: 'VALIDATION' })
+    expect(err).toHaveProperty('fields', Object.fromEntries(keys.map((key) => [key, code])))
+  }
+  // Keys and values outside `BookEdits`, as a client could send them.
+  const untyped = (edits: Record<string, unknown>) => edits as BookEdits
+
+  it('rejects genres from a user, themes, a cleared title, an ISBN and a non-holder', async () => {
     const x = await sharedX()
     const before = [await seen(asAdmin, x), await seen(asB, x)]
-    /** Fails with `VALIDATION` naming exactly `keys`. */
-    const rejectsNaming = async (call: Promise<void>, ...keys: string[]) => {
-      const err = await call.then(
-        () => undefined,
-        (error: unknown) => error,
-      )
-      expect(err).toMatchObject({ code: 'VALIDATION' })
-      expect(err).toHaveProperty(
-        'fields',
-        Object.fromEntries(keys.map((key) => [key, 'VALIDATION'])),
-      )
-    }
-    // Keys outside `BookEdits`, as a client could send them.
-    const untyped = (edits: Record<string, unknown>) => edits as BookEdits
-    const ghosts = [unique('Ghost A'), unique('Ghost B'), unique('Ghost C')]
+    const ghosts = [unique('Ghost A'), unique('Ghost B')]
     const ghostSeries = unique('Ghost Series')
 
     await rejectsNaming(
       editBook(asB, { bookId: x.id, edits: { title: 'B', genres: [genre.id] } }),
-      'genres',
+      ['genres'],
     )
     await rejectsNaming(
       editBook(asAdmin, { bookId: x.id, edits: untyped({ title: 'A', themes: ['myytit'] }) }),
-      'themes',
+      ['themes'],
     )
     await rejectsNaming(
       editBook(asAdmin, { bookId: x.id, edits: { title: '  ', subtitle: 'S' } }),
-      'title',
+      ['title'],
     )
-    await rejectsNaming(editBook(asB, { bookId: x.id, edits: untyped({ title: null }) }), 'title')
+    await rejectsNaming(editBook(asB, { bookId: x.id, edits: untyped({ title: null }) }), ['title'])
     await rejectsNaming(
       editBook(asB, { bookId: x.id, edits: { authors: [ghosts[0] ?? '', '  '] } }),
-      'authors',
+      ['authors'],
+    )
+    await rejectsNaming(
+      editBook(asAdmin, { bookId: x.id, edits: { title: 'A', isbn13: randomIsbn() } }),
+      ['isbn13'],
     )
     await expect(
       editBook(asC, {
@@ -261,33 +269,109 @@ describe('editBook', () => {
     ).rejects.toMatchObject(new DomainError('NOT_FOUND'))
     expect([await seen(asAdmin, x), await seen(asB, x)]).toEqual(before)
 
-    const p = await systemBook(a, 'private')
-    await holdCopy(asA, p)
-    const own = await seen(asA, p)
-    await rejectsNaming(
-      editBook(asA, {
-        bookId: p.id,
-        edits: { title: 'P', authors: [ghosts[2] ?? ''], series: ghostSeries, publisher: null },
-      }),
-      'title',
-      'authors',
-      'series',
-      'publisher',
-    )
-    expect(await seen(asA, p)).toEqual(own)
     expect([
       ...(await named('authors', ghosts)),
       ...(await named('series', [ghostSeries])),
     ]).toEqual([])
+  })
 
-    const q = await systemBook(admin, 'private')
-    await holdCopy(asAdmin, q)
-    const admins = await seen(asAdmin, q)
-    await rejectsNaming(
-      editBook(asAdmin, { bookId: q.id, edits: { title: 'Q', genres: [genre.id] } }),
-      'title',
-      'genres',
-    )
-    expect(await seen(asAdmin, q)).toEqual(admins)
+  // Story 4.4, FR-14/AD-5: a private Book's creator edits the Book itself.
+  describe('on a private Book', () => {
+    /** `user`'s private Book, held by them. */
+    const privateBook = async (user: User, ctx: Context) => {
+      const p = await systemBook(user, 'private')
+      await holdCopy(ctx, p)
+      return p
+    }
+
+    it("writes the creator's edit to the Book itself, with no override", async () => {
+      const p = await privateBook(a, asA)
+      const isbn13 = randomIsbn()
+      const pName = unique('A Kirjoittaja')
+      await expect(
+        editBook(asA, {
+          bookId: p.id,
+          edits: {
+            title: ' P2 ',
+            authors: [s.name, pName],
+            publisher: null,
+            genres: [genre.id, genre.id],
+            isbn13: hyphenatedIsbn10(isbn13),
+          },
+        }),
+      ).resolves.toBeUndefined()
+
+      const [author] = await named('authors', [pName])
+      expect(author).toMatchObject({ visibility: 'private', createdBy: a.id })
+      expect(await seen(asA, p)).toMatchObject({
+        title: 'P2',
+        subtitle: 'Suomen kansalliseepos',
+        authors: [
+          { id: s.id, name: s.name },
+          { id: author?.id, name: pName },
+        ],
+        publisher: null,
+        genres: [{ id: genre.id, name: genre.name }],
+        isbn13,
+        overridden: [],
+      })
+      const { totalDocs } = await payload.count({
+        collection: 'user-books',
+        where: { book: { equals: p.id } },
+        overrideAccess: true,
+      })
+      expect(totalDocs).toBe(0)
+    })
+
+    it("resolves the admin's names privately on the admin's own private Book", async () => {
+      const q = await privateBook(admin, asAdmin)
+      const qName = unique('Q Kirjoittaja')
+      await editBook(asAdmin, { bookId: q.id, edits: { authors: [qName] } })
+
+      const [author] = await named('authors', [qName])
+      expect(author).toMatchObject({ visibility: 'private', createdBy: admin.id })
+      expect(await seen(asAdmin, q)).toMatchObject({ authors: [{ id: author?.id, name: qName }] })
+    })
+
+    it('rejects a clashing or invalid ISBN and an edit by anyone but the creator', async () => {
+      const p1 = await privateBook(a, asA)
+      const p = await privateBook(a, asA)
+      const before = await seen(asA, p)
+      const ghost = unique('Ghost P')
+
+      // The names resolve before the write fails; the rollback removes them.
+      await rejectsNaming(
+        editBook(asA, {
+          bookId: p.id,
+          edits: { title: 'P3', authors: [ghost], isbn13: p1.isbn13! },
+        }),
+        ['isbn13'],
+      )
+      await rejectsNaming(
+        editBook(asA, { bookId: p.id, edits: { isbn13: 'abc' } }),
+        ['isbn13'],
+        'INVALID_ISBN',
+      )
+      await rejectsNaming(
+        editBook(asA, { bookId: p.id, edits: { isbn13: '' } }),
+        ['isbn13'],
+        'INVALID_ISBN',
+      )
+      // An ISBN is never removed.
+      await rejectsNaming(
+        editBook(asA, { bookId: p.id, edits: untyped({ isbn13: null }) }),
+        ['isbn13'],
+        'INVALID_ISBN',
+      )
+
+      // The admin can read and hold A's private Book, but not edit it.
+      await holdCopy(asAdmin, p)
+      await expect(
+        editBook(asAdmin, { bookId: p.id, edits: { title: 'Q' } }),
+      ).rejects.toMatchObject(new DomainError('NOT_FOUND'))
+
+      expect(await seen(asA, p)).toEqual(before)
+      expect(await named('authors', [ghost])).toEqual([])
+    })
   })
 })

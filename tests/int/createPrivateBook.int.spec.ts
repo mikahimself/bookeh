@@ -23,7 +23,7 @@ import config from '@/payload.config'
 import type { Author, Book, User, UserLocation } from '@/payload-types'
 
 import { as, contextFor, createUser } from '../helpers/harness'
-import { randomIsbn } from '../helpers/isbn'
+import { hyphenatedIsbn10, randomIsbn } from '../helpers/isbn'
 import { rejectedPaths } from '../helpers/validation'
 
 // Story 3.38, FR-12/AD-4/AD-5: a manual save makes a private Book from the
@@ -34,15 +34,6 @@ import { rejectedPaths } from '../helpers/validation'
 vi.mock('@/lib/metadata/lookup', () => ({ lookupSources: vi.fn(), heldOutcome: vi.fn() }))
 
 const unique = (name: string) => `${name} ${randomUUID().slice(0, 8)}`
-
-/** The ISBN-10 of a 978 ISBN-13, hyphenated as printed in a book. */
-function hyphenatedIsbn10(isbn13: string): string {
-  const core = isbn13.slice(3, 12)
-  let sum = 0
-  for (let i = 0; i < 9; i++) sum += Number(core[i]) * (10 - i)
-  const check = (11 - (sum % 11)) % 11
-  return `${core.slice(0, 1)}-${core.slice(1, 4)}-${core.slice(4)}-${check === 10 ? 'X' : check}`
-}
 
 const manualInput = (manual: ManualEntry): SaveInput => ({
   requestId: randomUUID(),

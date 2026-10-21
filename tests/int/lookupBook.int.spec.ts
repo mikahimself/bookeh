@@ -18,7 +18,7 @@ import config from '@/payload.config'
 import type { Book, Copy, User } from '@/payload-types'
 
 import { contextFor, createUser } from '../helpers/harness'
-import { randomIsbn } from '../helpers/isbn'
+import { hyphenatedIsbn10, randomIsbn } from '../helpers/isbn'
 
 // `lookupBook()`, AD-9/FR-11: the ISBN as entered answers a shared Book, the
 // viewer's own private Book, or what the sources know; another user's private
@@ -28,15 +28,6 @@ import { randomIsbn } from '../helpers/isbn'
 vi.mock('@/lib/metadata/lookup', () => ({ lookupSources: vi.fn() }))
 
 const unique = (name: string) => `${name} ${randomUUID().slice(0, 8)}`
-
-/** The ISBN-10 of a 978 ISBN-13, hyphenated as printed in a book. */
-function hyphenatedIsbn10(isbn13: string): string {
-  const core = isbn13.slice(3, 12)
-  let sum = 0
-  for (let i = 0; i < 9; i++) sum += Number(core[i]) * (10 - i)
-  const check = (11 - (sum % 11)) % 11
-  return `${core.slice(0, 1)}-${core.slice(1, 4)}-${core.slice(4)}-${check === 10 ? 'X' : check}`
-}
 
 // Shared names are global across runs, so the default author is run-unique
 // and matches no row unless a test seeds it.
