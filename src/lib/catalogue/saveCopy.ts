@@ -1,5 +1,6 @@
 import { normaliseIsbn } from '@/fields/isbn'
 import type { Named } from '@/lib/books/effectiveBook'
+import { requireOwnBook } from '@/lib/books/requireOwnBook'
 import { createCopy } from '@/lib/copies/createCopy'
 import { DomainError } from '@/lib/errors'
 import { heldOutcome, lookupSources } from '@/lib/metadata/lookup'
@@ -17,12 +18,14 @@ import { oncePerRequest } from './saveRequests'
 import { prepareShare, settleHeldBook } from './sharePrivateBook'
 
 // Spine, Structural Seed (Shared shapes, `src/lib/catalogue`), narrowed to
-// what exists now: the `{ bookId }` target arrives with `requireOwnBook()`
-// (Story 4.1), and wishlist entries with Epic 7.
+// what exists now: wishlist entries arrive with Epic 7.
 
 export type SaveInput = {
   requestId: string
-  target: { isbn13: string; pick?: number; candidate?: CandidateId } | { manual: ManualEntry }
+  target:
+    | { isbn13: string; pick?: number; candidate?: CandidateId }
+    | { manual: ManualEntry }
+    | { bookId: number }
   save: { kind: 'copy' }
 }
 
@@ -71,6 +74,15 @@ export type SaveResult = { bookId: number; copyId: number; savedTo: Named | null
  * and authors; without an ISBN that is always a new Book, never merged. A
  * manual save never asks the sources and downloads no cover.
  *
+ * A `{ bookId }` target (AD-7, AD-11) saves one more owned copy of a Book the
+ * user already holds. `requireOwnBook()` guards it in the save's transaction:
+ * `NOT_FOUND`, with nothing written, unless the user has a copy of the Book.
+ * It never asks the sources and changes nothing on the Book: no auto-share
+ * or merge, which are keyed on the ISBN and run on an `{ isbn13 }` save
+ * (AD-5). The target is for Books without an ISBN (I12); an Answer for a
+ * Book with one sends `{ isbn13 }`. A held Book the user can no longer read
+ * (a shared Book the admin made private) fails in `createCopy()`.
+ *
  * A repeat of a recent `requestId` by the same user returns the first result
  * and writes nothing, even with another `target`: the id identifies the press
  * (AD-11, AD-12, `oncePerRequest()`). A failed save is not remembered, so a
@@ -108,6 +120,13 @@ export async function saveCopy(ctx: Context, input: SaveInput): Promise<Undoable
 
 async function save(ctx: Context, input: SaveInput): Promise<Undoable<SaveResult>> {
   const { target } = input
+  if ('bookId' in target) {
+    const { bookId } = target
+    return withUndo(ctx, async (tx) => {
+      await requireOwnBook(tx, bookId)
+      return saveOwnedCopy(tx, bookId, undefined)
+    })
+  }
   if ('manual' in target) {
     const manual = normaliseManual(target.manual)
     // No cover to fetch first, so the held-Book read runs in the transaction.

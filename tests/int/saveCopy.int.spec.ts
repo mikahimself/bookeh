@@ -321,6 +321,42 @@ describe('saveCopy', () => {
     expect(books.find((book) => book.id === ofB.id)).toEqual(ofB)
   })
 
+  it('saves one more copy of a held Book by id, its Undo leaving the Book; never for another user', async () => {
+    const { user, location, ctx } = await userWithDefault()
+    const b = await freshUser()
+    const isbn = randomIsbn()
+    const shared = await bookFor(undefined, isbn, 'shared')
+    const first = await saveCopy(ctx, inputFor(isbn))
+    const byId = (bookId: number): SaveInput => ({
+      requestId: randomUUID(),
+      target: { bookId },
+      save: { kind: 'copy' },
+    })
+
+    const result = await saveCopy(ctx, byId(shared.id))
+
+    expect(result).toMatchObject({
+      bookId: shared.id,
+      savedTo: { id: location.id, name: location.name },
+    })
+    expect(result.copyId).not.toBe(first.copyId)
+    const copies = (await copiesOf(user)).sort((x, y) => x.id - y.id)
+    expect(copies.map((copy) => [copy.id, copy.book, copy.status, copy.location])).toEqual([
+      [first.copyId, shared.id, 'owned', location.id],
+      [result.copyId, shared.id, 'owned', location.id],
+    ])
+
+    await undo(ctx, result.undoToken)
+    expect((await copiesOf(user)).map((copy) => copy.id)).toEqual([first.copyId])
+    expect((await booksWithIsbn(isbn)).map((book) => book.id)).toEqual([shared.id])
+
+    await expect(saveCopy(b.ctx, byId(shared.id))).rejects.toMatchObject(
+      new DomainError('NOT_FOUND'),
+    )
+    expect(await copiesOf(b.user)).toEqual([])
+    expect(lookupSources).not.toHaveBeenCalled()
+  })
+
   it('rejects an invalid ISBN before any read', async () => {
     const { user, ctx } = await freshUser()
     const find = vi.spyOn(payload, 'find')
