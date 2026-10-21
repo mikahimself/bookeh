@@ -204,13 +204,13 @@ no identity inside — and harmless wherever the mode is 755.)
 
 ### 4. Copy the deploy files to the LXC — [dev]
 
-The LXC has no checkout; the seven files in `deploy/` travel by hand, now
+The LXC has no checkout; the eight files in `deploy/` travel by hand, now
 and after every change to them (see "Updating the deploy files"):
 
 ```sh
 cd <repo>/deploy
 scp compose.prod.yml postgres-entrypoint.sh .env.example bookeh.service \
-  backup.sh bookeh-backup.service bookeh-backup.timer \
+  backup.sh bookeh-backup.service bookeh-backup.timer restore-rehearsal.sh \
   root@<lxc>:/root/
 ```
 
@@ -225,6 +225,7 @@ mkdir -p /opt/bookeh
 cd /root
 cp compose.prod.yml postgres-entrypoint.sh /opt/bookeh/
 install -m 700 backup.sh /opt/bookeh/backup.sh
+install -m 700 restore-rehearsal.sh /opt/bookeh/restore-rehearsal.sh
 cp .env.example /opt/bookeh/.env
 ```
 
@@ -309,8 +310,9 @@ The files in `/opt/bookeh` are copies. After changing `compose.prod.yml` or
 cd /opt/bookeh && docker compose -f compose.prod.yml up -d
 ```
 
-A changed `backup.sh` is re-installed the same way
-(`install -m 700 /root/backup.sh /opt/bookeh/backup.sh`). A change to
+A changed `backup.sh` or `restore-rehearsal.sh` is re-installed the same
+way (`install -m 700 /root/backup.sh /opt/bookeh/backup.sh`,
+`install -m 700 /root/restore-rehearsal.sh /opt/bookeh/restore-rehearsal.sh`). A change to
 `bookeh.service`, `bookeh-backup.service` or `bookeh-backup.timer` needs a
 re-copy to `/etc/systemd/system/` followed by `systemctl daemon-reload`.
 
@@ -377,6 +379,80 @@ tag may ship a new ICU, which requires `REINDEX` and
 
 Note: `docker/postgres/initdb/` from the repo is **not** mounted here on
 purpose — `bookeh_test` is a dev/CI artifact.
+
+## Restore rehearsal — [lxc]
+
+`restore-rehearsal.sh` proves that a backup brings the catalogue back
+(NFR-6). It restores a backup into a throwaway Postgres initialised with the
+ICU `fi-FI` args (data on tmpfs) and a scratch copy of its media
+(`/tmp/bookeh-restore.XXXXXX`), starts the production app image on them at
+`127.0.0.1:3001`, runs the checks below, and removes the scratch
+containers, network and directory on exit — also on failure or Ctrl-C. It
+never writes to production, the media, the backups or `last-backup.json`;
+it takes no secret from production's `.env` (`docker compose` reads that
+only for interpolation; the scratch database password and `PAYLOAD_SECRET`
+are random per run).
+
+**When:** at the cataloguing gate, once the first real books and covers
+are in, and again after any change to `backup.sh`, the Postgres image tag
+or the restore procedure.
+
+**Steps:**
+
+1. Make sure `/opt/bookeh/restore-rehearsal.sh` is the current version.
+   **[dev]** `scp deploy/restore-rehearsal.sh root@<lxc>:/root/`, then
+   **[lxc]**
+   `install -m 700 /root/restore-rehearsal.sh /opt/bookeh/restore-rehearsal.sh`.
+2. Take a fresh backup and confirm it succeeded:
+   `systemctl start bookeh-backup.service`, then
+   `journalctl -u bookeh-backup -n 5` ends with `bookeh-backup: OK`.
+3. Do not catalogue until the rehearsal is done — the counts are compared
+   with production, so a write after the dump fails the run.
+4. Run it, signing in as the admin when prompted (both inputs are hidden):
+
+   ```sh
+   cd /opt/bookeh && ./restore-rehearsal.sh
+   ```
+
+   It takes the latest dated backup under `BOOKEH_BACKUP_DIR`; pass a
+   dated directory as the one argument to use another. Port and image can
+   be changed with `BOOKEH_RESTORE_PORT` and `BOOKEH_RESTORE_IMAGE`
+   (default: the image of the running app container). The media copy
+   needs free space in `/tmp` for the whole media directory.
+5. On `OK`, fill in a row of the record below in `deploy/README.md` on
+   the **[dev]** machine, from the script's output, and commit it (the LXC
+   has no checkout).
+
+**What each check proves** (a failure exits non-zero and names the check):
+
+| Check | Proves |
+|---|---|
+| `collation icu/fi-FI` | The restore target was created ICU `fi-FI`, as any real restore must be ("Collation and restore"); a libc target fails the run. |
+| `counts match` | `users`, `users_roles`, `books`, `books_rels`, `books_texts`, `authors`, `series`, `genres`, `media`, `copies`, `user_books`, `user_books_rels` and `locations` hold as many rows as production: users and roles, the catalogue with its author, series and genre links, and each user's copies and locations are all in the dump. A difference names the tables and asks for a fresh backup. |
+| `signed in` | The restored users and their password hashes work with a new `PAYLOAD_SECRET`, through the production image. |
+| `covers checked: N` | Every book cover's file is in the media copy and served by the app: the media backup is complete. A missing one is named. |
+| `time taken` | How long the restore took, without the sign-in prompt. The scratch database is on tmpfs and the media copy on local `/tmp`, so this is a lower bound for a real restore onto the NAS. |
+
+**Record:**
+
+| Date | Backup | Counts | Covers checked | Time taken | No test data before cataloguing |
+|---|---|---|---|---|---|
+| | | | | | |
+
+The last column confirms that production held no test books, authors,
+series or covers before real cataloguing began (cataloguing gate). Check it
+**[lxc]** before the first real book is saved:
+
+```sh
+cd /opt/bookeh && docker compose -f compose.prod.yml exec -T postgres \
+  psql -U bookeh -d bookeh -tAc \
+  'select (select count(*) from books), (select count(*) from authors),
+     (select count(*) from series), (select count(*) from media)'
+```
+
+Expected `0|0|0|0`. Any non-zero count means recreating the database from
+an empty `data/` directory before cataloguing (see "Collation and
+restore").
 
 ## Troubleshooting — [lxc]
 
@@ -450,6 +526,10 @@ purpose — `bookeh_test` is a dev/CI artifact.
 - [ ] Status mount: `docker compose -f compose.prod.yml exec app cat
       /app/backup-status/last-backup.json` prints the status JSON from
       inside the app container.
+- [ ] Restore rehearsal at the cataloguing gate: `./restore-rehearsal.sh`
+      prints `OK`, `docker ps -a` and `docker network ls` show no
+      `bookeh-restore-*` leftovers, `ls -d /tmp/bookeh-restore.*` prints
+      nothing, and the run is recorded under "Restore rehearsal".
 
 (The empty-database refusal is proven in the local rehearsal on the dev
 stack, not on production — see the story's verification notes.)
