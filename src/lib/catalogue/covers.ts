@@ -233,6 +233,22 @@ export async function attachCover(tx: Context, cover: DownloadedCover): Promise<
   return doc.id
 }
 
+/**
+ * Deletes a `media` row in the caller's transaction and leaves its file:
+ * Payload unlinks an upload's file before its delete and outside the
+ * transaction, so a delete that rolls back would leave the row without its
+ * file. `sweepOrphanMedia()` removes the file on the next start. A row
+ * already gone matches nothing.
+ */
+export async function deleteMediaRow(tx: Context, id: number): Promise<void> {
+  assertLive(tx)
+  await tx.req.payload.db.deleteMany({
+    collection: 'media',
+    where: { id: { equals: id } },
+    req: tx.req,
+  })
+}
+
 /** Removes a downloaded cover's file; one already gone is fine. */
 export async function discardCover(payload: Payload, cover: DownloadedCover): Promise<void> {
   try {

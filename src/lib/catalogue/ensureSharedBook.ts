@@ -3,7 +3,7 @@ import type { Context } from '@/lib/payload/context'
 import { assertLive, onRollback, withTransaction } from '@/lib/payload/transaction'
 import type { Restore, Undone } from '@/lib/undo/undo'
 
-import { attachCover, discardCover, type DownloadedCover } from './covers'
+import { attachCover, deleteMediaRow, discardCover, type DownloadedCover } from './covers'
 import { findOrCreateByName, type FoundOrCreated } from './findOrCreateByName'
 import { isUnreferenced } from './isUnreferenced'
 import { mapSubjectsToGenres } from './mapSubjectsToGenres'
@@ -34,11 +34,8 @@ import type { Chosen } from './pick'
  * of a created one deletes, in this order and each only when `isUnreferenced()`
  * finds no row of any user referencing it, the Book, the authors and the
  * series this call created, and the cover's `media` row; rows that were
- * matched are never deleted. The `media` row goes through `payload.db`, which
- * deletes the row and leaves the file: Payload unlinks an upload's file before
- * its delete and outside the transaction, so a restore that rolls back would
- * leave the row without its file. `sweepOrphanMedia()` removes the file on the
- * next start.
+ * matched are never deleted. The `media` row goes through `deleteMediaRow()`,
+ * which leaves the file to `sweepOrphanMedia()`.
  */
 export async function ensureSharedBook(
   ctx: Context,
@@ -121,12 +118,7 @@ export async function ensureSharedBook(
         await deleteRow(rtx, 'series', createdSeries)
       }
       if (coverId !== undefined && (await isUnreferenced(rtx, 'media', coverId))) {
-        assertLive(rtx)
-        await rtx.req.payload.db.deleteMany({
-          collection: 'media',
-          where: { id: { equals: coverId } },
-          req: rtx.req,
-        })
+        await deleteMediaRow(rtx, coverId)
       }
     }
     return { data: { id: bookId, created: true }, restore }

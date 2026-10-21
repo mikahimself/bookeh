@@ -1487,8 +1487,8 @@ So that my manual entries don't stay second-class (FR-12, AD-5).
 **Given** my private Book with an ISBN, and a `found` source outcome held server-side for it
 **When** I save another copy of it
 **Then** inside the save transaction the row keeps its id, takes the values of the candidate the Answer picked (D-7), its authors and series are re-matched to shared records, `visibility` becomes shared and `createdBy` clears
-**And** as admin, my differing hand-entered values are dropped; as another user, they become my overrides (FR-12, D-8)
-**And** if a shared Book with that ISBN already exists, my copies and `user-books` row move to it and my private Book is deleted (my wishlist entries move too from Epic 7, Story 7.7)
+**And** as admin, my differing hand-entered values are dropped; as another user, those that differ beyond case, whitespace and punctuation become my overrides (FR-12, D-8)
+**And** if a shared Book with that ISBN already exists, my copies and `user-books` row move to it and my private Book is deleted (only when nothing else references it; its unreferenced private authors, series and cover go too, AD-5) (my wishlist entries move too from Epic 7, Story 7.7)
 **And** the save never calls the sources itself, and other users' private Books are never touched
 **And** undoing the save removes the copy and leaves the Book shared
 
@@ -2585,8 +2585,8 @@ So that once Finna or Google knows it, it gets their details and becomes a norma
 **Given** my own private Book with an ISBN
 **When** I tap "Look it up again" in Book detail, or on its In library Answer
 **Then** the sources are called through `lookupBook` (rate-limited, never cached as `unavailable`)
-**And** on `found`, with the edition picker when there are several candidates (opened over the Book detail sheet, one overlay deep), the AD-5 auto-share runs in one transaction without creating a copy: source values replace the Book's, authors and series are re-matched to shared records, `visibility` becomes shared and `createdBy` clears, or my copies and `user-books` row move to an existing shared Book and the private one is deleted (entries move too from Epic 7, Story 7.7); the toast reads "Shared · from {source}"
-**And** as admin, my differing hand-entered values are dropped; as another user, they become my overrides
+**And** on `found`, with the edition picker when there are several candidates (opened over the Book detail sheet, one overlay deep), the AD-5 auto-share runs in one transaction without creating a copy: source values replace the Book's, authors and series are re-matched to shared records, `visibility` becomes shared and `createdBy` clears, or my copies and `user-books` row move to an existing shared Book and the private one is deleted (only when nothing else references it; its unreferenced private authors, series and cover go too, AD-5) (entries move too from Epic 7, Story 7.7); the toast reads "Shared · from {source}"
+**And** as admin, my differing hand-entered values are dropped; as another user, those that differ beyond case, whitespace and punctuation become my overrides
 **And** on `none` the toast reads "Still not found."; on `unavailable` it names the sources that didn't answer; nothing changes
 **And** a private Book without an ISBN shows "Add the ISBN on Edit book to look it up." instead of the link
 **And** the action is not undoable; integration tests cover each outcome and prove other users' private Books are untouched

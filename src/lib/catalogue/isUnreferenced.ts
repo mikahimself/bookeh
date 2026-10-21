@@ -3,7 +3,7 @@ import type { CollectionSlug } from 'payload'
 import type { Context } from '@/lib/payload/context'
 import { assertLive } from '@/lib/payload/transaction'
 
-/** The catalogue rows a restore may delete when nothing references them (AD-3, AD-11). */
+/** The catalogue rows a restore or a share's clean-up may delete when nothing references them (AD-3, AD-11). */
 export type CatalogueCollection = 'books' | 'authors' | 'series' | 'genres' | 'media'
 
 /**

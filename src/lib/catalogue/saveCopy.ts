@@ -53,9 +53,12 @@ export type SaveResult = { bookId: number; copyId: number; savedTo: Named | null
  * `chooseCandidate()` takes for `pick` and `candidate`.
  * When a shared Book with the ISBN exists and the user also has a private
  * one, the private Book merges into it: its copies and the user's row move,
- * and it is deleted. Either way the user's differing hand-entered values
- * become their overrides; an admin's are dropped. Otherwise the held Book
- * gets the copy unchanged. A held Book's save never asks the sources.
+ * and it is deleted, the save failing when anything else still references
+ * it. Either way the user's hand-entered values that differ beyond case,
+ * whitespace and punctuation become their overrides; an admin's are dropped.
+ * The private authors, series and cover left unreferenced are deleted.
+ * Otherwise the held Book gets the copy unchanged. A held Book's save never
+ * asks the sources.
  *
  * A `{ manual }` target (FR-12, FR-22, AD-4, AD-5) is normalised first by
  * `normaliseManual()` (`VALIDATION` marking `title` and `authors` blank or

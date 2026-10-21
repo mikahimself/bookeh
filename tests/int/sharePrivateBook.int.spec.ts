@@ -115,6 +115,10 @@ describe('saveCopy of a held private Book', () => {
       })
     ).docs
 
+  const exists = async (collection: 'authors' | 'series' | 'media', id: number) =>
+    (await payload.count({ collection, where: { id: { equals: id } }, overrideAccess: true }))
+      .totalDocs > 0
+
   /** Records a Book's cover for cleanup and returns its row. */
   const trackCover = async (bookId: number) => {
     const book = await bookById(bookId, 1)
@@ -250,6 +254,58 @@ describe('saveCopy of a held private Book', () => {
     },
   )
 
+  it('deletes the private author a promote leaves unreferenced', async () => {
+    const { ctx, isbn, own } = await promoteSetup()
+
+    await saveCopy(ctx, isbnInput(isbn))
+    await trackCover(own.id)
+
+    expect(await exists('authors', (own.authors as number[])[0]!)).toBe(false)
+  })
+
+  it('deletes a private series a promote leaves unreferenced, never a shared author', async () => {
+    const { user, ctx, isbn, own, key } = await promoteSetup()
+    const system = { overrideAccess: true, depth: 0, req: ctx.req } as const
+    // Another nameKey than the candidate's names, the same loose key.
+    const series = await payload.create({
+      collection: 'series',
+      data: { name: `S ${key}.`, nameKey: '', visibility: 'private' },
+      ...system,
+    })
+    const author = await payload.create({
+      collection: 'authors',
+      data: { name: `Aleksis Kivi ${key}.`, nameKey: '', visibility: 'shared' },
+      ...system,
+    })
+    await payload.update({
+      collection: 'books',
+      id: own.id,
+      data: { title: 'T2', authors: [author.id], series: series.id },
+      ...system,
+    })
+
+    await saveCopy(ctx, isbnInput(isbn))
+    await trackCover(own.id)
+
+    expect(await exists('series', series.id)).toBe(false)
+    expect(await exists('authors', author.id)).toBe(true)
+    expect(await rowsOf(user)).toEqual([])
+  })
+
+  it('keeps no override for values that differ only by case, whitespace or punctuation', async () => {
+    const { user, ctx } = await freshUser()
+    const isbn = randomIsbn()
+    const key = suffix()
+    await privateBook(ctx, isbn, 'the  hobbit.', `Aleksis Kivi ${key}.`)
+    vi.mocked(heldOutcome).mockReturnValue(
+      found({ isbn13: isbn, title: 'The Hobbit', authors: [{ name: `Aleksis Kivi ${key}` }] }),
+    )
+
+    await saveCopy(ctx, isbnInput(isbn))
+
+    expect(await rowsOf(user)).toEqual([])
+  })
+
   it('clears a field the source lacks and keeps it as an override', async () => {
     const { user, ctx, isbn, own } = await promoteSetup()
     await payload.update({
@@ -375,6 +431,66 @@ describe('saveCopy of a held private Book', () => {
     // The differing authors are written; the kept title override is not replaced.
     expect(rows[0]!.overridden).toEqual(['title', 'authors'])
     expect(rows[0]!.authors).toEqual(own.authors)
+    // The override still references the private author, so it stays.
+    expect(await exists('authors', (own.authors as number[])[0]!)).toBe(true)
+  })
+
+  it('refuses a merge while another row still references the private Book', async () => {
+    const { user, ctx } = await freshUser()
+    const isbn = randomIsbn()
+    const author = `Juhani Aho ${suffix()}`
+    const own = await privateBook(ctx, isbn, 'T1', author)
+    await upsertUserBook(ctx, own.id, { read: true })
+    await sharedBook(isbn, 'T2', author)
+    const b = await freshUser()
+    // No app path can do this (AD-4): written past validation and access.
+    const copyOfB = await payload.db.create({
+      collection: 'copies',
+      data: { owner: b.user.id, book: own.id, status: 'owned' },
+    })
+    const [copiesBefore, rowsBefore] = [await copiesOf(user), await rowsOf(user)]
+
+    await expect(saveCopy(ctx, isbnInput(isbn))).rejects.toThrow('still referenced')
+
+    expect(await bookById(own.id)).toEqual(own)
+    expect(await copiesOf(user)).toEqual(copiesBefore)
+    expect(await rowsOf(user)).toEqual(rowsBefore)
+    expect((await copiesOf(b.user)).map((copy) => copy.id)).toEqual([copyOfB.id])
+  })
+
+  it('deletes the private author and cover a merge leaves unreferenced', async () => {
+    const { ctx } = await freshUser()
+    const isbn = randomIsbn()
+    const author = `Juhani Aho ${suffix()}`
+    const own = await privateBook(ctx, isbn, 'T1', author)
+    const cover = await payload.create({
+      collection: 'media',
+      data: {
+        filename: `${randomUUID()}.jpg`,
+        mimeType: 'image/jpeg',
+        filesize: 1,
+        width: 4,
+        height: 6,
+      },
+      overrideAccess: true,
+      depth: 0,
+    })
+    mediaIds.push(cover.id)
+    await payload.update({
+      collection: 'books',
+      id: own.id,
+      data: { cover: cover.id },
+      overrideAccess: true,
+      depth: 0,
+      req: ctx.req,
+    })
+    // The same loose key: no `authors` override keeps the private author.
+    await sharedBook(isbn, 'T2', `${author}.`)
+
+    await saveCopy(ctx, isbnInput(isbn))
+
+    expect(await exists('authors', (own.authors as number[])[0]!)).toBe(false)
+    expect(await exists('media', cover.id)).toBe(false)
   })
 
   it("takes the private row's rating when the shared row has none", async () => {

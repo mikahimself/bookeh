@@ -1,6 +1,5 @@
 import { isAdmin } from '@/access/roles'
 import { OVERRIDABLE_BOOK_FIELDS, type OverridableBookField } from '@/fields/bookFields'
-import { toNameKey } from '@/fields/nameKey'
 import { type BookOverrides, mergeUserBook, upsertUserBook } from '@/lib/books/upsertUserBook'
 import { moveCopies } from '@/lib/copies/moveCopies'
 import { DomainError } from '@/lib/errors'
@@ -11,10 +10,17 @@ import * as gateway from '@/lib/payload/gateway'
 import { assertLive, onRollback } from '@/lib/payload/transaction'
 import type { Author, Book, Series } from '@/payload-types'
 
-import { attachCover, discardCover, type DownloadedCover, storeCover } from './covers'
+import {
+  attachCover,
+  deleteMediaRow,
+  discardCover,
+  type DownloadedCover,
+  storeCover,
+} from './covers'
 import { deleteRow } from './ensureSharedBook'
 import { findBookByIsbn, type HeldBook } from './findBookByIsbn'
 import { findOrCreateByName } from './findOrCreateByName'
+import { isUnreferenced } from './isUnreferenced'
 import { mapSubjectsToGenres } from './mapSubjectsToGenres'
 import { type CandidateId, type Chosen, chooseCandidate } from './pick'
 
@@ -76,7 +82,9 @@ export async function prepareShare(
  * - The shared Book: the user's own private Book with the ISBN, if any, is
  *   merged into it (its copies and `user-books` row move, then it is
  *   deleted), and the cover is discarded at once. No held outcome is needed:
- *   the shared Book's values are the target.
+ *   the shared Book's values are the target. When any row still references
+ *   the private Book after the move, the merge throws a plain `Error`, which
+ *   rolls the save back, rather than let Postgres null that reference.
  * - The user's private Book with `pending`: promoted in place. It keeps its
  *   id and takes the candidate's values, with authors and series matched or
  *   created among shared rows; `visibility` becomes shared and the field hook
@@ -86,11 +94,15 @@ export async function prepareShare(
  *
  * D-8: in a promote or a merge, a field the private Book has a value for
  * that the target (the candidate, or the shared Book) lacks or holds
- * differently becomes the user's override, written after the Book is shared:
- * text and numbers by exact equality, `authors` as the ordered name keys,
- * `series` by name key, keeping the private Book's own ids. An admin's
- * values are dropped. Another user's private Book, row or copy is never
- * read or changed.
+ * differently becomes the user's override, written after the Book is shared.
+ * Text compares by `looseKey()`, so a value that differs only by case,
+ * whitespace or punctuation is not kept; numbers compare exactly; `authors`
+ * as the ordered loose keys of their names and `series` by the loose key of
+ * its name, an override keeping the private Book's own ids. An admin's
+ * values are dropped. Afterwards the private authors and series the private
+ * Book used, and its cover's `media` row, are deleted when nothing
+ * references them (`isUnreferenced()`), so an override keeps its author.
+ * Another user's private Book, row or copy is never read or changed.
  */
 export async function settleHeldBook(
   tx: Context,
@@ -123,31 +135,45 @@ const SCALAR_FIELDS = OVERRIDABLE_BOOK_FIELDS.filter(
 /** A Book's overridable values as read for a share, relations populated. */
 type BookValues = Pick<Book, 'id' | 'cover' | OverridableBookField>
 
-/** The values a private Book is compared with: scalars present, author and series name keys. */
+/** The values a private Book is compared with: scalars present, text and names as loose keys. */
 type Comparable = {
   scalars: Partial<Record<ScalarField, string | number>>
   authors: string[]
   series: string | undefined
 }
 
+/**
+ * D-8 only: NFC, lower-cased, every punctuation, format (soft hyphen,
+ * zero-width space), modifier symbol (´ as an apostrophe) and whitespace
+ * character removed; accents kept. Not `toNameKey()`, which keys the unique `nameKey`
+ * columns and must keep punctuation ("A.B." and "AB" can be two authors).
+ */
+const looseKey = (text: string) =>
+  text
+    .normalize('NFC')
+    .toLowerCase()
+    .replace(/[\p{P}\p{Cf}\p{Sk}\s]/gu, '')
+
+const compareKey = (value: string | number) => (typeof value === 'string' ? looseKey(value) : value)
+
 const populated = <T extends Author | Series>(value: number | T | null | undefined): T => {
   if (typeof value !== 'object' || value === null) throw new Error('Relation not populated')
   return value
 }
 
-const idOf = (value: number | Author | Series): number =>
+const idOf = (value: number | { id: number }): number =>
   typeof value === 'number' ? value : value.id
 
 function fromBook(book: BookValues): Comparable {
   const scalars: Comparable['scalars'] = {}
   for (const key of SCALAR_FIELDS) {
     const value = book[key]
-    if (value !== null && value !== undefined) scalars[key] = value
+    if (value !== null && value !== undefined) scalars[key] = compareKey(value)
   }
   return {
     scalars,
-    authors: (book.authors ?? []).map((author) => toNameKey(populated<Author>(author).name)),
-    series: book.series == null ? undefined : toNameKey(populated<Series>(book.series).name),
+    authors: (book.authors ?? []).map((author) => looseKey(populated<Author>(author).name)),
+    series: book.series == null ? undefined : looseKey(populated<Series>(book.series).name),
   }
 }
 
@@ -155,12 +181,12 @@ function fromCandidate(candidate: SourceResult): Comparable {
   const scalars: Comparable['scalars'] = {}
   for (const key of SCALAR_FIELDS) {
     const value = candidate[key]
-    if (value !== undefined) scalars[key] = value
+    if (value !== undefined) scalars[key] = compareKey(value)
   }
   return {
     scalars,
-    authors: candidate.authors.map(({ name }) => toNameKey(name)),
-    series: candidate.series === undefined ? undefined : toNameKey(candidate.series),
+    authors: candidate.authors.map(({ name }) => looseKey(name)),
+    series: candidate.series === undefined ? undefined : looseKey(candidate.series),
   }
 }
 
@@ -170,7 +196,7 @@ function differing(own: BookValues, target: Comparable): BookOverrides {
   const entries: [OverridableBookField, unknown][] = []
   for (const key of SCALAR_FIELDS) {
     const value = mine.scalars[key]
-    if (value !== undefined && value !== target.scalars[key]) entries.push([key, value])
+    if (value !== undefined && value !== target.scalars[key]) entries.push([key, own[key]])
   }
   const sameAuthors =
     mine.authors.length === target.authors.length &&
@@ -205,7 +231,10 @@ async function readBook(tx: Context, id: number): Promise<BookValues> {
       cover: true,
     },
     depth: 1,
-    populate: { authors: { name: true }, series: { name: true } },
+    populate: {
+      authors: { name: true, visibility: true },
+      series: { name: true, visibility: true },
+    },
     req: tx.req,
     overrideAccess: true,
   })
@@ -282,13 +311,47 @@ async function promote(tx: Context, bookId: number, pending: PendingShare): Prom
 
   // After the update: overrides exist only on shared Books.
   await upsertUserBook(tx, bookId, { overrides })
+  await removeOrphans(tx, own)
 }
 
-/** FR-12 and D-8: the private Book's copies and row move to the shared Book, then it is deleted. */
+/**
+ * FR-12 and D-8: the private Book's copies and row move to the shared Book,
+ * then it is deleted, only when nothing references it any more.
+ */
 async function merge(tx: Context, ownId: number, sharedId: number): Promise<void> {
   const own = await readBook(tx, ownId)
   const overrides = isAdmin(tx.user) ? {} : differing(own, fromBook(await readBook(tx, sharedId)))
   await moveCopies(tx, ownId, sharedId)
   await mergeUserBook(tx, ownId, sharedId, overrides)
+  // Postgres would null a remaining reference on delete; the throw rolls the save back.
+  if (!(await isUnreferenced(tx, 'books', ownId))) {
+    throw new Error(`Private Book ${ownId} is still referenced after its merge`)
+  }
   await deleteRow(tx, 'books', ownId)
+  await removeOrphans(tx, own)
+}
+
+/**
+ * After a promote or a merge: the private authors and series `own` used, and
+ * its cover's `media` row, each deleted when nothing references it. Shared
+ * rows are never candidates; a private one an override keeps stays.
+ */
+async function removeOrphans(tx: Context, own: BookValues): Promise<void> {
+  // One after the other: calls on one context never run concurrently (AD-16).
+  for (const author of own.authors ?? []) {
+    const { id, visibility } = populated<Author>(author)
+    if (visibility === 'private' && (await isUnreferenced(tx, 'authors', id))) {
+      await deleteRow(tx, 'authors', id)
+    }
+  }
+  if (own.series != null) {
+    const { id, visibility } = populated<Series>(own.series)
+    if (visibility === 'private' && (await isUnreferenced(tx, 'series', id))) {
+      await deleteRow(tx, 'series', id)
+    }
+  }
+  if (own.cover != null) {
+    const id = idOf(own.cover)
+    if (await isUnreferenced(tx, 'media', id)) await deleteMediaRow(tx, id)
+  }
 }
