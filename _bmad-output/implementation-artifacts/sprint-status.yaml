@@ -29,7 +29,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 10-06-2026 17:50
-last_updated: 10-20-2026 19:04
+last_updated: 10-21-2026 09:15
 project: bookeh
 project_key: NOKEY
 tracking_system: file-system
@@ -68,10 +68,10 @@ development_status:
   2-3-k4-nightly-backups: done
   epic-2-retrospective: optional
 
-  epic-3: in-progress
+  epic-3: done
   3-54-k15-epic-1-test-and-toast-clean-up: done
   3-1-d9-scan-screen: done
-  3-2-c9-real-book-fixture-capture: in-progress
+  3-2-c9-real-book-fixture-capture: done
   3-3-b1-isbn-and-name-key-fields: done
   3-4-c1-source-contract-and-merge: done
   3-5-c2-finna-adapter-core-fields: done
@@ -123,7 +123,7 @@ development_status:
   3-51-d23-scan-loop-rules: done
   3-52-d15-end-to-end-scan-to-save: done
   3-53-c12-pick-the-edition: done
-  epic-3-retrospective: optional
+  epic-3-retrospective: done
 
   epic-4: backlog
   4-1-e21-only-my-own-books-by-id: backlog
@@ -240,6 +240,7 @@ development_status:
   9-8-g10-tag-a-selection: backlog
   9-9-g9-tags-my-genres-and-my-themes-in-settings: backlog
   9-10-g4-seeded-system-genres: backlog
+  9-16-c13-revalidate-google-books: backlog
   9-11-g5-genres-from-google-books-on-save: backlog
   9-12-g15-new-genre-on-the-answer: backlog
   9-13-g11-genre-admin-service: backlog
@@ -254,7 +255,8 @@ action_items:
       adopts flashToast()'
     owner: 'Mika'
     status: done
-    resolution: '2026-10-11: story 3.54. flashToast() sets plain JSON and Next percent-encodes once; pinned by a round trip through ResponseCookies into takeFlash().'
+    resolution: '2026-10-11: story 3.54. flashToast() sets plain JSON and Next percent-encodes
+      once; pinned by a round trip through ResponseCookies into takeFlash().'
     ref: '_bmad-output/implementation-artifacts/epic-1-retro-2026-10-10.md'
   - id: 'epic-1-retro-item-2-fix-the-settings-switch-revert-race-them'
     epic: 1
@@ -276,7 +278,7 @@ action_items:
       with pathname-derived next; reuse in SignOutButton and LoginForm; dedupe isPlainObject/tuple
       guards'
     owner: 'Mika'
-    status: open
+    status: done
     ref: '_bmad-output/implementation-artifacts/epic-1-retro-2026-10-10.md'
   - id: 'epic-1-retro-item-5-add-a-runtime-by-id-guard-to-gateway-upd'
     epic: 1
@@ -296,7 +298,8 @@ action_items:
       is tested'
     owner: 'Mika'
     status: done
-    resolution: '2026-10-11: story 3.54 removed the Epic 1 e2e specs and their seed helpers (retro: closes with 3.54).'
+    resolution: '2026-10-11: story 3.54 removed the Epic 1 e2e specs and their seed
+      helpers (retro: closes with 3.54).'
     ref: '_bmad-output/implementation-artifacts/epic-1-retro-2026-10-10.md'
   - id: 'epic-1-retro-item-8-harden-the-ci-migration-drift-check-to-a'
     epic: 1
@@ -319,10 +322,10 @@ action_items:
     owner: 'Mika'
     status: done
     resolution: '2026-10-11: story 3.1. navigation.ts stamps a depth on every history
-      state it writes (push: one deeper, replace: carried) and follows popstate; the X
-      goes back when the depth is above 0 and replaces to / otherwise, never reading
-      history.length. A module closing flag makes a second tap during the slide a no-op.
-      Pinned by tests/unit/navigation.unit.spec.ts.'
+      state it writes (push: one deeper, replace: carried) and follows popstate; the
+      X goes back when the depth is above 0 and replaces to / otherwise, never reading
+      history.length. A module closing flag makes a second tap during the slide a
+      no-op. Pinned by tests/unit/navigation.unit.spec.ts.'
     ref: '_bmad-output/implementation-artifacts/epic-1-retro-2026-10-10.md'
   - id: 'epic-1-retro-item-11-epic-2-security-gate-own-email-password'
     epic: 1
@@ -380,3 +383,154 @@ action_items:
     owner: 'Mika'
     status: done
     ref: '_bmad-output/implementation-artifacts/epic-1-retro-2026-10-10.md'
+  - id: "epic-3-retro-item-18-resolve-the-lookup-outcome-once-per-save"
+    epic: 3
+    action: "Resolve the lookup outcome once per save and carry the picked candidate's
+      identity: no source call inside the save transaction, cover and Book from one
+      outcome, refuse a save whose candidate is gone, thread pick through prepareShare
+      (R1)"
+    owner: "Mika"
+    status: open
+    ref: "_bmad-output/implementation-artifacts/epic-3-retro-2026-10-20.md"
+  - id: "epic-3-retro-item-19-put-the-save-path-and-the-cover-preview"
+    epic: 3
+    action: "Put the save path and the cover preview route under the per-user lookup
+      limit; memoise preview bytes per user, ISBN and pick (R2)"
+    owner: "Mika"
+    status: open
+    ref: "_bmad-output/implementation-artifacts/epic-3-retro-2026-10-20.md"
+  - id: "epic-3-retro-item-20-guard-the-private-book-merge-with-isunre"
+    epic: 3
+    action: "Guard the private-Book merge with isUnreferenced() and remove the user's
+      own private authors, series and cover rows that promote/merge leave unreferenced
+      (R3)"
+    owner: "Mika"
+    status: open
+    ref: "_bmad-output/implementation-artifacts/epic-3-retro-2026-10-20.md"
+  - id: "epic-3-retro-item-21-keep-not_found-distinct-in-savecopyactio"
+    epic: 3
+    action: "Keep NOT_FOUND distinct in saveCopyAction and re-render the Answer; clip
+      over-long source values to field limits; map manual title/author length errors
+      to their fields (R5, R6)"
+    owner: "Mika"
+    status: open
+    ref: "_bmad-output/implementation-artifacts/epic-3-retro-2026-10-20.md"
+  - id: "epic-3-retro-item-22-add-one-integration-assertion-that-finna"
+    epic: 3
+    action: "Add one integration assertion that Finna wins over Google when both sources
+      answer (R13)"
+    owner: "Mika"
+    status: open
+    ref: "_bmad-output/implementation-artifacts/epic-3-retro-2026-10-20.md"
+  - id: "epic-3-retro-item-23-fix-the-scanscreen-unit-flake-jsdom-canv"
+    epic: 3
+    action: "Fix the scanScreen unit flake (jsdom canvas error from @zxing/browser)
+      (P6)"
+    owner: "Mika"
+    status: open
+    ref: "_bmad-output/implementation-artifacts/epic-3-retro-2026-10-20.md"
+  - id: "epic-3-retro-item-24-make-npm-test-pass-end-to-end-locally-in"
+    epic: 3
+    action: "Make npm test pass end to end locally: int lane defaults to DATABASE_PUSH=false,
+      or the Playwright web server fails fast on a pushed bookeh_test (P8)"
+    owner: "Mika"
+    status: open
+    ref: "_bmad-output/implementation-artifacts/epic-3-retro-2026-10-20.md"
+  - id: "epic-3-retro-item-25-add-one-system-tx-helper-for-privileged"
+    epic: 3
+    action: "Add one system(tx) helper for privileged Local API calls in lib/catalogue
+      and lint-ban overrideAccess: true outside it and the seed (A7, retro decision
+      4)"
+    owner: "Mika"
+    status: open
+    ref: "_bmad-output/implementation-artifacts/epic-3-retro-2026-10-20.md"
+  - id: "epic-3-retro-item-26-spec-write-no-source-call-inside-a-trans"
+    epic: 3
+    action: "Spec: write 'no source call inside a transaction' into the spine (AD-11)
+      and resolve epic-3-context.md lines 81 and 84 (S2, retro decision 3)"
+    owner: "Mika"
+    status: open
+    ref: "_bmad-output/implementation-artifacts/epic-3-retro-2026-10-20.md"
+  - id: "epic-3-retro-item-27-spec-bring-the-spine-to-what-epic-3-buil"
+    epic: 3
+    action: "Spec: bring the spine to what Epic 3 built: AD-9 source contract, Toasts
+      row, AD-17 relation helpers, AD-16 seed and owner data, one-way table edges,
+      Tests row wording; add lint zones for kept edges (S3, A3)"
+    owner: "Mika"
+    status: open
+    ref: "_bmad-output/implementation-artifacts/epic-3-retro-2026-10-20.md"
+  - id: "epic-3-retro-item-28-spec-mark-deferred-items-closed-by-later"
+    epic: 3
+    action: "Spec: mark deferred items closed by later stories (3.45, 3.47 by 3.51;
+      3.43 by 3.53) and reopen 3.53's picker-wiring item and 3.39's pick residual
+      (S5)"
+    owner: "Mika"
+    status: open
+    ref: "_bmad-output/implementation-artifacts/epic-3-retro-2026-10-20.md"
+  - id: "epic-3-retro-item-29-sharpen-the-tests-statement-in-claude-md"
+    epic: 3
+    action: "Sharpen the tests statement in CLAUDE.md Conventions (draft wording in
+      the retro document, action item 12) (retro decision 5)"
+    owner: "Mika"
+    status: open
+    ref: "_bmad-output/implementation-artifacts/epic-3-retro-2026-10-20.md"
+  - id: "epic-3-retro-item-30-add-to-claude-md-conventions-a-story-tha"
+    epic: 3
+    action: "Add to CLAUDE.md Conventions: a story that changes a spine contract updates
+      the spine in the same commit as an acceptance criterion, never a deferral (retro
+      decision 6)"
+    owner: "Mika"
+    status: open
+    ref: "_bmad-output/implementation-artifacts/epic-3-retro-2026-10-20.md"
+  - id: "epic-3-retro-item-31-process-decide-whether-a-red-ci-on-main"
+    epic: 3
+    action: "Process: decide whether a red CI on main blocks a story from done; if
+      yes, the build run reads main's latest Actions result in Verification (P1)"
+    owner: "Mika"
+    status: done
+    ref: "_bmad-output/implementation-artifacts/epic-3-retro-2026-10-20.md"
+  - id: "epic-3-retro-item-32-process-a-deferred-item-handed-to-a-late"
+    epic: 3
+    action: "Process: a deferred item handed to a later story becomes that story's
+      acceptance criterion, or stays with the story that deferred it (P5)"
+    owner: "Mika"
+    status: open
+    ref: "_bmad-output/implementation-artifacts/epic-3-retro-2026-10-20.md"
+  - id: "epic-3-retro-item-33-process-decide-the-story-size-convention"
+    epic: 3
+    action: "Process: decide the story-size convention (48 of 54 Epic 3 specs warned
+      oversized): raise the threshold or slice Epic 4 to it (P2)"
+    owner: "Mika"
+    status: done
+    ref: "_bmad-output/implementation-artifacts/epic-3-retro-2026-10-20.md"
+  - id: "epic-3-retro-item-34-process-when-two-lanes-run-in-parallel-t"
+    epic: 3
+    action: "Process: when two lanes run in parallel, the lane plan names the files
+      both touch and which lane owns each (P7)"
+    owner: "Mika"
+    status: open
+    ref: "_bmad-output/implementation-artifacts/epic-3-retro-2026-10-20.md"
+  - id: "epic-3-retro-item-35-d-8-a-hand-typed-value-that-differs-from"
+    epic: 3
+    action: "D-8: a hand-typed value that differs from the source only by case or
+      punctuation merges (source value wins, no override); change differing() in sharePrivateBook.ts
+      and the D-8 wording (R4, retro follow-up decision 9)"
+    owner: "Mika"
+    status: open
+    ref: "_bmad-output/implementation-artifacts/epic-3-retro-2026-10-20.md"
+  - id: "epic-3-retro-item-36-add-to-claude-md-conventions-stories-sta"
+    epic: 3
+    action: "Add to CLAUDE.md Conventions: stories stay compact, a spec and diff Mika
+      can scan in one review; split a story before building when its spec warns oversized
+      (P2, retro follow-up decision 10)"
+    owner: "Mika"
+    status: open
+    ref: "_bmad-output/implementation-artifacts/epic-3-retro-2026-10-20.md"
+  - id: "epic-3-retro-item-37-store-only-the-finna-records-that-match"
+    epic: 3
+    action: "Store only the Finna records that match the ISBN in rawMetadata, keeping
+      their fullRecord (MARC); other editions are re-fetched when scanned (R7, retro
+      follow-up decision 12)"
+    owner: "Mika"
+    status: open
+    ref: "_bmad-output/implementation-artifacts/epic-3-retro-2026-10-20.md"

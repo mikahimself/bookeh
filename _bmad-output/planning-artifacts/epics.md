@@ -938,6 +938,8 @@ So that the adapters are built against reality and the genre question is answere
 **And** the report states the genre coverage checkpoint result (D-2): whether Google categories cover at least half; if not, Epic 9 also maps Finna genre terms
 **And** no test calls the network; the script is not part of the test suite
 
+**Scope change (Epic 3 retrospective, Mika, 2026-10-21):** closed with the Finna half done. Google Books `isbn:` search was down throughout Epic 3 (1 of 30 responses captured), and Finna is enough for now. The Google responses, the D-2 checkpoint and the Google adapter's recorded-answer tests move to Story 9.16.
+
 ### Story 3.3: [B1] ISBN and name-key fields
 
 As the developer,
@@ -3015,6 +3017,8 @@ So that "do I already have this?" can't silently break (Tests convention).
 
 Personal tags, user genres and user themes (one `tags` collection with a kind, D-6) on Book detail, Edit book and a selection, with Undo, filters, and management in Settings. System genres seeded and created on save from Google Books categories, re-run over Books saved earlier, shown in the user's language and managed by the admin in Settings, with "New genre" on the Answer. Finna system themes as chips and a filter. Slice G6 (genre override on Edit book) is retired by D-6.
 
+**Order.** Story 9.16 runs before Story 9.11 when Google Books answers again; it is numbered last so existing references keep their numbers. If Google is still down when Story 9.11 starts, 9.11 does not wait for it (Epic 3 retrospective, Mika, 2026-10-21).
+
 ### Story 9.1: [G1] `tags` collection with kinds
 
 As the developer,
@@ -3161,6 +3165,21 @@ So that books get sensible genres from day one (FR-17, D-2).
 **And** the seeded genres show in Finnish through `genreName()` (Story 3.17)
 **And** the migration is idempotent against genres already present
 
+### Story 9.16: [C13] Revalidate Google Books
+
+As the developer,
+I want Story 3.2's Google Books half captured once the API answers again,
+So that the genre decision (D-2) and the Google adapter rest on real responses instead of an outage.
+
+**Acceptance Criteria:**
+
+**Given** Google Books `isbn:` search answers again (the capture script's health check on a known ISBN returns its volume)
+**When** `npm run fixtures` runs
+**Then** `tests/fixtures/google/<isbn13>.json` holds one response per ISBN in `tests/fixtures/isbns.txt`, empty results included, and no file contains the key
+**And** `tests/fixtures/REPORT.md` is regenerated with found by Google, covers per source, how many Google results have `categories`, and the D-2 result: Google categories cover N of 30 books
+**And** the Google adapter's tests run on the recorded `isbn:` search answers instead of by-id volumes wrapped in a search body (Story 3.7 deferred item)
+**And** if Google still does not answer, the story records that and stays open; Story 9.11 then proceeds on its Finna branch
+
 ### Story 9.11: [G5] Genres from Google Books on save
 
 As Mika,
@@ -3172,7 +3191,7 @@ So that I don't classify two hundred books by hand (FR-17, D-2).
 **Given** `mapSubjectsToGenres(ctx, book)` in `lib/catalogue`
 **When** a shared Book is saved
 **Then** it reads Google's categories from `RawMetadata.subjects.google`, matches them by `nameKey` to system genres, creates missing ones (English name only) and sets `books.genres`
-**And** if the fixture checkpoint (Story 3.2) found Google covering under half, it also maps Finna's genre terms from the stored raw Finna response
+**And** if the fixture checkpoint (Story 9.16) found Google covering under half, or Story 9.16 has not run because Google is still down, it also maps Finna's genre terms from the stored raw Finna response
 **And** an admin-only re-run applies it to every shared Book saved before, filling `books.genres` only where it is empty
 **And** integration tests use stored fixture raw data
 

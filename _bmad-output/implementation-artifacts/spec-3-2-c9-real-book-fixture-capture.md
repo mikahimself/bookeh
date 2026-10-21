@@ -2,7 +2,7 @@
 title: 'Story 3.2: [C9] Real-book fixture capture'
 type: 'chore'
 created: '2026-10-11'
-status: 'blocked'
+status: 'done'
 baseline_revision: '7f99668701212caacb4ff80c213dbf39f9be60b7'
 review_loop_iteration: 0
 followup_review_recommended: true
@@ -157,3 +157,7 @@ Blocking condition: Google Books `isbn:` search is down (503 `backendFailed` or 
 - `npm run fixtures` -- expected: 30 + 30 files; re-run makes no requests and rewrites the same report.
 - `grep -rl "$GOOGLE_BOOKS_API_KEY" tests/fixtures` -- expected: no output.
 - `npm run lint && npm run typecheck && npm run test:unit` -- expected: pass, including `captureFixtures.unit.spec.ts`.
+
+## Closed by the Epic 3 retrospective
+
+2026-10-21, Mika: closed with the Finna half done. Google Books `isbn:` search stayed down (1 of 30 responses captured, D-2 not decided), and Finna is enough for now. The Google responses, the D-2 checkpoint and the Google adapter's recorded-answer tests move to Story 9.16 [C13] Revalidate Google Books (`epics.md`, Epic 9). The deferred CLAUDE.md Finna-line item above stays open.

@@ -119,6 +119,7 @@ Recommended sequence, as the epics order it: A with K1, K5, K9 and K10; K2 to K4
 | C10 | Finna adapter: series, themes and author `sortName` | Adapter | C2 | AD-9, D-3 |
 | C11 | `matches` on the lookup result: new authors and series | Service | C6 | AD-9, FR-13 |
 | C12 | Edition picker on the Answer, `?pick`, `{ isbn13, pick }` | Screen | D16, C4 | AD-9, AD-11, D-7 |
+| C13 | Revalidate Google Books: capture the Google responses C9 could not, the D-2 checkpoint, adapter tests on recorded `isbn:` answers (Epic 3 retrospective) | Setup | C3, C9 | Tests, D-2 |
 
 ## D — Save and edit
 
