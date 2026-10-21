@@ -99,6 +99,13 @@ describe('NotFoundForm', () => {
     render(createElement(NotFoundForm, { isbn13: null, title: '' }))
     add()
     expect(await screen.findByText('answer.titleRequired')).toBeTruthy()
+    // The marks can render before the first save settles; a click on the
+    // still-disabled button would be lost.
+    await waitFor(() =>
+      expect(
+        screen.getByRole<HTMLButtonElement>('button', { name: 'answer.addToLibrary' }).disabled,
+      ).toBe(false),
+    )
 
     saveManualAction.mockResolvedValueOnce({ ok: false, code: 'SAVE_FAILED' })
     add()

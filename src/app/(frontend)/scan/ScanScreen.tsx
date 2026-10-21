@@ -11,6 +11,7 @@ import { TextField } from '../components/TextField'
 
 import { isbnFromBarcode } from './barcode'
 import { useCamera } from './CameraSession'
+import { loadZxing } from './zxing'
 
 /** Between decode attempts, and after a successful one, in milliseconds. */
 const SCAN_ATTEMPT_MS = 100
@@ -34,8 +35,8 @@ const SCAN_SUCCESS_MS = 500
  * `isbn` is the text in the address, kept in the field; `error` the message
  * under it. Until the camera is on (permission pending, refused, or none)
  * the frame gives way to the no-camera message; once the camera is refused
- * or lost, the field takes focus. zxing is imported lazily, so it is only
- * loaded here.
+ * or lost, the field takes focus. zxing is imported lazily (`zxing.ts`), so
+ * it is only loaded here.
  */
 export function ScanScreen({ isbn, error }: { isbn?: string; error?: string }) {
   const t = useTranslations()
@@ -86,10 +87,7 @@ export function ScanScreen({ isbn, error }: { isbn?: string; error?: string }) {
       // A rejected play (an interrupted load) is no reason to stop: the
       // loop only finds nothing until the video runs.
       await element.play().catch(() => undefined)
-      const [{ BrowserMultiFormatReader }, { BarcodeFormat, DecodeHintType }] = await Promise.all([
-        import('@zxing/browser'),
-        import('@zxing/library'),
-      ])
+      const { BrowserMultiFormatReader, BarcodeFormat, DecodeHintType } = await loadZxing()
       if (cancelled) return
 
       const hints = new Map([[DecodeHintType.POSSIBLE_FORMATS, [BarcodeFormat.EAN_13]]])

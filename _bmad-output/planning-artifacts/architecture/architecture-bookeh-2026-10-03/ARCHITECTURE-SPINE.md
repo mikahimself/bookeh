@@ -209,7 +209,7 @@ Arrows are the only allowed import directions, and ESLint `no-restricted-imports
 - **Rule:**
   - Dev uses Payload push. A story that changes schema commits the generated migration under `src/migrations` and the regenerated `src/payload-types.ts` in the same change. `payload migrate` is never run against a dev database.
   - Schema-changing stories merge one at a time. After rebasing, the story deletes its own migration and regenerates it.
-  - CI applies all migrations to an empty database, runs the integration tests against it with push off, and fails if generating a migration produces changes.
+  - The integration and end-to-end lanes run on `bookeh_test` with push off, locally as in CI. Each first applies all migrations to it through `scripts/test-db.ts`, which refuses a pushed `bookeh_test` (a `batch = -1` row in `payload_migrations`) before migrating and names `npm run test:reset`, which drops and recreates its schema. CI starts them from an empty `bookeh_test` and fails if generating a migration produces changes.
   - Production applies migrations at start through `prodMigrations` and never pushes.
   - The old single-copy collections are replaced, not migrated. Migration history starts with the reworked model.
 

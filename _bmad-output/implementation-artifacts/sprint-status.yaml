@@ -133,7 +133,7 @@ development_status:
   4-19-d37-private-book-merge-clean-up-and-the-d-8-merge-rule: done
   4-20-c14-lean-finna-raw-data-and-the-source-order-check: done
   4-21-a27-one-helper-for-system-privileges: done
-  4-22-k17-test-lanes-that-pass-on-their-own: backlog
+  4-22-k17-test-lanes-that-pass-on-their-own: done
   4-23-a28-settings-switches-that-keep-up: backlog
   4-24-a29-server-side-guards-from-epic-1: backlog
   4-25-k18-checks-that-test-themselves: backlog

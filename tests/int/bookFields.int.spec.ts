@@ -41,8 +41,8 @@ const config = buildConfig({
   ],
   graphQL: { disable: true },
   secret: 'book-fields-test-secret',
-  // push: true regardless of DATABASE_PUSH: CI builds only the app's schema
-  // from migrations, and this one exists only for this spec.
+  // push: true regardless of DATABASE_PUSH: migrations build only the app's
+  // schema, and this one exists only for this spec.
   db: postgresAdapter({
     pool: { connectionString: process.env.DATABASE_URL || '' },
     schemaName,

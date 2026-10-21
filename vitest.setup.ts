@@ -8,6 +8,11 @@ import { testDatabaseUrl } from './tests/helpers/testDatabase'
 
 process.env.DATABASE_URL = testDatabaseUrl(process.env.DATABASE_URL)
 
+// Push off: `scripts/test-db.ts` has migrated bookeh_test before this lane
+// (AD-13). DATABASE_PUSH=true opts in, and the next default run is refused
+// until `npm run test:reset`.
+process.env.DATABASE_PUSH ||= 'false'
+
 // The int lane must never seed bookeh_test with the owner's real account
 // from `.env`; a spec that needs the variables stubs them.
 delete process.env.SEED_EMAIL

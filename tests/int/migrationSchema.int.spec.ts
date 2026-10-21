@@ -21,7 +21,7 @@ async function isNoOp(statement: string): Promise<boolean> {
   return rows[0]?.column_default === value
 }
 
-// CI runs the int lane with push off on a bookeh_test built by `payload migrate`.
+// The int lane runs with push off on a bookeh_test built by migrations (AD-13).
 // The other int specs only reach the tables they query; this diffs every table.
 describe.runIf(process.env.DATABASE_PUSH === 'false')('migration-built schema', () => {
   beforeAll(async () => {

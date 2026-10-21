@@ -18,17 +18,19 @@ const EAN_8 = 6
 
 vi.mock('next-intl', () => ({ useTranslations: () => (key: string) => key }))
 vi.mock('next/navigation', () => ({ useRouter: () => ({ push, replace }) }))
-vi.mock('@zxing/library', () => ({
-  BarcodeFormat: { EAN_13, [EAN_13]: 'EAN_13', EAN_8, [EAN_8]: 'EAN_8' },
-  DecodeHintType: { POSSIBLE_FORMATS: 2 },
-}))
-vi.mock('@zxing/browser', () => ({
-  BrowserMultiFormatReader: class {
-    scan(element: HTMLVideoElement, callback: Callback) {
-      scan(element, callback)
-      return { stop }
-    }
-  },
+// The local loader, not the packages: the real reader reached through its
+// dynamic imports fails in jsdom ("Couldn't create canvas").
+vi.mock('@/app/(frontend)/scan/zxing', () => ({
+  loadZxing: async () => ({
+    BarcodeFormat: { EAN_13, [EAN_13]: 'EAN_13', EAN_8, [EAN_8]: 'EAN_8' },
+    DecodeHintType: { POSSIBLE_FORMATS: 2 },
+    BrowserMultiFormatReader: class {
+      scan(element: HTMLVideoElement, callback: Callback) {
+        scan(element, callback)
+        return { stop }
+      }
+    },
+  }),
 }))
 
 const { CameraSession } = await import('@/app/(frontend)/scan/CameraSession')

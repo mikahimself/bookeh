@@ -26,9 +26,9 @@ export default defineConfig({
           // Rewrites DATABASE_URL to bookeh_test before Payload loads.
           setupFiles: ['./vitest.setup.ts'],
           include: ['tests/int/**/*.int.spec.ts'],
-          // Each file calls getPayload(), which pushes the schema in dev. Two
-          // workers pushing at once on an empty database race on enum
-          // creation; the harness does not change that.
+          // Push is off by default here. With DATABASE_PUSH=true, and for the
+          // specs that push their own schema, two workers pushing at once on
+          // an empty database race on enum creation.
           fileParallelism: false,
         },
       },

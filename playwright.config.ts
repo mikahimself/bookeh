@@ -10,7 +10,8 @@ const baseURL = `http://localhost:${PORT}`
 /**
  * Spine, Tests: Playwright runs its own `next dev` on bookeh_test, beside any
  * dev server on :3000: port 3100, its own `distDir` (Next locks
- * `<distDir>/dev`), migrations applied and push off, the fixture source in
+ * `<distDir>/dev`), migrations applied by `scripts/test-db.ts` (which refuses
+ * a schema-pushed bookeh_test) and push off, the fixture source in
  * place of the real ones, then a seed for the one known user. Not a
  * production server: the fixture source is refused there.
  */
@@ -32,9 +33,9 @@ export default defineConfig({
     },
   ],
   webServer: {
-    // stdin closed, as in CI: a Payload prompt reads EOF instead of hanging.
+    // stdin closed: a Payload prompt reads EOF instead of hanging.
     command:
-      'npm run payload -- migrate </dev/null && npm run payload -- run tests/e2e/seed.ts </dev/null && npm run dev',
+      'npx tsx scripts/test-db.ts && npm run payload -- run tests/e2e/seed.ts </dev/null && npm run dev',
     env: {
       DATABASE_URL: testDatabaseUrl(process.env.DATABASE_URL),
       DATABASE_PUSH: 'false',

@@ -77,17 +77,10 @@ jobs:
             exit 1
           fi
 
-      # Builds the empty bookeh_test from the committed migrations; the int
-      # tests below run on it with push off.
-      - name: Apply migrations to bookeh_test
-        run: npm run payload -- migrate </dev/null
-        env:
-          DATABASE_URL: postgres://bookeh:bookeh@localhost:5432/bookeh_test
-
       - run: npm run test:unit
+      # scripts/test-db.ts builds the empty bookeh_test from the committed
+      # migrations; the int tests run on it with push off, the lane's default.
       - run: npm run test:int
-        env:
-          DATABASE_PUSH: 'false'
       - run: npx playwright install --with-deps chromium
       # Its own `next dev` on bookeh_test (playwright.config.ts): migrate (a
       # no-op here), seed, then the fixture source with push off.
