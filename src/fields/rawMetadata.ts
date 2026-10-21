@@ -3,8 +3,8 @@ import type { JSONField } from 'payload'
 import { isAdmin } from '@/access/roles'
 
 /**
- * Spine, AD-9: every source's complete response keyed by source id, the
- * subjects per source and the cover's source URL, as `RawMetadata` in
+ * Spine, AD-9: every source's response keyed by source id, as received or,
+ * for Finna, cut to the records matching the ISBN; the subjects per source and the cover's source URL, as `RawMetadata` in
  * `lib/metadata/source.ts`. `src/fields` does not import `lib/metadata`, so
  * the shape is repeated here for `payload-types.ts`. Admin-only field read
  * access (FR-18): any read through the gateway drops it; `lib/catalogue`

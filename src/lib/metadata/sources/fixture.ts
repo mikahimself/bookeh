@@ -67,7 +67,7 @@ export const fixture: Source = {
         ...result,
         coverUrl: result.coverUrl ? `${fixtureOrigin()}/data/fixture-cover/${isbn13}` : undefined,
         source: 'fixture',
-        raw: { fixture: body },
+        raw: { fixture: result.raw.finna },
       }),
     )
   },

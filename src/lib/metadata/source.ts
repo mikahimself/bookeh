@@ -53,7 +53,8 @@ export type RawMetadata = {
  * - Each result's `isbn13` is the ISBN asked for, never another ISBN found in
  *   the record. `source` is the adapter's own `id`; `recordId` is the
  *   source's own id for the record (a record without one is skipped); `raw`
- *   is `{ [id]: completeResponse }`.
+ *   is `{ [id]: response }`, the response as received or cut to the records
+ *   that match the ISBN (Finna).
  * - A value the source does not have is left out (or `[]` for lists), never
  *   sent as a placeholder such as '', 0 or an author without a name.
  * - `binding` is for display only and is never stored.

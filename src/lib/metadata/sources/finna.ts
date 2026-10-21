@@ -90,6 +90,16 @@ export function finnaMatches(body: unknown, isbn13: string): Json[] {
     .filter((record) => matchingIsbnEntry(record, isbn13) !== undefined)
 }
 
+/**
+ * The body as stored in `raw.finna`: `records` cut to `finnaMatches()`, each record whole, every
+ * other key as received. A body without a `records` array is returned unchanged. Shared with the
+ * migration that trimmed Books saved before this rule.
+ */
+export function leanFinnaBody(body: unknown, isbn13: string): unknown {
+  if (!isObject(body) || !Array.isArray(body.records)) return body
+  return { ...body, records: finnaMatches(body, isbn13) }
+}
+
 // --- Fields ------------------------------------------------------------------------------
 
 const AUTHOR_ROLES = new Set(['kirjoittaja', 'tekijä', 'författare', 'author', 'aut'])
@@ -217,7 +227,7 @@ function binding(record: Json, isbn13: string): string | undefined {
   return clean(rest?.replace(/^\((.*)\)$/, '$1'))
 }
 
-function toResult(record: Json, isbn13: string, body: unknown): SourceResult | undefined {
+function toResult(record: Json, isbn13: string, raw: unknown): SourceResult | undefined {
   const title = cleanIsbd(record.shortTitle) ?? cleanIsbd(record.title)
   const recordId = clean(record.id)
   if (!title || !recordId) return undefined
@@ -238,7 +248,7 @@ function toResult(record: Json, isbn13: string, body: unknown): SourceResult | u
     coverUrl: coverUrl(record),
     source: 'finna',
     recordId,
-    raw: { finna: body },
+    raw: { finna: raw },
   }
   return compact(result)
 }
@@ -265,8 +275,9 @@ export function finnaResults(body: unknown, isbn13: string): SourceResult[] | un
   if (!noMatch && !Array.isArray(body.records)) {
     return lookupFailed(LABEL, isbn13, 'records is not an array')
   }
+  const lean = leanFinnaBody(body, isbn13)
   const scored = finnaMatches(body, isbn13).flatMap((record) => {
-    const result = toResult(record, isbn13, body)
+    const result = toResult(record, isbn13, lean)
     if (!result) return []
     const cover = result.coverUrl ? 1 : 0
     const themed = result.themes.length > 0 ? 1 : 0

@@ -26,6 +26,12 @@ function record(body: Body, id: string): Body['records'][number] {
   return body.records.find((entry) => entry.id === id)!
 }
 
+/** The recorded response with `records` cut to the one with this id, as `raw.finna` holds it. */
+function lean(isbn13: string, id: string): Body {
+  const body = fixture(isbn13) as Body
+  return { ...body, records: [record(body, id)] }
+}
+
 /** Serves the recorded response for the ISBN in the request's `lookfor`, optionally edited. */
 function serveFixtures(edit: (body: Body) => void = () => {}): void {
   vi.stubGlobal(
@@ -90,7 +96,7 @@ describe('finna.lookupByIsbn', () => {
         coverUrl: 'https://api.finna.fi/Cover/Show?source=Solr&id=helle.1637236&index=0&size=large',
         source: 'finna',
         recordId: 'helle.1637236',
-        raw: { finna: fixture('9789524035699') },
+        raw: { finna: lean('9789524035699', 'helle.1637236') },
       },
     ])
   })
@@ -253,12 +259,13 @@ describe('finna.lookupByIsbn', () => {
     expect(result.themes).toContain('Poverty.')
   })
 
-  it('reads no genre terms and leaves subjects and the raw body alone', async () => {
+  it('reads no genre terms and keeps only the matching record, whole, in the raw body', async () => {
     const [result] = await lookup('9789510397077')
 
     expect(result.themes).not.toContain('pienoisromaanit')
     expect(result.subjects).toEqual([])
-    expect(result.raw.finna).toEqual(fixture('9789510397077'))
+    const body = fixture('9789510397077') as Body
+    expect((result.raw.finna as Body).records).toStrictEqual([record(body, 'eepos.2281661')])
   })
 
   it('drops the ENNAKKOTIETO mark of a preliminary record', async () => {

@@ -192,6 +192,45 @@ describe('saveCopyAction', () => {
     }
   })
 
+  it("takes Finna's values before Google's, Google filling the gaps", async () => {
+    // Both sources know the book; Finna's record has no summary, Google's volume a description.
+    const fresh = randomIsbn()
+    const fixture = (name: string) =>
+      readFileSync(new URL(`../fixtures/${name}`, import.meta.url), 'utf8').replaceAll(
+        '9780007447831',
+        fresh,
+      )
+    const finnaBody = fixture('finna/9780007447831.json')
+    const volume = JSON.parse(fixture('google/volumes/zlwlTfBeiSoC.json')) as unknown
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (input: string | URL) => {
+        const url = new URL(String(input))
+        if (url.hostname === 'api.finna.fi' && url.pathname.endsWith('/v1/search')) {
+          return new Response(finnaBody, { headers: { 'Content-Type': 'application/json' } })
+        }
+        if (url.hostname === 'www.googleapis.com') {
+          return Response.json({ kind: 'books#volumes', totalItems: 1, items: [volume] })
+        }
+        return new Response(null, { status: 404 })
+      }),
+    )
+    try {
+      const result = await saveCopyAction({ requestId: randomUUID(), isbn13: fresh })
+      if (!result.ok) throw new Error(`save failed: ${result.code}`)
+      const book = await payload.findByID({
+        collection: 'books',
+        id: result.data.bookId,
+        overrideAccess: true,
+        depth: 0,
+      })
+      expect(book).toMatchObject({ title: 'A clash of kings', source: 'finna' })
+      expect(book.description).toContain("George R. R. Martin's superb fantasy epic")
+    } finally {
+      vi.unstubAllGlobals()
+    }
+  })
+
   it('answers NOT_FOUND and writes nothing when the candidate sent is not in the outcome', async () => {
     const fresh = randomIsbn()
     const body = readFileSync(
