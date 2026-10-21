@@ -244,7 +244,8 @@ describe('lookupBook', () => {
       found(candidate(isbn, 'Muumipeikko', { authors: [{ name: given }], series: seriesName.toUpperCase() }))
 
       expect(await matchesOf({ isbn })).toEqual({
-        authors: [{ name: given, id: sharedAuthor.id }],
+        // Shown normalised, as a save stores it.
+        authors: [{ name: author.replace('Tove Jansson', 'tove JANSSON'), id: sharedAuthor.id }],
         series: { name: seriesName.toUpperCase(), id: sharedSeries.id },
       })
     })

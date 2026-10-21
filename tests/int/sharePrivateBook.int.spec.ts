@@ -267,6 +267,22 @@ describe('saveCopy of a held private Book', () => {
     expect(row).toMatchObject({ overridden: ['title', 'publisher'], publisher: 'Otava' })
   })
 
+  it('clips over-long source values when it promotes', async () => {
+    const { ctx } = await freshUser()
+    const isbn = randomIsbn()
+    const own = await privateBook(ctx, isbn, 'T1', `Minna Canth ${suffix()}`)
+    const author = `${suffix()} ${'k'.repeat(240)}`
+    vi.mocked(heldOutcome).mockReturnValue(
+      found({ isbn13: isbn, title: 't'.repeat(600), authors: [{ name: author }] }),
+    )
+
+    expect((await saveCopy(ctx, isbnInput(isbn))).bookId).toBe(own.id)
+
+    const book = await bookById(own.id, 1)
+    expect(book).toMatchObject({ title: 't'.repeat(500), visibility: 'shared' })
+    expect(book.authors).toMatchObject([{ name: author.slice(0, 200) }])
+  })
+
   it.each([
     ['no held outcome', undefined],
     ['a held none', { kind: 'none' } as const],

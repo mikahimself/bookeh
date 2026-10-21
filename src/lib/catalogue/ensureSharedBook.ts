@@ -5,6 +5,7 @@ import type { Context } from '@/lib/payload/context'
 import { assertLive, onRollback, withTransaction } from '@/lib/payload/transaction'
 import type { Restore, Undone } from '@/lib/undo/undo'
 
+import { clipCandidate } from './clipCandidate'
 import { attachCover, discardCover, type DownloadedCover } from './covers'
 import { findOrCreateByName, type FoundOrCreated } from './findOrCreateByName'
 import { isUnreferenced } from './isUnreferenced'
@@ -18,10 +19,12 @@ import { pickIndex } from './pick'
  * never from the client, which sends at most the index `pick` of the
  * candidate to use (`pickIndex()`: none or out of range is the best). The
  * Book keeps the ISBN asked for, and its `rawMetadata` is the outcome's with
- * the picked candidate's cover URL. An existing
- * shared Book is returned as it is: no source call, no write (re-fetch is
- * admin-only, FR-19). Authors and series are matched or created among shared
- * rows only, so a shared Book references shared records only (AD-4).
+ * the picked candidate's cover URL. The candidate's text is clipped to the
+ * field limits first (`clipCandidate()`, R6), so an over-long source value
+ * never fails the write. An existing shared Book is returned as it is: no
+ * source call, no write (re-fetch is admin-only, FR-19). Authors and series
+ * are matched or created among shared rows only, so a shared Book references
+ * shared records only (AD-4).
  *
  * `INVALID_ISBN` before any read; `NOT_FOUND` when no source knows the ISBN;
  * a plain `Error` (logged `INTERNAL`) when a source could not be asked. Runs
@@ -77,7 +80,7 @@ export async function ensureSharedBook(
       throw new Error(`Sources unavailable: ${outcome.failed.join(', ')}`)
     }
     // `found` always holds at least one candidate, and `pickIndex` stays in range.
-    const picked = outcome.candidates[pickIndex(pick, outcome.candidates.length)]!
+    const picked = clipCandidate(outcome.candidates[pickIndex(pick, outcome.candidates.length)]!)
 
     // One after the other: calls on one context never run concurrently (AD-16).
     const authors: number[] = []

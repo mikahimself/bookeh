@@ -122,6 +122,26 @@ describe('NotFoundForm', () => {
     expect(screen.queryByText('answer.titleRequired')).toBeNull()
   })
 
+  it('marks a too long title as such, keeps the text and focuses Title', async () => {
+    saveManualAction.mockResolvedValue({
+      ok: false,
+      code: 'VALIDATION',
+      fields: { title: 'TOO_LONG' },
+    })
+    const long = 'a'.repeat(501)
+    render(createElement(NotFoundForm, { isbn13: null, title: long }))
+    type('answer.author', 'A. Kirjoittaja')
+    screen.getByLabelText<HTMLInputElement>('answer.author').focus()
+    add()
+
+    expect(await screen.findByText('errors.TOO_LONG')).toBeTruthy()
+    expect(screen.queryByText('answer.titleRequired')).toBeNull()
+    const title = screen.getByLabelText<HTMLInputElement>('answer.title')
+    expect(title.value).toBe(long)
+    expect(document.activeElement).toBe(title)
+    expect(show).not.toHaveBeenCalled()
+  })
+
   it('opens with the title focused', () => {
     render(createElement(NotFoundForm, { isbn13: null, title: '' }))
 

@@ -13,7 +13,7 @@ import {
 } from 'vitest'
 
 import { toNameKey } from '@/fields/nameKey'
-import type { ManualEntry } from '@/lib/catalogue/createPrivateBook'
+import { type ManualEntry, normaliseManual } from '@/lib/catalogue/createPrivateBook'
 import { lookupBook } from '@/lib/catalogue/lookupBook'
 import { saveCopy, type SaveInput } from '@/lib/catalogue/saveCopy'
 import { DomainError } from '@/lib/errors'
@@ -305,6 +305,33 @@ describe('saveCopy with a manual target', () => {
     expect(create).not.toHaveBeenCalled()
     vi.restoreAllMocks()
     expect(await copiesOf(user)).toEqual([])
+  })
+
+  it.each([
+    [
+      'a title over 500',
+      { title: 'a'.repeat(501), authors: ['Juhani Aho'] },
+      { title: 'TOO_LONG' },
+    ],
+    [
+      'an author over 200',
+      { title: 'Rautatie', authors: ['a'.repeat(201)] },
+      { authors: 'TOO_LONG' },
+    ],
+    [
+      'a blank title beside an author over 200',
+      { title: ' ', authors: ['Juhani Aho', 'a'.repeat(201)] },
+      { title: 'VALIDATION', authors: 'TOO_LONG' },
+    ],
+  ])('marks %s as TOO_LONG, never clipped', (_, manual, fields) => {
+    expect(() => normaliseManual(manual)).toThrow(
+      expect.objectContaining({ code: 'VALIDATION', fields }),
+    )
+  })
+
+  it('measures the length after normalising', () => {
+    const title = `  ${'a'.repeat(250)}   ${'b'.repeat(249)} `
+    expect(normaliseManual({ title, authors: ['Juhani Aho'] }).title).toHaveLength(500)
   })
 
   it('rejects an invalid ISBN before any read', async () => {

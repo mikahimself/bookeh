@@ -179,6 +179,34 @@ describe('saveCopyAction', () => {
     }
   })
 
+  it('answers NOT_FOUND and writes nothing when no source knows the ISBN', async () => {
+    const fresh = randomIsbn()
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (input: string | URL) => {
+        const url = new URL(String(input))
+        if (url.hostname === 'api.finna.fi') return Response.json({ resultCount: 0, status: 'OK' })
+        if (url.hostname === 'www.googleapis.com') return Response.json({ totalItems: 0 })
+        return new Response(null, { status: 404 })
+      }),
+    )
+    try {
+      expect(await saveCopyAction({ requestId: randomUUID(), isbn13: fresh })).toEqual({
+        ok: false,
+        code: 'NOT_FOUND',
+      })
+    } finally {
+      vi.unstubAllGlobals()
+    }
+    expect(await copies()).toEqual([])
+    const { totalDocs } = await payload.count({
+      collection: 'books',
+      where: { isbn13: { equals: fresh } },
+      overrideAccess: true,
+    })
+    expect(totalDocs).toBe(0)
+  })
+
   it('answers UNAUTHENTICATED without a session', async () => {
     requestHeaders = new Headers()
     expect(await saveCopyAction({ requestId: randomUUID(), isbn13 })).toEqual({

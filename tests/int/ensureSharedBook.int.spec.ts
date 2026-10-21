@@ -240,6 +240,37 @@ describe('ensureSharedBook', () => {
     expect((await booksWithIsbn(isbn)).totalDocs).toBe(0)
   })
 
+  it('clips over-long source values to the field limits', async () => {
+    const isbn = randomIsbn()
+    // A surrogate pair across the limit: the clip leaves no lone half.
+    const title = `${'a'.repeat(499)}😀${'a'.repeat(100)}`
+    const author = unique('A').padEnd(250, 'a')
+    const series = unique('S').padEnd(250, 's')
+    vi.mocked(lookupSources).mockResolvedValue(
+      found(
+        candidate(isbn, title, {
+          subtitle: 's'.repeat(600),
+          description: 'd'.repeat(12_000),
+          authors: [{ name: author }],
+          series,
+        }),
+      ),
+    )
+
+    const { data } = await ensureSharedBook(asA, isbn)
+    const book = await payload.findByID({
+      collection: 'books',
+      id: data.id,
+      overrideAccess: true,
+      depth: 1,
+    })
+    expect(book.title).toBe('a'.repeat(499))
+    expect(book.subtitle).toHaveLength(500)
+    expect(book.description).toHaveLength(10_000)
+    expect(book.authors).toMatchObject([{ name: author.slice(0, 200) }])
+    expect(book.series).toMatchObject({ name: series.slice(0, 200) })
+  })
+
   it("joins the caller's transaction and rolls back with it", async () => {
     const isbn = randomIsbn()
     const authorName = unique('Kalle Päätalo')

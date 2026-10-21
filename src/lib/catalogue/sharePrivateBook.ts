@@ -11,6 +11,7 @@ import * as gateway from '@/lib/payload/gateway'
 import { assertLive, onRollback } from '@/lib/payload/transaction'
 import type { Author, Book, Series } from '@/payload-types'
 
+import { clipCandidate } from './clipCandidate'
 import { attachCover, discardCover, type DownloadedCover, storeCover } from './covers'
 import { deleteRow } from './ensureSharedBook'
 import { findBookByIsbn, type HeldBook } from './findBookByIsbn'
@@ -20,16 +21,20 @@ import { mapSubjectsToGenres } from './mapSubjectsToGenres'
 // FR-12, AD-4, AD-5 and D-8: a private Book is shared on its creator's next
 // save once a source knows its ISBN, or joins the shared Book with that ISBN.
 
-/** What `prepareShare()` fetched for a promote: the best candidate, its raw metadata and cover. */
+/**
+ * What `prepareShare()` fetched for a promote: the best candidate, clipped to
+ * the field limits (`clipCandidate()`, R6), its raw metadata and cover.
+ */
 export type PendingShare = { candidate: SourceResult; raw: RawMetadata; cover?: DownloadedCover }
 
 /**
  * Spine, AD-5 and AD-14: the part of a share that runs before the save's
  * transaction opens. `undefined` unless `held` is the user's private Book and
  * the server-held outcome (`heldOutcome()`, the in-process cache alone) is
- * `found`; then the best candidate and the outcome's raw metadata, with the
- * candidate's cover stored by `storeCover()` when the Book has none and the
- * candidate has a `coverUrl`. Never asks the sources; the cover is the only
+ * `found`; then the best candidate, clipped to the field limits so the
+ * promote's write and its D-8 comparison see the values stored, and the
+ * outcome's raw metadata, with the candidate's cover stored by `storeCover()`
+ * when the Book has none and the candidate has a `coverUrl`. Never asks the sources; the cover is the only
  * network call.
  */
 export async function prepareShare(
@@ -41,7 +46,7 @@ export async function prepareShare(
   const outcome = heldOutcome(isbn13)
   if (outcome?.kind !== 'found') return undefined
   // `found` always holds at least one candidate.
-  const candidate = outcome.candidates[0]!
+  const candidate = clipCandidate(outcome.candidates[0]!)
   const pending: PendingShare = { candidate, raw: outcome.raw }
   if (!candidate.coverUrl) return pending
 

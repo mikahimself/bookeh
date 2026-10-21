@@ -5,6 +5,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 
 const back = vi.fn()
 const replace = vi.fn()
+const refresh = vi.fn()
 const show = vi.fn()
 const saveCopyAction = vi.fn()
 
@@ -14,7 +15,7 @@ vi.mock('next-intl', () => ({
 }))
 vi.mock('next/navigation', async (importOriginal) => ({
   ...(await importOriginal<typeof import('next/navigation')>()),
-  useRouter: () => ({ replace }),
+  useRouter: () => ({ replace, refresh }),
 }))
 vi.mock('@/app/(frontend)/components/navigation', () => ({ useTaskBack: () => back }))
 vi.mock('@/app/(frontend)/scan/actions', () => ({ saveCopyAction }))
@@ -127,6 +128,16 @@ describe('AddToLibrary', () => {
     const [first, retry, next] = requestIds()
     expect(retry).toBe(first)
     expect(next).not.toBe(first)
+  })
+
+  it('re-renders the address on NOT_FOUND, with no toast and no return', async () => {
+    saveCopyAction.mockResolvedValue({ ok: false, code: 'NOT_FOUND' })
+    render(createElement(AddToLibrary, { isbn13: ISBN }))
+    fireEvent.click(button())
+
+    await waitFor(() => expect(refresh).toHaveBeenCalledTimes(1))
+    expect(show).not.toHaveBeenCalled()
+    expect(back).not.toHaveBeenCalled()
   })
 
   it('goes to sign in, back to this address, when the session is gone', async () => {

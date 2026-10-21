@@ -1,5 +1,6 @@
 import type { CollectionSlug, Field, JSONField } from 'payload'
 
+import { limits } from '@/fields/limits'
 import { readableRelation } from '@/fields/relation'
 
 /** Spine, AD-6: the Book fields a user may override on `user-books`, in display order. */
@@ -41,12 +42,12 @@ const relation = (
 }
 
 /**
- * The single declaration of the overridable fields and their limits. An
+ * The single declaration of the overridable fields; their limits are `limits`. An
  * override may be stored empty (cleared, AD-6), so nothing there is required.
  */
 const overridable = (override: boolean): Field[] => [
-  { name: 'title', type: 'text', required: !override, maxLength: 500 },
-  { name: 'subtitle', type: 'text', maxLength: 500 },
+  { name: 'title', type: 'text', required: !override, maxLength: limits.title },
+  { name: 'subtitle', type: 'text', maxLength: limits.subtitle },
   relation(override, 'authors', { name: 'authors', hasMany: true }),
   relation(override, 'series', { name: 'series' }),
   { name: 'seriesIndex', type: 'number' },
@@ -54,7 +55,7 @@ const overridable = (override: boolean): Field[] => [
   { name: 'year', type: 'number' },
   { name: 'language', type: 'text' },
   { name: 'pages', type: 'number' },
-  { name: 'description', type: 'textarea', maxLength: 10_000 },
+  { name: 'description', type: 'textarea', maxLength: limits.description },
 ]
 
 /**

@@ -1,4 +1,5 @@
 import { normaliseIsbn } from '@/fields/isbn'
+import { limits } from '@/fields/limits'
 import { toNameKey } from '@/fields/nameKey'
 import { normaliseName } from '@/fields/sortName'
 import { DomainError, type ErrorCode } from '@/lib/errors'
@@ -21,8 +22,10 @@ export type NormalisedEntry = { isbn13?: string; title: string; authors: string[
  * are NFC, trimmed, whitespace runs collapsed (`normaliseName()`). Blank
  * authors are dropped, and repeats by `toNameKey()`, keeping the first. A
  * blank title and no author left fail together in one `VALIDATION` with
- * `title` and/or `authors` in `fields`. Only then the ISBN: absent or blank
- * means none; anything else must normalise (`INVALID_ISBN`).
+ * `title` and/or `authors` in `fields`, as `VALIDATION`; a title over
+ * `limits.title` or any author over `limits.name` after normalising is marked
+ * there as `TOO_LONG` instead, never clipped (R6). Only then the ISBN: absent
+ * or blank means none; anything else must normalise (`INVALID_ISBN`).
  */
 export function normaliseManual(manual: ManualEntry): NormalisedEntry {
   const title = normaliseName(manual.title)
@@ -38,7 +41,9 @@ export function normaliseManual(manual: ManualEntry): NormalisedEntry {
 
   const fields: Record<string, ErrorCode> = {}
   if (title === '') fields.title = 'VALIDATION'
+  else if (title.length > limits.title) fields.title = 'TOO_LONG'
   if (authors.length === 0) fields.authors = 'VALIDATION'
+  else if (authors.some((name) => name.length > limits.name)) fields.authors = 'TOO_LONG'
   if (Object.keys(fields).length > 0) throw new DomainError('VALIDATION', { fields })
 
   const isbn = manual.isbn?.trim() ?? ''
