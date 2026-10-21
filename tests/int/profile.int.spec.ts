@@ -45,13 +45,23 @@ describe('profile service', () => {
     expect((await stored(a.id)).displayName).toBe('Mäki')
   })
 
-  it.each(['   ', ''])('rejects the blank display name %j', async (displayName) => {
-    const error = await updateProfile(ctx, { displayName }).catch((err: unknown) => err)
-    expect(error).toBeInstanceOf(DomainError)
-    expect(error).toMatchObject({ code: 'VALIDATION', fields: { displayName: 'VALIDATION' } })
-    const row = await stored(a.id)
-    expect(row.displayName).toBe('Profile A')
-    expect(row.updatedAt).toBe(a.updatedAt)
+  it.each(['   ', '', 'ä'.repeat(101), 'Mi\tka', 'Mi\nka', 'Mi\u0000ka'])(
+    'rejects the display name %j',
+    async (displayName) => {
+      const error = await updateProfile(ctx, { displayName }).catch((err: unknown) => err)
+      expect(error).toBeInstanceOf(DomainError)
+      expect(error).toMatchObject({ code: 'VALIDATION', fields: { displayName: 'VALIDATION' } })
+      const row = await stored(a.id)
+      expect(row.displayName).toBe('Profile A')
+      expect(row.updatedAt).toBe(a.updatedAt)
+    },
+  )
+
+  // Two UTF-16 units each, so a code-unit count would reject it.
+  it('stores a display name of 100 code points', async () => {
+    const displayName = '😀'.repeat(100)
+    expect((await updateProfile(ctx, { displayName })).displayName).toBe(displayName)
+    expect((await stored(a.id)).displayName).toBe(displayName)
   })
 
   it('changes the language and leaves the display name', async () => {

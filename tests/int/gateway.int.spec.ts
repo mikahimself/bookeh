@@ -79,6 +79,30 @@ describe('gateway', () => {
     )
   })
 
+  it('refuses a where smuggled into a write before Payload sees it', async () => {
+    const payload = await getPayload({ config })
+    const before = await payload.findByID({ collection: 'users', id: a.id })
+    // Gets `where` past the compiler, as `escalate` below does for the scope keys.
+    const withWhere = <T extends object>(options: T): T => ({
+      ...options,
+      where: { id: { equals: a.id } },
+    })
+
+    await expect(
+      gateway.updateByID(
+        ctx,
+        withWhere({ collection: 'users' as const, id: a.id, data: { displayName: 'Widened' } }),
+      ),
+    ).rejects.toThrow(/by ID only/)
+    await expect(
+      gateway.deleteByID(ctx, withWhere({ collection: 'users' as const, id: a.id })),
+    ).rejects.toThrow(/by ID only/)
+
+    const after = await payload.findByID({ collection: 'users', id: a.id })
+    expect(after.displayName).toBe(before.displayName)
+    expect(after.updatedAt).toBe(before.updatedAt)
+  })
+
   // The option types leave these keys out; `escalate` stands in for a caller
   // that gets them past the compiler. Each case expects the unescalated outcome.
   const escalate = <T extends object>(options: T): T => ({

@@ -102,6 +102,21 @@ describe('seedFirstUser', () => {
     expect(fake.logger.info).not.toHaveBeenCalled()
   })
 
+  it('returns as already seeded when a concurrent boot created the user first', async () => {
+    fake.count.mockResolvedValueOnce({ totalDocs: 0 }).mockResolvedValueOnce({ totalDocs: 1 })
+    fake.create.mockRejectedValueOnce(
+      new ValidationError({
+        collection: 'users',
+        errors: [{ message: 'A user with the given email is already registered.', path: 'email' }],
+      }),
+    )
+
+    await expect(
+      seedFirstUser(payload, env({ SEED_EMAIL: email, SEED_PASSWORD: password })),
+    ).resolves.toBeUndefined()
+    expect(fake.logger.info).toHaveBeenCalledWith(expect.stringContaining('already seeded'))
+  })
+
   it('never logs the password', async () => {
     for (const vars of [
       { SEED_EMAIL: email, SEED_PASSWORD: password },

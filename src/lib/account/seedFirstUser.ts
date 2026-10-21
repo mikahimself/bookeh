@@ -1,8 +1,17 @@
-import type { Payload } from 'payload'
+import { ValidationError, type Payload } from 'payload'
 
 import type { User } from '@/payload-types'
 
-/** Spine, AD-3: the first-user seed in `onInit`, one of the system-privilege places. */
+/** A refused `email`: a duplicate from a concurrent seed, or an invalid `SEED_EMAIL`. */
+const isEmailError = (err: unknown): boolean =>
+  err instanceof ValidationError && err.data.errors.some((e) => e.path === 'email')
+
+/**
+ * Spine, AD-3: the first-user seed in `onInit`, one of the system-privilege
+ * places. Two processes booting on an empty database can both pass the count;
+ * the loser's create fails on `email`, and a re-count that now finds a user
+ * tells that race from an invalid `SEED_EMAIL`, which still aborts boot.
+ */
 export async function seedFirstUser(
   payload: Payload,
   env: NodeJS.ProcessEnv = process.env,
@@ -19,17 +28,24 @@ export async function seedFirstUser(
   }
 
   const roles: User['roles'] = ['admin', 'user']
-  await payload.create({
-    collection: 'users',
-    data: {
-      email,
-      password,
-      roles,
-      displayName: email.slice(0, email.lastIndexOf('@')),
-      language: 'en',
-      profileVisibility: 'hidden',
-      collectionVisibility: 'closed',
-    },
-  })
+  try {
+    await payload.create({
+      collection: 'users',
+      data: {
+        email,
+        password,
+        roles,
+        displayName: email.slice(0, email.lastIndexOf('@')),
+        language: 'en',
+        profileVisibility: 'hidden',
+        collectionVisibility: 'closed',
+      },
+    })
+  } catch (err) {
+    if (!isEmailError(err) || (await payload.count({ collection: 'users' })).totalDocs === 0)
+      throw err
+    payload.logger.info('First user already seeded by another process.')
+    return
+  }
   payload.logger.info(`Seeded the first user ${email} (${roles.join(', ')}).`)
 }

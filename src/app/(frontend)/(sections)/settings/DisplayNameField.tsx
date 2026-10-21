@@ -14,9 +14,10 @@ const normalise = (value: string) => value.trim().normalize('NFC')
  * Display name (FR-4): saved when the field loses focus and the normalised
  * value differs from the last saved one; Enter blurs. A blank name shows its
  * message under the field and keeps the typed text; a saved name shows as
- * stored. No toast on success.
+ * stored. No toast on success. `maxLength` keeps typing below the service's
+ * length limit, so its rejection shows only for a name sent past the input.
  */
-export function DisplayNameField({ initial }: { initial: string }) {
+export function DisplayNameField({ initial, maxLength }: { initial: string; maxLength: number }) {
   const t = useTranslations('settings')
   const report = useReportFailure()
   const [value, setValue] = useState(initial)
@@ -55,6 +56,7 @@ export function DisplayNameField({ initial }: { initial: string }) {
       name="displayName"
       autoComplete="nickname"
       enterKeyHint="done"
+      maxLength={maxLength}
       value={value}
       onChange={(event) => setValue(event.target.value)}
       onBlur={save}

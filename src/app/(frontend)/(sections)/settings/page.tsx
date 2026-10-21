@@ -1,7 +1,12 @@
 import { getTranslations } from 'next-intl/server'
 import type { ReactNode } from 'react'
 
-import { COLLECTION_VISIBILITIES, getProfile, PROFILE_VISIBILITIES } from '@/lib/account/profile'
+import {
+  COLLECTION_VISIBILITIES,
+  DISPLAY_NAME_MAX_LENGTH,
+  getProfile,
+  PROFILE_VISIBILITIES,
+} from '@/lib/account/profile'
 import { listLocations } from '@/lib/copies/locations'
 import { requireUser } from '@/lib/payload/context'
 
@@ -46,7 +51,7 @@ export default async function SettingsPage() {
     <div className="px-page-margin-phone pt-7 pb-7 wide:grid wide:grid-cols-2 wide:gap-7 wide:px-page-margin">
       <div className="flex max-w-panel-width flex-col gap-7">
         <Group heading={t('profile')}>
-          <DisplayNameField initial={profile.displayName} />
+          <DisplayNameField initial={profile.displayName} maxLength={DISPLAY_NAME_MAX_LENGTH} />
           {/* Shown, never edited (1.22): text, not an input. */}
           <div className="flex flex-col gap-1">
             <p className="text-label text-text-muted">{t('email')}</p>

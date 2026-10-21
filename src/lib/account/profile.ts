@@ -24,6 +24,13 @@ export type ProfileChanges = Partial<
   }
 >
 
+/** The longest display name `updateProfile()` stores, in code points after trim and NFC. */
+export const DISPLAY_NAME_MAX_LENGTH = 100
+
+/** Empty, over the limit, or holding any control character, tab and newline included. */
+const invalidDisplayName = (name: string): boolean =>
+  name === '' || [...name].length > DISPLAY_NAME_MAX_LENGTH || /\p{Cc}/u.test(name)
+
 /** Visibility towards friends (FR-4): stored now, read by nothing in Phase 1. */
 export const PROFILE_VISIBILITIES: readonly User['profileVisibility'][] = ['public', 'hidden']
 export const COLLECTION_VISIBILITIES: readonly User['collectionVisibility'][] = ['open', 'closed']
@@ -63,14 +70,16 @@ export async function getProfile(ctx: Context): Promise<Profile> {
  * context user's own document; `data` holds only the known keys, so neither an
  * id nor `roles` can reach the write, whatever the caller passes. The display
  * name is trimmed and NFC-normalised (Text input convention) and fails with
- * `VALIDATION` on `displayName` when empty. An unknown language is left to
- * Payload's select validation, which `runAction()` maps to the same shape.
+ * `VALIDATION` on `displayName` when empty, longer than
+ * `DISPLAY_NAME_MAX_LENGTH` code points, or holding a control character (tab
+ * and newline included). An unknown language is left to Payload's select
+ * validation, which `runAction()` maps to the same shape.
  */
 export async function updateProfile(ctx: Context, changes: ProfileChanges): Promise<Profile> {
   const data: ProfileChanges = {}
   if (changes.displayName !== undefined) {
     const displayName = changes.displayName.trim().normalize('NFC')
-    if (displayName === '') {
+    if (invalidDisplayName(displayName)) {
       throw new DomainError('VALIDATION', { fields: { displayName: 'VALIDATION' } })
     }
     data.displayName = displayName

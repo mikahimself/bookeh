@@ -8,7 +8,9 @@ import { assertLive } from './transaction'
  * function runs the Local API with the context's `req`, its `user`,
  * `overrideAccess: false` and `showHiddenFields: false`, spread after the
  * caller's options so nothing overrides them; the option types leave those
- * keys out. Writes are by ID only: no `where`-based update or delete. Calls on
+ * keys out. Writes are by ID only: no `where`-based update or delete, and
+ * `updateByID`/`deleteByID` throw on a `where` key before Payload is called,
+ * so one smuggled past the types cannot widen the write. Calls on
  * one context run one at a time, never concurrently, since they share its req
  * and transaction (AD-16). A context from `withTransaction()` carries the
  * transaction on its `req`, so every call on it joins; once Payload has rolled
@@ -64,11 +66,16 @@ export async function create<S extends CollectionSlug, Sel extends TypedCollecti
   return ctx.req.payload.create<S, Sel>({ ...options, ...scope(ctx) })
 }
 
+const refuseWhere = (options: object): void => {
+  if ('where' in options) throw new Error('Gateway writes are by ID only: `where` is refused.')
+}
+
 // `update` is overloaded and `Parameters` takes the last overload, the by-ID one.
 export async function updateByID<S extends CollectionSlug, Sel extends TypedCollectionSelect[S]>(
   ctx: Context,
   options: Scoped<Parameters<typeof ctx.req.payload.update<S, Sel>>[0]> & { id: number },
 ) {
+  refuseWhere(options)
   return ctx.req.payload.update<S, Sel>({ ...options, ...scope(ctx) })
 }
 
@@ -80,5 +87,6 @@ export async function deleteByID<S extends CollectionSlug, Sel extends TypedColl
     id: number
   },
 ) {
+  refuseWhere(options)
   return ctx.req.payload.delete<S, Sel>({ ...options, ...scope(ctx) })
 }
