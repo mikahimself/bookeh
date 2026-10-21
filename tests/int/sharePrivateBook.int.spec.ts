@@ -471,9 +471,11 @@ describe('saveCopy of a held private Book', () => {
         filesize: 1,
         width: 4,
         height: 6,
+        visibility: 'private',
       },
       overrideAccess: true,
       depth: 0,
+      req: ctx.req,
     })
     mediaIds.push(cover.id)
     await payload.update({

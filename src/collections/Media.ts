@@ -1,18 +1,10 @@
 import { randomUUID } from 'node:crypto'
 import path from 'node:path'
 
-import {
-  MissingFile,
-  type Access,
-  type CollectionBeforeOperationHook,
-  type CollectionConfig,
-} from 'payload'
+import { MissingFile, type CollectionBeforeOperationHook, type CollectionConfig } from 'payload'
 
-import { isAdmin } from '@/access/roles'
-
-const signedIn: Access = ({ req: { user } }) => Boolean(user)
-
-const adminOnly: Access = ({ req: { user } }) => isAdmin(user)
+import { catalogueAccess } from '@/access/catalogue'
+import { visibilityFields } from '@/fields/visibility'
 
 /**
  * Stores every upload under a random name, so a filename never carries a book
@@ -41,19 +33,15 @@ const requireFile: CollectionBeforeOperationHook = ({ args, operation, req }) =>
 }
 
 /**
- * Spine, AD-14: any signed-in user reads media rows and their files (the file
- * route runs `access.read` too); only the admin creates, updates or deletes.
- * Other writes come only from `lib/catalogue` with system privileges. Per-Book
- * visibility on media arrives with D28.
+ * Spine, AD-4/AD-14: a user reads shared media rows and the private ones they
+ * created, the admin reads every row; the file route applies the same rule
+ * (it ANDs `access.read` with the filename). Only the admin creates, updates
+ * or deletes. Other writes come only from `lib/catalogue` with system
+ * privileges.
  */
 export const Media: CollectionConfig = {
   slug: 'media',
-  access: {
-    read: signedIn,
-    create: adminOnly,
-    update: adminOnly,
-    delete: adminOnly,
-  },
+  access: catalogueAccess,
   admin: {
     group: 'Catalogue',
   },
@@ -67,6 +55,7 @@ export const Media: CollectionConfig = {
       name: 'alt',
       type: 'text',
     },
+    ...visibilityFields(),
   ],
   upload: {
     staticDir: process.env.MEDIA_DIR || 'media',

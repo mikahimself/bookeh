@@ -214,6 +214,7 @@ describe('saveCopy', () => {
     mediaIds.push(media.id)
     filenames.push(media.filename!)
     expect(book).toMatchObject({ isbn13: isbn, visibility: 'shared' })
+    expect(media).toMatchObject({ visibility: 'shared', createdBy: null })
     expect(await filesInMedia()).toContain(media.filename)
     expect(fetchSpy).toHaveBeenCalledTimes(1)
     expect(book.authors).toMatchObject([{ name: names.author, visibility: 'shared' }])

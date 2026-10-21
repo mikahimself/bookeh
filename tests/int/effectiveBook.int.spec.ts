@@ -134,7 +134,7 @@ describe('getEffectiveBooks', () => {
       .toBuffer()
     cover = await payload.create({
       collection: 'media',
-      data: {},
+      data: { visibility: 'shared' },
       file: { data, mimetype: 'image/png', name: 'cover.png', size: data.length },
       overrideAccess: true,
     })

@@ -246,6 +246,8 @@ export interface Series {
 export interface Media {
   id: number;
   alt?: string | null;
+  visibility: 'shared' | 'private';
+  createdBy?: (number | null) | User;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -504,6 +506,8 @@ export interface LocationsSelect<T extends boolean = true> {
  */
 export interface MediaSelect<T extends boolean = true> {
   alt?: T;
+  visibility?: T;
+  createdBy?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;

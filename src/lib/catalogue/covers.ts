@@ -220,14 +220,16 @@ export async function storeCover(
 /**
  * The `media` row for a downloaded cover, created in the caller's
  * transaction. Payload stores the row and writes no file: the file is
- * already in place (`filesRequiredOnCreate: false`, system create).
+ * already in place (`filesRequiredOnCreate: false`, system create). The row
+ * is shared: both callers (`ensureSharedBook`, `sharePrivateBook`) attach it
+ * to a shared Book.
  */
 export async function attachCover(tx: Context, cover: DownloadedCover): Promise<number> {
   assertLive(tx)
   const { filename, mimeType, filesize, width, height } = cover
   const doc = await tx.req.payload.create({
     collection: 'media',
-    data: { filename, mimeType, filesize, width, height },
+    data: { filename, mimeType, filesize, width, height, visibility: 'shared' },
     ...system(tx),
   })
   return doc.id

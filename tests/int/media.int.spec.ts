@@ -1,7 +1,15 @@
 import { readdir } from 'node:fs/promises'
 
 import { REST_GET } from '@payloadcms/next/routes'
-import { Forbidden, getPayload, MissingFile, type Payload, ValidationError } from 'payload'
+import {
+  Forbidden,
+  getPayload,
+  MissingFile,
+  NotFound,
+  type Payload,
+  type PayloadRequest,
+  ValidationError,
+} from 'payload'
 import sharp from 'sharp'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 
@@ -12,8 +20,9 @@ import type { Media, User } from '@/payload-types'
 
 import { contextFor, createUser } from '../helpers/harness'
 
-// `media`, AD-14: read for any signed-in user (files included), writes for the
-// admin only; other writes are system writes. Every stored name is random.
+// `media`, AD-4/AD-14: a user reads shared rows and their own private ones, the
+// admin every row, files included; writes for the admin only; other writes are
+// system writes. Every stored name is random.
 
 const randomName = /^[0-9a-f-]{36}\.png$/
 
@@ -35,12 +44,19 @@ describe('media', () => {
 
   const filesInMedia = async () => (await readdir(mediaDir(payload)).catch(() => [])).sort()
 
-  const systemCreate = async (name: string) => {
+  /** A private row takes its creator from `req.user` (AD-4). */
+  const systemCreate = async (
+    name: string,
+    visibility: Media['visibility'] = 'shared',
+    req?: PayloadRequest,
+  ) => {
     const doc = await payload.create({
       collection: 'media',
-      data: {},
+      data: { visibility },
       file: await png(name),
       overrideAccess: true,
+      depth: 0,
+      req,
     })
     created.push(doc.id)
     return doc
@@ -77,14 +93,39 @@ describe('media', () => {
     expect(response.headers.get('content-type')).not.toMatch(/^image\//)
   })
 
-  it('serves the file to a signed-in user', async () => {
+  const authAs = async (who: User) => {
     const { token } = await payload.login({
       collection: 'users',
-      data: { email: user.email, password: 'test-password' },
+      data: { email: who.email, password: 'test-password' },
     })
-    const response = await getFile(cover.filename!, { Authorization: `JWT ${token}` })
+    return { Authorization: `JWT ${token}` }
+  }
+
+  it('serves a shared file to a signed-in user', async () => {
+    const response = await getFile(cover.filename!, await authAs(user))
     expect(response.status).toBe(200)
     expect(response.headers.get('content-type')).toBe('image/png')
+  })
+
+  it('serves a private file to its creator and the admin, never to another user', async () => {
+    const asA = await contextFor(user)
+    const own = await systemCreate('Private cover.png', 'private', asA.req)
+    expect(own.createdBy).toBe(user.id)
+    const b = await createUser({ displayName: 'Media User B' })
+
+    const toA = await getFile(own.filename!, await authAs(user))
+    expect(toA.status).toBe(200)
+    expect(toA.headers.get('content-type')).toBe('image/png')
+    const toAdmin = await getFile(own.filename!, await authAs(admin))
+    expect(toAdmin.status).toBe(200)
+    expect(toAdmin.headers.get('content-type')).toBe('image/png')
+
+    const toB = await getFile(own.filename!, await authAs(b))
+    expect(toB.status).toBe(403)
+    expect(toB.headers.get('content-type')).not.toMatch(/^image\//)
+    await expect(
+      gateway.findByID(await contextFor(b), { collection: 'media', id: own.id }),
+    ).rejects.toThrow(NotFound)
   })
 
   it('lets a user read a row', async () => {
@@ -100,7 +141,7 @@ describe('media', () => {
     await expect(
       gateway.create(ctx, {
         collection: 'media',
-        data: {},
+        data: { visibility: 'shared' },
         file,
       }),
     ).rejects.toThrow(Forbidden)
@@ -124,7 +165,7 @@ describe('media', () => {
     const file = await png('Admin cover.png')
     const doc = await gateway.create(ctx, {
       collection: 'media',
-      data: {},
+      data: { visibility: 'shared' },
       file,
     })
     created.push(doc.id)
@@ -159,12 +200,15 @@ describe('media', () => {
   it('refuses an admin create without a file', async () => {
     const ctx = await contextFor(admin)
     const before = await payload.count({ collection: 'media' })
-    await expect(gateway.create(ctx, { collection: 'media', data: {} })).rejects.toThrow(
-      MissingFile,
-    )
+    await expect(
+      gateway.create(ctx, { collection: 'media', data: { visibility: 'shared' } }),
+    ).rejects.toThrow(MissingFile)
     // Payload drops a submitted `filename` from a create without `overrideAccess`.
     await expect(
-      gateway.create(ctx, { collection: 'media', data: { filename: 'chosen.png' } }),
+      gateway.create(ctx, {
+        collection: 'media',
+        data: { filename: 'chosen.png', visibility: 'shared' },
+      }),
     ).rejects.toThrow(MissingFile)
     expect(await payload.count({ collection: 'media' })).toEqual(before)
   })
@@ -175,7 +219,7 @@ describe('media', () => {
     await expect(
       payload.create({
         collection: 'media',
-        data: {},
+        data: { visibility: 'shared' },
         file: { data, mimetype: 'image/png', name: 'cover.png', size: data.length },
         overrideAccess: true,
       }),
@@ -193,7 +237,7 @@ describe('media', () => {
     await expect(
       payload.create({
         collection: 'media',
-        data: {},
+        data: { visibility: 'shared' },
         file: { data, mimetype: 'image/gif', name: 'cover.gif', size: data.length },
         overrideAccess: true,
       }),

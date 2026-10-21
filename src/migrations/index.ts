@@ -8,6 +8,7 @@ import * as migration_20261017_074009_user_books from './20261017_074009_user_bo
 import * as migration_20261018_162301_copies from './20261018_162301_copies'
 import * as migration_20261018_164917_locations from './20261018_164917_locations'
 import * as migration_20261021_072731_lean_finna_raw from './20261021_072731_lean_finna_raw'
+import * as migration_20261021_121736_media_visibility from './20261021_121736_media_visibility'
 
 export const migrations = [
   {
@@ -59,5 +60,10 @@ export const migrations = [
     up: migration_20261021_072731_lean_finna_raw.up,
     down: migration_20261021_072731_lean_finna_raw.down,
     name: '20261021_072731_lean_finna_raw',
+  },
+  {
+    up: migration_20261021_121736_media_visibility.up,
+    down: migration_20261021_121736_media_visibility.down,
+    name: '20261021_121736_media_visibility',
   },
 ]
