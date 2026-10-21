@@ -8,6 +8,7 @@ import nextTs from 'eslint-config-next/typescript'
 const rootDir = path.dirname(fileURLToPath(import.meta.url))
 const srcDir = path.join(rootDir, 'src')
 const libDir = path.join(srcDir, 'lib')
+const appDir = path.join(srcDir, 'app')
 
 /**
  * Import directions from the architecture spine (Design Paradigm).
@@ -83,9 +84,11 @@ const isTypeOnly = (node, kind) =>
 /**
  * Spine, Design Paradigm: client components import from `src/lib` only types
  * and `lib/shelf/query.ts`. A client component is a file whose directive
- * prologue contains 'use client'.
+ * prologue contains 'use client'. A module under `src/app` may not re-export
+ * `src/lib` values either, since a client component could import it: the rule
+ * reads one file at a time, so it reports the barrel, not the importer.
  */
-const clientLibImports = {
+export const clientLibImports = {
   meta: {
     type: 'problem',
     docs: {
@@ -95,12 +98,15 @@ const clientLibImports = {
     messages: {
       restricted:
         "Spine, Design Paradigm: a 'use client' component imports from src/lib only types and lib/shelf/query. Remove the import, or make it `import type`.",
+      reexport:
+        'Spine, Design Paradigm: client components import from src/lib only types and lib/shelf/query, so a module under src/app may not re-export src/lib values: a client component could import it. Import the value from src/lib in server code, or make it `export type`.',
     },
   },
   create(context) {
     const filename = context.physicalFilename ?? context.filename
     const fileDir = path.dirname(filename)
     const shelfQuery = path.join(libDir, 'shelf', 'query')
+    const inApp = filename.startsWith(appDir + path.sep)
 
     const isRestricted = (source) => {
       const resolved = resolveSource(source, fileDir)
@@ -111,9 +117,26 @@ const clientLibImports = {
     }
 
     let isClient = false
+    // Local names value-imported from a restricted source (src/app only).
+    const libBindings = new Set()
+
     const check = (node) => {
       if (isClient && isRestricted(node.source.value)) {
         context.report({ node: node.source, messageId: 'restricted' })
+      }
+    }
+    // `export … from` and `export * from`: a client component's own rule wins.
+    const checkReexport = (node) => {
+      if (isClient) check(node)
+      else if (inApp && isRestricted(node.source.value)) {
+        context.report({ node: node.source, messageId: 'reexport' })
+      }
+    }
+    // `export { x }` / `export default x` of a binding imported from src/lib.
+    // In a client component the import itself is already reported.
+    const checkLocal = (node) => {
+      if (!isClient && node.type === 'Identifier' && libBindings.has(node.name)) {
+        context.report({ node, messageId: 'reexport' })
       }
     }
 
@@ -123,15 +146,36 @@ const clientLibImports = {
           (statement) =>
             statement.type === 'ExpressionStatement' && statement.directive === 'use client',
         )
+        if (!inApp) return
+        for (const statement of program.body) {
+          if (
+            statement.type !== 'ImportDeclaration' ||
+            statement.importKind === 'type' ||
+            !isRestricted(statement.source.value)
+          )
+            continue
+          for (const specifier of statement.specifiers) {
+            if (specifier.importKind !== 'type') libBindings.add(specifier.local.name)
+          }
+        }
       },
       ImportDeclaration(node) {
         if (!isTypeOnly(node, 'importKind')) check(node)
       },
       ExportNamedDeclaration(node) {
-        if (node.source && !isTypeOnly(node, 'exportKind')) check(node)
+        if (node.source) {
+          if (!isTypeOnly(node, 'exportKind')) checkReexport(node)
+        } else if (node.exportKind !== 'type') {
+          for (const specifier of node.specifiers) {
+            if (specifier.exportKind !== 'type') checkLocal(specifier.local)
+          }
+        }
       },
       ExportAllDeclaration(node) {
-        if (node.source && node.exportKind !== 'type') check(node)
+        if (node.exportKind !== 'type') checkReexport(node)
+      },
+      ExportDefaultDeclaration(node) {
+        checkLocal(node.declaration)
       },
       ImportExpression(node) {
         if (node.source.type === 'Literal' && typeof node.source.value === 'string') check(node)

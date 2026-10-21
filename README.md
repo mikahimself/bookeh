@@ -114,18 +114,23 @@ refuse a schema-pushed `bookeh_test`. `npm run test:reset` drops and recreates
 its schema `public` and empties `media-test`, the lanes' media directory; the
 next lane migrates it again.
 
-**Migration check in CI.** CI fails when `payload migrate:create --skip-empty`
-would write a file (a schema change without its migration), and runs the int
-and e2e lanes as they run locally: migrations applied to the empty
-`bookeh_test`, push off. Its "Check push stayed off" step then fails on a
-`batch = -1` row. To reproduce locally: `npm run test:reset && npm test`. For a
-red drift check, run
+**Migration check in CI.** CI runs
+`payload migrate:create ci_drift_check --force-accept-warning` with stdin
+closed and fails when the snapshot it writes differs from the newest committed
+one, apart from `id` and `prevId` (a schema change without its migration, or a
+new snapshot format). It fails too when no snapshot was written: the command
+stopped at a prompt. CI also runs the int and e2e lanes as they run locally:
+migrations applied to the empty `bookeh_test`, push off. Its "Check push stayed
+off" step then fails on a `batch = -1` row. To reproduce locally:
+`npm run test:reset && npm test`. For a red drift check, run
 `npm run payload -- migrate:create <name> --skip-empty` locally and commit the
-generated `.ts`, `.json` and `index.ts` under a real migration name. If it
-says `migrate:create did not finish` (a rename prompt), run
+generated `.ts`, `.json` and `index.ts` under a real migration name. If CI
+says `migrate:create wrote no migration` (a rename prompt), or the diff shows
+only a new snapshot format (`--skip-empty` then writes nothing), run
 `npm run payload -- migrate:create <name>` interactively, without
-`--skip-empty` and with stdin open, answer the prompt, then commit the
-generated `.ts`, `.json` and `index.ts`.
+`--skip-empty` and with stdin open, answer the prompt (for a format-only
+change, yes to the blank migration), then commit the generated `.ts`, `.json`
+and `index.ts`.
 
 ## How it works
 
