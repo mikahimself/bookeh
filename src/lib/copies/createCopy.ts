@@ -1,14 +1,11 @@
 import type { Context } from '@/lib/payload/context'
 import * as gateway from '@/lib/payload/gateway'
-import type { Ref } from '@/lib/payload/ref'
 import { withTransaction } from '@/lib/payload/transaction'
 import type { Undone } from '@/lib/undo/undo'
 
-import { resolveLocation } from './locations'
+import { type CopyStatus, locationFor } from './locations'
 
-/** An ordered copy has no location (AD-8). */
-export type NewCopy =
-  { bookId: number; status: 'owned'; location?: Ref | null } | { bookId: number; status: 'ordered' }
+export type NewCopy = CopyStatus & { bookId: number }
 
 /**
  * Spine, AD-18: the only insert into `copies`. Creates one owned or ordered
@@ -50,13 +47,4 @@ async function deleteCopy(ctx: Context, id: number): Promise<void> {
   })
   if (totalDocs === 0) return
   await gateway.deleteByID(ctx, { collection: 'copies', id, depth: 0 })
-}
-
-async function locationFor(ctx: Context, input: NewCopy): Promise<number | null> {
-  if (input.status === 'ordered') return null
-  if (input.location === null) return null
-  if (input.location !== undefined) return resolveLocation(ctx, input.location)
-  const fallback = ctx.user.defaultLocation
-  if (fallback === null || fallback === undefined) return null
-  return typeof fallback === 'number' ? fallback : fallback.id
 }

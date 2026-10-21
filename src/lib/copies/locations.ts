@@ -43,6 +43,24 @@ export async function resolveLocation(ctx: Context, ref: Ref): Promise<number> {
   return created.id
 }
 
+/** A copy's status and, when owned, where it is. An ordered copy has no location (AD-8). */
+export type CopyStatus = { status: 'owned'; location?: Ref | null } | { status: 'ordered' }
+
+/**
+ * Spine, AD-8 and AD-18: the location a copy gets with a status, shared by
+ * `createCopy()` and `setStatus()`. Ordered: none. Owned: `null` means none,
+ * a `Ref` goes through `resolveLocation()`, and undefined means the context
+ * user's `defaultLocation`, or none without one (FR-4, FR-31).
+ */
+export async function locationFor(ctx: Context, change: CopyStatus): Promise<number | null> {
+  if (change.status === 'ordered') return null
+  if (change.location === null) return null
+  if (change.location !== undefined) return resolveLocation(ctx, change.location)
+  const fallback = ctx.user.defaultLocation
+  if (fallback === null || fallback === undefined) return null
+  return typeof fallback === 'number' ? fallback : fallback.id
+}
+
 /** A location as a picker lists it. */
 export type LocationOption = { id: number; name: string }
 
