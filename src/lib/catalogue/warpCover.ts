@@ -2,10 +2,7 @@ import sharp from 'sharp'
 
 import { DomainError } from '@/lib/errors'
 
-import { checkCorners, type Corners, type Point } from './corners'
-
-/** The projective map from the unit square to a quad: `(u, v)` → `(x, y)`. */
-export type QuadMap = (u: number, v: number) => Point
+import { checkCorners, squareToQuad, type Corners, type Point } from './corners'
 
 /** A larger image is `IMAGE_TOO_LARGE` before it is decoded: a small file can hold a huge one. */
 const MAX_INPUT_PIXELS = 50_000_000
@@ -14,39 +11,6 @@ const MAX_SIDE = 2000
 /** The tallest stored cover; its width is ⅔ of the height. */
 const MAX_HEIGHT = 1200
 const QUALITY = 85
-
-/**
- * Heckbert's closed-form square-to-quad mapping: (0,0), (1,0), (1,1), (0,1)
- * go to TL, TR, BR, BL. `x = (a·u + b·v + c) / (g·u + h·v + 1)`, `y` alike
- * with `d`, `e`, `f`; `g` and `h` are 0 for a parallelogram (affine).
- * `corners` must pass `checkCorners()`.
- */
-export function squareToQuad(corners: Corners): QuadMap {
-  const [p0, p1, p2, p3] = corners
-  const sx = p0.x - p1.x + p2.x - p3.x
-  const sy = p0.y - p1.y + p2.y - p3.y
-  let g = 0
-  let h = 0
-  if (sx !== 0 || sy !== 0) {
-    const dx1 = p1.x - p2.x
-    const dx2 = p3.x - p2.x
-    const dy1 = p1.y - p2.y
-    const dy2 = p3.y - p2.y
-    const den = dx1 * dy2 - dx2 * dy1
-    g = (sx * dy2 - sy * dx2) / den
-    h = (dx1 * sy - dy1 * sx) / den
-  }
-  const a = p1.x - p0.x + g * p1.x
-  const b = p3.x - p0.x + h * p3.x
-  const c = p0.x
-  const d = p1.y - p0.y + g * p1.y
-  const e = p3.y - p0.y + h * p3.y
-  const f = p0.y
-  return (u, v) => {
-    const w = g * u + h * v + 1
-    return { x: (a * u + b * v + c) / w, y: (d * u + e * v + f) / w }
-  }
-}
 
 const FORMATS = new Set(['jpeg', 'png', 'webp'])
 

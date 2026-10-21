@@ -4,7 +4,8 @@ import { useState } from 'react'
 
 /**
  * DESIGN.md, Cover placeholder; spine, AD-10: a book's cover at 2:3, filling
- * its parent's width. `src` is a `coverUrl()` result, computed on the server.
+ * its parent's width. `src` is a `coverUrl()` result, computed on the server,
+ * or a local `blob:` URL (Edit book's preview of an upload).
  * Without one, or once that `src` failed to load, an outlined box with the
  * title inside. Decorative either way: the title is always shown beside a
  * cover. A failed `src` is kept rather than a flag, so a new `src` loads again.

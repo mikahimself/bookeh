@@ -1,6 +1,8 @@
 'use server'
 
+import type { Corners } from '@/lib/catalogue/corners'
 import { editBook, type BookEdits, type EditBookInput } from '@/lib/catalogue/editBook'
+import { removeCover, setCover } from '@/lib/catalogue/setCover'
 import { DomainError, runAction, type ActionResult, type ErrorCode } from '@/lib/errors'
 import { requireUserOrThrow } from '@/lib/payload/context'
 
@@ -51,6 +53,14 @@ const isCopy = (value: unknown): boolean => {
   )
 }
 
+type CoverInput = { image: Blob; corners: Corners } | null | undefined
+
+/** `CoverInput`'s shape: absent, `null`, or an image with an array of corners. */
+const isCover = (value: unknown): boolean =>
+  value === undefined ||
+  value === null ||
+  (isPlainObject(value) && value.image instanceof Blob && Array.isArray(value.corners))
+
 /**
  * Save on Edit book (FR-14, FR-13, FR-28): the draft's changes to one Book
  * and, opened for one of its copies, to that copy. The input comes from the
@@ -61,12 +71,18 @@ const isCopy = (value: unknown): boolean => {
  * `editBook()`'s: unknown keys, a blank title, a bad ISBN, refused keys,
  * ordered with a location, the `requireOwnBook()` gate and the copy's owner.
  * Failures come back as they are.
+ *
+ * `cover` (AD-14, D-4) is absent, `null` to remove the cover, or
+ * `{ image, corners }` from the crop step, else `VALIDATION` naming `cover`.
+ * After `editBook()`, `removeCover()` or `setCover()` runs in its own
+ * transaction, which checks the corners and the gate: edits that fail write
+ * nothing, and a cover refused after them leaves them saved. No Undo.
  */
 export async function editBookAction(input: unknown): Promise<ActionResult<null>> {
   return runAction(async () => {
     const ctx = await requireUserOrThrow()
     if (typeof input !== 'object' || input === null) throw new DomainError('VALIDATION')
-    const { bookId, edits, copy } = input as Record<string, unknown>
+    const { bookId, edits, copy, cover } = input as Record<string, unknown>
     if (!id(bookId)) throw new DomainError('VALIDATION')
     if (!isPlainObject(edits)) throw new DomainError('VALIDATION')
     const fields: Record<string, ErrorCode> = {}
@@ -74,8 +90,12 @@ export async function editBookAction(input: unknown): Promise<ActionResult<null>
       if (hasType(key) && value !== undefined && !TYPES[key](value)) fields[key] = 'VALIDATION'
     }
     if (!isCopy(copy)) fields.copy = 'VALIDATION'
+    if (!isCover(cover)) fields.cover = 'VALIDATION'
     if (Object.keys(fields).length > 0) throw new DomainError('VALIDATION', { fields })
     await editBook(ctx, { bookId, edits: edits as BookEdits, copy: copy as EditBookInput['copy'] })
+    const change = cover as CoverInput
+    if (change === null) await removeCover(ctx, bookId)
+    else if (change) await setCover(ctx, bookId, change.image, change.corners)
     return null
   })
 }

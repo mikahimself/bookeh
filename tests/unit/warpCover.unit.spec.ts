@@ -1,8 +1,8 @@
 import sharp from 'sharp'
 import { describe, expect, it } from 'vitest'
 
-import { checkCorners, type Corners } from '@/lib/catalogue/corners'
-import { squareToQuad, warpCover } from '@/lib/catalogue/warpCover'
+import { checkCorners, squareToQuad, type Corners } from '@/lib/catalogue/corners'
+import { warpCover } from '@/lib/catalogue/warpCover'
 
 // The cover warp, AD-14: a hand-written square-to-quad map, a corner check
 // that admits only convex clockwise quads inside the image, and output that
@@ -110,7 +110,9 @@ describe('warpCover', () => {
     expect({ width, height }).toEqual({ width: 800, height: 1200 })
 
     const { data } = await sharp(bytes).raw().toBuffer({ resolveWithObject: true })
-    const rgb = (x: number, y: number) => [...data.subarray((y * 800 + x) * 3, (y * 800 + x) * 3 + 3)]
+    const rgb = (x: number, y: number) => [
+      ...data.subarray((y * 800 + x) * 3, (y * 800 + x) * 3 + 3),
+    ]
     const near = (actual: number[], expected: number[]) =>
       actual.every((value, i) => Math.abs(value - expected[i]) < 40)
     expect(near(rgb(200, 300), [255, 0, 0])).toBe(true)

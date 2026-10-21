@@ -20,6 +20,7 @@ import { upsertUserBook } from '@/lib/books/upsertUserBook'
 import { mediaDir } from '@/lib/catalogue/covers'
 import { DomainError } from '@/lib/errors'
 import { saveCopy, type SaveInput } from '@/lib/catalogue/saveCopy'
+import { setCover } from '@/lib/catalogue/setCover'
 import type { Context } from '@/lib/payload/context'
 import { heldOutcome, lookupSources } from '@/lib/metadata/lookup'
 import type { SourceResult, SourcesOutcome } from '@/lib/metadata/source'
@@ -250,6 +251,62 @@ describe('saveCopy of a held private Book', () => {
         expect(rows[0]).toMatchObject({ book: own.id, overridden: ['title'], title: 'T1' })
       } else {
         expect(rows).toEqual([])
+      }
+    },
+  )
+
+  /** Uploads a cover to the context's private Book; returns its row, tracked for cleanup. */
+  const upload = async (ctx: Context, bookId: number) => {
+    const file = new File([new Uint8Array(jpeg)], 'cover.jpg', { type: 'image/jpeg' })
+    const corners = [
+      { x: 0, y: 0 },
+      { x: 4, y: 0 },
+      { x: 4, y: 6 },
+      { x: 0, y: 6 },
+    ] as const
+    await setCover(ctx, bookId, file, corners)
+    return trackCover(bookId)
+  }
+
+  it("shares the admin's uploaded cover row in place, downloading none", async () => {
+    const { ctx, isbn, own } = await promoteSetup(true)
+    const uploaded = await upload(ctx, own.id)
+    expect(uploaded).toMatchObject({ visibility: 'private' })
+
+    await saveCopy(ctx, isbnInput(isbn))
+
+    expect((await bookById(own.id)).cover).toBe(uploaded.id)
+    const row = await payload.findByID({
+      collection: 'media',
+      id: uploaded.id,
+      depth: 0,
+      overrideAccess: true,
+    })
+    expect(row).toMatchObject({ visibility: 'shared', filename: uploaded.filename })
+    expect(row.createdBy ?? null).toBeNull()
+    expect(fetchSpy).not.toHaveBeenCalled()
+  })
+
+  it.each([
+    ['the source cover', true],
+    ['none when the source has no cover', false],
+  ] as const)(
+    "replaces a user's uploaded cover with %s and deletes the old row",
+    async (_, sourceCover) => {
+      const { ctx, isbn, own } = await promoteSetup()
+      const uploaded = await upload(ctx, own.id)
+      if (!sourceCover) vi.mocked(heldOutcome).mockReturnValue(found({ isbn13: isbn }))
+
+      await saveCopy(ctx, isbnInput(isbn))
+
+      expect(await exists('media', uploaded.id)).toBe(false)
+      if (sourceCover) {
+        const media = await trackCover(own.id)
+        expect(media.id).not.toBe(uploaded.id)
+        expect(media).toMatchObject({ visibility: 'shared' })
+        expect(fetchSpy).toHaveBeenCalledOnce()
+      } else {
+        expect((await bookById(own.id)).cover ?? null).toBeNull()
       }
     },
   )

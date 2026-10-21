@@ -1,6 +1,7 @@
 'use client'
 
 import { useTranslations } from 'next-intl'
+import { useRouter } from 'next/navigation'
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore, useTransition } from 'react'
 
 import type { Named } from '@/lib/books/effectiveBook'
@@ -8,7 +9,6 @@ import type { LocationOption } from '@/lib/copies/locations'
 import type { ErrorCode } from '@/lib/errors'
 
 import { Button } from '../../../components/Button'
-import { Cover } from '../../../components/Cover'
 import { FullScreenTask } from '../../../components/FullScreenTask'
 import { useCloseTask } from '../../../components/navigation'
 import { ProgressLine } from '../../../components/ProgressLine'
@@ -19,6 +19,7 @@ import { useCloseOnBack } from '../../../components/ui/overlay'
 
 import { editBookAction } from './actions'
 import { CopyFields, type CopyChange } from './CopyFields'
+import { CoverField, isCoverCode, type CoverChange } from './CoverField'
 import { clearDraft, isEmpty, readDraft, setEdit, writeDraft, type Draft } from './draft'
 import { MoreDetails, type EffectiveEdits, type OnEdit } from './MoreDetails'
 import type { SavedCopy } from './savedCopy'
@@ -31,6 +32,13 @@ const onServer = () => false
  * Edit book (EXPERIENCE.md, Edit book): the cover beside the title, the
  * author and source lines under it, and Save pinned at the bottom, the one
  * primary.
+ *
+ * With `coverEditable`, the cover has its controls (CoverField). The cover
+ * change lives in memory only (a Blob doesn't go to `sessionStorage`), counts
+ * toward `dirty` and goes with Save as `cover`, without its preview; the four
+ * cover codes Save answers show under the cover, with no toast. Those come
+ * after `editBook()` committed, so the Book draft is cleared and the page
+ * refreshed for the new `effective`; the cover change stays.
  *
  * Opened for one of the viewer's copies (`copy`, from the save toast's
  * Edit), the first screen shows that copy's Status and Location
@@ -69,6 +77,7 @@ export function EditBookScreen({
   authors,
   source,
   cover,
+  coverEditable,
   effective,
   isbnEditable,
   genreOptions,
@@ -84,6 +93,8 @@ export function EditBookScreen({
   /** "From {source}", or `null` with no or an unknown source. */
   source: string | null
   cover: string | null
+  /** The admin on a shared Book, the creator of a private one: may change the cover. */
+  coverEditable: boolean
   /** The `BookEdits` values as the viewer sees the Book. */
   effective: EffectiveEdits
   isbnEditable: boolean
@@ -100,6 +111,7 @@ export function EditBookScreen({
   const { show } = useToast()
   const reportFailure = useReportFailure()
   const closeTask = useCloseTask()
+  const router = useRouter()
   const mounted = useSyncExternalStore(subscribeNothing, onClient, onServer)
   // Read once mounted: the server has no `sessionStorage`, and a hydrating
   // render must match its HTML.
@@ -114,6 +126,7 @@ export function EditBookScreen({
   const draft = edits ?? restored
   // Per key, the code of a field Save had rejected.
   const [marks, setMarks] = useState<Record<string, ErrorCode>>({})
+  const [coverChange, setCoverChange] = useState<CoverChange | undefined>(undefined)
   const [asking, setAsking] = useState(false)
   const [armed, setArmed] = useState(true)
   const [pending, startTransition] = useTransition()
@@ -134,16 +147,25 @@ export function EditBookScreen({
     }
   }, [])
 
-  const dirty = !isEmpty(draft)
+  const dirty = !isEmpty(draft) || coverChange !== undefined
   const { copy: copyChange, ...bookEdits } = draft
+
+  const setMark = (mark: string, code: ErrorCode | undefined) =>
+    setMarks((current) => {
+      if (current[mark] === code) return current
+      const { [mark]: _cleared, ...rest } = current
+      return code === undefined ? rest : { ...rest, [mark]: code }
+    })
 
   const update = (next: Draft, mark: string) => {
     setEdits(next)
     writeDraft(bookId, next)
-    if (marks[mark] !== undefined) {
-      const { [mark]: _cleared, ...rest } = marks
-      setMarks(rest)
-    }
+    setMark(mark, undefined)
+  }
+
+  const changeCover = (change: CoverChange | undefined) => {
+    setCoverChange(change)
+    setMark('cover', undefined)
   }
 
   const edit: OnEdit = (key, value) => update(setEdit(draft, key, value, effective[key]), key)
@@ -193,13 +215,25 @@ export function EditBookScreen({
     inFlight.current = true
     startTransition(async () => {
       try {
+        const cover =
+          coverChange === undefined
+            ? {}
+            : { cover: coverChange && { image: coverChange.image, corners: coverChange.corners } }
         const result = await settleAction(
-          editBookAction({ bookId, edits: bookEdits, copy: copyChange }),
+          editBookAction({ bookId, edits: bookEdits, copy: copyChange, ...cover }),
         )
         if (!result.ok && result.code === 'UNAUTHENTICATED' && guarding) {
           leaving.current = true
           signedOut.current = true
           setArmed(false)
+          return
+        }
+        if (!result.ok && isCoverCode(result.code)) {
+          // The edits and the copy change are saved; only the cover is left.
+          setEdits({})
+          clearDraft(bookId)
+          setMarks({ cover: result.code })
+          router.refresh()
           return
         }
         if (!result.ok) {
@@ -231,16 +265,20 @@ export function EditBookScreen({
         </>
       }
     >
-      <div className="flex items-start gap-4">
-        <div className="w-cover-detail shrink-0">
-          <Cover src={cover} title={title} />
-        </div>
-        <div className="flex min-w-0 flex-col gap-1">
-          <h2 className="text-heading-detail break-words text-text">{title}</h2>
-          {authors !== '' && <p className="text-body text-text">{authors}</p>}
-          {source !== null && <p className="text-meta text-text-muted">{source}</p>}
-        </div>
-      </div>
+      <CoverField
+        saved={cover}
+        title={title}
+        editable={coverEditable}
+        pending={pending}
+        change={coverChange}
+        onChange={changeCover}
+        mark={marks.cover}
+        onMark={(code) => setMark('cover', code)}
+      >
+        <h2 className="text-heading-detail break-words text-text">{title}</h2>
+        {authors !== '' && <p className="text-body text-text">{authors}</p>}
+        {source !== null && <p className="text-meta text-text-muted">{source}</p>}
+      </CoverField>
       {copy !== null && (
         <CopyFields
           saved={copy}

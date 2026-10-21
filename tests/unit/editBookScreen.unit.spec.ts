@@ -3,11 +3,14 @@ import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testi
 import { createElement, Fragment, type ComponentProps } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import type { CornerCropProps } from '@/app/(frontend)/components/cornerCrop/CornerCrop'
+import type { Corners } from '@/lib/catalogue/corners'
+
 const show = vi.fn()
 const dismiss = vi.fn()
 const editBookAction = vi.fn()
 // Back as the browser does it, so a close lands on the entry below.
-const router = { back: vi.fn(() => window.history.back()), replace: vi.fn() }
+const router = { back: vi.fn(() => window.history.back()), replace: vi.fn(), refresh: vi.fn() }
 
 vi.mock('next-intl', () => ({
   useTranslations: (namespace?: string) => (key: string) =>
@@ -22,6 +25,16 @@ vi.mock('@/app/(frontend)/books/[bookId]/edit/actions', () => ({ editBookAction 
 vi.mock('@/app/(frontend)/components/toast/ToastProvider', () => ({
   useToast: () => ({ show, dismiss }),
 }))
+// The crop step and the warp need a real canvas: the step hands back what the test says.
+let crop: CornerCropProps | undefined
+vi.mock('@/app/(frontend)/components/cornerCrop/CornerCrop', () => ({
+  CornerCrop: (props: CornerCropProps) => {
+    crop = props
+    return null
+  },
+}))
+const warpPreview = vi.fn()
+vi.mock('@/app/(frontend)/components/cornerCrop/warpPreview', () => ({ warpPreview }))
 
 const { installNavigationTracking, OVERLAY_TOKENS_KEY, TaskBase } =
   await import('@/app/(frontend)/components/navigation')
@@ -51,7 +64,9 @@ type Details = Pick<
   ComponentProps<typeof EditBookScreen>,
   'effective' | 'isbnEditable' | 'genreOptions' | 'genres' | 'themes'
 > &
-  Partial<Pick<ComponentProps<typeof EditBookScreen>, 'copy' | 'locations'>>
+  Partial<
+    Pick<ComponentProps<typeof EditBookScreen>, 'copy' | 'locations' | 'cover' | 'coverEditable'>
+  >
 
 /** A shared Book seen by someone who is not the admin. */
 const shared: Details = {
@@ -75,6 +90,7 @@ const open = (draft?: object, details: Details = shared) => {
         authors: 'A. Kirjoittaja',
         source: 'From Finna',
         cover: null,
+        coverEditable: false,
         copy: null,
         locations: [],
         ...details,
@@ -422,6 +438,104 @@ describe('EditBookScreen, the copy', () => {
     expect(screen.getByRole('button', { name: 'editBook.moreDetails' })).toBeTruthy()
     fireEvent.click(screen.getByRole('button', { name: 'task.close' }))
     expect(await discardAsked()).toBeTruthy()
+  })
+})
+
+describe('EditBookScreen, the cover', () => {
+  const corners: Corners = [
+    { x: 1, y: 1 },
+    { x: 9, y: 1 },
+    { x: 9, y: 14 },
+    { x: 1, y: 14 },
+  ]
+  const image = new Blob(['jpeg'], { type: 'image/jpeg' })
+  /** The admin on a shared Book, or the creator of a private one. */
+  const editable = (cover: string | null = null): Details => ({
+    ...shared,
+    cover,
+    coverEditable: true,
+  })
+  const button = (key: string) => screen.queryByRole('button', { name: `editBook.${key}` })
+  const choose = () => {
+    const input = document.querySelector<HTMLInputElement>('input[type="file"]')!
+    const file = new File(['photo'], 'photo.heic', { type: 'image/heic' })
+    fireEvent.change(input, { target: { files: [file] } })
+    expect(crop?.file).toBe(file)
+  }
+  const upload = async () => {
+    choose()
+    await act(async () => crop!.onUse({ image, corners }))
+    await waitFor(() => expect(document.querySelector('img')?.getAttribute('src')).toBe('blob:p'))
+  }
+
+  beforeEach(() => {
+    window.history.pushState({}, '', '/')
+    window.history.pushState({}, '', PATH)
+    window.sessionStorage.clear()
+    crop = undefined
+    warpPreview.mockResolvedValue(new Blob(['preview'], { type: 'image/jpeg' }))
+    Object.assign(URL, { createObjectURL: () => 'blob:p', revokeObjectURL: () => undefined })
+  })
+
+  afterEach(async () => {
+    cleanup()
+    vi.clearAllMocks()
+    await new Promise((resolve) => setTimeout(resolve, 50))
+  })
+
+  it('has no cover controls for someone who may not change the cover', () => {
+    open(undefined, { ...shared, cover: '/api/media/file/c.jpg' })
+
+    expect(button('addCover')).toBeNull()
+    expect(button('replaceCover')).toBeNull()
+    expect(button('removeCover')).toBeNull()
+    expect(document.querySelector('input[type="file"]')).toBeNull()
+  })
+
+  it('shows the straightened upload and saves its image and corners', async () => {
+    editBookAction.mockResolvedValue({ ok: true, data: null })
+    open(undefined, editable())
+    expect(button('removeCover')).toBeNull()
+    await upload()
+
+    expect(warpPreview).toHaveBeenCalledWith(image, corners)
+    expect(button('replaceCover')).toBeTruthy()
+    await waitFor(() => expect(guarded()).toBe(true))
+    save()
+    await waitFor(() => expect(window.location.pathname).toBe('/'))
+    expect(editBookAction).toHaveBeenCalledWith({ bookId: 7, edits: {}, cover: { image, corners } })
+    expect(show).toHaveBeenCalledWith({ kind: 'success', message: 'toast.saved' })
+  })
+
+  it('removes the saved cover on Save', async () => {
+    editBookAction.mockResolvedValue({ ok: true, data: null })
+    open(undefined, editable('/api/media/file/c.jpg'))
+    fireEvent.click(button('removeCover')!)
+
+    expect(button('addCover')).toBeTruthy()
+    expect(button('removeCover')).toBeNull()
+    save()
+    await waitFor(() =>
+      expect(editBookAction).toHaveBeenCalledWith({ bookId: 7, edits: {}, cover: null }),
+    )
+  })
+
+  it('shows an undecodable photo and a refused Save under the cover, with no toast', async () => {
+    editBookAction.mockResolvedValue({ ok: false, code: 'IMAGE_TOO_LARGE' })
+    open(undefined, editable())
+    choose()
+    act(() => crop!.onReject('NOT_AN_IMAGE'))
+    expect(screen.getByText('errors.NOT_AN_IMAGE')).toBeTruthy()
+
+    await upload()
+    expect(screen.queryByText('errors.NOT_AN_IMAGE')).toBeNull()
+    save()
+
+    expect(await screen.findByText('errors.IMAGE_TOO_LARGE')).toBeTruthy()
+    expect(show).not.toHaveBeenCalled()
+    expect(router.refresh).toHaveBeenCalled()
+    expect(window.location.pathname).toBe(PATH)
+    expect(document.querySelector('img')?.getAttribute('src')).toBe('blob:p')
   })
 })
 

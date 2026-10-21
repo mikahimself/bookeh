@@ -43,8 +43,9 @@ export type PendingShare = Chosen & { cover?: DownloadedCover }
  * and `id` (D-7: `NOT_FOUND` when `id` names a candidate the outcome lacks),
  * clipped so the promote's write and its D-8 comparison see the values
  * stored, and its raw metadata, with the candidate's cover stored by
- * `storeCover()` when the Book has none and the candidate has a `coverUrl`.
- * Never asks the sources; the cover is the only network call.
+ * `storeCover()` when the candidate has a `coverUrl`, unless the Book has a
+ * cover and the user is the admin, whose cover the promote keeps. Never asks
+ * the sources; the cover is the only network call.
  */
 export async function prepareShare(
   ctx: Context,
@@ -69,7 +70,7 @@ export async function prepareShare(
     limit: 1,
     pagination: false,
   })
-  if (!docs[0] || docs[0].cover != null) return pending
+  if (!docs[0] || (docs[0].cover != null && isAdmin(ctx.user))) return pending
   const cover = await storeCover(ctx, isbn13, candidate.coverUrl)
   return cover ? { ...pending, cover } : pending
 }
@@ -89,7 +90,10 @@ export async function prepareShare(
  * - The user's private Book with `pending`: promoted in place. It keeps its
  *   id and takes the candidate's values, with authors and series matched or
  *   created among shared rows; `visibility` becomes shared and the field hook
- *   clears `createdBy`.
+ *   clears `createdBy`. The admin's own cover row is shared in place the same
+ *   way, and the downloaded cover discarded; anyone else's cover is replaced
+ *   by the downloaded one, or by none, since a private upload never reaches
+ *   the shared Book.
  * - The user's private Book without `pending`: unchanged.
  * - None: `NOT_FOUND`.
  *
@@ -264,7 +268,8 @@ async function promote(tx: Context, bookId: number, pending: PendingShare): Prom
   const { payload } = tx.req
   const { candidate: best, raw, cover } = pending
   const own = await readBook(tx, bookId)
-  const overrides = isAdmin(tx.user) ? {} : differing(own, fromCandidate(best))
+  const admin = isAdmin(tx.user)
+  const overrides = admin ? {} : differing(own, fromCandidate(best))
 
   // As `ensureSharedBook()`: shared rows only, one after the other (AD-16).
   const authors: number[] = []
@@ -278,9 +283,14 @@ async function promote(tx: Context, bookId: number, pending: PendingShare): Prom
       ? null
       : (await findOrCreateByName(tx, 'series', 'shared', { name: best.series })).id
   const genres = await mapSubjectsToGenres(tx, raw)
-  let coverId: number | undefined
-  if (cover && own.cover == null) coverId = await attachCover(tx, cover, 'shared')
-  else if (cover) await discardCover(payload, cover)
+  let coverId: number | null
+  if (admin && own.cover != null) {
+    if (cover) await discardCover(payload, cover)
+    coverId = idOf(own.cover)
+    await shareCoverRow(tx, coverId)
+  } else {
+    coverId = cover ? await attachCover(tx, cover, 'shared') : null
+  }
 
   assertLive(tx)
   await payload.update({
@@ -297,7 +307,7 @@ async function promote(tx: Context, bookId: number, pending: PendingShare): Prom
       language: best.language ?? null,
       pages: best.pages ?? null,
       description: best.description ?? null,
-      ...(coverId !== undefined && { cover: coverId }),
+      cover: coverId,
       themes: best.themes,
       genres,
       source: best.source,
@@ -310,6 +320,17 @@ async function promote(tx: Context, bookId: number, pending: PendingShare): Prom
   // After the update: overrides exist only on shared Books.
   await upsertUserBook(tx, bookId, { overrides })
   await removeOrphans(tx, own)
+}
+
+/** The admin's private cover row becomes shared; the field hook clears `createdBy`. */
+async function shareCoverRow(tx: Context, id: number): Promise<void> {
+  assertLive(tx)
+  await tx.req.payload.update({
+    collection: 'media',
+    id,
+    data: { visibility: 'shared' },
+    ...system(tx),
+  })
 }
 
 /**
@@ -331,8 +352,9 @@ async function merge(tx: Context, ownId: number, sharedId: number): Promise<void
 
 /**
  * After a promote or a merge: the private authors and series `own` used, and
- * its cover's `media` row, each deleted when nothing references it. Shared
- * rows are never candidates; a private one an override keeps stays.
+ * its cover's `media` row (a non-admin's promote replaced it), each deleted
+ * when nothing references it. Shared rows are never candidates; a private
+ * one an override keeps stays.
  */
 async function removeOrphans(tx: Context, own: BookValues): Promise<void> {
   // One after the other: calls on one context never run concurrently (AD-16).

@@ -57,7 +57,8 @@ function effectiveEdits(book: EffectiveBook): EffectiveEdits {
  *
  * The page decides what More details may change: the ISBN on the viewer's
  * own private Book; the system genres there and, for the admin, on a shared
- * Book, with every system genre as the options.
+ * Book, with every system genre as the options. The cover may change where
+ * the genres may (`setCover()` keeps its own gate).
  */
 export default async function EditBookPage({
   params,
@@ -90,6 +91,7 @@ export default async function EditBookPage({
         authors={book.authors.map(({ name }) => name).join(', ')}
         source={source}
         cover={book.coverUrl}
+        coverEditable={genresEditable}
         effective={effectiveEdits(book)}
         isbnEditable={isbnEditable}
         genreOptions={genreOptions}
