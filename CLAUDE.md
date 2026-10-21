@@ -66,7 +66,9 @@ Follow the PRD's **Build Order** (replaces the old M1–M5). Each story should b
 - Metadata logic in `src/lib/metadata/`: one adapter per source, shared normaliser.
 - Frontend data access through Payload Local API in server components / server actions. No client-side REST calls except where a client component genuinely needs them (scanner → lookup).
 - Frontend styling: Tailwind CSS 4 with the tokens from DESIGN.md; overlays from Base UI wrappers (spine, Consistency Conventions).
-- Tests at a functional minimum: write a test where it is necessary and makes sense. One focused test of behaviour that can break beats tests that restate markup, class names, CSS or config. Playwright covers only scan-to-save and shop check (spine, Tests convention). In reviews, a finding that only asks for more tests needs a reason; otherwise reject or defer it.
+- Tests at a functional minimum. Add a test only when the story's acceptance criteria name the behaviour or the test guards a spine rule (access, transactions, Undo, migrations, a stated order such as Finna before Google). One focused test per behaviour that can break; no tests that restate markup, class names, CSS, config or a mocked call sequence. Playwright covers only scan-to-save and shop check (spine, Tests convention). In review triage, a finding that only asks for a test is rejected unless it names the criterion or the spine rule the test would guard.
+- Stories stay compact: a spec and diff Mika can scan in one review. A spec that warns `oversized` is split before building.
+- A story that changes a spine contract updates ARCHITECTURE-SPINE.md in the same commit. The update is one of the story's acceptance criteria, never a deferral.
 - Commit after each story. Conventional commit messages.
 - v1 runs on the tailnet only. Frontend users sign in (PRD F1); the admin role does not read users' private data (PRD FR-48). Token links instead of email for invites and resets (PRD FR-2, FR-5, FR-52).
 - When touching Payload admin component overrides, read the current Payload docs first — the API differs across 3.x versions.
