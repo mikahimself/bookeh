@@ -8,6 +8,7 @@ export type ErrorCode =
   | 'WRONG_CREDENTIALS'
   | 'NOT_FOUND'
   | 'VALIDATION'
+  | 'TOO_LONG'
   | 'INVALID_ISBN'
   | 'INTERNAL'
   | 'UNDO_FAILED'

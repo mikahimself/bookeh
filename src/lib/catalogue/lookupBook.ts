@@ -5,6 +5,7 @@ import { lookupSources } from '@/lib/metadata/lookup'
 import type { SourceId, SourceResult } from '@/lib/metadata/source'
 import type { Context } from '@/lib/payload/context'
 
+import { clipCandidate } from './clipCandidate'
 import { recordCoverPreview } from './coverPreview'
 import { findBookByIsbn } from './findBookByIsbn'
 import { findByName, type NamedCollection } from './findOrCreateByName'
@@ -105,14 +106,16 @@ export async function lookupBook(ctx: Context, target: LookupTarget): Promise<Lo
     case 'unavailable':
       return { kind: 'unavailable', failed: outcome.failed }
     case 'found': {
-      const pick = pickIndex(target.pick, outcome.candidates.length)
+      // The values a save stores (R6): shown, and matched, as they will be.
+      const candidates = outcome.candidates.map(clipCandidate)
+      const pick = pickIndex(target.pick, candidates.length)
       // `found` always carries a candidate, and `pickIndex` stays in range.
-      const picked = outcome.candidates[pick]!
+      const picked = candidates[pick]!
       // Every candidate's cover, so the edition picker shows them all (AD-10).
       recordCoverPreview(
         ctx,
         isbn13,
-        outcome.candidates.map(({ coverUrl }) => coverUrl),
+        candidates.map(({ coverUrl }) => coverUrl),
       )
       // One after the other: calls on one context never run concurrently (AD-16).
       const authors: Match[] = []
@@ -121,7 +124,7 @@ export async function lookupBook(ctx: Context, target: LookupTarget): Promise<Lo
         picked.series === undefined ? null : await sharedMatch(ctx, 'series', picked.series)
       return {
         kind: 'source',
-        candidates: outcome.candidates.map(toDraft),
+        candidates: candidates.map(toDraft),
         pick,
         matches: { authors, series },
       }

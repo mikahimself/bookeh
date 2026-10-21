@@ -11,10 +11,14 @@ import type { Undoable } from '@/lib/undo/undo'
  * default location. The input comes from the client, so anything but
  * `{ requestId, isbn13 }` strings, with an optional `pick` that is a
  * non-negative integer (the edition picked, D-7), is `VALIDATION` before
- * `saveCopy()` sees it. Every failure but a signed-out session reads as
+ * `saveCopy()` sees it. `NOT_FOUND` comes back as it is (R5): no source knows
+ * the ISBN any more, or the held Book is gone, and the client refreshes the
+ * Answer, which then says so; trying again would fail the same way while the
+ * `none` stays cached. Every other failure but a signed-out session reads as
  * `SAVE_FAILED`: to the person scanning they all mean "try again". The
  * `runAction()` log line for an unexpected error still happens; any other
- * code is logged here as a warning, so the folded code leaves a trace.
+ * failure, `NOT_FOUND` included, is logged here as a warning, so the code
+ * leaves a trace.
  */
 export async function saveCopyAction(input: unknown): Promise<ActionResult<Undoable<SaveResult>>> {
   const result = await runAction(async () => {
@@ -29,7 +33,7 @@ export async function saveCopyAction(input: unknown): Promise<ActionResult<Undoa
   })
   if (result.ok || result.code === 'UNAUTHENTICATED') return result
   if (result.code !== 'INTERNAL') logger().warn({ code: result.code }, 'saveCopyAction failed')
-  return { ok: false, code: 'SAVE_FAILED' }
+  return result.code === 'NOT_FOUND' ? result : { ok: false, code: 'SAVE_FAILED' }
 }
 
 function isSaveInput(

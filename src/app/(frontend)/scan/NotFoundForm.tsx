@@ -3,6 +3,8 @@
 import { useTranslations } from 'next-intl'
 import { useRef, useState, type FormEvent, type KeyboardEvent } from 'react'
 
+import type { ErrorCode } from '@/lib/errors'
+
 import { Button } from '../components/Button'
 import { ProgressLine } from '../components/ProgressLine'
 import { TextField } from '../components/TextField'
@@ -14,24 +16,23 @@ import { useAddToLibrary } from './useAddToLibrary'
 /**
  * The Not found Answer's form: Title (focused; Enter moves to Author) and
  * Author (Enter submits), then Add to library above Back. The text goes as
- * typed with the ISBN, if any; the service checks it, and a missing title or
- * author shows its message under the field, the text kept. The save, toast
- * and return are Add to library's (`useAddToLibrary()`). No `required`: the
- * browser's own bubbles would show instead.
+ * typed with the ISBN, if any; the service checks it, and a missing or too
+ * long title or author shows its message under the field (the field's code:
+ * `VALIDATION` is the required message, `TOO_LONG` "Too long."), the text
+ * kept and the first marked field focused. The save, toast and return are
+ * Add to library's (`useAddToLibrary()`). No `required`: the browser's own
+ * bubbles would show instead.
  */
 export function NotFoundForm({ isbn13, title }: { isbn13: string | null; title: string }) {
   const t = useTranslations()
   const { pending, add } = useAddToLibrary()
   const titleField = useRef<HTMLInputElement>(null)
   const authorField = useRef<HTMLInputElement>(null)
-  const [missing, setMissing] = useState<{ title: boolean; author: boolean }>({
-    title: false,
-    author: false,
-  })
+  const [marks, setMarks] = useState<{ title?: ErrorCode; author?: ErrorCode }>({})
 
   const submit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    setMissing({ title: false, author: false })
+    setMarks({})
     const typed = {
       title: titleField.current?.value ?? '',
       author: authorField.current?.value ?? '',
@@ -43,16 +44,21 @@ export function NotFoundForm({ isbn13, title }: { isbn13: string | null; title: 
         ),
       (failure) => {
         if (failure.code !== 'VALIDATION' || !failure.fields) return false
-        const marked = { title: 'title' in failure.fields, author: 'authors' in failure.fields }
-        if (!marked.title && !marked.author) return false
-        setMissing(marked)
+        const marked = { title: failure.fields.title, author: failure.fields.authors }
+        if (marked.title === undefined && marked.author === undefined) return false
+        setMarks(marked)
         // Back to the field to fix, with the keyboard up.
-        const field = marked.title ? titleField : authorField
+        const field = marked.title === undefined ? authorField : titleField
         field.current?.focus()
         return true
       },
     )
   }
+
+  const message = (
+    code: ErrorCode | undefined,
+    required: 'answer.titleRequired' | 'answer.authorRequired',
+  ) => (code === undefined ? undefined : t(code === 'TOO_LONG' ? 'errors.TOO_LONG' : required))
 
   const nextOnEnter = (event: KeyboardEvent<HTMLInputElement>) => {
     // The Enter that confirms an IME composition is not a move.
@@ -70,7 +76,7 @@ export function NotFoundForm({ isbn13, title }: { isbn13: string | null; title: 
           name="title"
           label={t('answer.title')}
           defaultValue={title}
-          error={missing.title ? t('answer.titleRequired') : undefined}
+          error={message(marks.title, 'answer.titleRequired')}
           autoFocus
           enterKeyHint="next"
           onKeyDown={nextOnEnter}
@@ -79,7 +85,7 @@ export function NotFoundForm({ isbn13, title }: { isbn13: string | null; title: 
           ref={authorField}
           name="author"
           label={t('answer.author')}
-          error={missing.author ? t('answer.authorRequired') : undefined}
+          error={message(marks.author, 'answer.authorRequired')}
           enterKeyHint="go"
         />
       </div>

@@ -112,6 +112,7 @@
     "WRONG_CREDENTIALS": "Väärä sähköposti tai salasana.",
     "NOT_FOUND": "Ei löytynyt.",
     "VALIDATION": "Tarkista merkityt kentät.",
+    "TOO_LONG": "Liian pitkä.",
     "INVALID_ISBN": "Ei ISBN-tunnus. Kolmetoista numeroa tai kymmenen.",
     "INTERNAL": "Ei onnistunut. Yritä uudelleen.",
     "UNDO_FAILED": "Kumoaminen ei onnistunut.",

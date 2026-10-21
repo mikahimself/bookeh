@@ -51,8 +51,8 @@ export type SaveResult = { bookId: number; copyId: number; savedTo: Named | null
  * gets the copy unchanged. A held Book's save never asks the sources.
  *
  * A `{ manual }` target (FR-12, FR-22, AD-4, AD-5) is normalised first by
- * `normaliseManual()` (`VALIDATION` on `title` and `authors`, then
- * `INVALID_ISBN`, before any read). Then, in the save's transaction: with an
+ * `normaliseManual()` (`VALIDATION` marking `title` and `authors` blank or
+ * `TOO_LONG`, then `INVALID_ISBN`, before any read). Then, in the save's transaction: with an
  * ISBN, a Book the user holds for it (shared, else their own private Book)
  * gets the copy and the typed values are dropped: one ISBN leads to one Book.
  * Otherwise `createPrivateBook()` makes a private Book from the typed title

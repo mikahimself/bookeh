@@ -19,6 +19,7 @@ const codes = Object.keys({
   WRONG_CREDENTIALS: true,
   NOT_FOUND: true,
   VALIDATION: true,
+  TOO_LONG: true,
   INVALID_ISBN: true,
   INTERNAL: true,
   UNDO_FAILED: true,

@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload'
 
 import { catalogueAccess } from '@/access/catalogue'
+import { limits } from '@/fields/limits'
 import { nameKeyField } from '@/fields/nameKey'
 import { sortNameField } from '@/fields/sortName'
 import { visibilityFields } from '@/fields/visibility'
@@ -20,7 +21,7 @@ export const Authors: CollectionConfig = {
     defaultColumns: ['name', 'visibility', 'createdBy'],
   },
   fields: [
-    { name: 'name', type: 'text', required: true, maxLength: 200 },
+    { name: 'name', type: 'text', required: true, maxLength: limits.name },
     nameKeyField(),
     sortNameField(),
     ...visibilityFields(),
