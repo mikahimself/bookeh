@@ -1,7 +1,7 @@
 import { isAdmin } from '@/access/roles'
 import { OVERRIDABLE_BOOK_FIELDS, type OverridableBookField } from '@/fields/bookFields'
 import { type BookOverrides, mergeUserBook, upsertUserBook } from '@/lib/books/upsertUserBook'
-import { moveCopies } from '@/lib/copies/moveCopies'
+import { moveCopiesToBook } from '@/lib/copies/moveCopiesToBook'
 import { DomainError } from '@/lib/errors'
 import { heldOutcome } from '@/lib/metadata/lookup'
 import type { SourceResult } from '@/lib/metadata/source'
@@ -319,7 +319,7 @@ async function promote(tx: Context, bookId: number, pending: PendingShare): Prom
 async function merge(tx: Context, ownId: number, sharedId: number): Promise<void> {
   const own = await readBook(tx, ownId)
   const overrides = isAdmin(tx.user) ? {} : differing(own, fromBook(await readBook(tx, sharedId)))
-  await moveCopies(tx, ownId, sharedId)
+  await moveCopiesToBook(tx, ownId, sharedId)
   await mergeUserBook(tx, ownId, sharedId, overrides)
   // Postgres would null a remaining reference on delete; the throw rolls the save back.
   if (!(await isUnreferenced(tx, 'books', ownId))) {
