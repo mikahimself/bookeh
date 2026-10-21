@@ -441,6 +441,8 @@ type EntryLine = { entryId: number; wishlist: Named; forPerson: Named | null }
 type Holdings = { copies: CopyLine[]; entries: EntryLine[] } // open entries only
 
 // src/lib/catalogue
+type Point = { x: number; y: number } // image pixels, origin top left
+type Corners = readonly [tl: Point, tr: Point, br: Point, bl: Point] // a cover's corners in the uploaded image, clockwise; setCover()
 type Match = { name: string; id: number | null } // null: will be created
 type Draft = Omit<SourceResult, 'raw' | 'coverUrl'> & { hasCover: boolean }
 type LookupResult =

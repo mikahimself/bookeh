@@ -118,6 +118,10 @@
     "UNDO_FAILED": "Kumoaminen ei onnistunut.",
     "SAVE_FAILED": "Tallennus ei onnistunut. Yritä uudelleen.",
     "RATE_LIMITED": "Liikaa hakuja. Odota hetki.",
+    "NOT_AN_IMAGE": "Ei kuva.",
+    "IMAGE_TOO_LARGE": "Kuva on liian suuri.",
+    "INVALID_CORNERS": "Kulmat eivät muodosta kantta.",
+    "COVER_FAILED": "Kannen tallennus ei onnistunut.",
     "NO_CONNECTION": "Ei yhteyttä.",
     "APP_UPDATED": "bookeh päivittyi."
   }

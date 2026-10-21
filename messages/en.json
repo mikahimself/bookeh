@@ -118,6 +118,10 @@
     "UNDO_FAILED": "Couldn't undo.",
     "SAVE_FAILED": "Couldn't save. Try again.",
     "RATE_LIMITED": "Too many lookups. Wait a moment.",
+    "NOT_AN_IMAGE": "Not an image.",
+    "IMAGE_TOO_LARGE": "Image too large.",
+    "INVALID_CORNERS": "Corners don't form a cover.",
+    "COVER_FAILED": "Couldn't save cover.",
     "NO_CONNECTION": "No connection.",
     "APP_UPDATED": "bookeh was updated."
   }

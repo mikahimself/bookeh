@@ -165,11 +165,9 @@ export async function fetchCover(coverUrl: string, policy: CoverPolicy): Promise
 /**
  * Spine, AD-14: the save's cover step, for the chosen candidate's cover URL
  * from the outcome the save resolved (never from the client): `fetchCover()`,
- * then the file in the media directory under a temporary name renamed into
- * place, so a partial file never carries a final name. Runs before the save's
- * transaction opens (a plain `Error` inside one). Every download or write
- * failure is one logged warning and `undefined`: a Book is saved without a
- * cover rather than not at all.
+ * then `writeMediaFile()`. Runs before the save's transaction opens (a plain
+ * `Error` inside one). Every download or write failure is one logged warning
+ * and `undefined`: a Book is saved without a cover rather than not at all.
  */
 export async function storeCover(
   ctx: Context,
@@ -194,42 +192,58 @@ export async function storeCover(
   }
 
   const { bytes, ext, mimeType, width, height } = fetched
-  let tmp: string | undefined
-  let stage = 'write'
   try {
-    const dir = mediaDir(payload)
-    await fs.mkdir(dir, { recursive: true })
-    const id = randomUUID()
-    tmp = path.join(dir, `.${id}.tmp`)
-    await fs.writeFile(tmp, bytes, { flag: 'wx' })
-
-    stage = 'rename'
-    const filename = `${id}.${ext}`
-    await fs.rename(tmp, path.join(dir, filename))
-    tmp = undefined
-
+    const filename = await writeMediaFile(payload, bytes, ext)
     return { filename, mimeType, filesize: bytes.length, width, height }
   } catch (err) {
-    payload.logger.warn({ isbn13, host, err }, `Cover download failed: ${reasonOf(err, stage)}`)
-    // A leftover the sweep would remove anyway, so a failed unlink is not reported.
-    if (tmp) await fs.unlink(tmp).catch(() => {})
+    payload.logger.warn({ isbn13, host, err }, `Cover download failed: ${reasonOf(err, 'write')}`)
     return undefined
   }
 }
 
 /**
- * The `media` row for a downloaded cover, created in the caller's
- * transaction. Payload stores the row and writes no file: the file is
- * already in place (`filesRequiredOnCreate: false`, system create). The row
- * is shared: both callers (`ensureSharedBook`, `sharePrivateBook`) attach it
- * to a shared Book.
+ * Spine, AD-14: writes `bytes` to the media directory as `<uuid>.<ext>`,
+ * under a temporary name renamed into place, so a partial file never carries
+ * a final name. Returns the final name. On failure the temporary file is
+ * removed (a failed unlink is left to the sweep) and the error rethrown.
  */
-export async function attachCover(tx: Context, cover: DownloadedCover): Promise<number> {
+export async function writeMediaFile(
+  payload: Payload,
+  bytes: Buffer,
+  ext: string,
+): Promise<string> {
+  const dir = mediaDir(payload)
+  await fs.mkdir(dir, { recursive: true })
+  const id = randomUUID()
+  const tmp = path.join(dir, `.${id}.tmp`)
+  try {
+    await fs.writeFile(tmp, bytes, { flag: 'wx' })
+    const filename = `${id}.${ext}`
+    await fs.rename(tmp, path.join(dir, filename))
+    return filename
+  } catch (err) {
+    await fs.unlink(tmp).catch(() => {})
+    throw err
+  }
+}
+
+/**
+ * The `media` row for a cover file already written, created in the caller's
+ * transaction. Payload stores the row and writes no file: the file is
+ * already in place (`filesRequiredOnCreate: false`, system create).
+ * `visibility` is the Book's (AD-14): a private row takes `createdBy` from
+ * `tx`'s user.
+ */
+export async function attachCover(
+  tx: Context,
+  cover: DownloadedCover,
+  visibility: 'shared' | 'private',
+): Promise<number> {
   assertLive(tx)
   const { filename, mimeType, filesize, width, height } = cover
   const doc = await tx.req.payload.create({
     collection: 'media',
-    data: { filename, mimeType, filesize, width, height, visibility: 'shared' },
+    data: { filename, mimeType, filesize, width, height, visibility },
     ...system(tx),
   })
   return doc.id
@@ -251,8 +265,11 @@ export async function deleteMediaRow(tx: Context, id: number): Promise<void> {
   })
 }
 
-/** Removes a downloaded cover's file; one already gone is fine. */
-export async function discardCover(payload: Payload, cover: DownloadedCover): Promise<void> {
+/** Removes a cover's file; one already gone is fine. */
+export async function discardCover(
+  payload: Payload,
+  cover: Pick<DownloadedCover, 'filename'>,
+): Promise<void> {
   try {
     await fs.unlink(path.join(mediaDir(payload), cover.filename))
   } catch (err) {
@@ -261,7 +278,7 @@ export async function discardCover(payload: Payload, cover: DownloadedCover): Pr
 }
 
 // The names this app writes: covers and Payload uploads (`<uuid>.<ext>`, see
-// `Media.ts`) and `storeCover()`'s temporary files.
+// `Media.ts`) and `writeMediaFile()`'s temporary files.
 const UUID = '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
 const APP_NAME = new RegExp(`^(?:${UUID}\\.(?:jpe?g|png|webp)|\\.${UUID}\\.tmp)$`)
 

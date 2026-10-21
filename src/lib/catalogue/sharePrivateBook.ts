@@ -279,7 +279,7 @@ async function promote(tx: Context, bookId: number, pending: PendingShare): Prom
       : (await findOrCreateByName(tx, 'series', 'shared', { name: best.series })).id
   const genres = await mapSubjectsToGenres(tx, raw)
   let coverId: number | undefined
-  if (cover && own.cover == null) coverId = await attachCover(tx, cover)
+  if (cover && own.cover == null) coverId = await attachCover(tx, cover, 'shared')
   else if (cover) await discardCover(payload, cover)
 
   assertLive(tx)

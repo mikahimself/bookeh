@@ -2088,6 +2088,7 @@ So that covers are fixed where the other fields are (D-4, UX-DR47a).
 **And** the file input accepts any image (`image/*`); HEIC from an iPhone is decoded and re-encoded by the browser in the crop step, so only the shrunk JPEG is uploaded
 **And** Save uploads through `setCover` in the same save; Remove cover takes effect on Save; neither has Undo
 **And** a rejected file shows "Not an image." or "Image too large." under the cover
+**And** promoting a private Book with an uploaded cover never leaves a private cover on the shared Book: the admin's cover row becomes shared, anyone else's is replaced by the source's cover and deleted when unreferenced (deferred from Story 4.12)
 
 ## Epic 5: Browse, organise and move my collection
 

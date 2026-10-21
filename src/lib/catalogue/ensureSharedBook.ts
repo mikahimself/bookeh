@@ -82,7 +82,7 @@ export async function ensureSharedBook(
     const series = matchedSeries?.id
     const createdSeries = matchedSeries?.created ? matchedSeries.id : undefined
     const genres = await mapSubjectsToGenres(tx, raw)
-    const coverId = cover === undefined ? undefined : await attachCover(tx, cover)
+    const coverId = cover === undefined ? undefined : await attachCover(tx, cover, 'shared')
 
     assertLive(tx)
     const book = await payload.create({

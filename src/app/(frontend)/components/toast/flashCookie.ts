@@ -25,6 +25,10 @@ const codes = Object.keys({
   UNDO_FAILED: true,
   SAVE_FAILED: true,
   RATE_LIMITED: true,
+  NOT_AN_IMAGE: true,
+  IMAGE_TOO_LARGE: true,
+  INVALID_CORNERS: true,
+  COVER_FAILED: true,
   NO_CONNECTION: true,
   APP_UPDATED: true,
 } satisfies Record<ErrorCode, true>)

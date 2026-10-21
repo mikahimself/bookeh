@@ -12,6 +12,10 @@ const nextConfig: NextConfig = {
   distDir: process.env.NEXT_DIST_DIR || '.next',
   // Emits .next/standalone for the production Docker image (see Dockerfile).
   output: 'standalone',
+  experimental: {
+    // Cover upload (AD-14): a 5 MiB image plus the multipart overhead.
+    serverActions: { bodySizeLimit: '6mb' },
+  },
   images: {
     localPatterns: [
       {

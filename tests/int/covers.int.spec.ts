@@ -329,7 +329,7 @@ describe('covers', () => {
       width: WIDTH,
       height: HEIGHT,
     }
-    mediaIds.push(await attachCover(asA, cover))
+    mediaIds.push(await attachCover(asA, cover, 'shared'))
     return cover
   }
 
