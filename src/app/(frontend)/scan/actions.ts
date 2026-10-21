@@ -1,5 +1,6 @@
 'use server'
 
+import type { CandidateId } from '@/lib/catalogue/pick'
 import { saveCopy, type SaveResult } from '@/lib/catalogue/saveCopy'
 import { DomainError, logger, runAction, type ActionResult, type ErrorCode } from '@/lib/errors'
 import { requireUserOrThrow } from '@/lib/payload/context'
@@ -10,12 +11,15 @@ import type { Undoable } from '@/lib/undo/undo'
  * the In library Answer (FR-20): an owned copy of the ISBN's Book at the
  * default location. The input comes from the client, so anything but
  * `{ requestId, isbn13 }` strings, with an optional `pick` that is a
- * non-negative integer (the edition picked, D-7), is `VALIDATION` before
- * `saveCopy()` sees it. `NOT_FOUND` comes back as it is (R5): no source knows
- * the ISBN any more, or the held Book is gone, and the client refreshes the
- * Answer, which then says so; trying again would fail the same way while the
- * `none` stays cached. Every other failure but a signed-out session reads as
- * `SAVE_FAILED`: to the person scanning they all mean "try again". The
+ * non-negative integer (the edition picked, D-7) and an optional `candidate`
+ * of non-empty `source` and `recordId` strings (its identity, AD-11), is
+ * `VALIDATION` before `saveCopy()` sees it. `NOT_FOUND` comes back as it is
+ * (R5): no source knows the ISBN any more, the candidate shown has gone, or
+ * the held Book is gone, and the client refreshes the Answer, which then
+ * shows what the server holds now. When no source knows the ISBN, trying
+ * again would fail the same way while the `none` stays cached. Every other
+ * failure but a signed-out session reads as `SAVE_FAILED`: to the person
+ * scanning they all mean "try again". The
  * `runAction()` log line for an unexpected error still happens; any other
  * failure, `NOT_FOUND` included, is logged here as a warning, so the code
  * leaves a trace.
@@ -24,10 +28,16 @@ export async function saveCopyAction(input: unknown): Promise<ActionResult<Undoa
   const result = await runAction(async () => {
     const ctx = await requireUserOrThrow()
     if (!isSaveInput(input)) throw new DomainError('VALIDATION')
-    const { requestId, isbn13, pick } = input
+    const { requestId, isbn13, pick, candidate } = input
     return saveCopy(ctx, {
       requestId,
-      target: { isbn13, ...(pick !== undefined && { pick }) },
+      target: {
+        isbn13,
+        ...(pick !== undefined && { pick }),
+        ...(candidate !== undefined && {
+          candidate: { source: candidate.source, recordId: candidate.recordId },
+        }),
+      },
       save: { kind: 'copy' },
     })
   })
@@ -38,13 +48,22 @@ export async function saveCopyAction(input: unknown): Promise<ActionResult<Undoa
 
 function isSaveInput(
   input: unknown,
-): input is { requestId: string; isbn13: string; pick?: number } {
+): input is { requestId: string; isbn13: string; pick?: number; candidate?: CandidateId } {
   if (typeof input !== 'object' || input === null) return false
-  const { requestId, isbn13, pick } = input as Record<string, unknown>
+  const { requestId, isbn13, pick, candidate } = input as Record<string, unknown>
   return (
     typeof requestId === 'string' &&
     typeof isbn13 === 'string' &&
-    (pick === undefined || (typeof pick === 'number' && Number.isInteger(pick) && pick >= 0))
+    (pick === undefined || (typeof pick === 'number' && Number.isInteger(pick) && pick >= 0)) &&
+    (candidate === undefined || isCandidateId(candidate))
+  )
+}
+
+function isCandidateId(value: unknown): value is CandidateId {
+  if (typeof value !== 'object' || value === null) return false
+  const { source, recordId } = value as Record<string, unknown>
+  return (
+    typeof source === 'string' && source !== '' && typeof recordId === 'string' && recordId !== ''
   )
 }
 

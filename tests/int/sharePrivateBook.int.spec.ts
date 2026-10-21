@@ -18,6 +18,7 @@ import {
 
 import { upsertUserBook } from '@/lib/books/upsertUserBook'
 import { mediaDir } from '@/lib/catalogue/covers'
+import { DomainError } from '@/lib/errors'
 import { saveCopy, type SaveInput } from '@/lib/catalogue/saveCopy'
 import type { Context } from '@/lib/payload/context'
 import { heldOutcome, lookupSources } from '@/lib/metadata/lookup'
@@ -51,6 +52,7 @@ const found = (candidate: Partial<SourceResult> & { isbn13: string }): SourcesOu
       subjects: [],
       themes: ['sota'],
       source: 'finna',
+      recordId: 'finna.1',
       raw: { finna: {} },
       ...candidate,
     },
@@ -265,6 +267,25 @@ describe('saveCopy of a held private Book', () => {
     expect((await bookById(own.id)).publisher ?? null).toBeNull()
     const [row] = await rowsOf(user)
     expect(row).toMatchObject({ overridden: ['title', 'publisher'], publisher: 'Otava' })
+  })
+
+  it('promotes with the picked candidate, or not at all when the one shown has gone', async () => {
+    const { ctx } = await freshUser()
+    const isbn = randomIsbn()
+    const own = await privateBook(ctx, isbn, 'T1', `Minna Canth ${suffix()}`)
+    const outcome = found({ isbn13: isbn })
+    if (outcome.kind !== 'found') throw new Error('unreachable')
+    outcome.candidates.push({ ...outcome.candidates[0]!, title: 'T3', recordId: 'finna.2' })
+    vi.mocked(heldOutcome).mockReturnValue(outcome)
+
+    const gone = { source: 'finna', recordId: 'finna.gone' }
+    await expect(
+      saveCopy(ctx, { ...isbnInput(isbn), target: { isbn13: isbn, pick: 1, candidate: gone } }),
+    ).rejects.toMatchObject(new DomainError('NOT_FOUND'))
+    expect(await bookById(own.id)).toEqual(own)
+
+    await saveCopy(ctx, { ...isbnInput(isbn), target: { isbn13: isbn, pick: 1 } })
+    expect(await bookById(own.id)).toMatchObject({ title: 'T3', visibility: 'shared' })
   })
 
   it('clips over-long source values when it promotes', async () => {

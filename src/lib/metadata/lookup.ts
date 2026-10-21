@@ -16,6 +16,9 @@ export const CACHE_SIZE = 500
 export const FOUND_TTL_MS = 24 * 60 * 60 * 1000
 // Short: a source can answer a spurious "no match" during an outage.
 export const NONE_TTL_MS = 10 * 60 * 1000
+// Short: a `found` merged while a source failed lacks that source's gap-fill,
+// but holds long enough for the Answer's save (AD-11).
+export const PARTIAL_TTL_MS = 5 * 60 * 1000
 
 type CacheEntry = { outcome: SourcesOutcome; expiresAt: number }
 type BreakerEntry = { failures: number; openUntil: number }
@@ -39,8 +42,9 @@ function cached(isbn13: string): SourcesOutcome | undefined {
 /**
  * Spine, AD-5: the server-held outcome for a normalised ISBN-13, read from the
  * in-process cache alone: `undefined` on a miss or an expired entry, and never
- * a source call; a hit refreshes the entry's recency, as a lookup's does. Only `found` and `none` are ever cached, so those are the
- * only kinds it returns. The save path reads it to share a private Book
+ * a source call; a hit refreshes the entry's recency, as a lookup's does. Only
+ * `found` (a partial one included) and `none` are ever cached, so those are
+ * the only kinds it returns. The save path reads it to share a private Book
  * (FR-12, D-8) without asking the sources.
  */
 export function heldOutcome(isbn13: string): SourcesOutcome | undefined {
@@ -107,8 +111,10 @@ async function ask(source: Source, isbn13: string): Promise<SourceResult[] | und
  * Asks every source for a normalised ISBN-13 (AD-9). `found` holds one candidate per
  * record of the first source with records, each gap-filled from the other sources in
  * source order; `none` only when every source answered with no records; otherwise
- * `unavailable`, naming the failed sources. Only outcomes reached with no source failing
- * are cached. Never throws.
+ * `unavailable`, naming the failed sources. A `found` or `none` reached with no source
+ * failing is cached (`FOUND_TTL_MS`, `NONE_TTL_MS`); a `found` merged while a source
+ * failed is cached for `PARTIAL_TTL_MS`, so the save after the Answer uses the outcome
+ * the Answer showed (AD-11); `unavailable` never is. Never throws.
  */
 export async function lookupSources(isbn13: string): Promise<SourcesOutcome> {
   const hit = cached(isbn13)
@@ -140,6 +146,6 @@ export async function lookupSources(isbn13: string): Promise<SourcesOutcome> {
     candidates: merged.map(({ result }) => result),
     raw: merged[0].raw,
   }
-  if (failed.length === 0) remember(isbn13, outcome, FOUND_TTL_MS)
+  remember(isbn13, outcome, failed.length === 0 ? FOUND_TTL_MS : PARTIAL_TTL_MS)
   return outcome
 }

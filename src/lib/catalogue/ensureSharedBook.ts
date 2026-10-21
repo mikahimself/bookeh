@@ -1,38 +1,31 @@
 import { normaliseIsbn } from '@/fields/isbn'
-import { DomainError } from '@/lib/errors'
-import { lookupSources } from '@/lib/metadata/lookup'
 import type { Context } from '@/lib/payload/context'
 import { assertLive, onRollback, withTransaction } from '@/lib/payload/transaction'
 import type { Restore, Undone } from '@/lib/undo/undo'
 
-import { clipCandidate } from './clipCandidate'
 import { attachCover, discardCover, type DownloadedCover } from './covers'
 import { findOrCreateByName, type FoundOrCreated } from './findOrCreateByName'
 import { isUnreferenced } from './isUnreferenced'
 import { mapSubjectsToGenres } from './mapSubjectsToGenres'
-import { pickIndex } from './pick'
+import type { Chosen } from './pick'
 
 /**
- * Spine, AD-5 and FR-18: the shared Book for an ISBN, created from the
- * server-held source outcome when there is none. Values come only from
- * `lookupSources()` (the in-process cache, the sources again on a miss),
- * never from the client, which sends at most the index `pick` of the
- * candidate to use (`pickIndex()`: none or out of range is the best). The
- * Book keeps the ISBN asked for, and its `rawMetadata` is the outcome's with
- * the picked candidate's cover URL. The candidate's text is clipped to the
- * field limits first (`clipCandidate()`, R6), so an over-long source value
- * never fails the write. An existing shared Book is returned as it is: no
- * source call, no write (re-fetch is admin-only, FR-19). Authors and series
- * are matched or created among shared rows only, so a shared Book references
- * shared records only (AD-4).
+ * Spine, AD-5 and FR-18: the shared Book for an ISBN, created from `chosen`
+ * when there is none. `chosen` is the candidate `chooseCandidate()` took from
+ * the outcome the save resolved before its transaction opened (AD-11), so no
+ * source is asked here and no value comes from the client. The Book keeps the
+ * ISBN asked for, and its `rawMetadata` is `chosen.raw`. The caller has
+ * clipped the candidate to the field limits (R6), so an over-long source
+ * value never fails the write. An existing shared Book is returned as it is:
+ * no write (re-fetch is admin-only, FR-19). Authors and series are matched or
+ * created among shared rows only, so a shared Book references shared records
+ * only (AD-4).
  *
- * `INVALID_ISBN` before any read; `NOT_FOUND` when no source knows the ISBN;
- * a plain `Error` (logged `INTERNAL`) when a source could not be asked. Runs
- * in the caller's transaction or one of its own (AD-16). A lost race between
- * two concurrent creates surfaces as the unique index's `ValidationError`,
- * unchanged (AD-19).
+ * `INVALID_ISBN` before any read. Runs in the caller's transaction or one of
+ * its own (AD-16). A lost race between two concurrent creates surfaces as the
+ * unique index's `ValidationError`, unchanged (AD-19).
  *
- * `cover` is the file `downloadCover()` stored before the transaction opened
+ * `cover` is the file `storeCover()` stored before the transaction opened
  * (AD-14): a created Book gets its `media` row in this transaction. The file
  * is removed when the transaction rolls back, and at once when a shared Book
  * already exists.
@@ -50,8 +43,8 @@ import { pickIndex } from './pick'
 export async function ensureSharedBook(
   ctx: Context,
   isbn13: string,
+  chosen: Chosen,
   cover?: DownloadedCover,
-  pick?: number,
 ): Promise<Undone<FoundOrCreated>> {
   const isbn = normaliseIsbn(isbn13)
 
@@ -74,13 +67,7 @@ export async function ensureSharedBook(
       return { data: { id: docs[0].id, created: false }, restore: async () => {} }
     }
 
-    const outcome = await lookupSources(isbn)
-    if (outcome.kind === 'none') throw new DomainError('NOT_FOUND')
-    if (outcome.kind === 'unavailable') {
-      throw new Error(`Sources unavailable: ${outcome.failed.join(', ')}`)
-    }
-    // `found` always holds at least one candidate, and `pickIndex` stays in range.
-    const picked = clipCandidate(outcome.candidates[pickIndex(pick, outcome.candidates.length)]!)
+    const { candidate: picked, raw } = chosen
 
     // One after the other: calls on one context never run concurrently (AD-16).
     const authors: number[] = []
@@ -97,7 +84,7 @@ export async function ensureSharedBook(
         : await findOrCreateByName(tx, 'series', 'shared', { name: picked.series })
     const series = matchedSeries?.id
     const createdSeries = matchedSeries?.created ? matchedSeries.id : undefined
-    const genres = await mapSubjectsToGenres(tx, outcome.raw)
+    const genres = await mapSubjectsToGenres(tx, raw)
     const coverId = cover === undefined ? undefined : await attachCover(tx, cover)
 
     assertLive(tx)
@@ -119,8 +106,7 @@ export async function ensureSharedBook(
         themes: picked.themes,
         genres,
         source: picked.source,
-        // Only the cover differs per Finna candidate: the record names the one saved.
-        rawMetadata: { ...outcome.raw, coverUrl: picked.coverUrl ?? null },
+        rawMetadata: raw,
         visibility: 'shared',
       },
       ...system,

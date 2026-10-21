@@ -91,6 +91,7 @@ describe('google.lookupByIsbn', () => {
         themes: [],
         coverUrl: `${full.volumeInfo.imageLinks!.thumbnail.replace(/^http:/, 'https:')}&fife=w2000`,
         source: 'google',
+        recordId: '3Wf_ffkFQmgC',
         raw: { google: body },
       },
     ])

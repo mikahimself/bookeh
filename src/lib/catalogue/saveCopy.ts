@@ -1,14 +1,17 @@
 import { normaliseIsbn } from '@/fields/isbn'
 import type { Named } from '@/lib/books/effectiveBook'
 import { createCopy } from '@/lib/copies/createCopy'
+import { DomainError } from '@/lib/errors'
+import { lookupSources } from '@/lib/metadata/lookup'
 import type { Context } from '@/lib/payload/context'
 import * as gateway from '@/lib/payload/gateway'
 import { type Undoable, type Undone, withUndo } from '@/lib/undo/undo'
 
-import { downloadCover } from './covers'
+import { storeCover } from './covers'
 import { createPrivateBook, type ManualEntry, normaliseManual } from './createPrivateBook'
 import { ensureSharedBook } from './ensureSharedBook'
 import { findBookByIsbn } from './findBookByIsbn'
+import { type CandidateId, chooseCandidate } from './pick'
 import { oncePerRequest } from './saveRequests'
 import { prepareShare, settleHeldBook } from './sharePrivateBook'
 
@@ -18,7 +21,7 @@ import { prepareShare, settleHeldBook } from './sharePrivateBook'
 
 export type SaveInput = {
   requestId: string
-  target: { isbn13: string; pick?: number } | { manual: ManualEntry }
+  target: { isbn13: string; pick?: number; candidate?: CandidateId } | { manual: ManualEntry }
   save: { kind: 'copy' }
 }
 
@@ -31,19 +34,23 @@ export type SaveResult = { bookId: number; copyId: number; savedTo: Named | null
  *
  * An `{ isbn13 }` target is normalised first (`INVALID_ISBN` before any
  * read). The Book is the shared Book with the ISBN, else the user's own
- * private Book with it, else a shared Book `ensureSharedBook()` creates from
- * the server-held source outcome, its cover downloaded before the
- * transaction opens (AD-14). Another user's private Book is never used.
- * `pick` is the index of the source candidate that Book is made from (D-7):
- * `downloadCover()` and `ensureSharedBook()` apply `pickIndex()`, so none or
- * one out of range is the best, and the Book keeps the ISBN asked for. Only
- * that creation reads it: a Book found, held, shared or merged ignores it.
+ * private Book with it, else a shared Book `ensureSharedBook()` creates.
+ * Another user's private Book is never used. For that creation the save
+ * resolves the sources' outcome once, before the transaction opens:
+ * `lookupSources()`, which answers from the in-process cache and asks the
+ * sources only on a miss (AD-9, AD-11). No source is called inside the
+ * transaction. `chooseCandidate()` takes the candidate (D-7): the one with
+ * `candidate`'s `source` and `recordId`, or `NOT_FOUND` when the outcome
+ * lacks it, never another one; without `candidate`, `pick` by `pickIndex()`
+ * (none or out of range is the best). Its cover is stored by `storeCover()`
+ * before the transaction opens (AD-14), and the Book keeps the ISBN asked for.
  *
  * A held Book goes through `settleHeldBook()` in the save's transaction
  * (FR-12, AD-4, AD-5, D-8). The user's private Book is shared in place when
  * the in-process cache holds a `found` outcome for the ISBN
  * (`prepareShare()`, which also stores the candidate's cover beforehand when
- * the Book has none): it keeps its id and takes the best candidate's values.
+ * the Book has none): it keeps its id and takes the values of the candidate
+ * `chooseCandidate()` takes for `pick` and `candidate`.
  * When a shared Book with the ISBN exists and the user also has a private
  * one, the private Book merges into it: its copies and the user's row move,
  * and it is deleted. Either way the user's differing hand-entered values
@@ -66,10 +73,11 @@ export type SaveResult = { bookId: number; copyId: number; savedTo: Named | null
  * `VALIDATION` before any read.
  *
  * `saveCopy` opens the transaction itself and cannot be called inside one:
- * `withUndo()` refuses. Errors pass through unchanged (`NOT_FOUND`, a plain
- * `Error` when the sources are unavailable, `createCopy()`'s
- * `ValidationError`); a rollback removes every row written and the
- * downloaded cover file.
+ * `withUndo()` refuses. Errors pass through unchanged (`NOT_FOUND` when no
+ * source knows the ISBN or the candidate has gone, with nothing written and
+ * no cover stored; a plain `Error` when the sources are unavailable;
+ * `createCopy()`'s `ValidationError`); a rollback removes every row written
+ * and the stored cover file.
  *
  * Undo (AD-11, AD-20): the transaction is `withUndo()`'s, so the result
  * carries an `undoToken` and the whole seconds left on it, and `undo()` with
@@ -107,17 +115,25 @@ async function save(ctx: Context, input: SaveInput): Promise<Undoable<SaveResult
 
   const held = await findBookByIsbn(ctx, isbn13)
   if (!held) {
-    const cover = await downloadCover(ctx, isbn13, undefined, target.pick)
+    // AD-11: the one outcome this save uses, resolved before the transaction.
+    const outcome = await lookupSources(isbn13)
+    if (outcome.kind === 'none') throw new DomainError('NOT_FOUND')
+    if (outcome.kind === 'unavailable') {
+      throw new Error(`Sources unavailable: ${outcome.failed.join(', ')}`)
+    }
+    const chosen = chooseCandidate(outcome, target.pick, target.candidate)
+    const { coverUrl } = chosen.candidate
+    const cover = coverUrl === undefined ? undefined : await storeCover(ctx, isbn13, coverUrl)
     return withUndo(ctx, async (tx) => {
       // A shared Book created between the read and here is found again by
-      // `ensureSharedBook()`, which then discards the cover and ignores `pick`.
-      const book = await ensureSharedBook(tx, isbn13, cover, target.pick)
+      // `ensureSharedBook()`, which then discards the cover and ignores `chosen`.
+      const book = await ensureSharedBook(tx, isbn13, chosen, cover)
       return saveOwnedCopy(tx, book.data.id, book)
     })
   }
 
   // FR-12, D-8: a held private Book may be shared, or merged into a shared Book.
-  const pending = await prepareShare(ctx, isbn13, held)
+  const pending = await prepareShare(ctx, isbn13, held, target.pick, target.candidate)
   return withUndo(ctx, async (tx) => {
     const bookId = await settleHeldBook(tx, isbn13, pending)
     // No Book restore: a shared or merged Book stays shared after an Undo.

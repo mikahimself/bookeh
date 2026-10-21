@@ -121,7 +121,8 @@ function coverUrl(info: Json): string | undefined {
 function toResult(volume: Json, isbn13: string, body: unknown): SourceResult | undefined {
   const info = isObject(volume.volumeInfo) ? volume.volumeInfo : {}
   const title = clean(info.title)
-  if (!title) return undefined
+  const recordId = clean(volume.id)
+  if (!title || !recordId) return undefined
   return compact({
     isbn13,
     title,
@@ -136,6 +137,7 @@ function toResult(volume: Json, isbn13: string, body: unknown): SourceResult | u
     themes: [],
     coverUrl: coverUrl(info),
     source: 'google',
+    recordId,
     raw: { google: body },
   })
 }

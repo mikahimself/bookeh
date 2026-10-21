@@ -49,6 +49,7 @@ const candidate = (isbn13: string, coverUrl?: string): SourceResult => ({
   subjects: [],
   themes: [],
   source: 'finna',
+  recordId: 'finna.1',
   raw: { finna: {} },
   ...(coverUrl !== undefined && { coverUrl }),
 })

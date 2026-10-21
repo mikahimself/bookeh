@@ -6,7 +6,7 @@ import path from 'node:path'
 
 import { getPayload, type Payload } from 'payload'
 import sharp from 'sharp'
-import { afterAll, afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest'
 
 import {
   attachCover,
@@ -14,12 +14,12 @@ import {
   type CoverPolicy,
   discardCover,
   type DownloadedCover,
-  downloadCover,
   mediaDir,
+  storeCover,
   sweepOrphanMedia,
 } from '@/lib/catalogue/covers'
 import { ensureSharedBook } from '@/lib/catalogue/ensureSharedBook'
-import { lookupSources } from '@/lib/metadata/lookup'
+import { chooseCandidate } from '@/lib/catalogue/pick'
 import type { SourceResult, SourcesOutcome } from '@/lib/metadata/source'
 import type { Context } from '@/lib/payload/context'
 import { withTransaction } from '@/lib/payload/transaction'
@@ -30,9 +30,8 @@ import { randomIsbn } from '../helpers/isbn'
 
 // Covers, AD-14: downloaded from the source before the save's transaction,
 // recorded as a `media` row inside it, removed when it rolls back. The source
-// is a local fixture server; `lookupSources` is faked.
-
-vi.mock('@/lib/metadata/lookup', () => ({ lookupSources: vi.fn() }))
+// is a local fixture server. Which candidate's cover a save stores is
+// `saveCopy`'s (saveCopy.int.spec.ts).
 
 const WIDTH = 4
 const HEIGHT = 6
@@ -46,6 +45,7 @@ const found = (isbn13: string, coverUrl?: string): Extract<SourcesOutcome, { kin
     subjects: [],
     themes: [],
     source: 'finna',
+    recordId: 'finna.1',
     raw: { finna: {} },
     ...(coverUrl !== undefined && { coverUrl }),
   }
@@ -78,13 +78,12 @@ describe('covers', () => {
   const filesInMedia = async () => (await fs.readdir(mediaDir(payload)).catch(() => [])).sort()
   const at = (route: string) => `${origin}${route}`
 
-  /** Downloads `route` for a fresh ISBN; the file is cleaned up after the run. */
+  /** Stores `route` for a fresh ISBN; the file is cleaned up after the run. */
   const download = async (route: string, options: Partial<CoverPolicy> = {}) => {
     const isbn = randomIsbn()
-    vi.mocked(lookupSources).mockResolvedValue(found(isbn, at(route)))
-    const cover = await downloadCover(asA, isbn, { ...policy, ...options })
+    const cover = await storeCover(asA, isbn, at(route), { ...policy, ...options })
     if (cover) filenames.push(cover.filename)
-    return { isbn, cover }
+    return { isbn, cover, chosen: chooseCandidate(found(isbn, at(route))) }
   }
 
   const booksWithIsbn = async (isbn13: string) =>
@@ -165,10 +164,6 @@ describe('covers', () => {
     policy = { ...coverPolicy, allows: (u) => u.origin === origin, timeoutMs: 300 }
   })
 
-  beforeEach(() => {
-    vi.mocked(lookupSources).mockReset()
-  })
-
   afterEach(() => {
     vi.restoreAllMocks()
   })
@@ -185,7 +180,7 @@ describe('covers', () => {
   })
 
   it('downloads the cover and records it on the created Book', async () => {
-    const { isbn, cover } = await download('/cover.jpg')
+    const { isbn, cover, chosen } = await download('/cover.jpg')
     expect(cover).toEqual({
       filename: expect.stringMatching(finalName),
       mimeType: 'image/jpeg',
@@ -197,7 +192,7 @@ describe('covers', () => {
     expect(files).toContain(cover!.filename)
     expect(files.filter((name) => name.endsWith('.tmp'))).toEqual([])
 
-    const { data: result } = await ensureSharedBook(asA, isbn, cover)
+    const { data: result } = await ensureSharedBook(asA, isbn, chosen, cover)
     expect(result.created).toBe(true)
     const book = await payload.findByID({
       collection: 'books',
@@ -215,40 +210,6 @@ describe('covers', () => {
       height: HEIGHT,
     })
     expect(await filesInMedia()).toContain(cover!.filename)
-  })
-
-  it("downloads the picked candidate's cover", async () => {
-    const isbn = randomIsbn()
-    const outcome = found(isbn, at('/cover.jpg'))
-    outcome.candidates.push({ ...outcome.candidates[0]!, coverUrl: at('/other.png') })
-    vi.mocked(lookupSources).mockResolvedValue(outcome)
-    const cover = await downloadCover(asA, isbn, policy, 1)
-    if (cover) filenames.push(cover.filename)
-    expect(cover).toMatchObject({ mimeType: 'image/png', filesize: png.length })
-  })
-
-  it('requests nothing without a cover URL, for another outcome or a known Book', async () => {
-    const before = totalHits()
-    const isbn = randomIsbn()
-    vi.mocked(lookupSources).mockResolvedValue(found(isbn))
-    expect(await downloadCover(asA, isbn, policy)).toBeUndefined()
-
-    vi.mocked(lookupSources).mockResolvedValue({ kind: 'none' })
-    expect(await downloadCover(asA, isbn, policy)).toBeUndefined()
-
-    const known = randomIsbn()
-    await payload.create({
-      collection: 'books',
-      data: { title: 'Kotiseutu', isbn13: known, visibility: 'shared' },
-      overrideAccess: true,
-      depth: 0,
-    })
-    vi.mocked(lookupSources).mockReset()
-    vi.mocked(lookupSources).mockResolvedValue(found(known, at('/cover.jpg')))
-    expect(await downloadCover(asA, known, policy)).toBeUndefined()
-    expect(lookupSources).not.toHaveBeenCalled()
-
-    expect(totalHits()).toBe(before)
   })
 
   it.each([
@@ -279,8 +240,9 @@ describe('covers', () => {
     const isbn = randomIsbn()
     // Same server, another origin: the policy allows only `origin`.
     const port = (server.address() as AddressInfo).port
-    vi.mocked(lookupSources).mockResolvedValue(found(isbn, `http://localhost:${port}/rejected.jpg`))
-    expect(await downloadCover(asA, isbn, policy)).toBeUndefined()
+    expect(
+      await storeCover(asA, isbn, `http://localhost:${port}/rejected.jpg`, policy),
+    ).toBeUndefined()
     expect(warn).toHaveBeenCalledTimes(1)
     expect(hits.get('/rejected.jpg')).toBeUndefined()
     expect(await filesInMedia()).toEqual(before)
@@ -303,22 +265,20 @@ describe('covers', () => {
   it('refuses to run inside a transaction', async () => {
     const before = totalHits()
     const isbn = randomIsbn()
-    vi.mocked(lookupSources).mockResolvedValue(found(isbn, at('/cover.jpg')))
-    const error = await withTransaction(asA, (tx) => downloadCover(tx, isbn, policy)).catch(
-      (err: unknown) => err,
-    )
+    const error = await withTransaction(asA, (tx) =>
+      storeCover(tx, isbn, at('/cover.jpg'), policy),
+    ).catch((err: unknown) => err)
     expect(error).toBeInstanceOf(Error)
-    expect(lookupSources).not.toHaveBeenCalled()
     expect(totalHits()).toBe(before)
   })
 
   it('removes the file when the save rolls back', async () => {
-    const { isbn, cover } = await download('/cover.jpg')
+    const { isbn, cover, chosen } = await download('/cover.jpg')
     expect(cover).toBeDefined()
     const e = new Error('boom')
     await expect(
       withTransaction(asA, async (tx) => {
-        await ensureSharedBook(tx, isbn, cover)
+        await ensureSharedBook(tx, isbn, chosen, cover)
         throw e
       }),
     ).rejects.toBe(e)
@@ -328,7 +288,7 @@ describe('covers', () => {
   })
 
   it('discards the file when the shared Book already exists', async () => {
-    const { isbn, cover } = await download('/cover.jpg')
+    const { isbn, cover, chosen } = await download('/cover.jpg')
     expect(cover).toBeDefined()
     const existing = await payload.create({
       collection: 'books',
@@ -337,7 +297,7 @@ describe('covers', () => {
       depth: 0,
     })
 
-    expect((await ensureSharedBook(asA, isbn, cover)).data).toEqual({
+    expect((await ensureSharedBook(asA, isbn, chosen, cover)).data).toEqual({
       id: existing.id,
       created: false,
     })

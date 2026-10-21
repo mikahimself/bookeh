@@ -37,7 +37,7 @@ export async function NotInLibraryAnswer({ answer }: { answer: AnswerBook }) {
         ) : undefined
       }
     >
-      <AddToLibrary isbn13={answer.isbn13} pick={pick} />
+      <AddToLibrary isbn13={answer.isbn13} pick={pick} candidate={answer.candidate} />
       <AnswerBack label={t('answer.back')} />
     </AnswerLayout>
   )

@@ -129,15 +129,28 @@ describe('saveCopyAction', () => {
     expect(await copies()).toEqual([])
   })
 
-  it('ignores pick once a shared Book holds the ISBN', async () => {
-    expect(await saveCopyAction({ requestId: randomUUID(), isbn13, pick: 1 })).toMatchObject({
-      ok: true,
-    })
+  it('ignores pick and candidate once a shared Book holds the ISBN', async () => {
+    const candidate = { source: 'finna', recordId: 'not.in.any.outcome' }
+    expect(
+      await saveCopyAction({ requestId: randomUUID(), isbn13, pick: 1, candidate }),
+    ).toMatchObject({ ok: true })
     expect(await copies()).toMatchObject([{ status: 'owned', location: location.id }])
   })
 
   it.each(['1', -1, 1.5])('answers SAVE_FAILED for pick %s and writes nothing', async (pick) => {
     expect(await saveCopyAction({ requestId: randomUUID(), isbn13, pick })).toEqual({
+      ok: false,
+      code: 'SAVE_FAILED',
+    })
+    expect(await copies()).toEqual([])
+  })
+
+  it.each([
+    ['a string', 'finna.1'],
+    ['an empty recordId', { source: 'finna', recordId: '' }],
+    ['no source', { recordId: 'finna.1' }],
+  ])('answers SAVE_FAILED for a candidate that is %s and writes nothing', async (_, candidate) => {
+    expect(await saveCopyAction({ requestId: randomUUID(), isbn13, candidate })).toEqual({
       ok: false,
       code: 'SAVE_FAILED',
     })
@@ -179,6 +192,45 @@ describe('saveCopyAction', () => {
     }
   })
 
+  it('answers NOT_FOUND and writes nothing when the candidate sent is not in the outcome', async () => {
+    const fresh = randomIsbn()
+    const body = readFileSync(
+      new URL('../fixtures/finna/9780007466061.json', import.meta.url),
+      'utf8',
+    )
+      .replaceAll('9780007466061', fresh)
+      .replaceAll('978-0-00-746606-1', fresh)
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (input: string | URL) => {
+        const url = new URL(String(input))
+        if (url.hostname === 'api.finna.fi' && url.pathname.endsWith('/v1/search')) {
+          return new Response(body, { headers: { 'Content-Type': 'application/json' } })
+        }
+        if (url.hostname === 'www.googleapis.com') return Response.json({ totalItems: 0 })
+        return new Response(null, { status: 404 })
+      }),
+    )
+    try {
+      expect(
+        await saveCopyAction({
+          requestId: randomUUID(),
+          isbn13: fresh,
+          candidate: { source: 'finna', recordId: 'not.in.outcome' },
+        }),
+      ).toEqual({ ok: false, code: 'NOT_FOUND' })
+    } finally {
+      vi.unstubAllGlobals()
+    }
+    expect(await copies()).toEqual([])
+    const { totalDocs } = await payload.count({
+      collection: 'books',
+      where: { isbn13: { equals: fresh } },
+      overrideAccess: true,
+    })
+    expect(totalDocs).toBe(0)
+  })
+
   it('answers NOT_FOUND and writes nothing when no source knows the ISBN', async () => {
     const fresh = randomIsbn()
     vi.stubGlobal(
@@ -205,6 +257,23 @@ describe('saveCopyAction', () => {
       overrideAccess: true,
     })
     expect(totalDocs).toBe(0)
+  })
+
+  it('answers SAVE_FAILED and writes nothing when the sources cannot be asked', async () => {
+    const fresh = randomIsbn()
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => new Response(null, { status: 503 })),
+    )
+    try {
+      expect(await saveCopyAction({ requestId: randomUUID(), isbn13: fresh })).toEqual({
+        ok: false,
+        code: 'SAVE_FAILED',
+      })
+    } finally {
+      vi.unstubAllGlobals()
+    }
+    expect(await copies()).toEqual([])
   })
 
   it('answers UNAUTHENTICATED without a session', async () => {

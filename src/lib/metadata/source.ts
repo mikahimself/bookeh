@@ -19,6 +19,7 @@ export type SourceResult = {
   binding?: string // "paperback", "hardcover"; display only, never stored
   coverUrl?: string
   source: SourceId // first source in order that answered
+  recordId: string // `source`'s own id for the record; with `source`, the candidate's identity
   raw: Record<SourceId, unknown>
 }
 
@@ -50,8 +51,9 @@ export type RawMetadata = {
  * - Neither method ever throws or rejects: a failure is logged. The `undefined`
  *   failure signal is `lookupByIsbn`'s only; `search` still resolves a list.
  * - Each result's `isbn13` is the ISBN asked for, never another ISBN found in
- *   the record. `source` is the adapter's own `id`; `raw` is
- *   `{ [id]: completeResponse }`.
+ *   the record. `source` is the adapter's own `id`; `recordId` is the
+ *   source's own id for the record (a record without one is skipped); `raw`
+ *   is `{ [id]: completeResponse }`.
  * - A value the source does not have is left out (or `[]` for lists), never
  *   sent as a placeholder such as '', 0 or an author without a name.
  * - `binding` is for display only and is never stored.

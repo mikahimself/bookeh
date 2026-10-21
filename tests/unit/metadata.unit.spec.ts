@@ -15,6 +15,7 @@ const finnaRecord: SourceResult = {
   subjects: [],
   themes: ['muumit'],
   source: 'finna',
+  recordId: 'F1',
   raw: { finna: 'F' },
 }
 
@@ -28,6 +29,7 @@ const googleRecord: SourceResult = {
   themes: [],
   coverUrl: 'https://example.test/cover.jpg',
   source: 'google',
+  recordId: 'G1',
   raw: { google: 'G' },
 }
 
@@ -63,6 +65,7 @@ describe('mergeResults', () => {
       themes: ['muumit'],
       coverUrl: googleRecord.coverUrl,
       source: 'finna',
+      recordId: 'F1',
     })
     expect(result.description).toBeUndefined()
   })

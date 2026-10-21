@@ -219,7 +219,8 @@ function binding(record: Json, isbn13: string): string | undefined {
 
 function toResult(record: Json, isbn13: string, body: unknown): SourceResult | undefined {
   const title = cleanIsbd(record.shortTitle) ?? cleanIsbd(record.title)
-  if (!title) return undefined
+  const recordId = clean(record.id)
+  if (!title || !recordId) return undefined
   const result: SourceResult = {
     isbn13,
     title,
@@ -236,6 +237,7 @@ function toResult(record: Json, isbn13: string, body: unknown): SourceResult | u
     binding: binding(record, isbn13),
     coverUrl: coverUrl(record),
     source: 'finna',
+    recordId,
     raw: { finna: body },
   }
   return compact(result)

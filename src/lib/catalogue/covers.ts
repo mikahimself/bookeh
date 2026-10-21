@@ -5,14 +5,10 @@ import path from 'node:path'
 import type { Payload } from 'payload'
 import sharp from 'sharp'
 
-import { normaliseIsbn } from '@/fields/isbn'
-import { lookupSources } from '@/lib/metadata/lookup'
 import { fixtureOrigin, usesFixtureSources, type SourceEnv } from '@/lib/metadata/sources/fixture'
 // A type only: `payload.config` imports this file and `context.ts` imports `payload.config`.
 import type { Context } from '@/lib/payload/context'
 import { assertLive } from '@/lib/payload/transaction'
-
-import { pickIndex } from './pick'
 
 /** Spine, AD-14: the hosts a cover is downloaded from. */
 export const COVER_HOSTS: readonly string[] = ['api.finna.fi', 'books.google.com']
@@ -138,7 +134,7 @@ export type CoverFetch =
 
 /**
  * Spine, AD-14: the one network call for a source's cover, shared by
- * `downloadCover()` and the cover preview. Requests `coverUrl` only when it
+ * `storeCover()` and the cover preview. Requests `coverUrl` only when it
  * parses and `policy` allows it; no redirects, a 2xx answer within the time
  * and size limits, a JPEG, PNG or WebP image. Never throws: a failure is the
  * reason to log.
@@ -165,62 +161,13 @@ export async function fetchCover(coverUrl: string, policy: CoverPolicy): Promise
 }
 
 /**
- * Spine, AD-14: candidate `pick`'s cover for a new shared Book
- * (`pickIndex()`: none or out of range is the best), stored in the media
- * directory before the save's transaction opens. `undefined` with no request
- * when a shared Book with the ISBN exists, no source knows the ISBN or the
- * candidate has no cover. The URL comes only from the server-held source
- * outcome and is fetched only when `policy` allows it: no redirects, a 2xx
- * answer within the time and size limits, a JPEG, PNG or WebP image. The file
- * is written under a temporary name and renamed into place, so a partial file
- * never carries a final name.
- *
- * Every download or write failure is one logged warning and `undefined`: a
- * Book is saved without a cover rather than not at all. Throws a plain
- * `Error` inside a transaction, and `INVALID_ISBN` before any read.
- */
-export async function downloadCover(
-  ctx: Context,
-  isbn13: string,
-  policy: CoverPolicy = coverPolicy,
-  pick?: number,
-): Promise<DownloadedCover | undefined> {
-  if (ctx.transactionID !== undefined) {
-    throw new Error('downloadCover runs before the transaction opens (AD-14)')
-  }
-  assertLive(ctx)
-  const isbn = normaliseIsbn(isbn13)
-  const { payload } = ctx.req
-
-  // The find of `ensureSharedBook()`: an existing shared Book keeps its cover.
-  const { docs } = await payload.find({
-    collection: 'books',
-    where: { and: [{ isbn13: { equals: isbn } }, { visibility: { equals: 'shared' } }] },
-    select: { isbn13: true },
-    limit: 1,
-    pagination: false,
-    req: ctx.req,
-    overrideAccess: true,
-    depth: 0,
-  })
-  if (docs[0]) return undefined
-
-  const outcome = await lookupSources(isbn)
-  if (outcome.kind !== 'found') return undefined
-  const { candidates } = outcome
-  const coverUrl = candidates[pickIndex(pick, candidates.length)]?.coverUrl
-  if (!coverUrl) return undefined
-
-  return storeCover(ctx, isbn, coverUrl, policy)
-}
-
-/**
- * Spine, AD-14: the fetch-and-write half of `downloadCover()`, for a cover
- * URL taken from the server-held source outcome: `fetchCover()`, then the
- * file in the media directory under a temporary name renamed into place, so
- * a partial file never carries a final name. Runs before the save's
+ * Spine, AD-14: the save's cover step, for the chosen candidate's cover URL
+ * from the outcome the save resolved (never from the client): `fetchCover()`,
+ * then the file in the media directory under a temporary name renamed into
+ * place, so a partial file never carries a final name. Runs before the save's
  * transaction opens (a plain `Error` inside one). Every download or write
- * failure is one logged warning and `undefined`.
+ * failure is one logged warning and `undefined`: a Book is saved without a
+ * cover rather than not at all.
  */
 export async function storeCover(
   ctx: Context,
@@ -296,7 +243,7 @@ export async function discardCover(payload: Payload, cover: DownloadedCover): Pr
 }
 
 // The names this app writes: covers and Payload uploads (`<uuid>.<ext>`, see
-// `Media.ts`) and `downloadCover()`'s temporary files.
+// `Media.ts`) and `storeCover()`'s temporary files.
 const UUID = '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
 const APP_NAME = new RegExp(`^(?:${UUID}\\.(?:jpe?g|png|webp)|\\.${UUID}\\.tmp)$`)
 

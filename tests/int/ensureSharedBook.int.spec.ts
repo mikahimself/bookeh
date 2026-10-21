@@ -1,13 +1,13 @@
 import { randomUUID } from 'node:crypto'
 
 import { getPayload, ValidationError, type Payload } from 'payload'
-import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
+import { beforeAll, describe, expect, it } from 'vitest'
 
 import { toNameKey } from '@/fields/nameKey'
 import { ensureSharedBook } from '@/lib/catalogue/ensureSharedBook'
 import { findOrCreateByName } from '@/lib/catalogue/findOrCreateByName'
+import { chooseCandidate } from '@/lib/catalogue/pick'
 import { DomainError } from '@/lib/errors'
-import { lookupSources } from '@/lib/metadata/lookup'
 import type { RawMetadata, SourceResult, SourcesOutcome } from '@/lib/metadata/source'
 import type { Context } from '@/lib/payload/context'
 import { withTransaction } from '@/lib/payload/transaction'
@@ -18,11 +18,9 @@ import { contextFor, createUser } from '../helpers/harness'
 import { randomIsbn } from '../helpers/isbn'
 
 // `ensureSharedBook()`, AD-5/FR-18: the shared Book for an ISBN, created from
-// the best candidate of the server-held source outcome with shared authors
-// and series, or returned as it is. The sources are faked at the service's
-// dependency, so no cache or adapter is involved.
-
-vi.mock('@/lib/metadata/lookup', () => ({ lookupSources: vi.fn() }))
+// the candidate the save chose (`chooseCandidate()`) with shared authors and
+// series, or returned as it is. It asks no source: the save resolved the
+// outcome before (AD-11), so the tests hand it one.
 
 const unique = (name: string) => `${name} ${randomUUID().slice(0, 8)}`
 
@@ -45,6 +43,7 @@ const candidate = (
   subjects: [],
   themes: [],
   source: 'finna',
+  recordId: `finna.${title}`,
   raw: { finna: { title } },
   ...extra,
 })
@@ -54,6 +53,9 @@ const found = (...candidates: SourceResult[]): Extract<SourcesOutcome, { kind: '
   candidates,
   raw: raw(candidates[0]!.title),
 })
+
+/** The best candidate of an outcome holding `candidates`, as a save chooses it. */
+const chosen = (...candidates: SourceResult[]) => chooseCandidate(found(...candidates))
 
 describe('ensureSharedBook', () => {
   let payload: Payload
@@ -87,11 +89,7 @@ describe('ensureSharedBook', () => {
     asB = await contextFor(b)
   })
 
-  beforeEach(() => {
-    vi.mocked(lookupSources).mockReset()
-  })
-
-  it('creates a shared Book from the best candidate with shared authors and series', async () => {
+  it('creates a shared Book from the chosen candidate with shared authors and series', async () => {
     const isbn = randomIsbn()
     const existingName = unique('Tove Jansson')
     const existing = await findOrCreateByName(asA, 'authors', 'shared', {
@@ -120,11 +118,9 @@ describe('ensureSharedBook', () => {
       coverUrl: 'https://covers.example/muumi.jpg',
     })
     const outcome = found(best, candidate(isbn, 'Second', { source: 'google' }))
-    vi.mocked(lookupSources).mockResolvedValue(outcome)
 
-    const { data: result } = await ensureSharedBook(asA, isbn)
+    const { data: result } = await ensureSharedBook(asA, isbn, chooseCandidate(outcome))
     expect(result.created).toBe(true)
-    expect(lookupSources).toHaveBeenCalledWith(isbn)
 
     const book = await payload.findByID({
       collection: 'books',
@@ -179,7 +175,7 @@ describe('ensureSharedBook', () => {
     expect(series).toMatchObject({ name: seriesName, visibility: 'shared' })
   })
 
-  it('returns an existing shared Book without asking the sources', async () => {
+  it('returns an existing shared Book as it is', async () => {
     const isbn = randomIsbn()
     const existing = await payload.create({
       collection: 'books',
@@ -188,11 +184,9 @@ describe('ensureSharedBook', () => {
       depth: 0,
     })
     const hyphenated = `${isbn.slice(0, 3)}-${isbn.slice(3, 5)}-${isbn.slice(5, 9)}-${isbn.slice(9, 12)}-${isbn.slice(12)}`
-    expect((await ensureSharedBook(asA, hyphenated)).data).toEqual({
-      id: existing.id,
-      created: false,
-    })
-    expect(lookupSources).not.toHaveBeenCalled()
+    expect(
+      (await ensureSharedBook(asA, hyphenated, chosen(candidate(isbn, 'Other')))).data,
+    ).toEqual({ id: existing.id, created: false })
     expect((await booksWithIsbn(isbn)).totalDocs).toBe(1)
   })
 
@@ -205,9 +199,11 @@ describe('ensureSharedBook', () => {
       depth: 0,
       req: (await contextFor(a)).req,
     })
-    vi.mocked(lookupSources).mockResolvedValue(found(candidate(isbn, 'Lähteen kirja')))
-
-    const { data: result } = await ensureSharedBook(asA, isbn)
+    const { data: result } = await ensureSharedBook(
+      asA,
+      isbn,
+      chosen(candidate(isbn, 'Lähteen kirja')),
+    )
     expect(result.created).toBe(true)
     expect(result.id).not.toBe(privateBook.id)
     const book = await payload.findByID({
@@ -219,25 +215,10 @@ describe('ensureSharedBook', () => {
     expect(book.visibility).toBe('shared')
   })
 
-  it('rejects an invalid ISBN before asking anything', async () => {
-    await expect(ensureSharedBook(asA, '12345')).rejects.toMatchObject(
-      new DomainError('INVALID_ISBN'),
-    )
-    expect(lookupSources).not.toHaveBeenCalled()
-  })
-
-  it('fails with NOT_FOUND on none and a plain error on unavailable, creating nothing', async () => {
-    const isbn = randomIsbn()
-    vi.mocked(lookupSources).mockResolvedValue({ kind: 'none' })
-    await expect(ensureSharedBook(asA, isbn)).rejects.toMatchObject(new DomainError('NOT_FOUND'))
-
-    vi.mocked(lookupSources).mockResolvedValue({ kind: 'unavailable', failed: ['finna'] })
-    const error = await ensureSharedBook(asA, isbn).catch((err: unknown) => err)
-    expect(error).toBeInstanceOf(Error)
-    expect(error).not.toBeInstanceOf(DomainError)
-    expect((error as Error).message).toContain('finna')
-
-    expect((await booksWithIsbn(isbn)).totalDocs).toBe(0)
+  it('rejects an invalid ISBN', async () => {
+    await expect(
+      ensureSharedBook(asA, '12345', chosen(candidate('12345', 'X'))),
+    ).rejects.toMatchObject(new DomainError('INVALID_ISBN'))
   })
 
   it('clips over-long source values to the field limits', async () => {
@@ -246,18 +227,16 @@ describe('ensureSharedBook', () => {
     const title = `${'a'.repeat(499)}😀${'a'.repeat(100)}`
     const author = unique('A').padEnd(250, 'a')
     const series = unique('S').padEnd(250, 's')
-    vi.mocked(lookupSources).mockResolvedValue(
-      found(
-        candidate(isbn, title, {
-          subtitle: 's'.repeat(600),
-          description: 'd'.repeat(12_000),
-          authors: [{ name: author }],
-          series,
-        }),
-      ),
+    const picked = chosen(
+      candidate(isbn, title, {
+        subtitle: 's'.repeat(600),
+        description: 'd'.repeat(12_000),
+        authors: [{ name: author }],
+        series,
+      }),
     )
 
-    const { data } = await ensureSharedBook(asA, isbn)
+    const { data } = await ensureSharedBook(asA, isbn, picked)
     const book = await payload.findByID({
       collection: 'books',
       id: data.id,
@@ -275,15 +254,13 @@ describe('ensureSharedBook', () => {
     const isbn = randomIsbn()
     const authorName = unique('Kalle Päätalo')
     const seriesName = unique('Iijoki')
-    vi.mocked(lookupSources).mockResolvedValue(
-      found(
-        candidate(isbn, 'Huonetoverit', { authors: [{ name: authorName }], series: seriesName }),
-      ),
+    const picked = chosen(
+      candidate(isbn, 'Huonetoverit', { authors: [{ name: authorName }], series: seriesName }),
     )
     const e = new Error('boom')
     await expect(
       withTransaction(asA, (tx) =>
-        ensureSharedBook(tx, isbn).then(() => {
+        ensureSharedBook(tx, isbn, picked).then(() => {
           throw e
         }),
       ),
@@ -296,10 +273,10 @@ describe('ensureSharedBook', () => {
   it('leaves one shared Book after two concurrent creates', async () => {
     const isbn = randomIsbn()
     // No authors and no series: the Book insert is the only contested write.
-    vi.mocked(lookupSources).mockResolvedValue(found(candidate(isbn, 'Puhdistus', { authors: [] })))
+    const picked = chosen(candidate(isbn, 'Puhdistus', { authors: [] }))
     const settled = await Promise.allSettled([
-      ensureSharedBook(asA, isbn),
-      ensureSharedBook(asB, isbn),
+      ensureSharedBook(asA, isbn, picked),
+      ensureSharedBook(asB, isbn, picked),
     ])
 
     const fulfilled = settled.flatMap((r) => (r.status === 'fulfilled' ? [r.value.data] : []))

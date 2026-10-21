@@ -89,6 +89,7 @@ describe('finna.lookupByIsbn', () => {
         binding: 'pehmeäkantinen',
         coverUrl: 'https://api.finna.fi/Cover/Show?source=Solr&id=helle.1637236&index=0&size=large',
         source: 'finna',
+        recordId: 'helle.1637236',
         raw: { finna: fixture('9789524035699') },
       },
     ])

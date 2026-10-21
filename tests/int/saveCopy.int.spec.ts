@@ -1,4 +1,5 @@
 import { randomUUID } from 'node:crypto'
+import { readFileSync } from 'node:fs'
 import fs from 'node:fs/promises'
 import path from 'node:path'
 
@@ -18,13 +19,14 @@ import {
 
 import { toNameKey } from '@/fields/nameKey'
 import { mediaDir } from '@/lib/catalogue/covers'
+import { lookupBook } from '@/lib/catalogue/lookupBook'
 import { saveCopy, type SaveInput } from '@/lib/catalogue/saveCopy'
 import {
   oncePerRequest,
   REQUEST_MEMORY_SIZE,
   REQUEST_WINDOW_MS,
 } from '@/lib/catalogue/saveRequests'
-import { DomainError } from '@/lib/errors'
+import { DomainError, logger } from '@/lib/errors'
 import { lookupSources } from '@/lib/metadata/lookup'
 import type { SourcesOutcome } from '@/lib/metadata/source'
 import { undo } from '@/lib/undo/undo'
@@ -38,9 +40,15 @@ import { rejectedPaths } from '../helpers/validation'
 // `saveCopy()`, AD-11/FR-21: Add to library resolves the ISBN to a Book the
 // user may hold, or ensures a shared one from the source outcome with its
 // cover, and saves an owned copy at the default location in one transaction.
-// The sources are faked at `lookupSources`, the cover host at `fetch`.
+// The sources are faked at `lookupSources`, the cover host at `fetch`; the
+// one-outcome test runs the real `lookupSources` with `fetch` faked instead.
 
 vi.mock('@/lib/metadata/lookup', () => ({ lookupSources: vi.fn(), heldOutcome: vi.fn() }))
+
+const FINNA_FIXTURE = readFileSync(
+  new URL('../fixtures/finna/9780007466061.json', import.meta.url),
+  'utf8',
+)
 
 const unique = (name: string) => `${name} ${randomUUID().slice(0, 8)}`
 
@@ -60,6 +68,7 @@ const found = (
       subjects: [],
       themes: [],
       source: 'finna',
+      recordId: 'finna.1',
       coverUrl: COVER_URL,
       raw: { finna: {} },
     },
@@ -334,6 +343,88 @@ describe('saveCopy', () => {
     expect(await copiesOf(user)).toEqual([])
   })
 
+  // AD-11: one outcome per save. Finna answers the recorded response under a
+  // fresh ISBN, with a cover added to its second record; Google fails, so the
+  // `found` is partial and held for PARTIAL_TTL_MS.
+  it('saves the picked record from the outcome the Answer showed, asking Finna once', async () => {
+    const actual =
+      await vi.importActual<typeof import('@/lib/metadata/lookup')>('@/lib/metadata/lookup')
+    vi.mocked(lookupSources).mockImplementation(actual.lookupSources)
+    // Google's failure is logged.
+    vi.spyOn(logger(), 'warn').mockImplementation(() => {})
+    const { ctx } = await freshUser()
+    const isbn = randomIsbn()
+    const body = JSON.parse(
+      FINNA_FIXTURE.replaceAll('9780007466061', isbn).replaceAll('978-0-00-746606-1', isbn),
+    ) as { records: { id: string; images: string[] }[] }
+    const second = body.records[1]!
+    second.images = [`/Cover/Show?source=Solr&id=${second.id}&index=0&size=large`]
+    const asked = { finna: 0, google: 0 }
+    const covers: string[] = []
+    fetchSpy.mockImplementation(async (input) => {
+      const url = new URL(String(input instanceof Request ? input.url : input))
+      if (url.hostname === 'www.googleapis.com') {
+        asked.google++
+        throw new TypeError('fetch failed')
+      }
+      if (url.pathname.endsWith('/v1/search')) {
+        asked.finna++
+        return Response.json(body)
+      }
+      covers.push(url.href)
+      return new Response(new Uint8Array(jpeg), { headers: { 'Content-Type': 'image/jpeg' } })
+    })
+
+    const answer = await lookupBook(ctx, { isbn, pick: 1 })
+    if (answer.kind !== 'source') throw new Error(`Expected a source answer, got ${answer.kind}`)
+    const picked = answer.candidates[1]!
+    const result = await saveCopy(ctx, {
+      ...inputFor(isbn),
+      target: {
+        isbn13: isbn,
+        pick: 1,
+        candidate: { source: picked.source, recordId: picked.recordId },
+      },
+    })
+
+    expect(asked).toEqual({ finna: 1, google: 1 })
+    const book = await payload.findByID({
+      collection: 'books',
+      id: result.bookId,
+      overrideAccess: true,
+      depth: 1,
+    })
+    const media = book.cover
+    if (typeof media !== 'object' || media === null) throw new Error('Book has no cover row')
+    mediaIds.push(media.id)
+    filenames.push(media.filename!)
+    expect(book).toMatchObject({ isbn13: isbn, title: picked.title, visibility: 'shared' })
+    expect(covers).toEqual([expect.stringContaining(`id=${picked.recordId}`)])
+    expect(book.rawMetadata).toMatchObject({ coverUrl: covers[0] })
+  })
+
+  it('fails with NOT_FOUND when the candidate shown has gone, writing nothing', async () => {
+    const { user, ctx } = await freshUser()
+    const isbn = randomIsbn()
+    const names = { author: unique('Pentti Haanpää'), series: unique('Korpi') }
+    vi.mocked(lookupSources).mockResolvedValue(found(isbn, names))
+    const before = await filesInMedia()
+
+    await expect(
+      saveCopy(ctx, {
+        ...inputFor(isbn),
+        target: { isbn13: isbn, pick: 0, candidate: { source: 'finna', recordId: 'finna.gone' } },
+      }),
+    ).rejects.toMatchObject(new DomainError('NOT_FOUND'))
+
+    expect(lookupSources).toHaveBeenCalledTimes(1)
+    expect(fetchSpy).not.toHaveBeenCalled()
+    expect(await filesInMedia()).toEqual(before)
+    expect(await booksWithIsbn(isbn)).toEqual([])
+    expect(await countByName('authors', names.author)).toBe(0)
+    expect(await copiesOf(user)).toEqual([])
+  })
+
   it('rolls back the Book, its records, the cover and the copy when the copy fails', async () => {
     const created = await createUser({ displayName: 'Save Copy Broken Default' })
     // A default that names no location: the copy insert is the failing write.
@@ -341,7 +432,7 @@ describe('saveCopy', () => {
     const isbn = randomIsbn()
     const names = { author: unique('Kalle Päätalo'), series: unique('Iijoki') }
     vi.mocked(lookupSources).mockResolvedValue(found(isbn, names))
-    // The cover's final name, from `downloadCover()`'s rename into place.
+    // The cover's final name, from `storeCover()`'s rename into place.
     const renamed: string[] = []
     const rename = fs.rename.bind(fs)
     vi.spyOn(fs, 'rename').mockImplementation(async (from, to) => {

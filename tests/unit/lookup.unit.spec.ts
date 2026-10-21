@@ -9,6 +9,7 @@ import {
   heldOutcome,
   lookupSources,
   NONE_TTL_MS,
+  PARTIAL_TTL_MS,
   SOURCE_TIMEOUT_MS,
 } from '@/lib/metadata/lookup'
 import { mergeResults } from '@/lib/metadata/merge'
@@ -31,6 +32,7 @@ const rec = (source: string, title: string, extra: Partial<SourceResult> = {}): 
   subjects: [],
   themes: [],
   source,
+  recordId: `${source}-${title}`,
   raw: { [source]: title },
   ...extra,
 })
@@ -121,17 +123,15 @@ describe('lookupSources', () => {
     expect(await lookupSources(ISBN)).toEqual({ kind: 'unavailable', failed: ['A', 'B'] })
   })
 
-  it('answers found from the sources that answered, without caching it', async () => {
+  it('answers found from the sources that answered', async () => {
     const a1 = rec('A', 'a1')
-    const [a] = serve([a1], undefined)
+    serve([a1], undefined)
 
     expect(await lookupSources(ISBN)).toEqual({
       kind: 'found',
       candidates: [merged([a1]).result],
       raw: merged([a1]).raw,
     })
-    await lookupSources(ISBN)
-    expect(a).toHaveBeenCalledTimes(2)
   })
 
   it('counts a source that does not settle in time as failed, with a warning', async () => {
@@ -163,8 +163,14 @@ describe('lookupSources', () => {
 })
 
 describe('lookupSources circuit breaker', () => {
+  // A partial `found` is cached: each lookup here starts from an empty cache,
+  // so every one asks the sources.
+  async function fresh() {
+    processState('metadata.cache', () => new Map()).clear()
+    return lookupSources(ISBN)
+  }
   async function failTimes(n: number) {
-    for (let i = 0; i < n; i++) await lookupSources(ISBN)
+    for (let i = 0; i < n; i++) await fresh()
   }
 
   it(`skips a source after ${BREAKER_FAILURES} failed lookups in a row, warning once`, async () => {
@@ -172,8 +178,8 @@ describe('lookupSources circuit breaker', () => {
 
     await failTimes(BREAKER_FAILURES)
     warn.mockClear()
-    const outcome = await lookupSources(ISBN)
-    await lookupSources(ISBN)
+    const outcome = await fresh()
+    await fresh()
 
     expect(b).toHaveBeenCalledTimes(BREAKER_FAILURES)
     expect(a).toHaveBeenCalledTimes(BREAKER_FAILURES + 2)
@@ -240,6 +246,7 @@ describe('lookupSources cache', () => {
   it.each([
     ['found', [[rec('A', 'a1')]] as Answer[], FOUND_TTL_MS],
     ['none', [[]] as Answer[], NONE_TTL_MS],
+    ['partial found', [[rec('A', 'a1')], undefined] as Answer[], PARTIAL_TTL_MS],
   ])('asks again once a %s entry has expired', async (_, answers, ttl) => {
     const [a] = serve(...answers)
 

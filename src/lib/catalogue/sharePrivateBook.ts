@@ -5,49 +5,52 @@ import { type BookOverrides, mergeUserBook, upsertUserBook } from '@/lib/books/u
 import { moveCopies } from '@/lib/copies/moveCopies'
 import { DomainError } from '@/lib/errors'
 import { heldOutcome } from '@/lib/metadata/lookup'
-import type { RawMetadata, SourceResult } from '@/lib/metadata/source'
+import type { SourceResult } from '@/lib/metadata/source'
 import type { Context } from '@/lib/payload/context'
 import * as gateway from '@/lib/payload/gateway'
 import { assertLive, onRollback } from '@/lib/payload/transaction'
 import type { Author, Book, Series } from '@/payload-types'
 
-import { clipCandidate } from './clipCandidate'
 import { attachCover, discardCover, type DownloadedCover, storeCover } from './covers'
 import { deleteRow } from './ensureSharedBook'
 import { findBookByIsbn, type HeldBook } from './findBookByIsbn'
 import { findOrCreateByName } from './findOrCreateByName'
 import { mapSubjectsToGenres } from './mapSubjectsToGenres'
+import { type CandidateId, type Chosen, chooseCandidate } from './pick'
 
 // FR-12, AD-4, AD-5 and D-8: a private Book is shared on its creator's next
 // save once a source knows its ISBN, or joins the shared Book with that ISBN.
 
 /**
- * What `prepareShare()` fetched for a promote: the best candidate, clipped to
- * the field limits (`clipCandidate()`, R6), its raw metadata and cover.
+ * What `prepareShare()` fetched for a promote: the chosen candidate, clipped
+ * to the field limits, and its raw metadata (`chooseCandidate()`), with its
+ * cover.
  */
-export type PendingShare = { candidate: SourceResult; raw: RawMetadata; cover?: DownloadedCover }
+export type PendingShare = Chosen & { cover?: DownloadedCover }
 
 /**
- * Spine, AD-5 and AD-14: the part of a share that runs before the save's
- * transaction opens. `undefined` unless `held` is the user's private Book and
- * the server-held outcome (`heldOutcome()`, the in-process cache alone) is
- * `found`; then the best candidate, clipped to the field limits so the
- * promote's write and its D-8 comparison see the values stored, and the
- * outcome's raw metadata, with the candidate's cover stored by `storeCover()`
- * when the Book has none and the candidate has a `coverUrl`. Never asks the sources; the cover is the only
- * network call.
+ * Spine, AD-5, AD-11 and AD-14: the part of a share that runs before the
+ * save's transaction opens. `undefined` unless `held` is the user's private
+ * Book and the server-held outcome (`heldOutcome()`, the in-process cache
+ * alone) is `found`; then the candidate `chooseCandidate()` takes for `pick`
+ * and `id` (D-7: `NOT_FOUND` when `id` names a candidate the outcome lacks),
+ * clipped so the promote's write and its D-8 comparison see the values
+ * stored, and its raw metadata, with the candidate's cover stored by
+ * `storeCover()` when the Book has none and the candidate has a `coverUrl`.
+ * Never asks the sources; the cover is the only network call.
  */
 export async function prepareShare(
   ctx: Context,
   isbn13: string,
   held: HeldBook,
+  pick?: number,
+  id?: CandidateId,
 ): Promise<PendingShare | undefined> {
   if (held.visibility !== 'private') return undefined
   const outcome = heldOutcome(isbn13)
   if (outcome?.kind !== 'found') return undefined
-  // `found` always holds at least one candidate.
-  const candidate = clipCandidate(outcome.candidates[0]!)
-  const pending: PendingShare = { candidate, raw: outcome.raw }
+  const pending: PendingShare = chooseCandidate(outcome, pick, id)
+  const { candidate } = pending
   if (!candidate.coverUrl) return pending
 
   // A find rather than `findByID`: a Book deleted since is `settleHeldBook()`'s `NOT_FOUND`.

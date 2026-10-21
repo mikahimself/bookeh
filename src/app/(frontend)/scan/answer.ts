@@ -1,6 +1,7 @@
 import { normaliseIsbn } from '@/fields/isbn'
 import { coverUrl } from '@/lib/books/coverUrl'
 import type { LookupResult } from '@/lib/catalogue/lookupBook'
+import type { CandidateId } from '@/lib/catalogue/pick'
 import { DomainError } from '@/lib/errors'
 import type { SourceId } from '@/lib/metadata/source'
 
@@ -23,7 +24,9 @@ export type AnswerEdition = {
  * id, `null` for a shared Book; `newAuthors` and `newSeries` are the rows a
  * save would create; `isbn13` is what Add to library and Add another copy
  * save, with `pick`, the source candidate shown when there are several
- * (`undefined` for one candidate or a Book that exists). `editions` lists
+ * (`undefined` for one candidate or a Book that exists), and `candidate`,
+ * the shown candidate's identity, so the save uses that record or none
+ * (AD-11; `undefined` for a Book that exists). `editions` lists
  * every candidate in order when there are two or more, else it is empty.
  * Nothing here comes from a user record.
  */
@@ -39,6 +42,7 @@ export type AnswerBook = {
   newAuthors: string[]
   newSeries: string | null
   pick: number | undefined
+  candidate: CandidateId | undefined
   editions: AnswerEdition[]
 }
 
@@ -63,6 +67,7 @@ const existingBook = (book: ExistingResult['book'], isbn13: string): AnswerBook 
   newAuthors: [],
   newSeries: null,
   pick: undefined,
+  candidate: undefined,
   editions: [],
 })
 
@@ -100,6 +105,7 @@ export function notInLibrary(result: LookupResult): AnswerBook | null {
         newAuthors: result.matches.authors.filter(({ id }) => id === null).map(({ name }) => name),
         newSeries: series !== null && series.id === null ? series.name : null,
         pick: several ? pick : undefined,
+        candidate: { source: draft.source, recordId: draft.recordId },
         editions: !several
           ? []
           : candidates.map((candidate, i) => ({

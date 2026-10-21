@@ -49,6 +49,7 @@ const candidate = (isbn13: string, title: string, extra: Partial<SourceResult> =
   subjects: [],
   themes: [],
   source: 'finna',
+  recordId: `finna.${title}`,
   raw: { finna: { title } },
   ...extra,
 })

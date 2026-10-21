@@ -1,6 +1,6 @@
 import type { RawMetadata, SourceId, SourceResult } from './source'
 
-type MergedField = Exclude<keyof SourceResult, 'source' | 'raw'>
+type MergedField = Exclude<keyof SourceResult, 'source' | 'recordId' | 'raw'>
 
 // Every merged field, listed once. `Record` makes the compiler reject this
 // table when a field is added to `SourceResult` and left out here.
@@ -36,8 +36,9 @@ function copyField<K extends MergedField>(target: SourceResult, from: SourceResu
  * Merges sources by priority (AD-9). `lists` holds one entry per source in
  * source order, each that source's records best first; only each list's best
  * record is read. Every field takes the first non-empty value in that order,
- * `source` is the first answering source, and `raw` is the union of the
- * records' `raw` (first wins). `null` when no source has a record.
+ * `source` and `recordId` are the first answering source's (never gap-filled,
+ * so they name the candidate), and `raw` is the union of the records' `raw`
+ * (first wins). `null` when no source has a record.
  */
 export function mergeResults(
   lists: SourceResult[][],

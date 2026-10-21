@@ -69,7 +69,8 @@ describe('AddToLibrary', () => {
 
   it('sends the picked edition', async () => {
     saveCopyAction.mockResolvedValue(saved(null))
-    render(createElement(AddToLibrary, { isbn13: ISBN, pick: 1 }))
+    const candidate = { source: 'finna', recordId: 'helka.2' }
+    render(createElement(AddToLibrary, { isbn13: ISBN, pick: 1, candidate }))
     fireEvent.click(button())
 
     await waitFor(() => expect(back).toHaveBeenCalledTimes(1))
@@ -77,6 +78,7 @@ describe('AddToLibrary', () => {
       requestId: expect.any(String),
       isbn13: ISBN,
       pick: 1,
+      candidate,
     })
   })
 

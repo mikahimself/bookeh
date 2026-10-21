@@ -27,6 +27,7 @@ const draft = (over: Partial<Draft> = {}): Draft => ({
   subjects: [],
   themes: [],
   source: 'finna',
+  recordId: 'helka.1',
   hasCover: true,
   ...over,
 })
@@ -71,7 +72,7 @@ describe('notInLibrary', () => {
       kind: 'source',
       candidates: [
         draft({ title: 'Other edition', binding: 'nidottu', hasCover: false }),
-        draft({ publisher: 'WSOY', year: 2014, pages: 480 }),
+        draft({ publisher: 'WSOY', year: 2014, pages: 480, recordId: 'helka.2' }),
       ],
       pick: 1,
       matches: {
@@ -91,6 +92,7 @@ describe('notInLibrary', () => {
       newAuthors: ['Väinö Linna'],
       newSeries: null,
       pick: 1,
+      candidate: { source: 'finna', recordId: 'helka.2' },
       editions: [
         {
           title: 'Other edition',
@@ -127,8 +129,9 @@ describe('notInLibrary', () => {
       source: 'fixture',
       newAuthors: [],
       newSeries: 'Uusi',
-      // One candidate: nothing about editions, and no pick to send.
+      // One candidate: nothing about editions, and no pick to send, but its identity.
       pick: undefined,
+      candidate: { source: 'fixture', recordId: 'helka.1' },
       editions: [],
     })
   })
@@ -152,6 +155,7 @@ describe('notInLibrary', () => {
       newAuthors: [],
       newSeries: null,
       pick: undefined,
+      candidate: undefined,
       editions: [],
     })
   })
@@ -261,6 +265,7 @@ describe('answerLines', () => {
     newAuthors: ['Kristiina Kivivuori'],
     newSeries: 'Muumit',
     pick: 0,
+    candidate: undefined,
     editions: [],
     ...over,
   })
