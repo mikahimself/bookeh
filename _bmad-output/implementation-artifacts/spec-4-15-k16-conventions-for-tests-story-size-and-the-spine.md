@@ -120,3 +120,5 @@ deferred:
 **Verification.** `git diff -U0 CLAUDE.md` from baseline: one hunk at line 69 (one line replaced, two added), inside Conventions. `git diff --stat` from baseline: CLAUDE.md, the retrospective, sprint-status.yaml and this spec, plus epic-4-context.md. `sprint_plan.py validate` returned `valid: true` (verification-gap layer). Spec frontmatter parses as YAML with three deferred items.
 
 **Residual risks.** Until the spine Tests row and the new tests bullet are reconciled, a story session can read "guards a spine rule" as covering every service and pure-function test, so the restriction may not bite. The `oversized` rule, read literally, would split nearly every story; the unattended loop does not enforce it.
+
+**Owner follow-up (2026-10-21).** Deferred item 1: Mika had the spine Tests row (and its copy in `epics.md`) rewritten to the new tests rule; resolved. Deferred item 2: Mika dismissed it; the stories are designed small, and the `oversized` warning is not acted on. Deferred item 3: the memory note now defers to the CLAUDE.md rule; resolved.
