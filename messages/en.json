@@ -88,6 +88,12 @@
     "tryAgain": "Try again",
     "addByHand": "Add by hand"
   },
+  "editBook": {
+    "heading": "Edit book",
+    "save": "Save",
+    "discardTitle": "Discard changes?",
+    "discard": "Discard"
+  },
   "sources": {
     "finna": "Finna",
     "google": "Google Books"

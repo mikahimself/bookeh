@@ -88,6 +88,12 @@
     "tryAgain": "Yritä uudelleen",
     "addByHand": "Lisää käsin"
   },
+  "editBook": {
+    "heading": "Muokkaa kirjaa",
+    "save": "Tallenna",
+    "discardTitle": "Hylätäänkö muutokset?",
+    "discard": "Hylkää"
+  },
   "sources": {
     "finna": "Finna",
     "google": "Google Books"

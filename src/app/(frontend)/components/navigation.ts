@@ -107,15 +107,21 @@ export function NavigationTracker() {
  * Records the depth of a task's first entry. Mounted in a task's layout,
  * which persists across its search-param changes (Scan → Answer and back),
  * so the X can leave from any depth of the task and Back inside it knows
- * where the task starts. A reload records the entry it reloads. Renders
- * nothing.
+ * where the task starts. A reload records the entry it reloads, less the
+ * overlay entries that entry carries (a reload on Edit book's Back guard).
+ * Renders nothing.
  */
 export function TaskBase() {
   useEffect(() => {
     // `depth` is already the new entry's: Next's `HistoryUpdater` pushes in
     // `useInsertionEffect` (next/dist/client/components/app-router.js), which
     // runs before passive effects such as this one.
-    taskBase = depth
+    const state: unknown = window.history.state
+    const tokens =
+      typeof state === 'object' && state !== null
+        ? (state as Record<string, unknown>)[OVERLAY_TOKENS_KEY]
+        : undefined
+    taskBase = depth - (Array.isArray(tokens) ? tokens.length : 0)
     return () => {
       taskBase = null
     }
