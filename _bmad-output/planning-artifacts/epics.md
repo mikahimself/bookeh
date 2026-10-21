@@ -1707,7 +1707,169 @@ So that my Book gets the paperback's or the hardcover's details, whichever I hol
 
 Edit book from the save toast or by address: the first screen, More details, Save. As admin, Mika's edits to a shared Book change it for everyone (D-8); other users' edits are their overrides; edits to his private Book change it. Edit on the toast also shows the new copy's status and location. The admin, or a private Book's creator, adds, replaces or removes a cover, straightened and cropped to 2:3 by dragging four corners.
 
-**Cataloguing gate.** Stories 4.1–4.9 plus Epics 1–3 open the gate; Story 4.10 rehearses the restore once real books are in. The cover stories (4.11–4.14) may land after real cataloguing has started.
+**Cataloguing gate.** Stories 4.1–4.9 and 4.15–4.20 plus Epics 1–3 open the gate; Story 4.10 rehearses the restore once real books are in. The cover stories (4.11–4.14) may land after real cataloguing has started.
+
+**Order.** Stories 4.15–4.25 run first, in number order, then 4.1–4.14. They come from the Epic 3 retrospective (2026-10-21): 4.15 writes the conventions it decided, 4.16–4.20 harden the save path that Edit book builds on, and 4.21–4.25 are housekeeping, including the Epic 1 retrospective items still open. They are numbered last so existing references keep their numbers. Each story's source is `_bmad-output/implementation-artifacts/epic-3-retro-2026-10-20.md` (findings named in brackets) or `epic-1-retro-2026-10-10.md`.
+
+### Story 4.15: [K16] Conventions for tests, story size and the spine
+
+As Mika,
+I want the conventions the Epic 3 retrospective decided written where story sessions read them,
+So that the next stories follow them without being reminded (Epic 3 retrospective, action items 12, 13 and 19).
+
+**Acceptance Criteria:**
+
+**Given** the Conventions section of CLAUDE.md
+**When** the story is done
+**Then** the tests bullet says a story adds a test only when its acceptance criteria name the behaviour or the test guards a spine rule (access, transactions, Undo, migrations, a stated order such as Finna before Google); one focused test per behaviour that can break; no tests that restate markup, class names, CSS, config or a mocked call sequence; Playwright only for scan-to-save and shop check; and review triage rejects a finding that only asks for a test unless it names the criterion or the spine rule
+**And** a bullet says stories stay compact, a spec and diff Mika can scan in one review, and a spec that warns oversized is split before building
+**And** a bullet says a story that changes a spine contract updates ARCHITECTURE-SPINE.md in the same commit, as an acceptance criterion, never as a deferral
+**And** nothing else in CLAUDE.md changes
+
+### Story 4.16: [D34] Save failures that lead somewhere
+
+As Mika,
+I want a save that cannot succeed to tell me what to do next,
+So that I never retry "Couldn't save" on a book the sources stopped knowing or whose data is too long to store (Epic 3 retrospective R5, R6).
+
+**Acceptance Criteria:**
+
+**Given** Add to library on a Not in library Answer
+**When** the save finds that no source knows the ISBN any more (`NOT_FOUND`)
+**Then** `saveCopyAction` returns `NOT_FOUND` instead of folding it into `SAVE_FAILED`, and the scan screen shows the Answer for that ISBN again, which is now Not found with the manual fields
+**And** source values longer than their field allows (title and subtitle 500, description 10 000, author and series names 200) are clipped when the shared Book is created, so such an ISBN still saves
+**And** on Not found, a title over 500 or an author over 200 characters is marked on its own field as too long, not as required and not as "Couldn't save", with the string in English and Finnish
+**And** every other failure still shows "Couldn't save. Try again." (EXPERIENCE.md)
+
+### Story 4.17: [D35] One lookup outcome per save
+
+As Mika,
+I want Add to library to save the edition the Answer showed me,
+So that a slow or restarted source never swaps in another edition or cover, and a save never waits on the sources inside its transaction (Epic 3 retrospective R1, S2, S4).
+
+**Acceptance Criteria:**
+
+**Given** a save of `{ isbn13, pick }` with no Book held for the ISBN
+**When** `saveCopy` runs
+**Then** it resolves the sources' outcome once, before the transaction opens, and passes that outcome to both the cover download and `ensureSharedBook()`; no source is called inside the save transaction
+**And** the Answer sends the picked candidate's identity (source and record id) with `pick`, and a save whose candidate is no longer in the outcome fails with `NOT_FOUND` (shown as in Story 4.16) instead of saving another edition
+**And** a `found` outcome merged while a source failed is held for a few minutes, so the save sees what the Answer saw
+**And** a held private Book's auto-share takes the picked candidate's values (D-7), not always the first
+**And** the spine (AD-11) and `epic-3-context.md` state one rule: a save uses the held outcome and asks the sources again only on a miss, before the transaction opens
+
+### Story 4.18: [D36] Lookup limit on saves and cover previews
+
+As Mika,
+I want every path that asks Finna or Google Books in my name to count against my lookup limit,
+So that a runaway client cannot hammer the sources through a save or a cover image (Epic 3 retrospective R2).
+
+**Acceptance Criteria:**
+
+**Given** `limitLookups(ctx)` (30 lookups per 60 s per user)
+**When** a save asks the sources because no outcome is held, or the cover preview route fetches a cover it has not fetched before
+**Then** the call counts against the same per-user limit and is refused with `RATE_LIMITED` past it
+**And** the cover preview keeps fetched bytes per user, ISBN and pick for the preview's lifetime, bounded, so repeated requests for one image fetch it once
+**And** `lookupLimit.ts`'s comment lists every caller
+
+### Story 4.19: [D37] Private-Book merge clean-up and the D-8 merge rule
+
+As Mika,
+I want sharing or merging a hand-entered Book to leave no orphans and no needless overrides,
+So that authors lists stay clean and the source's spelling wins over a typing difference (Epic 3 retrospective R3, R4; D-8).
+
+**Acceptance Criteria:**
+
+**Given** a save that merges a private Book into the shared Book with its ISBN, or promotes it to shared
+**When** the merge deletes the private Book
+**Then** it first checks `isUnreferenced()`, and the save fails and rolls back when anything else still points at that Book
+**And** the private authors, series and cover the private Book used are deleted when nothing references them after the promote or merge
+**And** as a non-admin user, a value I typed that differs from the source only by case, whitespace or punctuation becomes no override, so the source value shows (an admin's differing values are already dropped)
+**And** the D-8 wording in Story 3.39's and Story 5.35's acceptance criteria says "differs beyond case, whitespace and punctuation"
+
+### Story 4.20: [C14] Lean Finna raw data and the source order check
+
+As Mika,
+I want a Book to store only its own edition's Finna records, and a test that keeps Finna ahead of Google Books,
+So that raw data stays small without losing what a parser needs, and the source order cannot flip silently (Epic 3 retrospective R7, R13).
+
+**Acceptance Criteria:**
+
+**Given** a Finna response for `isbn:"<isbn13>"`
+**When** the adapter builds `raw.finna`
+**Then** it keeps the response with only the records that match the ISBN asked for (`finnaMatches()`), each record whole, `fullRecord` included
+**And** a one-off script trims `rawMetadata.sources.finna` the same way on Books already saved, runs once against production and reports how many Books it changed
+**And** one integration test with both sources answering proves the stored Book takes Finna's title and `source: 'finna'`, and a field Finna lacks from Google Books; reversing the list in `sources/index.ts` fails it
+
+### Story 4.21: [A27] One helper for system privileges
+
+As the developer,
+I want privileged Local API calls to go through one helper that lint guards,
+So that system privileges stay inside the AD-3 allowlist without relying on review (Epic 3 retrospective A7, decision 4; Story 1.7 deferred item).
+
+**Acceptance Criteria:**
+
+**Given** the services in `lib/catalogue`
+**When** one needs system privileges
+**Then** it uses one `system(tx)` helper returning `{ req, overrideAccess: true, depth: 0 }`, which replaces the repeated literal in `ensureSharedBook.ts`, `createPrivateBook.ts` and `findOrCreateByName.ts` and the inline sites
+**And** `npm run lint` fails on `overrideAccess: true` anywhere in `src` outside the helper's module and the first-user seed
+**And** behaviour does not change, and the existing tests pass unchanged
+
+### Story 4.22: [K17] Test lanes that pass on their own
+
+As the developer,
+I want `npm test` to pass locally the way CI runs it, with no flaky unit test,
+So that a red run means a real failure (Epic 3 retrospective P6, P8).
+
+**Acceptance Criteria:**
+
+**Given** a local checkout with the Compose Postgres
+**When** `npm test` runs the unit, integration and Playwright lanes
+**Then** the integration lane runs on the migration-built `bookeh_test` with push off by default, as CI does, and Playwright's web server starts without stopping at Payload's push prompt
+**And** if `bookeh_test` was pushed anyway, the e2e lane fails within seconds with a message naming the reset, not after the 180 s web-server timeout
+**And** `tests/unit/scanScreen.unit.spec.ts` passes 20 runs in a row (the jsdom canvas error from `@zxing/browser` no longer occurs)
+**And** README and `.env.example` describe the same defaults
+
+### Story 4.23: [A28] Settings switches that keep up
+
+As Mika,
+I want the Settings switches to show what is stored, with names a screen reader can tell apart,
+So that two quick taps never leave a switch showing the wrong value (Epic 1 retrospective R3, R15; Story 3.44 deferred item).
+
+**Acceptance Criteria:**
+
+**Given** the Theme, Language and Visibility switches in Settings
+**When** I tap two options quickly and the first change settles after the second
+**Then** each switch shows the value of my last tap, and a stale settle is ignored (a request sequence per control)
+**And** each visibility switch group has its own accessible name, distinct from the "Profile" heading, and its visible label is associated with the group
+**And** an error toast from a failed change is dismissed when a retry of that change succeeds
+
+### Story 4.24: [A29] Server-side guards from Epic 1
+
+As the developer,
+I want the guards the Epic 1 retrospective asked for,
+So that the gateway, the profile and the first boot hold under misuse and races (Epic 1 retrospective R4, R10, R11).
+
+**Acceptance Criteria:**
+
+**Given** `updateByID` and `deleteByID` in `lib/payload/gateway.ts`
+**When** either is called with a `where` option
+**Then** it throws at runtime, not only at the type level
+**And** `updateProfile()` rejects a display name over 100 characters or containing control characters with `VALIDATION` on `displayName`
+**And** two processes running the first-user seed on an empty database both finish booting: the one that loses on the unique email treats it as already seeded
+
+### Story 4.25: [K18] Checks that test themselves
+
+As the developer,
+I want the CI migration check and the custom lint rule to fail when they stop working,
+So that a Payload bump or a config typo cannot quietly turn a gate into a no-op (Epic 1 retrospective R5, R14).
+
+**Acceptance Criteria:**
+
+**Given** CI's missing-migration step
+**When** `migrate:create` runs
+**Then** the step no longer depends on Payload's exact log wording: it fails when a migration file would be written and when the command stops at a prompt, and both cases are checked once by hand and recorded in the story's spec
+**And** a `RuleTester` unit spec covers `bookeh/client-lib-imports`: an allowed import passes, a `src/lib` import from a client component fails, and a re-export barrel under `src/app` that passes `src/lib` into a client component fails
+**And** the barrel loophole is closed in the rule
 
 ### Story 4.1: [E21] Only my own Books by id
 

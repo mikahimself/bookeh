@@ -48,7 +48,7 @@ flowchart LR
   A --> K["K Platform and operations"]
 ```
 
-Recommended sequence, as the epics order it: A with K1, K5, K9 and K10; K2 to K4; then K15, D9, C9, B, U, C, D1 to D8, D10, D15 to D18, D23, D25, D26, D32, E26, F1, F2, I9, A20, A23, K11 and C12 for the first saved book; then E21, D5, D19 to D22, D24, D27 and F6 for Edit book with the copy's status and location, which with K2 to K4 opens the cataloguing gate (K12 rehearses the restore once real books are in); then D28 to D31 (covers), E, F3 to F5, F7, F8, H13, D33, K6 and K14; then J, H, I, G, and K13 last. Edit book comes before the collection (D-5) so real cataloguing never produces a book without a location.
+Recommended sequence, as the epics order it: A with K1, K5, K9 and K10; K2 to K4; then K15, D9, C9, B, U, C, D1 to D8, D10, D15 to D18, D23, D25, D26, D32, E26, F1, F2, I9, A20, A23, K11 and C12 for the first saved book; then K16, D34 to D37 and C14 (Epic 3 retrospective hardening) and A27 to A29, K17 and K18 (housekeeping); then E21, D5, D19 to D22, D24, D27 and F6 for Edit book with the copy's status and location, which with K2 to K4 opens the cataloguing gate (K12 rehearses the restore once real books are in); then D28 to D31 (covers), E, F3 to F5, F7, F8, H13, D33, K6 and K14; then J, H, I, G, and K13 last. Edit book comes before the collection (D-5) so real cataloguing never produces a book without a location.
 
 ## A — Foundation
 
@@ -80,6 +80,9 @@ Recommended sequence, as the epics order it: A with K1, K5, K9 and K10; K2 to K4
 | A24 | `processState` helper for in-process state | Library | none | AD-12 |
 | A25 | Client helper for actions and `/data` requests: no connection, signed out | Library | A13 | Errors |
 | A26 | Swiping between sections, wrap-round, edge-swipe ignored | Screen | A22 | UX: Information Architecture |
+| A27 | One `system(tx)` helper for privileged Local API calls; lint bans `overrideAccess: true` elsewhere (Epic 3 retrospective) | Foundation | A7, A10 | AD-3 |
+| A28 | Settings switches: stale settles ignored, distinct accessible names, error toast cleared on retry (Epic 1 retrospective) | Screen | K5, K10 | UX: Settings |
+| A29 | Gateway by-ID runtime guard, display name cap, first-user seed safe under concurrent boot (Epic 1 retrospective) | Foundation | A9, A10, K9 | AD-16, AD-18 |
 
 ## U — Undo
 
@@ -120,6 +123,7 @@ Recommended sequence, as the epics order it: A with K1, K5, K9 and K10; K2 to K4
 | C11 | `matches` on the lookup result: new authors and series | Service | C6 | AD-9, FR-13 |
 | C12 | Edition picker on the Answer, `?pick`, `{ isbn13, pick }` | Screen | D16, C4 | AD-9, AD-11, D-7 |
 | C13 | Revalidate Google Books: capture the Google responses C9 could not, the D-2 checkpoint, adapter tests on recorded `isbn:` answers (Epic 3 retrospective) | Setup | C3, C9 | Tests, D-2 |
+| C14 | Finna raw data keeps only the records matching the ISBN; integration check that Finna wins over Google Books (Epic 3 retrospective) | Adapter | C2, C4 | AD-9, FR-18 |
 
 ## D — Save and edit
 
@@ -154,6 +158,10 @@ Recommended sequence, as the epics order it: A with K1, K5, K9 and K10; K2 to K4
 | D31 | Add, Replace and Remove cover on Edit book | Screen | D29, D30, D21 | AD-14, FR-47 |
 | D32 | `requestId`: a repeated save returns the first result | Service | D4, A24 | AD-11, AD-12 |
 | D33 | `lookupAgain`: Look it up again for a hand-entered Book (copies and `user-books` move; entries from H7) | Service | D8, C6, E8 | AD-5, AD-9, D-8 |
+| D34 | Save failures that lead somewhere: `NOT_FOUND` reopens the Answer, over-long values clipped or marked (Epic 3 retrospective) | Service | D4, D17, D26 | AD-11, AD-15 |
+| D35 | One lookup outcome per save, resolved before the transaction; the picked candidate carried by identity (Epic 3 retrospective) | Service | D4, C12, D8 | AD-9, AD-11, D-7 |
+| D36 | Lookup limit on saves and cover previews; preview bytes kept per user, ISBN and pick (Epic 3 retrospective) | Service | C7, D10, D35 | AD-9, AD-12 |
+| D37 | Private-Book merge checks references and removes orphaned private rows; case and punctuation differences merge (Epic 3 retrospective) | Service | D8 | AD-5, D-8 |
 
 After D17, the first book can be catalogued from the phone.
 
@@ -299,6 +307,9 @@ After I2, the first real shop check works.
 | K13 | Phase 1 acceptance: the success metrics measured and written down | Test | everything | PRD Success Metrics |
 | K14 | Last backup in Settings, admin only | Screen | K4, K5 | NFR-6 |
 | K15 | Epic 1 clean-up: e2e specs outside the Tests convention removed, unit and integration tests trimmed to a functional minimum, the flash-cookie encoding fixed, sign-out failures as an error toast (Epic 1 retrospective) | Test | A16, A17 | Tests |
+| K16 | Conventions in CLAUDE.md: tests, story size, spine updates with the story (Epic 3 retrospective) | Setup | none | Tests |
+| K17 | Test lanes pass locally as in CI: int push off, e2e fails fast on a pushed database, scan screen flake fixed (Epic 3 retrospective) | Test | A4, D15 | Tests |
+| K18 | CI migration check without log grepping; `RuleTester` spec for the client import rule and its barrel loophole closed (Epic 1 retrospective) | Test | A6, K7 | AD-13, Tests |
 
 ## Retired slices
 

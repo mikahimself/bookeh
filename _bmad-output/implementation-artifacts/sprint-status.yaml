@@ -126,6 +126,17 @@ development_status:
   epic-3-retrospective: done
 
   epic-4: backlog
+  4-15-k16-conventions-for-tests-story-size-and-the-spine: backlog
+  4-16-d34-save-failures-that-lead-somewhere: backlog
+  4-17-d35-one-lookup-outcome-per-save: backlog
+  4-18-d36-lookup-limit-on-saves-and-cover-previews: backlog
+  4-19-d37-private-book-merge-clean-up-and-the-d-8-merge-rule: backlog
+  4-20-c14-lean-finna-raw-data-and-the-source-order-check: backlog
+  4-21-a27-one-helper-for-system-privileges: backlog
+  4-22-k17-test-lanes-that-pass-on-their-own: backlog
+  4-23-a28-settings-switches-that-keep-up: backlog
+  4-24-a29-server-side-guards-from-epic-1: backlog
+  4-25-k18-checks-that-test-themselves: backlog
   4-1-e21-only-my-own-books-by-id: backlog
   4-2-d5-edit-a-shared-book: backlog
   4-3-d19-edit-authors-and-series: backlog
