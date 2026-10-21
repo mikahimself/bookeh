@@ -27,6 +27,10 @@ ruleTester.run('bookeh/client-lib-imports', clientLibImports as unknown as Rule.
         "import { shelfQuery } from '@/lib/shelf/query'",
       ].join('\n'),
     },
+    {
+      filename: client,
+      code: ["'use client'", "import { checkCorners } from '@/lib/catalogue/corners'"].join('\n'),
+    },
     { filename: server, code: "export type { Book } from '@/lib/books'" },
     {
       filename: path.resolve(import.meta.dirname, '../../src/lib/books/index.ts'),

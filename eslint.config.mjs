@@ -82,30 +82,35 @@ const isTypeOnly = (node, kind) =>
   (node.specifiers?.length > 0 && node.specifiers.every((s) => s[kind] === 'type'))
 
 /**
- * Spine, Design Paradigm: client components import from `src/lib` only types
- * and `lib/shelf/query.ts`. A client component is a file whose directive
- * prologue contains 'use client'. A module under `src/app` may not re-export
- * `src/lib` values either, since a client component could import it: the rule
- * reads one file at a time, so it reports the barrel, not the importer.
+ * Spine, Design Paradigm: client components import from `src/lib` only types,
+ * `lib/shelf/query.ts` and `lib/catalogue/corners.ts`, both pure. A client
+ * component is a file whose directive prologue contains 'use client'. A
+ * module under `src/app` may not re-export `src/lib` values either, since a
+ * client component could import it: the rule reads one file at a time, so it
+ * reports the barrel, not the importer.
  */
 export const clientLibImports = {
   meta: {
     type: 'problem',
     docs: {
-      description: 'Client components import from src/lib only types and lib/shelf/query.',
+      description:
+        'Client components import from src/lib only types, lib/shelf/query and lib/catalogue/corners.',
     },
     schema: [],
     messages: {
       restricted:
-        "Spine, Design Paradigm: a 'use client' component imports from src/lib only types and lib/shelf/query. Remove the import, or make it `import type`.",
+        "Spine, Design Paradigm: a 'use client' component imports from src/lib only types, lib/shelf/query and lib/catalogue/corners. Remove the import, or make it `import type`.",
       reexport:
-        'Spine, Design Paradigm: client components import from src/lib only types and lib/shelf/query, so a module under src/app may not re-export src/lib values: a client component could import it. Import the value from src/lib in server code, or make it `export type`.',
+        'Spine, Design Paradigm: client components import from src/lib only types, lib/shelf/query and lib/catalogue/corners, so a module under src/app may not re-export src/lib values: a client component could import it. Import the value from src/lib in server code, or make it `export type`.',
     },
   },
   create(context) {
     const filename = context.physicalFilename ?? context.filename
     const fileDir = path.dirname(filename)
-    const shelfQuery = path.join(libDir, 'shelf', 'query')
+    const pure = new Set([
+      path.join(libDir, 'shelf', 'query'),
+      path.join(libDir, 'catalogue', 'corners'),
+    ])
     const inApp = filename.startsWith(appDir + path.sep)
 
     const isRestricted = (source) => {
@@ -113,7 +118,7 @@ export const clientLibImports = {
       if (!resolved || (resolved !== libDir && !resolved.startsWith(libDir + path.sep)))
         return false
       const withoutExt = resolved.replace(/\.(ts|tsx|js|jsx|mjs|cjs)$/, '')
-      return withoutExt !== shelfQuery
+      return !pure.has(withoutExt)
     }
 
     let isClient = false

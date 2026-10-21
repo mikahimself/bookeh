@@ -117,6 +117,16 @@
       "themes": "Teemat"
     }
   },
+  "cornerCrop": {
+    "label": "Rajaa kansi",
+    "hint": "Kuvaa suoraan edestä",
+    "use": "Käytä",
+    "cancel": "Peruuta",
+    "tl": "Vasen yläkulma",
+    "tr": "Oikea yläkulma",
+    "br": "Oikea alakulma",
+    "bl": "Vasen alakulma"
+  },
   "sources": {
     "finna": "Finna",
     "google": "Google Books"

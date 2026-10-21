@@ -61,7 +61,7 @@ Arrows are the only allowed import directions, and ESLint `no-restricted-imports
 - `account` imports no other service.
 - `lib/undo` imports only `lib/payload` and `lib/errors`. Any service may import it. `lib/errors.ts` and `lib/processState.ts` import nothing from the project, and any module under `src/lib` may import them.
 - `src/app/(frontend)` imports from `lib/payload` only `requireUser`, `requireUserOrThrow` and types. It never calls the gateway.
-- Client components import from `src/lib` only types and `lib/shelf/query.ts`, which is pure.
+- Client components import from `src/lib` only types, `lib/shelf/query.ts` and `lib/catalogue/corners.ts` (`checkCorners`, `Point`, `Corners`), which are pure.
 
 ## Invariants & Rules
 
@@ -303,7 +303,7 @@ Arrows are the only allowed import directions, and ESLint `no-restricted-imports
 | Configuration | Environment variables only, each listed in `.env.example`. |
 | Caching | No shared or cross-request caching of anything derived from user data. No service worker. |
 | Device preferences | Layout, size, theme and loans order live in one cookie, `bookeh_prefs`. `devicePrefs()` in `src/app/(frontend)/prefs.ts` reads it at render; one server action writes it. They are never stored on the profile. A missing or unknown value falls back to the default. Interface language is not a device preference; it stays on the profile (AD-15). |
-| Styling | Tailwind CSS 4. The tokens are those of `DESIGN.md`, declared under the same names as Tailwind theme variables in `src/app/(frontend)/styles.css` and nowhere else. Dark values apply under `data-theme="dark"` on the root element, and under `prefers-color-scheme: dark` when the theme preference is `system`. `styles.css` clears Tailwind's default colour, radius, shadow and font scales, so only these tokens resolve; a size `DESIGN.md` gives outside its scale is declared there as a named variable. No `dark:` utilities, no CSS Modules, no inline style objects, no colour or size literals in components. |
+| Styling | Tailwind CSS 4. The tokens are those of `DESIGN.md`, declared under the same names as Tailwind theme variables in `src/app/(frontend)/styles.css` and nowhere else. Dark values apply under `data-theme="dark"` on the root element, under `prefers-color-scheme: dark` when the theme preference is `system`, and to a subtree marked `data-palette="dark"` whatever the theme (the Corner crop). `styles.css` clears Tailwind's default colour, radius, shadow and font scales, so only these tokens resolve; a size `DESIGN.md` gives outside its scale is declared there as a named variable. No `dark:` utilities, no CSS Modules, no inline style objects, no colour or size literals in components. The one exception: positions computed at run time from measured geometry (the Corner crop's handles) may use an inline `style`, with any px constant named after its token. |
 | UI primitives | Dialog, sheet, combobox, menu and the other overlays come from Base UI, each wrapped once in `src/app/(frontend)/components/ui`. Screens import the wrappers, never `@base-ui/react`, and ESLint enforces it. The side panel on wide screens is plain layout, not a drawer. No other component library and no animation library; motion is CSS transitions or view transitions. |
 | Font | Open Sans through `next/font`, loaded once in the frontend root layout. The browser makes no request to a font host. |
 | Product name | The interface says "bookeh", from the message catalogue and the manifest. Documents may say Bookie. |

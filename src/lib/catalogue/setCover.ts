@@ -8,7 +8,8 @@ import { assertLive, onRollback, withTransaction } from '@/lib/payload/transacti
 import { attachCover, deleteMediaRow, discardCover, writeMediaFile } from './covers'
 import { isUnreferenced } from './isUnreferenced'
 import { system } from './system'
-import { type Corners, warpCover } from './warpCover'
+import type { Corners } from './corners'
+import { warpCover } from './warpCover'
 
 /** The largest upload accepted, before any decoding. */
 export const MAX_COVER_UPLOAD_BYTES = 5 * 1024 * 1024

@@ -117,6 +117,16 @@
       "themes": "Themes"
     }
   },
+  "cornerCrop": {
+    "label": "Crop cover",
+    "hint": "Shoot it straight on",
+    "use": "Use",
+    "cancel": "Cancel",
+    "tl": "Top left corner",
+    "tr": "Top right corner",
+    "br": "Bottom right corner",
+    "bl": "Bottom left corner"
+  },
   "sources": {
     "finna": "Finna",
     "google": "Google Books"

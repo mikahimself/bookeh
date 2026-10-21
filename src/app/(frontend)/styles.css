@@ -12,7 +12,9 @@
  * off weight synthesis so no bold is ever drawn.
  * Dark values follow the light ones twice: once for `data-theme="dark"` and
  * once for the OS preference when the theme is anything but `light` or
- * `dark`. Keep the two dark blocks equal.
+ * `dark`. Keep the two dark blocks equal. The explicit block also matches
+ * `data-palette="dark"`, which keeps a subtree dark whatever the theme (the
+ * Corner crop).
  */
 @import 'tailwindcss' source('../..');
 
@@ -33,6 +35,9 @@
   --color-scrim: #00000033;
   --color-danger: #9b1c31;
   --color-shadow: #1f293324;
+  /* The Corner crop stage, the same in both themes (DESIGN.md, Corner crop). */
+  --color-crop-dim: #00000099;
+  --color-crop-halo: #0000008c;
 
   /* Type roles */
   --text-heading-section: 44px;
@@ -126,7 +131,9 @@
 }
 
 @layer theme {
-  :root[data-theme='dark'] {
+  /* `data-palette='dark'` keeps a subtree dark whatever the theme (Corner crop). */
+  :root[data-theme='dark'],
+  [data-palette='dark'] {
     color-scheme: dark;
     --color-background: #14181d;
     --color-text: #e3e8ee;

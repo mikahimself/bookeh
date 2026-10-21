@@ -7,7 +7,7 @@ import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest'
 
 import { mediaDir } from '@/lib/catalogue/covers'
 import { removeCover, setCover } from '@/lib/catalogue/setCover'
-import type { Corners } from '@/lib/catalogue/warpCover'
+import type { Corners } from '@/lib/catalogue/corners'
 import { DomainError } from '@/lib/errors'
 import type { Context } from '@/lib/payload/context'
 import * as gateway from '@/lib/payload/gateway'

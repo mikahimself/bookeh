@@ -1,7 +1,8 @@
 import sharp from 'sharp'
 import { describe, expect, it } from 'vitest'
 
-import { checkCorners, type Corners, squareToQuad, warpCover } from '@/lib/catalogue/warpCover'
+import { checkCorners, type Corners } from '@/lib/catalogue/corners'
+import { squareToQuad, warpCover } from '@/lib/catalogue/warpCover'
 
 // The cover warp, AD-14: a hand-written square-to-quad map, a corner check
 // that admits only convex clockwise quads inside the image, and output that
