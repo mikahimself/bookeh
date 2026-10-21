@@ -92,7 +92,25 @@
     "heading": "Edit book",
     "save": "Save",
     "discardTitle": "Discard changes?",
-    "discard": "Discard"
+    "discard": "Discard",
+    "moreDetails": "More details",
+    "addAuthor": "Add author",
+    "checkField": "Check this field.",
+    "field": {
+      "title": "Title",
+      "subtitle": "Subtitle",
+      "author": "Author",
+      "series": "Series",
+      "seriesIndex": "Number in series",
+      "publisher": "Publisher",
+      "year": "Year",
+      "language": "Language",
+      "pages": "Pages",
+      "description": "Description",
+      "isbn": "ISBN",
+      "genres": "Genres",
+      "themes": "Themes"
+    }
   },
   "sources": {
     "finna": "Finna",

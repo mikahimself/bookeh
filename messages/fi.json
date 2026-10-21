@@ -92,7 +92,25 @@
     "heading": "Muokkaa kirjaa",
     "save": "Tallenna",
     "discardTitle": "Hylätäänkö muutokset?",
-    "discard": "Hylkää"
+    "discard": "Hylkää",
+    "moreDetails": "Lisätiedot",
+    "addAuthor": "Lisää tekijä",
+    "checkField": "Tarkista tämä kenttä.",
+    "field": {
+      "title": "Nimeke",
+      "subtitle": "Alaotsikko",
+      "author": "Tekijä",
+      "series": "Sarja",
+      "seriesIndex": "Numero sarjassa",
+      "publisher": "Kustantaja",
+      "year": "Vuosi",
+      "language": "Kieli",
+      "pages": "Sivuja",
+      "description": "Kuvaus",
+      "isbn": "ISBN",
+      "genres": "Lajityypit",
+      "themes": "Teemat"
+    }
   },
   "sources": {
     "finna": "Finna",

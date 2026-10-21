@@ -3,6 +3,7 @@
 import { useTranslations } from 'next-intl'
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore, useTransition } from 'react'
 
+import type { Named } from '@/lib/books/effectiveBook'
 import type { ErrorCode } from '@/lib/errors'
 
 import { Button } from '../../../components/Button'
@@ -16,7 +17,8 @@ import { Dialog } from '../../../components/ui/Dialog'
 import { useCloseOnBack } from '../../../components/ui/overlay'
 
 import { editBookAction } from './actions'
-import { clearDraft, isEmpty, readDraft, type Draft } from './draft'
+import { clearDraft, isEmpty, readDraft, setEdit, writeDraft, type Draft } from './draft'
+import { MoreDetails, type EffectiveEdits, type OnEdit } from './MoreDetails'
 
 const subscribeNothing = () => () => undefined
 const onClient = () => true
@@ -28,11 +30,12 @@ const onServer = () => false
  * primary.
  *
  * The draft is the sparse `BookEdits` of unsaved changes, restored from
- * `sessionStorage` once mounted (draft.ts). Story 4.8 turns the restored
- * draft into state, which its fields change with `setEdit(draft, key, value,
- * effective)` and which is written through `writeDraft`; that state drives
+ * `sessionStorage` once mounted (draft.ts) and state from the first edit on.
+ * More details' fields change it with `setEdit(draft, key, value,
+ * effective)`, so it holds only keys that differ from the `effective`
+ * values, and every change is written through `writeDraft`; it drives
  * `dirty` and the guard. The fields show the `marks` a rejected Save left
- * under them.
+ * under them; editing a field clears its mark.
  *
  * Save sends the draft (`editBookAction`): "Saved", the draft cleared and
  * the task closed (history back, `/` fallback), unless the task has already
@@ -55,6 +58,11 @@ export function EditBookScreen({
   authors,
   source,
   cover,
+  effective,
+  isbnEditable,
+  genreOptions,
+  genres,
+  themes,
 }: {
   bookId: number
   title: string
@@ -63,6 +71,13 @@ export function EditBookScreen({
   /** "From {source}", or `null` with no or an unknown source. */
   source: string | null
   cover: string | null
+  /** The `BookEdits` values as the viewer sees the Book. */
+  effective: EffectiveEdits
+  isbnEditable: boolean
+  /** The system genres to choose from; `null` when the viewer may not change them. */
+  genreOptions: Named[] | null
+  genres: Named[]
+  themes: string[]
 }) {
   const t = useTranslations()
   const { show } = useToast()
@@ -71,9 +86,11 @@ export function EditBookScreen({
   const mounted = useSyncExternalStore(subscribeNothing, onClient, onServer)
   // Read once mounted: the server has no `sessionStorage`, and a hydrating
   // render must match its HTML.
-  const draft = useMemo<Draft>(() => (mounted ? readDraft(bookId) : {}), [mounted, bookId])
-  // Per key, the code of a field Save had rejected; Story 4.8's fields read it.
-  const [, setMarks] = useState<Record<string, ErrorCode>>({})
+  const restored = useMemo<Draft>(() => (mounted ? readDraft(bookId) : {}), [mounted, bookId])
+  const [edits, setEdits] = useState<Draft | null>(null)
+  const draft = edits ?? restored
+  // Per key, the code of a field Save had rejected.
+  const [marks, setMarks] = useState<Record<string, ErrorCode>>({})
   const [asking, setAsking] = useState(false)
   const [armed, setArmed] = useState(true)
   const [pending, startTransition] = useTransition()
@@ -95,6 +112,16 @@ export function EditBookScreen({
   }, [])
 
   const dirty = !isEmpty(draft)
+
+  const edit: OnEdit = (key, value) => {
+    const next = setEdit(draft, key, value, effective[key])
+    setEdits(next)
+    writeDraft(bookId, next)
+    if (marks[key] !== undefined) {
+      const { [key]: _cleared, ...rest } = marks
+      setMarks(rest)
+    }
+  }
 
   const guarding = dirty && armed
   useCloseOnBack(
@@ -185,6 +212,16 @@ export function EditBookScreen({
           {source !== null && <p className="text-meta text-text-muted">{source}</p>}
         </div>
       </div>
+      <MoreDetails
+        effective={effective}
+        draft={draft}
+        marks={marks}
+        isbnEditable={isbnEditable}
+        genreOptions={genreOptions}
+        genres={genres}
+        themes={themes}
+        onEdit={edit}
+      />
       <Dialog
         open={asking}
         onOpenChange={setAsking}

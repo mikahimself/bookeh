@@ -1,12 +1,15 @@
 import { getTranslations } from 'next-intl/server'
 import { ViewTransition } from 'react'
 
+import { canEditShared } from '@/access/roles'
 import { getEffectiveBooks, type EffectiveBook } from '@/lib/books/effectiveBook'
 import { requireOwnBook } from '@/lib/books/requireOwnBook'
+import { listGenres } from '@/lib/catalogue/listGenres'
 import { DomainError } from '@/lib/errors'
 import { requireUser, type Context } from '@/lib/payload/context'
 
 import { EditBookScreen } from './EditBookScreen'
+import type { EffectiveEdits } from './MoreDetails'
 import { NotHeld } from './NotHeld'
 
 /** Postgres `integer`'s largest value, the widest id a Book can have. */
@@ -23,12 +26,35 @@ async function heldBook(ctx: Context, bookId: number): Promise<EffectiveBook | u
   return (await getEffectiveBooks(ctx, [bookId])).get(bookId)
 }
 
+/** The Book's values in the shape of `BookEdits`, which the draft is compared with. */
+function effectiveEdits(book: EffectiveBook): EffectiveEdits {
+  const edits: EffectiveEdits = {
+    title: book.title,
+    subtitle: book.subtitle,
+    authors: book.authors.map(({ name }) => name),
+    series: book.series?.name ?? null,
+    seriesIndex: book.seriesIndex,
+    genres: book.genres.map(({ id }) => id).sort((a, b) => a - b),
+    publisher: book.publisher,
+    year: book.year,
+    language: book.language,
+    pages: book.pages,
+    description: book.description,
+  }
+  if (book.isbn13 !== null) edits.isbn13 = book.isbn13
+  return edits
+}
+
 /**
  * Edit book (EXPERIENCE.md, Edit book), a full-screen task at
  * `/books/[bookId]/edit`. The wrapper sits in the page, as on `/scan`, so the
  * task slides in and away with the route. An id that is not digits, a Book
  * the viewer holds no copy of, or one they can no longer read is "not held":
  * the toast "Not in library" over the section.
+ *
+ * The page decides what More details may change: the ISBN on the viewer's
+ * own private Book; the system genres there and, for the admin, on a shared
+ * Book, with every system genre as the options.
  */
 export default async function EditBookPage({ params }: PageProps<'/books/[bookId]/edit'>) {
   const ctx = await requireUser()
@@ -44,6 +70,10 @@ export default async function EditBookPage({ params }: PageProps<'/books/[bookId
   const source =
     key !== null && sources.has(key) ? t('answer.from', { source: sources(key) }) : null
 
+  const isbnEditable = book.visibility === 'private'
+  const genresEditable = isbnEditable || canEditShared(ctx.user)
+  const genreOptions = genresEditable ? await listGenres(ctx) : null
+
   return (
     <ViewTransition enter="task-enter" exit="task-exit" default="none">
       <EditBookScreen
@@ -52,6 +82,11 @@ export default async function EditBookPage({ params }: PageProps<'/books/[bookId
         authors={book.authors.map(({ name }) => name).join(', ')}
         source={source}
         cover={book.coverUrl}
+        effective={effectiveEdits(book)}
+        isbnEditable={isbnEditable}
+        genreOptions={genreOptions}
+        genres={book.genres}
+        themes={book.themes}
       />
     </ViewTransition>
   )
