@@ -202,6 +202,18 @@ describe('createToastStore', () => {
     expect(store.getState()).toMatchObject({ undoToken: null })
   })
 
+  // Matrix row 5: a retry that succeeds withdraws its own error, never a newer toast.
+  it('withdraw dismisses its own toast and leaves a newer one', () => {
+    const store = createToastStore()
+    const first = store.show(error)
+    const second = store.show(error)
+    store.withdraw(first)
+    expect(store.getState()).toMatchObject({ id: second, leaving: false })
+
+    store.withdraw(second)
+    expect(store.getState()).toMatchObject({ id: second, leaving: true })
+  })
+
   it('increments id per show', () => {
     const store = createToastStore()
     store.show(success)

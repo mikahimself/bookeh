@@ -2,8 +2,14 @@
 
 export type TextSwitchOption<V extends string> = { value: V; label: string }
 
-export type TextSwitchProps<V extends string> = {
-  label: string
+export type TextSwitchProps<V extends string> = (
+  | { label: string; labelledBy?: never }
+  | {
+      /** Ids of visible text naming the group (`aria-labelledby`), in reading order. */
+      labelledBy: string
+      label?: never
+    }
+) & {
   value: V
   options: readonly TextSwitchOption<V>[]
   onChange: (value: V) => void
@@ -20,13 +26,19 @@ export type TextSwitchProps<V extends string> = {
  */
 export function TextSwitch<V extends string>({
   label,
+  labelledBy,
   value,
   options,
   onChange,
   properNames = false,
 }: TextSwitchProps<V>) {
   return (
-    <div role="group" aria-label={label} className="flex flex-wrap gap-4">
+    <div
+      role="group"
+      aria-label={label}
+      aria-labelledby={labelledBy}
+      className="flex flex-wrap gap-4"
+    >
       {options.map((option) => {
         const chosen = option.value === value
         return (

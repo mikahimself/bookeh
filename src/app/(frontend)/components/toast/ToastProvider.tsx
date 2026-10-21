@@ -17,14 +17,10 @@ import { undoAction } from '../../actions/undo'
 import { ActionLink } from '../Link'
 import { reportFailure, settleAction } from '../request'
 import { takeFlash } from './flashCookie'
-import { createToastStore, toastMessage, type ToastInput } from './store'
+import { createToastStore, toastMessage, type ToastStore } from './store'
 import { ToastView } from './ToastView'
 
-type ToastContextValue = {
-  show: (input: ToastInput) => void
-  dismiss: () => void
-  release: () => void
-}
+type ToastContextValue = Pick<ToastStore, 'show' | 'dismiss' | 'withdraw' | 'release'>
 
 const ToastContext = createContext<ToastContextValue | null>(null)
 
@@ -48,7 +44,12 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   const router = useRouter()
   const [undoPending, startUndo] = useTransition()
   const value = useMemo(
-    () => ({ show: store.show, dismiss: store.dismiss, release: store.release }),
+    () => ({
+      show: store.show,
+      dismiss: store.dismiss,
+      withdraw: store.withdraw,
+      release: store.release,
+    }),
     [store],
   )
 

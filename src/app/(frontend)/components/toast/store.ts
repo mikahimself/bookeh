@@ -28,8 +28,11 @@ export type ToastState = {
 } | null
 
 export type ToastStore = {
-  show: (input: ToastInput) => void
+  /** Returns the new toast's id, for `withdraw`. */
+  show: (input: ToastInput) => number
   dismiss: () => void
+  /** `dismiss`, but only while toast `id` is the one shown: a newer toast stays. */
+  withdraw: (id: number) => void
   /** A held success starts the ordinary `successMs` timer; anything else is untouched. */
   release: () => void
   subscribe: (listener: () => void) => () => void
@@ -89,7 +92,8 @@ export function createToastStore(leaveMs = 200, successMs = 8000): ToastStore {
     clearUndoTimer()
     const undo =
       input.kind === 'success' && input.undo && input.undo.seconds > 0 ? input.undo : null
-    set({ input, id: nextId++, leaving: false, undoToken: undo?.token ?? null })
+    const id = nextId++
+    set({ input, id, leaving: false, undoToken: undo?.token ?? null })
     if (undo) {
       undoTimer = setTimeout(() => {
         undoTimer = undefined
@@ -102,10 +106,15 @@ export function createToastStore(leaveMs = 200, successMs = 8000): ToastStore {
         startLeaving()
       }, successMs)
     }
+    return id
   }
 
   const dismiss = () => {
     startLeaving()
+  }
+
+  const withdraw = (id: number) => {
+    if (state?.id === id) startLeaving()
   }
 
   const release = () => {
@@ -124,5 +133,5 @@ export function createToastStore(leaveMs = 200, successMs = 8000): ToastStore {
     }
   }
 
-  return { show, dismiss, release, subscribe, getState: () => state }
+  return { show, dismiss, withdraw, release, subscribe, getState: () => state }
 }

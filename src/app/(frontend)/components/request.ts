@@ -47,7 +47,7 @@ export async function fetchData<T>(
 }
 
 export type ReportTargets = {
-  show: (input: ToastInput) => void
+  show: (input: ToastInput) => number
   dismiss: () => void
   replace: (href: string) => void
 }
@@ -56,19 +56,23 @@ export type ReportTargets = {
  * Spine, Errors; UX-DR51: how a client reports a failure. A signed-out
  * session goes to sign in and back to the address it is on now, query
  * included; the toast goes first, since the provider wraps /login too.
- * Anything else is an error toast.
+ * Anything else is an error toast. Returns that toast's id, `null` when
+ * there is none.
  */
-export function reportFailure(code: ErrorCode, { show, dismiss, replace }: ReportTargets): void {
+export function reportFailure(
+  code: ErrorCode,
+  { show, dismiss, replace }: ReportTargets,
+): number | null {
   if (code === 'UNAUTHENTICATED') {
     dismiss()
     replace(`/login?next=${encodeURIComponent(location.pathname + location.search)}`)
-    return
+    return null
   }
-  show({ kind: 'error', code })
+  return show({ kind: 'error', code })
 }
 
 /** `reportFailure` bound to the toast and the router. */
-export function useReportFailure(): (code: ErrorCode) => void {
+export function useReportFailure(): (code: ErrorCode) => number | null {
   const router = useRouter()
   const { show, dismiss } = useToast()
   return useCallback(

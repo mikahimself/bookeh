@@ -14,7 +14,9 @@ import { useToast } from './ToastProvider'
 export function RaiseToast({ input }: { input: ToastInput }) {
   const { show } = useToast()
 
-  useEffect(() => show(input), [show, input])
+  useEffect(() => {
+    show(input)
+  }, [show, input])
 
   return null
 }

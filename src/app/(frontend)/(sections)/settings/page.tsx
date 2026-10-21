@@ -13,10 +13,15 @@ import { LanguageSwitch } from './LanguageSwitch'
 import { ThemeSwitch } from './ThemeSwitch'
 import { VisibilitySwitch } from './VisibilitySwitch'
 
-function Group({ heading, children }: { heading: string; children: ReactNode }) {
+/** Names both visibility groups, after each one's own label. */
+const VISIBILITY_HEADING = 'settings-visibility'
+
+function Group({ heading, id, children }: { heading: string; id?: string; children: ReactNode }) {
   return (
     <section className="flex flex-col gap-4">
-      <h2 className="text-heading-group text-text-muted ui-case">{heading}</h2>
+      <h2 id={id} className="text-heading-group text-text-muted ui-case">
+        {heading}
+      </h2>
       {children}
     </section>
   )
@@ -54,16 +59,18 @@ export default async function SettingsPage() {
         <Group heading={t('theme')}>
           <ThemeSwitch initial={theme} options={THEMES} />
         </Group>
-        <Group heading={t('visibility')}>
+        <Group heading={t('visibility')} id={VISIBILITY_HEADING}>
           <VisibilitySwitch
             field="profileVisibility"
             label={t('profileVisibility')}
+            headingId={VISIBILITY_HEADING}
             initial={profile.profileVisibility}
             options={PROFILE_VISIBILITIES}
           />
           <VisibilitySwitch
             field="collectionVisibility"
             label={t('collectionVisibility')}
+            headingId={VISIBILITY_HEADING}
             initial={profile.collectionVisibility}
             options={COLLECTION_VISIBILITIES}
           />
