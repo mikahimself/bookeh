@@ -16,10 +16,10 @@ import { readableBy, visibleCopies } from './visibleCopies'
  * what is seen. `user_books` joins on the viewer, never the copy's owner.
  * `author` orders by the first readable effective author's `sortName`, no
  * author last both ways, then the effective title. Every sort ends on copy id
- * in the same direction. `q` (`textSearch`), the
- * scalar filters (`scalarFilters`) and the author, series and genre filters
- * (`relationFilters`) narrow the shared `from`, so the count applies them
- * too; tag and theme are not applied yet (Epic 9).
+ * in the same direction. `q` (`textSearch`), the scalar filters
+ * (`scalarFilters`) and the author, series and genre filters
+ * (`relationFilters`) narrow the shared `from`, so the count applies them too;
+ * tag and theme are not applied yet (Epic 9).
  */
 export async function shelfIds(
   ctx: Context,

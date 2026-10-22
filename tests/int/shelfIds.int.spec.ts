@@ -45,15 +45,15 @@ describe('shelfIds', () => {
       })
     ).id
 
-  /** A shared author with an explicit sort name; the name only has to be unique. */
-  const author = async (by: User, sortName: string) =>
+  /** An author with an explicit sort name; the name only has to be unique. */
+  const author = async (by: User, sortName: string, visibility: 'shared' | 'private' = 'shared') =>
     (
       await payload.create({
         collection: 'authors',
         data: {
           name: `${sortName} ${randomUUID().slice(0, 8)}`,
           sortName,
-          visibility: 'shared',
+          visibility,
           nameKey: '',
         },
         overrideAccess: true,
@@ -149,6 +149,15 @@ describe('shelfIds', () => {
     const orn = await by('Örn', [await author(a, 'Örn, Ari')])
     const zorn = await by('Zorn', [await author(a, 'Zorn, Ari')])
     const none = await by('Aapinen', [])
+    // B's private author would sort first if A could read it; A sees Kivi
+    // first on one Book and no author on the other.
+    const hidden = await author(
+      await createUser({ displayName: 'Shelf Hidden' }),
+      'Aaltonen, X',
+      'private',
+    )
+    const hiddenThenKivi = await by('Pientä', [hidden, kivi])
+    const onlyHidden = await by('Salainen', [hidden])
     const overriddenBook = await sharedBook(a, { title: 'Kirja', authors: [jansson] })
     const overridden = await copyOf(a, overriddenBook)
     await upsertUserBook(asA, overriddenBook.id, { overrides: { authors: [kivi] } })
@@ -157,20 +166,24 @@ describe('shelfIds', () => {
       muumi,
       overridden,
       nummisuutarit,
+      hiddenThenKivi,
       seitseman,
       valskari,
       zorn,
       orn,
       none,
+      onlyHidden,
     ])
     expect(await copyIds(asA, 'author', 'desc')).toEqual([
       orn,
       zorn,
       valskari,
       seitseman,
+      hiddenThenKivi,
       nummisuutarit,
       overridden,
       muumi,
+      onlyHidden,
       none,
     ])
   })
