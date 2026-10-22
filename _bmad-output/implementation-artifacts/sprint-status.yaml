@@ -156,7 +156,7 @@ development_status:
   epic-5: in-progress
   5-1-e16-shelf-query-parameters: done
   5-2-e1-shelf-query-my-copies-sorted: done
-  5-3-e2-shelf-query-text-search: backlog
+  5-3-e2-shelf-query-text-search: done
   5-4-e3-shelf-query-scalar-filters: backlog
   5-5-e4-shelf-query-author-series-and-genre-filters: backlog
   5-6-e15-author-sort: backlog
