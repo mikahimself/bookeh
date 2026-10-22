@@ -439,7 +439,7 @@ or the restore procedure.
 
 | Date | Backup | Counts | Covers checked | Time taken | No test data before cataloguing |
 |---|---|---|---|---|---|
-| 2026-10-22 | `20261022-052417` | users=1 users_roles=2 books=19 books_rels=17 books_texts=159 authors=14 series=5 genres=0 media=1 copies=19 user_books=0 user_books_rels=0 locations=0 | 1 | 40 s (lower bound) | |
+| 2026-10-22 | `20261022-052417` | users=1 users_roles=2 books=19 books_rels=17 books_texts=159 authors=14 series=5 genres=0 media=1 copies=19 user_books=0 user_books_rels=0 locations=0 | 1 | 40 s (lower bound) | Yes (operator, 2026-10-22) |
 
 The last column confirms that production held no test books, authors,
 series or covers before real cataloguing began (cataloguing gate). Check it
