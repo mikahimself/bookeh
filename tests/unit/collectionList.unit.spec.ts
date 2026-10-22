@@ -5,13 +5,15 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import type { EffectiveBook } from '@/lib/books/effectiveBook'
 import type { ActionResult } from '@/lib/errors'
-import type { ShelfQuery, ShelfRow, ShelfRows } from '@/lib/shelf/query'
+import { shelfHref, type ShelfQuery, type ShelfRow, type ShelfRows } from '@/lib/shelf/query'
 
 import en from '../../messages/en.json'
 
 // The client list over a stubbed `fetch` and `IntersectionObserver` (AD-7):
 // the next range appended without a held copy twice, no request with all
-// held, and a reload of rows 0..n after Undo and after `afterAction`.
+// held, a reload of rows 0..n after Undo and after `afterAction`, and keep my
+// place: the rows held and the scroll position in `sessionStorage`, restored
+// for the first query the page mounts with.
 
 const undoAction = vi.fn()
 // Stable, as Next's router is: the list's callbacks must not change per render.
@@ -53,6 +55,10 @@ vi.stubGlobal(
 
 const fetchStub = vi.fn<(url: string) => Promise<Pick<Response, 'json' | 'status'>>>()
 vi.stubGlobal('fetch', fetchStub)
+const scrollTo = vi.fn()
+window.scrollTo = scrollTo as typeof window.scrollTo
+const scrolledTo = (y: number) =>
+  Object.defineProperty(window, 'scrollY', { value: y, configurable: true })
 
 const { ToastProvider, useToast } = await import('@/app/(frontend)/components/toast/ToastProvider')
 const { ShelfRowsProvider, useShelfRows } = await import('@/app/(frontend)/(sections)/ShelfRows')
@@ -103,20 +109,23 @@ function Probe() {
   return null
 }
 
-const mount = (initial: ShelfRows) =>
-  render(
+const tree = (initial: ShelfRows, q: ShelfQuery = query) =>
+  createElement(
+    ToastProvider,
+    null,
     createElement(
-      ToastProvider,
-      null,
-      createElement(
-        ShelfRowsProvider,
-        // `children` comes as the arguments after props.
-        { query, initial } as ComponentProps<typeof ShelfRowsProvider>,
-        createElement(CollectionList, { query }),
-        createElement(Probe),
-      ),
+      ShelfRowsProvider,
+      // `children` comes as the arguments after props.
+      { query: q, initial } as ComponentProps<typeof ShelfRowsProvider>,
+      createElement(CollectionList, { query: q }),
+      createElement(Probe),
     ),
   )
+const mount = (initial: ShelfRows) => render(tree(initial))
+
+const placeKey = (q: ShelfQuery = query) => `bookeh:shelf-place:${shelfHref(q)}`
+const storePlace = (value: string, q: ShelfQuery = query) =>
+  window.sessionStorage.setItem(placeKey(q), value)
 
 const answerWith = (body: ActionResult<ShelfRows>) =>
   fetchStub.mockResolvedValueOnce({ status: 200, json: async () => body })
@@ -147,7 +156,11 @@ describe('CollectionList', () => {
     cleanup()
     observers.length = 0
     vi.clearAllMocks()
+    vi.restoreAllMocks()
     fetchStub.mockReset()
+    scrollTo.mockReset()
+    window.sessionStorage.clear()
+    scrolledTo(0)
   })
 
   it('appends the next range, skipping a copy already held', async () => {
@@ -228,5 +241,98 @@ describe('CollectionList', () => {
     await waitFor(() => expect(titles()).toEqual(['Book 1', 'Book 2', 'Book 3']))
     expect(fetchStub).toHaveBeenCalledTimes(2)
     expect(fetchStub.mock.calls[1]![0]).toBe('/data/shelf?offset=2&limit=50')
+  })
+
+  describe('keep my place', () => {
+    it('loads the rows held in one request, then scrolls back', async () => {
+      storePlace('{"rows":120,"scrollY":4000}')
+      answerWith({ ok: true, data: { rows: rows(1, 120), total: 300, labels: {} } })
+      let rowsAtScroll = 0
+      scrollTo.mockImplementation(() => {
+        rowsAtScroll = screen.getAllByRole('listitem').length
+      })
+      mount({ rows: rows(1, 50), total: 300, labels: {} })
+
+      await waitFor(() => expect(scrollTo).toHaveBeenCalledWith(0, 4000))
+      expect(fetchStub).toHaveBeenCalledOnce()
+      expect(fetchStub.mock.calls[0]![0]).toBe('/data/shelf?offset=0&limit=120')
+      expect(rowsAtScroll).toBe(120)
+    })
+
+    it('scrolls back without a request when the first page holds the place', () => {
+      storePlace('{"rows":30,"scrollY":900}')
+      mount({ rows: rows(1, 50), total: 300, labels: {} })
+
+      expect(fetchStub).not.toHaveBeenCalled()
+      expect(scrollTo).toHaveBeenCalledWith(0, 900)
+    })
+
+    it('asks for at most SHELF_MAX_ROWS rows', async () => {
+      storePlace('{"rows":1500,"scrollY":10}')
+      answerWith({ ok: true, data: { rows: rows(1, 60), total: 1500, labels: {} } })
+      mount({ rows: rows(1, 50), total: 1500, labels: {} })
+
+      await waitFor(() => expect(scrollTo).toHaveBeenCalledWith(0, 10))
+      expect(fetchStub.mock.calls[0]![0]).toBe('/data/shelf?offset=0&limit=1000')
+    })
+
+    it.each([
+      ['no entry', () => {}],
+      ['not an object', () => storePlace('"x"')],
+      ['a negative count', () => storePlace('{"rows":-1,"scrollY":0}')],
+      [
+        'blocked storage',
+        () => {
+          storePlace('{"rows":120,"scrollY":4000}')
+          vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
+            throw new DOMException('blocked', 'SecurityError')
+          })
+        },
+      ],
+    ])('restores nothing with %s', (_, arrange) => {
+      arrange()
+      mount({ rows: rows(1, 50), total: 300, labels: {} })
+
+      expect(fetchStub).not.toHaveBeenCalled()
+      expect(scrollTo).not.toHaveBeenCalled()
+    })
+
+    it('restores nothing for a query reached on the page', () => {
+      const kivi: ShelfQuery = { ...query, q: 'kivi' }
+      const linna: ShelfQuery = { ...query, q: 'linna' }
+      const { rerender } = render(tree({ rows: rows(1, 50), total: 300, labels: {} }, kivi))
+      storePlace('{"rows":120,"scrollY":4000}', linna)
+      rerender(tree({ rows: rows(1, 50), total: 300, labels: {} }, linna))
+      // Back to the first query on the page: still no restore.
+      storePlace('{"rows":120,"scrollY":4000}', kivi)
+      rerender(tree({ rows: rows(1, 50), total: 300, labels: {} }, kivi))
+
+      expect(fetchStub).not.toHaveBeenCalled()
+      expect(scrollTo).not.toHaveBeenCalled()
+    })
+
+    it('reports a failed restore and keeps the first page where it is', async () => {
+      storePlace('{"rows":120,"scrollY":4000}')
+      answerWith({ ok: false, code: 'NO_CONNECTION' })
+      mount({ rows: rows(1, 50), total: 300, labels: {} })
+
+      await screen.findByText(en.errors.NO_CONNECTION)
+      expect(titles()).toHaveLength(50)
+      expect(scrollTo).not.toHaveBeenCalled()
+    })
+
+    it('keeps only the rows held and the scroll position', async () => {
+      mount({ rows: rows(1, 50), total: 100, labels: {} })
+      answerWith({ ok: true, data: { rows: rows(51, 100), total: 100, labels: {} } })
+      approach()
+      await waitFor(() => expect(titles()).toHaveLength(100))
+
+      scrolledTo(2500)
+      fireEvent.scroll(window)
+      await waitFor(() =>
+        expect(window.sessionStorage.getItem(placeKey())).toBe('{"rows":100,"scrollY":2500}'),
+      )
+      expect(window.sessionStorage.length).toBe(1)
+    })
   })
 })

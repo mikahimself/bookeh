@@ -6,6 +6,7 @@ import {
   useCallback,
   useContext,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -16,6 +17,7 @@ import type { ActionResult } from '@/lib/errors'
 import {
   SHELF_MAX_ROWS,
   SHELF_PAGE_SIZE,
+  shelfHref,
   shelfRowsPath,
   type ShelfQuery,
   type ShelfRange,
@@ -24,6 +26,8 @@ import {
 
 import { fetchData, useReportFailure } from '../components/request'
 import { useToast } from '../components/toast/ToastProvider'
+
+import { readPlace, writePlace } from './shelfPlace'
 
 type ShelfRowsValue = {
   shelf: ShelfRows
@@ -52,36 +56,52 @@ function append(held: ShelfRows, answer: ShelfRows): ShelfRows {
   return { rows: [...held.rows, ...added], total: answer.total, labels: answer.labels }
 }
 
+type Props = { query: ShelfQuery; initial: ShelfRows; children: ReactNode }
+
 /**
  * Spine, AD-7: the client list's rows for one shelf query, seeded with the
- * server's first page. The page keys it by `shelfHref(query)`, so a new
- * search, filter or sort starts over while `?book=` keeps the rows. Rows are
+ * server's first page. Keyed by `shelfHref(query)`, so a new search, filter
+ * or sort starts over at the top while `?book=` keeps the rows. Rows are
  * never patched: more rows append the next range from `/data/shelf`, and any
  * change reloads rows 0..n (n held, at most `SHELF_MAX_ROWS`). A reload makes
  * every earlier request stale and its answer is dropped. Reloads after a
  * successful Undo from the toast and after `afterAction`.
+ *
+ * Keep my place: the rows held and the scroll position are kept per query
+ * (`shelfPlace`). Only the first query since the page mounted restores
+ * them, so coming back from another route does and a query change on `/`
+ * (Next keeps the page across search params) does not.
  */
-export function ShelfRowsProvider({
-  query,
-  initial,
-  children,
-}: {
-  query: ShelfQuery
-  initial: ShelfRows
-  children: ReactNode
-}) {
+export function ShelfRowsProvider({ query, initial, children }: Props) {
+  const key = shelfHref(query)
+  const [first] = useState(key)
+  const [moved, setMoved] = useState(false)
+  if (key !== first && !moved) setMoved(true)
+  return (
+    <ShelfRowsState key={key} query={query} initial={initial} restore={!moved && key === first}>
+      {children}
+    </ShelfRowsState>
+  )
+}
+
+function ShelfRowsState({ query, initial, restore, children }: Props & { restore: boolean }) {
   const t = useTranslations('answer')
   const { show, onUndone } = useToast()
   const reportFailure = useReportFailure()
-  // Fixed for the provider's life: the page remounts it for another query.
+  // Fixed for the state's life: the provider remounts it for another query.
   const [rowsQuery] = useState(query)
+  const [placeKey] = useState(() => shelfHref(query))
   const [shelf, setShelf] = useState(initial)
   const [loading, setLoading] = useState(false)
+  /** Where a restore scrolls once its rows have committed. */
+  const [restoreTo, setRestoreTo] = useState<number | null>(null)
 
   /** The rows held, ahead of the render: a load right after an answer starts from them. */
   const held = useRef(shelf)
   /** The newest request's number; `current` is the oldest one still counted. */
   const requests = useRef({ last: 0, current: 0, inFlight: null as number | null })
+  /** A restore is under way: the place is not saved meanwhile. */
+  const restoring = useRef(false)
   // An answer after unmount (another query) is dropped, failure toast included.
   const mounted = useRef(false)
   useEffect(() => {
@@ -91,8 +111,9 @@ export function ShelfRowsProvider({
     }
   }, [])
 
+  /** Resolves to whether the answer was applied. */
   const run = useCallback(
-    async (range: ShelfRange, replace: boolean) => {
+    async (range: ShelfRange, replace: boolean): Promise<boolean> => {
       const r = requests.current
       const id = ++r.last
       if (replace) r.current = id
@@ -103,17 +124,72 @@ export function ShelfRowsProvider({
         r.inFlight = null
         setLoading(false)
       }
-      if (!mounted.current || id < r.current) return
+      if (!mounted.current || id < r.current) return false
       if (!result.ok) {
         reportFailure(result.code)
-        return
+        return false
       }
       const next = replace ? result.data : append(held.current, result.data)
       held.current = next
       setShelf(next)
+      return true
     },
     [rowsQuery, reportFailure],
   )
+
+  const save = useCallback(() => {
+    if (restoring.current) return
+    const scrollY = Math.max(0, Math.round(window.scrollY))
+    writePlace(placeKey, { rows: held.current.rows.length, scrollY })
+  }, [placeKey])
+
+  // Before the save below, so a restore under way is not overwritten.
+  useEffect(() => {
+    if (!restore) return
+    const place = readPlace(placeKey)
+    if (!place) return
+    const { rows, total } = held.current
+    if (place.rows <= rows.length || rows.length >= total) {
+      // After Next's own scroll, which runs as the page commits.
+      window.scrollTo(0, place.scrollY)
+      return
+    }
+    let live = true
+    restoring.current = true
+    void run({ offset: 0, limit: Math.min(place.rows, SHELF_MAX_ROWS) }, true).then((applied) => {
+      if (!live) return
+      if (applied) setRestoreTo(place.scrollY)
+      else restoring.current = false
+    })
+    return () => {
+      live = false
+      restoring.current = false
+    }
+  }, [restore, placeKey, run])
+
+  useLayoutEffect(() => {
+    if (restoreTo === null) return
+    window.scrollTo(0, restoreTo)
+    restoring.current = false
+  }, [restoreTo])
+
+  useEffect(save, [shelf, save])
+
+  // Removed as the page leaves, before the clamp or Next's scroll to top.
+  useLayoutEffect(() => {
+    let frame: number | null = null
+    const onScroll = () => {
+      frame ??= requestAnimationFrame(() => {
+        frame = null
+        save()
+      })
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => {
+      window.removeEventListener('scroll', onScroll)
+      if (frame !== null) cancelAnimationFrame(frame)
+    }
+  }, [save])
 
   const loadMore = useCallback(() => {
     const { rows, total } = held.current

@@ -95,6 +95,8 @@ describe('CollectionPage', () => {
   afterEach(() => {
     cleanup()
     vi.clearAllMocks()
+    // The list keeps its place per query; each case starts without one.
+    window.sessionStorage.clear()
   })
 
   it('shows the tools, the count and one row per copy in shelf order', async () => {
