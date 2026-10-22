@@ -622,7 +622,7 @@ deploy/                # production compose file, backup script
 - **Rate limiting beyond lookup**, and the other NFR-5 items. Required before public exposure, not on the tailnet.
 - **Genre vocabulary.** The seeded list and its Finnish names are written in the seed story (G4). Whether Finna's genre terms are also mapped is decided by the fixture checkpoint (C9). AD-5 fixes who writes genres; raw subjects are stored, so mapping can be re-run.
 - **Lookup tuning.** Cache size and lifetime (shorter for `none`), per-source timeout, circuit-breaker thresholds, rate-limit numbers and dump retention days are set in their stories against NFR-1 and NFR-6.
-- **Search indexing** (trigram or full-text). Only if `ILIKE` misses NFR-3 when measured at 10,000 copies.
+- **Search indexing** (trigram or full-text). Timed at 10,000 copies by `tests/int/shelfTiming.int.spec.ts` (5.7) on every CI run; plain `ILIKE` passed locally with wide margin. Indexes only if that test fails.
 - **Change password.** Not in Phase 1 (Mika, 2026-10-06). When it comes, it is a profile update through `lib/account`.
 - **Undo store size.** Set in the `lib/undo` story; the receipt lifetime is 30 minutes (Mika, 2026-10-06).
 - **Edit book in the detail panel's place on wide screens.** `EXPERIENCE.md` assumed it; Edit book is a page on every width (Mika, 2026-10-06).
