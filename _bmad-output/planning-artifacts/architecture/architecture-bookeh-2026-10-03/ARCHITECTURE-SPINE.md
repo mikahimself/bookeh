@@ -491,6 +491,7 @@ type ShelfQuery = {
   sort: 'author' | 'title' | 'year' | 'added'
   dir: 'asc' | 'desc'
 }
+type ShelfAddress = { query: ShelfQuery; book: number | null } // parseShelfQuery()
 type ShelfRange = { offset: number; limit: number }
 type ShelfRow = { copy: CopyLine; book: EffectiveBook }
 type ShelfRows = { rows: ShelfRow[]; total: number; labels: Record<string, string> } // names of the filter values

@@ -153,8 +153,8 @@ development_status:
   4-14-d31-cover-on-edit-book: done
   epic-4-retrospective: done
 
-  epic-5: backlog
-  5-1-e16-shelf-query-parameters: backlog
+  epic-5: in-progress
+  5-1-e16-shelf-query-parameters: done
   5-2-e1-shelf-query-my-copies-sorted: backlog
   5-3-e2-shelf-query-text-search: backlog
   5-4-e3-shelf-query-scalar-filters: backlog
