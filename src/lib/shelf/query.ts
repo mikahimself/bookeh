@@ -11,7 +11,8 @@
  * for a single-valued parameter the first value counts. No page number.
  */
 
-import type { Named } from '@/lib/books/effectiveBook'
+import type { EffectiveBook, Named } from '@/lib/books/effectiveBook'
+import type { CopyLine } from '@/lib/books/holdings'
 
 /** Spine, Shared shapes: what the collection lists and in what order. */
 export type ShelfQuery = {
@@ -61,6 +62,12 @@ export type FilterValues = {
   language: Counted<{ value: string }>[]
 }
 
+/** Spine, Shared shapes: one of the viewer's copies with its Book, `getShelfRows()`. */
+export type ShelfRow = { copy: CopyLine; book: EffectiveBook }
+
+/** Spine, Shared shapes: `labels` names the id-valued filter values, keyed `field:id`. */
+export type ShelfRows = { rows: ShelfRow[]; total: number; labels: Record<string, string> }
+
 /** Spine, Shared shapes: the parsed address; the client list keys on `query` alone. */
 export type ShelfAddress = { query: ShelfQuery; book: number | null }
 
@@ -80,9 +87,12 @@ const whole = (text: string): number | undefined => {
   return Number.isSafeInteger(n) ? n : undefined
 }
 
+/** Every id column is Postgres `integer` (int4); a larger id would fail the query. */
+const MAX_ID = 2147483647
+
 const id = (text: string | undefined): number | undefined => {
   const n = text === undefined ? undefined : whole(text)
-  return n !== undefined && n > 0 ? n : undefined
+  return n !== undefined && n > 0 && n <= MAX_ID ? n : undefined
 }
 
 const oneOf =

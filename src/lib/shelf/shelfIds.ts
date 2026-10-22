@@ -9,7 +9,7 @@ import { textSearch } from './search'
 import { readableBy, visibleCopies } from './visibleCopies'
 
 /** The sorts built so far; Story 5.6 adds `author`. */
-type SortedQuery = Omit<ShelfQuery, 'sort'> & { sort: 'title' | 'year' | 'added' }
+export type SortedQuery = Omit<ShelfQuery, 'sort'> & { sort: 'title' | 'year' | 'added' }
 
 /**
  * Spine, AD-7: the viewer's copies in `query`'s order, the slice `range` of

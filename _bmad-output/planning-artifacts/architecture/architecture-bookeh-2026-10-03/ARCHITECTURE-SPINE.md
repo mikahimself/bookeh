@@ -494,7 +494,8 @@ type ShelfQuery = {
 type ShelfAddress = { query: ShelfQuery; book: number | null } // parseShelfQuery()
 type ShelfRange = { offset: number; limit: number }
 type ShelfRow = { copy: CopyLine; book: EffectiveBook }
-type ShelfRows = { rows: ShelfRow[]; total: number; labels: Record<string, string> } // names of the filter values
+type ShelfRows = { rows: ShelfRow[]; total: number; labels: Record<string, string> } // labels keyed `field:id` for location, genre, author, series: a location named for its owner only, a genre in the viewer's language,
+  // an author or series only when readable and sharing its `nameKey` with a readable effective author or series on a visible copy
 type Counted<T> = T & { count: number }
 type FilterValues = { // filterValues(ctx, locale): values in use on the viewer's copies, each counted in copies
   location: Counted<Named>[]; status: Counted<{ value: 'owned' | 'ordered' }>[]

@@ -29,7 +29,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 10-06-2026 17:50
-last_updated: 10-22-2026 15:45
+last_updated: 10-22-2026 16:47
 project: bookeh
 project_key: NOKEY
 tracking_system: file-system
@@ -161,7 +161,7 @@ development_status:
   5-5-e4-shelf-query-author-series-and-genre-filters: backlog
   5-6-e15-author-sort: backlog
   5-7-e14-shelf-timing-at-10-000-copies: backlog
-  5-8-e17-hydrated-shelf-rows: backlog
+  5-8-e17-hydrated-shelf-rows: done
   5-9-e18-filter-values-and-suggestions: done
   5-10-e6-collection-screen: backlog
   5-11-e19-endless-scrolling: backlog
