@@ -1,7 +1,8 @@
 /**
  * The collection's address: search, filters, sort and the open Book live in
- * `/` search params (spine, AD-7), and only `parseShelfQuery` and `shelfHref`
- * read or write them. Pure, so client components may import it (spine,
+ * `/` search params (spine, AD-7), and only `parseShelfQuery` and
+ * `shelfSearchParams` (behind `shelfHref` and `shelfRowsPath`) read or write
+ * them. Pure, so client components may import it (spine,
  * Design Paradigm).
  *
  * One parameter per field, named after it (`ratingMin` is `rating`); several
@@ -41,6 +42,9 @@ export type ShelfRange = { offset: number; limit: number }
 
 /** AD-7: the one fixed page size, shared by the page and the client list. */
 export const SHELF_PAGE_SIZE = 50
+
+/** The most rows one `/data/shelf` request may ask for: the route's `limit` cap. */
+export const SHELF_MAX_ROWS = 1000
 
 /** The fields `/data/suggest` suggests names for; the route checks `field` against it. */
 export const SUGGEST_FIELDS = ['author', 'series', 'publisher'] as const
@@ -170,14 +174,15 @@ export function parseShelfQuery(params: ShelfParams): ShelfAddress {
 }
 
 /**
- * `/` with the canonical query string for `query` and `book`: `q`, the
- * filters in `ShelfQuery` order, `sort`, `dir`, `book`; default sort and dir,
- * empty filters and repeated values left out.
+ * The canonical shelf params for `query` and `book`: `q`, the filters in
+ * `ShelfQuery` order, `sort`, `dir`, `book`; default sort and dir, empty
+ * filters and repeated values left out. The one writer of shelf params, for
+ * links and `/data/shelf` requests alike.
  */
-export function shelfHref(
+export function shelfSearchParams(
   query: ShelfQuery,
   { book = null }: { book?: number | null } = {},
-): string {
+): URLSearchParams {
   const params = new URLSearchParams()
   const add = (name: string, values: readonly (string | number | boolean)[] | undefined) => {
     for (const value of new Set(values?.map(String))) if (value !== '') params.append(name, value)
@@ -205,7 +210,22 @@ export function shelfHref(
   if (query.sort !== 'author') params.set('sort', query.sort)
   if (query.dir !== 'asc') params.set('dir', query.dir)
   add('book', one(book ?? undefined))
+  return params
+}
 
-  const search = params.toString()
+/** `/` with the canonical query string for `query` and `book` (`shelfSearchParams`). */
+export function shelfHref(
+  query: ShelfQuery,
+  { book = null }: { book?: number | null } = {},
+): string {
+  const search = shelfSearchParams(query, { book }).toString()
   return search ? `/?${search}` : '/'
+}
+
+/** The `/data/shelf` request for `range` of `query`'s rows. */
+export function shelfRowsPath(query: ShelfQuery, { offset, limit }: ShelfRange): `/data/${string}` {
+  const params = shelfSearchParams(query)
+  params.set('offset', String(offset))
+  params.set('limit', String(limit))
+  return `/data/shelf?${params.toString()}`
 }

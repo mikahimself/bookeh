@@ -35,6 +35,18 @@ vi.mock('next/navigation', async (importOriginal) => ({
 vi.mock('@/lib/payload/context', () => ({ requireUser: async () => ({}) }))
 vi.mock('@/lib/shelf/getShelfRows', () => ({ getShelfRows }))
 vi.mock('@/lib/errors', () => ({ logger: () => ({ error: logError }) }))
+// The client list's provider: no Undo and no scrolling here.
+vi.mock('@/app/(frontend)/components/toast/ToastProvider', () => ({
+  useToast: () => ({ show: vi.fn(), dismiss: vi.fn(), onUndone: () => () => {} }),
+}))
+vi.stubGlobal(
+  'IntersectionObserver',
+  class {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  },
+)
 
 const { default: CollectionPage } = await import('@/app/(frontend)/(sections)/page')
 
@@ -109,6 +121,31 @@ describe('CollectionPage', () => {
     within(items[1]).getByText('Väinö Linna · WSOY')
     expect(within(items[1]).queryByText('Ordered')).toBeNull()
     within(items[2]).getByText('Ordered')
+  })
+
+  it('starts the list over for a new query, and keeps the rows held when only book changes', async () => {
+    const page = (params: Record<string, string>) =>
+      CollectionPage({ searchParams: Promise.resolve(params) })
+    const answer = (copyId: number, title: string) =>
+      getShelfRows.mockResolvedValueOnce({
+        rows: [row(copyId, book(copyId, title))],
+        total: 1,
+        labels: {},
+      })
+    const titles = () =>
+      screen.getAllByRole('listitem').map((item) => item.querySelector('p')?.textContent)
+
+    answer(1, 'Seitsemän veljestä')
+    const { rerender } = render(await page({ q: 'kivi' }))
+    expect(titles()).toEqual(['Seitsemän veljestä'])
+
+    answer(2, 'Tuntematon sotilas')
+    rerender(await page({ q: 'linna' }))
+    expect(titles()).toEqual(['Tuntematon sotilas'])
+
+    answer(3, 'Sinuhe')
+    rerender(await page({ q: 'linna', book: '7' }))
+    expect(titles()).toEqual(['Tuntematon sotilas'])
   })
 
   it('shows First run with no copies', async () => {

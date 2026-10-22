@@ -20,7 +20,10 @@ import { takeFlash } from './flashCookie'
 import { createToastStore, toastMessage, type ToastStore } from './store'
 import { ToastView } from './ToastView'
 
-type ToastContextValue = Pick<ToastStore, 'show' | 'dismiss' | 'withdraw' | 'release'>
+type ToastContextValue = Pick<ToastStore, 'show' | 'dismiss' | 'withdraw' | 'release'> & {
+  /** Runs `listener` after each successful Undo from the toast; returns the unsubscribe. */
+  onUndone: (listener: () => void) => () => void
+}
 
 const ToastContext = createContext<ToastContextValue | null>(null)
 
@@ -39,6 +42,7 @@ export function useToast(): ToastContextValue {
 export function ToastProvider({ children }: { children: ReactNode }) {
   const t = useTranslations()
   const [store] = useState(() => createToastStore())
+  const [undoneListeners] = useState(() => new Set<() => void>())
   const state = useSyncExternalStore(store.subscribe, store.getState, () => null)
   const pathname = usePathname()
   const router = useRouter()
@@ -49,8 +53,14 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       dismiss: store.dismiss,
       withdraw: store.withdraw,
       release: store.release,
+      onUndone: (listener: () => void) => {
+        undoneListeners.add(listener)
+        return () => {
+          undoneListeners.delete(listener)
+        }
+      },
     }),
-    [store],
+    [store, undoneListeners],
   )
 
   /**
@@ -58,7 +68,9 @@ export function ToastProvider({ children }: { children: ReactNode }) {
    * success, also on Scan: the hold is for Edit and Undo, which "Undone"
    * offers neither of) or "Couldn't undo."; any other failure is reported
    * like every action's (`reportFailure`, with this store: the provider sits
-   * outside its own context). Nothing else on the screen changes.
+   * outside its own context). After a successful Undo the `onUndone`
+   * listeners run, so a list showing the undone change reloads (the
+   * collection's rows, AD-7); the toast itself changes nothing else.
    */
   const undoToken = state?.undoToken ?? null
   const runUndo = () => {
@@ -67,6 +79,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       const result = await settleAction(undoAction(undoToken))
       if (result.ok) {
         store.show({ kind: 'success', message: t('toast.undone') })
+        for (const listener of undoneListeners) listener()
         return
       }
       reportFailure(result.code, {

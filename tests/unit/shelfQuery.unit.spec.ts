@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest'
 
-import { parseShelfQuery, shelfHref, type ShelfAddress, type ShelfQuery } from '@/lib/shelf/query'
+import {
+  parseShelfQuery,
+  shelfHref,
+  shelfRowsPath,
+  type ShelfAddress,
+  type ShelfQuery,
+} from '@/lib/shelf/query'
 
 const DEFAULT: ShelfQuery = { filters: {}, sort: 'author', dir: 'asc' }
 
@@ -80,5 +86,14 @@ describe('shelf query parameters', () => {
     expect(
       shelfHref(parseShelfQuery(new URLSearchParams('page=3&sort=author&dir=asc')).query),
     ).toBe('/')
+  })
+
+  it('writes the same shelf params for /data/shelf as for links, without book', () => {
+    const query: ShelfQuery = { q: 'linna', filters: { location: [3] }, sort: 'title', dir: 'desc' }
+    const params = shelfHref(query).slice('/?'.length)
+    expect(params).toBe('q=linna&location=3&sort=title&dir=desc')
+    expect(shelfRowsPath(query, { offset: 50, limit: 50 })).toBe(
+      `/data/shelf?${params}&offset=50&limit=50`,
+    )
   })
 })
