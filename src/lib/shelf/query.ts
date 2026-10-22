@@ -33,6 +33,12 @@ export type ShelfQuery = {
   dir: 'asc' | 'desc'
 }
 
+/** Spine, Shared shapes: one slice of the ordered shelf, as offset and limit. */
+export type ShelfRange = { offset: number; limit: number }
+
+/** AD-7: the one fixed page size, shared by the page and the client list. */
+export const SHELF_PAGE_SIZE = 50
+
 /** Spine, Shared shapes: the parsed address; the client list keys on `query` alone. */
 export type ShelfAddress = { query: ShelfQuery; book: number | null }
 
