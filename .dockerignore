@@ -28,6 +28,7 @@ playwright/.cache
 .DS_Store
 *.pem
 tests
+scripts
 playwright.config.ts
 vitest.config.mts
 vitest.setup.ts
