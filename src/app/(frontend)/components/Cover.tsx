@@ -20,9 +20,11 @@ export function Cover({ src, title }: { src: string | null; title: string }) {
       <img
         src={src}
         alt=""
+        loading="lazy"
         // An image that failed before hydration fired `error` before React listened.
+        // A lazy image not yet requested has no `currentSrc` and has not failed.
         ref={(img) => {
-          if (img?.complete && img.naturalWidth === 0) setFailed(src)
+          if (img?.complete && img.naturalWidth === 0 && img.currentSrc !== '') setFailed(src)
         }}
         onError={() => setFailed(src)}
         className="block aspect-2/3 w-full object-cover"

@@ -146,6 +146,40 @@
     "create": "New: {name}",
     "clear": "Clear"
   },
+  "collection": {
+    "search": "Search your books",
+    "filter": "Filter",
+    "select": "Select",
+    "layout": "Layout",
+    "layouts": {
+      "rows": "Rows",
+      "covers": "Covers"
+    },
+    "size": "Size",
+    "sizes": {
+      "s": "S",
+      "m": "M",
+      "l": "L"
+    },
+    "count": "{n, plural, one {# book} other {# books}}",
+    "clear": "Clear",
+    "quoted": "“{text}”",
+    "statuses": {
+      "owned": "owned",
+      "ordered": "ordered"
+    },
+    "read": "read",
+    "unread": "unread",
+    "rating": "{n, plural, =5 {# stars} other {#+ stars}}",
+    "yearRange": "{from}–{to}",
+    "pagesRange": "{from}–{to} pages",
+    "ordered": "Ordered",
+    "empty": "No books yet",
+    "emptyRemark": "The shelves are patient.",
+    "noMatch": "No books match",
+    "loadFailed": "Couldn't load.",
+    "tryAgain": "Try again"
+  },
   "progress": {
     "loading": "Loading"
   },

@@ -132,7 +132,7 @@ export function useCloseOnBack(open: boolean, close: () => void, onClosed?: () =
  * The wide layout's media query. Must equal `--breakpoint-wide` in
  * styles.css, so the overlay chosen here matches the `wide:` styles.
  */
-const WIDE_QUERY = '(min-width: 900px)'
+export const WIDE_QUERY = '(min-width: 900px)'
 
 function subscribeWide(onChange: () => void): () => void {
   const query = window.matchMedia(WIDE_QUERY)

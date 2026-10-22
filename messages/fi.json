@@ -146,6 +146,40 @@
     "create": "Uusi: {name}",
     "clear": "Tyhjennä"
   },
+  "collection": {
+    "search": "Hae kirjoistasi",
+    "filter": "Suodata",
+    "select": "Valitse",
+    "layout": "Asettelu",
+    "layouts": {
+      "rows": "Rivit",
+      "covers": "Kannet"
+    },
+    "size": "Koko",
+    "sizes": {
+      "s": "S",
+      "m": "M",
+      "l": "L"
+    },
+    "count": "{n, plural, one {# kirja} other {# kirjaa}}",
+    "clear": "Tyhjennä",
+    "quoted": "”{text}”",
+    "statuses": {
+      "owned": "oma",
+      "ordered": "tilattu"
+    },
+    "read": "luettu",
+    "unread": "lukematon",
+    "rating": "{n, plural, =5 {# tähteä} other {#+ tähteä}}",
+    "yearRange": "{from}–{to}",
+    "pagesRange": "{from}–{to} sivua",
+    "ordered": "Tilattu",
+    "empty": "Ei vielä kirjoja",
+    "emptyRemark": "Hyllyt odottavat kärsivällisesti.",
+    "noMatch": "Ei osumia",
+    "loadFailed": "Lataus ei onnistunut.",
+    "tryAgain": "Yritä uudelleen"
+  },
   "progress": {
     "loading": "Ladataan"
   },

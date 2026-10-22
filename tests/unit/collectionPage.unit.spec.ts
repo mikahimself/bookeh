@@ -1,0 +1,152 @@
+// @vitest-environment jsdom
+import { cleanup, fireEvent, render, screen, within } from '@testing-library/react'
+import { afterEach, describe, expect, it, vi } from 'vitest'
+
+import type { EffectiveBook } from '@/lib/books/effectiveBook'
+import type { ShelfRow, ShelfRows } from '@/lib/shelf/query'
+
+import en from '../../messages/en.json'
+
+const router = { replace: vi.fn(), refresh: vi.fn() }
+const getShelfRows = vi.fn<() => Promise<ShelfRows>>()
+const logError = vi.fn()
+
+// The English catalogue, so the assertions read the screen's words.
+const english = async () => {
+  const { createTranslator } = await vi.importActual<typeof import('next-intl')>('next-intl')
+  const { default: messages } = await import('../../messages/en.json')
+  return (namespace?: string) =>
+    createTranslator({ locale: 'en', messages, namespace: namespace as 'collection' })
+}
+
+vi.mock('next-intl', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('next-intl')>()),
+  useTranslations: await english(),
+}))
+vi.mock('next-intl/server', async () => {
+  const translator = await english()
+  return { getTranslations: async (namespace?: string) => translator(namespace) }
+})
+vi.mock('next/navigation', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('next/navigation')>()),
+  useRouter: () => router,
+  useSearchParams: () => new URLSearchParams(),
+}))
+vi.mock('@/lib/payload/context', () => ({ requireUser: async () => ({}) }))
+vi.mock('@/lib/shelf/getShelfRows', () => ({ getShelfRows }))
+vi.mock('@/lib/errors', () => ({ logger: () => ({ error: logError }) }))
+
+const { default: CollectionPage } = await import('@/app/(frontend)/(sections)/page')
+
+const book = (
+  bookId: number,
+  title: string,
+  extra: Partial<EffectiveBook> = {},
+): EffectiveBook => ({
+  bookId,
+  isbn13: null,
+  visibility: 'shared',
+  source: null,
+  title,
+  subtitle: null,
+  authors: [{ id: 1, name: 'Väinö Linna' }],
+  series: null,
+  seriesIndex: null,
+  genres: [],
+  themes: [],
+  publisher: 'WSOY',
+  year: 1954,
+  language: null,
+  pages: null,
+  description: null,
+  coverUrl: null,
+  overridden: [],
+  ...extra,
+})
+
+const row = (
+  copyId: number,
+  b: EffectiveBook,
+  status: 'owned' | 'ordered' = 'owned',
+): ShelfRow => ({
+  copy: { copyId, status, location: null, note: null, loan: null },
+  book: b,
+})
+
+async function renderPage(params: Record<string, string> = {}) {
+  render(await CollectionPage({ searchParams: Promise.resolve(params) }))
+}
+
+const countLine = () => screen.getByText(/\d+ books?/).closest('p') as HTMLElement
+
+describe('CollectionPage', () => {
+  afterEach(() => {
+    cleanup()
+    vi.clearAllMocks()
+  })
+
+  it('shows the tools, the count and one row per copy in shelf order', async () => {
+    getShelfRows.mockResolvedValue({
+      rows: [
+        row(11, book(1, 'Tuntematon sotilas')),
+        row(12, book(2, 'Täällä Pohjantähden alla 1', { year: null })),
+        row(13, book(2, 'Täällä Pohjantähden alla 1', { year: null }), 'ordered'),
+      ],
+      total: 3,
+      labels: {},
+    })
+    await renderPage()
+
+    screen.getByRole('searchbox', { name: 'Search your books' })
+    expect(countLine().textContent).toBe('3 books')
+    const items = screen.getAllByRole('listitem')
+    expect(items.map((item) => item.querySelector('p')?.textContent)).toEqual([
+      'Tuntematon sotilas',
+      'Täällä Pohjantähden alla 1',
+      'Täällä Pohjantähden alla 1',
+    ])
+    within(items[0]).getByText('Väinö Linna · 1954 · WSOY')
+    within(items[1]).getByText('Väinö Linna · WSOY')
+    expect(within(items[1]).queryByText('Ordered')).toBeNull()
+    within(items[2]).getByText('Ordered')
+  })
+
+  it('shows First run with no copies', async () => {
+    getShelfRows.mockResolvedValue({ rows: [], total: 0, labels: {} })
+    await renderPage()
+
+    expect(countLine().textContent).toBe('0 books')
+    screen.getByText('No books yet')
+    screen.getByText(en.collection.emptyRemark)
+    expect(screen.getByRole('link', { name: 'Scan book' }).getAttribute('href')).toBe('/scan')
+  })
+
+  it('shows No matches with Clear back to / with sort kept', async () => {
+    getShelfRows.mockResolvedValue({ rows: [], total: 0, labels: {} })
+    await renderPage({ q: 'zzz', sort: 'title', book: '7' })
+
+    expect(countLine().textContent).toBe('“zzz” · 0 books · Clear')
+    screen.getByText('No books match')
+    const clears = screen.getAllByRole('link', { name: 'Clear' })
+    expect(clears).toHaveLength(2)
+    for (const clear of clears) expect(clear.getAttribute('href')).toBe('/?sort=title')
+  })
+
+  it('names the active filters in the count line', async () => {
+    getShelfRows.mockResolvedValue({ rows: [], total: 14, labels: { 'location:3': 'Tampere' } })
+    await renderPage({ location: '3', read: 'false' })
+
+    expect(countLine().textContent).toBe('Tampere, unread · 14 books · Clear')
+  })
+
+  it('shows Load failed when the shelf read fails, and Try again re-renders', async () => {
+    getShelfRows.mockRejectedValue(new Error('down'))
+    await renderPage()
+
+    expect(logError).toHaveBeenCalledOnce()
+    screen.getByRole('searchbox', { name: 'Search your books' })
+    screen.getByText("Couldn't load.")
+    fireEvent.click(screen.getByRole('button', { name: 'Try again' }))
+    expect(router.refresh).toHaveBeenCalledOnce()
+  })
+})

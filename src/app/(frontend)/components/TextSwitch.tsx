@@ -15,6 +15,8 @@ export type TextSwitchProps<V extends string> = (
   onChange: (value: V) => void
   /** Keeps the options' own case (language names); lowercased otherwise. */
   properNames?: boolean
+  /** Every option disabled; the chosen one stays in text. */
+  disabled?: boolean
 }
 
 /**
@@ -31,6 +33,7 @@ export function TextSwitch<V extends string>({
   options,
   onChange,
   properNames = false,
+  disabled = false,
 }: TextSwitchProps<V>) {
   return (
     <div
@@ -46,6 +49,7 @@ export function TextSwitch<V extends string>({
             key={option.value}
             type="button"
             aria-pressed={chosen}
+            disabled={disabled}
             onClick={() => {
               if (!chosen) onChange(option.value)
             }}

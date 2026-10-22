@@ -33,6 +33,9 @@ describe('Cover', () => {
   it('shows the placeholder for an image that failed before hydration', () => {
     vi.spyOn(HTMLImageElement.prototype, 'complete', 'get').mockReturnValue(true)
     vi.spyOn(HTMLImageElement.prototype, 'naturalWidth', 'get').mockReturnValue(0)
+    vi.spyOn(HTMLImageElement.prototype, 'currentSrc', 'get').mockReturnValue(
+      'http://localhost/data/cover/9789510000000',
+    )
     const title = 'Seitsemän veljestä'
     const { container } = render(createElement(Cover, { src: '/data/cover/9789510000000', title }))
     expect(container.querySelector('img')).toBeNull()
