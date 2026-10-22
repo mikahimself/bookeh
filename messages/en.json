@@ -164,6 +164,7 @@
     "IMAGE_TOO_LARGE": "Image too large.",
     "INVALID_CORNERS": "Corners don't form a cover.",
     "COVER_FAILED": "Couldn't save cover.",
+    "NAME_TAKEN": "That name is already in use.",
     "NO_CONNECTION": "No connection.",
     "APP_UPDATED": "bookeh was updated."
   }

@@ -68,6 +68,7 @@ describe('message catalogues', () => {
     IMAGE_TOO_LARGE: true,
     INVALID_CORNERS: true,
     COVER_FAILED: true,
+    NAME_TAKEN: true,
     NO_CONNECTION: true,
     APP_UPDATED: true,
   } satisfies Record<ErrorCode, true>) as ErrorCode[]

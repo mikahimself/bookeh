@@ -18,6 +18,7 @@ export type ErrorCode =
   | 'IMAGE_TOO_LARGE'
   | 'INVALID_CORNERS'
   | 'COVER_FAILED'
+  | 'NAME_TAKEN'
   // Client-only: no server code returns these. `components/request.ts` maps
   // a dropped connection and a stale action (an older build's tab) to them.
   | 'NO_CONNECTION'

@@ -164,6 +164,7 @@
     "IMAGE_TOO_LARGE": "Kuva on liian suuri.",
     "INVALID_CORNERS": "Kulmat eivät muodosta kantta.",
     "COVER_FAILED": "Kannen tallennus ei onnistunut.",
+    "NAME_TAKEN": "Nimi on jo käytössä.",
     "NO_CONNECTION": "Ei yhteyttä.",
     "APP_UPDATED": "bookeh päivittyi."
   }
