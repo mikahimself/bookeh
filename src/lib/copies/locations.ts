@@ -1,9 +1,11 @@
 import { toNameKey } from '@/fields/nameKey'
 import { normaliseName } from '@/fields/sortName'
+import { getProfile, updateProfile } from '@/lib/account/profile'
 import { DomainError } from '@/lib/errors'
 import type { Context } from '@/lib/payload/context'
 import * as gateway from '@/lib/payload/gateway'
 import type { Ref } from '@/lib/payload/ref'
+import { withTransaction } from '@/lib/payload/transaction'
 
 /**
  * Spine, AD-18 and Ref: resolves a location `Ref` to an id of the context
@@ -78,4 +80,50 @@ export async function listLocations(ctx: Context): Promise<LocationOption[]> {
     select: { name: true },
   })
   return docs.map(({ id, name }) => ({ id, name }))
+}
+
+/**
+ * Spine, AD-18, FR-31: deletes one of the context user's locations in the
+ * caller's transaction or one of its own (AD-16). An id that is not a positive
+ * safe integer, or not the viewer's location (gone, or another user's, for the
+ * admin too), fails with `NOT_FOUND` before any write; the check filters on
+ * `owner` explicitly as well as through `ownerAccess` (FR-48). The viewer's
+ * copies there and their default location, as read here, are cleared
+ * explicitly; the `ON DELETE set null` foreign keys catch only a reference
+ * committed concurrently. The profile goes through `lib/account`. No Undo.
+ */
+export async function deleteLocation(ctx: Context, id: number): Promise<void> {
+  if (!Number.isSafeInteger(id) || id <= 0) throw new DomainError('NOT_FOUND')
+
+  await withTransaction(ctx, async (tx) => {
+    // `count`, not `findByID`: a `NotFound` would end the transaction.
+    const { totalDocs } = await gateway.count(tx, {
+      collection: 'locations',
+      where: { and: [{ id: { equals: id } }, { owner: { equals: tx.user.id } }] },
+    })
+    if (totalDocs === 0) throw new DomainError('NOT_FOUND')
+
+    const { docs } = await gateway.find(tx, {
+      collection: 'copies',
+      where: { and: [{ location: { equals: id } }, { owner: { equals: tx.user.id } }] },
+      select: { location: true },
+      depth: 0,
+      pagination: false,
+    })
+    // One after the other: calls on one context never run concurrently (AD-16).
+    for (const doc of docs) {
+      await gateway.updateByID(tx, {
+        collection: 'copies',
+        id: doc.id,
+        data: { location: null },
+        depth: 0,
+      })
+    }
+
+    if ((await getProfile(tx)).defaultLocation === id) {
+      await updateProfile(tx, { defaultLocation: null })
+    }
+
+    await gateway.deleteByID(tx, { collection: 'locations', id, depth: 0 })
+  })
 }

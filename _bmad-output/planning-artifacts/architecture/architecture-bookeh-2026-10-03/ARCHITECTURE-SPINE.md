@@ -57,7 +57,7 @@ Arrows are the only allowed import directions, and ESLint `no-restricted-imports
 
 - `src/lib` never imports from `src/app`. `src/collections` imports only from `src/access` and `src/fields`.
 - `lib/metadata` has no database access.
-- Between services, imports are one-way: `catalogue` may import `copies`, `wishlists`, `books` and `metadata`; `wishlists` and `loans` may import `copies` and `people`; `shelf` may import `books`; `tags` may import `books` and `shelf`; `copies`, `people`, `books` and `metadata` import no other service.
+- Between services, imports are one-way: `catalogue` may import `copies`, `wishlists`, `books` and `metadata`; `wishlists` and `loans` may import `copies` and `people`; `shelf` may import `books`; `tags` may import `books` and `shelf`; `copies` may import `account` (deleting or merging a location clears or moves the profile default, AD-18); `people`, `books` and `metadata` import no other service.
 - `account` imports no other service.
 - `lib/undo` imports only `lib/payload` and `lib/errors`. Any service may import it. `lib/errors.ts` and `lib/processState.ts` import nothing from the project, and any module under `src/lib` may import them.
 - `src/app/(frontend)` imports from `lib/payload` only `requireUser`, `requireUserOrThrow` and types. It never calls the gateway.

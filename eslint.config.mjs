@@ -25,7 +25,7 @@ const serviceImports = {
   loans: ['copies', 'people', 'payload', 'undo'],
   shelf: ['books', 'payload', 'undo'],
   tags: ['books', 'shelf', 'payload', 'undo'],
-  copies: ['payload', 'undo'],
+  copies: ['account', 'payload', 'undo'],
   people: ['payload', 'undo'],
   books: ['payload', 'undo'],
   account: ['payload', 'undo'],
