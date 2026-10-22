@@ -130,7 +130,11 @@ compose exec -T postgres pg_dump -U bookeh -Fc bookeh > "${run_dir}/bookeh.dump"
 compose exec -T postgres pg_restore --list > /dev/null < "${run_dir}/bookeh.dump"
 
 echo "bookeh-backup: copying media from ${BOOKEH_MEDIA_DIR}"
-cp -a "$BOOKEH_MEDIA_DIR" "${run_dir}/media"
+# Mode and timestamps only, not ownership: over NFS, root in the
+# unprivileged LXC is not root on the NAS, so chown to the app's uid is
+# refused and `cp -a` fails. Restores set the owner (README, Backups).
+# GNU cp, as on the Debian LXC.
+cp -R --preserve=mode,timestamps "$BOOKEH_MEDIA_DIR" "${run_dir}/media"
 
 # --- Prune (only after a fully successful backup) ---------------------------
 

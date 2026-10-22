@@ -326,7 +326,9 @@ add them to `/opt/bookeh/.env` by hand — this story added the three
 run writes a dated directory under `BOOKEH_BACKUP_DIR`
 (`/mnt/nas/bookeh/backups`) holding `bookeh.dump` — a custom-format
 `pg_dump`, verified with `pg_restore --list` before the run counts as a
-success — and `media/`, a full copy of the media directory. Configuration
+success — and `media/`, a full copy of the media directory (modes and
+timestamps kept, owned by root: over NFS the LXC's root cannot chown to
+the app user, so a restore sets the owner to uid 1001 itself). Configuration
 lives in `/opt/bookeh/.env` (`BOOKEH_BACKUP_DIR`, `BOOKEH_STATUS_DIR`,
 `BOOKEH_BACKUP_RETENTION_DAYS`).
 

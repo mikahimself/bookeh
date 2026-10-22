@@ -236,6 +236,9 @@ say "counts match:${summary}"
 
 step='media copy'
 cp -a "$backup/media" "$scratch/media"
+# The backup's copy is owned by root (backup.sh keeps no ownership); the app
+# runs as uid 1001 and owns its media, as in production.
+chown -R 1001:1001 "$scratch/media"
 
 # --- App on the restored data -----------------------------------------------
 
