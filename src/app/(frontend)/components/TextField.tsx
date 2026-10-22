@@ -5,8 +5,8 @@ export type TextFieldProps = Omit<
   'id' | 'className' | 'aria-invalid' | 'aria-describedby'
 > & {
   label: string
-  /** A message for this field; draws the danger underline. */
-  error?: string
+  /** A message for this field, a Link included where one helps; draws the danger underline. */
+  error?: ReactNode
 }
 
 /**
@@ -25,7 +25,7 @@ function Field({
   children,
 }: {
   label: string
-  error?: string
+  error?: ReactNode
   children: (props: {
     id: string
     'aria-invalid'?: true

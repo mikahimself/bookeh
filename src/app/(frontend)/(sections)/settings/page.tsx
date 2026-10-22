@@ -9,12 +9,14 @@ import {
 } from '@/lib/account/profile'
 import { listLocations } from '@/lib/copies/locations'
 import { requireUser } from '@/lib/payload/context'
+import { filterValues } from '@/lib/shelf/filterValues'
 
 import { SignOutButton } from '../../components/SignOutButton'
 import { devicePrefs, THEMES } from '../../prefs'
 import { DefaultLocationField } from './DefaultLocationField'
 import { DisplayNameField } from './DisplayNameField'
 import { LanguageSwitch } from './LanguageSwitch'
+import { LocationsGroup } from './LocationsGroup'
 import { ThemeSwitch } from './ThemeSwitch'
 import { VisibilitySwitch } from './VisibilitySwitch'
 
@@ -35,10 +37,11 @@ function Group({ heading, id, children }: { heading: string; id?: string; childr
 /**
  * Settings (EXPERIENCE.md, Settings): profile, language, theme, visibility,
  * default location and Sign out in the first of two columns on wide screens,
- * one column on the phone.
- * Reads go through `getProfile()`, `listLocations()` and `devicePrefs()`; the
- * controls write through `updateProfileAction`, `setDefaultLocationAction`
- * and `setDevicePrefsAction`.
+ * the managed lists (Locations) in the second; one column on the phone.
+ * Reads go through `getProfile()`, `listLocations()`, `filterValues()` and
+ * `devicePrefs()`; the controls write through `updateProfileAction`,
+ * `setDefaultLocationAction`, `setDevicePrefsAction` and the location actions
+ * in `./actions`.
  */
 export default async function SettingsPage() {
   const ctx = await requireUser()
@@ -46,6 +49,19 @@ export default async function SettingsPage() {
   // Gateway calls on one context run one after the other, never concurrently.
   const profile = await getProfile(ctx)
   const locations = await listLocations(ctx)
+  // Spine, AD-18: a location's count is its copies from the shelf values; unused ones are absent.
+  const counts = new Map(
+    (await filterValues(ctx, profile.language)).location.map(({ id, count }) => [id, count]),
+  )
+  const counted = locations.map((location) => ({
+    ...location,
+    count: counts.get(location.id) ?? 0,
+  }))
+  // A refresh after a rename, merge or delete remounts the field with the fresh default and list.
+  const defaultLocationKey = [
+    profile.defaultLocation,
+    ...locations.map(({ id, name }) => `${id}:${name}`),
+  ].join('|')
 
   return (
     <div className="px-page-margin-phone pt-7 pb-7 wide:grid wide:grid-cols-2 wide:gap-7 wide:px-page-margin">
@@ -81,11 +97,20 @@ export default async function SettingsPage() {
           />
         </Group>
         <Group heading={t('defaultLocation')}>
-          <DefaultLocationField initial={profile.defaultLocation} locations={locations} />
+          <DefaultLocationField
+            key={defaultLocationKey}
+            initial={profile.defaultLocation}
+            locations={locations}
+          />
         </Group>
         <SignOutButton />
       </div>
-      {/* Second column: the managed lists (locations, people, tags) of later stories. */}
+      {/* Second column: the managed lists; People and tags arrive with later stories. */}
+      <div className="flex max-w-panel-width flex-col gap-7 max-wide:mt-7">
+        <Group heading={t('locations')}>
+          <LocationsGroup locations={counted} />
+        </Group>
+      </div>
     </div>
   )
 }

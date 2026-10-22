@@ -37,7 +37,21 @@
       "closed": "Suljettu"
     },
     "defaultLocation": "Oletussijainti",
-    "defaultLocationLabel": "Uusien kappaleiden sijainti"
+    "defaultLocationLabel": "Uusien kappaleiden sijainti",
+    "locations": "Sijainnit",
+    "noLocations": "Ei sijainteja",
+    "addLocation": "Lisää sijainti",
+    "locationName": "Nimi",
+    "locationNameRequired": "Anna nimi.",
+    "locationCount": "{count, plural, one {# kirja} other {# kirjaa}}",
+    "rename": "Nimeä uudelleen",
+    "merge": "Yhdistä",
+    "delete": "Poista",
+    "mergeInto": "Yhdistä {name} sijaintiin",
+    "mergeTitle": "Yhdistetäänkö {source} sijaintiin {target}?",
+    "mergeBody": "{count, plural, =0 {Yhtään kirjaa ei siirry sijaintiin {target}.} one {# kirja siirtyy sijaintiin {target}.} other {# kirjaa siirtyy sijaintiin {target}.}}",
+    "deleteTitle": "Poistetaanko {name}?",
+    "deleteBody": "{count, plural, =0 {Yksikään kirja ei menetä sijaintiaan.} one {# kirja menettää sijaintinsa.} other {# kirjaa menettää sijaintinsa.}}"
   },
   "toast": {
     "close": "Sulje",

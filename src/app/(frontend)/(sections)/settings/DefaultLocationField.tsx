@@ -1,6 +1,7 @@
 'use client'
 
 import { useTranslations } from 'next-intl'
+import { useRouter } from 'next/navigation'
 import { useMemo, useRef, useState, useTransition } from 'react'
 
 import type { LocationOption } from '@/lib/copies/locations'
@@ -18,7 +19,8 @@ import { settleAction, useReportFailure } from '../../components/request'
  * its name); the answer replaces both the value and the options, so a
  * created location becomes a marked option. Only the latest call's answer
  * is applied; on its failure the field returns to the last stored value and
- * reports. No `router.refresh()`.
+ * reports. A successful create by name calls `router.refresh()`, so the
+ * Locations group lists the new location; otherwise no refresh.
  */
 export function DefaultLocationField({
   initial,
@@ -29,6 +31,7 @@ export function DefaultLocationField({
 }) {
   const t = useTranslations('settings')
   const report = useReportFailure()
+  const router = useRouter()
   const [value, setValue] = useState<Ref | null>(initial)
   const [list, setList] = useState(locations)
   const [, startTransition] = useTransition()
@@ -47,6 +50,7 @@ export function DefaultLocationField({
     startTransition(async () => {
       const result = await settleAction(setDefaultLocationAction(next))
       if (result.ok) stored.current = result.data
+      if (result.ok && next !== null && typeof next !== 'number') router.refresh()
       if (call !== latest.current) return
       setValue(stored.current.defaultLocation)
       setList(stored.current.locations)

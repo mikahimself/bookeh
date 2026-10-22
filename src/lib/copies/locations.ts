@@ -82,6 +82,42 @@ export async function listLocations(ctx: Context): Promise<LocationOption[]> {
   return docs.map(({ id, name }) => ({ id, name }))
 }
 
+/**
+ * Spine, AD-18, FR-31: adds a location for the context user in the caller's
+ * transaction or one of its own (AD-16), and answers its id. Unlike
+ * `resolveLocation()`, a name in use is no match but a failure: a name blank
+ * after normalising fails with `VALIDATION` on `name`; another of the
+ * viewer's locations with the same `nameKey` fails with `NAME_TAKEN` and its
+ * id as `conflictId`. Both before any write. A lost race against a concurrent
+ * create or rename surfaces as the unique index's `ValidationError`, unchanged.
+ */
+export async function createLocation(ctx: Context, name: string): Promise<number> {
+  const normalised = normaliseName(name)
+  if (normalised === '') throw new DomainError('VALIDATION', { fields: { name: 'VALIDATION' } })
+
+  return withTransaction(ctx, async (tx) => {
+    const { docs } = await gateway.find(tx, {
+      collection: 'locations',
+      where: {
+        and: [{ nameKey: { equals: toNameKey(normalised) } }, { owner: { equals: tx.user.id } }],
+      },
+      limit: 1,
+      pagination: false,
+      depth: 0,
+    })
+    const taken = docs[0]
+    if (taken) throw new DomainError('NAME_TAKEN', { conflictId: taken.id })
+
+    // `owner` and `nameKey` are what Payload's create type requires; the hooks set both.
+    const created = await gateway.create(tx, {
+      collection: 'locations',
+      data: { owner: tx.user.id, name: normalised, nameKey: '' },
+      depth: 0,
+    })
+    return created.id
+  })
+}
+
 /** A positive safe integer: anything else cannot be a location id. */
 const isId = (id: number): boolean => Number.isSafeInteger(id) && id > 0
 
