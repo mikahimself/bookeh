@@ -51,9 +51,12 @@ export const effectiveAuthorIds: SQL = sql`select e.authors_id from (${effective
 /**
  * Spine, AD-7: the author sort key, the `sort_name` of the first effective
  * author (lowest `order`) the viewer may read; the first author Book detail
- * shows, since unreadable ones are dropped there. Null with none.
+ * shows, since unreadable ones are dropped there. Null with none. `offset 0`
+ * keeps the lateral a primary-key lookup per author row; flattened, the
+ * planner may hash-join a scan of every author for every copy.
  */
 export const firstAuthorSortName = (viewer: Viewer): SQL => sql`(
   select a.sort_name from (${effectiveAuthorRows}) e
-    join authors a on a.id = e.authors_id and ${readableBy(viewer, 'a')}
+    cross join lateral (select a.sort_name from authors a
+      where a.id = e.authors_id and ${readableBy(viewer, 'a')} offset 0) a
    order by e."order" limit 1)`

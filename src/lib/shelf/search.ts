@@ -15,6 +15,9 @@ type Viewer = Context['user']
  * under the database's Finnish collation, never accent-folded. It matches the
  * effective title, an effective author's name, the effective series' name,
  * ISBN-13 or the copy's own notes; authors and series pass the AD-4 read rule.
+ * The matching authors are an uncorrelated `array(…)`, so `ILIKE` runs over
+ * `authors` once per query; as an `in (select …)` the planner pulls it into a
+ * per-row join that scans every author for every copy.
  */
 export function textSearch(viewer: Viewer, q: string | undefined): SQL | undefined {
   const text = q?.trim()
@@ -24,8 +27,9 @@ export function textSearch(viewer: Viewer, q: string | undefined): SQL | undefin
 
   return sql`(
     ${like(effective('title'))}
-    or exists (select 1 from authors a
-      where a.id in (${effectiveAuthorIds}) and ${readableBy(viewer, 'a')} and ${like(sql`a.name`)})
+    or exists (select 1 from (${effectiveAuthorIds}) e
+      where e.authors_id = any(array(select a.id from authors a
+        where ${readableBy(viewer, 'a')} and ${like(sql`a.name`)})))
     or exists (select 1 from series s
       where s.id = ${effective('series')} and ${readableBy(viewer, 's')} and ${like(sql`s.name`)})
     or ${like(sql`b.isbn13`)}

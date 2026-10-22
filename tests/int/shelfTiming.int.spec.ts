@@ -119,6 +119,14 @@ describe('shelf timing at 10,000 copies', () => {
       select ub.id, 'authors', a.ids[1 + ub.id % 400], 1 from user_books ub, a
        where ub.owner_id = ${v}::int and ub.overridden ? 'authors'`)
 
+    // A library grows gradually and autovacuum keeps its statistics current;
+    // this one appears at once. Unanalysed (a freshly migrated bookeh_test, as
+    // in CI) the planner guesses ~100 `books_rels` rows and the author
+    // subqueries take seconds.
+    await db.execute(sql`
+      analyze genres, authors, series, books, books_rels, locations, copies,
+              user_books, user_books_rels`)
+
     const genre = await db.execute(sql`select min(id) id from genres where name like ${tagged}`)
     genreId = Number(genre.rows[0]?.id)
   }, 60_000)
