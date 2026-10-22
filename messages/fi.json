@@ -51,7 +51,12 @@
     "mergeTitle": "Yhdistetäänkö {source} sijaintiin {target}?",
     "mergeBody": "{count, plural, =0 {Yhtään kirjaa ei siirry sijaintiin {target}.} one {# kirja siirtyy sijaintiin {target}.} other {# kirjaa siirtyy sijaintiin {target}.}}",
     "deleteTitle": "Poistetaanko {name}?",
-    "deleteBody": "{count, plural, =0 {Yksikään kirja ei menetä sijaintiaan.} one {# kirja menettää sijaintinsa.} other {# kirjaa menettää sijaintinsa.}}"
+    "deleteBody": "{count, plural, =0 {Yksikään kirja ei menetä sijaintiaan.} one {# kirja menettää sijaintinsa.} other {# kirjaa menettää sijaintinsa.}}",
+    "backup": "Varmuuskopio",
+    "lastBackup": "Viimeisin varmuuskopio: {date}",
+    "lastBackupFailed": "Viimeisin varmuuskopiointi epäonnistui: {date}",
+    "lastBackupNone": "Viimeisin varmuuskopio: ei löytynyt",
+    "backupOverdue": "Varmuuskopio on myöhässä."
   },
   "toast": {
     "close": "Sulje",

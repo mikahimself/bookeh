@@ -304,7 +304,7 @@ Two columns on wide screens: profile, language, theme, visibility, default locat
 | Merge | Picks another item of the same kind; everything that used this one moves to it. Confirmed by a dialog. |
 | Delete | Confirmed by a dialog that says what will lose its location or tag. A Person who has loans, open or returned, or wishlist entries cannot be deleted; the dialog says so and offers Merge (AD-18). |
 | Genres (admin only) | One List row per system genre in the user's language with its Book count and a "No Finnish name" mark where missing. The English and Finnish names are edited in place; "Add genre" adds one; Merge and Delete are confirmed by a dialog and have no Undo. Absent for other users. Not mocked; its story starts with a rendered mock-up choice. |
-| Last backup (admin only) | "Last backup: {date}". Marked in {colors.danger} with "Backup is overdue." when the last successful backup is older than 48 hours, missing or failed. |
+| Last backup (admin only) | "Last backup: {date}"; "Last backup failed: {date}" when the last run failed; "Last backup: none found" when there is no readable record. Marked in {colors.danger} with "Backup is overdue." when the last successful backup is older than 48 hours, missing or failed. |
 | Sign out | A secondary button at the end of the first column. |
 
 ## State Patterns

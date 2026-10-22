@@ -1,4 +1,4 @@
-import { getTranslations } from 'next-intl/server'
+import { getFormatter, getTranslations } from 'next-intl/server'
 import type { ReactNode } from 'react'
 
 import {
@@ -16,6 +16,7 @@ import { devicePrefs, THEMES } from '../../prefs'
 import { DefaultLocationField } from './DefaultLocationField'
 import { DisplayNameField } from './DisplayNameField'
 import { LanguageSwitch } from './LanguageSwitch'
+import { readLastBackup } from './lastBackup'
 import { LocationsGroup } from './LocationsGroup'
 import { ThemeSwitch } from './ThemeSwitch'
 import { VisibilitySwitch } from './VisibilitySwitch'
@@ -37,7 +38,9 @@ function Group({ heading, id, children }: { heading: string; id?: string; childr
 /**
  * Settings (EXPERIENCE.md, Settings): profile, language, theme, visibility,
  * default location and Sign out in the first of two columns on wide screens,
- * the managed lists (Locations) in the second; one column on the phone.
+ * the managed lists (Locations) and, for admins only, Backup (NFR-6) in the
+ * second; one column on the phone. Backup shows the last backup from
+ * `readLastBackup()`, in `danger` with "Backup is overdue." when overdue.
  * Reads go through `getProfile()`, `listLocations()`, `filterValues()` and
  * `devicePrefs()`; the controls write through `updateProfileAction`,
  * `setDefaultLocationAction`, `setDevicePrefsAction` and the location actions
@@ -45,7 +48,12 @@ function Group({ heading, id, children }: { heading: string; id?: string; childr
  */
 export default async function SettingsPage() {
   const ctx = await requireUser()
-  const [{ theme }, t] = await Promise.all([devicePrefs(), getTranslations('settings')])
+  const [{ theme }, t, format, backup] = await Promise.all([
+    devicePrefs(),
+    getTranslations('settings'),
+    getFormatter(),
+    readLastBackup(ctx.user),
+  ])
   // Gateway calls on one context run one after the other, never concurrently.
   const profile = await getProfile(ctx)
   const locations = await listLocations(ctx)
@@ -105,11 +113,30 @@ export default async function SettingsPage() {
         </Group>
         <SignOutButton />
       </div>
-      {/* Second column: the managed lists; People and tags arrive with later stories. */}
+      {/* Second column: the managed lists, then Backup (admin only); People and tags arrive with later stories. */}
       <div className="flex max-w-panel-width flex-col gap-7 max-wide:mt-7">
         <Group heading={t('locations')}>
           <LocationsGroup locations={counted} />
         </Group>
+        {backup && (
+          <Group heading={t('backup')}>
+            <div
+              className={`flex flex-col gap-1 text-control ${backup.overdue ? 'text-danger' : 'text-text'}`}
+            >
+              <p>
+                {backup.kind === 'missing'
+                  ? t('lastBackupNone')
+                  : t(backup.kind === 'success' ? 'lastBackup' : 'lastBackupFailed', {
+                      date: format.dateTime(backup.time, {
+                        dateStyle: 'medium',
+                        timeStyle: 'short',
+                      }),
+                    })}
+              </p>
+              {backup.overdue && <p>{t('backupOverdue')}</p>}
+            </div>
+          </Group>
+        )}
       </div>
     </div>
   )
