@@ -439,6 +439,7 @@ type CopyLine = {
 }
 type EntryLine = { entryId: number; wishlist: Named; forPerson: Named | null }
 type Holdings = { copies: CopyLine[]; entries: EntryLine[] } // open entries only
+type ReadTarget = { copyIds: readonly number[] } | { bookId: number } // setRead(ctx, target, value | 'toggle'): Undone<{ read; count }>
 
 // src/lib/catalogue
 type Point = { x: number; y: number } // image pixels, origin top left
