@@ -30,7 +30,8 @@ test('scan to save, undo, save again', async ({ page, context, baseURL }) => {
   await page.getByLabel('Email').fill(E2E_EMAIL)
   await page.getByLabel('Password').fill(E2E_PASSWORD)
   await page.getByRole('button', { name: 'Sign in' }).click()
-  await page.getByRole('link', { name: 'Scan book' }).click()
+  // The header copy: an empty shelf draws a second Scan book in the content.
+  await page.locator('header').getByRole('link', { name: 'Scan book' }).click()
   await expect(scanHeading).toBeVisible()
 
   await enterIsbn(page)
