@@ -5,7 +5,7 @@ import type { OverridableBookField } from '@/fields/bookFields'
 /** The scalar fields shelf queries read; `series` is its id column. */
 type ShelfField = Extract<
   OverridableBookField,
-  'title' | 'year' | 'series' | 'language' | 'publisher'
+  'title' | 'year' | 'series' | 'language' | 'publisher' | 'pages'
 >
 
 const COLUMNS: Record<ShelfField, string> = {
@@ -14,6 +14,7 @@ const COLUMNS: Record<ShelfField, string> = {
   series: 'series_id',
   language: 'language',
   publisher: 'publisher',
+  pages: 'pages',
 }
 
 /**
