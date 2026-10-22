@@ -2,7 +2,8 @@ import { type SQL, sql } from '@payloadcms/db-postgres/drizzle'
 
 import type { Context } from '@/lib/payload/context'
 
-import { effective } from './effective'
+import { effective, effectiveAuthorIds } from './effective'
+import { containsPattern } from './like'
 import { readableBy } from './visibleCopies'
 
 type Viewer = Context['user']
@@ -18,19 +19,13 @@ type Viewer = Context['user']
 export function textSearch(viewer: Viewer, q: string | undefined): SQL | undefined {
   const text = q?.trim()
   if (!text) return undefined
-  const pattern = `%${text.replace(/[\\%_]/g, '\\$&')}%`
+  const pattern = containsPattern(text)
   const like = (value: SQL) => sql`${value} ilike ${pattern} escape '\\'`
-
-  const authorIn = (rels: string, parent: string) => sql`exists (
-    select 1 from ${sql.identifier(rels)} r
-    join authors a on a.id = r.authors_id
-    where r.parent_id = ${sql.identifier(parent)}.id and r.path = 'authors'
-      and ${readableBy(viewer, 'a')} and ${like(sql`a.name`)})`
 
   return sql`(
     ${like(effective('title'))}
-    or (ub.overridden ? 'authors' and ${authorIn('user_books_rels', 'ub')})
-    or (coalesce(not ub.overridden ? 'authors', true) and ${authorIn('books_rels', 'b')})
+    or exists (select 1 from authors a
+      where a.id in (${effectiveAuthorIds}) and ${readableBy(viewer, 'a')} and ${like(sql`a.name`)})
     or exists (select 1 from series s
       where s.id = ${effective('series')} and ${readableBy(viewer, 's')} and ${like(sql`s.name`)})
     or ${like(sql`b.isbn13`)}

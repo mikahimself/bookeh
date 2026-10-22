@@ -11,6 +11,8 @@
  * for a single-valued parameter the first value counts. No page number.
  */
 
+import type { Named } from '@/lib/books/effectiveBook'
+
 /** Spine, Shared shapes: what the collection lists and in what order. */
 export type ShelfQuery = {
   q?: string
@@ -38,6 +40,26 @@ export type ShelfRange = { offset: number; limit: number }
 
 /** AD-7: the one fixed page size, shared by the page and the client list. */
 export const SHELF_PAGE_SIZE = 50
+
+/** The fields `/data/suggest` suggests names for; the route checks `field` against it. */
+export const SUGGEST_FIELDS = ['author', 'series', 'publisher'] as const
+
+/** Spine, Shared shapes. */
+export type SuggestField = (typeof SUGGEST_FIELDS)[number]
+
+/** Spine, Shared shapes: one suggested name; `id` is `null` for a publisher. */
+export type Suggestion = { id: number | null; name: string }
+
+/** Spine, Shared shapes: a filter value with how many of the viewer's copies carry it. */
+export type Counted<T> = T & { count: number }
+
+/** Spine, Shared shapes: the values in use on the viewer's copies, `filterValues()`. */
+export type FilterValues = {
+  location: Counted<Named>[]
+  status: Counted<{ value: 'owned' | 'ordered' }>[]
+  genre: Counted<Named>[]
+  language: Counted<{ value: string }>[]
+}
 
 /** Spine, Shared shapes: the parsed address; the client list keys on `query` alone. */
 export type ShelfAddress = { query: ShelfQuery; book: number | null }

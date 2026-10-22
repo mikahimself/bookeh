@@ -146,7 +146,7 @@ Arrows are the only allowed import directions, and ESLint `no-restricted-imports
   - Paging is by offset and limit with one fixed page size, and every sort ends on copy id. The page number is not in the URL.
   - One client list component holds the loaded rows, keyed by the shelf query without `book`. After any successful action or Undo that can change rows, it reloads rows 0 to the number it holds through `/data/shelf`. Rows are never patched locally. Per shelf query, the list keeps in `sessionStorage` only how many rows it held and the scroll position, never row data; on return from another route it loads that many rows in one request, up to a fixed cap, and restores the position.
   - Search, filters, sort and the open Book live in URL search params. `parseShelfQuery()` and `shelfHref(query, { book })` in `lib/shelf/query.ts` are the only code that reads or writes them; a Filter chip is a link built with `shelfHref()`.
-  - The values a filter offers (locations, genres, tags, languages in use), their copy counts, and the suggestions for author, series and publisher are shelf queries on `visibleCopies`. Suggestions are distinct on `nameKey` and prefer the shared record's id.
+  - The values a filter offers and the suggestions for author, series and publisher are shelf queries on `visibleCopies`. `filterValues()` returns the locations, statuses, genres and languages in use on the viewer's copies, each with its copy count, never narrowed by the current query; tags arrive in Epic 9. Suggestions are distinct on `nameKey` and prefer the shared record's id.
   - Text sort relies on the database's `fi-FI` ICU collation. Author sort uses the `sortName` of the Book's first effective author. Text search is `ILIKE` with no accent folding.
   - No code lists or searches `books`, `authors` or `series` on their own. They are reached through a copy or wishlist entry the viewer can see, or by exact match on ISBN-13 or `nameKey`. Book detail, Edit book and every `{ bookId }` a client sends start with `requireOwnBook(ctx, bookId)` in `lib/books`, which fails with `NOT_FOUND` unless the viewer has a copy or an open wishlist entry of that Book.
   - Lookup's own-library results are a shelf text search over the viewer's copies and open wishlist entries, the entries through a `visibleEntries(viewer)` fragment that mirrors `visibleCopies`. Every other list that is not copies (loans, a wishlist) hydrates Books through `getEffectiveBooks()` and does not sort or filter on Book fields.
@@ -495,6 +495,13 @@ type ShelfAddress = { query: ShelfQuery; book: number | null } // parseShelfQuer
 type ShelfRange = { offset: number; limit: number }
 type ShelfRow = { copy: CopyLine; book: EffectiveBook }
 type ShelfRows = { rows: ShelfRow[]; total: number; labels: Record<string, string> } // names of the filter values
+type Counted<T> = T & { count: number }
+type FilterValues = { // filterValues(ctx, locale): values in use on the viewer's copies, each counted in copies
+  location: Counted<Named>[]; status: Counted<{ value: 'owned' | 'ordered' }>[]
+  genre: Counted<Named>[]; language: Counted<{ value: string }>[]
+}
+type SuggestField = 'author' | 'series' | 'publisher' // SUGGEST_FIELDS
+type Suggestion = { id: number | null; name: string } // suggest(ctx, field, text); id null for a publisher
 
 // src/lib/undo
 type Restore = (ctx: Context) => Promise<void>
@@ -521,7 +528,8 @@ The addresses are those of `EXPERIENCE.md` → Information Architecture, with th
 | `/books/[bookId]/edit` | Edit book, a page on every screen width. With `?copy=<copyId>`, that copy's status and location too. |
 | `/loans`, `/wishlists`, `/settings` | Loans, the list of wishlists, settings |
 | `/wishlists/[listId]` | One wishlist. `?entry=<entryId>` opens that entry in its own sheet or panel. |
-| `/data/shelf`, `/data/suggest`, `/data/cover/[isbn13]` | Route handlers for client-initiated reads (AD-10) |
+| `/data/shelf`, `/data/cover/[isbn13]` | Route handlers for client-initiated reads (AD-10) |
+| `/data/suggest?field=author\|series\|publisher&q=<text>` | Route handler (AD-10): `ActionResult<Suggestion[]>` from the viewer's collection, at most 10, by name; a blank `q` answers `[]`; a missing or unknown `field` or a `q` over 200 characters is `VALIDATION` |
 
 ### Deployment and environments
 

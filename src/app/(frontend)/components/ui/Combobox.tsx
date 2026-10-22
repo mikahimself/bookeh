@@ -21,6 +21,10 @@ export type ComboboxProps = {
   /** A message for this field; draws the danger underline. */
   error?: string
   disabled?: boolean
+  /** Called with the text as the user types it; never for Base UI's own resets. */
+  onInputValueChange?: (text: string) => void
+  /** Highlights the first row as the list opens, so Enter chooses it. */
+  autoHighlight?: boolean
 }
 
 /** An option, or the last row that creates one by name. */
@@ -42,7 +46,16 @@ const sameOption = (item: Item, value: Item): boolean =>
  * Clear, or emptying the text, empties the value. The popup is no overlay:
  * no history entry.
  */
-export function Combobox({ label, options, value, onValueChange, error, disabled }: ComboboxProps) {
+export function Combobox({
+  label,
+  options,
+  value,
+  onValueChange,
+  error,
+  disabled,
+  onInputValueChange,
+  autoHighlight = true,
+}: ComboboxProps) {
   const t = useTranslations('combobox')
   const locale = useLocale()
   const id = useId()
@@ -86,13 +99,16 @@ export function Combobox({ label, options, value, onValueChange, error, disabled
         onValueChange(next === null ? null : isOption(next) ? next.id : { create: next.create })
       }
       inputValue={query}
-      onInputValueChange={setQuery}
+      onInputValueChange={(text, { reason }) => {
+        setQuery(text)
+        if (reason === 'input-change') onInputValueChange?.(text)
+      }}
       open={open}
       onOpenChange={setOpen}
       itemToStringLabel={itemLabel}
       isItemEqualToValue={sameOption}
-      filter={(item, text) => !isOption(item) || contains(item, text, itemLabel)}
-      autoHighlight
+      filter={(item, text) => !isOption(item) || contains(item, text.trim(), itemLabel)}
+      autoHighlight={autoHighlight}
       locale={locale}
       disabled={disabled}
     >

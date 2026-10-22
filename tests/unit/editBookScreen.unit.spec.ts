@@ -5,6 +5,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import type { CornerCropProps } from '@/app/(frontend)/components/cornerCrop/CornerCrop'
 import type { Corners } from '@/lib/catalogue/corners'
+import type { Suggestion } from '@/lib/shelf/query'
 
 const show = vi.fn()
 const dismiss = vi.fn()
@@ -35,6 +36,11 @@ vi.mock('@/app/(frontend)/components/cornerCrop/CornerCrop', () => ({
 }))
 const warpPreview = vi.fn()
 vi.mock('@/app/(frontend)/components/cornerCrop/warpPreview', () => ({ warpPreview }))
+// What `/data/suggest` answers for any typed text; none unless a test says so.
+let suggested: Suggestion[] = []
+vi.mock('@/app/(frontend)/components/suggest', () => ({
+  useSuggestions: (_field: string, text: string) => (text.trim() ? suggested : []),
+}))
 
 const { installNavigationTracking, OVERLAY_TOKENS_KEY, TaskBase } =
   await import('@/app/(frontend)/components/navigation')
@@ -106,6 +112,12 @@ const discardAsked = () => screen.findByRole('dialog', { name: 'editBook.discard
 const unfold = () => fireEvent.click(screen.getByRole('button', { name: 'editBook.moreDetails' }))
 const type = (field: HTMLElement, value: string) => fireEvent.change(field, { target: { value } })
 const field = (key: string) => screen.getByLabelText(`editBook.field.${key}`)
+/** Types into a combobox as a user does, which opens its list. */
+const typeName = async (input: HTMLElement, text: string) => {
+  act(() => input.focus())
+  fireEvent.input(input, { target: { value: text }, inputType: 'insertText' })
+  await waitFor(() => expect(screen.getByRole('listbox')).toBeTruthy())
+}
 
 describe('EditBookScreen', () => {
   beforeEach(() => {
@@ -221,6 +233,7 @@ describe('EditBookScreen, More details', () => {
   afterEach(async () => {
     cleanup()
     vi.clearAllMocks()
+    suggested = []
     await new Promise((resolve) => setTimeout(resolve, 50))
   })
 
@@ -265,17 +278,72 @@ describe('EditBookScreen, More details', () => {
     expect(screen.queryByRole('dialog')).toBeNull()
   })
 
-  it('saves the authors as the names of their rows, an added one included', async () => {
+  it('saves a chosen suggestion and a new name as the authors', async () => {
     editBookAction.mockResolvedValue({ ok: true, data: null })
+    suggested = [{ id: 9, name: 'Väinö Linna' }]
     open()
     unfold()
-    type(field('author'), 'B')
+    await typeName(field('author'), 'linna')
+    fireEvent.click(screen.getByRole('option', { name: 'Väinö Linna' }))
     fireEvent.click(screen.getByRole('button', { name: 'editBook.addAuthor' }))
-    type(screen.getAllByLabelText('editBook.field.author')[1]!, 'C')
+    await typeName(screen.getAllByLabelText('editBook.field.author')[1]!, 'Uusi Nimi')
+    fireEvent.click(screen.getByRole('option', { name: 'combobox.create' }))
     save()
 
     await waitFor(() =>
-      expect(editBookAction).toHaveBeenCalledWith({ bookId: 7, edits: { authors: ['B', 'C'] } }),
+      expect(editBookAction).toHaveBeenCalledWith({
+        bookId: 7,
+        edits: { authors: ['Väinö Linna', 'Uusi Nimi'] },
+      }),
+    )
+  })
+
+  it('saves a chosen series suggestion as the series', async () => {
+    editBookAction.mockResolvedValue({ ok: true, data: null })
+    suggested = [{ id: 4, name: 'Muumit' }]
+    open()
+    unfold()
+    await typeName(field('series'), 'muumi')
+    fireEvent.click(screen.getByRole('option', { name: 'Muumit' }))
+    save()
+
+    await waitFor(() =>
+      expect(editBookAction).toHaveBeenCalledWith({ bookId: 7, edits: { series: 'Muumit' } }),
+    )
+  })
+
+  it('keeps a typed name through Enter and a mouse press on Save', async () => {
+    editBookAction.mockResolvedValue({ ok: true, data: null })
+    suggested = [{ id: 5, name: 'Mika Waltari' }]
+    open()
+    unfold()
+    const author = field('author')
+    await typeName(author, 'Mika Walt')
+    fireEvent.keyDown(author, { key: 'Enter' })
+    const button = screen.getByRole('button', { name: 'editBook.save' })
+    fireEvent.pointerDown(button)
+    fireEvent.mouseDown(button)
+    act(() => button.focus())
+    await waitFor(() => expect(screen.queryByRole('listbox')).toBeNull())
+    expect(author).toHaveProperty('value', 'Mika Walt')
+    fireEvent.click(button)
+
+    await waitFor(() =>
+      expect(editBookAction).toHaveBeenCalledWith({ bookId: 7, edits: { authors: ['Mika Walt'] } }),
+    )
+  })
+
+  it('saves no series after Clear', async () => {
+    editBookAction.mockResolvedValue({ ok: true, data: null })
+    open(undefined, { ...shared, effective: { ...effective, series: 'Muumit' } })
+    unfold()
+    const series = field('series')
+    expect(series).toHaveProperty('value', 'Muumit')
+    fireEvent.click(within(series.parentElement!).getByRole('button', { name: 'combobox.clear' }))
+    save()
+
+    await waitFor(() =>
+      expect(editBookAction).toHaveBeenCalledWith({ bookId: 7, edits: { series: null } }),
     )
   })
 

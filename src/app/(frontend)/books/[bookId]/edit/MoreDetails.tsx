@@ -12,6 +12,7 @@ import { TextAreaField, TextField } from '../../../components/TextField'
 import { markerSlotClass } from '../../../components/ui/classes'
 
 import { isEmpty } from './draft'
+import { NameCombobox } from './NameCombobox'
 
 /**
  * Every `BookEdits` key's value as the viewer sees the Book: author and
@@ -44,7 +45,9 @@ type Props = {
  * to `onEdit` as its `BookEdits` value: text `''` is `null` (a title stays
  * `''`), an emptied ISBN `undefined`, number fields keep digits only, authors
  * are the non-blank trimmed names of their rows, genres the chosen ids sorted
- * ascending. Read-only genres and themes are lines, absent when empty.
+ * ascending. Author rows and the series are name comboboxes over the
+ * collection's suggestions. Read-only genres and themes are lines, absent
+ * when empty.
  */
 export function MoreDetails(props: Props) {
   const t = useTranslations('editBook')
@@ -79,7 +82,7 @@ export function MoreDetails(props: Props) {
   )
 }
 
-type TextKey = 'subtitle' | 'series' | 'publisher' | 'language' | 'description'
+type TextKey = 'subtitle' | 'publisher' | 'language' | 'description'
 type NumberKey = 'seriesIndex' | 'year' | 'pages'
 
 const ascending = (a: number, b: number) => a - b
@@ -106,7 +109,7 @@ function Fields({
   // Local, so an emptied ISBN stays empty: its `undefined` leaves the draft.
   const [isbn, setIsbn] = useState(() => draft.isbn13 ?? effective.isbn13 ?? '')
 
-  const shown = (key: 'title' | TextKey | NumberKey): string => {
+  const shown = (key: 'title' | 'series' | TextKey | NumberKey): string => {
     const value = Object.hasOwn(draft, key) ? draft[key] : effective[key]
     return value === null || value === undefined ? '' : String(value)
   }
@@ -167,13 +170,14 @@ function Fields({
       <TextField {...text('subtitle')} />
       <div className="flex flex-col gap-2">
         {rows.map((row, index) => (
-          <TextField
+          <NameCombobox
             key={index}
             label={t('editBook.field.author')}
+            field="author"
             value={row}
             error={index === 0 ? message('authors') : undefined}
             autoFocus={index === focusRow}
-            onChange={({ target }) => setRow(index, target.value)}
+            onChange={(name) => setRow(index, name)}
           />
         ))}
         <div>
@@ -187,7 +191,13 @@ function Fields({
           </ActionLink>
         </div>
       </div>
-      <TextField {...text('series')} />
+      <NameCombobox
+        label={t('editBook.field.series')}
+        field="series"
+        value={shown('series')}
+        error={message('series')}
+        onChange={(name) => onEdit('series', name === '' ? null : name)}
+      />
       <TextField {...number('seriesIndex')} />
       <TextField {...text('publisher')} />
       <TextField {...number('year')} />
