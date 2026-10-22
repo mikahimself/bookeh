@@ -2349,6 +2349,7 @@ So that a tap answers "what is this and where are my copies?" (FR-26, UX-DR43, U
 **And** opening pushes a history entry; Back, X or tapping the dimmed list closes it; swapping to another Book replaces the entry
 **And** a `?book=` for a Book I don't hold opens the section without it and the toast "Not in library"
 **And** if a change makes the open row stop matching the filters, the row goes and the detail stays open until closed
+**And** checked on the phone before the story is done, from Book detail's Edit: the `image/*` picker offers the camera, a photo from the iPhone camera goes through the corner crop by touch, and a HEIC photo uploads as the cover (the phone check Story 4.14 left open; Epic 4 retrospective, decision 5)
 
 ### Story 5.19: [E29] Book detail beside the list on wide screens
 
