@@ -51,7 +51,7 @@ Make the collection at `/` the place Mika uses every day: a fast, Finnish-ordere
 - The app opens on the collection; there is no home screen. One row is one copy; only the viewer's own copies are ever listed.
 - Search covers effective title, author names, series name, ISBN-13 and copy notes: case-insensitive `ILIKE`, no accent folding ("a" never matches "ä"), `%`, `_`, `\` matched literally. It never searches outside the collection.
 - Filters: location and status (copy); read and rating "at least" (the viewer's `user-books` row, a missing row = unread, unrated); genre (system genres); language, publisher (exact effective value); author, series; year and pages ranges, inclusive, either end open, an active range excluding Books with no effective value (a cleared override included). Fields AND, values within a field OR. Filters, sort and search use the viewer's overrides.
-- Sort: author (default; first effective author's `sortName`, then title; no author last), title, year (no year last both directions), date added; `fi-FI` collation ("Örkki" after "Zorro"); every sort ends on copy id.
+- Sort: author (default; `sortName` of the Book's first effective author the viewer may read, then effective title, both in the sort's direction; no readable author last both ways), title, year (no year last both directions), date added; `fi-FI` collation ("Örkki" after "Zorro"); every sort ends on copy id.
 - First page for no filter, text search, three combined filters and author sort under 1 s at 10,000 copies on the CI runner.
 - Read and rating belong to the user and the Book, not a copy. Notes are per copy.
 - Received makes an ordered copy owned at the default location. Ordered copies have no location.
@@ -95,8 +95,8 @@ Make the collection at `/` the place Mika uses every day: a fast, Finnish-ordere
 
 ## Cross-Story Dependencies
 
-- Done: 5.1, 5.2, 5.3, 5.4, 5.5, 5.8, 5.9, 5.22, 5.31. Next: 5.6 author sort, then **5.7 timing (and any indexes) before any collection screen**.
-- `getShelfRows` and `shelfIds` accept the sort type without `author`; 5.6 widens both.
+- Done: 5.1–5.6, 5.8, 5.9, 5.22, 5.31. Next: **5.7 timing (and any indexes) before any collection screen**.
+- `shelfIds` and `getShelfRows` take the full `ShelfQuery` (all four sorts).
 - 5.10 renders the first page through `getShelfRows`; 5.11 builds `/data/shelf` (range validation, request serializer in `query.ts`) and the reload rule; 5.12 builds on 5.11.
 - 5.18 builds Book detail's content component; 5.19 renders it in the wide panel; later groups (here and Epics 6, 7, 9) depend only on that component. 5.18 also carries Epic 4's open phone check (camera picker, touch corner crop, HEIC cover upload).
 - 5.22 `setRead` serves 5.23 and 5.29. `moveCopies` and `removeCopies` already exist in `lib/copies`; 5.24, 5.28 and 5.30 wire them. 5.27 builds the action bar with count and Done only; Remove, Read, Move (and Tag in 9.8) are added by 5.28–5.30.
