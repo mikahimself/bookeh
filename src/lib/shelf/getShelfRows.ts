@@ -3,8 +3,8 @@ import { type CopyLine, getHoldings } from '@/lib/books/holdings'
 import type { Context } from '@/lib/payload/context'
 
 import { shelfLabels } from './labels'
-import type { ShelfRange, ShelfRows } from './query'
-import { type SortedQuery, shelfIds } from './shelfIds'
+import type { ShelfQuery, ShelfRange, ShelfRows } from './query'
+import { shelfIds } from './shelfIds'
 
 /**
  * Spine, AD-7: the one hydrated shelf read, for the first page and every
@@ -14,7 +14,7 @@ import { type SortedQuery, shelfIds } from './shelfIds'
  */
 export async function getShelfRows(
   ctx: Context,
-  query: SortedQuery,
+  query: ShelfQuery,
   range: ShelfRange,
 ): Promise<ShelfRows> {
   const [{ ids, total }, labels] = await Promise.all([

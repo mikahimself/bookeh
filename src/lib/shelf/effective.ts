@@ -1,6 +1,11 @@
 import { type SQL, sql } from '@payloadcms/db-postgres/drizzle'
 
 import type { OverridableBookField } from '@/fields/bookFields'
+import type { Context } from '@/lib/payload/context'
+
+import { readableBy } from './visibleCopies'
+
+type Viewer = Context['user']
 
 /** The scalar fields shelf queries read; `series` is its id column. */
 type ShelfField = Extract<
@@ -29,13 +34,26 @@ export const effective = (field: ShelfField): SQL => {
 }
 
 /**
- * Spine, AD-6: the ids of the effective authors of the Book on `b` and `ub`,
- * as rows: the Book's own unless the viewer's row lists `authors`, then the
- * row's.
+ * Spine, AD-6: the effective authors of the Book on `b` and `ub` as rows of
+ * `authors_id` and their position `order`: the Book's own unless the viewer's
+ * row lists `authors`, then the row's.
  */
-export const effectiveAuthorIds: SQL = sql`
-  select r.authors_id from books_rels r
+export const effectiveAuthorRows: SQL = sql`
+  select r.authors_id, r."order" from books_rels r
    where r.parent_id = b.id and r.path = 'authors' and not coalesce(ub.overridden ? 'authors', false)
   union all
-  select r.authors_id from user_books_rels r
+  select r.authors_id, r."order" from user_books_rels r
    where r.parent_id = ub.id and r.path = 'authors' and ub.overridden ? 'authors'`
+
+/** Spine, AD-6: the ids of the effective authors of the Book on `b` and `ub`, as rows. */
+export const effectiveAuthorIds: SQL = sql`select e.authors_id from (${effectiveAuthorRows}) e`
+
+/**
+ * Spine, AD-7: the author sort key, the `sort_name` of the first effective
+ * author (lowest `order`) the viewer may read; the first author Book detail
+ * shows, since unreadable ones are dropped there. Null with none.
+ */
+export const firstAuthorSortName = (viewer: Viewer): SQL => sql`(
+  select a.sort_name from (${effectiveAuthorRows}) e
+    join authors a on a.id = e.authors_id and ${readableBy(viewer, 'a')}
+   order by e."order" limit 1)`

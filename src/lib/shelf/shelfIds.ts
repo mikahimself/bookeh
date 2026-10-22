@@ -3,28 +3,27 @@ import { sql } from '@payloadcms/db-postgres/drizzle'
 import type { Context } from '@/lib/payload/context'
 import { drizzleFor } from '@/lib/payload/drizzle'
 
-import { effective } from './effective'
+import { effective, firstAuthorSortName } from './effective'
 import { relationFilters, scalarFilters } from './filters'
 import type { ShelfQuery, ShelfRange } from './query'
 import { textSearch } from './search'
 import { readableBy, visibleCopies } from './visibleCopies'
-
-/** The sorts built so far; Story 5.6 adds `author`. */
-export type SortedQuery = Omit<ShelfQuery, 'sort'> & { sort: 'title' | 'year' | 'added' }
 
 /**
  * Spine, AD-7: the viewer's copies in `query`'s order, the slice `range` of
  * them with their Book ids, and how many there are in all. Read-only, with
  * system privileges: `visibleCopies` and the AD-4 read rule on `books` decide
  * what is seen. `user_books` joins on the viewer, never the copy's owner.
- * Every sort ends on copy id in the same direction. `q` (`textSearch`), the
+ * `author` orders by the first readable effective author's `sortName`, no
+ * author last both ways, then the effective title. Every sort ends on copy id
+ * in the same direction. `q` (`textSearch`), the
  * scalar filters (`scalarFilters`) and the author, series and genre filters
  * (`relationFilters`) narrow the shared `from`, so the count applies them
  * too; tag and theme are not applied yet (Epic 9).
  */
 export async function shelfIds(
   ctx: Context,
-  query: SortedQuery,
+  query: ShelfQuery,
   range: ShelfRange,
 ): Promise<{ ids: { copyId: number; bookId: number }[]; total: number }> {
   const viewer = ctx.user
@@ -42,6 +41,7 @@ export async function shelfIds(
 
   const dir = sql.raw(query.dir === 'asc' ? 'asc' : 'desc')
   const key = {
+    author: sql`${firstAuthorSortName(viewer)} ${dir} nulls last, ${effective('title')} ${dir}`,
     title: sql`${effective('title')} ${dir}`,
     year: sql`${effective('year')} ${dir} nulls last`,
     added: sql`copies.created_at ${dir}`,
