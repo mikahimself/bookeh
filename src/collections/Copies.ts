@@ -37,8 +37,8 @@ export const Copies: CollectionConfig = {
   slug: 'copies',
   access: ownerAccess,
   admin: {
-    group: 'Library',
-    defaultColumns: ['book', 'status', 'location', 'owner', 'updatedAt'],
+    group: 'My data',
+    defaultColumns: ['book', 'status', 'location', 'updatedAt'],
   },
   hooks: { beforeValidate: [noLocationWhenOrdered] },
   fields: [

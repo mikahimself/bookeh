@@ -28,8 +28,8 @@ export const UserBooks: CollectionConfig = {
   slug: 'user-books',
   access: ownerAccess,
   admin: {
-    group: 'Library',
-    defaultColumns: ['book', 'owner', 'read', 'rating'],
+    group: 'My data',
+    defaultColumns: ['book', 'read', 'rating'],
   },
   indexes: [{ fields: ['owner', 'book'], unique: true }],
   fields: [

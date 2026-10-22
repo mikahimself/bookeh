@@ -27,6 +27,20 @@ export default buildConfig({
     importMap: {
       baseDir: path.resolve(dirname),
     },
+    meta: {
+      titleSuffix: '- bookeh',
+      icons: [{ rel: 'icon', type: 'image/svg+xml', url: '/icons/icon.svg' }],
+      // The OG image route cannot load the Icon's relative image, and the tailnet
+      // back office is never shared, so no OG image; the defaults say "Payload".
+      defaultOGImageType: 'off',
+      openGraph: { siteName: 'bookeh', description: 'bookeh back office' },
+    },
+    components: {
+      graphics: {
+        Logo: '/app/(payload)/graphics#Logo',
+        Icon: '/app/(payload)/graphics#Icon',
+      },
+    },
   },
   collections: [Authors, Books, Copies, Genres, Locations, Media, Series, UserBooks, Users],
   graphQL: { disable: true },

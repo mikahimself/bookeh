@@ -1,0 +1,21 @@
+// bookeh back office theme. Spine "Theme only": the admin gets tokens, no
+// restructuring. Values come from DESIGN.md (square corners, background and
+// text tokens), set on Payload's elevation scale so its surfaces and text
+// follow, not only the page. `@layer payload` wins over Payload's
+// `payload-default` by layer. Radii Payload hard-codes stay as they are.
+
+@layer payload {
+  :root {
+    --style-radius-s: 0px;
+    --style-radius-m: 0px;
+    --style-radius-l: 0px;
+    // Light ground is Payload's white already; text is elevation-800.
+    --theme-elevation-800: #1f2933;
+  }
+
+  html[data-theme='dark'] {
+    --theme-elevation-0: #14181d;
+    --theme-elevation-800: #e3e8ee;
+    --theme-text: #e3e8ee;
+  }
+}

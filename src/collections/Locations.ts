@@ -18,7 +18,7 @@ export const Locations: CollectionConfig = {
   defaultSort: 'name',
   typescript: { interface: 'UserLocation' },
   admin: {
-    group: 'Library',
+    group: 'My data',
     useAsTitle: 'name',
     defaultColumns: ['name', 'updatedAt'],
   },

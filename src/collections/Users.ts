@@ -55,6 +55,7 @@ const defaultLocation: SingleRelationshipField = {
 export const Users: CollectionConfig = {
   slug: 'users',
   admin: {
+    group: 'System',
     useAsTitle: 'displayName',
     defaultColumns: ['displayName', 'email', 'roles'],
   },
