@@ -4,7 +4,7 @@ import type { Context } from '@/lib/payload/context'
 import { drizzleFor } from '@/lib/payload/drizzle'
 
 import { effective } from './effective'
-import { scalarFilters } from './filters'
+import { relationFilters, scalarFilters } from './filters'
 import type { ShelfQuery, ShelfRange } from './query'
 import { textSearch } from './search'
 import { readableBy, visibleCopies } from './visibleCopies'
@@ -17,10 +17,10 @@ export type SortedQuery = Omit<ShelfQuery, 'sort'> & { sort: 'title' | 'year' | 
  * them with their Book ids, and how many there are in all. Read-only, with
  * system privileges: `visibleCopies` and the AD-4 read rule on `books` decide
  * what is seen. `user_books` joins on the viewer, never the copy's owner.
- * Every sort ends on copy id in the same direction. `q` (`textSearch`) and
- * the scalar filters (`scalarFilters`) narrow the shared `from`, so the count
- * applies them too; author, series and genre filters are not applied yet
- * (5.5), nor tag and theme (Epic 9).
+ * Every sort ends on copy id in the same direction. `q` (`textSearch`), the
+ * scalar filters (`scalarFilters`) and the author, series and genre filters
+ * (`relationFilters`) narrow the shared `from`, so the count applies them
+ * too; tag and theme are not applied yet (Epic 9).
  */
 export async function shelfIds(
   ctx: Context,
@@ -32,6 +32,7 @@ export async function shelfIds(
     visibleCopies(viewer),
     textSearch(viewer, query.q),
     scalarFilters(query.filters),
+    relationFilters(viewer, query.filters),
   ].filter((condition) => condition !== undefined)
   const from = sql`
     from copies

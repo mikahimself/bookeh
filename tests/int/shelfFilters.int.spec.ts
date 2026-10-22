@@ -1,3 +1,5 @@
+import { randomUUID } from 'node:crypto'
+
 import { getPayload, type Payload } from 'payload'
 import { beforeAll, describe, expect, it } from 'vitest'
 
@@ -12,15 +14,20 @@ import type { Book, User } from '@/payload-types'
 import { contextFor, createUser } from '../helpers/harness'
 import { randomIsbn } from '../helpers/isbn'
 
-// `shelfIds()` scalar filters, AD-7 (FR-25): fields AND, values within a
+// `shelfIds()` filters, AD-7 (FR-25): fields AND, values within a
 // field OR, the count narrowed with the page; Book fields by effective value
 // (AD-6); ranges open at either end exclude no value; read and rating from
 // the viewer's `user-books` row, a missing row unread and unrated.
-// Each test has its own users; owner scoping keeps them apart.
+// Author and series ids stand for every readable record with their
+// `name_key`, matched against effective values; genres are the Book's own.
+// Each test has its own users; owner scoping keeps them apart. Shared name
+// keys are unique and rows stay, so names carry a per-run suffix.
 
 const ALL = { offset: 0, limit: 50 }
 
-describe('shelf scalar filters', () => {
+const unique = (name: string) => `${name} ${randomUUID().slice(0, 8)}`
+
+describe('shelf filters', () => {
   let payload: Payload
 
   const sharedBook = async (by: User, data: Partial<Book> = {}) =>
@@ -53,9 +60,32 @@ describe('shelf scalar filters', () => {
       depth: 0,
     })
 
-  /** The copies `filters` lists, in the order added, and the total. */
-  const listed = async (ctx: Context, filters: ShelfQuery['filters']) => {
-    const { ids, total } = await shelfIds(ctx, { filters, sort: 'added', dir: 'asc' }, ALL)
+  /** An author or series; the hook derives `nameKey`, given only to satisfy the create type. */
+  const record = async (
+    by: User,
+    collection: 'authors' | 'series',
+    name: string,
+    visibility: 'shared' | 'private',
+  ) =>
+    payload.create({
+      collection,
+      data: { name, visibility, nameKey: '' },
+      overrideAccess: true,
+      depth: 0,
+      req: (await contextFor(by)).req,
+    })
+
+  const genreNamed = (name: string) =>
+    payload.create({
+      collection: 'genres',
+      data: { name: unique(name), nameFi: unique(name), nameKey: '' },
+      overrideAccess: true,
+      depth: 0,
+    })
+
+  /** The copies `filters` (and `q`) list, in the order added, and the total. */
+  const listed = async (ctx: Context, filters: ShelfQuery['filters'], q?: string) => {
+    const { ids, total } = await shelfIds(ctx, { q, filters, sort: 'added', dir: 'asc' }, ALL)
     return { copies: ids.map((id) => id.copyId), total }
   }
 
@@ -171,6 +201,97 @@ describe('shelf scalar filters', () => {
     expect(await listed(asA, { ratingMin: 1 })).toEqual({
       copies: [lovedCopy, mehCopy],
       total: 2,
+    })
+  })
+
+  it('matches an author id through every readable author with its name, never an unreadable id', async () => {
+    const a = await createUser({ displayName: 'Filters Author A' })
+    const b = await createUser({ displayName: 'Filters Author B' })
+    const asA = await contextFor(a)
+    const name = unique('Kivi')
+    const shared = await record(b, 'authors', name, 'shared')
+    const own = await record(a, 'authors', name.toLowerCase(), 'private')
+    const othersPrivate = await record(b, 'authors', name, 'private')
+    const other = await record(b, 'authors', unique('Leino'), 'shared')
+
+    const x = await copyOf(a, await sharedBook(a, { authors: [shared.id] }))
+    const p = await copyOf(a, await sharedBook(a, { authors: [own.id], visibility: 'private' }))
+    await copyOf(a, await sharedBook(a, { authors: [other.id] }))
+
+    expect(await listed(asA, { author: [shared.id] })).toEqual({ copies: [x, p], total: 2 })
+    expect(await listed(asA, { author: [own.id] })).toEqual({ copies: [x, p], total: 2 })
+    expect(await listed(asA, { author: [othersPrivate.id] })).toEqual({ copies: [], total: 0 })
+  })
+
+  it("lets the viewer's author override decide the match", async () => {
+    const a = await createUser({ displayName: 'Filters Override' })
+    const asA = await contextFor(a)
+    const leino = await record(a, 'authors', unique('Leino'), 'shared')
+    const kivi = await record(a, 'authors', unique('Kivi'), 'shared')
+    const book = await sharedBook(a, { authors: [leino.id] })
+    const y = await copyOf(a, book)
+    await upsertUserBook(asA, book.id, { overrides: { authors: [kivi.id] } })
+
+    expect(await listed(asA, { author: [kivi.id] })).toEqual({ copies: [y], total: 1 })
+    expect(await listed(asA, { author: [leino.id] })).toEqual({ copies: [], total: 0 })
+  })
+
+  it('matches a series id through every readable series with its name, by effective value', async () => {
+    const a = await createUser({ displayName: 'Filters Series A' })
+    const b = await createUser({ displayName: 'Filters Series B' })
+    const asA = await contextFor(a)
+    const muumit = await record(b, 'series', unique('Muumit'), 'shared')
+    const aPrivate = await record(a, 'series', muumit.name.toLowerCase(), 'private')
+    const bPrivate = await record(b, 'series', muumit.name, 'private')
+    const s1 = await record(a, 'series', unique('Eka'), 'shared')
+    const s2 = await record(a, 'series', unique('Toka'), 'shared')
+
+    const shared = await copyOf(a, await sharedBook(a, { series: muumit.id }))
+    const own = await copyOf(a, await sharedBook(a, { series: aPrivate.id, visibility: 'private' }))
+    const moved = await sharedBook(a, { series: s1.id })
+    const movedCopy = await copyOf(a, moved)
+    await upsertUserBook(asA, moved.id, { overrides: { series: s2.id } })
+    await copyOf(a, await sharedBook(a))
+
+    expect(await listed(asA, { series: [muumit.id] })).toEqual({ copies: [shared, own], total: 2 })
+    expect(await listed(asA, { series: [aPrivate.id] })).toEqual({
+      copies: [shared, own],
+      total: 2,
+    })
+    expect(await listed(asA, { series: [bPrivate.id] })).toEqual({ copies: [], total: 0 })
+    expect(await listed(asA, { series: [s2.id] })).toEqual({ copies: [movedCopy], total: 1 })
+    expect(await listed(asA, { series: [s1.id] })).toEqual({ copies: [], total: 0 })
+  })
+
+  it('ORs genres within the field and ANDs them with other fields and q', async () => {
+    const a = await createUser({ displayName: 'Filters Genre' })
+    const asA = await contextFor(a)
+    const muumit = await record(a, 'series', unique('Muumit'), 'shared')
+    const g1 = await genreNamed('Fantasy')
+    const g2 = await genreNamed('History')
+
+    const inSeries = await copyOf(
+      a,
+      await sharedBook(a, { title: 'Taikurin hattu', series: muumit.id, genres: [g1.id] }),
+    )
+    const second = await copyOf(a, await sharedBook(a, { genres: [g2.id], language: 'sv' }))
+    await copyOf(a, await sharedBook(a, { title: 'Taikurin hattu' }))
+
+    expect(await listed(asA, { genre: [g1.id, g2.id] })).toEqual({
+      copies: [inSeries, second],
+      total: 2,
+    })
+    expect(await listed(asA, { genre: [g1.id, g2.id], language: ['sv'] })).toEqual({
+      copies: [second],
+      total: 1,
+    })
+    expect(await listed(asA, { genre: [g1.id, g2.id] }, 'taikurin')).toEqual({
+      copies: [inSeries],
+      total: 1,
+    })
+    expect(await listed(asA, { genre: [g2.id], series: [muumit.id] })).toEqual({
+      copies: [],
+      total: 0,
     })
   })
 })
