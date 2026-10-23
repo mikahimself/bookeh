@@ -31,7 +31,9 @@ import { ShelfRowsProvider } from './ShelfRows'
  * a failed `filterValues()` read leaves the panel without lists. Layout and
  * size come from the device preferences cookie, so the first render already
  * shows them; the switches work even when the list failed. With `?book=`,
- * Book detail as well, whatever the shelf read gave. Select mode's state
+ * Book detail as well, whatever the shelf read gave: from 900px the row's
+ * last column, filling the section's height so its edge runs to the bottom
+ * of a short list; on the phone a sheet, portalled out. Select mode's state
  * sits above the list, so it outlives a query change; its action bar comes
  * last and, in a column filling the section, sits at the bottom of a short
  * list.
@@ -66,7 +68,7 @@ export default async function CollectionPage({
         <FilterPanelProvider>
           <SelectionProvider>
             <CollectionTools />
-            <div className="wide:flex wide:gap-6">
+            <div className="wide:flex wide:flex-1 wide:gap-6">
               <FilterPanel values={values} labels={shelf?.labels ?? {}} />
               <div className="min-w-0 flex-1">
                 {shelf ? (
@@ -77,12 +79,12 @@ export default async function CollectionPage({
                   <LoadFailed />
                 )}
               </div>
+              {book !== null && <BookDetail ctx={ctx} bookId={book} query={query} />}
             </div>
             <SelectBar />
           </SelectionProvider>
         </FilterPanelProvider>
       </CollectionDisplayProvider>
-      {book !== null && <BookDetail ctx={ctx} bookId={book} query={query} />}
     </div>
   )
 }

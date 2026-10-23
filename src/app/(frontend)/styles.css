@@ -340,6 +340,45 @@
 }
 
 /*
+ * DESIGN.md, Elevation & Depth: the one shadow, Book detail's wide panel
+ * falling to the left onto the list.
+ */
+@utility panel-shadow {
+  box-shadow: -10px 0 24px -14px var(--color-shadow);
+}
+
+/*
+ * Book detail's wide panel (BookDetailPanel.tsx): its frame, the last column
+ * of the collection's row, grows from nothing on mount and shrinks back when
+ * `data-open` goes, while the list (`flex-1`) narrows and widens in step. The
+ * frame takes the row's `gap-6` inside itself, so the gap grows with it, and
+ * reaches over the page's right margin, so the panel ends at the screen's
+ * edge. Under reduce motion it appears and goes at once.
+ */
+@utility panel-motion {
+  width: 0px;
+  margin-left: calc(var(--spacing-6) * -1);
+  margin-right: 0px;
+  transition-property: width, margin-right;
+  transition-duration: var(--default-transition-duration);
+  transition-timing-function: var(--default-transition-timing-function);
+
+  &[data-open] {
+    width: calc(var(--spacing-panel-width) + var(--spacing-6));
+    margin-right: calc(var(--spacing-page-margin) * -1);
+
+    @starting-style {
+      width: 0px;
+      margin-right: 0px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    transition: none;
+  }
+}
+
+/*
  * Overlay motion (components/ui). Base UI marks an entering overlay
  * `data-starting-style` and a leaving one `data-ending-style`, and unmounts it
  * once the transition ends. The backdrop and the dialog fade; the sheet

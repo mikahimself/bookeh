@@ -110,10 +110,11 @@ vi.stubGlobal(
   },
 )
 
-// The phone: the Filter panel is a closed sheet.
+// The phone unless a case widens the screen: the Filter panel is a closed sheet.
+let matchesScreen = (_query: string) => false
 vi.stubGlobal('matchMedia', (query: string) => ({
   media: query,
-  matches: false,
+  matches: matchesScreen(query),
   addEventListener: () => {},
   removeEventListener: () => {},
 }))
@@ -552,6 +553,89 @@ describe('CollectionPage', () => {
       expect(router.replace).toHaveBeenCalledOnce()
       // Settle the back as the browser would, so later cases start at depth 0.
       act(() => window.dispatchEvent(new PopStateEvent('popstate', { state: null })))
+    })
+
+    describe('beside the list at 1300px', () => {
+      const sinuhe = book(6, 'Sinuhe')
+      const panel = (name: string) => screen.findByRole('complementary', { name })
+
+      beforeEach(() => {
+        // Wide, with room for Filter and Book detail together.
+        matchesScreen = (query) => !query.includes('1200px')
+        getShelfRows.mockResolvedValue({
+          rows: [row(11, linna), row(12, sinuhe)],
+          total: 2,
+          labels: {},
+        })
+        heldBook.mockImplementation(async (_, bookId) =>
+          [linna, sinuhe].find((b) => b.bookId === bookId),
+        )
+        getHoldings.mockImplementation(
+          async (_, ids) =>
+            new Map(ids.map((id) => [id, { copies: [copy(20 + id)], entries: [] }])),
+        )
+      })
+
+      afterEach(() => {
+        matchesScreen = () => false
+      })
+
+      it('opens as a panel beside the list, not a dialog', async () => {
+        await renderPage({ book: '5' })
+
+        const aside = await panel('Tuntematon sotilas')
+        within(aside).getByRole('heading', { name: 'Tuntematon sotilas' })
+        within(aside).getByRole('heading', { name: 'Your copies' })
+        within(aside).getByRole('link', { name: 'Edit' })
+        expect(screen.queryByRole('dialog')).toBeNull()
+        // Not hidden from assistive technology: the list stays operable.
+        fireEvent.click(screen.getByRole('link', { name: /Sinuhe/ }))
+        expect(router.replace).toHaveBeenCalledWith('/?book=6', { scroll: false })
+      })
+
+      it('swaps the Book in the same panel without closing', async () => {
+        searchParams = new URLSearchParams('book=5')
+        const { rerender } = await renderPage({ book: '5' })
+        const aside = await panel('Tuntematon sotilas')
+
+        searchParams = new URLSearchParams('book=6')
+        rerender(await page({ book: '6' }))
+        expect(await panel('Sinuhe')).toBe(aside)
+        within(aside).getByRole('heading', { name: 'Sinuhe' })
+        expect(router.back).not.toHaveBeenCalled()
+        expect(router.replace).not.toHaveBeenCalled()
+      })
+
+      it('closes on X, replacing without book', async () => {
+        await renderPage({ q: 'linna', book: '5' })
+
+        fireEvent.click(
+          within(await panel('Tuntematon sotilas')).getByRole('button', { name: 'Close' }),
+        )
+        await waitFor(() =>
+          expect(router.replace).toHaveBeenCalledWith('/?q=linna', { scroll: false }),
+        )
+      })
+
+      it('closes on Esc from a row, not from the search field', async () => {
+        await renderPage({ book: '5' })
+        await panel('Tuntematon sotilas')
+
+        fireEvent.keyDown(screen.getByRole('searchbox'), { key: 'Escape' })
+        // The leave runs after the transitions settle, a microtask later.
+        await act(async () => {})
+        expect(router.replace).not.toHaveBeenCalled()
+        fireEvent.keyDown(screen.getByRole('link', { name: /Sinuhe/ }), { key: 'Escape' })
+        await waitFor(() => expect(router.replace).toHaveBeenCalledWith('/', { scroll: false }))
+      })
+
+      it('toasts Not in library for a Book not held, with no panel', async () => {
+        await renderPage({ book: '99' })
+
+        expect(showToast).toHaveBeenCalledWith({ kind: 'success', message: 'Not in library' })
+        expect(router.replace).toHaveBeenCalledWith('/', { scroll: false })
+        expect(screen.queryByRole('complementary', { name: /./ })).toBeNull()
+      })
     })
   })
 })

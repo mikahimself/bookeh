@@ -9,7 +9,7 @@ import { buttonClass } from '../components/Button'
 import { Cover } from '../components/Cover'
 import { heldBook } from '../heldBook'
 
-import { BookDetailSheet } from './BookDetailSheet'
+import { BookDetailFrame } from './BookDetailPanel'
 import { NotInLibrary } from './NotInLibrary'
 
 /**
@@ -19,7 +19,9 @@ import { NotInLibrary } from './NotInLibrary'
  * with its location and status, and the foot with Edit. The one component
  * later groups are added to; it reads the Book and the viewer's copies only
  * and never the client rows, so it stays open when its row leaves the list.
- * A Book the viewer does not hold is "Not in library".
+ * A Book the viewer does not hold is "Not in library". The content is the
+ * same at every width; only the frame differs: the bottom sheet on the
+ * phone, the panel beside the list from 900px (`BookDetailFrame`).
  */
 export async function BookDetail({
   ctx,
@@ -53,7 +55,7 @@ export async function BookDetail({
     .join(' · ')
 
   return (
-    <BookDetailSheet label={book.title} query={query}>
+    <BookDetailFrame label={book.title} query={query} bookId={bookId}>
       <div className="flex flex-col gap-6">
         <div className="flex items-start gap-4">
           <div className="w-cover-detail shrink-0">
@@ -86,6 +88,6 @@ export async function BookDetail({
           </Link>
         </div>
       </div>
-    </BookDetailSheet>
+    </BookDetailFrame>
   )
 }
