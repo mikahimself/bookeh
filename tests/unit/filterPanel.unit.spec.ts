@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { createElement, type ComponentProps } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -12,8 +12,10 @@ const router = { replace: vi.fn() }
 let search = new URLSearchParams()
 
 vi.mock('next-intl', () => ({
-  useTranslations: () => (key: string, values?: { name?: string }) =>
-    values?.name === undefined ? key : `${key}: ${values.name}`,
+  useTranslations: () => (key: string, values?: { name?: string; n?: number }) => {
+    const value = values?.name ?? values?.n
+    return value === undefined ? key : `${key}: ${value}`
+  },
   useLocale: () => 'en',
 }))
 vi.mock('next/navigation', () => ({
@@ -223,5 +225,106 @@ describe('Filter panel author, series and publisher', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'filterRemove: WSOY' }))
     expect(router.replace).toHaveBeenCalledWith('/', { scroll: false })
+  })
+})
+
+describe('Filter panel rating, year and pages', () => {
+  beforeEach(() => {
+    vi.stubGlobal('matchMedia', (query: string) => ({
+      media: query,
+      matches: !query.includes('1200px'),
+      addEventListener: () => {},
+      removeEventListener: () => {},
+    }))
+  })
+
+  afterEach(() => {
+    cleanup()
+    vi.clearAllMocks()
+    vi.unstubAllGlobals()
+  })
+
+  const group = (name: string) => within(screen.getByRole('group', { name }))
+  const star = (n: number) =>
+    group('filterFields.rating').getByRole('button', { name: `stars: ${n}` })
+  const clear = () =>
+    group('filterFields.rating').queryByRole('button', { name: 'clear filterFields.rating' })
+  const input = (field: 'year' | 'pages', end: 'rangeFrom' | 'rangeTo') =>
+    group(`filterFields.${field}`).getByRole<HTMLInputElement>('textbox', { name: end })
+  const open = (address: string) => {
+    search = new URLSearchParams(address)
+    const view = render(page())
+    fireEvent.click(filter())
+    return view
+  }
+
+  it('sets a rating and shows Clear', () => {
+    open('')
+    expect(clear()).toBeNull()
+    fireEvent.click(star(3))
+    expect(router.replace).toHaveBeenCalledWith('/?rating=3', { scroll: false })
+    expect(star(3).getAttribute('aria-pressed')).toBe('true')
+    expect(clear()).not.toBeNull()
+  })
+
+  it('does nothing on the current star', () => {
+    open('rating=3')
+    fireEvent.click(star(3))
+    expect(router.replace).not.toHaveBeenCalled()
+  })
+
+  it('changes the rating on another star', () => {
+    open('rating=3')
+    fireEvent.click(star(5))
+    expect(router.replace).toHaveBeenCalledWith('/?rating=5', { scroll: false })
+  })
+
+  it('removes the rating with Clear', () => {
+    open('rating=3')
+    fireEvent.click(clear()!)
+    expect(router.replace).toHaveBeenCalledWith('/', { scroll: false })
+  })
+
+  it('applies an open-ended year on Enter', () => {
+    open('')
+    fireEvent.change(input('year', 'rangeFrom'), { target: { value: '1990' } })
+    act(() => input('year', 'rangeFrom').focus())
+    fireEvent.keyDown(input('year', 'rangeFrom'), { key: 'Enter' })
+    expect(router.replace).toHaveBeenCalledWith('/?year=1990-', { scroll: false })
+  })
+
+  it('applies an open-started pages range on blur', () => {
+    open('')
+    fireEvent.change(input('pages', 'rangeTo'), { target: { value: '200' } })
+    fireEvent.blur(input('pages', 'rangeTo'))
+    expect(router.replace).toHaveBeenCalledWith('/?pages=-200', { scroll: false })
+  })
+
+  it('drops the range when both ends are emptied', () => {
+    open('year=1990-')
+    expect(input('year', 'rangeFrom').value).toBe('1990')
+    fireEvent.change(input('year', 'rangeFrom'), { target: { value: '' } })
+    act(() => input('year', 'rangeFrom').focus())
+    fireEvent.keyDown(input('year', 'rangeFrom'), { key: 'Enter' })
+    expect(router.replace).toHaveBeenCalledWith('/', { scroll: false })
+  })
+
+  it('shows the message and keeps the range when from is greater than to', () => {
+    open('')
+    fireEvent.change(input('year', 'rangeFrom'), { target: { value: '2000' } })
+    fireEvent.change(input('year', 'rangeTo'), { target: { value: '1990' } })
+    act(() => input('year', 'rangeTo').focus())
+    fireEvent.keyDown(input('year', 'rangeTo'), { key: 'Enter' })
+    expect(router.replace).not.toHaveBeenCalled()
+    expect(group('filterFields.year').getByText('rangeInvalid')).toBeTruthy()
+    expect(input('year', 'rangeFrom').getAttribute('aria-invalid')).toBe('true')
+    expect(input('year', 'rangeTo').getAttribute('aria-invalid')).toBe('true')
+  })
+
+  it('follows a range change it did not write', () => {
+    const { rerender } = open('year=1990-')
+    search = new URLSearchParams()
+    rerender(page())
+    expect(input('year', 'rangeFrom').value).toBe('')
   })
 })

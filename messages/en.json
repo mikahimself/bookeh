@@ -176,9 +176,16 @@
       "language": "Language",
       "author": "Author",
       "series": "Series",
-      "publisher": "Publisher"
+      "publisher": "Publisher",
+      "rating": "Rating",
+      "year": "Year",
+      "pages": "Pages"
     },
     "filterRemove": "Remove {name}",
+    "rangeFrom": "From",
+    "rangeTo": "To",
+    "rangeInvalid": "From is greater than to.",
+    "stars": "{n, plural, one {# star} other {# stars}}",
     "filterValues": {
       "owned": "Owned",
       "ordered": "Ordered",

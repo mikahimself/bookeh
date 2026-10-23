@@ -111,6 +111,8 @@
      density); l is spacing-6. */
   --spacing-tile-gap-s: 10px;
   --spacing-tile-gap-m: 18px;
+  /* A Rating star outline (DESIGN.md, Rating). */
+  --spacing-star: 22px;
   /* Minimum control height on the phone (DESIGN.md, Tap area). */
   --spacing-tap: 44px;
   /* The pinned bottom bar (Scan book on the phone): a tap-high control with

@@ -176,9 +176,16 @@
       "language": "Kieli",
       "author": "Tekijä",
       "series": "Sarja",
-      "publisher": "Kustantaja"
+      "publisher": "Kustantaja",
+      "rating": "Arvio",
+      "year": "Vuosi",
+      "pages": "Sivuja"
     },
     "filterRemove": "Poista {name}",
+    "rangeFrom": "Alkaen",
+    "rangeTo": "Asti",
+    "rangeInvalid": "Alkaen on suurempi kuin asti.",
+    "stars": "{n, plural, one {# tähti} other {# tähteä}}",
     "filterValues": {
       "owned": "Oma",
       "ordered": "Tilattu",

@@ -5,6 +5,8 @@ import { useLocale, useTranslations } from 'next-intl'
 import {
   createContext,
   use,
+  useEffect,
+  useEffectEvent,
   useId,
   useMemo,
   useState,
@@ -13,16 +15,24 @@ import {
 } from 'react'
 
 import { languageName } from '@/lib/books/languageName'
-import { parseShelfQuery, shelfHref, type FilterValues, type SuggestField } from '@/lib/shelf/query'
+import {
+  parseShelfQuery,
+  shelfHref,
+  type FilterValues,
+  type ShelfQuery,
+  type SuggestField,
+} from '@/lib/shelf/query'
 
 import { useTaskBack } from '../components/navigation'
+import { Rating } from '../components/Rating'
 import { useSuggestions } from '../components/suggest'
+import { fieldClass } from '../components/TextField'
 import { markerSlotClass } from '../components/ui/classes'
 import { Combobox, type ComboboxOption } from '../components/ui/Combobox'
 import { useWide } from '../components/ui/overlay'
 import { Sheet } from '../components/ui/Sheet'
 
-import { toggleFilter, type ListedField, type ListedValue } from './filterToggle'
+import { setFilter, toggleFilter, type ListedField, type ListedValue } from './filterToggle'
 
 /**
  * Wide but under 1200px: room for one side panel, so Filter and Book detail
@@ -133,14 +143,18 @@ export function FilterPanel({
 
 type Option = { key: string; label: string; count: number; on: boolean; tap: () => void }
 
+/** Replaces the address with `update` applied to the query the panel builds on. */
+type Go = (update: (query: ShelfQuery) => ShelfQuery) => void
+
 /**
  * Location, status, read, genre and language as option lists of the values
- * in use, then author, series and publisher as comboboxes with short lists;
- * those only for a viewer with copies. A tap replaces the address at once,
- * keeping search, sort, the other fields and `book`. Until the address
- * reaches the last tap, the next tap builds on it, so quick taps add up. Once
- * it does, or the address goes somewhere no tap wrote (Clear, Back), the
- * address counts again.
+ * in use, then author, series and publisher as comboboxes with short lists,
+ * then rating, year and pages; those only for a viewer with copies. Every
+ * change replaces the address at once through `go`, keeping search, sort,
+ * the other fields and `book`. Until the address reaches the last change,
+ * the next builds on it, so quick taps add up. Once it does, or the address
+ * goes somewhere the panel did not write (Clear, Back), the address counts
+ * again.
  */
 function OptionLists({ values, labels }: { values: FilterValues; labels: Record<string, string> }) {
   const t = useTranslations('collection')
@@ -158,14 +172,17 @@ function OptionLists({ values, labels }: { values: FilterValues; labels: Record<
   const { query, book } = useMemo(() => parseShelfQuery(new URLSearchParams(built)), [built])
   const f = query.filters
 
+  const go: Go = (update) => {
+    const href = shelfHref(update(query), { book })
+    if (href === shelfHref(query, { book })) return
+    const to = new URL(href, 'http://shelf').searchParams.toString()
+    setPending(waiting ? [...pending, to] : [address, to])
+    router.replace(href, { scroll: false })
+  }
   const tap =
     <F extends ListedField>(field: F, value: ListedValue<F>) =>
-    () => {
-      const href = shelfHref(toggleFilter(query, field, value), { book })
-      const to = new URL(href, 'http://shelf').searchParams.toString()
-      setPending(waiting ? [...pending, to] : [address, to])
-      router.replace(href, { scroll: false })
-    }
+    () =>
+      go((q) => toggleFilter(q, field, value))
   const collator = new Intl.Collator(locale)
   const languages = values.language
     .map(({ value, count }) => ({ value, count, name: languageName(value, locale) }))
@@ -223,16 +240,164 @@ function OptionLists({ values, labels }: { values: FilterValues; labels: Record<
           tap: tap('language', value),
         }))}
       />
-      {values.status.length > 0 &&
-        (['author', 'series', 'publisher'] as const).map((field) => (
-          <AddedValues
-            key={field}
-            field={field}
-            on={f[field] ?? NONE}
-            labels={labels}
-            tap={(value) => tap(field, value)()}
-          />
-        ))}
+      {values.status.length > 0 && (
+        <>
+          {(['author', 'series', 'publisher'] as const).map((field) => (
+            <AddedValues
+              key={field}
+              field={field}
+              on={f[field] ?? NONE}
+              labels={labels}
+              tap={(value) => tap(field, value)()}
+            />
+          ))}
+          <RatingField value={f.ratingMin ?? null} go={go} />
+          <RangeField field="year" range={f.year} go={go} />
+          <RangeField field="pages" range={f.pages} go={go} />
+        </>
+      )}
+    </div>
+  )
+}
+
+/** EXPERIENCE.md, Filter panel: the Rating component, meaning "at least". */
+function RatingField({ value, go }: { value: number | null; go: Go }) {
+  const t = useTranslations('collection')
+  const id = useId()
+  return (
+    <div className="flex flex-col">
+      <h3 id={id} className="text-heading-group text-text-muted ui-case">
+        {t('filterFields.rating')}
+      </h3>
+      <Rating
+        value={value}
+        onRate={(n) => go((q) => setFilter(q, 'ratingMin', n))}
+        onClear={() => go((q) => setFilter(q, 'ratingMin', undefined))}
+        aria-labelledby={id}
+      />
+    </div>
+  )
+}
+
+type Range = [number?, number?]
+
+/** How long typing pauses before a range applies, as the search's. */
+const PAUSE_MS = 300
+
+/** A range as the address writes it, `from-to`; `''` for none. */
+const rangeKey = (range: Range | undefined): string =>
+  range && (range[0] !== undefined || range[1] !== undefined)
+    ? `${range[0] ?? ''}-${range[1] ?? ''}`
+    : ''
+
+/** Digits only, at most nine: within Postgres `integer`, as `maxLength` keeps typing. */
+const digits = (text: string): string => text.replace(/\D/g, '').slice(0, 9)
+
+/**
+ * EXPERIENCE.md, Filter panel: From and To for year or pages, either may be
+ * empty. The range applies after typing pauses, or at once on Enter or blur;
+ * both empty drops the field. From greater than to shows the message and
+ * keeps the previous range. A change of `range` the field did not write
+ * (Clear, Back) cancels a pending apply and puts it in the inputs; the
+ * field's own leaves what was typed since.
+ */
+function RangeField({
+  field,
+  range,
+  go,
+}: {
+  field: 'year' | 'pages'
+  range: Range | undefined
+  go: Go
+}) {
+  const t = useTranslations('collection')
+  const id = useId()
+  const key = rangeKey(range)
+  const [from, setFrom] = useState(String(range?.[0] ?? ''))
+  const [to, setTo] = useState(String(range?.[1] ?? ''))
+  const [invalid, setInvalid] = useState(false)
+  /** Bumped by each edit; the pause runs from the last, `0` when none is pending. */
+  const [edit, setEdit] = useState(0)
+  /** The range the address stood for at the last render. */
+  const [seen, setSeen] = useState(key)
+  /** The range of the field's own replace, until the address reaches it. */
+  const [written, setWritten] = useState<string | null>(null)
+  if (key !== seen) {
+    setSeen(key)
+    setWritten(null)
+    if (key !== written) {
+      setFrom(String(range?.[0] ?? ''))
+      setTo(String(range?.[1] ?? ''))
+      setInvalid(false)
+      setEdit(0)
+    }
+  }
+
+  /** On a pause an invalid pair does nothing; only Enter and blur show the message. */
+  const apply = (fromText: string, toText: string, pause = false) => {
+    setEdit(0)
+    const start = fromText === '' ? undefined : Number(fromText)
+    const end = toText === '' ? undefined : Number(toText)
+    if (start !== undefined && end !== undefined && start > end) {
+      if (!pause) setInvalid(true)
+      return
+    }
+    setInvalid(false)
+    const next: Range | undefined =
+      start === undefined && end === undefined ? undefined : [start, end]
+    if (rangeKey(next) === key) return
+    setWritten(rangeKey(next))
+    go((q) => setFilter(q, field, next))
+  }
+  const paused = useEffectEvent(() => apply(from, to, true))
+  useEffect(() => {
+    if (edit === 0) return
+    const timer = setTimeout(paused, PAUSE_MS)
+    return () => clearTimeout(timer)
+  }, [edit])
+
+  const errorId = `${id}-error`
+  const input = (label: string, value: string, set: (value: string) => void) => (
+    <label className="flex min-w-0 flex-1 flex-col gap-1">
+      <span className="text-label text-text-muted">{label}</span>
+      <input
+        value={value}
+        inputMode="numeric"
+        enterKeyHint="done"
+        maxLength={9}
+        autoComplete="off"
+        placeholder=" "
+        aria-invalid={invalid || undefined}
+        aria-describedby={invalid ? errorId : undefined}
+        onChange={(event) => {
+          set(digits(event.target.value))
+          setInvalid(false)
+          setEdit((n) => n + 1)
+        }}
+        onKeyDown={(event) => {
+          // Blur applies, and closes the phone keyboard.
+          if (event.key === 'Enter') event.currentTarget.blur()
+        }}
+        onBlur={() => apply(from, to)}
+        className={fieldClass(invalid)}
+      />
+    </label>
+  )
+
+  return (
+    <div role="group" aria-labelledby={id} className="flex flex-col gap-1">
+      <h3 id={id} className="text-heading-group text-text-muted ui-case">
+        {t(`filterFields.${field}`)}
+      </h3>
+      <div className="flex gap-4">
+        {input(t('rangeFrom'), from, setFrom)}
+        {input(t('rangeTo'), to, setTo)}
+      </div>
+      {invalid && (
+        <p id={errorId} role="alert" className="text-meta">
+          {t('rangeInvalid')}
+        </p>
+      )}
     </div>
   )
 }

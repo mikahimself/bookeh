@@ -39,3 +39,20 @@ export function toggleFilter<F extends ListedField>(
   const filters = (next === undefined ? rest : { ...rest, [field]: next }) as Filters
   return { ...query, filters }
 }
+
+/** The fields the Filter panel sets to one value: the rating and the two ranges. */
+export type SetField = 'ratingMin' | 'year' | 'pages'
+
+/**
+ * `query` with `field` set to `value`, or without it when `value` is
+ * `undefined`. Search, sort, direction and the other fields stay.
+ */
+export function setFilter<F extends SetField>(
+  query: ShelfQuery,
+  field: F,
+  value: Filters[F] | undefined,
+): ShelfQuery {
+  const { [field]: _old, ...rest } = query.filters
+  const filters: Filters = value === undefined ? rest : { ...rest, [field]: value }
+  return { ...query, filters }
+}
