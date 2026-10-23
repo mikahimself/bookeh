@@ -133,7 +133,7 @@ Undo is offered where the action has a plain opposite. Removals are confirmed fi
 | Add to wishlist | "Added to {list} · Undo" | Removes the entry, and the Book on the same rule. |
 | Move (one or many) | "{n} moved to {location} · Undo" | Puts each copy back where it was. |
 | Tag (one or many, any kind) | "Tagged {n} · Undo" | Restores each Book's tags. |
-| Read (one or many) | "Marked {n} read · Undo" | Restores each Book's read flag. |
+| Read (one or many) | "Marked {n} read · Undo" ("unread" when it marks them unread) | Restores each Book's read flag. |
 | Lend | "Lent to {person} · Undo" | Removes the loan. |
 | Returned | "Returned · Undo" | Reopens the loan. |
 | Bought (wishlist entry, for me) | "Saved to {location} · Undo" | Removes the copy and reopens the entry. |

@@ -209,6 +209,7 @@
     "select": "Valitse",
     "selected": "{n} valittu",
     "done": "Valmis",
+    "markRead": "Luettu",
     "remove": "Poista",
     "removeTitle": "{n, plural, one {Poistetaanko # kirja kirjastosta?} other {Poistetaanko # kirjaa kirjastosta?}}",
     "layout": "Asettelu",

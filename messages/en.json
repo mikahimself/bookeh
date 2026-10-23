@@ -209,6 +209,7 @@
     "select": "Select",
     "selected": "{n} selected",
     "done": "Done",
+    "markRead": "Read",
     "remove": "Remove",
     "removeTitle": "{n, plural, one {Remove # book from library?} other {Remove # books from library?}}",
     "layout": "Layout",

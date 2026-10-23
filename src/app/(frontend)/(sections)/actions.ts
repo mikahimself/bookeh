@@ -10,7 +10,8 @@ import { withUndo, type Undoable } from '@/lib/undo/undo'
 // The collection's actions: select mode and Book detail (AD-18). Client input
 // is checked here, never repaired: an id that is not a positive safe integer,
 // or a value of the wrong type, is `VALIDATION` with no write. Ownership is
-// the service's. The client reports the result through `afterAction`.
+// the service's. An undoable action returns its receipt (AD-20) for the
+// client's success toast; the client reports the result through `afterAction`.
 
 const isId = (value: unknown): value is number =>
   typeof value === 'number' && Number.isSafeInteger(value) && value > 0
@@ -60,5 +61,19 @@ export async function setRatingAction(input: unknown): Promise<ActionResult<null
     if (rating !== null && typeof rating !== 'number') throw new DomainError('VALIDATION')
     await setRating(ctx, bookId, rating)
     return null
+  })
+}
+
+/**
+ * AD-18: toggles read on the distinct Books of the viewer's copies: read, or
+ * unread when all are read already. `count` is those Books. Undoable (AD-20).
+ */
+export async function toggleCopiesReadAction(
+  copyIds: unknown,
+): Promise<ActionResult<Undoable<{ read: boolean; count: number }>>> {
+  return runAction(async () => {
+    const ctx = await requireUserOrThrow()
+    const copies = ids(copyIds)
+    return withUndo(ctx, (tx) => setRead(tx, { copyIds: copies }, 'toggle'))
   })
 }

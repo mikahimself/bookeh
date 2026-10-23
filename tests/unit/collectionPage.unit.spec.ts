@@ -28,6 +28,7 @@ const setDevicePrefsAction = vi.fn()
 const fetchStub = vi.fn()
 const showToast = vi.fn()
 const removeCopiesAction = vi.fn()
+const toggleCopiesReadAction = vi.fn()
 
 // The English catalogue, so the assertions read the screen's words.
 const english = async () => {
@@ -69,6 +70,7 @@ vi.mock('@/app/(frontend)/(sections)/actions', () => ({
   removeCopiesAction,
   setReadAction: vi.fn(),
   setRatingAction: vi.fn(),
+  toggleCopiesReadAction,
 }))
 vi.mock('@/app/(frontend)/heldBook', () => ({ heldBook }))
 vi.mock('@/lib/books/holdings', () => ({ getHoldings }))
@@ -394,7 +396,7 @@ describe('CollectionPage', () => {
     expect(router.replace).not.toHaveBeenCalled()
   })
 
-  describe('Remove in select mode', () => {
+  describe('Read and Remove in select mode', () => {
     const both = {
       rows: [row(11, book(1, 'Sinuhe')), row(12, book(2, 'Kätilö'))],
       total: 2,
@@ -403,6 +405,11 @@ describe('CollectionPage', () => {
     const selected = () => screen.queryByText(/\d+ selected/)?.textContent
     const tap = (title: string) => fireEvent.click(screen.getByText(title, { selector: 'p' }))
     const removeButton = () => screen.getByRole('button', { name: 'Remove' }) as HTMLButtonElement
+    const readButton = () => screen.getByRole('button', { name: 'Read' }) as HTMLButtonElement
+    const toggled = (read: boolean, count: number) => ({
+      ok: true,
+      data: { read, count, undoToken: `token-${count}`, undoSeconds: 1800 },
+    })
     /** The reload after the action: `fetchStub` answers `/data/shelf`. */
     const reloadsWith = (shelf: ShelfRows) =>
       fetchStub.mockResolvedValue({ status: 200, json: async () => ({ ok: true, data: shelf }) })
@@ -412,6 +419,71 @@ describe('CollectionPage', () => {
       fireEvent.click(within(dialog).getByRole('button', { name: 'Remove' }))
       await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
     }
+
+    it('toggles read on every ticked copy, in view or not, with Undo, and keeps selecting', async () => {
+      const page = (params: Record<string, string>) =>
+        CollectionPage({ searchParams: Promise.resolve(params) })
+      toggleCopiesReadAction.mockResolvedValueOnce(toggled(true, 2))
+      reloadsWith(both)
+      getShelfRows.mockResolvedValueOnce(both)
+      const { rerender } = render(await page({}))
+      fireEvent.click(screen.getByRole('button', { name: 'Select' }))
+      expect(readButton().disabled).toBe(true)
+
+      tap('Sinuhe')
+      tap('Kätilö')
+      getShelfRows.mockResolvedValueOnce({ rows: [both.rows[0]], total: 1, labels: {} })
+      rerender(await page({ q: 'sinuhe' }))
+      readButton().focus()
+      fireEvent.click(readButton())
+
+      await waitFor(() => expect(selected()).toBe('0 selected'))
+      expect(toggleCopiesReadAction).toHaveBeenCalledExactlyOnceWith([11, 12])
+      expect(showToast).toHaveBeenCalledExactlyOnceWith({
+        kind: 'success',
+        message: 'Marked 2 read',
+        undo: { token: 'token-2', seconds: 1800 },
+      })
+      await waitFor(() => expect(fetchStub).toHaveBeenCalledOnce())
+      expect(fetchStub.mock.calls[0]![0]).toMatch(/^\/data\/shelf\?q=sinuhe&/)
+      expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Done' }))
+      expect(readButton().disabled).toBe(true)
+
+      toggleCopiesReadAction.mockResolvedValueOnce(toggled(false, 1))
+      tap('Sinuhe')
+      fireEvent.click(readButton())
+      await waitFor(() =>
+        expect(showToast).toHaveBeenLastCalledWith({
+          kind: 'success',
+          message: 'Marked 1 unread',
+          undo: { token: 'token-1', seconds: 1800 },
+        }),
+      )
+      expect(toggleCopiesReadAction).toHaveBeenLastCalledWith([11])
+    })
+
+    it('keeps the ticks when Read fails, and clears them when a copy is gone', async () => {
+      getShelfRows.mockResolvedValue(both)
+      reloadsWith({ rows: [both.rows[1]], total: 1, labels: {} })
+      await renderPage()
+      fireEvent.click(screen.getByRole('button', { name: 'Select' }))
+      tap('Sinuhe')
+
+      toggleCopiesReadAction.mockRejectedValueOnce(new TypeError('Failed to fetch'))
+      fireEvent.click(readButton())
+      await waitFor(() =>
+        expect(showToast).toHaveBeenCalledWith({ kind: 'error', code: 'NO_CONNECTION' }),
+      )
+      expect(selected()).toBe('1 selected')
+      expect(fetchStub).not.toHaveBeenCalled()
+
+      toggleCopiesReadAction.mockResolvedValueOnce({ ok: false, code: 'NOT_FOUND' })
+      fireEvent.click(readButton())
+      await waitFor(() => expect(selected()).toBe('0 selected'))
+      expect(showToast).toHaveBeenCalledWith({ kind: 'success', message: 'Not in library' })
+      await waitFor(() => expect(screen.queryByText('Sinuhe', { selector: 'p' })).toBeNull())
+      expect(fetchStub).toHaveBeenCalledOnce()
+    })
 
     it('asks first, then removes every ticked copy, in view or not, and keeps selecting', async () => {
       const page = (params: Record<string, string>) =>
