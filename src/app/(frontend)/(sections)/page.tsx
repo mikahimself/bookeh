@@ -20,6 +20,8 @@ import { CollectionList } from './CollectionList'
 import { CollectionTools } from './CollectionTools'
 import { FilterPanel, FilterPanelProvider } from './FilterPanel'
 import { LoadFailed } from './LoadFailed'
+import { SelectBar } from './SelectBar'
+import { SelectionProvider } from './Selection'
 import { ShelfRowsProvider } from './ShelfRows'
 
 /**
@@ -29,7 +31,10 @@ import { ShelfRowsProvider } from './ShelfRows'
  * a failed `filterValues()` read leaves the panel without lists. Layout and
  * size come from the device preferences cookie, so the first render already
  * shows them; the switches work even when the list failed. With `?book=`,
- * Book detail as well, whatever the shelf read gave.
+ * Book detail as well, whatever the shelf read gave. Select mode's state
+ * sits above the list, so it outlives a query change; its action bar comes
+ * last and, in a column filling the section, sits at the bottom of a short
+ * list.
  */
 export default async function CollectionPage({
   searchParams,
@@ -56,22 +61,25 @@ export default async function CollectionPage({
   ])
 
   return (
-    <div className="px-page-margin-phone wide:px-page-margin">
+    <div className="flex flex-1 flex-col px-page-margin-phone wide:px-page-margin">
       <CollectionDisplayProvider initial={{ layout, size }}>
         <FilterPanelProvider>
-          <CollectionTools />
-          <div className="wide:flex wide:gap-6">
-            <FilterPanel values={values} />
-            <div className="min-w-0 flex-1">
-              {shelf ? (
-                <ShelfRowsProvider query={query} initial={shelf}>
-                  <CollectionList query={query} book={book} />
-                </ShelfRowsProvider>
-              ) : (
-                <LoadFailed />
-              )}
+          <SelectionProvider>
+            <CollectionTools />
+            <div className="wide:flex wide:gap-6">
+              <FilterPanel values={values} />
+              <div className="min-w-0 flex-1">
+                {shelf ? (
+                  <ShelfRowsProvider query={query} initial={shelf}>
+                    <CollectionList query={query} book={book} />
+                  </ShelfRowsProvider>
+                ) : (
+                  <LoadFailed />
+                )}
+              </div>
             </div>
-          </div>
+            <SelectBar />
+          </SelectionProvider>
         </FilterPanelProvider>
       </CollectionDisplayProvider>
       {book !== null && <BookDetail ctx={ctx} bookId={book} query={query} />}

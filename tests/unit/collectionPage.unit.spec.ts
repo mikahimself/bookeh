@@ -18,6 +18,7 @@ import type { ShelfRow, ShelfRows } from '@/lib/shelf/query'
 import en from '../../messages/en.json'
 
 const router = { replace: vi.fn(), refresh: vi.fn(), push: vi.fn(), back: vi.fn() }
+let searchParams = new URLSearchParams()
 const getShelfRows = vi.fn<() => Promise<ShelfRows>>()
 const heldBook = vi.fn<(ctx: unknown, bookId: number) => Promise<EffectiveBook | undefined>>()
 const getHoldings = vi.fn<(ctx: unknown, ids: number[]) => Promise<Map<number, Holdings>>>()
@@ -50,7 +51,7 @@ vi.mock('next-intl/server', async () => {
 vi.mock('next/navigation', async (importOriginal) => ({
   ...(await importOriginal<typeof import('next/navigation')>()),
   useRouter: () => router,
-  useSearchParams: () => new URLSearchParams(),
+  useSearchParams: () => searchParams,
 }))
 vi.mock('@/lib/payload/context', () => ({ requireUser: async () => ({}) }))
 vi.mock('@/lib/shelf/getShelfRows', () => ({ getShelfRows }))
@@ -218,6 +219,7 @@ describe('CollectionPage', () => {
     getHoldings.mockReset()
     // The list keeps its place per query; each case starts without one.
     window.sessionStorage.clear()
+    searchParams = new URLSearchParams()
   })
 
   it('shows the tools, the count and one row per copy in shelf order', async () => {
@@ -327,6 +329,82 @@ describe('CollectionPage', () => {
 
     expect(pressed('Layout')).toBe('Rows')
     within(screen.getByRole('listitem')).getByText('Väinö Linna · 1954 · WSOY')
+  })
+
+  it('ticks copies in select mode, keeps them across queries, and clears on Done or Esc', async () => {
+    const page = (params: Record<string, string>) =>
+      CollectionPage({ searchParams: Promise.resolve(params) })
+    const both = {
+      rows: [row(11, book(1, 'Sinuhe')), row(12, book(2, 'Kätilö'))],
+      total: 2,
+      labels: {},
+    }
+    const box = (title: string) => screen.getByRole('checkbox', { name: new RegExp(title) })
+    const selected = () => screen.queryByText(/\d+ selected/)?.textContent
+    const tap = (title: string) => screen.getByText(title, { selector: 'p' })
+
+    getShelfRows.mockResolvedValueOnce(both)
+    const { rerender } = render(await page({}))
+    expect(screen.queryByRole('checkbox')).toBeNull()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Select' }))
+    expect(screen.getAllByRole('checkbox')).toHaveLength(2)
+    expect(selected()).toBe('0 selected')
+    expect(screen.queryByRole('button', { name: 'Select' })).toBeNull()
+
+    fireEvent.click(tap('Sinuhe'))
+    expect((box('Sinuhe') as HTMLInputElement).checked).toBe(true)
+    expect(selected()).toBe('1 selected')
+    fireEvent.click(tap('Sinuhe'))
+    expect((box('Sinuhe') as HTMLInputElement).checked).toBe(false)
+    expect(selected()).toBe('0 selected')
+    fireEvent.click(tap('Sinuhe'))
+    fireEvent.click(tap('Kätilö'))
+    expect(selected()).toBe('2 selected')
+
+    getShelfRows.mockResolvedValueOnce({ rows: [both.rows[0]], total: 1, labels: {} })
+    rerender(await page({ q: 'sinuhe' }))
+    expect(screen.queryByText('Kätilö')).toBeNull()
+    expect(selected()).toBe('2 selected')
+
+    getShelfRows.mockResolvedValueOnce(both)
+    rerender(await page({}))
+    expect((box('Kätilö') as HTMLInputElement).checked).toBe(true)
+
+    fireEvent.click(screen.getByRole('button', { name: 'Done' }))
+    expect(screen.queryByRole('checkbox')).toBeNull()
+    expect(selected()).toBeUndefined()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Select' }))
+    expect(selected()).toBe('0 selected')
+    fireEvent.click(tap('Sinuhe'))
+    fireEvent.keyDown(document, { key: 'Escape' })
+    expect(screen.queryByRole('checkbox')).toBeNull()
+    screen.getByRole('button', { name: 'Select' })
+    expect(router.replace).not.toHaveBeenCalled()
+  })
+
+  it('ticks a cover tile in select mode', async () => {
+    devicePrefs.mockResolvedValue({ ...DEFAULT_PREFS, layout: 'covers' })
+    getShelfRows.mockResolvedValue({ rows: [row(11, book(1, 'Sinuhe'))], total: 1, labels: {} })
+    await renderPage()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Select' }))
+    fireEvent.click(screen.getByText('Sinuhe', { selector: 'p' }))
+    expect((screen.getByRole('checkbox', { name: /Sinuhe/ }) as HTMLInputElement).checked).toBe(
+      true,
+    )
+    screen.getByText('1 selected')
+  })
+
+  it('closes Book detail on entering select mode', async () => {
+    searchParams = new URLSearchParams({ sort: 'title', book: '5' })
+    getShelfRows.mockResolvedValue({ rows: [row(11, book(1, 'Sinuhe'))], total: 1, labels: {} })
+    await renderPage({ sort: 'title', book: '5' })
+
+    fireEvent.click(screen.getByRole('button', { name: 'Select' }))
+    expect(router.replace).toHaveBeenCalledWith('/?sort=title', { scroll: false })
+    expect(router.back).not.toHaveBeenCalled()
   })
 
   it('shows First run with no copies', async () => {

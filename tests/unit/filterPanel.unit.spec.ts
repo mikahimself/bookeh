@@ -29,6 +29,7 @@ vi.mock('@/app/(frontend)/components/toast/ToastProvider', () => ({
 const { CollectionDisplayProvider } = await import('@/app/(frontend)/(sections)/CollectionDisplay')
 const { CollectionTools } = await import('@/app/(frontend)/(sections)/CollectionTools')
 const { FilterPanel, FilterPanelProvider } = await import('@/app/(frontend)/(sections)/FilterPanel')
+const { SelectionProvider } = await import('@/app/(frontend)/(sections)/Selection')
 
 const values: FilterValues = {
   location: [],
@@ -46,8 +47,12 @@ const page = () =>
     createElement(
       FilterPanelProvider,
       null,
-      createElement(CollectionTools),
-      createElement(FilterPanel, { values }),
+      createElement(
+        SelectionProvider,
+        null,
+        createElement(CollectionTools),
+        createElement(FilterPanel, { values }),
+      ),
     ),
   )
 

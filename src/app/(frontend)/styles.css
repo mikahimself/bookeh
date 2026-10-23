@@ -281,7 +281,9 @@
   mix-blend-mode: normal;
 }
 
-:root:active-view-transition-type(section-next, section-prev) [data-pinned-bottom] {
+/* Select mode's action bar is part of the collection: it slides away with it. */
+:root:active-view-transition-type(section-next, section-prev)
+  [data-pinned-bottom]:not([data-action-bar]) {
   view-transition-name: pinned-bottom;
 }
 
@@ -398,4 +400,13 @@
       transition: none;
     }
   }
+}
+
+/*
+ * Select mode's action bar takes the place of the layout's pinned Scan book
+ * (EXPERIENCE.md, Action bar). The toast lift (ToastProvider) assumes one
+ * `pinned-bar` of height, which the bar keeps.
+ */
+:root:has([data-action-bar]) [data-pinned-bottom]:not([data-action-bar]) {
+  display: none;
 }

@@ -33,6 +33,7 @@ vi.mock('next/navigation', async (importOriginal) => ({
   ...(await importOriginal<typeof import('next/navigation')>()),
   useRouter: () => router,
   usePathname: () => '/',
+  useSearchParams: () => new URLSearchParams(),
 }))
 vi.mock('@/app/(frontend)/actions/undo', () => ({ undoAction }))
 vi.mock('@/app/(frontend)/actions/prefs', () => ({ setDevicePrefsAction: vi.fn() }))
@@ -66,6 +67,7 @@ const { ToastProvider, useToast } = await import('@/app/(frontend)/components/to
 const { ShelfRowsProvider, useShelfRows } = await import('@/app/(frontend)/(sections)/ShelfRows')
 const { CollectionList } = await import('@/app/(frontend)/(sections)/CollectionList')
 const { CollectionDisplayProvider } = await import('@/app/(frontend)/(sections)/CollectionDisplay')
+const { SelectionProvider } = await import('@/app/(frontend)/(sections)/Selection')
 
 const book = (bookId: number): EffectiveBook => ({
   bookId,
@@ -123,10 +125,14 @@ const tree = (initial: ShelfRows, q: ShelfQuery = query) =>
         typeof CollectionDisplayProvider
       >,
       createElement(
-        ShelfRowsProvider,
-        { query: q, initial } as ComponentProps<typeof ShelfRowsProvider>,
-        createElement(CollectionList, { query: q, book: null }),
-        createElement(Probe),
+        SelectionProvider,
+        null,
+        createElement(
+          ShelfRowsProvider,
+          { query: q, initial } as ComponentProps<typeof ShelfRowsProvider>,
+          createElement(CollectionList, { query: q, book: null }),
+          createElement(Probe),
+        ),
       ),
     ),
   )

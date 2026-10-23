@@ -40,7 +40,7 @@ export default async function SectionsLayout({ children }: { children: ReactNode
             <SectionNav />
             {scanBook('hidden shrink-0 wide:inline-flex', { 'data-scan-book': true })}
           </header>
-          <div className="flex-1">{children}</div>
+          <div className="flex flex-1 flex-col">{children}</div>
         </div>
       </SectionTransition>
       <SectionSwipe />

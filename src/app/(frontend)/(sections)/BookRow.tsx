@@ -2,10 +2,14 @@ import Link from 'next/link'
 
 import type { ShelfRow } from '@/lib/shelf/query'
 
+import { Checkbox } from '../components/Checkbox'
 import { Cover } from '../components/Cover'
 import type { DevicePrefs } from '../prefs'
 
 type Size = DevicePrefs['size']
+
+/** Select mode on a row or tile: whether the copy is ticked, and its toggle. */
+export type RowSelect = { ticked: boolean; onToggle: () => void }
 
 /** DESIGN.md, Collection density: the row's padding and cover width per size. */
 const ROW: Record<Size, { row: string; cover: string }> = {
@@ -25,7 +29,9 @@ const joined = (parts: (string | number | null)[]) =>
  * at every size. One row is one copy. Hook-free, so the server page and the
  * client list share it; the caller passes the words it needs. The whole row
  * is a link to `href`, its Book's detail; `open` marks it with the selection
- * bar.
+ * bar. In select mode (`select`) the row is one `<label>` with the checkbox
+ * before the cover instead, so a tap anywhere ticks it and opens nothing; at
+ * least tap-high on the phone.
  */
 export function BookRow({
   row: { copy, book },
@@ -34,6 +40,7 @@ export function BookRow({
   href,
   replace,
   open,
+  select,
 }: {
   row: ShelfRow
   size: Size
@@ -41,6 +48,7 @@ export function BookRow({
   href: string
   replace: boolean
   open: boolean
+  select?: RowSelect
 }) {
   const authors = book.authors.map((author) => author.name).join(', ')
   const lines =
@@ -49,37 +57,47 @@ export function BookRow({
       : [joined([authors, book.year, book.publisher])]
   const meta = lines.filter((line) => line !== '')
 
+  const content = (
+    <>
+      <div className={`${ROW[size].cover} shrink-0`}>
+        <Cover src={book.coverUrl} title={size === 's' ? '' : book.title} />
+      </div>
+      <div className={`flex min-w-0 flex-1 ${size === 's' ? 'items-baseline gap-2' : 'flex-col'}`}>
+        <p className={`truncate text-title text-text${size === 's' ? ' max-w-full shrink-0' : ''}`}>
+          {book.title}
+        </p>
+        {meta.map((line, i) => (
+          <p key={i} className="min-w-0 truncate text-meta text-text-muted">
+            {line}
+          </p>
+        ))}
+      </div>
+      {copy.status === 'ordered' && (
+        <span className="shrink-0 text-meta text-text-muted">{ordered}</span>
+      )}
+    </>
+  )
+  const layout = `flex items-center gap-4 ${ROW[size].row}`
+
   return (
     <li className={open ? 'selection-bar' : undefined}>
-      <Link
-        href={href}
-        replace={replace}
-        scroll={false}
-        prefetch={false}
-        aria-current={open ? 'true' : undefined}
-        className={`flex items-center gap-4 ${ROW[size].row}`}
-      >
-        <div className={`${ROW[size].cover} shrink-0`}>
-          <Cover src={book.coverUrl} title={size === 's' ? '' : book.title} />
-        </div>
-        <div
-          className={`flex min-w-0 flex-1 ${size === 's' ? 'items-baseline gap-2' : 'flex-col'}`}
+      {select ? (
+        <label className={`${layout} cursor-pointer max-wide:min-h-tap`}>
+          <Checkbox checked={select.ticked} onChange={select.onToggle} />
+          {content}
+        </label>
+      ) : (
+        <Link
+          href={href}
+          replace={replace}
+          scroll={false}
+          prefetch={false}
+          aria-current={open ? 'true' : undefined}
+          className={layout}
         >
-          <p
-            className={`truncate text-title text-text${size === 's' ? ' max-w-full shrink-0' : ''}`}
-          >
-            {book.title}
-          </p>
-          {meta.map((line, i) => (
-            <p key={i} className="min-w-0 truncate text-meta text-text-muted">
-              {line}
-            </p>
-          ))}
-        </div>
-        {copy.status === 'ordered' && (
-          <span className="shrink-0 text-meta text-text-muted">{ordered}</span>
-        )}
-      </Link>
+          {content}
+        </Link>
+      )}
     </li>
   )
 }

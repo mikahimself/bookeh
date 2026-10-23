@@ -16,6 +16,7 @@ import { BookRow } from './BookRow'
 import { useCollectionDisplay } from './CollectionDisplay'
 import { activeValues, clearHref, isNarrowed } from './countLine'
 import { CoverTile } from './CoverTile'
+import { useSelection } from './Selection'
 import { useShelfRows } from './ShelfRows'
 
 /** Between the count line's parts (EXPERIENCE.md, Count line). */
@@ -37,7 +38,8 @@ const GRID: Record<DevicePrefs['size'], string> = {
  * within a screen of view, the next rows load with the progress line and the
  * rows shown stay usable; a failed load is tried again on the next approach.
  * A row or tile opens Book detail (`?book=`): pushing, or replacing while
- * `book` is open, whose rows carry the selection bar.
+ * `book` is open, whose rows carry the selection bar. In select mode
+ * (`useSelection`) it carries its checkbox and ticks instead.
  */
 export function CollectionList({ query, book }: { query: ShelfQuery; book: number | null }) {
   const t = useTranslations('collection')
@@ -45,6 +47,7 @@ export function CollectionList({ query, book }: { query: ShelfQuery; book: numbe
   const locale = useLocale()
   const { shelf, loading, loadMore } = useShelfRows()
   const { layout, size } = useCollectionDisplay()
+  const { selecting, ticked, toggle } = useSelection()
   const sentinel = useRef<HTMLDivElement>(null)
   const [near, setNear] = useState(false)
 
@@ -78,6 +81,9 @@ export function CollectionList({ query, book }: { query: ShelfQuery; book: numbe
     href: shelfHref(query, { book: row.book.bookId }),
     replace: book !== null,
     open: row.book.bookId === book,
+    select: selecting
+      ? { ticked: ticked.has(row.copy.copyId), onToggle: () => toggle(row.copy.copyId) }
+      : undefined,
   })
 
   return (
