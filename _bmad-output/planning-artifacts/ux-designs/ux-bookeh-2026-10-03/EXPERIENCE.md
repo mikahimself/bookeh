@@ -65,7 +65,7 @@ Mock-ups, in the final tokens. The spines win on any conflict with a mock-up.
 | [mockups/key-wishlists.html](mockups/key-wishlists.html) | The list of wishlists, one wishlist, an entry opened. |
 | [mockups/key-settings.html](mockups/key-settings.html) | Settings on wide and phone. |
 
-Not mocked, built from this spine alone: Sign in, Lookup, the Filter panel on the phone, pickers and dialogs, select mode on the phone, and sizes s and l. The Genres group in Settings is not mocked either; its story starts with a rendered mock-up choice. So do the tag picker, the Lend picker, creating a list from the wishlist picker when there is none and the admin's Re-fetch result. The app icon and theme colour are settled in DESIGN.md → App Icon & Theme Colour, and the Corner crop in DESIGN.md → Components.
+Not mocked, built from this spine alone: Sign in, Lookup, the Filter panel on the phone, pickers and dialogs, select mode on the phone, and sizes s and l. The Genres group in Settings is not mocked either; its story starts with a rendered mock-up choice. So do the tag picker, the Lend picker and creating a list from the wishlist picker when there is none. The app icon and theme colour are settled in DESIGN.md → App Icon & Theme Colour, and the Corner crop in DESIGN.md → Components.
 
 ## Voice and Tone
 
@@ -198,7 +198,7 @@ The same content in the panel and the sheet. Changes save at once; there is no S
 | On wishlists | One line per entry: "{list} · for {person}". Absent when there are none. |
 | Classification | System genres (in the user's language), the user's genres, system themes, the user's themes and personal tags as Filter chips; empty kinds are absent. "Add tag" opens the picker for tags, genres and themes. |
 | Look it up again | On the creator's own private Book with an ISBN: a Link that calls the sources. Found: the Book takes the source's values and becomes shared (the edition picker when there are several), toast "Shared · from {source}". None: toast "Still not found." Sources didn't answer: the toast names them. Without an ISBN the line reads "Add the ISBN on Edit book to look it up." Not undoable. |
-| Re-fetch | Admin only, on a shared Book: fills empty fields, themes and the cover included; never overwrites. |
+| Re-fetch | Admin only, on a shared Book: fills empty fields, themes and the cover included; never overwrites. A "Re-fetch" Link line above the foot, after the classification, with the muted hint "Fills empty fields from the sources." under it; it reads "Re-fetching…" while the sources run. The result is a toast only, no Undo: "Filled {fields} · from {source}" (themes as "{n} themes"), "Nothing to fill.", or "{sources} didn't answer." Book detail redraws after a fill. (Mock-up A + 1, Mika, 2026-10-23.) |
 | Foot | Edit (opens Edit book) and Add to wishlist. No primary button. |
 
 The half-open sheet shows the header, read and rating, and the first copies, so Lend and Returned are reachable without opening it fully.

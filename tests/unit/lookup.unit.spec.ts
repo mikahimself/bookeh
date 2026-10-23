@@ -260,6 +260,17 @@ describe('lookupSources cache', () => {
     expect(a).toHaveBeenCalledTimes(2)
   })
 
+  it('asks the sources with fresh even when a found outcome is cached, and caches the answer', async () => {
+    serve([rec('A', 'a1')])
+    await lookupSources(ISBN)
+
+    const [again] = serve([rec('A', 'a2')])
+    const outcome = await lookupSources(ISBN, { fresh: true })
+    expect(again).toHaveBeenCalledOnce()
+    expect(outcome).toMatchObject({ kind: 'found', candidates: [{ title: 'a2' }] })
+    expect(heldOutcome(ISBN)).toEqual(outcome)
+  })
+
   it(`keeps at most ${CACHE_SIZE} entries, evicting the least recently used`, async () => {
     const [a] = serve([])
     const isbn = (n: number) => `isbn-${n}`

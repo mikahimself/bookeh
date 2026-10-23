@@ -114,10 +114,15 @@ async function ask(source: Source, isbn13: string): Promise<SourceResult[] | und
  * `unavailable`, naming the failed sources. A `found` or `none` reached with no source
  * failing is cached (`FOUND_TTL_MS`, `NONE_TTL_MS`); a `found` merged while a source
  * failed is cached for `PARTIAL_TTL_MS`, so the save after the Answer uses the outcome
- * the Answer showed (AD-11); `unavailable` never is. Never throws.
+ * the Answer showed (AD-11); `unavailable` never is. `fresh` skips the cache
+ * read and still writes the cache: re-fetch asks the sources again (AD-5).
+ * Never throws.
  */
-export async function lookupSources(isbn13: string): Promise<SourcesOutcome> {
-  const hit = cached(isbn13)
+export async function lookupSources(
+  isbn13: string,
+  { fresh = false }: { fresh?: boolean } = {},
+): Promise<SourcesOutcome> {
+  const hit = fresh ? undefined : cached(isbn13)
   if (hit) return hit
 
   const lists = await Promise.all(

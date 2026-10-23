@@ -3,6 +3,7 @@
 import { setRating } from '@/lib/books/setRating'
 import type { Named } from '@/lib/books/effectiveBook'
 import { setRead } from '@/lib/books/setRead'
+import { refetchBook, type RefetchResult } from '@/lib/catalogue/refetchBook'
 import { listLocations, type LocationOption } from '@/lib/copies/locations'
 import { moveCopies } from '@/lib/copies/moveCopies'
 import { receiveCopy } from '@/lib/copies/receiveCopy'
@@ -104,6 +105,18 @@ export async function setRatingAction(input: unknown): Promise<ActionResult<null
     if (rating !== null && typeof rating !== 'number') throw new DomainError('VALIDATION')
     await setRating(ctx, bookId, rating)
     return null
+  })
+}
+
+/**
+ * Book detail's admin Re-fetch: fills a shared Book's empty fields from the
+ * sources (FR-19). No Undo. The gate is the service's (`NOT_FOUND`).
+ */
+export async function refetchBookAction(input: unknown): Promise<ActionResult<RefetchResult>> {
+  return runAction(async () => {
+    const ctx = await requireUserOrThrow()
+    const { bookId } = bookInput(input)
+    return refetchBook(ctx, bookId)
   })
 }
 

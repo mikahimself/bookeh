@@ -253,7 +253,26 @@
     "read": "Luettu",
     "rating": "Arvio",
     "note": "Muistiinpano",
-    "received": "Saapunut"
+    "received": "Saapunut",
+    "refetch": "Hae uudelleen",
+    "refetching": "Haetaan…",
+    "refetchHint": "Täyttää tyhjät kentät lähteistä.",
+    "refetchFilled": "Täytetty {fields} · lähteestä {source}",
+    "refetchNothing": "Ei täytettävää.",
+    "refetchNoAnswer": "{count, plural, one {{sources} ei vastannut.} other {{sources} eivät vastanneet.}}",
+    "refetchThemes": "{n, plural, one {# teema} other {# teemaa}}",
+    "refetchField": {
+      "subtitle": "alaotsikko",
+      "authors": "tekijät",
+      "series": "sarja",
+      "seriesIndex": "numero sarjassa",
+      "publisher": "kustantaja",
+      "year": "vuosi",
+      "pages": "sivumäärä",
+      "language": "kieli",
+      "description": "kuvaus",
+      "cover": "kansi"
+    }
   },
   "progress": {
     "loading": "Ladataan"

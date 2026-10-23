@@ -253,7 +253,26 @@
     "read": "Read",
     "rating": "Rating",
     "note": "Note",
-    "received": "Received"
+    "received": "Received",
+    "refetch": "Re-fetch",
+    "refetching": "Re-fetching…",
+    "refetchHint": "Fills empty fields from the sources.",
+    "refetchFilled": "Filled {fields} · from {source}",
+    "refetchNothing": "Nothing to fill.",
+    "refetchNoAnswer": "{sources} didn't answer.",
+    "refetchThemes": "{n, plural, one {# theme} other {# themes}}",
+    "refetchField": {
+      "subtitle": "subtitle",
+      "authors": "authors",
+      "series": "series",
+      "seriesIndex": "number in series",
+      "publisher": "publisher",
+      "year": "year",
+      "pages": "pages",
+      "language": "language",
+      "description": "description",
+      "cover": "cover"
+    }
   },
   "progress": {
     "loading": "Loading"
