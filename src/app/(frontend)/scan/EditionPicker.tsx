@@ -15,6 +15,18 @@ import { Picker } from '../components/ui/Picker'
  */
 export type EditionRow = { cover: string | null; title: string; line: string }
 
+/** An edition Picker row's label: the cover at Rows m beside the edition line. */
+export function EditionLabel({ cover, title, line }: EditionRow) {
+  return (
+    <span className="flex items-center gap-3">
+      <span className="w-cover-row shrink-0">
+        <Cover src={cover} title={title} />
+      </span>
+      <span>{line}</span>
+    </span>
+  )
+}
+
 /**
  * EXPERIENCE.md, Answer, Several editions (D-7): "{n} editions found" under
  * the Book, opening a Picker of the candidates, each row a cover at Rows m
@@ -56,16 +68,9 @@ export function EditionPicker({
         title={t('answer.editions')}
         value={pick}
         onChoose={choose}
-        options={editions.map(({ cover, title, line }, index) => ({
+        options={editions.map((row, index) => ({
           value: index,
-          label: (
-            <span className="flex items-center gap-3">
-              <span className="w-cover-row shrink-0">
-                <Cover src={cover} title={title} />
-              </span>
-              <span>{line}</span>
-            </span>
-          ),
+          label: <EditionLabel {...row} />,
         }))}
       />
     </div>

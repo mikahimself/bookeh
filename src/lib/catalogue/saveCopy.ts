@@ -164,7 +164,14 @@ async function save(ctx: Context, input: SaveInput): Promise<Undoable<SaveResult
   }
 
   // FR-12, D-8: a held private Book may be shared, or merged into a shared Book.
-  const pending = await prepareShare(ctx, isbn13, held, target.pick, target.candidate)
+  const pending = await prepareShare(
+    ctx,
+    isbn13,
+    held,
+    heldOutcome(isbn13),
+    target.pick,
+    target.candidate,
+  )
   return withUndo(ctx, async (tx) => {
     const bookId = await settleHeldBook(tx, isbn13, pending)
     // No Book restore: a shared or merged Book stays shared after an Undo.

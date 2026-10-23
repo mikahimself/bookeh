@@ -68,7 +68,11 @@
     "reload": "Reload",
     "markedRead": "Marked {n} read",
     "markedUnread": "Marked {n} unread",
-    "moved": "{n} moved to {location}"
+    "moved": "{n} moved to {location}",
+    "sharedFrom": "Shared · from {source}",
+    "shared": "Shared",
+    "stillNotFound": "Still not found.",
+    "noAnswer": "{sources} didn't answer."
   },
   "sections": {
     "label": "Sections",
@@ -261,6 +265,9 @@
     "refetchNothing": "Nothing to fill.",
     "refetchNoAnswer": "{sources} didn't answer.",
     "refetchThemes": "{n, plural, one {# theme} other {# themes}}",
+    "lookUpAgain": "Look it up again",
+    "lookingUp": "Looking it up…",
+    "lookUpNeedsIsbn": "Add the ISBN on Edit book to look it up.",
     "refetchField": {
       "subtitle": "subtitle",
       "authors": "authors",

@@ -197,12 +197,20 @@ describe('inLibrary', () => {
       pick: undefined,
       editions: [],
       bookId: 7,
+      lookAgain: false,
       copies: [
         { location: 'Tampere', status: 'owned' },
         { location: null, status: 'owned' },
         { location: null, status: 'ordered' },
       ],
     })
+  })
+
+  it("offers Look it up again on the viewer's private Book", () => {
+    const own = { ...book, visibility: 'private' as const }
+    expect(
+      inLibrary({ kind: 'existing', book: own, mine: { copies: [copy()], entries: [] } }),
+    ).toMatchObject({ lookAgain: true })
   })
 
   it('is not the answer without a copy, without an ISBN, or for the other kinds', () => {

@@ -1,14 +1,12 @@
 import { isAdmin } from '@/access/roles'
-import { OVERRIDABLE_BOOK_FIELDS, type OverridableBookField } from '@/fields/bookFields'
-import { type BookOverrides, mergeUserBook, upsertUserBook } from '@/lib/books/upsertUserBook'
+import { mergeUserBook, upsertUserBook } from '@/lib/books/upsertUserBook'
 import { moveCopiesToBook } from '@/lib/copies/moveCopiesToBook'
 import { DomainError } from '@/lib/errors'
-import { heldOutcome } from '@/lib/metadata/lookup'
-import type { SourceResult } from '@/lib/metadata/source'
+import type { SourcesOutcome } from '@/lib/metadata/source'
 import type { Context } from '@/lib/payload/context'
 import * as gateway from '@/lib/payload/gateway'
 import { assertLive, onRollback } from '@/lib/payload/transaction'
-import type { Author, Book, Series } from '@/payload-types'
+import type { Author, Series } from '@/payload-types'
 
 import {
   attachCover,
@@ -20,13 +18,22 @@ import {
 import { deleteRow } from './ensureSharedBook'
 import { findBookByIsbn, type HeldBook } from './findBookByIsbn'
 import { findOrCreateByName } from './findOrCreateByName'
+import {
+  type BookValues,
+  differing,
+  fromBook,
+  fromCandidate,
+  idOf,
+  populated,
+} from './handEnteredValues'
 import { isUnreferenced } from './isUnreferenced'
 import { mapSubjectsToGenres } from './mapSubjectsToGenres'
 import { type CandidateId, type Chosen, chooseCandidate } from './pick'
 import { system } from './system'
 
 // FR-12, AD-4, AD-5 and D-8: a private Book is shared on its creator's next
-// save once a source knows its ISBN, or joins the shared Book with that ISBN.
+// save once a source knows its ISBN, or joins the shared Book with that ISBN;
+// `lookupAgain()` runs the same share without a save.
 
 /**
  * What `prepareShare()` fetched for a promote: the chosen candidate, clipped
@@ -37,9 +44,10 @@ export type PendingShare = Chosen & { cover?: DownloadedCover }
 
 /**
  * Spine, AD-5, AD-11 and AD-14: the part of a share that runs before the
- * save's transaction opens. `undefined` unless `held` is the user's private
- * Book and the server-held outcome (`heldOutcome()`, the in-process cache
- * alone) is `found`; then the candidate `chooseCandidate()` takes for `pick`
+ * share's transaction opens. `undefined` unless `held` is the user's private
+ * Book and `outcome` is `found` (the save passes `heldOutcome()`, the
+ * in-process cache alone; `lookupAgain()` the outcome it asked for); then the
+ * candidate `chooseCandidate()` takes for `pick`
  * and `id` (D-7: `NOT_FOUND` when `id` names a candidate the outcome lacks),
  * clipped so the promote's write and its D-8 comparison see the values
  * stored, and its raw metadata, with the candidate's cover stored by
@@ -51,11 +59,11 @@ export async function prepareShare(
   ctx: Context,
   isbn13: string,
   held: HeldBook,
+  outcome: SourcesOutcome | undefined,
   pick?: number,
   id?: CandidateId,
 ): Promise<PendingShare | undefined> {
   if (held.visibility !== 'private') return undefined
-  const outcome = heldOutcome(isbn13)
   if (outcome?.kind !== 'found') return undefined
   const pending: PendingShare = chooseCandidate(outcome, pick, id)
   const { candidate } = pending
@@ -77,7 +85,8 @@ export async function prepareShare(
 
 /**
  * Spine, AD-5 and AD-11: the Book an `{ isbn13 }` save of a held Book puts
- * its copy on, settled inside the save's transaction. The cover in `pending`
+ * its copy on, settled inside the save's transaction (or `lookupAgain()`'s,
+ * which puts no copy on it). The cover in `pending`
  * is removed if the transaction rolls back. The held Book is read again
  * (`findBookByIsbn()`):
  *
@@ -130,90 +139,6 @@ export async function settleHeldBook(
 
   if (pending) await promote(tx, held.id, pending)
   return held.id
-}
-
-type ScalarField = Exclude<OverridableBookField, 'authors' | 'series'>
-const SCALAR_FIELDS = OVERRIDABLE_BOOK_FIELDS.filter(
-  (key): key is ScalarField => key !== 'authors' && key !== 'series',
-)
-
-/** A Book's overridable values as read for a share, relations populated. */
-type BookValues = Pick<Book, 'id' | 'cover' | OverridableBookField>
-
-/** The values a private Book is compared with: scalars present, text and names as loose keys. */
-type Comparable = {
-  scalars: Partial<Record<ScalarField, string | number>>
-  authors: string[]
-  series: string | undefined
-}
-
-/**
- * D-8 only: NFC, lower-cased, every punctuation, format (soft hyphen,
- * zero-width space), modifier symbol (´ as an apostrophe) and whitespace
- * character removed; accents kept. Not `toNameKey()`, which keys the unique `nameKey`
- * columns and must keep punctuation ("A.B." and "AB" can be two authors).
- */
-const looseKey = (text: string) =>
-  text
-    .normalize('NFC')
-    .toLowerCase()
-    .replace(/[\p{P}\p{Cf}\p{Sk}\s]/gu, '')
-
-const compareKey = (value: string | number) => (typeof value === 'string' ? looseKey(value) : value)
-
-const populated = <T extends Author | Series>(value: number | T | null | undefined): T => {
-  if (typeof value !== 'object' || value === null) throw new Error('Relation not populated')
-  return value
-}
-
-const idOf = (value: number | { id: number }): number =>
-  typeof value === 'number' ? value : value.id
-
-function fromBook(book: BookValues): Comparable {
-  const scalars: Comparable['scalars'] = {}
-  for (const key of SCALAR_FIELDS) {
-    const value = book[key]
-    if (value !== null && value !== undefined) scalars[key] = compareKey(value)
-  }
-  return {
-    scalars,
-    authors: (book.authors ?? []).map((author) => looseKey(populated<Author>(author).name)),
-    series: book.series == null ? undefined : looseKey(populated<Series>(book.series).name),
-  }
-}
-
-function fromCandidate(candidate: SourceResult): Comparable {
-  const scalars: Comparable['scalars'] = {}
-  for (const key of SCALAR_FIELDS) {
-    const value = candidate[key]
-    if (value !== undefined) scalars[key] = compareKey(value)
-  }
-  return {
-    scalars,
-    authors: candidate.authors.map(({ name }) => looseKey(name)),
-    series: candidate.series === undefined ? undefined : looseKey(candidate.series),
-  }
-}
-
-/** D-8: the private Book's values the target lacks or holds differently, as overrides. */
-function differing(own: BookValues, target: Comparable): BookOverrides {
-  const mine = fromBook(own)
-  const entries: [OverridableBookField, unknown][] = []
-  for (const key of SCALAR_FIELDS) {
-    const value = mine.scalars[key]
-    if (value !== undefined && value !== target.scalars[key]) entries.push([key, own[key]])
-  }
-  const sameAuthors =
-    mine.authors.length === target.authors.length &&
-    mine.authors.every((key, i) => key === target.authors[i])
-  if (mine.authors.length > 0 && !sameAuthors) {
-    entries.push(['authors', (own.authors ?? []).map(idOf)])
-  }
-  if (mine.series !== undefined && mine.series !== target.series && own.series != null) {
-    entries.push(['series', idOf(own.series)])
-  }
-  // `fromEntries` loses the key-to-value pairing; each value is the Book's own field.
-  return Object.fromEntries(entries) as BookOverrides
 }
 
 /** The Book's overridable values and cover, with system privileges (the caller's own or a shared Book). */

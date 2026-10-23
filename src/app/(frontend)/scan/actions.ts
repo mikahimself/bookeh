@@ -1,6 +1,6 @@
 'use server'
 
-import type { CandidateId } from '@/lib/catalogue/pick'
+import { type CandidateId, isCandidateId } from '@/lib/catalogue/pick'
 import { saveCopy, type SaveResult } from '@/lib/catalogue/saveCopy'
 import { DomainError, logger, runAction, type ActionResult, type ErrorCode } from '@/lib/errors'
 import { requireUserOrThrow } from '@/lib/payload/context'
@@ -60,14 +60,6 @@ function isSaveInput(
     typeof isbn13 === 'string' &&
     (pick === undefined || (typeof pick === 'number' && Number.isInteger(pick) && pick >= 0)) &&
     (candidate === undefined || isCandidateId(candidate))
-  )
-}
-
-function isCandidateId(value: unknown): value is CandidateId {
-  if (typeof value !== 'object' || value === null) return false
-  const { source, recordId } = value as Record<string, unknown>
-  return (
-    typeof source === 'string' && source !== '' && typeof recordId === 'string' && recordId !== ''
   )
 }
 

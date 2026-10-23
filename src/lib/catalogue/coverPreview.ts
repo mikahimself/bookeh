@@ -6,6 +6,7 @@ import { limitLookups } from './lookupLimit'
 import { pickIndex } from './pick'
 
 // Spine, AD-9, AD-10, AD-12 and AD-14: the pre-save cover preview. `lookupBook`
+// (and `lookupAgain`)
 // records every candidate's cover URL per user and ISBN-13; the
 // `/data/cover/[isbn13]` handler serves the one at the requested index. The
 // first request for an image fetches it through `fetchCover()`, the same
@@ -42,7 +43,7 @@ const keyOf = (ctx: Context, isbn13: string) => `${ctx.user.id}:${isbn13}`
  * Records `urls`, every candidate's cover URL in candidate order, as
  * `ctx.user`'s cover previews for `isbn13`, or forgets them when none is
  * defined. The previous record's held covers whose URL is still listed are
- * kept; the rest go. Called by `lookupBook` alone. Bounded to `PREVIEW_SIZE`
+ * kept; the rest go. Called by `lookupBook` and `lookupAgain` alone. Bounded to `PREVIEW_SIZE`
  * entries (one per user and ISBN), each living `PREVIEW_TTL_MS`.
  */
 export function recordCoverPreview(

@@ -16,6 +16,7 @@ import { heldBook } from '../heldBook'
 import { BookDetailFrame } from './BookDetailPanel'
 import { CopyNote, MoveCopy, ReceiveCopy, RemoveCopy } from './CopyLine'
 import { FilterChip } from './FilterChip'
+import { DetailLookUpAgain } from './LookUpAgain'
 import { NotInLibrary } from './NotInLibrary'
 import { ReadAndRating } from './ReadAndRating'
 import { Refetch } from './Refetch'
@@ -31,7 +32,9 @@ const DOT = ' · '
  * when the viewer has locations, FR-32) or an ordered copy's Received
  * beside it and the copy's note under it (`CopyLine`), Genres when the Book
  * has system genres, the admin's Re-fetch on a shared Book (`Refetch`,
- * `canEditShared`), and the foot with Edit. Each author, the series, each
+ * `canEditShared`) or, in its place on a private Book, Look it up again
+ * (`DetailLookUpAgain`; without an ISBN a muted line pointing to Edit book),
+ * and the foot with Edit. Each author, the series, each
  * genre and each copy's location is a Filter chip (`FilterChip`) that adds
  * it to the current filters; an ordered copy has no location and so no
  * chip. The one component later groups are added to; it reads the Book, the
@@ -164,6 +167,14 @@ export async function BookDetail({
         {book.visibility === 'shared' && book.isbn13 && canEditShared(ctx.user) && (
           <Refetch bookId={bookId} />
         )}
+        {book.visibility === 'private' &&
+          (book.isbn13 ? (
+            <div className="flex">
+              <DetailLookUpAgain bookId={bookId} />
+            </div>
+          ) : (
+            <p className="text-meta text-text-muted">{t('detail.lookUpNeedsIsbn')}</p>
+          ))}
         <div className="flex gap-2">
           <Link
             href={`/books/${bookId}/edit`}

@@ -14,6 +14,15 @@ export const pickIndex = (pick: number | undefined, length: number): number =>
 /** A candidate's identity (AD-11): its source and that source's own record id. */
 export type CandidateId = { source: SourceId; recordId: string }
 
+/** A client's `CandidateId`: non-empty `source` and `recordId` strings. */
+export function isCandidateId(value: unknown): value is CandidateId {
+  if (typeof value !== 'object' || value === null) return false
+  const { source, recordId } = value as Record<string, unknown>
+  return (
+    typeof source === 'string' && source !== '' && typeof recordId === 'string' && recordId !== ''
+  )
+}
+
 /**
  * The candidate a save builds a Book from, clipped to the field limits
  * (`clipCandidate()`, R6), and the outcome's raw metadata with that

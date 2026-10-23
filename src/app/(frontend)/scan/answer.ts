@@ -1,6 +1,6 @@
 import { normaliseIsbn } from '@/fields/isbn'
 import { coverUrl } from '@/lib/books/coverUrl'
-import type { LookupResult } from '@/lib/catalogue/lookupBook'
+import type { Draft, LookupResult } from '@/lib/catalogue/lookupBook'
 import type { CandidateId } from '@/lib/catalogue/pick'
 import { DomainError } from '@/lib/errors'
 import type { SourceId } from '@/lib/metadata/source'
@@ -51,11 +51,29 @@ export type AnswerCopy = { location: string | null; status: 'owned' | 'ordered' 
 
 /**
  * What the In library Answer shows: the Book and the viewer's copies, oldest
- * first. `bookId` is the Book Open book shows in the collection.
+ * first. `bookId` is the Book Open book shows in the collection. `lookAgain`:
+ * the Book is the viewer's own private Book (the lookup never answers with
+ * another user's), so Look it up again shows.
  */
-export type InLibrary = AnswerBook & { bookId: number; copies: AnswerCopy[] }
+export type InLibrary = AnswerBook & { bookId: number; copies: AnswerCopy[]; lookAgain: boolean }
 
 type ExistingResult = Extract<LookupResult, { kind: 'existing' }>
+
+/**
+ * The edition picker's candidates in order (D-7), each cover the pre-save
+ * preview at its index (`recordCoverPreview()` holds the URLs). For the
+ * Answer and Look it up again.
+ */
+export function answerEditions(isbn13: string, drafts: readonly Draft[]): AnswerEdition[] {
+  return drafts.map((draft, i) => ({
+    title: draft.title,
+    binding: draft.binding ?? null,
+    year: draft.year ?? null,
+    publisher: draft.publisher ?? null,
+    pages: draft.pages ?? null,
+    cover: draft.hasCover ? coverUrl({ isbn13, pick: i }) : null,
+  }))
+}
 
 /** A Book the viewer can read: no source line, and a save creates nothing new. */
 const existingBook = (book: ExistingResult['book'], isbn13: string): AnswerBook => ({
@@ -109,16 +127,7 @@ export function notInLibrary(result: LookupResult): AnswerBook | null {
         newSeries: series !== null && series.id === null ? series.name : null,
         pick: several ? pick : undefined,
         candidate: { source: draft.source, recordId: draft.recordId },
-        editions: !several
-          ? []
-          : candidates.map((candidate, i) => ({
-              title: candidate.title,
-              binding: candidate.binding ?? null,
-              year: candidate.year ?? null,
-              publisher: candidate.publisher ?? null,
-              pages: candidate.pages ?? null,
-              cover: candidate.hasCover ? coverUrl({ isbn13, pick: i }) : null,
-            })),
+        editions: several ? answerEditions(isbn13, candidates) : [],
       }
     }
     default:
@@ -142,6 +151,7 @@ export function inLibrary(result: LookupResult): InLibrary | null {
   return {
     ...existingBook(book, book.isbn13),
     bookId: book.bookId,
+    lookAgain: book.visibility === 'private',
     copies: mine.copies.map(({ location, status }) => ({
       location: location?.name ?? null,
       status,

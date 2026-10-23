@@ -55,6 +55,8 @@ Make the collection at `/` the place Mika uses every day: a fast list of his own
 - Locations are optional. A user with no locations sees no location field, filter, row ending or Move anywhere.
 - Bulk actions apply to every ticked copy or to none. Removals are confirmed by a dialog and have no Undo. Move, Read and Received have Undo. Rating saves at once, without Undo.
 - Re-fetch is admin-only. It fills only empty shared fields, themes and the cover included (an uploaded cover counts as a value), and never touches `user-books`. A non-admin call fails with `NOT_FOUND`.
+- The admin writes shared records from the app in exactly four places, all in `lib/catalogue` behind `canEditShared`: Edit book, genre management, cover upload and re-fetch.
+- `lookupBook`, `searchBooks`, `lookupAgain`, re-fetch, a save that asks the sources and a cover preview fetch share one per-user rate limit.
 - Every story ships its strings in English and Finnish (ICU plurals), uses design tokens only, and meets the accessibility floor: 44px tap areas and keyboard reach. The modal sheet and dialogs trap focus; the wide panel does not.
 - A story that changes the schema is verified against a restored production dump before merge.
 - Tests only where an acceptance criterion or a spine rule names the behaviour.
@@ -70,13 +72,14 @@ Make the collection at `/` the place Mika uses every day: a fast list of his own
   - A successful toast Undo reloads through `ToastProvider`'s `onUndone`.
 - **Book detail** is one server component (`BookDetail`). It renders in an addressed `Sheet` on the phone and in the 360px panel on wide screens, and later stories add groups to it only. Its single close is `useTaskBack(shelfHref(query), true)`. Every `{ bookId }` from the client starts with `requireOwnBook(ctx, bookId)`. Surface code sees only `EffectiveBook` and `UserBookState`.
 - **One writer per row kind:**
-  - `lib/copies` owns copies and locations: `moveCopies`, `removeCopies`, `setNote` and the location functions (built), and receive (to build in 5.25).
+  - `lib/copies` owns copies and locations: `moveCopies`, `removeCopies`, `setNote`, receive and the location functions (all built).
   - `lib/books` owns `user-books`, through `upsertUserBook()` only: `setRead` and `setRating(ctx, bookId, rating | null)` with `ratedAt` (both built).
-  - `lib/catalogue` owns re-fetch and `lookupAgain()`.
+  - `lib/catalogue` owns `refetchBook()` (built) and `lookupAgain()`.
   - Selection actions take copy ids and run in one transaction. A single-row action calls the same function with one id.
   - A location picked or created inline is a `Ref` (an id, or `{ create: name }`), resolved inside the action's transaction. Undo leaves a row created this way.
 - **`setRead(ctx, target, value | 'toggle')`** (built) takes copy ids or a Book id and applies to the distinct Books. `toggle` resolves to unread only when every Book is already read. It returns `Undone<{ read, count }>`; Book detail's switch and the select bar's Read already call it.
-- **Server actions** live in `(sections)/actions.ts` (`removeCopiesAction` is the pattern). Each validates its input as an array of positive safe integers (anything else is `VALIDATION`, with no write) and runs `requireUserOrThrow()` inside `runAction()`. An undoable action wraps its one service call in `withUndo`. Undoable service functions return `Undone<T>`, join the caller's transaction, and ship an integration test that undoes them. The undoable actions are exactly those EXPERIENCE.md lists with an Undo; removals, deletes, merges and `lookupAgain` are not undoable.
+- **Server actions** live in `(sections)/actions.ts` (`removeCopiesAction` is the pattern). Each validates its input as an array of positive safe integers (anything else is `VALIDATION`, with no write) and runs `requireUserOrThrow()` inside `runAction()`. An undoable action wraps its one service call in `withUndo`. Undoable service functions return `Undone<T>`, join the caller's transaction, and ship an integration test that undoes them. The undoable actions are exactly those EXPERIENCE.md lists with an Undo; removals, deletes, merges, `refetchBook` and `lookupAgain` are not undoable.
+- **Re-fetch (built, `refetchBook(ctx, bookId)`):** gated like cover upload (`requireOwnBook()`, then a gateway read). A Book that is not shared, or a user who fails `canEditShared`, gets `NOT_FOUND` before any source is asked. Then `limitLookups()` and `lookupSources(isbn13, { fresh: true })`, which skips the cache read but still writes the cache, and `chooseCandidate()`'s default candidate. In one transaction that reads the Book again, it fills only empty fields (`null`, `''`, `[]`), plus `rawMetadata` and `source` when null. It returns `filled` (fields, themes added, source), `nothing` (no write) or `unavailable` (failed sources). It never touches copies or genres, and it is not undoable.
 - **Look it up again:** the lookup is rate-limited, and `unavailable` is never cached. On `found` it runs the auto-share transaction without creating a copy: it either promotes the Book in place, or moves the copies and the `user-books` row to an existing shared Book and deletes the private one when nothing else references it. The admin's differing hand-entered values are dropped; another user's become overrides.
 - **Client imports from `src/lib`** are limited to types and pure modules: `lib/shelf/query.ts`, `lib/catalogue/corners.ts` and `lib/books/languageName.ts`.
 - **Overlays** come from the Base UI wrappers in `components/ui` (Sheet, Dialog, Combobox, Picker, Menu). The wide panel is plain layout, not a drawer.
@@ -102,17 +105,25 @@ Make the collection at `/` the place Mika uses every day: a fast list of his own
   - "Still not found."
   - "Add the ISBN on Edit book to look it up."
   - The dialog "Remove {n} books from library?"
-- **Admin Re-fetch:** Mika picks its placement and result display from rendered mock-up options, and the pick is recorded in EXPERIENCE.md before building.
+- **Admin Re-fetch (built, mock-up A + 1):** a "Re-fetch" Link line above the foot, after the classification, with the muted hint "Fills empty fields from the sources." under it. It reads "Re-fetching…" while the sources run. The result is a toast only, with no Undo: "Filled {fields} · from {source}" (themes as "{n} themes"), "Nothing to fill." or "{sources} didn't answer." Book detail redraws after a fill.
+- **Look it up again:** a Link on the creator's own private Book with an ISBN, in Book detail and on the In library Answer. Without an ISBN, the line reads "Add the ISBN on Edit book to look it up."
+- **Location picker:** a bottom sheet on the phone, a dialog on wide screens; one choice, then it closes. It ends with a "New location" text field under the rows and a secondary Move button beside it, disabled while the field is blank. A typed name moves to the location of that name, creating it when none matches.
 - **Overlay depth:** one overlay deep. A sheet or panel may open one picker or dialog. `Esc` closes the topmost thing: dialog, then panel, then select mode.
 
 ## Cross-Story Dependencies
 
-- **Status:** done are 5.1–5.23, 5.27–5.29, 5.31–5.33, 5.36 and 5.37. Still open are 5.24–5.26, 5.30, 5.34 and 5.35.
-- **Action bar:** it now holds Read and Remove, with a `--spacing-pinned-bar` override so the toast clears the phone's two rows. 5.30 adds Move and 9.8 adds Tag. The phone's actions row has to fit four buttons at 390px, and the toast override assumes one row of actions.
+- **Status:** everything is done except 5.35 (Look it up again).
+- **Action bar:** it holds Move, Read and Remove, with a `--spacing-pinned-bar` override so the toast clears the phone's two rows. 9.8 adds Tag. Whether Move, Read and Remove fit one phone row at 390px was not checked by hand yet.
+- **Esc inside overlays:** the document `Esc` listeners of the wide panel and of select mode ignore targets inside `[role="dialog"]` or `[role="alertdialog"]` (`inDialog`). Base UI's popup already stops `Esc` propagating, so this is a safety net. A picker or dialog opened from Book detail (the 5.35 edition picker, a 5.34 result) closes alone on `Esc`.
+- **Book detail refresh:** after an action, Book detail refreshes through `router.refresh()`; after a toast Undo it relies on `ReadAndRating`'s `onUndone`, since that component is always mounted.
 - **Stale filter counts (deferred from 5.28):** Filter panel counts and value lists come from the server render, and `afterAction` reloads only the rows. They go stale after any action that changes rows (Remove, Read, Move, Received) until the next navigation. The fix belongs to the `afterAction` contract in the spine, not to one action.
-- **Esc inside the wide panel:** Base UI's `Esc` listener is registered after the panel's, so one `Esc` may close both a picker or dialog inside the panel and the panel itself. 5.24 and 5.30 must handle this.
-- **Filter chips (built):** authors, series, genres and each owned copy's location in Book detail are already chips via `FilterChip`. 5.26 adds the row ending, the Answer's location and the no-locations absence. Closing Book detail goes through `useTaskBack`; when filters changed under it, the close keeps the list as shown.
-- **5.30 Move:** wires the existing `moveCopies` and reuses the location picker with inline create. Known gap: Undo of a move fails with `UNDO_FAILED` if a location it would restore has since been deleted (possible from Settings).
-- **5.24 Remove:** wires the existing `removeCopies` (all or none). After the last copy is removed, the detail closes.
-- **5.35:** reuses Epic 3's auto-share and edition picker. Split `sharePrivateBook.ts` at its D-8 compare seam when 5.34 or 5.35 touches it. Wishlist entries move too once Epic 7 lands.
+- **Move Undo gap:** Undo of a move fails with `UNDO_FAILED` if a location it would restore has since been deleted (possible from Settings).
+- **Possible iOS issue (unverified):** the phone keyboard may cover the picker's "New location" field in the half-height sheet.
+- **5.35:** it reuses Epic 3's auto-share and edition picker; the picker opens over the Book detail sheet, one overlay deep. Split `sharePrivateBook.ts` at its D-8 compare seam when you touch it (5.34 left it alone). Wishlist entries move too once Epic 7 lands (7.7).
+- **What 5.34 built that 5.35 can reuse:**
+  - `src/lib/catalogue/refetchBook.ts`: the gate pattern, `limitLookups()` before the sources, `storeCover()` before the transaction with `discardCover` on rollback, and `chooseCandidate()`.
+  - `src/app/(frontend)/(sections)/Refetch.tsx`: a Link with a pending label, `settleAction`, a success toast whose source labels come from the `sources` messages joined with `format.list`, then `afterAction(result)` and `router.refresh()`.
+  - `refetchBookAction` in `(sections)/actions.ts`: `bookInput`, `requireUserOrThrow`, `runAction`, no `withUndo`.
+  - `lookupSources(isbn13, { fresh })` in `lib/metadata/lookup.ts`.
+  - `lookupLimit.ts` still says `lookupAgain` must call `limitLookups()`; update its comment when 5.35 does.
 - **Other epics:** the `genre` filter carries only system genre ids for now; Epic 9 settles user genre tags. Lent markers and loan actions arrive with Epic 6, tags and themes with Epic 9. Chips from `/loans` (6.9) and wishlist entries (Epic 7) opening the collection with only that filter are deferred to those stories.

@@ -68,7 +68,11 @@
     "reload": "Lataa uudelleen",
     "markedRead": "{n} merkitty luetuksi",
     "markedUnread": "{n} merkitty lukemattomaksi",
-    "moved": "{n} siirretty · {location}"
+    "moved": "{n} siirretty · {location}",
+    "sharedFrom": "Jaettu · lähteestä {source}",
+    "shared": "Jaettu",
+    "stillNotFound": "Ei vieläkään löytynyt.",
+    "noAnswer": "{count, plural, one {{sources} ei vastannut.} other {{sources} eivät vastanneet.}}"
   },
   "sections": {
     "label": "Osiot",
@@ -261,6 +265,9 @@
     "refetchNothing": "Ei täytettävää.",
     "refetchNoAnswer": "{count, plural, one {{sources} ei vastannut.} other {{sources} eivät vastanneet.}}",
     "refetchThemes": "{n, plural, one {# teema} other {# teemaa}}",
+    "lookUpAgain": "Etsi uudelleen",
+    "lookingUp": "Etsitään…",
+    "lookUpNeedsIsbn": "Lisää ISBN kohdassa Muokkaa kirjaa, niin kirjaa voi etsiä.",
     "refetchField": {
       "subtitle": "alaotsikko",
       "authors": "tekijät",

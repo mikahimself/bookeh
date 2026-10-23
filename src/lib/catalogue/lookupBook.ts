@@ -52,7 +52,8 @@ export type LookupResult =
   | { kind: 'none' }
   | { kind: 'unavailable'; failed: SourceId[] }
 
-const toDraft = ({ raw: _raw, coverUrl, ...rest }: SourceResult): Draft => ({
+/** A candidate as the Answer shows it: no `raw`, `hasCover` for its `coverUrl`. */
+export const toDraft = ({ raw: _raw, coverUrl, ...rest }: SourceResult): Draft => ({
   ...rest,
   hasCover: coverUrl !== undefined,
 })
