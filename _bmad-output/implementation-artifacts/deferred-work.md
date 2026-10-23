@@ -94,3 +94,6 @@
 - source_spec: `_bmad-output/implementation-artifacts/spec-2-3-k4-nightly-backups.md`
   summary: backup.sh's failure branches (empty-DB refusal, pg_restore self-verification, .failed rename, prune-only-after-success) have no repeatable verification.
   evidence: Verification-gap reviewer — only a one-time local rehearsal plus `sh -n` cover them; CI never touches deploy/, so dropping the `pg_restore --list` line or breaking the trap ships green. Deferred per the deploy-artifact pattern (story 2.2) and tests-at-a-functional-minimum; cheap partial close is committing the rehearsal as a rerunnable script under deploy/, worth revisiting when story 5.37 consumes last-backup.json.
+- source_spec: `_bmad-output/implementation-artifacts/spec-5-21-e22-filter-chips-on-book-detail.md`
+  summary: Filter chips in Book detail on `/loans` (Story 6.9) and in an opened wishlist entry (Epic 7's entry sheet) open the collection with only that filter (UX-DR34).
+  evidence: Neither surface renders Book detail yet. Today `FilterChip` builds on the current address's query (`useSearchParams()` → `parseShelfQuery`), which is right on `/` only; elsewhere it must start from an empty query and go to `/`.

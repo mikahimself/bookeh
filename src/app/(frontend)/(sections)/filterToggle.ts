@@ -65,3 +65,17 @@ export function sortBy(query: ShelfQuery, sort: ShelfQuery['sort']): ShelfQuery 
   const dir = query.sort === sort && query.dir === 'asc' ? 'desc' : 'asc'
   return { ...query, sort, dir }
 }
+
+/** The fields a Filter chip on Book detail adds to (EXPERIENCE.md, Book detail). */
+export type ChipField = 'author' | 'series' | 'genre' | 'location'
+
+/**
+ * `query` after a tap on a Filter chip: `id` appended to `field`, widening
+ * it. A value already on leaves `query` as it is; chips never take one off.
+ * Search, sort, direction and the other fields stay.
+ */
+export function addFilter(query: ShelfQuery, field: ChipField, id: number): ShelfQuery {
+  const current = query.filters[field] ?? []
+  if (current.includes(id)) return query
+  return { ...query, filters: { ...query.filters, [field]: [...current, id] } }
+}

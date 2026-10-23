@@ -237,24 +237,45 @@ export function useCloseTask(): (task: HTMLElement | null, to?: string) => void 
   )
 }
 
+/** The current entry is on `href`'s pathname but not at `href`. */
+function staleBelow(href: string): boolean {
+  const target = new URL(href, window.location.href)
+  return target.pathname === window.location.pathname && target.search !== window.location.search
+}
+
 /**
  * Back inside a task (EXPERIENCE.md, Answer): history back while the task
  * has an entry below the current one, otherwise `fallback`, replacing (an
  * Answer opened directly). While a back is in flight a second tap does
  * nothing, as on the X. Outside a task, any in-app entry counts (Book
  * detail's close); `keepScroll` replaces with `scroll: false`.
+ *
+ * With `to` (a Filter chip in the phone's Book detail), the close lands on
+ * `to`: the back branch replaces the entry it reaches with `to` once the
+ * traversal has settled, so neither the open Book nor the address below it
+ * stays in history; the other branch replaces to `to` instead of `fallback`.
+ * Without `to`, a back that reaches `fallback`'s pathname with other params
+ * replaces that entry with `fallback`: filters changed while Book detail was
+ * open (a chip in the wide panel, the Filter panel) stay as they are shown.
  */
-export function useTaskBack(fallback: string, keepScroll = false): () => void {
+export function useTaskBack(fallback: string, keepScroll = false): (to?: string) => void {
   const router = useRouter()
-  return useCallback(() => {
-    if (closing) return
-    if (depth > (taskBase ?? 0)) {
-      closing = true
-      traverseBack(
-        () => router.back(),
-        () => undefined,
-      )
-    } else if (keepScroll) router.replace(fallback, { scroll: false })
-    else router.replace(fallback)
-  }, [router, fallback, keepScroll])
+  return useCallback(
+    (to?: string) => {
+      const replace = (href: string) =>
+        keepScroll ? router.replace(href, { scroll: false }) : router.replace(href)
+      if (closing) return
+      if (depth > (taskBase ?? 0)) {
+        closing = true
+        traverseBack(
+          () => router.back(),
+          () => {
+            if (to !== undefined) replace(to)
+            else if (staleBelow(fallback)) replace(fallback)
+          },
+        )
+      } else replace(to ?? fallback)
+    },
+    [router, fallback, keepScroll],
+  )
 }

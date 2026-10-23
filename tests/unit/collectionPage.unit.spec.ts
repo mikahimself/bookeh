@@ -94,6 +94,7 @@ vi.mock('next/link', () => ({
     scroll,
     prefetch: _prefetch,
     transitionTypes: _transitionTypes,
+    onClick,
     ...rest
   }: ComponentProps<'a'> & {
     href: string
@@ -105,7 +106,9 @@ vi.mock('next/link', () => ({
     createElement('a', {
       ...rest,
       href,
-      onClick: (event: MouseEvent) => {
+      onClick: (event: Parameters<NonNullable<typeof onClick>>[0]) => {
+        onClick?.(event)
+        if (event.defaultPrevented) return
         event.preventDefault()
         router[replace ? 'replace' : 'push'](href, { scroll })
       },
@@ -605,6 +608,7 @@ describe('CollectionPage', () => {
   describe('Book detail', () => {
     const linna = book(5, 'Tuntematon sotilas', {
       series: { id: 2, name: 'Sotaromaanit' },
+      genres: [{ id: 8, name: 'Sotaromaani' }],
       seriesIndex: 1,
       pages: 474,
       language: 'fin',
@@ -616,12 +620,21 @@ describe('CollectionPage', () => {
         copy(21, { location: { id: 3, name: 'Tampere' } }),
         copy(22, { status: 'ordered' }),
       ])
-      await renderPage({ book: '5' })
+      searchParams = new URLSearchParams('q=linna&book=5')
+      await renderPage({ q: 'linna', book: '5' })
 
       const sheet = await detail('Tuntematon sotilas')
       within(sheet).getByRole('heading', { name: 'Tuntematon sotilas' })
-      within(sheet).getByText('Väinö Linna')
-      within(sheet).getByText('Sotaromaanit 1')
+      expect(
+        within(sheet).getByRole('link', { name: 'Sotaromaanit' }).parentElement?.textContent,
+      ).toBe('Sotaromaanit 1')
+      // Filter chips: each adds its value to the address's filters, without `book` in the sheet.
+      const chip = (name: string) => within(sheet).getByRole('link', { name }).getAttribute('href')
+      expect(chip('Väinö Linna')).toBe('/?q=linna&author=1')
+      expect(chip('Sotaromaanit')).toBe('/?q=linna&series=2')
+      expect(chip('Tampere')).toBe('/?q=linna&location=3')
+      within(sheet).getByRole('heading', { name: 'Genres' })
+      expect(chip('Sotaromaani')).toBe('/?q=linna&genre=8')
       within(sheet).getByText('WSOY · 1954 · 474 pages · fin')
       expect(
         within(sheet)
@@ -707,7 +720,40 @@ describe('CollectionPage', () => {
       await waitFor(() => expect(router.back).toHaveBeenCalledOnce())
       expect(router.replace).toHaveBeenCalledOnce()
       // Settle the back as the browser would, so later cases start at depth 0.
-      act(() => window.dispatchEvent(new PopStateEvent('popstate', { state: null })))
+      act(() => {
+        window.history.replaceState(null, '', '/?q=linna')
+        window.dispatchEvent(new PopStateEvent('popstate', { state: null }))
+      })
+      // The close settles a frame after the traversal.
+      await act(() => new Promise((resolve) => requestAnimationFrame(resolve)))
+    })
+
+    it('a chip closes the sheet onto the list with its filter added, replacing below', async () => {
+      installNavigationTracking()
+      getShelfRows.mockResolvedValue({ rows: [row(11, linna)], total: 1, labels: {} })
+      holds(linna, [copy(21, { location: { id: 3, name: 'Tampere' } })])
+      // The row's push: an in-app entry below.
+      window.history.pushState(null, '', '/?q=linna&book=5')
+      searchParams = new URLSearchParams('q=linna&book=5')
+      await renderPage({ q: 'linna', book: '5' })
+
+      const sheet = await detail('Tuntematon sotilas')
+      fireEvent.click(within(sheet).getByRole('link', { name: 'Tampere' }))
+      await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
+      await waitFor(() => expect(router.back).toHaveBeenCalledOnce())
+      expect(router.replace).not.toHaveBeenCalled()
+
+      // The back lands on the list below; then the chip's address replaces it.
+      act(() => {
+        window.history.replaceState(null, '', '/?q=linna')
+        window.dispatchEvent(new PopStateEvent('popstate', { state: null }))
+      })
+      await waitFor(() =>
+        expect(router.replace).toHaveBeenCalledExactlyOnceWith('/?q=linna&location=3', {
+          scroll: false,
+        }),
+      )
+      expect(router.push).not.toHaveBeenCalled()
     })
 
     describe('beside the list at 1300px', () => {

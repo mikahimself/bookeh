@@ -14,7 +14,7 @@ export function AnswerBack({
   const back = useTaskBack('/scan')
 
   return (
-    <Button variant={variant} onClick={back}>
+    <Button variant={variant} onClick={() => back()}>
       {label}
     </Button>
   )

@@ -244,7 +244,7 @@
   },
   "detail": {
     "yourCopies": "Kappaleesi",
-    "series": "{name} {index}",
+    "genres": "Lajityypit",
     "edit": "Muokkaa",
     "read": "Luettu",
     "rating": "Arvio"

@@ -203,6 +203,65 @@ describe('a task with a recorded base', () => {
   })
 })
 
+describe("a Filter chip in the phone's Book detail", () => {
+  beforeEach(() => {
+    installNavigationTracking()
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout', 'requestAnimationFrame'] })
+  })
+  afterEach(() => {
+    vi.runAllTimers()
+    vi.useRealTimers()
+    vi.clearAllMocks()
+  })
+
+  const leave = () => renderHook(() => useTaskBack('/', true)).result.current
+
+  it('from the list: goes back once for two taps, then replaces once to the chip', () => {
+    // The row pushed `/?book=5` over `/`.
+    traverseTo(stampPush({}, 1))
+    const tap = leave()
+    tap('/?location=4')
+    tap('/?location=4')
+    expect(back).toHaveBeenCalledTimes(1)
+    expect(replace).not.toHaveBeenCalled()
+
+    traverseTo(stampPush({}, 0))
+    vi.advanceTimersToNextFrame()
+    expect(replace).toHaveBeenCalledTimes(1)
+    expect(replace).toHaveBeenCalledWith('/?location=4', { scroll: false })
+    expect(push).not.toHaveBeenCalled()
+  })
+
+  it('a close after a chip in the wide panel replaces the stale list it reaches', () => {
+    window.history.replaceState(null, '', '/?author=7&book=5')
+    traverseTo(stampPush({}, 1))
+    leave()()
+    expect(back).toHaveBeenCalledTimes(1)
+
+    // Back lands on the list as it was when the Book was opened.
+    window.history.replaceState(null, '', '/')
+    traverseTo(stampPush({}, 0))
+    vi.advanceTimersToNextFrame()
+    expect(replace).not.toHaveBeenCalled()
+
+    window.history.replaceState(null, '', '/?author=7&book=5')
+    traverseTo(stampPush({}, 1))
+    renderHook(() => useTaskBack('/?author=7', true)).result.current()
+    window.history.replaceState(null, '', '/')
+    traverseTo(stampPush({}, 0))
+    vi.advanceTimersToNextFrame()
+    expect(replace).toHaveBeenCalledExactlyOnceWith('/?author=7', { scroll: false })
+    window.history.replaceState(null, '', '/')
+  })
+
+  it('opened directly: replaces to the chip', () => {
+    traverseTo(null)
+    leave()('/?location=4')
+    expect(replace).toHaveBeenCalledWith('/?location=4', { scroll: false })
+    expect(back).not.toHaveBeenCalled()
+  })
+})
+
 // Last: a fresh module instance wraps history a second time in this tab.
 describe('a reload', () => {
   it('keeps the depth stamped on the current entry', async () => {

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { toggleFilter } from '@/app/(frontend)/(sections)/filterToggle'
+import { addFilter, toggleFilter } from '@/app/(frontend)/(sections)/filterToggle'
 import { languageName } from '@/lib/books/languageName'
 import type { ShelfQuery } from '@/lib/shelf/query'
 
@@ -27,6 +27,23 @@ describe('toggleFilter', () => {
   it('switches read to the other value and clears it when the one on is tapped', () => {
     expect(toggleFilter(query({ read: true }), 'read', false)).toEqual(query({ read: false }))
     expect(toggleFilter(query({ read: false }), 'read', false)).toEqual(query({}))
+  })
+})
+
+describe('addFilter', () => {
+  it('adds a value to its field and keeps search, sort and the other fields', () => {
+    expect(addFilter(query({ genre: [2] }), 'author', 7)).toEqual(
+      query({ genre: [2], author: [7] }),
+    )
+  })
+
+  it('widens a field that has a value', () => {
+    expect(addFilter(query({ author: [3] }), 'author', 7)).toEqual(query({ author: [3, 7] }))
+  })
+
+  it('leaves the query as it is when the value is already on', () => {
+    const on = query({ author: [7], location: [4] })
+    expect(addFilter(on, 'author', 7)).toBe(on)
   })
 })
 
