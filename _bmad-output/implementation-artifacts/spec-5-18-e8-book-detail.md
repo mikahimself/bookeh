@@ -215,7 +215,7 @@ All rows of the open Book get the selection bar: the address names a Book, not a
   - an Edit save showing fresh values.
 
 **Residual risks:**
-- **Phone check:** not done (deferred to Mika).
+- **Phone check:** done by Mika on 2026-10-23 after the merge. Taking a photo from Book detail's Edit and cropping it by touch works.
 - **Close animation:** the browser's Back drops the sheet without its exit animation, which the spec accepts.
 - **Edit book saves:** each one now purges the whole client cache, so the next back/forward navigations refetch.
 - **Rebased onto 5.13:** `CoverTile` got the same link, `replace`, `aria-current` and an open marker: the selection bar along the bottom edge of the cover (DESIGN.md, Cover tile). After the rebase: typecheck and eslint clean, `npm run test:unit` 819 pass.
