@@ -173,8 +173,12 @@
       "status": "Status",
       "read": "Read",
       "genre": "Genre",
-      "language": "Language"
+      "language": "Language",
+      "author": "Author",
+      "series": "Series",
+      "publisher": "Publisher"
     },
+    "filterRemove": "Remove {name}",
     "filterValues": {
       "owned": "Owned",
       "ordered": "Ordered",

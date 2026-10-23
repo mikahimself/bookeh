@@ -173,8 +173,12 @@
       "status": "Tila",
       "read": "Luettu",
       "genre": "Lajityyppi",
-      "language": "Kieli"
+      "language": "Kieli",
+      "author": "Tekijä",
+      "series": "Sarja",
+      "publisher": "Kustantaja"
     },
+    "filterRemove": "Poista {name}",
     "filterValues": {
       "owned": "Oma",
       "ordered": "Tilattu",

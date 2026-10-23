@@ -67,7 +67,7 @@ export default async function CollectionPage({
           <SelectionProvider>
             <CollectionTools />
             <div className="wide:flex wide:gap-6">
-              <FilterPanel values={values} />
+              <FilterPanel values={values} labels={shelf?.labels ?? {}} />
               <div className="min-w-0 flex-1">
                 {shelf ? (
                   <ShelfRowsProvider query={query} initial={shelf}>

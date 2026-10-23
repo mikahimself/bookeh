@@ -21,10 +21,15 @@ export type ComboboxProps = {
   /** A message for this field; draws the danger underline. */
   error?: string
   disabled?: boolean
-  /** Called with the text as the user types it; never for Base UI's own resets. */
+  /**
+   * Called with the text as the user types it, and with `''` when the text is
+   * emptied (Clear, or Base UI's reset on close); never for its other resets.
+   */
   onInputValueChange?: (text: string) => void
   /** Highlights the first row as the list opens, so Enter chooses it. */
   autoHighlight?: boolean
+  /** Whether the last row offers the typed text as a new name; `false` keeps to the options. */
+  create?: boolean
 }
 
 /** An option, or the last row that creates one by name. */
@@ -42,7 +47,8 @@ const sameOption = (item: Item, value: Item): boolean =>
  * selection bar, the chosen one the 8px marker. Typing narrows the list
  * ("contains", in the UI locale). While no option is named like the typed
  * text (case-insensitive, accents count), a last row offers it as a new
- * name: choosing it emits `{ create }`, which the owning service resolves.
+ * name: choosing it emits `{ create }`, which the owning service resolves;
+ * `create={false}` drops that row.
  * Clear, or emptying the text, empties the value. The popup is no overlay:
  * no history entry.
  */
@@ -55,6 +61,7 @@ export function Combobox({
   disabled,
   onInputValueChange,
   autoHighlight = true,
+  create = true,
 }: ComboboxProps) {
   const t = useTranslations('combobox')
   const locale = useLocale()
@@ -84,7 +91,7 @@ export function Combobox({
 
   const name = query.trim()
   const offersCreate =
-    name !== '' && !options.some((option) => collator.compare(option.label, name) === 0)
+    create && name !== '' && !options.some((option) => collator.compare(option.label, name) === 0)
   const items = useMemo<Item[]>(
     () => (offersCreate ? [...options, { create: name }] : [...options]),
     [options, offersCreate, name],
@@ -101,7 +108,7 @@ export function Combobox({
       inputValue={query}
       onInputValueChange={(text, { reason }) => {
         setQuery(text)
-        if (reason === 'input-change') onInputValueChange?.(text)
+        if (reason === 'input-change' || text === '') onInputValueChange?.(text)
       }}
       open={open}
       onOpenChange={setOpen}
