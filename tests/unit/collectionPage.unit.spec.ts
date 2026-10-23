@@ -13,6 +13,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { DevicePrefs } from '@/app/(frontend)/prefs'
 import type { EffectiveBook } from '@/lib/books/effectiveBook'
 import type { CopyLine, Holdings } from '@/lib/books/holdings'
+import type { LocationOption } from '@/lib/copies/locations'
 import type { ShelfRow, ShelfRows } from '@/lib/shelf/query'
 
 import en from '../../messages/en.json'
@@ -31,6 +32,8 @@ const removeCopiesAction = vi.fn()
 const toggleCopiesReadAction = vi.fn()
 const setNoteAction = vi.fn()
 const receiveCopyAction = vi.fn()
+const moveCopiesAction = vi.fn()
+const listLocations = vi.fn<(ctx: unknown) => Promise<LocationOption[]>>()
 
 // The English catalogue, so the assertions read the screen's words.
 const english = async () => {
@@ -75,7 +78,9 @@ vi.mock('@/app/(frontend)/(sections)/actions', () => ({
   setRatingAction: vi.fn(),
   setNoteAction,
   toggleCopiesReadAction,
+  moveCopiesAction,
 }))
+vi.mock('@/lib/copies/locations', () => ({ listLocations }))
 vi.mock('@/app/(frontend)/heldBook', () => ({ heldBook }))
 vi.mock('@/lib/books/holdings', () => ({ getHoldings }))
 vi.mock('@/lib/books/userBookState', () => ({
@@ -230,6 +235,7 @@ const pressed = (group: string) =>
 describe('CollectionPage', () => {
   beforeEach(() => {
     devicePrefs.mockResolvedValue({ ...DEFAULT_PREFS })
+    listLocations.mockResolvedValue([])
   })
 
   afterEach(() => {
@@ -372,6 +378,8 @@ describe('CollectionPage', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Select' }))
     expect(screen.getAllByRole('checkbox')).toHaveLength(2)
     expect(selected()).toBe('0 selected')
+    // No locations: no Move.
+    expect(screen.queryByRole('button', { name: 'Move' })).toBeNull()
     expect(screen.queryByRole('button', { name: 'Select' })).toBeNull()
 
     fireEvent.click(tap('Sinuhe'))
@@ -550,6 +558,121 @@ describe('CollectionPage', () => {
     })
   })
 
+  describe('Move', () => {
+    const both = {
+      rows: [row(11, book(1, 'Sinuhe')), row(12, book(2, 'Kätilö'))],
+      total: 2,
+      labels: {},
+    }
+    const selected = () => screen.queryByText(/\d+ selected/)?.textContent
+    const tap = (title: string) => fireEvent.click(screen.getByText(title, { selector: 'p' }))
+    const reloadsWith = (shelf: ShelfRows) =>
+      fetchStub.mockResolvedValue({ status: 200, json: async () => ({ ok: true, data: shelf }) })
+    const moved = (id: number, name: string, count: number) => ({
+      ok: true,
+      data: { location: { id, name }, count, undoToken: `token-${name}`, undoSeconds: 1800 },
+    })
+    /** Opens the bar's Move picker. */
+    const openMove = async () => {
+      fireEvent.click(screen.getByRole('button', { name: 'Move' }))
+      return screen.findByRole('dialog', { name: 'Move to' })
+    }
+    const moveTo = async (name: string) =>
+      fireEvent.click(within(await openMove()).getByRole('button', { name }))
+
+    beforeEach(() => {
+      listLocations.mockResolvedValue([
+        { id: 3, name: 'Kirjahylly' },
+        { id: 4, name: 'Mökki' },
+      ])
+    })
+
+    it('moves every ticked copy, to a location or a new one, all or none', async () => {
+      const page = (params: Record<string, string>) =>
+        CollectionPage({ searchParams: Promise.resolve(params) })
+      getShelfRows.mockResolvedValueOnce(both)
+      const { rerender } = render(await page({}))
+      fireEvent.click(screen.getByRole('button', { name: 'Select' }))
+      tap('Sinuhe')
+      tap('Kätilö')
+      getShelfRows.mockResolvedValueOnce({ rows: [both.rows[0]], total: 1, labels: {} })
+      rerender(await page({ q: 'sinuhe' }))
+
+      // Bar move: both ids, the toast with Undo, the rows reload without the moved copy.
+      moveCopiesAction.mockResolvedValueOnce(moved(4, 'Mökki', 2))
+      reloadsWith({ rows: [], total: 0, labels: {} })
+      await moveTo('Mökki')
+      await waitFor(() => expect(selected()).toBe('0 selected'))
+      expect(moveCopiesAction).toHaveBeenCalledExactlyOnceWith({ copyIds: [11, 12], location: 4 })
+      expect(showToast).toHaveBeenCalledExactlyOnceWith({
+        kind: 'success',
+        message: '2 moved to Mökki',
+        undo: { token: 'token-Mökki', seconds: 1800 },
+      })
+      expect(router.refresh).toHaveBeenCalledOnce()
+      await waitFor(() => expect(screen.queryByText('Sinuhe', { selector: 'p' })).toBeNull())
+      screen.getByRole('button', { name: 'Done' })
+
+      // Create inline: the name as typed; the toast names the stored one.
+      reloadsWith(both)
+      rerender(await page({}))
+      getShelfRows.mockResolvedValueOnce(both)
+      await waitFor(() => screen.getByText('Sinuhe', { selector: 'p' }))
+      tap('Sinuhe')
+      moveCopiesAction.mockResolvedValueOnce(moved(5, 'Kellari', 1))
+      const picker = await openMove()
+      fireEvent.change(within(picker).getByRole('textbox', { name: 'New location' }), {
+        target: { value: ' Kellari ' },
+      })
+      fireEvent.click(within(picker).getByRole('button', { name: 'Move' }))
+      await waitFor(() =>
+        expect(moveCopiesAction).toHaveBeenLastCalledWith({
+          copyIds: [11],
+          location: { create: ' Kellari ' },
+        }),
+      )
+      await waitFor(() =>
+        expect(showToast).toHaveBeenLastCalledWith({
+          kind: 'success',
+          message: '1 moved to Kellari',
+          undo: { token: 'token-Kellari', seconds: 1800 },
+        }),
+      )
+
+      // Ordered ticked: nothing moves, the ticks stay.
+      await waitFor(() => expect(selected()).toBe('0 selected'))
+      tap('Sinuhe')
+      moveCopiesAction.mockResolvedValueOnce({ ok: false, code: 'VALIDATION' })
+      await moveTo('Mökki')
+      await waitFor(() =>
+        expect(showToast).toHaveBeenLastCalledWith({ kind: 'error', code: 'VALIDATION' }),
+      )
+      expect(selected()).toBe('1 selected')
+
+      // Gone meanwhile: Not in library, a reload, the ticks cleared.
+      const fetches = fetchStub.mock.calls.length
+      moveCopiesAction.mockResolvedValueOnce({ ok: false, code: 'NOT_FOUND' })
+      await moveTo('Mökki')
+      await waitFor(() => expect(selected()).toBe('0 selected'))
+      expect(showToast).toHaveBeenLastCalledWith({ kind: 'success', message: 'Not in library' })
+      await waitFor(() => expect(fetchStub.mock.calls.length).toBe(fetches + 1))
+      expect(router.refresh).toHaveBeenCalledTimes(2)
+    })
+
+    it('closes only the picker on Esc', async () => {
+      getShelfRows.mockResolvedValue(both)
+      await renderPage()
+      fireEvent.click(screen.getByRole('button', { name: 'Select' }))
+      tap('Sinuhe')
+
+      const picker = await openMove()
+      fireEvent.keyDown(within(picker).getByRole('button', { name: 'Mökki' }), { key: 'Escape' })
+      await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
+      expect(selected()).toBe('1 selected')
+      expect(moveCopiesAction).not.toHaveBeenCalled()
+    })
+  })
+
   it('ticks a cover tile in select mode', async () => {
     devicePrefs.mockResolvedValue({ ...DEFAULT_PREFS, layout: 'covers' })
     getShelfRows.mockResolvedValue({ rows: [row(11, book(1, 'Sinuhe'))], total: 1, labels: {} })
@@ -652,6 +775,64 @@ describe('CollectionPage', () => {
         '/books/5/edit',
       )
       expect(getHoldings).toHaveBeenCalledWith(expect.anything(), [5])
+      // No locations: no Move.
+      expect(within(sheet).queryByRole('button', { name: 'Move' })).toBeNull()
+    })
+
+    it('moves one copy from its line, with Undo', async () => {
+      listLocations.mockResolvedValue([
+        { id: 3, name: 'Tampere' },
+        { id: 4, name: 'Mökki' },
+      ])
+      getShelfRows.mockResolvedValue({ rows: [row(11, linna)], total: 1, labels: {} })
+      holds(linna, [
+        copy(21, { location: { id: 3, name: 'Tampere' } }),
+        copy(22, { status: 'ordered' }),
+      ])
+      moveCopiesAction.mockResolvedValue({
+        ok: true,
+        data: { location: { id: 4, name: 'Mökki' }, count: 1, undoToken: 't', undoSeconds: 1800 },
+      })
+      fetchStub.mockResolvedValue({
+        status: 200,
+        json: async () => ({ ok: true, data: { rows: [], total: 0, labels: {} } }),
+      })
+      const { rerender } = await renderPage({ book: '5' })
+
+      const sheet = await detail('Tuntematon sotilas')
+      // Only the owned line has Move.
+      const [move, ...others] = within(sheet).getAllByRole('button', { name: 'Move' })
+      expect(others).toHaveLength(0)
+      fireEvent.click(move!)
+      const picker = await screen.findByRole('dialog', { name: 'Move to' })
+      expect(within(picker).getByRole('button', { pressed: true }).textContent).toBe('Tampere')
+      fireEvent.click(within(picker).getByRole('button', { name: 'Mökki' }))
+
+      await waitFor(() =>
+        expect(moveCopiesAction).toHaveBeenCalledExactlyOnceWith({ copyIds: [21], location: 4 }),
+      )
+      await waitFor(() =>
+        expect(showToast).toHaveBeenCalledWith({
+          kind: 'success',
+          message: '1 moved to Mökki',
+          undo: { token: 't', seconds: 1800 },
+        }),
+      )
+      expect(router.refresh).toHaveBeenCalledOnce()
+
+      // The refresh renders the line anew from the server.
+      holds(linna, [
+        copy(21, { location: { id: 4, name: 'Mökki' } }),
+        copy(22, { status: 'ordered' }),
+      ])
+      rerender(await page({ book: '5' }))
+      await waitFor(() =>
+        expect(
+          within(sheet)
+            .getAllByRole('listitem')
+            .map((line) => line.querySelector('p')?.textContent),
+        ).toEqual(['Mökki · Owned', 'Ordered']),
+      )
     })
 
     it('opens from a row, pushing, and swaps the Book open, replacing', async () => {
@@ -984,6 +1165,23 @@ describe('CollectionPage', () => {
         expect(await panel('Tuntematon sotilas')).toBe(aside)
         expect(router.replace).not.toHaveBeenCalled()
         expect(removeCopiesAction).not.toHaveBeenCalled()
+      })
+
+      it('closes only the Move picker on Esc, moving nothing', async () => {
+        listLocations.mockResolvedValue([{ id: 4, name: 'Mökki' }])
+        await renderPage({ book: '5' })
+        const aside = await panel('Tuntematon sotilas')
+
+        fireEvent.click(within(aside).getByRole('button', { name: 'Move' }))
+        const picker = await screen.findByRole('dialog', { name: 'Move to' })
+        fireEvent.keyDown(within(picker).getByRole('button', { name: 'Mökki' }), {
+          key: 'Escape',
+        })
+        await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
+        await act(async () => {})
+        expect(await panel('Tuntematon sotilas')).toBe(aside)
+        expect(router.replace).not.toHaveBeenCalled()
+        expect(moveCopiesAction).not.toHaveBeenCalled()
       })
 
       it('closes after removing the only copy, and reloads the rows', async () => {

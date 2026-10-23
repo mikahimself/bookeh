@@ -3,12 +3,16 @@
 import { useTranslations } from 'next-intl'
 import { useRef, useState, useTransition } from 'react'
 
+import type { LocationOption } from '@/lib/copies/locations'
+import type { ActionResult } from '@/lib/errors'
+
 import { Button } from '../components/Button'
 import { settleAction } from '../components/request'
 import { useToast } from '../components/toast/ToastProvider'
 import { Dialog } from '../components/ui/Dialog'
 
 import { removeCopiesAction, toggleCopiesReadAction } from './actions'
+import { MovePicker } from './MovePicker'
 import { useSelection } from './Selection'
 import { useAfterAction } from './ShelfRows'
 
@@ -21,17 +25,19 @@ import { useAfterAction } from './ShelfRows'
  * on the phone; `data-pinned-wide` lifts the toast above it on wide screens
  * too.
  *
- * Read and Remove send every ticked id, in view or not, and share one
- * pending state. Read toggles the distinct Books at once (AD-18) and toasts
- * "Marked {n} read" or "unread" with Undo (AD-20); the toast's Undo reloads
- * the rows through `onUndone` and leaves the ticks alone. Remove asks first;
- * no Undo. For both, `ok` and `NOT_FOUND` untick the ids sent and keep select
- * mode (a copy gone elsewhere cannot be unticked from the list); any other
- * failure keeps them. Focus goes to Done after Read settles and after
- * Remove's dialog closes, whatever the result, since the pending state
- * disables the button that had it.
+ * Move, Read and Remove send every ticked id, in view or not, and share one
+ * pending state. Move picks a location, or names a new one (`MovePicker`),
+ * and is absent without locations (FR-32). Read toggles the distinct Books
+ * at once (AD-18) and toasts "Marked {n} read" or "unread" with Undo
+ * (AD-20); the toast's Undo reloads the rows through `onUndone` and leaves
+ * the ticks alone. Remove asks first; no Undo. For all three, `ok` and
+ * `NOT_FOUND` untick the ids sent and keep select mode (a copy gone
+ * elsewhere cannot be unticked from the list); any other failure keeps them.
+ * Focus goes to Done after Move and Read settle and after Remove's dialog
+ * closes, whatever the result, since the pending state disables the button
+ * that had it.
  */
-export function SelectBar() {
+export function SelectBar({ locations }: { locations: readonly LocationOption[] }) {
   const t = useTranslations('collection')
   const tToast = useTranslations('toast')
   const { show } = useToast()
@@ -39,6 +45,7 @@ export function SelectBar() {
   const afterAction = useAfterAction()
   const [pending, startTransition] = useTransition()
   const [confirmOpen, setConfirmOpen] = useState(false)
+  const [moveOpen, setMoveOpen] = useState(false)
   // Kept while the dialog closes, so its title does not change on the way out.
   const [removing, setRemoving] = useState(0)
   const doneButton = useRef<HTMLButtonElement>(null)
@@ -54,6 +61,11 @@ export function SelectBar() {
     })
   }
 
+  const settled = (result: ActionResult<unknown>, copyIds: number[]) => {
+    if (result.ok || result.code === 'NOT_FOUND') untick(copyIds)
+    doneButton.current?.focus()
+  }
+
   const markRead = (copyIds: number[]) => {
     startTransition(async () => {
       const result = await settleAction(toggleCopiesReadAction(copyIds))
@@ -65,8 +77,7 @@ export function SelectBar() {
           undo: { token: undoToken, seconds: undoSeconds },
         })
       }
-      if (result.ok || result.code === 'NOT_FOUND') untick(copyIds)
-      doneButton.current?.focus()
+      settled(result, copyIds)
       afterAction(result)
     })
   }
@@ -82,6 +93,15 @@ export function SelectBar() {
         {t('selected', { n: ticked.size })}
       </p>
       <div className="flex gap-2 max-wide:col-span-2 max-wide:row-start-2 wide:ml-auto">
+        {locations.length > 0 && (
+          <Button
+            variant="secondary"
+            disabled={ticked.size === 0 || pending}
+            onClick={() => setMoveOpen(true)}
+          >
+            {t('move')}
+          </Button>
+        )}
         <Button
           variant="secondary"
           disabled={ticked.size === 0 || pending}
@@ -104,6 +124,15 @@ export function SelectBar() {
       <Button ref={doneButton} variant="primary" onClick={done} autoFocus>
         {t('done')}
       </Button>
+      <MovePicker
+        open={moveOpen}
+        onOpenChange={setMoveOpen}
+        locations={locations}
+        value={null}
+        copyIds={[...ticked]}
+        startTransition={startTransition}
+        onSettled={settled}
+      />
       <Dialog
         open={confirmOpen}
         onOpenChange={setConfirmOpen}

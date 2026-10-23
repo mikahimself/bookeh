@@ -7,7 +7,7 @@ import { shelfHref, type ShelfQuery } from '@/lib/shelf/query'
 
 import { CloseButton } from '../components/CloseButton'
 import { useTaskBack } from '../components/navigation'
-import { useWide } from '../components/ui/overlay'
+import { inDialog, useWide } from '../components/ui/overlay'
 
 import { BookDetailSheet } from './BookDetailSheet'
 import { DetailCloseContext } from './detailClose'
@@ -39,10 +39,6 @@ const inField = (target: EventTarget | null): boolean =>
   target instanceof HTMLInputElement ||
   target instanceof HTMLTextAreaElement ||
   target instanceof HTMLSelectElement
-
-/** `Esc` in a dialog opened from the panel closes only the dialog (topmost first). */
-const inDialog = (target: EventTarget | null): boolean =>
-  target instanceof Element && target.closest('[role="dialog"], [role="alertdialog"]') !== null
 
 /**
  * Book detail from 900px (EXPERIENCE.md, Book detail; DESIGN.md, Detail

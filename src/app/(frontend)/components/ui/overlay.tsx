@@ -13,6 +13,15 @@ import {
 
 import { leftAddress, OVERLAY_TOKENS_KEY } from '../navigation'
 
+/**
+ * Whether `target` sits in a dialog, a Picker's included. A safety net for
+ * the document `Esc` listeners (the wide panel's close, select mode's
+ * leave): Base UI's popup already stops its `Esc` propagating, and this
+ * keeps one that gets through from closing more than the dialog.
+ */
+export const inDialog = (target: EventTarget | null): boolean =>
+  target instanceof Element && target.closest('[role="dialog"], [role="alertdialog"]') !== null
+
 /** How many overlays an element sits inside. */
 const OverlayDepth = createContext(0)
 

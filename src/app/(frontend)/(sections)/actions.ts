@@ -3,12 +3,16 @@
 import { setRating } from '@/lib/books/setRating'
 import type { Named } from '@/lib/books/effectiveBook'
 import { setRead } from '@/lib/books/setRead'
+import { listLocations, type LocationOption } from '@/lib/copies/locations'
+import { moveCopies } from '@/lib/copies/moveCopies'
 import { receiveCopy } from '@/lib/copies/receiveCopy'
 import { removeCopies } from '@/lib/copies/removeCopies'
 import { setNote } from '@/lib/copies/updateCopy'
 import { DomainError, runAction, type ActionResult } from '@/lib/errors'
 import { requireUserOrThrow } from '@/lib/payload/context'
 import { withUndo, type Undoable } from '@/lib/undo/undo'
+
+import { parseRef } from '../ref'
 
 // The collection's actions: select mode and Book detail (AD-18). Client input
 // is checked here, never repaired: an id that is not a positive safe integer,
@@ -114,5 +118,30 @@ export async function toggleCopiesReadAction(
     const ctx = await requireUserOrThrow()
     const copies = ids(copyIds)
     return withUndo(ctx, (tx) => setRead(tx, { copyIds: copies }, 'toggle'))
+  })
+}
+
+/**
+ * FR-33, AD-18: moves the viewer's copies to one location, an id or
+ * `{ create }`, all or none, with Undo (AD-20). No `null`: the collection
+ * offers no "no location". Answers the target as the toast names it, read in
+ * the move's transaction, and `count`, the distinct copies sent.
+ */
+export async function moveCopiesAction(
+  input: unknown,
+): Promise<ActionResult<Undoable<{ location: LocationOption; count: number }>>> {
+  return runAction(async () => {
+    const ctx = await requireUserOrThrow()
+    if (typeof input !== 'object' || input === null) throw new DomainError('VALIDATION')
+    const fields = input as Record<string, unknown>
+    const copies = ids(fields.copyIds)
+    const location = parseRef(fields.location)
+    if (location === undefined) throw new DomainError('VALIDATION')
+    return withUndo(ctx, async (tx) => {
+      const { data, restore } = await moveCopies(tx, copies, location)
+      const target = (await listLocations(tx)).find(({ id }) => id === data.location)
+      if (!target) throw new Error('moveCopies() answered no location of the viewer')
+      return { data: { location: target, count: new Set(copies).size }, restore }
+    })
   })
 }

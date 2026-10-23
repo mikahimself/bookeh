@@ -4,6 +4,8 @@ import { useTranslations } from 'next-intl'
 import { useRouter } from 'next/navigation'
 import { useEffect, useEffectEvent, useRef, useState, useTransition } from 'react'
 
+import type { LocationOption } from '@/lib/copies/locations'
+
 import { Button } from '../components/Button'
 import { ActionLink } from '../components/Link'
 import { settleAction } from '../components/request'
@@ -13,6 +15,7 @@ import { Dialog } from '../components/ui/Dialog'
 
 import { receiveCopyAction, removeCopiesAction, setNoteAction } from './actions'
 import { useCloseDetail } from './detailClose'
+import { MovePicker } from './MovePicker'
 import { useAfterAction } from './ShelfRows'
 
 /**
@@ -65,6 +68,52 @@ export function CopyNote({ copyId, note }: { copyId: number; note: string }) {
         if (event.key === 'Escape') event.currentTarget.blur()
       }}
     />
+  )
+}
+
+/**
+ * FR-33: an owned copy's Move, a Link before Remove that opens the Move
+ * picker (`MovePicker`) on the copy's location; disabled while its move
+ * runs. `ok` or `NOT_FOUND` refreshes Book detail, so the line shows its new
+ * location or goes. Focus goes to the copies' section once the move
+ * settles: the disabled Link would drop it to the body, outside the sheet.
+ * After the toast's Undo, the line returns to its old location through
+ * `ReadAndRating`'s `onUndone` refresh, while Book detail is mounted.
+ */
+export function MoveCopy({
+  copyId,
+  location,
+  locations,
+}: {
+  copyId: number
+  location: number | null
+  locations: readonly LocationOption[]
+}) {
+  const t = useTranslations('collection')
+  const router = useRouter()
+  const [open, setOpen] = useState(false)
+  const [pending, startTransition] = useTransition()
+  const link = useRef<HTMLButtonElement>(null)
+
+  return (
+    <>
+      <ActionLink ref={link} disabled={pending} onClick={() => setOpen(true)}>
+        {t('move')}
+      </ActionLink>
+      <MovePicker
+        open={open}
+        onOpenChange={setOpen}
+        locations={locations}
+        value={location}
+        copyIds={[copyId]}
+        startTransition={startTransition}
+        onSettled={(result) => {
+          link.current?.closest('section')?.focus()
+          // `MovePicker` refreshes on `ok`.
+          if (!result.ok && result.code === 'NOT_FOUND') router.refresh()
+        }}
+      />
+    </>
   )
 }
 

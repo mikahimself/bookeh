@@ -2,7 +2,9 @@
 
 import { useRef, useState, type ReactNode } from 'react'
 
+import { Button } from '../Button'
 import { useSuspendSwipe } from '../swipe'
+import { TextField } from '../TextField'
 import { markerSlotClass } from './classes'
 import { Dialog } from './Dialog'
 import { useWide } from './overlay'
@@ -18,14 +20,26 @@ export type PickerProps<V extends string | number> = {
   value: V | null
   /** Runs once the picker's history entry is gone, so a navigation lands on the entry before it. */
   onChoose: (value: V) => void
+  /**
+   * A field under the rows that names a value by typing it (Move: the
+   * location of that name, created when none matches): `label` names the
+   * field, `submit` its Button. `onCreate` gets the value as typed and runs
+   * after the close, as `onChoose` does.
+   */
+  create?: { label: string; submit: string; onCreate: (name: string) => void }
 }
+
+type Choice<V> = { value: V } | { create: string }
 
 /**
  * DESIGN.md, Picker: the Bottom sheet on the phone, the Dialog on wide
  * screens, holding one choice from a short list; the chosen row has the 8px
  * marker. One tap chooses and closes; the chosen row, Back, X or Cancel
  * close without a choice. The form is taken at each open and kept until the
- * close, so a resize never swaps the overlay while it is open.
+ * close, so a resize never swaps the overlay while it is open. With `create`,
+ * a field and a secondary Button under the rows: a value blank after
+ * trimming does nothing (the Button is disabled), any other closes and is
+ * the choice. The field starts empty at each open.
  */
 export function Picker<V extends string | number>({
   open,
@@ -34,15 +48,20 @@ export function Picker<V extends string | number>({
   options,
   value,
   onChoose,
+  create,
 }: PickerProps<V>) {
   const wide = useWide()
   const [heldWide, setHeldWide] = useState(wide)
   /** The choice waiting for the close to finish; `null` when the close is no choice. */
-  const pending = useRef<{ value: V } | null>(null)
+  const pending = useRef<Choice<V> | null>(null)
+  const [name, setName] = useState('')
   const [wasOpen, setWasOpen] = useState(open)
   if (open !== wasOpen) {
     setWasOpen(open)
-    if (open) setHeldWide(wide)
+    if (open) {
+      setHeldWide(wide)
+      setName('')
+    }
   }
   // The Sheet and Dialog suspend it too; held here as well, like every wrapper.
   useSuspendSwipe(open)
@@ -50,12 +69,19 @@ export function Picker<V extends string | number>({
   const onClosed = () => {
     const choice = pending.current
     pending.current = null
-    if (choice) onChoose(choice.value)
+    if (!choice) return
+    if ('value' in choice) onChoose(choice.value)
+    else create?.onCreate(choice.create)
   }
   const choose = (next: V) => {
     // A row tapped during the exit is no choice: it would wait for a close that never comes.
     if (!open) return
     pending.current = next === value ? null : { value: next }
+    onOpenChange(false)
+  }
+  const submit = () => {
+    if (!open || name.trim() === '') return
+    pending.current = { create: name }
     onOpenChange(false)
   }
 
@@ -82,16 +108,42 @@ export function Picker<V extends string | number>({
       })}
     </ul>
   )
+  const body = create ? (
+    <div className="flex flex-col gap-4">
+      {rows}
+      <form
+        className="flex items-end gap-2"
+        onSubmit={(event) => {
+          event.preventDefault()
+          submit()
+        }}
+      >
+        <div className="min-w-0 flex-1">
+          <TextField
+            label={create.label}
+            value={name}
+            onChange={(event) => setName(event.target.value)}
+            autoComplete="off"
+          />
+        </div>
+        <Button type="submit" variant="secondary" disabled={name.trim() === ''}>
+          {create.submit}
+        </Button>
+      </form>
+    </div>
+  ) : (
+    rows
+  )
 
   return heldWide ? (
     <Dialog open={open} onOpenChange={onOpenChange} title={title} onClosed={onClosed}>
-      {rows}
+      {body}
     </Dialog>
   ) : (
     <Sheet open={open} onOpenChange={onOpenChange} label={title} onClosed={onClosed}>
       <div className="flex flex-col gap-4">
         <h2 className="text-heading-group ui-case">{title}</h2>
-        {rows}
+        {body}
       </div>
     </Sheet>
   )

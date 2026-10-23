@@ -67,7 +67,8 @@
     "undone": "Kumottu",
     "reload": "Lataa uudelleen",
     "markedRead": "{n} merkitty luetuksi",
-    "markedUnread": "{n} merkitty lukemattomaksi"
+    "markedUnread": "{n} merkitty lukemattomaksi",
+    "moved": "{n} siirretty · {location}"
   },
   "sections": {
     "label": "Osiot",
@@ -212,6 +213,9 @@
     "markRead": "Luettu",
     "remove": "Poista",
     "removeTitle": "{n, plural, one {Poistetaanko # kirja kirjastosta?} other {Poistetaanko # kirjaa kirjastosta?}}",
+    "move": "Siirrä",
+    "moveTitle": "Siirrä sijaintiin",
+    "newLocation": "Uusi sijainti",
     "layout": "Asettelu",
     "layouts": {
       "rows": "Rivit",

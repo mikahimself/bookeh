@@ -67,7 +67,8 @@
     "undone": "Undone",
     "reload": "Reload",
     "markedRead": "Marked {n} read",
-    "markedUnread": "Marked {n} unread"
+    "markedUnread": "Marked {n} unread",
+    "moved": "{n} moved to {location}"
   },
   "sections": {
     "label": "Sections",
@@ -212,6 +213,9 @@
     "markRead": "Read",
     "remove": "Remove",
     "removeTitle": "{n, plural, one {Remove # book from library?} other {Remove # books from library?}}",
+    "move": "Move",
+    "moveTitle": "Move to",
+    "newLocation": "New location",
     "layout": "Layout",
     "layouts": {
       "rows": "Rows",

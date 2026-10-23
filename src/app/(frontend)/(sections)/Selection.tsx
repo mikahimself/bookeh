@@ -14,6 +14,7 @@ import {
 import { parseShelfQuery, shelfHref } from '@/lib/shelf/query'
 
 import { useTaskBack } from '../components/navigation'
+import { inDialog } from '../components/ui/overlay'
 
 /** `Esc` in the search field clears the search, not the selection. */
 const inSearch = (target: EventTarget | null): boolean =>
@@ -47,7 +48,8 @@ const NONE: ReadonlySet<number> = new Set()
  * the way its own close does (`BookDetailSheet`): history back to the entry
  * the row pushed from, or, opened directly, the address without `book`,
  * replacing. Done or `Esc`, unless something above already
- * took it or focus is in the search, leaves and clears the selection.
+ * took it or focus is in the search or a dialog (`inDialog`, a safety
+ * net), leaves and clears the selection.
  */
 export function SelectionProvider({ children }: { children: ReactNode }) {
   const params = useSearchParams()
@@ -86,7 +88,14 @@ export function SelectionProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (!selecting) return
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape' && !event.defaultPrevented && !inSearch(event.target)) done()
+      if (
+        event.key === 'Escape' &&
+        !event.defaultPrevented &&
+        !inSearch(event.target) &&
+        !inDialog(event.target)
+      ) {
+        done()
+      }
     }
     document.addEventListener('keydown', onKeyDown)
     return () => document.removeEventListener('keydown', onKeyDown)

@@ -4,6 +4,7 @@ import { Fragment, type ReactNode } from 'react'
 
 import { getHoldings } from '@/lib/books/holdings'
 import { getUserBookState } from '@/lib/books/userBookState'
+import type { LocationOption } from '@/lib/copies/locations'
 import type { Context } from '@/lib/payload/context'
 import type { ShelfQuery } from '@/lib/shelf/query'
 
@@ -12,7 +13,7 @@ import { Cover } from '../components/Cover'
 import { heldBook } from '../heldBook'
 
 import { BookDetailFrame } from './BookDetailPanel'
-import { CopyNote, ReceiveCopy, RemoveCopy } from './CopyLine'
+import { CopyNote, MoveCopy, ReceiveCopy, RemoveCopy } from './CopyLine'
 import { FilterChip } from './FilterChip'
 import { NotInLibrary } from './NotInLibrary'
 import { ReadAndRating } from './ReadAndRating'
@@ -24,15 +25,16 @@ const DOT = ' · '
  * header (cover beside the title, then authors, series and number, and the
  * edition line, each left out when empty), the read switch and Rating (keyed
  * by the Book, so swapping it resets them), Your copies, one line per copy
- * with its location and status, an owned copy's Remove or an ordered copy's
- * Received beside it and the copy's note under it (`CopyLine`), Genres when
- * the Book has system genres, and the foot with Edit. Each author, the
- * series, each genre and each copy's location is a Filter chip
- * (`FilterChip`) that adds it to the current filters; an ordered copy has
- * no location and so no chip. The one component later groups are added to;
- * it reads the Book, the viewer's copies and their read flag and rating
- * only, never the client rows, so it stays open when its row leaves the
- * list.
+ * with its location and status, an owned copy's Move and Remove (Move only
+ * when the viewer has locations, FR-32) or an ordered copy's Received
+ * beside it and the copy's note under it (`CopyLine`), Genres when the Book
+ * has system genres, and the foot with Edit. Each author, the series, each
+ * genre and each copy's location is a Filter chip (`FilterChip`) that adds
+ * it to the current filters; an ordered copy has no location and so no
+ * chip. The one component later groups are added to; it reads the Book, the
+ * viewer's copies and their read flag and rating only, never the client
+ * rows, so it stays open when its row leaves the list. `locations` are the
+ * page's, for Move; none when that read failed.
  * A Book the viewer does not hold is "Not in library". The content is the
  * same at every width; only the frame differs: the bottom sheet on the
  * phone, the panel beside the list from 900px (`BookDetailFrame`).
@@ -41,10 +43,12 @@ export async function BookDetail({
   ctx,
   bookId,
   query,
+  locations,
 }: {
   ctx: Context
   bookId: number
   query: ShelfQuery
+  locations: readonly LocationOption[]
 }) {
   const book = await heldBook(ctx, bookId)
   if (!book) return <NotInLibrary query={query} />
@@ -95,13 +99,13 @@ export async function BookDetail({
           </div>
         </div>
         <ReadAndRating key={bookId} bookId={bookId} initial={state} />
-        {/* Focus lands here when a copy's line goes or changes (`RemoveCopy`, `ReceiveCopy`). */}
+        {/* Focus lands here when a copy's line goes or changes (`RemoveCopy`, `ReceiveCopy`, `MoveCopy`). */}
         <section tabIndex={-1} className="flex flex-col gap-2">
           <h3 className="text-heading-group text-text-muted ui-case">{t('detail.yourCopies')}</h3>
           <ul className="flex flex-col gap-4">
             {copies.map(({ copyId, location, status, note }) => (
               <li key={copyId}>
-                {/* Names the line's Remove, Received and Note after the copy. */}
+                {/* Names the line's Move, Remove, Received and Note after the copy. */}
                 <div
                   role="group"
                   aria-labelledby={`copy-${copyId}`}
@@ -120,7 +124,16 @@ export async function BookDetail({
                       {t('answer.copy', { status })}
                     </p>
                     {status === 'owned' && (
-                      <RemoveCopy copyId={copyId} last={copies.length === 1} />
+                      <div className="flex shrink-0 gap-4">
+                        {locations.length > 0 && (
+                          <MoveCopy
+                            copyId={copyId}
+                            location={location?.id ?? null}
+                            locations={locations}
+                          />
+                        )}
+                        <RemoveCopy copyId={copyId} last={copies.length === 1} />
+                      </div>
                     )}
                     {status === 'ordered' && <ReceiveCopy copyId={copyId} />}
                   </div>

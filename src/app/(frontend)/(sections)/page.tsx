@@ -1,6 +1,7 @@
 import { getLocale } from 'next-intl/server'
 
 import { resolveLocale } from '@/i18n/locale'
+import { listLocations, type LocationOption } from '@/lib/copies/locations'
 import { logger } from '@/lib/errors'
 import { requireUser } from '@/lib/payload/context'
 import { filterValues } from '@/lib/shelf/filterValues'
@@ -36,7 +37,9 @@ import { ShelfActionsProvider, ShelfRowsProvider } from './ShelfRows'
  * of a short list; on the phone a sheet, portalled out. Select mode's state
  * sits above the list, so it outlives a query change; its action bar comes
  * last and, in a column filling the section, sits at the bottom of a short
- * list. `afterAction` sits above the list as well, so the bar reaches it.
+ * list. The bar and Book detail get the viewer's locations for Move, none
+ * when that read fails.
+ * `afterAction` sits above the list as well, so the bar reaches it.
  */
 export default async function CollectionPage({
   searchParams,
@@ -49,7 +52,7 @@ export default async function CollectionPage({
 
   const locale = resolveLocale(await getLocale(), null)
 
-  const [shelf, values] = await Promise.all([
+  const [shelf, values, locations] = await Promise.all([
     getShelfRows(ctx, query, { offset: 0, limit: SHELF_PAGE_SIZE }).catch(
       (err: unknown): ShelfRows | null => {
         logger().error({ err }, 'The collection failed to load')
@@ -59,6 +62,10 @@ export default async function CollectionPage({
     filterValues(ctx, locale).catch((err: unknown): FilterValues | null => {
       logger().error({ err }, 'The filter values failed to load')
       return null
+    }),
+    listLocations(ctx).catch((err: unknown): LocationOption[] => {
+      logger().error({ err }, 'The locations failed to load')
+      return []
     }),
   ])
 
@@ -80,9 +87,11 @@ export default async function CollectionPage({
                     <LoadFailed />
                   )}
                 </div>
-                {book !== null && <BookDetail ctx={ctx} bookId={book} query={query} />}
+                {book !== null && (
+                  <BookDetail ctx={ctx} bookId={book} query={query} locations={locations} />
+                )}
               </div>
-              <SelectBar />
+              <SelectBar locations={locations} />
             </ShelfActionsProvider>
           </SelectionProvider>
         </FilterPanelProvider>
