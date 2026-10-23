@@ -34,6 +34,7 @@ vi.mock('next/navigation', async (importOriginal) => ({
   usePathname: () => '/',
 }))
 vi.mock('@/app/(frontend)/actions/undo', () => ({ undoAction }))
+vi.mock('@/app/(frontend)/actions/prefs', () => ({ setDevicePrefsAction: vi.fn() }))
 
 /** Every observer made, with the elements it watches. */
 const observers: { callback: IntersectionObserverCallback; elements: Element[] }[] = []
@@ -63,6 +64,7 @@ const scrolledTo = (y: number) =>
 const { ToastProvider, useToast } = await import('@/app/(frontend)/components/toast/ToastProvider')
 const { ShelfRowsProvider, useShelfRows } = await import('@/app/(frontend)/(sections)/ShelfRows')
 const { CollectionList } = await import('@/app/(frontend)/(sections)/CollectionList')
+const { CollectionDisplayProvider } = await import('@/app/(frontend)/(sections)/CollectionDisplay')
 
 const book = (bookId: number): EffectiveBook => ({
   bookId,
@@ -114,11 +116,17 @@ const tree = (initial: ShelfRows, q: ShelfQuery = query) =>
     ToastProvider,
     null,
     createElement(
-      ShelfRowsProvider,
+      CollectionDisplayProvider,
       // `children` comes as the arguments after props.
-      { query: q, initial } as ComponentProps<typeof ShelfRowsProvider>,
-      createElement(CollectionList, { query: q }),
-      createElement(Probe),
+      { initial: { layout: 'rows', size: 'm' } } as ComponentProps<
+        typeof CollectionDisplayProvider
+      >,
+      createElement(
+        ShelfRowsProvider,
+        { query: q, initial } as ComponentProps<typeof ShelfRowsProvider>,
+        createElement(CollectionList, { query: q }),
+        createElement(Probe),
+      ),
     ),
   )
 const mount = (initial: ShelfRows) => render(tree(initial))

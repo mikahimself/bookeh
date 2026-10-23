@@ -4,15 +4,16 @@ import { useRef, useState, useTransition } from 'react'
 
 import type { ActionResult } from '@/lib/errors'
 
-import { settleAction, useReportFailure } from '../../components/request'
-import { useToast } from '../../components/toast/ToastProvider'
+import { settleAction, useReportFailure } from './request'
+import { useToast } from './toast/ToastProvider'
 
 /**
- * A switch saved at once (Theme, Language, Visibility). The tapped value
- * shows while any call is in flight; when the last one settles, the switch
- * shows the stored value: the newest call's success, or `initial`. Only the
- * latest call's failure is reported. A success newer than the call that
- * raised this switch's error toast withdraws that toast, and only that one.
+ * A switch saved at once (Theme, Language, Visibility; the collection's
+ * Layout and Size). The tapped value shows while any call is in flight; when
+ * the last one settles, the switch shows the stored value: the newest call's
+ * success, or `initial`. Only the latest call's failure is reported. A
+ * success newer than the call that raised this switch's error toast
+ * withdraws that toast, and only that one.
  */
 export function useSavedSwitch<V>(
   initial: V,

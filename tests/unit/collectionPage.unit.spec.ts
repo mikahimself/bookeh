@@ -1,7 +1,8 @@
 // @vitest-environment jsdom
-import { cleanup, fireEvent, render, screen, within } from '@testing-library/react'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { act, cleanup, fireEvent, render, screen, within } from '@testing-library/react'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import type { DevicePrefs } from '@/app/(frontend)/prefs'
 import type { EffectiveBook } from '@/lib/books/effectiveBook'
 import type { ShelfRow, ShelfRows } from '@/lib/shelf/query'
 
@@ -10,6 +11,9 @@ import en from '../../messages/en.json'
 const router = { replace: vi.fn(), refresh: vi.fn() }
 const getShelfRows = vi.fn<() => Promise<ShelfRows>>()
 const logError = vi.fn()
+const devicePrefs = vi.fn<() => Promise<DevicePrefs>>()
+const setDevicePrefsAction = vi.fn()
+const fetchStub = vi.fn()
 
 // The English catalogue, so the assertions read the screen's words.
 const english = async () => {
@@ -35,10 +39,21 @@ vi.mock('next/navigation', async (importOriginal) => ({
 vi.mock('@/lib/payload/context', () => ({ requireUser: async () => ({}) }))
 vi.mock('@/lib/shelf/getShelfRows', () => ({ getShelfRows }))
 vi.mock('@/lib/errors', () => ({ logger: () => ({ error: logError }) }))
+vi.mock('@/app/(frontend)/prefs', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/app/(frontend)/prefs')>()),
+  devicePrefs,
+}))
+vi.mock('@/app/(frontend)/actions/prefs', () => ({ setDevicePrefsAction }))
 // The client list's provider: no Undo and no scrolling here.
 vi.mock('@/app/(frontend)/components/toast/ToastProvider', () => ({
-  useToast: () => ({ show: vi.fn(), dismiss: vi.fn(), onUndone: () => () => {} }),
+  useToast: () => ({
+    show: vi.fn(),
+    dismiss: vi.fn(),
+    withdraw: vi.fn(),
+    onUndone: () => () => {},
+  }),
 }))
+vi.stubGlobal('fetch', fetchStub)
 vi.stubGlobal(
   'IntersectionObserver',
   class {
@@ -49,6 +64,7 @@ vi.stubGlobal(
 )
 
 const { default: CollectionPage } = await import('@/app/(frontend)/(sections)/page')
+const { DEFAULT_PREFS } = await import('@/app/(frontend)/prefs')
 
 const book = (
   bookId: number,
@@ -91,7 +107,15 @@ async function renderPage(params: Record<string, string> = {}) {
 
 const countLine = () => screen.getByText(/\d+ books?/).closest('p') as HTMLElement
 
+const pressed = (group: string) =>
+  within(screen.getByRole('group', { name: group })).getByRole('button', { pressed: true })
+    .textContent
+
 describe('CollectionPage', () => {
+  beforeEach(() => {
+    devicePrefs.mockResolvedValue({ ...DEFAULT_PREFS })
+  })
+
   afterEach(() => {
     cleanup()
     vi.clearAllMocks()
@@ -148,6 +172,63 @@ describe('CollectionPage', () => {
     answer(3, 'Sinuhe')
     rerender(await page({ q: 'linna', book: '7' }))
     expect(titles()).toEqual(['Tuntematon sotilas'])
+  })
+
+  it('renders the layout and size from the device preferences on first paint', async () => {
+    devicePrefs.mockResolvedValue({ ...DEFAULT_PREFS, layout: 'covers', size: 's' })
+    getShelfRows.mockResolvedValue({
+      rows: [row(11, book(1, 'Tuntematon sotilas'))],
+      total: 1,
+      labels: {},
+    })
+    await renderPage()
+
+    expect(pressed('Layout')).toBe('Covers')
+    expect(pressed('Size')).toBe('S')
+    const [tile] = screen.getAllByRole('listitem')
+    within(tile).getByText('Tuntematon sotilas', { selector: 'p' })
+    within(tile).getByText('Väinö Linna')
+    expect(within(tile).queryByText(/· 1954 · WSOY/)).toBeNull()
+  })
+
+  it('switches layout and size at once, saves each, and fetches nothing', async () => {
+    setDevicePrefsAction.mockResolvedValue({ ok: true, data: null })
+    getShelfRows.mockResolvedValue({
+      rows: [row(11, book(1, 'Tuntematon sotilas'))],
+      total: 1,
+      labels: {},
+    })
+    await renderPage()
+    within(screen.getByRole('listitem')).getByText('Väinö Linna · 1954 · WSOY')
+
+    fireEvent.click(screen.getByRole('button', { name: 'L' }))
+    const item = screen.getByRole('listitem')
+    within(item).getByText('Väinö Linna')
+    within(item).getByText('1954 · WSOY')
+    fireEvent.click(screen.getByRole('button', { name: 'Covers' }))
+    await act(async () => {})
+
+    expect(setDevicePrefsAction.mock.calls).toEqual([[{ size: 'l' }], [{ layout: 'covers' }]])
+    expect(pressed('Layout')).toBe('Covers')
+    expect(pressed('Size')).toBe('L')
+    within(screen.getByRole('listitem')).getByText('Väinö Linna')
+    expect(fetchStub).not.toHaveBeenCalled()
+  })
+
+  it('returns the switch and the list to the stored layout when the save fails', async () => {
+    setDevicePrefsAction.mockResolvedValue({ ok: false, code: 'NO_CONNECTION' })
+    getShelfRows.mockResolvedValue({
+      rows: [row(11, book(1, 'Tuntematon sotilas'))],
+      total: 1,
+      labels: {},
+    })
+    await renderPage()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Covers' }))
+    await act(async () => {})
+
+    expect(pressed('Layout')).toBe('Rows')
+    within(screen.getByRole('listitem')).getByText('Väinö Linna · 1954 · WSOY')
   })
 
   it('shows First run with no copies', async () => {

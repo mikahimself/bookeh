@@ -92,6 +92,22 @@
   --spacing-cover-detail: 72px;
   /* The cover in a row at m, 32 × 48px (DESIGN.md, Rows). */
   --spacing-cover-row: 32px;
+  /* The cover in a row at s, 16 × 24px, and at l, 44 × 66px (DESIGN.md,
+     Collection density). */
+  --spacing-cover-row-s: 16px;
+  --spacing-cover-row-l: 44px;
+  /* Above and below a row at s, 3px, and at l, 10px (DESIGN.md, Collection
+     density); m is spacing-2. */
+  --spacing-row-pad-s: 3px;
+  --spacing-row-pad-l: 10px;
+  /* The narrowest cover column at s, m and l (DESIGN.md, Collection density). */
+  --spacing-tile-s: 76px;
+  --spacing-tile-m: 116px;
+  --spacing-tile-l: 160px;
+  /* Between cover columns at s, 10px, and at m, 18px (DESIGN.md, Collection
+     density); l is spacing-6. */
+  --spacing-tile-gap-s: 10px;
+  --spacing-tile-gap-m: 18px;
   /* Minimum control height on the phone (DESIGN.md, Tap area). */
   --spacing-tap: 44px;
   /* The pinned bottom bar (Scan book on the phone): a tap-high control with

@@ -8,7 +8,7 @@ import type { Profile } from '@/lib/account/profile'
 
 import { updateProfileAction } from '../../actions/account'
 import { TextSwitch } from '../../components/TextSwitch'
-import { useSavedSwitch } from './useSavedSwitch'
+import { useSavedSwitch } from '../../components/useSavedSwitch'
 
 /**
  * Interface language (FR-51, AD-15): on the profile, so it follows the user

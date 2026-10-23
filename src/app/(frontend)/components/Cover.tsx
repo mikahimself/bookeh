@@ -35,7 +35,8 @@ export function Cover({ src, title }: { src: string | null; title: string }) {
   return (
     <div
       aria-hidden
-      className="aspect-2/3 w-full overflow-hidden border border-text-dim p-2 text-label break-words text-text-muted"
+      // Without a title (a row at s, 16px wide) the box has no padding to overflow it.
+      className={`aspect-2/3 w-full overflow-hidden border border-text-dim text-label break-words text-text-muted${title ? ' p-2' : ''}`}
     >
       {title}
     </div>

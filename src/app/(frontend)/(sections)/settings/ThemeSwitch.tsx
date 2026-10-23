@@ -5,8 +5,8 @@ import { useEffect, useRef } from 'react'
 
 import { setDevicePrefsAction } from '../../actions/prefs'
 import { TextSwitch } from '../../components/TextSwitch'
+import { useSavedSwitch } from '../../components/useSavedSwitch'
 import type { DevicePrefs } from '../../prefs'
-import { useSavedSwitch } from './useSavedSwitch'
 
 /**
  * Theme (UX-DR50): a device preference, never on the profile. The client

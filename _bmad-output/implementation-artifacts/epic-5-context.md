@@ -95,8 +95,8 @@ Make the collection at `/` the place Mika uses every day: a fast, Finnish-ordere
 
 ## Cross-Story Dependencies
 
-- Done: 5.1–5.12, 5.22, 5.31–5.33, 5.36, 5.37. Next: 5.13.
-- The server page seeds `ShelfRowsProvider` with the first `SHELF_PAGE_SIZE` rows; `BookRow` takes a `ShelfRow` and uses no hooks. Filter, Select and the layout/size switches are rendered disabled until 5.14, 5.27 and 5.13 enable them in place. The search field replaces the URL itself and tells its own replace from outside navigation (Clear, Back); keep that intact.
+- Done: 5.1–5.13, 5.22, 5.31–5.33, 5.36, 5.37. Next: 5.14.
+- The server page seeds `ShelfRowsProvider` with the first `SHELF_PAGE_SIZE` rows; `BookRow` and `CoverTile` take a `ShelfRow` and a size and use no hooks; the list picks one from `useCollectionDisplay()` (layout and size, seeded from `devicePrefs()`, built in 5.13). Filter and Select are rendered disabled until 5.14 and 5.27 enable them in place. The search field replaces the URL itself and tells its own replace from outside navigation (Clear, Back); keep that intact.
 - Actions in 5.18 and 5.23–5.30 call `afterAction`; none patch rows. Open check from 5.12: the restore after a history Back (X on Scan or Edit book) is verified only in jsdom; confirm it in a real browser when a later story touches the list.
 - 5.18 builds Book detail's content component; 5.19 renders it in the wide panel; later groups (here and Epics 6, 7, 9) depend only on that component. 5.18 also carries Epic 4's open phone check (camera picker, touch corner crop, HEIC cover upload) and adds the modal guard to the `/` search shortcut.
 - 5.14 must name languages for display; the count line shows raw codes until then.

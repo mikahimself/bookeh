@@ -7,7 +7,7 @@ import type { User } from '@/payload-types'
 
 import { updateProfileAction } from '../../actions/account'
 import { TextSwitch } from '../../components/TextSwitch'
-import { useSavedSwitch } from './useSavedSwitch'
+import { useSavedSwitch } from '../../components/useSavedSwitch'
 
 type Visibility = User['profileVisibility'] | User['collectionVisibility']
 

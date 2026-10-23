@@ -10,17 +10,29 @@ import { buttonClass } from '../components/Button'
 import { TextLink } from '../components/Link'
 import { ProgressLine } from '../components/ProgressLine'
 
+import type { DevicePrefs } from '../prefs'
+
 import { BookRow } from './BookRow'
+import { useCollectionDisplay } from './CollectionDisplay'
 import { activeValues, clearHref, isNarrowed } from './countLine'
+import { CoverTile } from './CoverTile'
 import { useShelfRows } from './ShelfRows'
 
 /** Between the count line's parts (EXPERIENCE.md, Count line). */
 const SEPARATOR = ' · '
 
+/** DESIGN.md, Collection density: cover columns at least this wide, with this gap. */
+const GRID: Record<DevicePrefs['size'], string> = {
+  s: 'grid-cols-[repeat(auto-fill,minmax(var(--spacing-tile-s),1fr))] gap-tile-gap-s',
+  m: 'grid-cols-[repeat(auto-fill,minmax(var(--spacing-tile-m),1fr))] gap-tile-gap-m',
+  l: 'grid-cols-[repeat(auto-fill,minmax(var(--spacing-tile-l),1fr))] gap-6',
+}
+
 /**
  * The collection's list (EXPERIENCE.md, Count line, States, Loading more):
- * the count line, then the viewer's copies at size m, one row per copy in
- * shelf order, from `ShelfRowsProvider`. With none: First run, or No matches
+ * the count line, then the viewer's copies as rows or cover tiles at the
+ * chosen size (`useCollectionDisplay`), one per copy in shelf order, from
+ * `ShelfRowsProvider`. With none: First run, or No matches
  * while a search or filter is on. When a sentinel after the last row comes
  * within a screen of view, the next rows load with the progress line and the
  * rows shown stay usable; a failed load is tried again on the next approach.
@@ -29,6 +41,7 @@ export function CollectionList({ query }: { query: ShelfQuery }) {
   const t = useTranslations('collection')
   const root = useTranslations()
   const { shelf, loading, loadMore } = useShelfRows()
+  const { layout, size } = useCollectionDisplay()
   const sentinel = useRef<HTMLDivElement>(null)
   const [near, setNear] = useState(false)
 
@@ -88,10 +101,16 @@ export function CollectionList({ query }: { query: ShelfQuery }) {
             </>
           )}
         </div>
+      ) : layout === 'covers' ? (
+        <ul className={`grid ${GRID[size]}`}>
+          {shelf.rows.map((row) => (
+            <CoverTile key={row.copy.copyId} row={row} size={size} />
+          ))}
+        </ul>
       ) : (
         <ul>
           {shelf.rows.map((row) => (
-            <BookRow key={row.copy.copyId} row={row} ordered={t('ordered')} />
+            <BookRow key={row.copy.copyId} row={row} size={size} ordered={t('ordered')} />
           ))}
         </ul>
       )}
