@@ -65,7 +65,9 @@
     "edit": "Muokkaa",
     "undo": "Kumoa",
     "undone": "Kumottu",
-    "reload": "Lataa uudelleen"
+    "reload": "Lataa uudelleen",
+    "markedRead": "{n} merkitty luetuksi",
+    "markedUnread": "{n} merkitty lukemattomaksi"
   },
   "sections": {
     "label": "Osiot",
@@ -242,7 +244,9 @@
   "detail": {
     "yourCopies": "Kappaleesi",
     "series": "{name} {index}",
-    "edit": "Muokkaa"
+    "edit": "Muokkaa",
+    "read": "Luettu",
+    "rating": "Arvio"
   },
   "progress": {
     "loading": "Ladataan"

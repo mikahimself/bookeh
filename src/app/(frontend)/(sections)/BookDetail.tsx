@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { getTranslations } from 'next-intl/server'
 
 import { getHoldings } from '@/lib/books/holdings'
+import { getUserBookState } from '@/lib/books/userBookState'
 import type { Context } from '@/lib/payload/context'
 import type { ShelfQuery } from '@/lib/shelf/query'
 
@@ -11,14 +12,17 @@ import { heldBook } from '../heldBook'
 
 import { BookDetailFrame } from './BookDetailPanel'
 import { NotInLibrary } from './NotInLibrary'
+import { ReadAndRating } from './ReadAndRating'
 
 /**
  * Book detail (EXPERIENCE.md, Book detail; DESIGN.md, Detail panel): the
  * header (cover beside the title, then authors, series and number, and the
- * edition line, each left out when empty), Your copies, one line per copy
- * with its location and status, and the foot with Edit. The one component
- * later groups are added to; it reads the Book and the viewer's copies only
- * and never the client rows, so it stays open when its row leaves the list.
+ * edition line, each left out when empty), the read switch and Rating
+ * (keyed by the Book, so swapping it resets them), Your copies, one line per
+ * copy with its location and status, and the foot with Edit. The one
+ * component later groups are added to; it reads the Book, the viewer's copies
+ * and their read flag and rating only, never the client rows, so it stays
+ * open when its row leaves the list.
  * A Book the viewer does not hold is "Not in library". The content is the
  * same at every width; only the frame differs: the bottom sheet on the
  * phone, the panel beside the list from 900px (`BookDetailFrame`).
@@ -35,6 +39,7 @@ export async function BookDetail({
   const book = await heldBook(ctx, bookId)
   if (!book) return <NotInLibrary query={query} />
   const copies = (await getHoldings(ctx, [bookId])).get(bookId)?.copies ?? []
+  const state = await getUserBookState(ctx, bookId)
 
   const t = await getTranslations()
   const authors = book.authors.map(({ name }) => name).join(', ')
@@ -68,6 +73,7 @@ export async function BookDetail({
             {edition && <p className="text-meta text-text-muted">{edition}</p>}
           </div>
         </div>
+        <ReadAndRating key={bookId} bookId={bookId} initial={state} />
         <section className="flex flex-col gap-2">
           <h3 className="text-heading-group text-text-muted ui-case">{t('detail.yourCopies')}</h3>
           <ul className="flex flex-col gap-1">

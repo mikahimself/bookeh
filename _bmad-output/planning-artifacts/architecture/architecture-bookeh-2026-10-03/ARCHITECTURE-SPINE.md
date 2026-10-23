@@ -440,6 +440,8 @@ type CopyLine = {
 type EntryLine = { entryId: number; wishlist: Named; forPerson: Named | null }
 type Holdings = { copies: CopyLine[]; entries: EntryLine[] } // open entries only
 type ReadTarget = { copyIds: readonly number[] } | { bookId: number } // setRead(ctx, target, value | 'toggle'): Undone<{ read; count }>
+// setRating(ctx, bookId, rating | null): void — no Undo
+// getUserBookState(ctx, bookId): Pick<UserBookState, 'read' | 'rating'> — the caller gates the Book id (AD-7)
 
 // src/lib/catalogue
 type Point = { x: number; y: number } // image pixels, origin top left
@@ -578,7 +580,7 @@ src/
     undo/              # receipt store, withUndo, undo
     metadata/          # source contract, sources/, merge, lookupSources, cache
     catalogue/         # lookupBook, searchBooks, saveCopy, saveEntry, editBook, findOrCreateByName, isUnreferenced, covers (download, upload and warp), re-fetch, lookupAgain, genre admin
-    books/             # EffectiveBook, getEffectiveBooks, getHoldings, requireOwnBook, upsertUserBook, setRead, setRating, coverUrl
+    books/             # EffectiveBook, getEffectiveBooks, getHoldings, getUserBookState, requireOwnBook, upsertUserBook, setRead, setRating, coverUrl
     shelf/             # Drizzle query module, read-only: getShelfRows, values and suggestions; query.ts (pure): parseShelfQuery, shelfHref, shelfRowsPath
     tags/              # tags of every kind: changeTags, rename, merge, delete, tagUse; SYSTEM_NAME checks
     copies/            # createCopy, move, receive, status, note, remove; locations

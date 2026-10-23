@@ -46,7 +46,8 @@ export function useShelfRows(): ShelfRowsValue {
 }
 
 type ShelfActionsValue = {
-  afterAction: (result: ActionResult<unknown>) => void
+  /** Returns the error toast it raised, if any, so a later success can withdraw it. */
+  afterAction: (result: ActionResult<unknown>) => number | null
   /** The mounted rows' reload; returns the unregister. */
   register: (reload: () => void) => () => void
 }
@@ -86,12 +87,10 @@ export function ShelfActionsProvider({ children }: { children: ReactNode }) {
 
   const afterAction = useCallback(
     (result: ActionResult<unknown>) => {
-      if (!result.ok && result.code !== 'NOT_FOUND') {
-        reportFailure(result.code)
-        return
-      }
+      if (!result.ok && result.code !== 'NOT_FOUND') return reportFailure(result.code)
       if (!result.ok) show({ kind: 'success', message: t('notInLibrary') })
       reload.current?.()
+      return null
     },
     [reportFailure, show, t],
   )

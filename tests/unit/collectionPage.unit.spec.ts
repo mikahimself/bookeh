@@ -65,9 +65,16 @@ vi.mock('@/app/(frontend)/prefs', async (importOriginal) => ({
   devicePrefs,
 }))
 vi.mock('@/app/(frontend)/actions/prefs', () => ({ setDevicePrefsAction }))
-vi.mock('@/app/(frontend)/(sections)/actions', () => ({ removeCopiesAction }))
+vi.mock('@/app/(frontend)/(sections)/actions', () => ({
+  removeCopiesAction,
+  setReadAction: vi.fn(),
+  setRatingAction: vi.fn(),
+}))
 vi.mock('@/app/(frontend)/heldBook', () => ({ heldBook }))
 vi.mock('@/lib/books/holdings', () => ({ getHoldings }))
+vi.mock('@/lib/books/userBookState', () => ({
+  getUserBookState: async () => ({ read: false, rating: null }),
+}))
 // The client list's provider: no Undo and no scrolling here.
 vi.mock('@/app/(frontend)/components/toast/ToastProvider', () => ({
   useToast: () => ({

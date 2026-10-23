@@ -65,7 +65,9 @@
     "edit": "Edit",
     "undo": "Undo",
     "undone": "Undone",
-    "reload": "Reload"
+    "reload": "Reload",
+    "markedRead": "Marked {n} read",
+    "markedUnread": "Marked {n} unread"
   },
   "sections": {
     "label": "Sections",
@@ -242,7 +244,9 @@
   "detail": {
     "yourCopies": "Your copies",
     "series": "{name} {index}",
-    "edit": "Edit"
+    "edit": "Edit",
+    "read": "Read",
+    "rating": "Rating"
   },
   "progress": {
     "loading": "Loading"
