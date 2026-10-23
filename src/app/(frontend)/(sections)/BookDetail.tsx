@@ -12,6 +12,7 @@ import { Cover } from '../components/Cover'
 import { heldBook } from '../heldBook'
 
 import { BookDetailFrame } from './BookDetailPanel'
+import { CopyNote, RemoveCopy } from './CopyLine'
 import { FilterChip } from './FilterChip'
 import { NotInLibrary } from './NotInLibrary'
 import { ReadAndRating } from './ReadAndRating'
@@ -21,15 +22,16 @@ const DOT = ' · '
 /**
  * Book detail (EXPERIENCE.md, Book detail; DESIGN.md, Detail panel): the
  * header (cover beside the title, then authors, series and number, and the
- * edition line, each left out when empty), the read switch and Rating
- * (keyed by the Book, so swapping it resets them), Your copies, one line per
- * copy with its location and status, Genres when the Book has system genres,
- * and the foot with Edit. Each author, the series, each genre and each copy's
- * location is a Filter chip (`FilterChip`) that adds it to the current
- * filters; an ordered copy has no location and so no chip. The one component
- * later groups are added to; it reads the Book, the viewer's copies and their
- * read flag and rating only, never the client rows, so it stays open when its
- * row leaves the list.
+ * edition line, each left out when empty), the read switch and Rating (keyed
+ * by the Book, so swapping it resets them), Your copies, one line per copy
+ * with its location and status, an owned copy's Remove beside it and the
+ * copy's note under it (`CopyLine`), Genres when the Book has system genres,
+ * and the foot with Edit. Each author, the series, each genre and each
+ * copy's location is a Filter chip (`FilterChip`) that adds it to the
+ * current filters; an ordered copy has no location and so no chip. The one
+ * component later groups are added to; it reads the Book, the viewer's
+ * copies and their read flag and rating only, never the client rows, so it
+ * stays open when its row leaves the list.
  * A Book the viewer does not hold is "Not in library". The content is the
  * same at every width; only the frame differs: the bottom sheet on the
  * phone, the panel beside the list from 900px (`BookDetailFrame`).
@@ -92,20 +94,36 @@ export async function BookDetail({
           </div>
         </div>
         <ReadAndRating key={bookId} bookId={bookId} initial={state} />
-        <section className="flex flex-col gap-2">
+        {/* Focus lands here when a removed copy's line goes (`RemoveCopy`). */}
+        <section tabIndex={-1} className="flex flex-col gap-2">
           <h3 className="text-heading-group text-text-muted ui-case">{t('detail.yourCopies')}</h3>
-          <ul className="flex flex-col gap-1">
-            {copies.map(({ copyId, location, status }) => (
-              <li key={copyId} className="text-body text-text">
-                {location && (
-                  <>
-                    <FilterChip field="location" id={location.id}>
-                      {location.name}
-                    </FilterChip>
-                    {DOT}
-                  </>
-                )}
-                {t('answer.copy', { status })}
+          <ul className="flex flex-col gap-4">
+            {copies.map(({ copyId, location, status, note }) => (
+              <li key={copyId}>
+                {/* Names the line's Remove and Note after the copy. */}
+                <div
+                  role="group"
+                  aria-labelledby={`copy-${copyId}`}
+                  className="flex flex-col gap-2"
+                >
+                  <div className="flex items-center justify-between gap-4">
+                    <p id={`copy-${copyId}`} className="text-body text-text">
+                      {location && (
+                        <>
+                          <FilterChip field="location" id={location.id}>
+                            {location.name}
+                          </FilterChip>
+                          {DOT}
+                        </>
+                      )}
+                      {t('answer.copy', { status })}
+                    </p>
+                    {status === 'owned' && (
+                      <RemoveCopy copyId={copyId} last={copies.length === 1} />
+                    )}
+                  </div>
+                  <CopyNote copyId={copyId} note={note ?? ''} />
+                </div>
               </li>
             ))}
           </ul>

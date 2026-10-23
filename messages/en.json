@@ -247,7 +247,8 @@
     "genres": "Genres",
     "edit": "Edit",
     "read": "Read",
-    "rating": "Rating"
+    "rating": "Rating",
+    "note": "Note"
   },
   "progress": {
     "loading": "Loading"

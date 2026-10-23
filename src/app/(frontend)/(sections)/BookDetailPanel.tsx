@@ -1,7 +1,7 @@
 'use client'
 
 import { useTranslations } from 'next-intl'
-import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 
 import { shelfHref, type ShelfQuery } from '@/lib/shelf/query'
 
@@ -10,6 +10,7 @@ import { useTaskBack } from '../components/navigation'
 import { useWide } from '../components/ui/overlay'
 
 import { BookDetailSheet } from './BookDetailSheet'
+import { DetailCloseContext } from './detailClose'
 
 type FrameProps = {
   /** The Book's title: names the sheet or the panel. */
@@ -39,6 +40,10 @@ const inField = (target: EventTarget | null): boolean =>
   target instanceof HTMLTextAreaElement ||
   target instanceof HTMLSelectElement
 
+/** `Esc` in a dialog opened from the panel closes only the dialog (topmost first). */
+const inDialog = (target: EventTarget | null): boolean =>
+  target instanceof Element && target.closest('[role="dialog"], [role="alertdialog"]') !== null
+
 /**
  * Book detail from 900px (EXPERIENCE.md, Book detail; DESIGN.md, Detail
  * panel): the last column of the collection's row, flush with the screen's
@@ -46,8 +51,9 @@ const inField = (target: EventTarget | null): boolean =>
  * an overlay: the list stays operable beside it, so there is no scrim, no
  * focus trap and nothing made inert. `?book=` is the open state, as with the
  * sheet: a new `bookId` swaps the content in place and scrolls it to the top.
- * It grows in on mount (`panel-motion`); X, or `Esc` anywhere outside a
- * field, shrinks it away, then leaves the address as the sheet's close does.
+ * It grows in on mount (`panel-motion`); X, `Esc` anywhere outside a field
+ * or a dialog, or `useCloseDetail()` (removing the last copy) shrinks it
+ * away, then leaves the address as the sheet's close does.
  * The leave waits on the frame's running transitions, so it goes at once
  * when there are none (reduce motion); focus inside the panel moves to the
  * open Book's row or tile first. A new Book during the close keeps it open.
@@ -70,7 +76,12 @@ function BookDetailPanel({ label, query, bookId, children }: FrameProps) {
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === 'Escape' && !event.defaultPrevented && !inField(event.target)) {
+      if (
+        event.key === 'Escape' &&
+        !event.defaultPrevented &&
+        !inField(event.target) &&
+        !inDialog(event.target)
+      ) {
         // Taken here: select mode's `Esc` stays for the next press.
         event.preventDefault()
         setLeaving(true)
@@ -101,6 +112,8 @@ function BookDetailPanel({ label, query, bookId, children }: FrameProps) {
     }
   }, [leaving, leave])
 
+  const close = useCallback(() => setLeaving(true), [])
+
   return (
     <div
       ref={frame}
@@ -113,10 +126,10 @@ function BookDetailPanel({ label, query, bookId, children }: FrameProps) {
       >
         <div className="sticky top-0 flex max-h-dvh flex-col">
           <div className="flex shrink-0 justify-end px-4 pt-3">
-            <CloseButton label={t('close')} onClick={() => setLeaving(true)} />
+            <CloseButton label={t('close')} onClick={close} />
           </div>
           <div ref={content} className="min-h-0 flex-1 overflow-y-auto px-6 pt-1 pb-6">
-            {children}
+            <DetailCloseContext value={close}>{children}</DetailCloseContext>
           </div>
         </div>
       </aside>

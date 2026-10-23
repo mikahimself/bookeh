@@ -15,6 +15,8 @@ import { shelfHref, type ShelfQuery } from '@/lib/shelf/query'
 import { useTaskBack } from '../components/navigation'
 import { Sheet } from '../components/ui/Sheet'
 
+import { DetailCloseContext } from './detailClose'
+
 /**
  * Book detail on the phone (EXPERIENCE.md, Book detail): a bottom sheet over
  * the dimmed list. `?book=` is the open state, so the sheet is `addressed`:
@@ -45,6 +47,11 @@ export function BookDetailSheet({
     landing.current = href
     setOpen(false)
   }, [])
+  /** `useCloseDetail()`: as X does, landing on the collection without `book`. */
+  const close = useCallback(() => {
+    landing.current = undefined
+    setOpen(false)
+  }, [])
 
   // Mounted open, Base UI would show the sheet without sliding it up.
   useEffect(() => {
@@ -60,7 +67,9 @@ export function BookDetailSheet({
       label={label}
       onClosed={() => leave(landing.current)}
     >
-      <SheetChipContext value={chip}>{children}</SheetChipContext>
+      <DetailCloseContext value={close}>
+        <SheetChipContext value={chip}>{children}</SheetChipContext>
+      </DetailCloseContext>
     </Sheet>
   )
 }

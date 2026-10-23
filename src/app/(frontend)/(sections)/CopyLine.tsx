@@ -1,0 +1,131 @@
+'use client'
+
+import { useTranslations } from 'next-intl'
+import { useRouter } from 'next/navigation'
+import { useEffect, useEffectEvent, useRef, useState, useTransition } from 'react'
+
+import { Button } from '../components/Button'
+import { ActionLink } from '../components/Link'
+import { settleAction } from '../components/request'
+import { TextAreaField } from '../components/TextField'
+import { Dialog } from '../components/ui/Dialog'
+
+import { removeCopiesAction, setNoteAction } from './actions'
+import { useCloseDetail } from './detailClose'
+import { useAfterAction } from './ShelfRows'
+
+/**
+ * EXPERIENCE.md, Book detail: the note under a copy's line. It saves on blur
+ * (`Esc` blurs too) when the trimmed, NFC text differs from the last saved
+ * one, and shows the saved text on success. Every result goes to
+ * `afterAction`, since search covers notes; on failure the typed text stays
+ * and the next blur tries again. A note left without a blur (Back, another
+ * Book) is saved as the field unmounts. No Undo.
+ */
+export function CopyNote({ copyId, note }: { copyId: number; note: string }) {
+  const t = useTranslations('detail')
+  const afterAction = useAfterAction()
+  const [value, setValue] = useState(note)
+  /** The value as typed, for the save on unmount. */
+  const latest = useRef(note)
+  const saved = useRef(note.trim().normalize('NFC'))
+
+  const save = async () => {
+    const sent = latest.current
+    const text = sent.trim().normalize('NFC')
+    if (text === saved.current) return
+    const result = await settleAction(setNoteAction({ copyId, note: text }))
+    if (result.ok) {
+      saved.current = text
+      // Typing since the blur stays.
+      if (latest.current === sent) {
+        latest.current = text
+        setValue(text)
+      }
+    }
+    afterAction(result)
+  }
+
+  const saveOnUnmount = useEffectEvent(() => void save())
+  useEffect(() => () => saveOnUnmount(), [])
+
+  return (
+    <TextAreaField
+      label={t('note')}
+      rows={2}
+      maxLength={2000}
+      value={value}
+      onChange={(event) => {
+        latest.current = event.target.value
+        setValue(event.target.value)
+      }}
+      onBlur={() => void save()}
+      onKeyDown={(event) => {
+        if (event.key === 'Escape') event.currentTarget.blur()
+      }}
+    />
+  )
+}
+
+/**
+ * EXPERIENCE.md, Book detail: an owned copy's Remove, confirmed by the
+ * one-copy dialog; no toast and no Undo. The removal starts once the
+ * dialog's history entry is gone (`onClosed`), so closing Book detail after
+ * the last copy never overlaps it. `ok` on the last copy closes Book detail;
+ * `ok` otherwise, or `NOT_FOUND`, refreshes it (a Book gone entirely then
+ * closes as "Not in library").
+ */
+export function RemoveCopy({ copyId, last }: { copyId: number; last: boolean }) {
+  const t = useTranslations('collection')
+  const router = useRouter()
+  const afterAction = useAfterAction()
+  const closeDetail = useCloseDetail()
+  const [pending, startTransition] = useTransition()
+  const [open, setOpen] = useState(false)
+  const confirmed = useRef(false)
+  const link = useRef<HTMLButtonElement>(null)
+
+  const remove = () => {
+    startTransition(async () => {
+      const result = await settleAction(removeCopiesAction([copyId]))
+      afterAction(result)
+      if (result.ok && last) {
+        closeDetail()
+        return
+      }
+      // The line goes with the refresh; focus would fall to the body, outside the sheet.
+      if (result.ok) link.current?.closest('section')?.focus()
+      if (result.ok || result.code === 'NOT_FOUND') router.refresh()
+    })
+  }
+
+  return (
+    <>
+      <ActionLink ref={link} destructive disabled={pending} onClick={() => setOpen(true)}>
+        {t('remove')}
+      </ActionLink>
+      <Dialog
+        open={open}
+        onOpenChange={setOpen}
+        onClosed={() => {
+          if (!confirmed.current) return
+          confirmed.current = false
+          remove()
+        }}
+        title={t('removeTitle', { n: 1 })}
+        confirm={
+          <Button
+            variant="destructive"
+            onClick={() => {
+              if (!open) return
+              confirmed.current = true
+              setOpen(false)
+            }}
+          >
+            {t('remove')}
+          </Button>
+        }
+      />
+    </>
+  )
+}

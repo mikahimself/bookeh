@@ -29,6 +29,7 @@ const fetchStub = vi.fn()
 const showToast = vi.fn()
 const removeCopiesAction = vi.fn()
 const toggleCopiesReadAction = vi.fn()
+const setNoteAction = vi.fn()
 
 // The English catalogue, so the assertions read the screen's words.
 const english = async () => {
@@ -70,6 +71,7 @@ vi.mock('@/app/(frontend)/(sections)/actions', () => ({
   removeCopiesAction,
   setReadAction: vi.fn(),
   setRatingAction: vi.fn(),
+  setNoteAction,
   toggleCopiesReadAction,
 }))
 vi.mock('@/app/(frontend)/heldBook', () => ({ heldBook }))
@@ -639,7 +641,7 @@ describe('CollectionPage', () => {
       expect(
         within(sheet)
           .getAllByRole('listitem')
-          .map((line) => line.textContent),
+          .map((line) => line.querySelector('p')?.textContent),
       ).toEqual(['Tampere · Owned', 'Ordered'])
       expect(within(sheet).getByRole('link', { name: 'Edit' }).getAttribute('href')).toBe(
         '/books/5/edit',
@@ -756,6 +758,119 @@ describe('CollectionPage', () => {
       expect(router.push).not.toHaveBeenCalled()
     })
 
+    describe('a copy line', () => {
+      const note = () => screen.getByRole('textbox', { name: 'Note' }) as HTMLTextAreaElement
+      /** The reload after the action: `fetchStub` answers `/data/shelf`. */
+      const reloads = () =>
+        fetchStub.mockResolvedValue({
+          status: 200,
+          json: async () => ({ ok: true, data: { rows: [], total: 0, labels: {} } }),
+        })
+      const confirmRemove = async (sheet: HTMLElement, line = 0) => {
+        fireEvent.click(within(sheet).getAllByRole('button', { name: 'Remove' })[line]!)
+        const dialog = await screen.findByRole('dialog', { name: 'Remove 1 book from library?' })
+        fireEvent.click(within(dialog).getByRole('button', { name: 'Remove' }))
+      }
+
+      beforeEach(() => {
+        getShelfRows.mockResolvedValue({ rows: [row(11, linna)], total: 1, labels: {} })
+        // The dialog's pop lands here: an entry with no in-app one below, so closing replaces.
+        window.history.replaceState(null, '', '/')
+      })
+
+      it('saves the note on blur, and sends nothing when it is unchanged', async () => {
+        holds(linna, [copy(21)])
+        setNoteAction.mockResolvedValue({ ok: true, data: null })
+        reloads()
+        await renderPage({ book: '5' })
+        await detail('Tuntematon sotilas')
+
+        fireEvent.focus(note())
+        fireEvent.blur(note())
+        expect(setNoteAction).not.toHaveBeenCalled()
+
+        fireEvent.change(note(), { target: { value: ' signed ' } })
+        fireEvent.blur(note())
+        await waitFor(() =>
+          expect(setNoteAction).toHaveBeenCalledExactlyOnceWith({ copyId: 21, note: 'signed' }),
+        )
+        await waitFor(() => expect(note().value).toBe('signed'))
+        await waitFor(() => expect(fetchStub).toHaveBeenCalledOnce())
+        fireEvent.blur(note())
+        expect(setNoteAction).toHaveBeenCalledOnce()
+      })
+
+      it('keeps the typed note when the save fails, and tries again on the next blur', async () => {
+        holds(linna, [copy(21, { note: 'old' })])
+        setNoteAction
+          .mockResolvedValueOnce({ ok: false, code: 'INTERNAL' })
+          .mockResolvedValue({ ok: true, data: null })
+        reloads()
+        await renderPage({ book: '5' })
+        await detail('Tuntematon sotilas')
+        expect(note().value).toBe('old')
+
+        fireEvent.change(note(), { target: { value: 'signed' } })
+        fireEvent.blur(note())
+        await waitFor(() =>
+          expect(showToast).toHaveBeenCalledWith({ kind: 'error', code: 'INTERNAL' }),
+        )
+        expect(note().value).toBe('signed')
+        fireEvent.blur(note())
+        await waitFor(() => expect(setNoteAction).toHaveBeenCalledTimes(2))
+        expect(setNoteAction).toHaveBeenLastCalledWith({ copyId: 21, note: 'signed' })
+        // Saved, so unmounting sends nothing into the next case.
+        await waitFor(() => expect(fetchStub).toHaveBeenCalledOnce())
+      })
+
+      it('removes one of two copies after the dialog and keeps Book detail open', async () => {
+        holds(linna, [copy(21), copy(22)])
+        removeCopiesAction.mockResolvedValue({ ok: true, data: null })
+        reloads()
+        await renderPage({ book: '5' })
+        const sheet = await detail('Tuntematon sotilas')
+
+        await confirmRemove(sheet)
+        await waitFor(() => expect(router.refresh).toHaveBeenCalledOnce())
+        expect(removeCopiesAction).toHaveBeenCalledExactlyOnceWith([21])
+        expect(showToast).not.toHaveBeenCalled()
+        await detail('Tuntematon sotilas')
+        expect(router.replace).not.toHaveBeenCalled()
+        expect(router.back).not.toHaveBeenCalled()
+      })
+
+      it('closes Book detail after removing the last copy, and reloads the rows', async () => {
+        holds(linna, [copy(21)])
+        removeCopiesAction.mockResolvedValue({ ok: true, data: null })
+        reloads()
+        await renderPage({ book: '5' })
+        const sheet = await detail('Tuntematon sotilas')
+
+        await confirmRemove(sheet)
+        await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
+        await waitFor(() => expect(router.replace).toHaveBeenCalledWith('/', { scroll: false }))
+        expect(removeCopiesAction).toHaveBeenCalledExactlyOnceWith([21])
+        expect(fetchStub.mock.calls[0]![0]).toMatch(/^\/data\/shelf\?/)
+        expect(router.refresh).not.toHaveBeenCalled()
+        expect(showToast).not.toHaveBeenCalled()
+      })
+
+      it('refreshes Book detail when the copy is gone already', async () => {
+        holds(linna, [copy(21), copy(22)])
+        removeCopiesAction.mockResolvedValue({ ok: false, code: 'NOT_FOUND' })
+        reloads()
+        await renderPage({ book: '5' })
+        const sheet = await detail('Tuntematon sotilas')
+
+        await confirmRemove(sheet)
+        await waitFor(() => expect(router.refresh).toHaveBeenCalledOnce())
+        expect(showToast).toHaveBeenCalledExactlyOnceWith({
+          kind: 'success',
+          message: 'Not in library',
+        })
+      })
+    })
+
     describe('beside the list at 1300px', () => {
       const sinuhe = book(6, 'Sinuhe')
       const panel = (name: string) => screen.findByRole('complementary', { name })
@@ -828,6 +943,42 @@ describe('CollectionPage', () => {
         expect(router.replace).not.toHaveBeenCalled()
         fireEvent.keyDown(screen.getByRole('link', { name: /Sinuhe/ }), { key: 'Escape' })
         await waitFor(() => expect(router.replace).toHaveBeenCalledWith('/', { scroll: false }))
+      })
+
+      it('closes only the remove dialog on Esc, removing nothing', async () => {
+        await renderPage({ book: '5' })
+        const aside = await panel('Tuntematon sotilas')
+
+        fireEvent.click(within(aside).getByRole('button', { name: 'Remove' }))
+        const dialog = await screen.findByRole('dialog', { name: 'Remove 1 book from library?' })
+        fireEvent.keyDown(within(dialog).getByRole('button', { name: 'Cancel' }), {
+          key: 'Escape',
+        })
+        await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
+        await act(async () => {})
+        expect(await panel('Tuntematon sotilas')).toBe(aside)
+        expect(router.replace).not.toHaveBeenCalled()
+        expect(removeCopiesAction).not.toHaveBeenCalled()
+      })
+
+      it('closes after removing the only copy, and reloads the rows', async () => {
+        // The dialog's pop lands here: an entry with no in-app one below, so closing replaces.
+        window.history.replaceState(null, '', '/')
+        removeCopiesAction.mockResolvedValue({ ok: true, data: null })
+        fetchStub.mockResolvedValue({
+          status: 200,
+          json: async () => ({ ok: true, data: { rows: [row(12, sinuhe)], total: 1, labels: {} } }),
+        })
+        await renderPage({ book: '5' })
+        const aside = await panel('Tuntematon sotilas')
+
+        fireEvent.click(within(aside).getByRole('button', { name: 'Remove' }))
+        const dialog = await screen.findByRole('dialog', { name: 'Remove 1 book from library?' })
+        fireEvent.click(within(dialog).getByRole('button', { name: 'Remove' }))
+        await waitFor(() => expect(router.replace).toHaveBeenCalledWith('/', { scroll: false }))
+        expect(removeCopiesAction).toHaveBeenCalledExactlyOnceWith([25])
+        expect(fetchStub.mock.calls[0]![0]).toMatch(/^\/data\/shelf\?/)
+        expect(router.refresh).not.toHaveBeenCalled()
       })
 
       it('toasts Not in library for a Book not held, with no panel', async () => {

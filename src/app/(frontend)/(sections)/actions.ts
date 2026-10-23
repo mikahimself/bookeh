@@ -3,6 +3,7 @@
 import { setRating } from '@/lib/books/setRating'
 import { setRead } from '@/lib/books/setRead'
 import { removeCopies } from '@/lib/copies/removeCopies'
+import { setNote } from '@/lib/copies/updateCopy'
 import { DomainError, runAction, type ActionResult } from '@/lib/errors'
 import { requireUserOrThrow } from '@/lib/payload/context'
 import { withUndo, type Undoable } from '@/lib/undo/undo'
@@ -29,11 +30,33 @@ function bookInput(input: unknown): Record<string, unknown> & { bookId: number }
   return { ...fields, bookId: fields.bookId }
 }
 
+/** `input` as an object with a valid `copyId`, its other fields unchecked; `VALIDATION` otherwise. */
+function copyInput(input: unknown): Record<string, unknown> & { copyId: number } {
+  if (typeof input !== 'object' || input === null) throw new DomainError('VALIDATION')
+  const fields = input as Record<string, unknown>
+  if (!isId(fields.copyId)) throw new DomainError('VALIDATION')
+  return { ...fields, copyId: fields.copyId }
+}
+
 /** Removes the viewer's copies, all or none: one not theirs fails `NOT_FOUND`. No Undo. */
 export async function removeCopiesAction(copyIds: unknown): Promise<ActionResult<null>> {
   return runAction(async () => {
     const ctx = await requireUserOrThrow()
     await removeCopies(ctx, ids(copyIds))
+    return null
+  })
+}
+
+/**
+ * Book detail's copy note: sets the note of one of the viewer's copies. No
+ * Undo. Trimming, the empty note and the length limit are the service's.
+ */
+export async function setNoteAction(input: unknown): Promise<ActionResult<null>> {
+  return runAction(async () => {
+    const ctx = await requireUserOrThrow()
+    const { copyId, note } = copyInput(input)
+    if (typeof note !== 'string') throw new DomainError('VALIDATION')
+    await setNote(ctx, copyId, note)
     return null
   })
 }

@@ -247,7 +247,8 @@
     "genres": "Lajityypit",
     "edit": "Muokkaa",
     "read": "Luettu",
-    "rating": "Arvio"
+    "rating": "Arvio",
+    "note": "Muistiinpano"
   },
   "progress": {
     "loading": "Ladataan"
