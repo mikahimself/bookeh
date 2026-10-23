@@ -4,9 +4,10 @@ import { createElement } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 const back = vi.fn()
+const push = vi.fn()
 const replace = vi.fn()
 
-vi.mock('next/navigation', () => ({ useRouter: () => ({ back, replace }) }))
+vi.mock('next/navigation', () => ({ useRouter: () => ({ back, push, replace }) }))
 
 const {
   canGoBackInApp,
@@ -152,6 +153,32 @@ describe('a task with a recorded base', () => {
     renderHook(() => useCloseTask()).result.current(null)
     expect(replace).toHaveBeenCalledWith('/')
     expect(back).not.toHaveBeenCalled()
+  })
+
+  it('Open book leaves the task once, then pushes its address', () => {
+    const go = vi.spyOn(window.history, 'go').mockImplementation(() => undefined)
+    openTask(1, 1)
+    const tap = renderHook(() => useCloseTask()).result.current
+    tap(null, '/?book=5')
+    tap(null, '/?book=5')
+    expect(go).toHaveBeenCalledTimes(1)
+    expect(go).toHaveBeenCalledWith(-2)
+    expect(push).not.toHaveBeenCalled()
+
+    traverseTo(stampPush({}, 1))
+    vi.advanceTimersToNextFrame()
+    expect(push).toHaveBeenCalledTimes(1)
+    expect(push).toHaveBeenCalledWith('/?book=5', { scroll: false })
+    expect(replace).not.toHaveBeenCalled()
+  })
+
+  it('Open book replaces to its address when the task was the first entry', () => {
+    const go = vi.spyOn(window.history, 'go').mockImplementation(() => undefined)
+    openTask(0, 1)
+    renderHook(() => useCloseTask()).result.current(null, '/?book=5')
+    expect(replace).toHaveBeenCalledWith('/?book=5')
+    expect(go).not.toHaveBeenCalled()
+    expect(push).not.toHaveBeenCalled()
   })
 
   it('Back goes back above the base and replaces at it', () => {

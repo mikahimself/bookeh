@@ -86,6 +86,7 @@
     "notInLibrary": "Not in library",
     "inLibrary": "In library",
     "addAnotherCopy": "Add another copy",
+    "openBook": "Open book",
     "copy": "{status, select, ordered {Ordered} other {Owned}}",
     "copyAt": "{location} · {status, select, ordered {ordered} other {owned}}",
     "addToLibrary": "Add to library",

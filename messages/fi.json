@@ -86,6 +86,7 @@
     "notInLibrary": "Ei kirjastossa",
     "inLibrary": "Kirjastossa",
     "addAnotherCopy": "Lisää uusi kappale",
+    "openBook": "Avaa kirja",
     "copy": "{status, select, ordered {Tilattu} other {Oma}}",
     "copyAt": "{location} · {status, select, ordered {tilattu} other {oma}}",
     "addToLibrary": "Lisää kirjastoon",

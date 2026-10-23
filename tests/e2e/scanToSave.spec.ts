@@ -68,5 +68,19 @@ test('scan to save, undo, save again', async ({ page, context, baseURL }) => {
   await page.goBack()
   await expect(page).toHaveURL(`${origin}/`)
 
+  // 5.20: Open book leaves Scan for that Book's detail; closing it lands on the section.
+  await page.locator('header').getByRole('link', { name: 'Scan book' }).click()
+  await expect(scanHeading).toBeVisible()
+  await enterIsbn(page)
+  await expect(page.getByRole('heading', { name: 'In library' })).toBeVisible()
+  await page.getByRole('button', { name: 'Open book' }).click()
+  await expect(page).toHaveURL(/\/\?book=\d+$/)
+  // Desktop Chrome is wide: Book detail is the side panel, named by the title.
+  const detail = page.getByRole('complementary', { name: /Sapiens/ })
+  await expect(detail).toBeVisible()
+  await detail.getByRole('button', { name: 'Close' }).click()
+  await expect(page).toHaveURL(`${origin}/`)
+  await expect(scanHeading).not.toBeVisible()
+
   expect(offOrigin).toEqual([])
 })

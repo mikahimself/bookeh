@@ -196,6 +196,7 @@ describe('inLibrary', () => {
       newSeries: null,
       pick: undefined,
       editions: [],
+      bookId: 7,
       copies: [
         { location: 'Tampere', status: 'owned' },
         { location: null, status: 'owned' },

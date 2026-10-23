@@ -176,6 +176,12 @@ function traverseBack(traverse: () => void, settled: () => void): void {
  * entry is the task's first) when that entry is in-app, otherwise `/`,
  * replacing. While a back is in flight a second tap does nothing.
  *
+ * With `to`, the task is left the same way and `to` is where it lands
+ * (Open book on the Answer): the replace goes to `to` instead of `/`, and
+ * the back branch pushes `to` with `scroll: false` once the traversal has
+ * settled, so the task's entries are gone below it. Callers pass `null` as
+ * the task, so no slide is started by hand.
+ *
  * React renders a history traversal synchronously, with no view transition,
  * so the back branch starts one itself: the task, marked
  * `data-task-closing`, slides away (styles.css) over the section the
@@ -184,14 +190,14 @@ function traverseBack(traverse: () => void, settled: () => void): void {
  * closes at once. The replace branch is a normal transition, so the task's
  * own `<ViewTransition exit>` plays.
  */
-export function useCloseTask(): (task: HTMLElement | null) => void {
+export function useCloseTask(): (task: HTMLElement | null, to?: string) => void {
   const router = useRouter()
   return useCallback(
-    (task) => {
+    (task, to) => {
       if (closing) return
       const base = taskBase ?? depth
       if (base === 0) {
-        router.replace('/')
+        router.replace(to ?? '/')
         return
       }
       const steps = Math.max(1, depth - base + 1)
@@ -200,10 +206,16 @@ export function useCloseTask(): (task: HTMLElement | null) => void {
       // from a deferred callback, and a second tap must not get in first.
       closing = true
       const back = (settled: () => void) =>
-        traverseBack(() => {
-          if (steps === 1) router.back()
-          else window.history.go(-steps)
-        }, settled)
+        traverseBack(
+          () => {
+            if (steps === 1) router.back()
+            else window.history.go(-steps)
+          },
+          () => {
+            if (to !== undefined) router.push(to, { scroll: false })
+            settled()
+          },
+        )
 
       if (
         !task ||

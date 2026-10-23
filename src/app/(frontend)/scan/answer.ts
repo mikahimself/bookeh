@@ -49,8 +49,11 @@ export type AnswerBook = {
 /** One of the viewer's copies on the In library Answer: its location's name, if any, and status. */
 export type AnswerCopy = { location: string | null; status: 'owned' | 'ordered' }
 
-/** What the In library Answer shows: the Book and the viewer's copies, oldest first. */
-export type InLibrary = AnswerBook & { copies: AnswerCopy[] }
+/**
+ * What the In library Answer shows: the Book and the viewer's copies, oldest
+ * first. `bookId` is the Book Open book shows in the collection.
+ */
+export type InLibrary = AnswerBook & { bookId: number; copies: AnswerCopy[] }
 
 type ExistingResult = Extract<LookupResult, { kind: 'existing' }>
 
@@ -138,6 +141,7 @@ export function inLibrary(result: LookupResult): InLibrary | null {
   if (book.isbn13 === null || mine.copies.length === 0) return null
   return {
     ...existingBook(book, book.isbn13),
+    bookId: book.bookId,
     copies: mine.copies.map(({ location, status }) => ({
       location: location?.name ?? null,
       status,
