@@ -31,7 +31,9 @@ function changeOf(saved: SavedCopy, status: Status, location: Ref | null): CopyC
  * is the draft's change, shown over `saved`; every choice hands the sparse
  * change to `onChange` (`undefined` when the shown values are the saved
  * ones). Choosing ordered hides the combobox and keeps the location it
- * showed, so owned again shows it and returns to the saved values.
+ * showed, so owned again shows it and returns to the saved values. With no
+ * locations the combobox is absent; the first location is added in Settings
+ * (FR-32, EXPERIENCE.md No locations).
  */
 export function CopyFields({
   saved,
@@ -74,7 +76,7 @@ export function CopyFields({
           }}
         />
       </div>
-      {status === 'owned' && (
+      {status === 'owned' && locations.length > 0 && (
         <Combobox
           label={t('location')}
           options={options}

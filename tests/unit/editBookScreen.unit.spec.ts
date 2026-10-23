@@ -480,6 +480,13 @@ describe('EditBookScreen, the copy', () => {
     expect(show).toHaveBeenCalledWith({ kind: 'success', message: 'toast.saved' })
   })
 
+  it('shows the Status switch and no Location field without locations', () => {
+    open(undefined, { ...owned, copy: { id: 9, status: 'owned', location: null }, locations: [] })
+
+    expect(status('owned').getAttribute('aria-pressed')).toBe('true')
+    expect(location()).toBeNull()
+  })
+
   it('drops the copy from the draft after ordered and owned again, location kept', () => {
     open(undefined, owned)
     fireEvent.click(status('ordered'))

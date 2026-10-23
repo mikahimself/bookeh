@@ -192,8 +192,9 @@ const row = (
   copyId: number,
   b: EffectiveBook,
   status: 'owned' | 'ordered' = 'owned',
+  location: CopyLine['location'] = null,
 ): ShelfRow => ({
-  copy: { copyId, status, location: null, note: null, loan: null },
+  copy: { copyId, status, location, note: null, loan: null },
   book: b,
 })
 
@@ -244,7 +245,7 @@ describe('CollectionPage', () => {
   it('shows the tools, the count and one row per copy in shelf order', async () => {
     getShelfRows.mockResolvedValue({
       rows: [
-        row(11, book(1, 'Tuntematon sotilas')),
+        row(11, book(1, 'Tuntematon sotilas'), 'owned', { id: 2, name: 'Tampere' }),
         row(12, book(2, 'Täällä Pohjantähden alla 1', { year: null })),
         row(13, book(2, 'Täällä Pohjantähden alla 1', { year: null }), 'ordered'),
       ],
@@ -262,8 +263,10 @@ describe('CollectionPage', () => {
       'Täällä Pohjantähden alla 1',
     ])
     within(items[0]).getByText('Väinö Linna · 1954 · WSOY')
+    within(items[0]).getByText('Tampere')
     within(items[1]).getByText('Väinö Linna · WSOY')
-    expect(within(items[1]).queryByText('Ordered')).toBeNull()
+    // Owned with no location: no ending.
+    expect(items[1].textContent?.endsWith('Väinö Linna · WSOY')).toBe(true)
     within(items[2]).getByText('Ordered')
   })
 

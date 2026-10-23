@@ -25,13 +25,15 @@ const joined = (parts: (string | number | null)[]) =>
  * DESIGN.md, Book row and Collection density: the cover, the title in
  * `title`, then muted meta, then the ending. At l the authors and year ·
  * publisher are two lines; at m one; at s the meta follows the title on its
- * one line, and a placeholder cover is an empty box. "Ordered" ends the row
- * at every size. One row is one copy. Hook-free, so the server page and the
- * client list share it; the caller passes the words it needs. The whole row
- * is a link to `href`, its Book's detail; `open` marks it with the selection
- * bar. In select mode (`select`) the row is one `<label>` with the checkbox
- * before the cover instead, so a tap anywhere ticks it and opens nothing; at
- * least tap-high on the phone.
+ * one line, and a placeholder cover is an empty box. At every size an ordered
+ * copy's row ends with "Ordered" and an owned copy's with its location's name,
+ * truncated when long. Nothing ends an owned row without a location, so a
+ * user with no locations never sees a location there (FR-32). One row is one copy.
+ * Hook-free, so the server page and the client list share it; the caller
+ * passes the words it needs. The whole row is a link to `href`, its Book's
+ * detail; `open` marks it with the selection bar. In select mode (`select`)
+ * the row is one `<label>` with the checkbox before the cover instead, so a
+ * tap anywhere ticks it and opens nothing; at least tap-high on the phone.
  */
 export function BookRow({
   row: { copy, book },
@@ -56,6 +58,7 @@ export function BookRow({
       ? [authors, joined([book.year, book.publisher])]
       : [joined([authors, book.year, book.publisher])]
   const meta = lines.filter((line) => line !== '')
+  const ending = copy.status === 'ordered' ? ordered : copy.location?.name
 
   const content = (
     <>
@@ -72,8 +75,8 @@ export function BookRow({
           </p>
         ))}
       </div>
-      {copy.status === 'ordered' && (
-        <span className="shrink-0 text-meta text-text-muted">{ordered}</span>
+      {ending !== undefined && (
+        <span className="max-w-1/3 shrink-0 truncate text-meta text-text-muted">{ending}</span>
       )}
     </>
   )
