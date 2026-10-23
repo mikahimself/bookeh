@@ -12,8 +12,8 @@ const router = { replace: vi.fn() }
 let search = new URLSearchParams()
 
 vi.mock('next-intl', () => ({
-  useTranslations: () => (key: string, values?: { name?: string; n?: number }) => {
-    const value = values?.name ?? values?.n
+  useTranslations: () => (key: string, values?: { name?: string; n?: number; label?: string }) => {
+    const value = values?.name ?? values?.n ?? values?.label
     return value === undefined ? key : `${key}: ${value}`
   },
   useLocale: () => 'en',
@@ -326,5 +326,63 @@ describe('Filter panel rating, year and pages', () => {
     search = new URLSearchParams()
     rerender(page())
     expect(input('year', 'rangeFrom').value).toBe('')
+  })
+})
+
+describe('Filter panel sort', () => {
+  beforeEach(() => {
+    vi.stubGlobal('matchMedia', (query: string) => ({
+      media: query,
+      matches: !query.includes('1200px'),
+      addEventListener: () => {},
+      removeEventListener: () => {},
+    }))
+  })
+
+  afterEach(() => {
+    cleanup()
+    vi.clearAllMocks()
+    vi.unstubAllGlobals()
+  })
+
+  const sort = () => within(screen.getByRole('group', { name: 'filterFields.sort' }))
+  const line = (name: string) => sort().getByRole('button', { name })
+  const open = (address: string) => {
+    search = new URLSearchParams(address)
+    render(page())
+    fireEvent.click(filter())
+  }
+
+  it('has Author on, ascending, by default', () => {
+    open('')
+    const author = line('sortDir.asc: sorts.author')
+    expect(author.getAttribute('aria-pressed')).toBe('true')
+    expect(author.textContent).toBe('sorts.author↑')
+    expect(line('sorts.title').getAttribute('aria-pressed')).toBe('false')
+  })
+
+  it('switches to another sort, keeping search and the open Book', () => {
+    open('q=linna&book=7')
+    fireEvent.click(line('sorts.title'))
+    expect(router.replace).toHaveBeenCalledWith('/?q=linna&sort=title&book=7', { scroll: false })
+  })
+
+  it('reverses the default sort', () => {
+    open('')
+    fireEvent.click(line('sortDir.asc: sorts.author'))
+    expect(router.replace).toHaveBeenCalledWith('/?dir=desc', { scroll: false })
+  })
+
+  it('reverses a descending sort back', () => {
+    open('sort=year&dir=desc')
+    expect(line('sortDir.desc: sorts.year').textContent).toBe('sorts.year↓')
+    fireEvent.click(line('sortDir.desc: sorts.year'))
+    expect(router.replace).toHaveBeenCalledWith('/?sort=year', { scroll: false })
+  })
+
+  it('starts another sort ascending from a descending one', () => {
+    open('sort=year&dir=desc')
+    fireEvent.click(line('sorts.added'))
+    expect(router.replace).toHaveBeenCalledWith('/?sort=added', { scroll: false })
   })
 })

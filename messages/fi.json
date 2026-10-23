@@ -179,7 +179,18 @@
       "publisher": "Kustantaja",
       "rating": "Arvio",
       "year": "Vuosi",
-      "pages": "Sivuja"
+      "pages": "Sivuja",
+      "sort": "Järjestys"
+    },
+    "sorts": {
+      "author": "Tekijä",
+      "title": "Nimeke",
+      "year": "Vuosi",
+      "added": "Lisätty"
+    },
+    "sortDir": {
+      "asc": "{label}, nouseva järjestys",
+      "desc": "{label}, laskeva järjestys"
     },
     "filterRemove": "Poista {name}",
     "rangeFrom": "Alkaen",

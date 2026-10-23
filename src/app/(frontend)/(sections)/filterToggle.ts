@@ -56,3 +56,12 @@ export function setFilter<F extends SetField>(
   const filters: Filters = value === undefined ? rest : { ...rest, [field]: value }
   return { ...query, filters }
 }
+
+/**
+ * `query` after a tap on `sort` under "Sort by": the chosen sort reverses
+ * `dir`, another sort becomes the sort, ascending. Search and filters stay.
+ */
+export function sortBy(query: ShelfQuery, sort: ShelfQuery['sort']): ShelfQuery {
+  const dir = query.sort === sort && query.dir === 'asc' ? 'desc' : 'asc'
+  return { ...query, sort, dir }
+}

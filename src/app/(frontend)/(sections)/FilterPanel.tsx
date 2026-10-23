@@ -32,7 +32,7 @@ import { Combobox, type ComboboxOption } from '../components/ui/Combobox'
 import { useWide } from '../components/ui/overlay'
 import { Sheet } from '../components/ui/Sheet'
 
-import { setFilter, toggleFilter, type ListedField, type ListedValue } from './filterToggle'
+import { setFilter, sortBy, toggleFilter, type ListedField, type ListedValue } from './filterToggle'
 
 /**
  * Wide but under 1200px: room for one side panel, so Filter and Book detail
@@ -141,7 +141,16 @@ export function FilterPanel({
   )
 }
 
-type Option = { key: string; label: string; count: number; on: boolean; tap: () => void }
+/** `mark` is the arrow in the count's place, `name` the accessible name when not `label`. */
+type Option = {
+  key: string
+  label: string
+  count?: number
+  mark?: string
+  name?: string
+  on: boolean
+  tap: () => void
+}
 
 /** Replaces the address with `update` applied to the query the panel builds on. */
 type Go = (update: (query: ShelfQuery) => ShelfQuery) => void
@@ -149,12 +158,12 @@ type Go = (update: (query: ShelfQuery) => ShelfQuery) => void
 /**
  * Location, status, read, genre and language as option lists of the values
  * in use, then author, series and publisher as comboboxes with short lists,
- * then rating, year and pages; those only for a viewer with copies. Every
- * change replaces the address at once through `go`, keeping search, sort,
- * the other fields and `book`. Until the address reaches the last change,
- * the next builds on it, so quick taps add up. Once it does, or the address
- * goes somewhere the panel did not write (Clear, Back), the address counts
- * again.
+ * then rating, year and pages, then "Sort by"; those only for a viewer with
+ * copies. Every change replaces the address at once through `go`, keeping
+ * search, `book` and whatever it does not change. Until the address reaches
+ * the last change, the next builds on it, so quick taps add up. Once it
+ * does, or the address goes somewhere the panel did not write (Clear, Back),
+ * the address counts again.
  */
 function OptionLists({ values, labels }: { values: FilterValues; labels: Record<string, string> }) {
   const t = useTranslations('collection')
@@ -254,9 +263,40 @@ function OptionLists({ values, labels }: { values: FilterValues; labels: Record<
           <RatingField value={f.ratingMin ?? null} go={go} />
           <RangeField field="year" range={f.year} go={go} />
           <RangeField field="pages" range={f.pages} go={go} />
+          <SortField query={query} go={go} />
         </>
       )}
     </div>
+  )
+}
+
+const SORTS: readonly ShelfQuery['sort'][] = ['author', 'title', 'year', 'added']
+
+/**
+ * EXPERIENCE.md, Filter panel "Sort by": one line per sort, the chosen one on
+ * with its direction's arrow after it. Tapping it reverses the direction;
+ * another sort starts ascending.
+ */
+function SortField({ query, go }: { query: ShelfQuery; go: Go }) {
+  const t = useTranslations('collection')
+  return (
+    <Field
+      heading={t('filterFields.sort')}
+      options={SORTS.map((sort) => {
+        const label = t(`sorts.${sort}`)
+        const on = query.sort === sort
+        return {
+          key: sort,
+          label,
+          on,
+          ...(on && {
+            mark: query.dir === 'asc' ? '↑' : '↓',
+            name: t(`sortDir.${query.dir}`, { label }),
+          }),
+          tap: () => go((q) => sortBy(q, sort)),
+        }
+      })}
+    />
   )
 }
 
@@ -488,26 +528,38 @@ function Field({ heading, options }: { heading: string; options: Option[] }) {
       <h3 id={id} className="text-heading-group text-text-muted ui-case">
         {heading}
       </h3>
-      {options.map(({ key, label, count, on, tap }) => (
-        <OptionLine key={key} label={label} count={count} on={on} aria-pressed={on} onClick={tap} />
+      {options.map(({ key, label, count, mark, name, on, tap }) => (
+        <OptionLine
+          key={key}
+          label={label}
+          count={count}
+          mark={mark}
+          on={on}
+          aria-pressed={on}
+          aria-label={name}
+          onClick={tap}
+        />
       ))}
     </div>
   )
 }
 
 /**
- * One value line: `body`, `text-muted` with its count after it; when on,
- * `text` with the 8px accent marker. A 44px tap.
+ * One value line: `body`, `text-muted` with its count after it, or `mark`
+ * (hidden from assistive tech) in the count's place; when on, `text` with the
+ * 8px accent marker. A 44px tap.
  */
 function OptionLine({
   label,
   count,
+  mark,
   on,
   onClick,
   ...aria
 }: {
   label: string
   count?: number
+  mark?: string
   on: boolean
   onClick: () => void
   'aria-pressed'?: boolean
@@ -525,6 +577,11 @@ function OptionLine({
       <span aria-hidden="true" className={on ? `${markerSlotClass} bg-accent` : markerSlotClass} />
       <span className="min-w-0 truncate">{label}</span>
       {count !== undefined && <span className="text-text-muted">{count}</span>}
+      {mark !== undefined && (
+        <span aria-hidden="true" className="text-text-muted">
+          {mark}
+        </span>
+      )}
     </button>
   )
 }

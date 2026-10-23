@@ -179,7 +179,18 @@
       "publisher": "Publisher",
       "rating": "Rating",
       "year": "Year",
-      "pages": "Pages"
+      "pages": "Pages",
+      "sort": "Sort by"
+    },
+    "sorts": {
+      "author": "Author",
+      "title": "Title",
+      "year": "Year",
+      "added": "Added"
+    },
+    "sortDir": {
+      "asc": "{label}, ascending",
+      "desc": "{label}, descending"
     },
     "filterRemove": "Remove {name}",
     "rangeFrom": "From",
