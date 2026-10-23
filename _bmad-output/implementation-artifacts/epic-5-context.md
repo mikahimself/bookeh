@@ -4,7 +4,7 @@
 
 ## Goal
 
-Make the collection at `/` the place Mika uses every day: a fast, Finnish-ordered list of his own copies with search, filters, sort, rows or covers in three sizes and endless scrolling; Book detail (phone sheet, wide side panel) where read, rating, notes, Received, Move and Remove happen in place; select mode for bulk read, move and remove; locations shown on rows and managed in Settings; plus the admin extras (re-fetch, look a hand-entered Book up again, back-office tidy-up, last backup). It answers "have I got it, and where is it?" in seconds and holds up at 10,000 copies.
+Make the collection at `/` the place Mika uses every day: a fast list of his own copies in Finnish order, with search, filters, sort, rows or covers in three sizes and endless scrolling. Book detail opens as a sheet on the phone and as a side panel on wide screens, and read, rating, notes, Received, Move and Remove happen there. Select mode handles bulk read, move and remove. Locations show on rows and are managed in Settings. The admin extras are re-fetch, looking up a hand-entered Book again, the back-office tidy-up and the last backup line. The collection answers "have I got it, and where is it?" in seconds and holds up at 10,000 copies.
 
 ## Stories
 
@@ -48,60 +48,71 @@ Make the collection at `/` the place Mika uses every day: a fast, Finnish-ordere
 
 ## Requirements & Constraints
 
-- The app opens on the collection; there is no home screen. One row is one copy; only the viewer's own copies are ever listed.
-- Scrolling is endless: the next page loads as the end approaches, with the progress line, and the list stays usable. No page buttons, no page number in the URL, no skeletons.
-- Search covers effective title, author names, series name, ISBN-13 and copy notes: case-insensitive `ILIKE`, no accent folding ("a" never matches "ä"), `%`, `_`, `\` matched literally. It never searches outside the collection.
-- Filters: location and status (copy); read and rating "at least" (the viewer's `user-books` row, a missing row = unread, unrated); genre (system genres); language, publisher (exact effective value); author, series; year and pages ranges, inclusive, either end open, an active range excluding Books with no effective value. Fields AND, values within a field OR. Filters, sort and search use the viewer's overrides.
-- Sort: author (default; `sortName` of the Book's first effective author the viewer may read, then effective title, both in the sort's direction; no readable author last both ways), title, year (no year last both directions), date added; `fi-FI` collation ("Örkki" after "Zorro"); every sort ends on copy id.
-- First page for no filter, text search, three combined filters and author sort under 1 s at 10,000 copies on the CI runner.
-- Read and rating belong to the user and the Book, not a copy. Notes are per copy.
+- The app opens on the collection; there is no home screen. One row is one copy, and only the viewer's own copies are ever listed.
+- Filters, sort and search all use the viewer's effective values (their overrides). Fields combine with AND, values within one field with OR. Read and rating come from the viewer's `user-books` row; a missing row means unread and unrated.
+- Read and rating belong to the user and the Book, not to a copy. Notes belong to each copy.
 - Received makes an ordered copy owned at the default location. Ordered copies have no location.
-- Locations are optional: a user with none sees no location field, filter, row ending or Move anywhere.
-- Bulk actions apply to all ticked copies or none. Removals are confirmed by a dialog and have no Undo; Move, Read and Received have Undo. Rating saves at once without Undo.
-- Re-fetch is admin-only, fills only empty shared fields (themes and cover included; an uploaded cover counts as a value), never touches `user-books`. Non-admin calls fail `NOT_FOUND`.
-- Every story: strings in English and Finnish, tokens only, accessibility floor (44px tap areas, keyboard reachable; modal sheet and dialogs trap focus, the wide panel does not). Schema-changing stories are verified against a restored production dump before merge. Tests only where an AC or spine rule names the behaviour; no markup/CSS tests.
+- Locations are optional. A user with no locations sees no location field, filter, row ending or Move anywhere.
+- Bulk actions apply to every ticked copy or to none. Removals are confirmed by a dialog and have no Undo. Move, Read and Received have Undo. Rating saves at once, without Undo.
+- Re-fetch is admin-only. It fills only empty shared fields, themes and the cover included (an uploaded cover counts as a value), and never touches `user-books`. A non-admin call fails with `NOT_FOUND`.
+- Every story ships its strings in English and Finnish (ICU plurals), uses design tokens only, and meets the accessibility floor: 44px tap areas and keyboard reach. The modal sheet and dialogs trap focus; the wide panel does not.
+- A story that changes the schema is verified against a restored production dump before merge.
+- Tests only where an acceptance criterion or a spine rule names the behaviour.
 
 ## Technical Decisions
 
-- **Shelf module (`src/lib/shelf`)** is the only code that filters, sorts or searches copies on Book fields: read-only Drizzle through the `lib/payload` helper. Every query starts from `visibleCopies(viewer)` (today `owner = viewer`) and applies the shared-or-own read rule in joins to `books`, `authors`, `series`. Effective values in SQL test whether the field name is in `overridden`. Author/series filter values are ids matching every readable record with the same `nameKey`. All values are bound parameters.
-- **No browsing the catalogue:** nothing lists or searches `books`, `authors` or `series` on their own; they are reached through a copy the viewer can see, or by exact ISBN-13 / `nameKey` match.
-- **URL is the state.** Search, filters, sort and the open Book live in `/` search params; only the pure, client-importable `lib/shelf/query.ts` reads or writes them (`parseShelfQuery` → `ShelfAddress { query, book }`, never throws, bad values drop to defaults; one param writer behind `shelfHref(query, { book })` for links and `shelfRowsPath(query, range)` for `/data/shelf`; `SHELF_PAGE_SIZE`, `SHELF_MAX_ROWS`). Filter chips are links built with `shelfHref()`.
-- **One hydrated read:** `getShelfRows(ctx, query, range)` → `ShelfRows { rows, total, labels }`, hydrating ordered ids through `getEffectiveBooks()` and `getHoldings()` (a copy gone between reads is dropped). `labels` is keyed `field:id` for location, genre, author, series only. The page calls it for the first rows; the `/data/shelf` route handler calls it for every other range. Offset/limit, one fixed page size, every sort ends on copy id.
-- **`/data/shelf?<shelf params>&offset&limit`** (built) answers `ActionResult<ShelfRows>`; `book` ignored; `offset` ≥ 0, `limit` 1–1000 (`SHELF_MAX_ROWS`), anything else `VALIDATION` with no query run; 401 when signed out. The client reaches it only through `fetchData` and `shelfRowsPath`.
-- **Client list** (built): rows live in `ShelfRowsProvider`, read with `useShelfRows()` → `{ shelf, loading, loadMore, afterAction }`; the provider keys its inner state by `shelfHref(query)` itself (a `?book=` change keeps held rows). Any sibling that acts on the collection (Book detail, select bar) reports through `afterAction(result)`: `ok` reloads, `NOT_FOUND` toasts "Not in library" then reloads, anything else goes to `reportFailure`. A successful toast Undo reloads via `ToastProvider`'s `onUndone`. A reload fetches rows 0..min(held, `SHELF_MAX_ROWS`) and replaces them; stale answers are dropped. Rows are never patched locally. Keep my place (built): `sessionStorage` holds only `{ rows, scrollY }` per query (never row data); on return from another route the first query mounted reloads that many rows in one request and restores the position; a search, filter or sort change on `/` never restores.
-- **Filter values and suggestions** (built): `filterValues` gives locations, statuses, read and unread (read first; a missing `user-books` row is unread), genres and languages in use on the viewer's copies with counts, never narrowed by the current query; `/data/suggest` gives author, series and publisher suggestions distinct on `nameKey`, preferring the shared record's id.
-- **Timing and indexes:** the 10,000-copy timing test runs on every CI run; plain `ILIKE` passes, so there are no search indexes. Add `pg_trgm` GIN on stored columns only if that test fails; never on computed effective values.
-- **Book detail** is one server component rendered by the section page when `?book=` is set; later epics add groups to it only. Every `{ bookId }` from the client and Book detail itself starts with `requireOwnBook(ctx, bookId)` (`NOT_FOUND` unless the viewer holds a copy or, from Epic 7, an open wishlist entry). Surface code sees only `EffectiveBook` and `UserBookState`.
-- **Writers (one per row kind):** `lib/copies` owns copies and locations (move, receive, note, remove, create/rename/merge/delete location); `lib/books` owns `user-books` via `upsertUserBook()` only (`setRead`; `setRating(ctx, bookId, rating | null)` with `ratedAt`, still to build); `lib/catalogue` owns re-fetch and `lookupAgain()`. Selection actions take copy ids and run in one transaction; a single-row action calls the same function with one id. A location picked or created inline is a `Ref` (id or `{ create: name }`) resolved inside the action's transaction; Undo leaves a row created this way.
-- **`setRead`** (built) takes copy ids or a Book id, applies to the distinct Books, `toggle` → unread only when every Book is read, returns `Undone<{ read, count }>`. 5.23 and 5.29 call it.
-- **Locations** (built in `lib/copies`): rename onto an existing `nameKey`, and adding by name from a Settings list (`createLocation`), fail `NAME_TAKEN` with the other row's id as `conflictId` (a case-only rename of itself is allowed); only a `Ref` matches an existing name instead. Merge moves copies and the default location, then deletes the source; delete clears copies and the default location. One transaction each, no Undo. The profile default changes only through `lib/account`.
-- **Undo:** undoable service functions return `Undone<T>` and join the caller's transaction; the server action wraps its one call in `withUndo`. Each undoable function ships an integration test that undoes it.
-- **Look it up again:** rate-limited lookup, `unavailable` never cached; on `found` runs the auto-share transaction without creating a copy (promote in place, or move copies and `user-books` to an existing shared Book and delete the private one only if unreferenced, with its unreferenced private authors, series and cover). Admin's differing hand values are dropped; another user's become overrides. Not undoable.
-- **Client imports from `src/lib`:** only types, `lib/shelf/query.ts`, `lib/catalogue/corners.ts` and `lib/books/languageName.ts` (`languageName`, for language display names), all pure.
-- **Device preferences** (layout, size) live in the `bookeh_prefs` cookie read at render, so first paint is right. Overlays come from the `components/ui` Base UI wrappers (Sheet, Dialog, Combobox, Picker, Menu); the wide side panel is plain layout, not a drawer.
-- **History:** opening Book detail pushes; swapping the Book or changing search/filters/sort replaces; closing is history back (fallback `/`). Overlays without an address (pickers, dialogs, the phone Filter sheet) handle Back in their wrapper. A replace that keeps the pathname keeps open overlays' history tokens, and an overlay whose address changed while open (a filter tap under the Filter sheet) lands on its latest address when closed by X, scrim or Back. Overlay and search navigation use `scroll: false`, no prefetch.
+- **Shelf module (`src/lib/shelf`)** is the only code that filters, sorts or searches copies on Book fields. It uses read-only Drizzle through the `lib/payload` helper and starts every query from `visibleCopies(viewer)`. Nothing lists or searches `books`, `authors` or `series` on their own; they are reached only through a copy the viewer can see.
+- **The URL is the state.** Search, filters, sort and the open Book live in the search params of `/`. Only the pure `lib/shelf/query.ts` reads or writes them, through `parseShelfQuery` and `shelfHref(query, { book })`. Filter chips are links built with `shelfHref()`.
+- **Client rows:** the loaded rows live in `ShelfRowsProvider`, read with `useShelfRows()`, and are keyed by the query without `book`. Rows are never patched locally. Every action on the collection (Book detail, the select bar) reports its result through `afterAction(result)` from `useAfterAction()`. The unkeyed `ShelfActionsProvider` provides it above the tools, the columns and `SelectBar`, and the mounted rows register their reload with it.
+  - `ok` reloads rows 0..held.
+  - `NOT_FOUND` toasts "Not in library", then reloads.
+  - Any other code goes to `reportFailure`.
+  - A successful toast Undo reloads through `ToastProvider`'s `onUndone`.
+- **Book detail** is one server component (`BookDetail`). It renders in an addressed `Sheet` on the phone and in the 360px panel on wide screens, and later stories add groups to it only. Its single close is `useTaskBack(shelfHref(query), true)`. Every `{ bookId }` from the client starts with `requireOwnBook(ctx, bookId)`. Surface code sees only `EffectiveBook` and `UserBookState`.
+- **One writer per row kind:**
+  - `lib/copies` owns copies and locations: `moveCopies`, `removeCopies`, receive, note, and the location functions.
+  - `lib/books` owns `user-books`, through `upsertUserBook()` only: `setRead` (built) and `setRating(ctx, bookId, rating | null)` with `ratedAt` (to build in 5.23).
+  - `lib/catalogue` owns re-fetch and `lookupAgain()`.
+  - Selection actions take copy ids and run in one transaction. A single-row action calls the same function with one id.
+  - A location picked or created inline is a `Ref` (an id, or `{ create: name }`), resolved inside the action's transaction. Undo leaves a row created this way.
+- **`setRead(ctx, target, value | 'toggle')`** (built) takes copy ids or a Book id and applies to the distinct Books. `toggle` resolves to unread only when every Book is already read. It returns `Undone<{ read, count }>`. 5.23 and 5.29 call it.
+- **Server actions** live in `(sections)/actions.ts` (`removeCopiesAction` is the pattern). Each validates its input as an array of positive safe integers (anything else is `VALIDATION`, with no write) and runs `requireUserOrThrow()` inside `runAction()`. An undoable action wraps its one service call in `withUndo`. Undoable service functions return `Undone<T>`, join the caller's transaction, and ship an integration test that undoes them. The undoable actions are exactly those EXPERIENCE.md lists with an Undo; removals, deletes, merges and `lookupAgain` are not undoable.
+- **Look it up again:** the lookup is rate-limited, and `unavailable` is never cached. On `found` it runs the auto-share transaction without creating a copy: it either promotes the Book in place, or moves the copies and the `user-books` row to an existing shared Book and deletes the private one when nothing else references it. The admin's differing hand-entered values are dropped; another user's become overrides.
+- **Client imports from `src/lib`** are limited to types and pure modules: `lib/shelf/query.ts`, `lib/catalogue/corners.ts` and `lib/books/languageName.ts`.
+- **Overlays** come from the Base UI wrappers in `components/ui` (Sheet, Dialog, Combobox, Picker, Menu). The wide panel is plain layout, not a drawer.
+- **History:** opening Book detail pushes an entry. Swapping the Book, or changing search, filters or sort, replaces it. Navigation uses `scroll: false` and no prefetch.
 
 ## UX & Interaction Patterns
 
-- **Tools row:** search, Filter, Select, rows/covers, s/m/l. Count line: "{n} books", or active values · count · Clear. Row ending: location, lent marker, or "Ordered"; blank with no locations.
-- **States:** "No books yet" + dry remark (+ Scan book on wide only); "No books match" + Clear; "Couldn't load. Try again." with a retry Link; "Loading more": progress line, list stays usable. `?book=` for a Book not held → toast "Not in library". A row that stops matching leaves; open detail stays until closed.
-- **Density:** DESIGN.md's density table; covers 2:3; size changes what fits, not what is fetched.
-- **Filter panel:** left of the list on wide, bottom sheet on phone; applies instantly, no Apply. Option lists with counts and the marker (languages need display names); author/series/publisher comboboxes add to a short list; rating "at least" with a Clear Link; year/pages from–to with an inline error when from > to. Tapping the chosen sort reverses it. 900–1200px: Filter and Book detail are mutually exclusive.
-- **Book detail:** phone bottom sheet (a little over half, list dimmed and keeping its scroll position, modal); ≥900px a 360px right panel, not modal, no scrim, clicking another row swaps, X/`Esc` close, `Enter` on a row opens. Content: header, read switch and Rating, "your copies" lines (location + status; owned: Move, Remove; ordered: Received), note saved on blur, foot with Edit. Filter chips (Link style) add to current filters; from `/loans` or a wishlist entry they open the collection with only that filter.
-- **Rating:** tap sets, another star changes, tapping the current star does nothing, Clear Link while set.
-- **Select mode:** entering closes Book detail; tap ticks; action bar replaces Scan book on phone (count + Done above, actions below), bottom on wide. Actions disabled with nothing ticked; selection survives search, filter, scroll; no select all; Done or `Esc` exits.
-- **Toasts / dialogs:** "Marked {n} read · Undo", "{n} moved to {location} · Undo", "Saved to {location} · Undo" (Received), "Shared · from {source}", "Still not found.", "Add the ISBN on Edit book to look it up."; dialog "Remove {n} books from library?".
-- **Admin:** Re-fetch placement and result display are picked by Mika from rendered mock-up options and recorded in EXPERIENCE.md before building.
-- One overlay deep: a sheet or panel may open one picker or dialog.
+- **Row ending:** the location, the lent marker or "Ordered". It is blank when the user has no locations.
+- **Book detail content:** the header, the read switch and Rating, then "your copies" lines (location and status). An owned copy has Move and Remove; an ordered copy has Received. A note sits under each copy and saves on blur. The foot has Edit.
+- **Filter chips:** styled as Links. A chip adds its value to the current filters (a second value in the same field widens it), and on the phone the sheet closes. A chip in Book detail opened from `/loans`, or in a wishlist entry, opens the collection with only that filter.
+- **Rating:** a tap sets it and tapping another star changes it. Tapping the current star does nothing. A Clear Link shows while a rating is set.
+- **Select mode:**
+  - Entering it closes Book detail, and a tap ticks a row instead of opening it.
+  - The bar's order is count, then Move, Tag, Read, Remove, Done. On the phone it has two rows: the count and Done above, the actions below. On wide screens it is one row at the bottom.
+  - Actions are disabled while nothing is ticked or while one is in flight.
+  - The selection survives search, filtering and scrolling. There is no select all.
+  - After an action, the sent ids are unticked and select mode stays on. Only Done or `Esc` leaves.
+- **Toasts and dialogs:**
+  - "Marked {n} read · Undo"
+  - "{n} moved to {location} · Undo"
+  - "Saved to {location} · Undo" (Received)
+  - "Shared · from {source}"
+  - "Still not found."
+  - "Add the ISBN on Edit book to look it up."
+  - The dialog "Remove {n} books from library?"
+- **Admin Re-fetch:** Mika picks its placement and result display from rendered mock-up options, and the pick is recorded in EXPERIENCE.md before building.
+- **Overlay depth:** one overlay deep. A sheet or panel may open one picker or dialog. `Esc` closes the topmost thing: dialog, then panel, then select mode.
 
 ## Cross-Story Dependencies
 
-- Done: 5.1–5.14, 5.22, 5.27, 5.31–5.33, 5.36, 5.37. 5.18 is built and stays in review only for Epic 4's phone check (camera picker, touch corner crop, HEIC cover upload via Book detail's Edit), which needs Mika's iPhone. Next: 5.15.
-- The server page seeds `ShelfRowsProvider` with the first `SHELF_PAGE_SIZE` rows; `BookRow` and `CoverTile` take a `ShelfRow` and a size and use no hooks; the list picks one from `useCollectionDisplay()` (layout and size, seeded from `devicePrefs()`). The search field replaces the URL itself and tells its own replace from outside navigation (Clear, Back); keep that intact.
-- Actions in 5.18 and 5.23–5.30 call `afterAction`; none patch rows. Open check from 5.12: the restore after a history Back (X on Scan or Edit book) is verified only in jsdom; confirm it in a real browser when a later story touches the list.
-- Book detail (5.18) is the `BookDetail` server component in an addressed `Sheet` (pushes no entry of its own) at every width; its one close is `useTaskBack(shelfHref(query), true)` (history back, or replace without `book`). 5.19 renders the same component in the wide panel and owns swapping the open Book; later groups (here and Epics 6, 7, 9) add to that component only. Opening Filter at 900–1199px and entering select mode both close Book detail through that close.
-- The Filter panel (5.14) holds the value-list fields; 5.15 and 5.16 add author/series/publisher comboboxes and year/pages/rating ranges to it, 5.17 adds sort.
-- `moveCopies` and `removeCopies` exist in `lib/copies`; 5.24, 5.28 and 5.30 wire them. Select mode (5.27) has the action bar with count and Done only; in select mode rows render a tick label instead of the Book detail link. Remove, Read, Move (and Tag in 9.8) come with 5.28–5.30; the phone's actions row makes the bar taller than `--spacing-pinned-bar`, so the toast lift must follow. 5.30 reuses the location picker with inline create. Known gap: Undo of a move fails `UNDO_FAILED` if a location it would restore was deleted since (now reachable via Settings).
-- 5.33 built the reusable `ListRow` (People, tags, wishlists reuse it).
-- 5.35 reuses Epic 3's auto-share and edition picker; split `sharePrivateBook.ts` at its D-8 compare seam when 5.34 or 5.35 touches it. Entries move too once Epic 7 lands.
-- The `genre` filter carries only system genre ids here; Epic 9 settles user genre tags. Lent markers and loan actions arrive with Epic 6; tags/themes with Epic 9.
+- **Status:** done are 5.1–5.20, 5.22, 5.27, 5.28 and 5.31–5.33, 5.36, 5.37. Still open are 5.21, 5.23–5.26, 5.29, 5.30, 5.34 and 5.35.
+- **Action bar:** 5.28 built it with Remove and the phone's actions row, plus a `--spacing-pinned-bar` override so the toast clears the two rows. 5.29 adds Read, 5.30 adds Move and 9.8 adds Tag. The phone's actions row has to fit four buttons at 390px, and the toast override assumes one row of actions.
+- **Stale filter counts (deferred from 5.28):** Filter panel counts and value lists come from the server render, and `afterAction` reloads only the rows. They go stale after any action that changes rows (Remove, Read, Move, Received) until the next navigation. The fix belongs to the `afterAction` contract in the spine, not to one action.
+- **Esc inside the wide panel:** Base UI's `Esc` listener is registered after the panel's, so one `Esc` may close both a picker or dialog inside the panel and the panel itself. 5.24 and 5.30 must handle this.
+- **5.21 and suggestions:** check that a chip's author id and the shared id from `/data/suggest` for the same `nameKey` don't list the name twice in the Filter panel.
+- **5.30 Move:** wires the existing `moveCopies` and reuses the location picker with inline create. Known gap: Undo of a move fails with `UNDO_FAILED` if a location it would restore has since been deleted (possible from Settings).
+- **5.24 Remove:** wires the existing `removeCopies` (all or none). After the last copy is removed, the detail closes.
+- **5.35:** reuses Epic 3's auto-share and edition picker. Split `sharePrivateBook.ts` at its D-8 compare seam when 5.34 or 5.35 touches it. Wishlist entries move too once Epic 7 lands.
+- **Other epics:** the `genre` filter carries only system genre ids for now; Epic 9 settles user genre tags. Lent markers and loan actions arrive with Epic 6, tags and themes with Epic 9.
