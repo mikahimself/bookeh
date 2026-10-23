@@ -1,3 +1,5 @@
+import Link from 'next/link'
+
 import type { ShelfRow } from '@/lib/shelf/query'
 
 import { Cover } from '../components/Cover'
@@ -21,16 +23,24 @@ const joined = (parts: (string | number | null)[]) =>
  * publisher are two lines; at m one; at s the meta follows the title on its
  * one line, and a placeholder cover is an empty box. "Ordered" ends the row
  * at every size. One row is one copy. Hook-free, so the server page and the
- * client list share it; the caller passes the words it needs.
+ * client list share it; the caller passes the words it needs. The whole row
+ * is a link to `href`, its Book's detail; `open` marks it with the selection
+ * bar.
  */
 export function BookRow({
   row: { copy, book },
   size,
   ordered,
+  href,
+  replace,
+  open,
 }: {
   row: ShelfRow
   size: Size
   ordered: string
+  href: string
+  replace: boolean
+  open: boolean
 }) {
   const authors = book.authors.map((author) => author.name).join(', ')
   const lines =
@@ -40,23 +50,36 @@ export function BookRow({
   const meta = lines.filter((line) => line !== '')
 
   return (
-    <li className={`flex items-center gap-4 ${ROW[size].row}`}>
-      <div className={`${ROW[size].cover} shrink-0`}>
-        <Cover src={book.coverUrl} title={size === 's' ? '' : book.title} />
-      </div>
-      <div className={`flex min-w-0 flex-1 ${size === 's' ? 'items-baseline gap-2' : 'flex-col'}`}>
-        <p className={`truncate text-title text-text${size === 's' ? ' max-w-full shrink-0' : ''}`}>
-          {book.title}
-        </p>
-        {meta.map((line, i) => (
-          <p key={i} className="min-w-0 truncate text-meta text-text-muted">
-            {line}
+    <li className={open ? 'selection-bar' : undefined}>
+      <Link
+        href={href}
+        replace={replace}
+        scroll={false}
+        prefetch={false}
+        aria-current={open ? 'true' : undefined}
+        className={`flex items-center gap-4 ${ROW[size].row}`}
+      >
+        <div className={`${ROW[size].cover} shrink-0`}>
+          <Cover src={book.coverUrl} title={size === 's' ? '' : book.title} />
+        </div>
+        <div
+          className={`flex min-w-0 flex-1 ${size === 's' ? 'items-baseline gap-2' : 'flex-col'}`}
+        >
+          <p
+            className={`truncate text-title text-text${size === 's' ? ' max-w-full shrink-0' : ''}`}
+          >
+            {book.title}
           </p>
-        ))}
-      </div>
-      {copy.status === 'ordered' && (
-        <span className="shrink-0 text-meta text-text-muted">{ordered}</span>
-      )}
+          {meta.map((line, i) => (
+            <p key={i} className="min-w-0 truncate text-meta text-text-muted">
+              {line}
+            </p>
+          ))}
+        </div>
+        {copy.status === 'ordered' && (
+          <span className="shrink-0 text-meta text-text-muted">{ordered}</span>
+        )}
+      </Link>
     </li>
   )
 }

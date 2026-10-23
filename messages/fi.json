@@ -199,6 +199,11 @@
     "loadFailed": "Lataus ei onnistunut.",
     "tryAgain": "Yritä uudelleen"
   },
+  "detail": {
+    "yourCopies": "Kappaleesi",
+    "series": "{name} {index}",
+    "edit": "Muokkaa"
+  },
   "progress": {
     "loading": "Ladataan"
   },

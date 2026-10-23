@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useTranslations } from 'next-intl'
 import { Fragment, useEffect, useRef, useState, type ReactNode } from 'react'
 
-import type { ShelfQuery } from '@/lib/shelf/query'
+import { shelfHref, type ShelfQuery, type ShelfRow } from '@/lib/shelf/query'
 
 import { buttonClass } from '../components/Button'
 import { TextLink } from '../components/Link'
@@ -36,8 +36,10 @@ const GRID: Record<DevicePrefs['size'], string> = {
  * while a search or filter is on. When a sentinel after the last row comes
  * within a screen of view, the next rows load with the progress line and the
  * rows shown stay usable; a failed load is tried again on the next approach.
+ * A row or tile opens Book detail (`?book=`): pushing, or replacing while
+ * `book` is open, whose rows carry the selection bar.
  */
-export function CollectionList({ query }: { query: ShelfQuery }) {
+export function CollectionList({ query, book }: { query: ShelfQuery; book: number | null }) {
   const t = useTranslations('collection')
   const root = useTranslations()
   const { shelf, loading, loadMore } = useShelfRows()
@@ -71,6 +73,11 @@ export function CollectionList({ query }: { query: ShelfQuery }) {
   const values = activeValues(query, shelf.labels, t).join(', ')
   const count = t('count', { n: shelf.total })
   const parts: ReactNode[] = narrowed ? [...(values ? [values] : []), count, clear] : [count]
+  const opens = (row: ShelfRow) => ({
+    href: shelfHref(query, { book: row.book.bookId }),
+    replace: book !== null,
+    open: row.book.bookId === book,
+  })
 
   return (
     <>
@@ -104,13 +111,19 @@ export function CollectionList({ query }: { query: ShelfQuery }) {
       ) : layout === 'covers' ? (
         <ul className={`grid ${GRID[size]}`}>
           {shelf.rows.map((row) => (
-            <CoverTile key={row.copy.copyId} row={row} size={size} />
+            <CoverTile key={row.copy.copyId} row={row} size={size} {...opens(row)} />
           ))}
         </ul>
       ) : (
         <ul>
           {shelf.rows.map((row) => (
-            <BookRow key={row.copy.copyId} row={row} size={size} ordered={t('ordered')} />
+            <BookRow
+              key={row.copy.copyId}
+              row={row}
+              size={size}
+              ordered={t('ordered')}
+              {...opens(row)}
+            />
           ))}
         </ul>
       )}

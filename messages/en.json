@@ -199,6 +199,11 @@
     "loadFailed": "Couldn't load.",
     "tryAgain": "Try again"
   },
+  "detail": {
+    "yourCopies": "Your copies",
+    "series": "{name} {index}",
+    "edit": "Edit"
+  },
   "progress": {
     "loading": "Loading"
   },

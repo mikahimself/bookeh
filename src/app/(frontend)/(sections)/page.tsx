@@ -5,6 +5,7 @@ import { parseShelfQuery, SHELF_PAGE_SIZE, type ShelfRows } from '@/lib/shelf/qu
 
 import { devicePrefs } from '../prefs'
 
+import { BookDetail } from './BookDetail'
 import { CollectionDisplayProvider } from './CollectionDisplay'
 import { CollectionList } from './CollectionList'
 import { CollectionTools } from './CollectionTools'
@@ -16,7 +17,8 @@ import { ShelfRowsProvider } from './ShelfRows'
  * row, then the client list seeded with the first page of the viewer's
  * copies (AD-7). A failed read shows Load failed. Layout and size come from
  * the device preferences cookie, so the first render already shows them; the
- * switches work even when the list failed.
+ * switches work even when the list failed. With `?book=`, Book detail as
+ * well, whatever the shelf read gave.
  */
 export default async function CollectionPage({
   searchParams,
@@ -24,7 +26,7 @@ export default async function CollectionPage({
   searchParams: Promise<Record<string, string | string[] | undefined>>
 }) {
   const ctx = await requireUser()
-  const { query } = parseShelfQuery(await searchParams)
+  const { query, book } = parseShelfQuery(await searchParams)
   const { layout, size } = await devicePrefs()
 
   let shelf: ShelfRows | null = null
@@ -40,12 +42,13 @@ export default async function CollectionPage({
         <CollectionTools />
         {shelf ? (
           <ShelfRowsProvider query={query} initial={shelf}>
-            <CollectionList query={query} />
+            <CollectionList query={query} book={book} />
           </ShelfRowsProvider>
         ) : (
           <LoadFailed />
         )}
       </CollectionDisplayProvider>
+      {book !== null && <BookDetail ctx={ctx} bookId={book} query={query} />}
     </div>
   )
 }

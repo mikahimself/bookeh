@@ -15,6 +15,8 @@ import { randomIsbn } from '../helpers/isbn'
 // then `setCover()` or `removeCover()`.
 
 vi.mock('next/headers', () => ({ headers: vi.fn(), cookies: vi.fn() }))
+// A save purges the client cache; outside a request there is none.
+vi.mock('next/cache', () => ({ revalidatePath: vi.fn() }))
 
 const password = 'edit-book-action-password'
 const WIDTH = 300

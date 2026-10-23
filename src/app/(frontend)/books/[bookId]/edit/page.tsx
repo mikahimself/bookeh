@@ -2,28 +2,17 @@ import { getTranslations } from 'next-intl/server'
 import { ViewTransition } from 'react'
 
 import { canEditShared } from '@/access/roles'
-import { getEffectiveBooks, type EffectiveBook } from '@/lib/books/effectiveBook'
-import { requireOwnBook } from '@/lib/books/requireOwnBook'
+import type { EffectiveBook } from '@/lib/books/effectiveBook'
 import { listGenres } from '@/lib/catalogue/listGenres'
 import { listLocations } from '@/lib/copies/locations'
-import { DomainError } from '@/lib/errors'
-import { requireUser, type Context } from '@/lib/payload/context'
+import { requireUser } from '@/lib/payload/context'
+
+import { heldBook } from '../../../heldBook'
 
 import { EditBookScreen } from './EditBookScreen'
 import type { EffectiveEdits } from './MoreDetails'
 import { NotHeld } from './NotHeld'
 import { MAX_ID, savedCopy } from './savedCopy'
-
-/** The Book as the viewer sees it, or `undefined` when they do not hold it (AD-7). */
-async function heldBook(ctx: Context, bookId: number): Promise<EffectiveBook | undefined> {
-  try {
-    await requireOwnBook(ctx, bookId)
-  } catch (err) {
-    if (err instanceof DomainError && err.code === 'NOT_FOUND') return undefined
-    throw err
-  }
-  return (await getEffectiveBooks(ctx, [bookId])).get(bookId)
-}
 
 /** The Book's values in the shape of `BookEdits`, which the draft is compared with. */
 function effectiveEdits(book: EffectiveBook): EffectiveEdits {

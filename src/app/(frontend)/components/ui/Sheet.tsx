@@ -22,8 +22,18 @@ export type SheetProps = {
   /** Names the sheet for assistive technology; the content draws its own heading. */
   label: string
   children?: ReactNode
-  /** Runs once per close, after the sheet's history entry is gone (`useCloseOnBack`). */
+  /**
+   * Runs once per close: after the sheet's history entry is gone
+   * (`useCloseOnBack`), or, `addressed`, after the close animation.
+   */
   onClosed?: () => void
+  /**
+   * The address is the open state (Book detail's `?book=`), so the sheet
+   * pushes no same-URL entry of its own: Back would pop that entry first and
+   * leave the address open. The caller leaves the address in `onClosed`;
+   * Back changes the address itself and the caller unmounts the sheet.
+   */
+  addressed?: boolean
 }
 
 /**
@@ -34,7 +44,7 @@ export type SheetProps = {
  * Back closes it. Modal, and the list underneath keeps its scroll position.
  * Every open starts half open.
  */
-export function Sheet({ open, onOpenChange, label, children, onClosed }: SheetProps) {
+export function Sheet({ open, onOpenChange, label, children, onClosed, addressed }: SheetProps) {
   const t = useTranslations('overlay')
   const layer = useOverlayLayer('sheet')
   const [snapPoint, setSnapPoint] = useState<Drawer.Root.SnapPoint | null>(HALF_OPEN)
@@ -44,12 +54,19 @@ export function Sheet({ open, onOpenChange, label, children, onClosed }: SheetPr
     if (open) setSnapPoint(HALF_OPEN)
   }
   useSuspendSwipe(open)
-  useCloseOnBack(open, () => onOpenChange(false), onClosed)
+  useCloseOnBack(
+    addressed ? false : open,
+    () => onOpenChange(false),
+    addressed ? undefined : onClosed,
+  )
 
   return layer(
     <Drawer.Root
       open={open}
       onOpenChange={(next) => onOpenChange(next)}
+      onOpenChangeComplete={(next) => {
+        if (addressed && !next) onClosed?.()
+      }}
       swipeDirection="down"
       snapPoints={SNAP_POINTS}
       snapPoint={snapPoint}

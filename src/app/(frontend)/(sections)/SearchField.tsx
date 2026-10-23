@@ -30,7 +30,7 @@ const canonical = (params: ShelfParams): string => {
  * removes it. The progress line runs while the new page renders. Any other
  * change of the address (Clear, Back) cancels a pending search and puts the
  * address's `q` in the field; the field's own replace leaves what was typed
- * since. On wide screens `/` focuses it.
+ * since. On wide screens `/` focuses it, unless a modal is open.
  */
 export function SearchField() {
   const t = useTranslations()
@@ -68,6 +68,7 @@ export function SearchField() {
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key !== '/' || event.defaultPrevented || event.ctrlKey || event.metaKey) return
       if (editable(event.target) || !window.matchMedia(WIDE_QUERY).matches) return
+      if (document.querySelector('[role="dialog"]')) return
       event.preventDefault()
       input.current?.focus()
     }

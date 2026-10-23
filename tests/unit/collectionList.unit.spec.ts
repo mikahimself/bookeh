@@ -124,7 +124,7 @@ const tree = (initial: ShelfRows, q: ShelfQuery = query) =>
       createElement(
         ShelfRowsProvider,
         { query: q, initial } as ComponentProps<typeof ShelfRowsProvider>,
-        createElement(CollectionList, { query: q }),
+        createElement(CollectionList, { query: q, book: null }),
         createElement(Probe),
       ),
     ),

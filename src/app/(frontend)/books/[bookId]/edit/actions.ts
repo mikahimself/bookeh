@@ -1,5 +1,7 @@
 'use server'
 
+import { revalidatePath } from 'next/cache'
+
 import type { Corners } from '@/lib/catalogue/corners'
 import { editBook, type BookEdits, type EditBookInput } from '@/lib/catalogue/editBook'
 import { removeCover, setCover } from '@/lib/catalogue/setCover'
@@ -76,7 +78,8 @@ const isCover = (value: unknown): boolean =>
  * `{ image, corners }` from the crop step, else `VALIDATION` naming `cover`.
  * After `editBook()`, `removeCover()` or `setCover()` runs in its own
  * transaction, which checks the corners and the gate: edits that fail write
- * nothing, and a cover refused after them leaves them saved. No Undo.
+ * nothing, and a cover refused after them leaves them saved. No Undo. A
+ * save purges the client cache, so the page Edit book returns to is fresh.
  */
 export async function editBookAction(input: unknown): Promise<ActionResult<null>> {
   return runAction(async () => {
@@ -96,6 +99,9 @@ export async function editBookAction(input: unknown): Promise<ActionResult<null>
     const change = cover as CoverInput
     if (change === null) await removeCover(ctx, bookId)
     else if (change) await setCover(ctx, bookId, change.image, change.corners)
+    // The close is history back (to Book detail or the list), which would
+    // otherwise reuse the page from before the save.
+    revalidatePath('/', 'layout')
     return null
   })
 }

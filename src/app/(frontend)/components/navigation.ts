@@ -207,9 +207,10 @@ export function useCloseTask(): (task: HTMLElement | null) => void {
  * Back inside a task (EXPERIENCE.md, Answer): history back while the task
  * has an entry below the current one, otherwise `fallback`, replacing (an
  * Answer opened directly). While a back is in flight a second tap does
- * nothing, as on the X.
+ * nothing, as on the X. Outside a task, any in-app entry counts (Book
+ * detail's close); `keepScroll` replaces with `scroll: false`.
  */
-export function useTaskBack(fallback: string): () => void {
+export function useTaskBack(fallback: string, keepScroll = false): () => void {
   const router = useRouter()
   return useCallback(() => {
     if (closing) return
@@ -219,6 +220,7 @@ export function useTaskBack(fallback: string): () => void {
         () => router.back(),
         () => undefined,
       )
-    } else router.replace(fallback)
-  }, [router, fallback])
+    } else if (keepScroll) router.replace(fallback, { scroll: false })
+    else router.replace(fallback)
+  }, [router, fallback, keepScroll])
 }
