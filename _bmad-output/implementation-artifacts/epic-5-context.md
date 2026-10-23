@@ -70,12 +70,12 @@ Make the collection at `/` the place Mika uses every day: a fast list of his own
   - A successful toast Undo reloads through `ToastProvider`'s `onUndone`.
 - **Book detail** is one server component (`BookDetail`). It renders in an addressed `Sheet` on the phone and in the 360px panel on wide screens, and later stories add groups to it only. Its single close is `useTaskBack(shelfHref(query), true)`. Every `{ bookId }` from the client starts with `requireOwnBook(ctx, bookId)`. Surface code sees only `EffectiveBook` and `UserBookState`.
 - **One writer per row kind:**
-  - `lib/copies` owns copies and locations: `moveCopies`, `removeCopies`, receive, note, and the location functions.
-  - `lib/books` owns `user-books`, through `upsertUserBook()` only: `setRead` (built) and `setRating(ctx, bookId, rating | null)` with `ratedAt` (to build in 5.23).
+  - `lib/copies` owns copies and locations: `moveCopies`, `removeCopies`, `setNote` and the location functions (built), and receive (to build in 5.25).
+  - `lib/books` owns `user-books`, through `upsertUserBook()` only: `setRead` and `setRating(ctx, bookId, rating | null)` with `ratedAt` (both built).
   - `lib/catalogue` owns re-fetch and `lookupAgain()`.
   - Selection actions take copy ids and run in one transaction. A single-row action calls the same function with one id.
   - A location picked or created inline is a `Ref` (an id, or `{ create: name }`), resolved inside the action's transaction. Undo leaves a row created this way.
-- **`setRead(ctx, target, value | 'toggle')`** (built) takes copy ids or a Book id and applies to the distinct Books. `toggle` resolves to unread only when every Book is already read. It returns `Undone<{ read, count }>`. 5.23 and 5.29 call it.
+- **`setRead(ctx, target, value | 'toggle')`** (built) takes copy ids or a Book id and applies to the distinct Books. `toggle` resolves to unread only when every Book is already read. It returns `Undone<{ read, count }>`; Book detail's switch and the select bar's Read already call it.
 - **Server actions** live in `(sections)/actions.ts` (`removeCopiesAction` is the pattern). Each validates its input as an array of positive safe integers (anything else is `VALIDATION`, with no write) and runs `requireUserOrThrow()` inside `runAction()`. An undoable action wraps its one service call in `withUndo`. Undoable service functions return `Undone<T>`, join the caller's transaction, and ship an integration test that undoes them. The undoable actions are exactly those EXPERIENCE.md lists with an Undo; removals, deletes, merges and `lookupAgain` are not undoable.
 - **Look it up again:** the lookup is rate-limited, and `unavailable` is never cached. On `found` it runs the auto-share transaction without creating a copy: it either promotes the Book in place, or moves the copies and the `user-books` row to an existing shared Book and deletes the private one when nothing else references it. The admin's differing hand-entered values are dropped; another user's become overrides.
 - **Client imports from `src/lib`** are limited to types and pure modules: `lib/shelf/query.ts`, `lib/catalogue/corners.ts` and `lib/books/languageName.ts`.
@@ -95,7 +95,7 @@ Make the collection at `/` the place Mika uses every day: a fast list of his own
   - The selection survives search, filtering and scrolling. There is no select all.
   - After an action, the sent ids are unticked and select mode stays on. Only Done or `Esc` leaves.
 - **Toasts and dialogs:**
-  - "Marked {n} read · Undo"
+  - "Marked {n} read · Undo" ("unread" when it marks them unread)
   - "{n} moved to {location} · Undo"
   - "Saved to {location} · Undo" (Received)
   - "Shared · from {source}"
@@ -107,12 +107,12 @@ Make the collection at `/` the place Mika uses every day: a fast list of his own
 
 ## Cross-Story Dependencies
 
-- **Status:** done are 5.1–5.20, 5.22, 5.27, 5.28 and 5.31–5.33, 5.36, 5.37. Still open are 5.21, 5.23–5.26, 5.29, 5.30, 5.34 and 5.35.
-- **Action bar:** 5.28 built it with Remove and the phone's actions row, plus a `--spacing-pinned-bar` override so the toast clears the two rows. 5.29 adds Read, 5.30 adds Move and 9.8 adds Tag. The phone's actions row has to fit four buttons at 390px, and the toast override assumes one row of actions.
+- **Status:** done are 5.1–5.23, 5.27–5.29, 5.31–5.33, 5.36 and 5.37. Still open are 5.24–5.26, 5.30, 5.34 and 5.35.
+- **Action bar:** it now holds Read and Remove, with a `--spacing-pinned-bar` override so the toast clears the phone's two rows. 5.30 adds Move and 9.8 adds Tag. The phone's actions row has to fit four buttons at 390px, and the toast override assumes one row of actions.
 - **Stale filter counts (deferred from 5.28):** Filter panel counts and value lists come from the server render, and `afterAction` reloads only the rows. They go stale after any action that changes rows (Remove, Read, Move, Received) until the next navigation. The fix belongs to the `afterAction` contract in the spine, not to one action.
 - **Esc inside the wide panel:** Base UI's `Esc` listener is registered after the panel's, so one `Esc` may close both a picker or dialog inside the panel and the panel itself. 5.24 and 5.30 must handle this.
-- **5.21 and suggestions:** check that a chip's author id and the shared id from `/data/suggest` for the same `nameKey` don't list the name twice in the Filter panel.
+- **Filter chips (built):** authors, series, genres and each owned copy's location in Book detail are already chips via `FilterChip`. 5.26 adds the row ending, the Answer's location and the no-locations absence. Closing Book detail goes through `useTaskBack`; when filters changed under it, the close keeps the list as shown.
 - **5.30 Move:** wires the existing `moveCopies` and reuses the location picker with inline create. Known gap: Undo of a move fails with `UNDO_FAILED` if a location it would restore has since been deleted (possible from Settings).
 - **5.24 Remove:** wires the existing `removeCopies` (all or none). After the last copy is removed, the detail closes.
 - **5.35:** reuses Epic 3's auto-share and edition picker. Split `sharePrivateBook.ts` at its D-8 compare seam when 5.34 or 5.35 touches it. Wishlist entries move too once Epic 7 lands.
-- **Other epics:** the `genre` filter carries only system genre ids for now; Epic 9 settles user genre tags. Lent markers and loan actions arrive with Epic 6, tags and themes with Epic 9.
+- **Other epics:** the `genre` filter carries only system genre ids for now; Epic 9 settles user genre tags. Lent markers and loan actions arrive with Epic 6, tags and themes with Epic 9. Chips from `/loans` (6.9) and wishlist entries (Epic 7) opening the collection with only that filter are deferred to those stories.
