@@ -38,10 +38,14 @@ const english = async () => {
 vi.mock('next-intl', async (importOriginal) => ({
   ...(await importOriginal<typeof import('next-intl')>()),
   useTranslations: await english(),
+  useLocale: () => 'en',
 }))
 vi.mock('next-intl/server', async () => {
   const translator = await english()
-  return { getTranslations: async (namespace?: string) => translator(namespace) }
+  return {
+    getTranslations: async (namespace?: string) => translator(namespace),
+    getLocale: async () => 'en',
+  }
 })
 vi.mock('next/navigation', async (importOriginal) => ({
   ...(await importOriginal<typeof import('next/navigation')>()),
@@ -50,6 +54,9 @@ vi.mock('next/navigation', async (importOriginal) => ({
 }))
 vi.mock('@/lib/payload/context', () => ({ requireUser: async () => ({}) }))
 vi.mock('@/lib/shelf/getShelfRows', () => ({ getShelfRows }))
+vi.mock('@/lib/shelf/filterValues', () => ({
+  filterValues: async () => ({ location: [], status: [], read: [], genre: [], language: [] }),
+}))
 vi.mock('@/lib/errors', () => ({ logger: () => ({ error: logError }) }))
 vi.mock('@/app/(frontend)/prefs', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@/app/(frontend)/prefs')>()),
@@ -101,6 +108,14 @@ vi.stubGlobal(
     disconnect() {}
   },
 )
+
+// The phone: the Filter panel is a closed sheet.
+vi.stubGlobal('matchMedia', (query: string) => ({
+  media: query,
+  matches: false,
+  addEventListener: () => {},
+  removeEventListener: () => {},
+}))
 
 const { default: CollectionPage } = await import('@/app/(frontend)/(sections)/page')
 const { DEFAULT_PREFS } = await import('@/app/(frontend)/prefs')

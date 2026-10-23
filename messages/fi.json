@@ -168,6 +168,19 @@
   "collection": {
     "search": "Hae kirjoistasi",
     "filter": "Suodata",
+    "filterFields": {
+      "location": "Sijainti",
+      "status": "Tila",
+      "read": "Luettu",
+      "genre": "Lajityyppi",
+      "language": "Kieli"
+    },
+    "filterValues": {
+      "owned": "Oma",
+      "ordered": "Tilattu",
+      "read": "Luettu",
+      "unread": "Lukematon"
+    },
     "select": "Valitse",
     "layout": "Asettelu",
     "layouts": {

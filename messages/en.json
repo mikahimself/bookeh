@@ -168,6 +168,19 @@
   "collection": {
     "search": "Search your books",
     "filter": "Filter",
+    "filterFields": {
+      "location": "Location",
+      "status": "Status",
+      "read": "Read",
+      "genre": "Genre",
+      "language": "Language"
+    },
+    "filterValues": {
+      "owned": "Owned",
+      "ordered": "Ordered",
+      "read": "Read",
+      "unread": "Unread"
+    },
     "select": "Select",
     "layout": "Layout",
     "layouts": {

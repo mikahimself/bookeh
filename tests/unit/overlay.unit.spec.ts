@@ -4,6 +4,11 @@ import { createElement, StrictMode, useState, type ReactNode } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi, type MockInstance } from 'vitest'
 
 vi.mock('next-intl', () => ({ useTranslations: () => (key: string) => key }))
+// Next's replace, as far as the history goes: the current entry takes the new address.
+const replace = vi.hoisted(() =>
+  vi.fn((href: string) => window.history.replaceState(window.history.state, '', href)),
+)
+vi.mock('next/navigation', () => ({ useRouter: () => ({ replace }) }))
 
 const { installNavigationTracking, OVERLAY_TOKENS_KEY } =
   await import('@/app/(frontend)/components/navigation')
@@ -114,6 +119,27 @@ describe('overlay wrappers', () => {
     act(() => window.history.replaceState({ __NA: true }, ''))
     fireEvent.click(screen.getByRole('button', { name: 'ok' }))
     await waitFor(() => expect(back).toHaveBeenCalledTimes(1))
+  })
+
+  it('lands on the address a same-path replace moved it to when Back closes it', async () => {
+    render(createElement(CallerSheet))
+    act(() => window.history.replaceState({ __NA: true }, '', '/?location=3'))
+    act(() => window.history.back())
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
+    expect(replace).toHaveBeenCalledWith('/?location=3', { scroll: false })
+    expect(`${window.location.pathname}${window.location.search}`).toBe('/?location=3')
+    expect(OVERLAY_TOKENS_KEY in (window.history.state as object)).toBe(false)
+  })
+
+  it('lands on the address a same-path replace moved it to when the X closes it', async () => {
+    replace.mockClear()
+    render(createElement(CallerSheet))
+    act(() => window.history.replaceState({ __NA: true }, '', '/?location=3'))
+    fireEvent.click(screen.getByRole('button', { name: 'close' }))
+    await waitFor(() => expect(replace).toHaveBeenCalledWith('/?location=3', { scroll: false }))
+    expect(back).toHaveBeenCalledTimes(1)
+    expect(`${window.location.pathname}${window.location.search}`).toBe('/?location=3')
+    expect(OVERLAY_TOKENS_KEY in (window.history.state as object)).toBe(false)
   })
 
   it('does not go back after a navigation', () => {

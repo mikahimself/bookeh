@@ -6,6 +6,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { Photo } from '@/app/(frontend)/components/cornerCrop/decodePhoto'
 
 vi.mock('next-intl', () => ({ useTranslations: () => (key: string) => key }))
+// The overlays' close may replace the address (`useCloseOnBack`); nothing here moves it.
+vi.mock('next/navigation', () => ({ useRouter: () => ({ replace: vi.fn() }) }))
 vi.mock('@/app/(frontend)/components/cornerCrop/decodePhoto', () => ({ decodePhoto: vi.fn() }))
 
 const { installNavigationTracking } = await import('@/app/(frontend)/components/navigation')

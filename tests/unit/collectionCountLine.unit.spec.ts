@@ -27,17 +27,20 @@ describe('activeValues', () => {
           status: ['ordered'],
           location: [3],
           publisher: ['WSOY'],
+          language: ['fi'],
           ratingMin: 4,
         },
       }),
       { 'location:3': 'Tampere', 'author:5': 'Väinö Linna' },
       t,
+      'en',
     )
     expect(values).toEqual([
       '“linna”',
       'Tampere',
       'ordered',
       'read',
+      'Finnish',
       'Väinö Linna',
       'WSOY',
       '4+ stars',
@@ -50,13 +53,19 @@ describe('activeValues', () => {
       query({ filters: { location: [3, 9], read: false } }),
       { 'location:3': 'Tampere' },
       t,
+      'en',
     )
     expect(values).toEqual(['Tampere', 'unread'])
   })
 
   it('leaves an open end of a range blank', () => {
     expect(
-      activeValues(query({ filters: { year: [1950, undefined], pages: [undefined, 200] } }), {}, t),
+      activeValues(
+        query({ filters: { year: [1950, undefined], pages: [undefined, 200] } }),
+        {},
+        t,
+        'en',
+      ),
     ).toEqual(['1950–', '–200 pages'])
   })
 })

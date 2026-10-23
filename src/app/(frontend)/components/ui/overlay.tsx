@@ -1,5 +1,6 @@
 'use client'
 
+import { useRouter } from 'next/navigation'
 import {
   createContext,
   use,
@@ -10,7 +11,7 @@ import {
   type ReactNode,
 } from 'react'
 
-import { OVERLAY_TOKENS_KEY } from '../navigation'
+import { leftAddress, OVERLAY_TOKENS_KEY } from '../navigation'
 
 /** How many overlays an element sits inside. */
 const OverlayDepth = createContext(0)
@@ -58,12 +59,30 @@ function tokensOf(state: unknown): string[] {
 }
 
 /**
+ * Where a closed overlay should land: `latest`, the address its entry had
+ * got to, when a same-pathname replace moved it while open (a filter tap
+ * under the Filter sheet) and the close came back to `openedAt`; otherwise
+ * `null`, nothing to do.
+ */
+function movedTo(openedAt: string, latest: string): string | null {
+  if (!latest || latest === openedAt || window.location.href !== openedAt) return null
+  const to = new URL(latest)
+  if (to.pathname !== new URL(openedAt).pathname) return null
+  return `${to.pathname}${to.search}${to.hash}`
+}
+
+/**
  * Back closes an overlay that has no address (spine, Navigation and history).
  * Opening pushes one same-URL entry: the current state, so Next's keys
  * survive, plus a token for this open after those of the overlays it sits
  * in. A traversal to an entry without the token closes the overlay. Any
  * other close pops the entry, but only while it is the current one, so a
  * close after a navigation never undoes the navigation.
+ *
+ * A same-pathname replace while open keeps the token (navigation.ts), so the
+ * entry follows the address. Closing pops it back to the entry from before
+ * the open; when the address had changed, a replace then lands on the
+ * entry's latest address, so the changes made under the overlay stay.
  *
  * `onClosed` runs once per close, after this overlay's entry is gone: on the
  * `popstate` of its own `back()`, or at once when no `back()` was needed
@@ -76,17 +95,28 @@ function tokensOf(state: unknown): string[] {
  * entry; Back over it then changes nothing on screen.
  */
 export function useCloseOnBack(open: boolean, close: () => void, onClosed?: () => void): void {
+  const router = useRouter()
   const token = useRef<string | null>(null)
-  /** Back left this overlay's entry; the close that follows needs no `back()`. */
-  const left = useRef(false)
+  /** The address the overlay opened on. */
+  const openedAt = useRef('')
+  /**
+   * Back left this overlay's entry, which had got to this address; the
+   * close that follows needs no `back()`.
+   */
+  const left = useRef<string | null>(null)
   const onBack = useEffectEvent(close)
-  const closed = useEffectEvent(() => onClosed?.())
+  const closed = useEffectEvent((latest: string | null) => {
+    const to = latest === null ? null : movedTo(openedAt.current, latest)
+    if (to !== null) router.replace(to, { scroll: false })
+    onClosed?.()
+  })
 
   useEffect(() => {
     if (open) {
       if (token.current) return
-      left.current = false
+      left.current = null
       token.current = `${LOAD}-${++opens}`
+      openedAt.current = window.location.href
       const state: unknown = window.history.state
       window.history.pushState(
         {
@@ -97,20 +127,22 @@ export function useCloseOnBack(open: boolean, close: () => void, onClosed?: () =
       )
       return
     }
-    if (left.current) {
-      left.current = false
-      closed()
+    if (left.current !== null) {
+      const latest = left.current
+      left.current = null
+      closed(latest)
       return
     }
     const pushed = token.current
     if (!pushed) return
     token.current = null
     if (tokensOf(window.history.state).at(-1) === pushed) {
+      const latest = window.location.href
       // The listener below is gone by the time this pop lands: it went with `open`.
-      window.addEventListener('popstate', () => closed(), { once: true })
+      window.addEventListener('popstate', () => closed(latest), { once: true })
       window.history.back()
     } else {
-      closed()
+      closed(null)
     }
   }, [open])
 
@@ -120,7 +152,7 @@ export function useCloseOnBack(open: boolean, close: () => void, onClosed?: () =
       const pushed = token.current
       if (!pushed || tokensOf(window.history.state).includes(pushed)) return
       token.current = null
-      left.current = true
+      left.current = leftAddress()
       onBack()
     }
     window.addEventListener('popstate', onPopState)

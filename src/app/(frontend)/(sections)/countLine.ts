@@ -1,3 +1,4 @@
+import { languageName } from '@/lib/books/languageName'
 import { shelfHref, type ShelfQuery } from '@/lib/shelf/query'
 
 /** The `collection.*` keys the count line's values use. */
@@ -28,12 +29,13 @@ export function clearHref(query: ShelfQuery): string {
 /**
  * EXPERIENCE.md, Count line: the active search and filter values as shown,
  * in `ShelfQuery` order. Ids take their name from `labels`; an id without one
- * is left out.
+ * is left out. Languages are named in `locale`.
  */
 export function activeValues(
   query: ShelfQuery,
   labels: Record<string, string>,
   t: CountLineT,
+  locale: string,
 ): string[] {
   const f = query.filters
   const named = (field: IdField, ids: number[] | undefined): string[] =>
@@ -54,7 +56,7 @@ export function activeValues(
     ...named('genre', f.genre),
     ...named('tag', f.tag),
     ...(f.theme ?? []),
-    ...(f.language ?? []),
+    ...(f.language ?? []).map((code) => languageName(code, locale)),
     ...named('author', f.author),
     ...named('series', f.series),
     ...(f.publisher ?? []),

@@ -10,12 +10,14 @@ import type { FilterValues } from './query'
 import { readableBy, visibleCopies } from './visibleCopies'
 
 const STATUSES = ['owned', 'ordered'] as const
+const READ = [true, false] as const
 
 /**
  * Spine, AD-7: the values the Filter panel offers, each with how many of the
  * viewer's copies carry it: own locations and system genres by name (a copy
  * counts once under each of its Book's genres), effective languages (AD-6) by
- * value, statuses `owned` then `ordered`. Only values in use; a copy with no
+ * value, statuses `owned` then `ordered`, read then unread (the viewer's
+ * `user-books` row; a missing row is unread). Only values in use; a copy with no
  * location or language adds none. Counts run over all the viewer's copies,
  * never narrowed by a shelf query. Read-only, one grouped query per field.
  */
@@ -35,13 +37,14 @@ export async function filterValues(ctx: Context, locale: Locale): Promise<Filter
       .then(({ rows }) => rows)
 
   const language = effective('language')
-  const [locations, statuses, genres, languages] = await Promise.all([
+  const [locations, statuses, reads, genres, languages] = await Promise.all([
     grouped(
       sql`l.id, l.name`,
       sql`join locations l on l.id = copies.location_id and l.owner_id = ${viewer.id}`,
       sql`group by l.id, l.name order by l.name, l.id`,
     ),
     grouped(sql`copies.status as value`, sql``, sql`group by copies.status`),
+    grouped(sql`ub.read is true as value`, sql``, sql`group by 1`),
     grouped(
       sql`g.id, g.name, g.name_fi`,
       sql`join books_rels r on r.parent_id = b.id and r.path = 'genres'
@@ -64,6 +67,10 @@ export async function filterValues(ctx: Context, locale: Locale): Promise<Filter
     })),
     status: STATUSES.flatMap((value) => {
       const row = statuses.find((r) => r.value === value)
+      return row ? [{ value, count: Number(row.count) }] : []
+    }),
+    read: READ.flatMap((value) => {
+      const row = reads.find((r) => r.value === value)
       return row ? [{ value, count: Number(row.count) }] : []
     }),
     genre: genres

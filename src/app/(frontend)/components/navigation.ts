@@ -14,6 +14,9 @@ export const OVERLAY_TOKENS_KEY = '__bookehOverlays'
 
 /** In-app entries pushed above the one this tab loaded; module state, like `holds` in swipe.ts. */
 let depth = 0
+/** The current entry's address, and the one the latest traversal left. */
+let here = ''
+let left = ''
 let installed = false
 /** A hand-started exit is in flight; a second tap on the X is a no-op until it settles. */
 let closing = false
@@ -46,11 +49,12 @@ export function stampPush(state: unknown, depth: number): object {
 
 /**
  * `state` with the current entry's overlay tokens carried onto it when the
- * replace keeps the URL. Next replaces the entry with a fresh state after
- * every soft navigation, refresh or revalidating server action; without this
+ * replace keeps the pathname. Next replaces the entry with a fresh state
+ * after every soft navigation, refresh or revalidating server action, and a
+ * filter tap replaces the address under the open Filter sheet; without this
  * an open overlay would lose its token and a later close could not pop its
- * entry. A replace that changes the URL, or brings tokens of its own, is
- * left as it is.
+ * entry. A replace to another pathname, or one that brings tokens of its
+ * own, is left as it is.
  */
 function keepOverlayTokens(state: unknown, url: string | URL | null | undefined): unknown {
   const current: unknown = window.history.state
@@ -61,8 +65,19 @@ function keepOverlayTokens(state: unknown, url: string | URL | null | undefined)
   if (tokens === undefined) return state
   const base = typeof state === 'object' && state !== null ? state : {}
   if (OVERLAY_TOKENS_KEY in base) return state
-  if (url != null && new URL(url, window.location.href).href !== window.location.href) return state
+  if (url != null && new URL(url, window.location.href).pathname !== window.location.pathname) {
+    return state
+  }
   return { ...base, [OVERLAY_TOKENS_KEY]: tokens }
+}
+
+/**
+ * The address of the entry the latest traversal left: where an overlay
+ * closed by Back had got to (components/ui/overlay.tsx). Empty before the
+ * first traversal.
+ */
+export function leftAddress(): string {
+  return left
 }
 
 /** Whether history back stays in the app: an in-app entry was pushed above the loaded one. */
@@ -72,27 +87,34 @@ export function canGoBackInApp(): boolean {
 
 /**
  * Wraps `history.pushState` / `replaceState` once per tab so every entry
- * carries its depth (push: one more; replace: the same), a same-URL replace
- * keeps the open overlays' tokens, and traversals are followed through
- * `popstate`. Reads the current entry's stamp first, so a reload keeps its
- * depth. `history.length` is never read: browsers cap it at 50, which a long
- * scanning session reaches.
+ * carries its depth (push: one more; replace: the same), a same-pathname
+ * replace keeps the open overlays' tokens, and traversals are followed
+ * through `popstate`, remembering the address each one left. Reads the
+ * current entry's stamp first, so a reload keeps its depth. `history.length`
+ * is never read: browsers cap it at 50, which a long scanning session
+ * reaches.
  */
 export function installNavigationTracking(): void {
   if (installed) return
   installed = true
   depth = depthOf(window.history.state)
+  here = window.location.href
 
   const push = window.history.pushState.bind(window.history)
   const replace = window.history.replaceState.bind(window.history)
   window.history.pushState = (state, unused, url) => {
     push(stampPush(state, depth + 1), unused, url)
     depth += 1
+    here = window.location.href
   }
-  window.history.replaceState = (state, unused, url) =>
+  window.history.replaceState = (state, unused, url) => {
     replace(stampPush(keepOverlayTokens(state, url), depth), unused, url)
+    here = window.location.href
+  }
   window.addEventListener('popstate', (event) => {
     depth = depthOf(event.state)
+    left = here
+    here = window.location.href
   })
 }
 

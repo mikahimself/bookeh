@@ -62,6 +62,7 @@ export type Counted<T> = T & { count: number }
 export type FilterValues = {
   location: Counted<Named>[]
   status: Counted<{ value: 'owned' | 'ordered' }>[]
+  read: Counted<{ value: boolean }>[]
   genre: Counted<Named>[]
   language: Counted<{ value: string }>[]
 }

@@ -88,6 +88,9 @@
   --spacing-stroke-control: 2px;
   --spacing-stroke-selection: 4px;
   --spacing-panel-width: 360px;
+  /* The Filter panel left of the list on wide screens
+     (mockups/key-collection-wide.html, `.fp`). */
+  --spacing-filter-width: 220px;
   /* The cover beside a Book's title, 72 × 108px at 2:3 (DESIGN.md, Detail panel). */
   --spacing-cover-detail: 72px;
   /* The cover in a row at m, 32 × 48px (DESIGN.md, Rows). */

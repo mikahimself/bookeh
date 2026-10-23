@@ -4,6 +4,8 @@ import { createElement, useState } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi, type MockInstance } from 'vitest'
 
 vi.mock('next-intl', () => ({ useTranslations: () => (key: string) => key }))
+// The overlays' close may replace the address (`useCloseOnBack`); nothing here moves it.
+vi.mock('next/navigation', () => ({ useRouter: () => ({ replace: vi.fn() }) }))
 
 const { installNavigationTracking } = await import('@/app/(frontend)/components/navigation')
 const { Picker } = await import('@/app/(frontend)/components/ui/Picker')

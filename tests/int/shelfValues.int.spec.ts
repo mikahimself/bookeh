@@ -15,7 +15,8 @@ import { randomIsbn } from '../helpers/isbn'
 
 // `filterValues()` and `suggest()`, AD-7: values in use on the viewer's
 // copies only (two-user access test), counted in copies and in name order,
-// effective values (AD-6) applied; suggestions distinct on name key, the
+// effective values (AD-6) applied, read from the viewer's own `user-books`
+// row (a missing row is unread); suggestions distinct on name key, the
 // shared id first, with `%` matched literally.
 // Each test has its own users. Shared name keys are unique and rows stay, so
 // names carry a per-run suffix.
@@ -103,6 +104,10 @@ describe('shelf filter values and suggestions', () => {
     await copyOf(b, z, { location: vintti.id })
     await copyOf(b, x, { status: 'ordered' })
     await upsertUserBook(await contextFor(b), y.id, { overrides: { language: 'it' } })
+    // Read: x by A (two copies); y unread with a row; w without a row; B's read of w not A's.
+    await upsertUserBook(asA, x.id, { read: true })
+    await upsertUserBook(asA, y.id, { read: false })
+    await upsertUserBook(await contextFor(b), w.id, { read: true })
 
     expect(await filterValues(asA, 'en')).toEqual({
       location: [
@@ -112,6 +117,10 @@ describe('shelf filter values and suggestions', () => {
       status: [
         { value: 'owned', count: 3 },
         { value: 'ordered', count: 1 },
+      ],
+      read: [
+        { value: true, count: 2 },
+        { value: false, count: 2 },
       ],
       genre: [
         { id: biography.id, name: biography.name, count: 3 },

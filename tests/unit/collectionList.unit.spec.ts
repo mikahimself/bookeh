@@ -26,6 +26,7 @@ vi.mock('next-intl', async (importOriginal) => {
     ...actual,
     useTranslations: (namespace?: string) =>
       actual.createTranslator({ locale: 'en', messages, namespace: namespace as 'collection' }),
+    useLocale: () => 'en',
   }
 })
 vi.mock('next/navigation', async (importOriginal) => ({

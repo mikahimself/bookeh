@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { Fragment, useEffect, useRef, useState, type ReactNode } from 'react'
 
 import { shelfHref, type ShelfQuery, type ShelfRow } from '@/lib/shelf/query'
@@ -42,6 +42,7 @@ const GRID: Record<DevicePrefs['size'], string> = {
 export function CollectionList({ query, book }: { query: ShelfQuery; book: number | null }) {
   const t = useTranslations('collection')
   const root = useTranslations()
+  const locale = useLocale()
   const { shelf, loading, loadMore } = useShelfRows()
   const { layout, size } = useCollectionDisplay()
   const sentinel = useRef<HTMLDivElement>(null)
@@ -70,7 +71,7 @@ export function CollectionList({ query, book }: { query: ShelfQuery; book: numbe
       {t('clear')}
     </TextLink>
   )
-  const values = activeValues(query, shelf.labels, t).join(', ')
+  const values = activeValues(query, shelf.labels, t, locale).join(', ')
   const count = t('count', { n: shelf.total })
   const parts: ReactNode[] = narrowed ? [...(values ? [values] : []), count, clear] : [count]
   const opens = (row: ShelfRow) => ({

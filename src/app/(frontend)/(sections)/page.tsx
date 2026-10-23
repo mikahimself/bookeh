@@ -1,7 +1,16 @@
+import { getLocale } from 'next-intl/server'
+
+import { resolveLocale } from '@/i18n/locale'
 import { logger } from '@/lib/errors'
 import { requireUser } from '@/lib/payload/context'
+import { filterValues } from '@/lib/shelf/filterValues'
 import { getShelfRows } from '@/lib/shelf/getShelfRows'
-import { parseShelfQuery, SHELF_PAGE_SIZE, type ShelfRows } from '@/lib/shelf/query'
+import {
+  parseShelfQuery,
+  SHELF_PAGE_SIZE,
+  type FilterValues,
+  type ShelfRows,
+} from '@/lib/shelf/query'
 
 import { devicePrefs } from '../prefs'
 
@@ -9,16 +18,18 @@ import { BookDetail } from './BookDetail'
 import { CollectionDisplayProvider } from './CollectionDisplay'
 import { CollectionList } from './CollectionList'
 import { CollectionTools } from './CollectionTools'
+import { FilterPanel, FilterPanelProvider } from './FilterPanel'
 import { LoadFailed } from './LoadFailed'
 import { ShelfRowsProvider } from './ShelfRows'
 
 /**
  * The collection (EXPERIENCE.md, Collection controls and States): the tools
- * row, then the client list seeded with the first page of the viewer's
- * copies (AD-7). A failed read shows Load failed. Layout and size come from
- * the device preferences cookie, so the first render already shows them; the
- * switches work even when the list failed. With `?book=`, Book detail as
- * well, whatever the shelf read gave.
+ * row, then the Filter panel beside the client list seeded with the first
+ * page of the viewer's copies (AD-7). A failed shelf read shows Load failed;
+ * a failed `filterValues()` read leaves the panel without lists. Layout and
+ * size come from the device preferences cookie, so the first render already
+ * shows them; the switches work even when the list failed. With `?book=`,
+ * Book detail as well, whatever the shelf read gave.
  */
 export default async function CollectionPage({
   searchParams,
@@ -29,24 +40,39 @@ export default async function CollectionPage({
   const { query, book } = parseShelfQuery(await searchParams)
   const { layout, size } = await devicePrefs()
 
-  let shelf: ShelfRows | null = null
-  try {
-    shelf = await getShelfRows(ctx, query, { offset: 0, limit: SHELF_PAGE_SIZE })
-  } catch (err) {
-    logger().error({ err }, 'The collection failed to load')
-  }
+  const locale = resolveLocale(await getLocale(), null)
+
+  const [shelf, values] = await Promise.all([
+    getShelfRows(ctx, query, { offset: 0, limit: SHELF_PAGE_SIZE }).catch(
+      (err: unknown): ShelfRows | null => {
+        logger().error({ err }, 'The collection failed to load')
+        return null
+      },
+    ),
+    filterValues(ctx, locale).catch((err: unknown): FilterValues | null => {
+      logger().error({ err }, 'The filter values failed to load')
+      return null
+    }),
+  ])
 
   return (
     <div className="px-page-margin-phone wide:px-page-margin">
       <CollectionDisplayProvider initial={{ layout, size }}>
-        <CollectionTools />
-        {shelf ? (
-          <ShelfRowsProvider query={query} initial={shelf}>
-            <CollectionList query={query} book={book} />
-          </ShelfRowsProvider>
-        ) : (
-          <LoadFailed />
-        )}
+        <FilterPanelProvider>
+          <CollectionTools />
+          <div className="wide:flex wide:gap-6">
+            <FilterPanel values={values} />
+            <div className="min-w-0 flex-1">
+              {shelf ? (
+                <ShelfRowsProvider query={query} initial={shelf}>
+                  <CollectionList query={query} book={book} />
+                </ShelfRowsProvider>
+              ) : (
+                <LoadFailed />
+              )}
+            </div>
+          </div>
+        </FilterPanelProvider>
       </CollectionDisplayProvider>
       {book !== null && <BookDetail ctx={ctx} bookId={book} query={query} />}
     </div>
