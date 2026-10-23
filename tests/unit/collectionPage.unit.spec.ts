@@ -27,6 +27,7 @@ const devicePrefs = vi.fn<() => Promise<DevicePrefs>>()
 const setDevicePrefsAction = vi.fn()
 const fetchStub = vi.fn()
 const showToast = vi.fn()
+const removeCopiesAction = vi.fn()
 
 // The English catalogue, so the assertions read the screen's words.
 const english = async () => {
@@ -64,6 +65,7 @@ vi.mock('@/app/(frontend)/prefs', async (importOriginal) => ({
   devicePrefs,
 }))
 vi.mock('@/app/(frontend)/actions/prefs', () => ({ setDevicePrefsAction }))
+vi.mock('@/app/(frontend)/(sections)/actions', () => ({ removeCopiesAction }))
 vi.mock('@/app/(frontend)/heldBook', () => ({ heldBook }))
 vi.mock('@/lib/books/holdings', () => ({ getHoldings }))
 // The client list's provider: no Undo and no scrolling here.
@@ -383,6 +385,80 @@ describe('CollectionPage', () => {
     expect(screen.queryByRole('checkbox')).toBeNull()
     screen.getByRole('button', { name: 'Select' })
     expect(router.replace).not.toHaveBeenCalled()
+  })
+
+  describe('Remove in select mode', () => {
+    const both = {
+      rows: [row(11, book(1, 'Sinuhe')), row(12, book(2, 'Kätilö'))],
+      total: 2,
+      labels: {},
+    }
+    const selected = () => screen.queryByText(/\d+ selected/)?.textContent
+    const tap = (title: string) => fireEvent.click(screen.getByText(title, { selector: 'p' }))
+    const removeButton = () => screen.getByRole('button', { name: 'Remove' }) as HTMLButtonElement
+    /** The reload after the action: `fetchStub` answers `/data/shelf`. */
+    const reloadsWith = (shelf: ShelfRows) =>
+      fetchStub.mockResolvedValue({ status: 200, json: async () => ({ ok: true, data: shelf }) })
+    const confirm = async (title: string) => {
+      fireEvent.click(removeButton())
+      const dialog = await screen.findByRole('dialog', { name: title })
+      fireEvent.click(within(dialog).getByRole('button', { name: 'Remove' }))
+      await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
+    }
+
+    it('asks first, then removes every ticked copy, in view or not, and keeps selecting', async () => {
+      const page = (params: Record<string, string>) =>
+        CollectionPage({ searchParams: Promise.resolve(params) })
+      removeCopiesAction.mockResolvedValue({ ok: true, data: null })
+      reloadsWith({ rows: [], total: 0, labels: {} })
+      getShelfRows.mockResolvedValueOnce(both)
+      const { rerender } = render(await page({}))
+      fireEvent.click(screen.getByRole('button', { name: 'Select' }))
+      expect(removeButton().disabled).toBe(true)
+
+      tap('Sinuhe')
+      tap('Kätilö')
+      fireEvent.click(removeButton())
+      const dialog = await screen.findByRole('dialog', { name: 'Remove 2 books from library?' })
+      fireEvent.click(within(dialog).getByRole('button', { name: 'Cancel' }))
+      await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
+      expect(removeCopiesAction).not.toHaveBeenCalled()
+      expect(selected()).toBe('2 selected')
+
+      getShelfRows.mockResolvedValueOnce({ rows: [both.rows[0]], total: 1, labels: {} })
+      rerender(await page({ q: 'sinuhe' }))
+      await confirm('Remove 2 books from library?')
+
+      await waitFor(() => expect(selected()).toBe('0 selected'))
+      expect(removeCopiesAction).toHaveBeenCalledExactlyOnceWith([11, 12])
+      await waitFor(() => expect(screen.queryByText('Sinuhe', { selector: 'p' })).toBeNull())
+      expect(fetchStub.mock.calls[0]![0]).toMatch(/^\/data\/shelf\?q=sinuhe&/)
+      screen.getByRole('button', { name: 'Done' })
+      expect(showToast).not.toHaveBeenCalled()
+    })
+
+    it('keeps the ticks when the call fails, and clears them when a copy is gone', async () => {
+      getShelfRows.mockResolvedValue(both)
+      reloadsWith({ rows: [both.rows[1]], total: 1, labels: {} })
+      await renderPage()
+      fireEvent.click(screen.getByRole('button', { name: 'Select' }))
+      tap('Sinuhe')
+
+      removeCopiesAction.mockRejectedValueOnce(new TypeError('Failed to fetch'))
+      await confirm('Remove 1 book from library?')
+      await waitFor(() =>
+        expect(showToast).toHaveBeenCalledWith({ kind: 'error', code: 'NO_CONNECTION' }),
+      )
+      expect(selected()).toBe('1 selected')
+      expect(fetchStub).not.toHaveBeenCalled()
+
+      removeCopiesAction.mockResolvedValueOnce({ ok: false, code: 'NOT_FOUND' })
+      await confirm('Remove 1 book from library?')
+      await waitFor(() => expect(selected()).toBe('0 selected'))
+      expect(showToast).toHaveBeenCalledWith({ kind: 'success', message: 'Not in library' })
+      await waitFor(() => expect(screen.queryByText('Sinuhe', { selector: 'p' })).toBeNull())
+      expect(fetchStub).toHaveBeenCalledOnce()
+    })
   })
 
   it('ticks a cover tile in select mode', async () => {

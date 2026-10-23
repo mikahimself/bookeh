@@ -35,8 +35,6 @@ type ShelfRowsValue = {
   loading: boolean
   /** The next `SHELF_PAGE_SIZE` rows, unless all are held or a request is in flight. */
   loadMore: () => void
-  /** What an action on the list reports: a reload, or "Not in library" and a reload. */
-  afterAction: (result: ActionResult<unknown>) => void
 }
 
 const ShelfRowsContext = createContext<ShelfRowsValue | null>(null)
@@ -45,6 +43,61 @@ export function useShelfRows(): ShelfRowsValue {
   const context = useContext(ShelfRowsContext)
   if (!context) throw new Error('useShelfRows called outside ShelfRowsProvider')
   return context
+}
+
+type ShelfActionsValue = {
+  afterAction: (result: ActionResult<unknown>) => void
+  /** The mounted rows' reload; returns the unregister. */
+  register: (reload: () => void) => () => void
+}
+
+const ShelfActionsContext = createContext<ShelfActionsValue | null>(null)
+
+function useShelfActions(): ShelfActionsValue {
+  const context = useContext(ShelfActionsContext)
+  if (!context) throw new Error('useShelfActions called outside ShelfActionsProvider')
+  return context
+}
+
+/** What an action on the collection reports: a reload, or "Not in library" and a reload. */
+export function useAfterAction(): ShelfActionsValue['afterAction'] {
+  return useShelfActions().afterAction
+}
+
+/**
+ * Spine, AD-7: `afterAction` above the list, unkeyed, so the action bar and
+ * Book detail reach it and it outlives a query change. `ok` reloads the
+ * mounted rows, `NOT_FOUND` shows "Not in library" and then reloads, any
+ * other code goes to `reportFailure`. With no rows mounted (Load failed) it
+ * only toasts.
+ */
+export function ShelfActionsProvider({ children }: { children: ReactNode }) {
+  const t = useTranslations('answer')
+  const { show } = useToast()
+  const reportFailure = useReportFailure()
+  const reload = useRef<(() => void) | null>(null)
+
+  const register = useCallback((next: () => void) => {
+    reload.current = next
+    return () => {
+      if (reload.current === next) reload.current = null
+    }
+  }, [])
+
+  const afterAction = useCallback(
+    (result: ActionResult<unknown>) => {
+      if (!result.ok && result.code !== 'NOT_FOUND') {
+        reportFailure(result.code)
+        return
+      }
+      if (!result.ok) show({ kind: 'success', message: t('notInLibrary') })
+      reload.current?.()
+    },
+    [reportFailure, show, t],
+  )
+
+  const value = useMemo(() => ({ afterAction, register }), [afterAction, register])
+  return <ShelfActionsContext.Provider value={value}>{children}</ShelfActionsContext.Provider>
 }
 
 /** `answer` after `held`, skipping copies already held (the shelf shifted between reads). */
@@ -65,7 +118,8 @@ type Props = { query: ShelfQuery; initial: ShelfRows; children: ReactNode }
  * never patched: more rows append the next range from `/data/shelf`, and any
  * change reloads rows 0..n (n held, at most `SHELF_MAX_ROWS`). A reload makes
  * every earlier request stale and its answer is dropped. Reloads after a
- * successful Undo from the toast and after `afterAction`.
+ * successful Undo from the toast and after `afterAction`, which the mounted
+ * state registers its reload with.
  *
  * Keep my place: the rows held and the scroll position are kept per query
  * (`shelfPlace`). Only the first query since the page mounted restores
@@ -85,8 +139,8 @@ export function ShelfRowsProvider({ query, initial, children }: Props) {
 }
 
 function ShelfRowsState({ query, initial, restore, children }: Props & { restore: boolean }) {
-  const t = useTranslations('answer')
-  const { show, onUndone } = useToast()
+  const { onUndone } = useToast()
+  const { register } = useShelfActions()
   const reportFailure = useReportFailure()
   // Fixed for the state's life: the provider remounts it for another query.
   const [rowsQuery] = useState(query)
@@ -202,23 +256,9 @@ function ShelfRowsState({ query, initial, restore, children }: Props & { restore
     void run({ offset: 0, limit }, true)
   }, [run])
 
-  const afterAction = useCallback(
-    (result: ActionResult<unknown>) => {
-      if (!result.ok && result.code !== 'NOT_FOUND') {
-        reportFailure(result.code)
-        return
-      }
-      if (!result.ok) show({ kind: 'success', message: t('notInLibrary') })
-      reload()
-    },
-    [reload, reportFailure, show, t],
-  )
-
+  useEffect(() => register(reload), [register, reload])
   useEffect(() => onUndone(reload), [onUndone, reload])
 
-  const value = useMemo(
-    () => ({ shelf, loading, loadMore, afterAction }),
-    [shelf, loading, loadMore, afterAction],
-  )
+  const value = useMemo(() => ({ shelf, loading, loadMore }), [shelf, loading, loadMore])
   return <ShelfRowsContext.Provider value={value}>{children}</ShelfRowsContext.Provider>
 }

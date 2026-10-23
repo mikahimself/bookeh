@@ -26,6 +26,8 @@ type SelectionValue = {
   start: () => void
   toggle: (copyId: number) => void
   done: () => void
+  /** Unticks these copies and keeps select mode. */
+  untick: (copyIds: readonly number[]) => void
 }
 
 const SelectionContext = createContext<SelectionValue | null>(null)
@@ -73,6 +75,14 @@ export function SelectionProvider({ children }: { children: ReactNode }) {
     setTicked(NONE)
   }, [])
 
+  const untick = useCallback((copyIds: readonly number[]) => {
+    setTicked((current) => {
+      const next = new Set(current)
+      for (const copyId of copyIds) next.delete(copyId)
+      return next
+    })
+  }, [])
+
   useEffect(() => {
     if (!selecting) return
     const onKeyDown = (event: KeyboardEvent) => {
@@ -83,8 +93,8 @@ export function SelectionProvider({ children }: { children: ReactNode }) {
   }, [selecting, done])
 
   const value = useMemo(
-    () => ({ selecting, ticked, start, toggle, done }),
-    [selecting, ticked, start, toggle, done],
+    () => ({ selecting, ticked, start, toggle, done, untick }),
+    [selecting, ticked, start, toggle, done, untick],
   )
   return <SelectionContext.Provider value={value}>{children}</SelectionContext.Provider>
 }

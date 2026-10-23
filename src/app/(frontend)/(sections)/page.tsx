@@ -22,7 +22,7 @@ import { FilterPanel, FilterPanelProvider } from './FilterPanel'
 import { LoadFailed } from './LoadFailed'
 import { SelectBar } from './SelectBar'
 import { SelectionProvider } from './Selection'
-import { ShelfRowsProvider } from './ShelfRows'
+import { ShelfActionsProvider, ShelfRowsProvider } from './ShelfRows'
 
 /**
  * The collection (EXPERIENCE.md, Collection controls and States): the tools
@@ -36,7 +36,7 @@ import { ShelfRowsProvider } from './ShelfRows'
  * of a short list; on the phone a sheet, portalled out. Select mode's state
  * sits above the list, so it outlives a query change; its action bar comes
  * last and, in a column filling the section, sits at the bottom of a short
- * list.
+ * list. `afterAction` sits above the list as well, so the bar reaches it.
  */
 export default async function CollectionPage({
   searchParams,
@@ -67,21 +67,23 @@ export default async function CollectionPage({
       <CollectionDisplayProvider initial={{ layout, size }}>
         <FilterPanelProvider>
           <SelectionProvider>
-            <CollectionTools />
-            <div className="wide:flex wide:flex-1 wide:gap-6">
-              <FilterPanel values={values} labels={shelf?.labels ?? {}} />
-              <div className="min-w-0 flex-1">
-                {shelf ? (
-                  <ShelfRowsProvider query={query} initial={shelf}>
-                    <CollectionList query={query} book={book} />
-                  </ShelfRowsProvider>
-                ) : (
-                  <LoadFailed />
-                )}
+            <ShelfActionsProvider>
+              <CollectionTools />
+              <div className="wide:flex wide:flex-1 wide:gap-6">
+                <FilterPanel values={values} labels={shelf?.labels ?? {}} />
+                <div className="min-w-0 flex-1">
+                  {shelf ? (
+                    <ShelfRowsProvider query={query} initial={shelf}>
+                      <CollectionList query={query} book={book} />
+                    </ShelfRowsProvider>
+                  ) : (
+                    <LoadFailed />
+                  )}
+                </div>
+                {book !== null && <BookDetail ctx={ctx} bookId={book} query={query} />}
               </div>
-              {book !== null && <BookDetail ctx={ctx} bookId={book} query={query} />}
-            </div>
-            <SelectBar />
+              <SelectBar />
+            </ShelfActionsProvider>
           </SelectionProvider>
         </FilterPanelProvider>
       </CollectionDisplayProvider>

@@ -64,7 +64,8 @@ const scrolledTo = (y: number) =>
   Object.defineProperty(window, 'scrollY', { value: y, configurable: true })
 
 const { ToastProvider, useToast } = await import('@/app/(frontend)/components/toast/ToastProvider')
-const { ShelfRowsProvider, useShelfRows } = await import('@/app/(frontend)/(sections)/ShelfRows')
+const { ShelfActionsProvider, ShelfRowsProvider, useAfterAction } =
+  await import('@/app/(frontend)/(sections)/ShelfRows')
 const { CollectionList } = await import('@/app/(frontend)/(sections)/CollectionList')
 const { CollectionDisplayProvider } = await import('@/app/(frontend)/(sections)/CollectionDisplay')
 const { SelectionProvider } = await import('@/app/(frontend)/(sections)/Selection')
@@ -106,7 +107,7 @@ let probe: {
   toast: ReturnType<typeof useToast>
 }
 function Probe() {
-  const { afterAction } = useShelfRows()
+  const afterAction = useAfterAction()
   const toast = useToast()
   useEffect(() => {
     probe = { afterAction, toast }
@@ -128,10 +129,14 @@ const tree = (initial: ShelfRows, q: ShelfQuery = query) =>
         SelectionProvider,
         null,
         createElement(
-          ShelfRowsProvider,
-          { query: q, initial } as ComponentProps<typeof ShelfRowsProvider>,
-          createElement(CollectionList, { query: q, book: null }),
-          createElement(Probe),
+          ShelfActionsProvider,
+          null,
+          createElement(
+            ShelfRowsProvider,
+            { query: q, initial } as ComponentProps<typeof ShelfRowsProvider>,
+            createElement(CollectionList, { query: q, book: null }),
+            createElement(Probe),
+          ),
         ),
       ),
     ),

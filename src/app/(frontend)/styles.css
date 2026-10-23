@@ -116,7 +116,8 @@
   /* Minimum control height on the phone (DESIGN.md, Tap area). */
   --spacing-tap: 44px;
   /* The pinned bottom bar (Scan book on the phone): a tap-high control with
-     spacing-4 above and below, before the safe area. */
+     spacing-4 above and below, before the safe area. Select mode's two-row
+     bar raises it on the phone (below). */
   --spacing-pinned-bar: calc(var(--spacing-tap) + 2 * var(--spacing-4));
   /* A full-screen task's column on wide screens: a large phone
      (EXPERIENCE.md, Responsive). */
@@ -445,9 +446,16 @@
 
 /*
  * Select mode's action bar takes the place of the layout's pinned Scan book
- * (EXPERIENCE.md, Action bar). The toast lift (ToastProvider) assumes one
- * `pinned-bar` of height, which the bar keeps.
+ * (EXPERIENCE.md, Action bar). The toast lift (ToastProvider) reads
+ * `pinned-bar`: wide, the bar is one row and keeps it; on the phone it has
+ * two tap-high rows with spacing-4 above, between and below.
  */
 :root:has([data-action-bar]) [data-pinned-bottom]:not([data-action-bar]) {
   display: none;
+}
+
+:root:has([data-action-bar]) {
+  @variant max-wide {
+    --spacing-pinned-bar: calc(2 * var(--spacing-tap) + 3 * var(--spacing-4));
+  }
 }

@@ -207,6 +207,8 @@
     "select": "Select",
     "selected": "{n} selected",
     "done": "Done",
+    "remove": "Remove",
+    "removeTitle": "{n, plural, one {Remove # book from library?} other {Remove # books from library?}}",
     "layout": "Layout",
     "layouts": {
       "rows": "Rows",

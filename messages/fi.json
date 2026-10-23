@@ -207,6 +207,8 @@
     "select": "Valitse",
     "selected": "{n} valittu",
     "done": "Valmis",
+    "remove": "Poista",
+    "removeTitle": "{n, plural, one {Poistetaanko # kirja kirjastosta?} other {Poistetaanko # kirjaa kirjastosta?}}",
     "layout": "Asettelu",
     "layouts": {
       "rows": "Rivit",
