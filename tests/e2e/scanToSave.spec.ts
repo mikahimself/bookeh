@@ -39,8 +39,12 @@ test('scan to save, undo, save again', async ({ page, context, baseURL }) => {
   await expect(page.getByText('From fixture', { exact: true })).toBeVisible()
   const cover = page.locator('img[src^="/data/cover/"]')
   await expect(cover).toBeVisible()
+  // A number while pending too, so a miss reads as "0 > 0". The first cover
+  // compiles two dev routes and loads sharp: seconds on a cold CI runner.
   await expect
-    .poll(() => cover.evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth))
+    .poll(() => cover.evaluate((img: HTMLImageElement) => (img.complete ? img.naturalWidth : 0)), {
+      timeout: 15_000,
+    })
     .toBeGreaterThan(0)
 
   await addToLibrary.click()
