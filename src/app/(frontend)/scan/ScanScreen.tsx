@@ -167,6 +167,8 @@ export function ScanScreen({ isbn, error }: { isbn?: string; error?: string }) {
           // The field is a new element after Go; keep the keyboard up to correct it.
           autoFocus={error !== undefined}
           enterKeyHint="go"
+          // Digits pad on phones; an ISBN-10 ending in X is typed as its 978 ISBN-13.
+          inputMode="numeric"
           autoComplete="off"
           autoCapitalize="off"
           autoCorrect="off"
