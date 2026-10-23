@@ -12,7 +12,7 @@ import { Cover } from '../components/Cover'
 import { heldBook } from '../heldBook'
 
 import { BookDetailFrame } from './BookDetailPanel'
-import { CopyNote, RemoveCopy } from './CopyLine'
+import { CopyNote, ReceiveCopy, RemoveCopy } from './CopyLine'
 import { FilterChip } from './FilterChip'
 import { NotInLibrary } from './NotInLibrary'
 import { ReadAndRating } from './ReadAndRating'
@@ -24,14 +24,15 @@ const DOT = ' · '
  * header (cover beside the title, then authors, series and number, and the
  * edition line, each left out when empty), the read switch and Rating (keyed
  * by the Book, so swapping it resets them), Your copies, one line per copy
- * with its location and status, an owned copy's Remove beside it and the
- * copy's note under it (`CopyLine`), Genres when the Book has system genres,
- * and the foot with Edit. Each author, the series, each genre and each
- * copy's location is a Filter chip (`FilterChip`) that adds it to the
- * current filters; an ordered copy has no location and so no chip. The one
- * component later groups are added to; it reads the Book, the viewer's
- * copies and their read flag and rating only, never the client rows, so it
- * stays open when its row leaves the list.
+ * with its location and status, an owned copy's Remove or an ordered copy's
+ * Received beside it and the copy's note under it (`CopyLine`), Genres when
+ * the Book has system genres, and the foot with Edit. Each author, the
+ * series, each genre and each copy's location is a Filter chip
+ * (`FilterChip`) that adds it to the current filters; an ordered copy has
+ * no location and so no chip. The one component later groups are added to;
+ * it reads the Book, the viewer's copies and their read flag and rating
+ * only, never the client rows, so it stays open when its row leaves the
+ * list.
  * A Book the viewer does not hold is "Not in library". The content is the
  * same at every width; only the frame differs: the bottom sheet on the
  * phone, the panel beside the list from 900px (`BookDetailFrame`).
@@ -94,13 +95,13 @@ export async function BookDetail({
           </div>
         </div>
         <ReadAndRating key={bookId} bookId={bookId} initial={state} />
-        {/* Focus lands here when a removed copy's line goes (`RemoveCopy`). */}
+        {/* Focus lands here when a copy's line goes or changes (`RemoveCopy`, `ReceiveCopy`). */}
         <section tabIndex={-1} className="flex flex-col gap-2">
           <h3 className="text-heading-group text-text-muted ui-case">{t('detail.yourCopies')}</h3>
           <ul className="flex flex-col gap-4">
             {copies.map(({ copyId, location, status, note }) => (
               <li key={copyId}>
-                {/* Names the line's Remove and Note after the copy. */}
+                {/* Names the line's Remove, Received and Note after the copy. */}
                 <div
                   role="group"
                   aria-labelledby={`copy-${copyId}`}
@@ -121,6 +122,7 @@ export async function BookDetail({
                     {status === 'owned' && (
                       <RemoveCopy copyId={copyId} last={copies.length === 1} />
                     )}
+                    {status === 'ordered' && <ReceiveCopy copyId={copyId} />}
                   </div>
                   <CopyNote copyId={copyId} note={note ?? ''} />
                 </div>

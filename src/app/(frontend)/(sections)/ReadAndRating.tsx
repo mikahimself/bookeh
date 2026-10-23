@@ -26,7 +26,9 @@ type Props = { bookId: number; initial: Pick<UserBookState, 'read' | 'rating'> }
  * After a successful Undo from the toast the route is refreshed and the
  * group remounted in the same transition, so the switch seeds from the
  * restored flag: a refresh can bring back the very value the group was
- * rendered with, so a prop-change key would not remount it.
+ * rendered with, so a prop-change key would not remount it. The refresh
+ * follows any toast Undo, so it refreshes Book detail after one from another
+ * group too; `ReceiveCopy` relies on it.
  */
 export function ReadAndRating(props: Props) {
   const router = useRouter()

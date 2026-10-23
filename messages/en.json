@@ -248,7 +248,8 @@
     "edit": "Edit",
     "read": "Read",
     "rating": "Rating",
-    "note": "Note"
+    "note": "Note",
+    "received": "Received"
   },
   "progress": {
     "loading": "Loading"

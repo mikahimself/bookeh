@@ -1,7 +1,9 @@
 'use server'
 
 import { setRating } from '@/lib/books/setRating'
+import type { Named } from '@/lib/books/effectiveBook'
 import { setRead } from '@/lib/books/setRead'
+import { receiveCopy } from '@/lib/copies/receiveCopy'
 import { removeCopies } from '@/lib/copies/removeCopies'
 import { setNote } from '@/lib/copies/updateCopy'
 import { DomainError, runAction, type ActionResult } from '@/lib/errors'
@@ -58,6 +60,20 @@ export async function setNoteAction(input: unknown): Promise<ActionResult<null>>
     if (typeof note !== 'string') throw new DomainError('VALIDATION')
     await setNote(ctx, copyId, note)
     return null
+  })
+}
+
+/**
+ * Book detail's Received: makes one of the viewer's ordered copies owned at
+ * their default location, with Undo. `savedTo` is where it landed, or `null`.
+ */
+export async function receiveCopyAction(
+  input: unknown,
+): Promise<ActionResult<Undoable<{ savedTo: Named | null }>>> {
+  return runAction(async () => {
+    const ctx = await requireUserOrThrow()
+    const { copyId } = copyInput(input)
+    return withUndo(ctx, (tx) => receiveCopy(tx, copyId))
   })
 }
 

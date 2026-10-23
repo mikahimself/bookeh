@@ -248,7 +248,8 @@
     "edit": "Muokkaa",
     "read": "Luettu",
     "rating": "Arvio",
-    "note": "Muistiinpano"
+    "note": "Muistiinpano",
+    "received": "Saapunut"
   },
   "progress": {
     "loading": "Ladataan"

@@ -8,9 +8,10 @@ import { Button } from '../components/Button'
 import { ActionLink } from '../components/Link'
 import { settleAction } from '../components/request'
 import { TextAreaField } from '../components/TextField'
+import { useToast } from '../components/toast/ToastProvider'
 import { Dialog } from '../components/ui/Dialog'
 
-import { removeCopiesAction, setNoteAction } from './actions'
+import { receiveCopyAction, removeCopiesAction, setNoteAction } from './actions'
 import { useCloseDetail } from './detailClose'
 import { useAfterAction } from './ShelfRows'
 
@@ -127,5 +128,48 @@ export function RemoveCopy({ copyId, last }: { copyId: number; last: boolean }) 
         }
       />
     </>
+  )
+}
+
+/**
+ * EXPERIENCE.md, Book detail: an ordered copy's Received (FR-28). The copy
+ * becomes owned at the default location; the toast says where it landed
+ * ("Saved to {location}", or "Saved" without one) with Undo, which orders it
+ * again. Every result goes to `afterAction`. `ok` or `NOT_FOUND` moves focus
+ * to Your copies and refreshes Book detail, which unmounts this Link. A toast
+ * Undo is refreshed by `ReadAndRating`'s `onUndone` listener.
+ */
+export function ReceiveCopy({ copyId }: { copyId: number }) {
+  const t = useTranslations()
+  const router = useRouter()
+  const { show } = useToast()
+  const afterAction = useAfterAction()
+  const [pending, startTransition] = useTransition()
+  const link = useRef<HTMLButtonElement>(null)
+
+  const receive = () => {
+    startTransition(async () => {
+      const result = await settleAction(receiveCopyAction({ copyId }))
+      if (result.ok) {
+        const { savedTo, undoToken, undoSeconds } = result.data
+        show({
+          kind: 'success',
+          message: savedTo ? t('toast.savedTo', { location: savedTo.name }) : t('toast.saved'),
+          undo: { token: undoToken, seconds: undoSeconds },
+        })
+      }
+      afterAction(result)
+      if (result.ok || result.code === 'NOT_FOUND') {
+        // The line changes with the refresh; focus would fall to the body, outside the sheet.
+        link.current?.closest('section')?.focus()
+        router.refresh()
+      }
+    })
+  }
+
+  return (
+    <ActionLink ref={link} disabled={pending} onClick={receive}>
+      {t('detail.received')}
+    </ActionLink>
   )
 }

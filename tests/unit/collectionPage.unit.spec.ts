@@ -30,6 +30,7 @@ const showToast = vi.fn()
 const removeCopiesAction = vi.fn()
 const toggleCopiesReadAction = vi.fn()
 const setNoteAction = vi.fn()
+const receiveCopyAction = vi.fn()
 
 // The English catalogue, so the assertions read the screen's words.
 const english = async () => {
@@ -69,6 +70,7 @@ vi.mock('@/app/(frontend)/prefs', async (importOriginal) => ({
 vi.mock('@/app/(frontend)/actions/prefs', () => ({ setDevicePrefsAction }))
 vi.mock('@/app/(frontend)/(sections)/actions', () => ({
   removeCopiesAction,
+  receiveCopyAction,
   setReadAction: vi.fn(),
   setRatingAction: vi.fn(),
   setNoteAction,
@@ -853,6 +855,26 @@ describe('CollectionPage', () => {
         expect(fetchStub.mock.calls[0]![0]).toMatch(/^\/data\/shelf\?/)
         expect(router.refresh).not.toHaveBeenCalled()
         expect(showToast).not.toHaveBeenCalled()
+      })
+
+      it('receives an ordered copy with a toast that undoes it, and refreshes Book detail', async () => {
+        holds(linna, [copy(21, { status: 'ordered' })])
+        receiveCopyAction.mockResolvedValue({
+          ok: true,
+          data: { savedTo: { id: 3, name: 'Olohuone' }, undoToken: 'tok', undoSeconds: 1800 },
+        })
+        reloads()
+        await renderPage({ book: '5' })
+        const sheet = await detail('Tuntematon sotilas')
+
+        fireEvent.click(within(sheet).getByRole('button', { name: 'Received' }))
+        await waitFor(() => expect(router.refresh).toHaveBeenCalledOnce())
+        expect(receiveCopyAction).toHaveBeenCalledExactlyOnceWith({ copyId: 21 })
+        expect(showToast).toHaveBeenCalledExactlyOnceWith({
+          kind: 'success',
+          message: 'Saved to Olohuone',
+          undo: { token: 'tok', seconds: 1800 },
+        })
       })
 
       it('refreshes Book detail when the copy is gone already', async () => {
