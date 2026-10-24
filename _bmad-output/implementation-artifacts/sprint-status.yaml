@@ -29,7 +29,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 10-06-2026 17:50
-last_updated: 10-23-2026 14:14
+last_updated: 10-23-2026 16:59
 project: bookeh
 project_key: NOKEY
 tracking_system: file-system
@@ -191,7 +191,7 @@ development_status:
   5-35-d33-look-up-a-hand-entered-book-again: done
   5-36-k6-back-office-tidy-up: done
   5-37-k14-last-backup-in-settings: done
-  epic-5-retrospective: optional
+  epic-5-retrospective: done
 
   epic-6: backlog
   6-1-j1-people-collection: backlog
@@ -598,7 +598,7 @@ action_items:
     action: 'Push the three unpushed main commits (2bef9c3, 01a021a, a8fa090) and
       set epic-4: done in sprint-status.yaml (P2, P3)'
     owner: 'Mika'
-    status: open
+    status: in-progress
     ref: '_bmad-output/implementation-artifacts/epic-4-retro-2026-10-22.md'
   - id: 'epic-4-retro-item-44-spec-reconciliation-spine-ad-5-names-edi'
     epic: 4
@@ -634,7 +634,7 @@ action_items:
       touch drag on iOS Safari, a HEIC photo from the camera, and whether the picker
       offers the camera (P6, S5)'
     owner: 'Mika'
-    status: open
+    status: in-progress
     ref: '_bmad-output/implementation-artifacts/epic-4-retro-2026-10-22.md'
   - id: 'epic-4-retro-item-48-decide-a-user-s-uploaded-cover-when-a-pr'
     epic: 4
@@ -674,3 +674,115 @@ action_items:
     owner: 'Mika'
     status: open
     ref: '_bmad-output/implementation-artifacts/epic-4-retro-2026-10-22.md'
+  - id: "epic-5-retro-item-53-refresh-the-server-render-in-the-afterac"
+    epic: 5
+    action: "Refresh the server render in the afterAction contract: router.refresh()
+      in a transition after the rows reload (or revalidatePath in every collection
+      action), so Filter panel values and the cached first page follow Remove, Read,
+      Move, Received and rating; AD-7 updated in the same commit; one unit case for
+      Remove then Back (R1, R2; observed in the browser)"
+    owner: "Mika"
+    status: open
+    ref: "_bmad-output/implementation-artifacts/epic-5-retro-2026-10-23.md"
+  - id: "epic-5-retro-item-54-move-and-its-undo-skip-or-block-ordered"
+    epic: 5
+    action: "Move and its Undo: skip or block ordered copies in a bulk Move with a
+      toast that says so (open question 1); restoreLocations writes null for a previous
+      location that no longer exists, mirrored in receiveCopy, with an int case; moveCopies
+      returns moved.length for the toast count; maxLength 200 on the picker New location
+      field; lookupAgain counts limitLookups only on the path that asks the sources
+      (S7/R3, R4, R5, R6, R7)"
+    owner: "Mika"
+    status: open
+    ref: "_bmad-output/implementation-artifacts/epic-5-retro-2026-10-23.md"
+  - id: "epic-5-retro-item-55-small-code-reconciliations-parseshelfque"
+    epic: 5
+    action: "Small code reconciliations: parseShelfQuery drops tag and theme until
+      Epic 9 applies them; Book detail edition line uses languageName; the last-backup.json
+      read moves under src/lib with its path from an env var; shelf and suggest q
+      NFC-normalised at the route boundary (S5, S6, A4a, A4b; fold the q rule into
+      Epic 4 item 40)"
+    owner: "Mika"
+    status: open
+    ref: "_bmad-output/implementation-artifacts/epic-5-retro-2026-10-23.md"
+  - id: "epic-5-retro-item-56-ac-named-test-gaps-rating-handlers-paylo"
+    epic: 5
+    action: "AC-named test gaps: Rating handlers payload and no Undo toast (5.23);
+      Look it up again edition round trip and its three toasts (5.35); Re-fetch gate
+      rendered for a non-admin and an admin (5.34); /data/suggest answers 401 when
+      signed out (Errors convention) (V1-V4)"
+    owner: "Mika"
+    status: open
+    ref: "_bmad-output/implementation-artifacts/epic-5-retro-2026-10-23.md"
+  - id: "epic-5-retro-item-57-one-phone-session-recorded-in-one-place"
+    epic: 5
+    action: "One phone session, recorded in one place: HEIC upload and camera offer
+      from Book detail Edit (closes the owed half of Epic 4 item 47); covers column
+      counts at 375 and 390px (DESIGN.md decision, open question 3); iOS keyboard
+      over New location in the Move sheet; sheet restore after history Back from Scan
+      (5.12); Done autoFocus on entering select mode (S2, P5)"
+    owner: "Mika"
+    status: open
+    ref: "_bmad-output/implementation-artifacts/epic-5-retro-2026-10-23.md"
+  - id: "epic-5-retro-item-58-spec-reconciliation-spec-5-7-and-spine-l"
+    epic: 5
+    action: "Spec reconciliation: spec-5-7 and spine line 630 record that the timing
+      test failed in CI and was fixed by the e606558 plan rewrite plus analyze; epics.md
+      6.9 and 7.12 carry 5.21 chip clause as an AC; DESIGN.md names the 220px filter
+      width; spec-5-18 frontmatter drops the deferred phone check when item 5 lands;
+      epic-5 context recompiled (S1, S3, A4c, P8; extends Epic 4 item 44)"
+    owner: "Mika"
+    status: open
+    ref: "_bmad-output/implementation-artifacts/epic-5-retro-2026-10-23.md"
+  - id: "epic-5-retro-item-59-housekeeping-push-89d2a79-and-2bd8265-se"
+    epic: 5
+    action: "Housekeeping: push 89d2a79 and 2bd8265; set epic-5 and epic-4 to done
+      in sprint-status.yaml; remove the stale bookeh-postgres-last-backup container;
+      land Epic 4 item 42 (ignore .claude/** in lint) before the next parallel lane
+      (P3, P7)"
+    owner: "Mika"
+    status: open
+    ref: "_bmad-output/implementation-artifacts/epic-5-retro-2026-10-23.md"
+  - id: "epic-5-retro-item-60-process-a-red-main-run-gets-a-recorded-c"
+    epic: 5
+    action: "Process: a red main run gets a recorded cause, one line in the next commit
+      or the story Auto Run Result, so a flaky e2e lane is named rather than ridden
+      out (P1: three red runs at the Playwright step during Epic 5)"
+    owner: "Mika"
+    status: open
+    ref: "_bmad-output/implementation-artifacts/epic-5-retro-2026-10-23.md"
+  - id: "epic-5-retro-item-61-process-give-the-17-open-previous-epic-i"
+    epic: 5
+    action: "Process: give the 17 open previous-epic items a slot: a clean-up story
+      before Epic 6 or a decision that closes them (P4; open question 5)"
+    owner: "Mika"
+    status: open
+    ref: "_bmad-output/implementation-artifacts/epic-5-retro-2026-10-23.md"
+  - id: "epic-5-retro-item-62-process-act-on-the-oversized-warning-14"
+    epic: 5
+    action: "Process: act on the oversized warning: 14 of 37 Epic 5 specs warned and
+      none was split; decide whether the rule holds or the threshold moves (P2; open
+      question 4)"
+    owner: "Mika"
+    status: open
+    ref: "_bmad-output/implementation-artifacts/epic-5-retro-2026-10-23.md"
+  - id: "epic-5-retro-item-63-covers-on-the-phone-the-placeholder-and"
+    epic: 5
+    action: "Covers on the phone, the placeholder and the ordered tile (retro decision
+      3): DESIGN.md density table takes minimums 150 / 96 / 70px (l / m / s), the
+      Cover placeholder row the typeset paperback (title bottom-left, wrapped and
+      clamped, author under it; title only at s and in rows), the Cover tile row a
+      red-white-blue airmail band across the top-left corner for an ordered copy;
+      styles.css tokens, Cover.tsx and CoverTile.tsx follow; closes 5.13 deferred
+      items"
+    owner: "Mika"
+    status: open
+    ref: "_bmad-output/implementation-artifacts/epic-5-retro-2026-10-23.md"
+  - id: "epic-5-retro-item-64-raise-the-oversized-threshold-in-the-spe"
+    epic: 5
+    action: "Raise the oversized threshold in the spec skill customization so a story
+      of Epic 5 typical size passes, and note the new bound in the CLAUDE.md compact-stories
+      line (retro decision 4)"
+    owner: "Mika"
+    status: open
+    ref: "_bmad-output/implementation-artifacts/epic-5-retro-2026-10-23.md"
