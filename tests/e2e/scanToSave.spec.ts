@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test'
 
-import { E2E_EMAIL, E2E_ISBN_TYPED, E2E_LOCATION, E2E_PASSWORD } from './account'
+import { E2E_EMAIL, E2E_ISBN, E2E_ISBN_TYPED, E2E_LOCATION, E2E_PASSWORD } from './account'
 
 // Spine, Tests: the primary flow in a browser, on the fixture source (BOOKEH_SOURCES=fixture)
 // with a typed ISBN. The seed has removed earlier runs' Book, so the first Answer is
@@ -26,6 +26,15 @@ test('scan to save, undo, save again', async ({ page, context, baseURL }) => {
   const notInLibrary = page.getByRole('heading', { name: 'Not in library' })
   const addToLibrary = page.getByRole('button', { name: 'Add to library' })
 
+  // Warm both cover routes before anything is timed. The first request to
+  // each compiles it under `next dev` and the fixture one loads sharp; on a
+  // cold CI runner that passes the 5 s the server allows its own fetch of
+  // the fixture cover (coverPolicy.timeoutMs), and the preview becomes a 404.
+  // Signed out, the preview answers 401 once compiled; the fixture cover
+  // needs no sign-in.
+  await page.request.get(`/data/fixture-cover/${E2E_ISBN}`)
+  await page.request.get(`/data/cover/${E2E_ISBN}`)
+
   await page.goto('/login')
   await page.getByLabel('Email').fill(E2E_EMAIL)
   await page.getByLabel('Password').fill(E2E_PASSWORD)
@@ -39,12 +48,9 @@ test('scan to save, undo, save again', async ({ page, context, baseURL }) => {
   await expect(page.getByText('From fixture', { exact: true })).toBeVisible()
   const cover = page.locator('img[src^="/data/cover/"]')
   await expect(cover).toBeVisible()
-  // A number while pending too, so a miss reads as "0 > 0". The first cover
-  // compiles two dev routes and loads sharp: seconds on a cold CI runner.
+  // A number while pending too, so a miss reads as "0 > 0".
   await expect
-    .poll(() => cover.evaluate((img: HTMLImageElement) => (img.complete ? img.naturalWidth : 0)), {
-      timeout: 15_000,
-    })
+    .poll(() => cover.evaluate((img: HTMLImageElement) => (img.complete ? img.naturalWidth : 0)))
     .toBeGreaterThan(0)
 
   await addToLibrary.click()
