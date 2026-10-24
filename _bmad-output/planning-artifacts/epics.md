@@ -2092,7 +2092,7 @@ So that covers are fixed where the other fields are (D-4, UX-DR47a).
 
 ## Epic 5: Browse, organise and move my collection
 
-The collection at `/`: rows or covers in three sizes, endless scrolling, search, Filter panel and sort, Book detail with Filter chips, read and rating, copy notes and removal, Received, locations on rows and as a filter, select mode with bulk read, move and remove, locations managed in Settings, Open book on the Answer, admin re-fetch, and the 10,000-copy timing test right after the query.
+The collection at `/`: rows or covers in three sizes, endless scrolling, search, Filter panel and sort, Book detail with Filter chips, read and rating, copy notes and removal, Received, locations on rows and as a filter, select mode with bulk read, move and remove, locations managed in Settings, Open book on the Answer, admin re-fetch, the 10,000-copy timing test right after the query, and two clean-up stories decided by the Epic 5 retrospective.
 
 ### Story 5.1: [E16] Shelf query parameters
 
@@ -2620,6 +2620,68 @@ So that a silently failing backup doesn't go unnoticed for weeks (NFR-6).
 **Then** a line reads "Last backup: {date}", in the user's time zone format
 **And** it is marked in `danger` with "Backup is overdue." when the last successful backup is older than 48 hours, or the file is missing or reports a failure
 **And** the line is absent for non-admins
+
+### Story 5.38: [K19] Collection clean-up
+
+As Mika,
+I want the collection's loose ends from the Epic 5 retrospective fixed in one pass,
+So that counts and rows never go stale, bulk actions explain themselves, and the covers layout follows the decided design (Epic 5 retrospective, 2026-10-23, items 1–4 and 11).
+
+**Acceptance Criteria:**
+
+**Given** a Remove, Read, Move, Received or rating on the collection
+**When** `afterAction` reports its result
+**Then** after the rows reload, `ShelfActionsProvider` refreshes the server render (`router.refresh()` in a transition), so the Filter panel's values and the cached first page follow; AD-7's `afterAction` paragraph says so in the same commit
+**And** a unit case shows a bar Remove followed by Back renders the reloaded rows (AD-7: rows are never patched or stale)
+
+**Given** a selection that includes an ordered copy
+**When** I tap Move or Remove in the action bar
+**Then** owned copies are acted on, ordered ones stay ticked, and the toast says how many were skipped (retro decision 1)
+**And** `moveCopies` returns the number actually moved, which the toast shows; the picker's "New location" field has `maxLength` 200
+**And** Undo of a move whose previous location has since been deleted or merged restores `null` for that copy instead of failing (AD-20 extended to targets, mirrored in `receiveCopy`), with an integration case that deletes the location before Undo
+**And** `lookupAgain` counts `limitLookups()` only on the path that asks the sources
+
+**Given** the small reconciliations the retro named
+**When** the story is done
+**Then** `parseShelfQuery` drops `tag` and `theme` until Epic 9 applies them; Book detail's edition line uses `languageName`; the `last-backup.json` read lives under `src/lib` with its path from `BACKUP_STATUS_FILE` (default as today); the shelf and suggest `q` are NFC-normalised at the route boundary
+**And** tests exist for the criteria the retro found unguarded: the Rating handlers' payload and the absence of an Undo toast (5.23), the Look-it-up-again edition round trip and its three toasts (5.35), the Re-fetch link rendered for an admin and absent for a user (5.34), `/data/suggest` answering 401 signed out (Errors convention)
+
+**Given** the covers layout (retro decision 3)
+**When** DESIGN.md is updated
+**Then** its density table takes column minimums 150 / 96 / 70px (l / m / s) and `styles.css` follows, so 375 and 390px phones get 4 / 3 / 2 columns
+**And** a Book with no cover shows the typeset paperback placeholder: outline kept, title bottom-left in the product type, wrapped and clamped, author under it, title only at s and in rows (replaces the Cover placeholder assumption)
+**And** an ordered copy's cover tile carries a red-white-blue airmail band across its top-left corner; the row ending still reads "Ordered"
+
+### Story 5.39: [K20] Epic 4 leftovers
+
+As Mika,
+I want the open action items of the Epic 4 retrospective landed, with the Epic 5 retrospective's spec and housekeeping items,
+So that the next epic starts from a reconciled spine and a clean tree (Epic 4 retrospective items 38–42, 44–46, 51–52; Epic 5 retrospective items 6, 7 and 12; retro decision 5).
+
+**Acceptance Criteria:**
+
+**Given** `sharePrivateBook`
+**When** a non-admin's promote cannot fetch the source's cover, or `merge()` meets a shared Book with no cover
+**Then** the user's own cover is shared in place, as the admin's is; integration cases for both; AD-5's promote rule updated in the same commit (item 38)
+**And** a non-admin drops an override by retyping the shared value: `writeBook` compares each normalised edit with the stored shared value and passes equal keys as `dropOverrides`; one integration case (item 51)
+**And** the first un-held cover fetch for a user and ISBN counts one lookup and further covers of the same Answer do not; `lookupLimit.ts`'s comment and AD-9 updated (item 52)
+
+**Given** the id, limit and normalisation rules
+**When** the story is done
+**Then** one `isRowId()` helper with the int4 bound is used by `requireOwnBook`, `requireOwnCopy`, `moveCopies`, `removeCopies`, `editBookAction` and `isSaveInput`, `2147483648` is in the `requireOwnBook` bad-id case, and the `idOf` and `isPlainObject` copies are folded in (item 39)
+**And** `editBook` checks title, subtitle, description, authors and series against `fields/limits.ts` with `TOO_LONG` on the edit key, and one normalisation rule (whitespace runs collapsed) applies in `editBook`, `upsertUserBook` and `normaliseManual`, named in the spine's Text input row (item 40)
+**And** `bookeh/system-privileges` has `RuleTester` cases beside `client-lib-imports` (item 41)
+
+**Given** the spine, the epics and the design documents
+**When** the story is done
+**Then** AD-5 names `editBook()` as the admin's genres writer; the Tests row drops "never truncate" and names `test:reset`; the Toasts row drops `flashToast()` or the function is deleted; `epic-3-context.md` takes the 4.19 D-8 wording; the 4.12 AC and `epic-4-context.md` say "5 MiB file, 6 MB body"; `epics.md` 4.2 says "except title", 4.14 "after the edits commit, in its own transaction", 4.18 "per cover URL" (item 44)
+**And** `spec-5-7` and the spine's Search indexing entry record that the timing test failed in CI and was fixed by the `e606558` plan rewrite plus `analyze`; `epics.md` 6.9 and 7.12 carry 5.21's "opens the collection with only that filter" clause; DESIGN.md names the 220px filter width; `spec-5-18`'s frontmatter drops the deferred phone check once the HEIC and camera halves are recorded (item 58)
+**And** CLAUDE.md Conventions say that a deferred item handed to a later story is one of its acceptance criteria or stays with the story that deferred it, and that a story built beside others names the files it shares in Residual risks (item 45)
+**And** the `oversized` threshold in the spec skill's customization is raised so a story of Epic 5's typical size passes, and CLAUDE.md's compact-stories line names the new bound (item 64)
+
+**Given** the tree and CI
+**When** the story is done
+**Then** `eslint.config.mjs` ignores `.claude/**` (item 42); CI's `check` job runs `docker build` on every branch (item 46); the stale `bookeh-postgres-last-backup` container is gone and `epic-5-context.md` is recompiled (item 59)
 
 ## Epic 6: Lend books and see who has them
 
