@@ -5,6 +5,7 @@ import { DomainError } from '@/lib/errors'
 import type { SourcesOutcome } from '@/lib/metadata/source'
 import type { Context } from '@/lib/payload/context'
 import * as gateway from '@/lib/payload/gateway'
+import { idOf } from '@/lib/payload/ref'
 import { assertLive, onRollback } from '@/lib/payload/transaction'
 import type { Author, Series } from '@/payload-types'
 
@@ -18,14 +19,7 @@ import {
 import { deleteRow } from './ensureSharedBook'
 import { findBookByIsbn, type HeldBook } from './findBookByIsbn'
 import { findOrCreateByName } from './findOrCreateByName'
-import {
-  type BookValues,
-  differing,
-  fromBook,
-  fromCandidate,
-  idOf,
-  populated,
-} from './handEnteredValues'
+import { type BookValues, differing, fromBook, fromCandidate, populated } from './handEnteredValues'
 import { isUnreferenced } from './isUnreferenced'
 import { mapSubjectsToGenres } from './mapSubjectsToGenres'
 import { type CandidateId, type Chosen, chooseCandidate } from './pick'
@@ -52,8 +46,9 @@ export type PendingShare = Chosen & { cover?: DownloadedCover }
  * clipped so the promote's write and its D-8 comparison see the values
  * stored, and its raw metadata, with the candidate's cover stored by
  * `storeCover()` when the candidate has a `coverUrl`, unless the Book has a
- * cover and the user is the admin, whose cover the promote keeps. Never asks
- * the sources; the cover is the only network call.
+ * cover and the user is the admin, whose cover the promote keeps. Without a
+ * stored cover the promote keeps the Book's own. Never asks the sources; the
+ * cover is the only network call.
  */
 export async function prepareShare(
   ctx: Context,
@@ -92,17 +87,19 @@ export async function prepareShare(
  *
  * - The shared Book: the user's own private Book with the ISBN, if any, is
  *   merged into it (its copies and `user-books` row move, then it is
- *   deleted), and the cover is discarded at once. No held outcome is needed:
- *   the shared Book's values are the target. When any row still references
- *   the private Book after the move, the merge throws a plain `Error`, which
- *   rolls the save back, rather than let Postgres null that reference.
+ *   deleted), and the cover is discarded at once. When the shared Book has
+ *   no cover, the private Book's cover row is shared in place and becomes
+ *   the shared Book's. No held outcome is needed: the shared Book's values
+ *   are the target. When any row still references the private Book after
+ *   the move, the merge throws a plain `Error`, which rolls the save back,
+ *   rather than let Postgres null that reference.
  * - The user's private Book with `pending`: promoted in place. It keeps its
  *   id and takes the candidate's values, with authors and series matched or
  *   created among shared rows; `visibility` becomes shared and the field hook
- *   clears `createdBy`. The admin's own cover row is shared in place the same
- *   way, and the downloaded cover discarded; anyone else's cover is replaced
- *   by the downloaded one, or by none, since a private upload never reaches
- *   the shared Book.
+ *   clears `createdBy`. The Book's own cover row is shared in place the same
+ *   way when the user is the admin (the downloaded cover discarded) or when
+ *   there is no downloaded cover (the candidate has none, or its download
+ *   failed); otherwise it is replaced by the downloaded one.
  * - The user's private Book without `pending`: unchanged.
  * - None: `NOT_FOUND`.
  *
@@ -209,7 +206,7 @@ async function promote(tx: Context, bookId: number, pending: PendingShare): Prom
       : (await findOrCreateByName(tx, 'series', 'shared', { name: best.series })).id
   const genres = await mapSubjectsToGenres(tx, raw)
   let coverId: number | null
-  if (admin && own.cover != null) {
+  if (own.cover != null && (admin || !cover)) {
     if (cover) await discardCover(payload, cover)
     coverId = idOf(own.cover)
     await shareCoverRow(tx, coverId)
@@ -247,7 +244,7 @@ async function promote(tx: Context, bookId: number, pending: PendingShare): Prom
   await removeOrphans(tx, own)
 }
 
-/** The admin's private cover row becomes shared; the field hook clears `createdBy`. */
+/** A private Book's cover row becomes shared in place; the field hook clears `createdBy`. */
 async function shareCoverRow(tx: Context, id: number): Promise<void> {
   assertLive(tx)
   await tx.req.payload.update({
@@ -260,11 +257,13 @@ async function shareCoverRow(tx: Context, id: number): Promise<void> {
 
 /**
  * FR-12 and D-8: the private Book's copies and row move to the shared Book,
- * then it is deleted, only when nothing references it any more.
+ * then it is deleted, only when nothing references it any more. A shared
+ * Book without a cover takes the private Book's, shared in place (AD-5).
  */
 async function merge(tx: Context, ownId: number, sharedId: number): Promise<void> {
   const own = await readBook(tx, ownId)
-  const overrides = isAdmin(tx.user) ? {} : differing(own, fromBook(await readBook(tx, sharedId)))
+  const shared = await readBook(tx, sharedId)
+  const overrides = isAdmin(tx.user) ? {} : differing(own, fromBook(shared))
   await moveCopiesToBook(tx, ownId, sharedId)
   await mergeUserBook(tx, ownId, sharedId, overrides)
   // Postgres would null a remaining reference on delete; the throw rolls the save back.
@@ -272,14 +271,26 @@ async function merge(tx: Context, ownId: number, sharedId: number): Promise<void
     throw new Error(`Private Book ${ownId} is still referenced after its merge`)
   }
   await deleteRow(tx, 'books', ownId)
+  if (shared.cover == null && own.cover != null) {
+    const coverId = idOf(own.cover)
+    await shareCoverRow(tx, coverId)
+    assertLive(tx)
+    await tx.req.payload.update({
+      collection: 'books',
+      id: sharedId,
+      data: { cover: coverId },
+      ...system(tx),
+    })
+  }
   await removeOrphans(tx, own)
 }
 
 /**
  * After a promote or a merge: the private authors and series `own` used, and
- * its cover's `media` row (a non-admin's promote replaced it), each deleted
- * when nothing references it. Shared rows are never candidates; a private
- * one an override keeps stays.
+ * its cover's `media` row (replaced by the source's cover, or left behind by
+ * a merge into a covered shared Book), each deleted when nothing references
+ * it; a cover row shared in place is referenced and stays. Shared rows are
+ * never candidates; a private one an override keeps stays.
  */
 async function removeOrphans(tx: Context, own: BookValues): Promise<void> {
   // One after the other: calls on one context never run concurrently (AD-16).

@@ -96,6 +96,7 @@ spacing:
   stroke-control: 2px
   stroke-selection: 4px
   panel-width: 360px
+  filter-width: 220px
 components:
   section-heading:
     typography: '{typography.heading-section}'
@@ -326,7 +327,7 @@ On wide screens the detail panel is {spacing.panel-width} wide and sits beside t
 
 One element is raised: the book detail panel on wide screens. It has a {spacing.stroke-hairline} {colors.border} line down its left edge and a light shadow falling to the left onto the list (`-10px 0 24px -14px` in {colors.shadow}). In dark mode the shadow is barely visible and the line does the separating.
 
-Nothing else has a shadow or a raised surface, and there is no tonal layering. The filter panel is separated from the list by space. The bottom sheet is separated from the list by its {spacing.stroke-control} top edge and the {colors.scrim}. Toasts, dialogs and combobox popups are outlined boxes on the plain ground, with no shadow.
+Nothing else has a shadow or a raised surface, and there is no tonal layering. The filter panel is {spacing.filter-width} wide on wide screens and is separated from the list by space. The bottom sheet is separated from the list by its {spacing.stroke-control} top edge and the {colors.scrim}. Toasts, dialogs and combobox popups are outlined boxes on the plain ground, with no shadow.
 
 → Reference: [collection, wide](mockups/key-collection-wide.html), light and dark.
 

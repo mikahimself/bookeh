@@ -1,6 +1,7 @@
 import { DomainError } from '@/lib/errors'
 import type { Context } from '@/lib/payload/context'
 import * as gateway from '@/lib/payload/gateway'
+import { isRowId } from '@/lib/payload/ref'
 import { withTransaction } from '@/lib/payload/transaction'
 import type { Undone } from '@/lib/undo/undo'
 
@@ -13,7 +14,7 @@ import { locationFor, type LocationOption } from './locations'
  * it landed (`savedTo`, `null` for none) with the restore that orders it
  * again. Records nothing: callers wrap it in `withUndo()`.
  *
- * An id that is not a positive safe integer, or not the viewer's copy (a gone
+ * An id that is not a row id (`isRowId()`), or not the viewer's copy (a gone
  * copy, or another user's, for the admin too), fails with `NOT_FOUND` before
  * any write; the find filters on `owner` explicitly as well as through
  * `ownerAccess` (FR-48). A copy that is not ordered fails with `VALIDATION`
@@ -31,7 +32,7 @@ export async function receiveCopy(
   ctx: Context,
   copyId: number,
 ): Promise<Undone<{ savedTo: LocationOption | null }>> {
-  if (!Number.isSafeInteger(copyId) || copyId <= 0) throw new DomainError('NOT_FOUND')
+  if (!isRowId(copyId)) throw new DomainError('NOT_FOUND')
 
   return withTransaction(ctx, async (tx) => {
     const { docs } = await gateway.find(tx, {

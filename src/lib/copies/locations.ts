@@ -4,7 +4,7 @@ import { getProfile, updateProfile } from '@/lib/account/profile'
 import { DomainError } from '@/lib/errors'
 import type { Context } from '@/lib/payload/context'
 import * as gateway from '@/lib/payload/gateway'
-import type { Ref } from '@/lib/payload/ref'
+import { idOf, isRowId, type Ref } from '@/lib/payload/ref'
 import { withTransaction } from '@/lib/payload/transaction'
 
 /**
@@ -59,8 +59,7 @@ export async function locationFor(ctx: Context, change: CopyStatus): Promise<num
   if (change.location === null) return null
   if (change.location !== undefined) return resolveLocation(ctx, change.location)
   const fallback = ctx.user.defaultLocation
-  if (fallback === null || fallback === undefined) return null
-  return typeof fallback === 'number' ? fallback : fallback.id
+  return idOf(fallback) ?? null
 }
 
 /** A location as a picker lists it. */
@@ -118,9 +117,6 @@ export async function createLocation(ctx: Context, name: string): Promise<number
   })
 }
 
-/** A positive safe integer: anything else cannot be a location id. */
-const isId = (id: number): boolean => Number.isSafeInteger(id) && id > 0
-
 /**
  * Fails with `NOT_FOUND` unless every id (distinct) is one of the context
  * user's locations. `count`, not `findByID`: a `NotFound` would end the
@@ -173,7 +169,7 @@ async function repointLocation(tx: Context, from: number, to: number | null): Pr
  * No Undo.
  */
 export async function deleteLocation(ctx: Context, id: number): Promise<void> {
-  if (!isId(id)) throw new DomainError('NOT_FOUND')
+  if (!isRowId(id)) throw new DomainError('NOT_FOUND')
 
   await withTransaction(ctx, async (tx) => {
     await assertOwnLocations(tx, [id])
@@ -195,7 +191,7 @@ export async function deleteLocation(ctx: Context, id: number): Promise<void> {
  * `ValidationError`, unchanged. No Undo.
  */
 export async function renameLocation(ctx: Context, id: number, name: string): Promise<void> {
-  if (!isId(id)) throw new DomainError('NOT_FOUND')
+  if (!isRowId(id)) throw new DomainError('NOT_FOUND')
   const normalised = normaliseName(name)
   if (normalised === '') throw new DomainError('VALIDATION', { fields: { name: 'VALIDATION' } })
 
@@ -230,7 +226,7 @@ export async function renameLocation(ctx: Context, id: number, name: string): Pr
 /**
  * Spine, AD-18, FR-31: merges one of the context user's locations into
  * another in the caller's transaction or one of its own (AD-16). Either id
- * not a positive safe integer, or not the viewer's location (the admin's
+ * not a row id (`isRowId()`), or not the viewer's location (the admin's
  * included), fails with `NOT_FOUND`; merging a location into itself fails with
  * `VALIDATION`; both before any write. The viewer's copies at the source and
  * their default location, when it is the source, move to the target, then the
@@ -241,7 +237,7 @@ export async function mergeLocation(
   sourceId: number,
   targetId: number,
 ): Promise<void> {
-  if (!isId(sourceId) || !isId(targetId)) throw new DomainError('NOT_FOUND')
+  if (!isRowId(sourceId) || !isRowId(targetId)) throw new DomainError('NOT_FOUND')
   if (sourceId === targetId) throw new DomainError('VALIDATION')
 
   await withTransaction(ctx, async (tx) => {

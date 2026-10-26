@@ -1,5 +1,6 @@
 import type { Context } from '@/lib/payload/context'
 import * as gateway from '@/lib/payload/gateway'
+import { idOf } from '@/lib/payload/ref'
 
 import type { Named } from './effectiveBook'
 
@@ -25,9 +26,6 @@ export type EntryLine = { entryId: number; wishlist: Named; forPerson: Named | n
 
 /** What the viewer holds of a Book: their copies and their open entries. */
 export type Holdings = { copies: CopyLine[]; entries: EntryLine[] }
-
-const idOf = (value: number | { id: number }): number =>
-  typeof value === 'object' ? value.id : value
 
 const empty = (): Holdings => ({ copies: [], entries: [] })
 

@@ -175,7 +175,7 @@ From the architecture spine (AD-1 to AD-20, conventions, stack, deployment) and 
 - Text from sources and users trimmed and NFC-normalised at the boundary. Language codes ISO 639-1, else 639-2.
 - Dates ISO 8601 UTC; loan dates are calendar dates stored at 12:00 UTC; formatting via `next-intl` with time zone `Europe/Helsinki`.
 - Errors: `DomainError`, `ActionResult`, `ErrorCode` (`SCREAMING_SNAKE`), `runAction()`, `runRoute()` in `src/lib/errors.ts`; message key `errors.<CODE>`; Payload errors mapped to `NOT_FOUND`, `VALIDATION`, `INTERNAL`; route handlers answer JSON with `Cache-Control: no-store` and 401 for `UNAUTHENTICATED`; one client helper turns network failure into `NO_CONNECTION` and `UNAUTHENTICATED` into a move to sign-in.
-- Toasts: one provider in the frontend root layout (survives navigation), rendering `ActionResult`; server renders raise toasts only through `flashToast()` cookie.
+- Toasts: one provider in the frontend root layout (survives navigation), rendering `ActionResult`.
 - Navigation and history: opening Book detail, an entry or a full-screen task pushes; swapping the open Book, changing search/filters/sort and one Answer following another replace; closing is history back with fallback `/`; overlays without an address handle Back in their `components/ui` wrapper; overlay links use router navigation with `scroll: false`, no prefetch; `cacheComponents` off.
 - Device preferences (layout, size, theme, loans order) in one cookie `bookeh_prefs`, read by `devicePrefs()` at render, written by one server action; never on the profile.
 - Styling: Tailwind CSS 4; DESIGN.md tokens declared once in `src/app/(frontend)/styles.css`; Tailwind default colour, radius, shadow and font scales cleared; dark under `data-theme="dark"` and under `prefers-color-scheme` when theme is `system`; no `dark:` utilities, CSS Modules, inline styles or colour/size literals.
@@ -1768,7 +1768,7 @@ So that a runaway client cannot hammer the sources through a save or a cover ima
 **Given** `limitLookups(ctx)` (30 lookups per 60 s per user)
 **When** a save asks the sources because no outcome is held, or the cover preview route fetches a cover it has not fetched before
 **Then** the call counts against the same per-user limit and is refused with `RATE_LIMITED` past it
-**And** the cover preview keeps fetched bytes per user, ISBN and pick for the preview's lifetime, bounded, so repeated requests for one image fetch it once
+**And** the cover preview keeps fetched bytes per user and ISBN, bytes per cover URL, for the preview's lifetime, bounded, so repeated requests for one image fetch it once
 **And** `lookupLimit.ts`'s comment lists every caller
 
 ### Story 4.19: [D37] Private-Book merge clean-up and the D-8 merge rule
@@ -1895,8 +1895,8 @@ So that wrong source data is corrected once (FR-14, AD-5, AD-6, D-8).
 
 **Given** `editBook(ctx, EditBookInput)` in `lib/catalogue` and a shared Book I hold
 **When** I submit sparse `BookEdits` with scalar fields (title, subtitle, series index, publisher, year, language, pages, description)
-**Then** as admin, each submitted field is written to the shared Book itself through `lib/catalogue` with system privileges (guarded by `canEditShared`), including a cleared field, and my own override of that field, if any, is cleared; system genres may be submitted too
-**And** as a non-admin user, each submitted field becomes my override through `upsertUserBook`, including a cleared field; the shared Book does not change, and genres are rejected (D-6)
+**Then** as admin, each submitted field is written to the shared Book itself through `lib/catalogue` with system privileges (guarded by `canEditShared`), including a cleared field, except title, and my own override of that field, if any, is cleared; system genres may be submitted too
+**And** as a non-admin user, each submitted field becomes my override through `upsertUserBook`, including a cleared field, except title; the shared Book does not change, and genres are rejected (D-6)
 **And** unsubmitted fields are untouched; the server never diffs; themes are rejected for everyone
 **And** a two-user test proves an admin's edit is seen by another user, and a user's edit is not
 **And** `editBook` is not undoable
@@ -2044,7 +2044,7 @@ So that books without a cover, or with a wrong one, look right (FR-47 part, D-4)
 
 **Given** `setCover(ctx, bookId, file, corners)` in `lib/catalogue`
 **When** the admin calls it for a shared Book, or the creator for their private Book
-**Then** it accepts only JPEG, PNG or WebP images up to about 5 MB (`NOT_AN_IMAGE`, `IMAGE_TOO_LARGE` otherwise), downsizes anything over about 2000 px on the long side as a guard, warps the four-corner quadrilateral into a 2:3 rectangle with Heckbert's closed-form square-to-quad projective mapping and bilinear sampling on sharp's raw pixels (no general linear solver), strips all metadata, resizes to a fixed maximum and re-encodes
+**Then** it accepts only JPEG, PNG or WebP images up to a 5 MiB file, 6 MB body (`NOT_AN_IMAGE`, `IMAGE_TOO_LARGE` otherwise), downsizes anything over about 2000 px on the long side as a guard, warps the four-corner quadrilateral into a 2:3 rectangle with Heckbert's closed-form square-to-quad projective mapping and bilinear sampling on sharp's raw pixels (no general linear solver), strips all metadata, resizes to a fixed maximum and re-encodes
 **And** it creates the `media` row (shared for a shared Book, private for a private one) with a random filename and sets the Book's cover; the replaced media row is deleted when `isUnreferenced()`
 **And** `removeCover` clears the cover the same way
 **And** any other user, or a non-admin on a shared Book, fails with `NOT_FOUND`
@@ -2053,7 +2053,7 @@ So that books without a cover, or with a wrong one, look right (FR-47 part, D-4)
 **And** the output is written under a temporary name and renamed into place only when complete; a failed write leaves nothing behind and fails with `COVER_FAILED` ("Couldn't save cover.")
 **And** corners that cross, fold in on themselves or put three points in a line fail with `INVALID_CORNERS`
 **And** admin re-fetch never replaces an uploaded cover
-**And** the file reaches the server in a server action as form data; `serverActions.bodySizeLimit` in `next.config.ts` is raised to about 5 MB (the default is 1 MB), after checking the bundled Next.js docs
+**And** the file reaches the server in a server action as form data; `serverActions.bodySizeLimit` in `next.config.ts` is raised for a 5 MiB file, 6 MB body (the default is 1 MB), after checking the bundled Next.js docs
 
 ### Story 4.13: [D30] Four-corner crop
 
@@ -2086,7 +2086,7 @@ So that covers are fixed where the other fields are (D-4, UX-DR47a).
 **Then** beside the cover are "Add cover" (no cover) or "Replace cover", and a destructive "Remove cover" with no dialog, since it takes effect on Save and "Discard changes?" can still cancel it; for anyone else they are absent
 **And** choosing a file (the camera is offered on the phone) opens the four-corner crop; Use shows the straightened preview in place of the cover until Save
 **And** the file input accepts any image (`image/*`); HEIC from an iPhone is decoded and re-encoded by the browser in the crop step, so only the shrunk JPEG is uploaded
-**And** Save uploads through `setCover` in the same save; Remove cover takes effect on Save; neither has Undo
+**And** Save uploads through `setCover` after the edits commit, in its own transaction; Remove cover takes effect on Save; neither has Undo
 **And** a rejected file shows "Not an image." or "Image too large." under the cover
 **And** promoting a private Book with an uploaded cover never leaves a private cover on the shared Book: the admin's cover row becomes shared, anyone else's is replaced by the source's cover and deleted when unreferenced (deferred from Story 4.12)
 
@@ -2821,6 +2821,7 @@ So that I know which loans to chase (FR-37, UX-DR48).
 **And** tapping a row opens Book detail at `?book=` on `/loans`
 **And** with nothing lent it shows "Nothing lent" and one dry remark
 **And** on a load failure it shows "Couldn't load. Try again." with a retry Link
+**And** a chip in Book detail opened from here opens the collection with only that filter (5.21)
 
 ### Story 6.10: [J12] Loans by person
 
@@ -3050,6 +3051,7 @@ So that I can turn a wish into a gift idea (FR-38, UX-DR49).
 **Then** it opens as a bottom sheet on the phone and a side panel on wide screens, with the Book's header, "On {list}" and a "For" combobox of People that can be set, changed or cleared at any time, saving at once
 **And** the entry is addressed by its own id, so the same Book twice on a list opens the right one
 **And** an entry that isn't mine, or is closed, opens the list without it and the toast "Not on this list"
+**And** a chip in Book detail opened from here opens the collection with only that filter (5.21)
 
 ### Story 7.13: [H8] Bought, Ordered and Remove
 

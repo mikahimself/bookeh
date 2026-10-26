@@ -31,9 +31,9 @@ deferred: []
 - `afterAll` deletes the seeded rows in foreign-key order (copies, user_books, locations, books, authors, series, genres; rels cascade); users stay. Otherwise `bookeh_test` grows ~30,000 rows per run.
 
 **Never:**
-- No `pg_trgm` extension, no indexes, no migration, no change to `src/lib/shelf`: measured not needed.
+- No `pg_trgm` extension, no indexes, no migration, no change to `src/lib/shelf`: measured not needed. *(Superseded in part by the post-merge note: `e606558` changed `src/lib/shelf`, still with no index.)*
 - No timing of `shelfIds` alone, and no warm-up call before the timed one.
-- No new test helper module and no `analyze` (measured: it changes nothing).
+- No new test helper module and no `analyze` (measured: it changes nothing). *(Superseded by the post-merge note: the test now runs `analyze` after the seed.)*
 
 ## I/O & Edge-Case Matrix
 
@@ -158,3 +158,7 @@ A runner 2–3× slower still fits under 1 s. Seeding took 1.3–4.4 s.
 **Residual risks:**
 - The 1 s limit is proven only locally. This session has no `gh` CLI, so CI results could not be read, and nothing was pushed. If the CI runner misses, the AC's `pg_trgm` index fallback is next, and it must land before 5.10.
 - Story 5.32 (`0529c79`) was committed to `main` by another session during this run. `baseline_revision` points at it, so this spec's diff covers only 5.7.
+
+## Post-merge note (2026-10-24)
+
+The timing test failed in CI on the freshly migrated `bookeh_test`: text search took 3–5 s and author sort 0.8–1.5 s. Commit `e606558` (2026-10-22) fixed it without an index. It rewrote the author search arm in `src/lib/shelf/search.ts` as an uncorrelated array match and the sort key's author lookup in `effective.ts` as a fenced lateral, and added `analyze` after the seed in `tests/int/shelfTiming.int.spec.ts`. Text search fell to ~130 ms and author sort to ~80 ms. The Never lines on `src/lib/shelf` and `analyze` above are superseded by this note. The test stays the gate for indexes (spine, Deferred: Search indexing).

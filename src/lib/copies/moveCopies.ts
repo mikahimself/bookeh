@@ -1,7 +1,7 @@
 import { DomainError } from '@/lib/errors'
 import type { Context } from '@/lib/payload/context'
 import * as gateway from '@/lib/payload/gateway'
-import type { Ref } from '@/lib/payload/ref'
+import { idOf, isRowId, type Ref } from '@/lib/payload/ref'
 import { withTransaction } from '@/lib/payload/transaction'
 import type { Undone } from '@/lib/undo/undo'
 
@@ -19,11 +19,11 @@ export type MoveResult = { location: number | null; moved: number; skipped: numb
  * (`moved`), the ordered copies left alone (`skipped`) and the restore that
  * puts each moved copy back. Records nothing: callers wrap it in `withUndo()`.
  *
- * Duplicate ids count once. An empty list, an id that is not a positive safe
- * integer, or one that is not the viewer's (a gone copy, or another user's,
- * for the admin too) fails with `NOT_FOUND` before any write; the find filters
- * on `owner` explicitly as well as through `ownerAccess` (FR-48).
- * An ordered copy has no location (AD-8), so it is skipped rather than moved
+ * Duplicate ids count once. An empty list, an id that is not a row id
+ * (`isRowId()`), or one that is not the viewer's (a gone copy, or another
+ * user's, for the admin too) fails with `NOT_FOUND` before any write; the
+ * find filters on `owner` explicitly as well as through `ownerAccess`
+ * (FR-48). An ordered copy has no location (AD-8), so it is skipped rather than moved
  * and its id reported in `skipped`; the owned copies move. With no owned copy
  * nothing is written, no target is resolved or created (`location` is then
  * `null`) and the call still succeeds with `moved: 0`. A caller setting
@@ -44,7 +44,7 @@ export async function moveCopies(
   location: Ref | null,
 ): Promise<Undone<MoveResult>> {
   const ids = [...new Set(copyIds)]
-  if (ids.length === 0 || ids.some((id) => !Number.isSafeInteger(id) || id <= 0)) {
+  if (ids.length === 0 || !ids.every(isRowId)) {
     throw new DomainError('NOT_FOUND')
   }
 
@@ -66,7 +66,7 @@ export async function moveCopies(
     const moved: Moved[] = []
     // One after the other: calls on one context never run concurrently (AD-16).
     for (const doc of owned) {
-      const previous = idOf(doc.location)
+      const previous = idOf(doc.location) ?? null
       if (previous === target) continue
       await gateway.updateByID(tx, {
         collection: 'copies',
@@ -109,6 +109,3 @@ async function stillThere(ctx: Context, previous: number | null): Promise<number
   })
   return totalDocs === 0 ? null : previous
 }
-
-const idOf = (ref: number | { id: number } | null | undefined): number | null =>
-  ref === null || ref === undefined ? null : typeof ref === 'number' ? ref : ref.id

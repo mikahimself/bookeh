@@ -11,21 +11,19 @@ import { removeCopies, type RemoveResult } from '@/lib/copies/removeCopies'
 import { setNote } from '@/lib/copies/updateCopy'
 import { DomainError, runAction, type ActionResult } from '@/lib/errors'
 import { requireUserOrThrow } from '@/lib/payload/context'
+import { isRowId } from '@/lib/payload/ref'
 import { withUndo, type Undoable } from '@/lib/undo/undo'
 
 import { parseRef } from '../ref'
 
 // The collection's actions: select mode and Book detail (AD-18). Client input
-// is checked here, never repaired: an id that is not a positive safe integer,
+// is checked here, never repaired: an id that is not a row id (`isRowId()`),
 // or a value of the wrong type, is `VALIDATION` with no write. Ownership is
 // the service's. An undoable action returns its receipt (AD-20) for the
 // client's success toast; the client reports the result through `afterAction`.
 
-const isId = (value: unknown): value is number =>
-  typeof value === 'number' && Number.isSafeInteger(value) && value > 0
-
 const ids = (value: unknown): number[] => {
-  if (!Array.isArray(value) || !value.every(isId)) throw new DomainError('VALIDATION')
+  if (!Array.isArray(value) || !value.every(isRowId)) throw new DomainError('VALIDATION')
   return value
 }
 
@@ -33,7 +31,7 @@ const ids = (value: unknown): number[] => {
 function bookInput(input: unknown): Record<string, unknown> & { bookId: number } {
   if (typeof input !== 'object' || input === null) throw new DomainError('VALIDATION')
   const fields = input as Record<string, unknown>
-  if (!isId(fields.bookId)) throw new DomainError('VALIDATION')
+  if (!isRowId(fields.bookId)) throw new DomainError('VALIDATION')
   return { ...fields, bookId: fields.bookId }
 }
 
@@ -41,7 +39,7 @@ function bookInput(input: unknown): Record<string, unknown> & { bookId: number }
 function copyInput(input: unknown): Record<string, unknown> & { copyId: number } {
   if (typeof input !== 'object' || input === null) throw new DomainError('VALIDATION')
   const fields = input as Record<string, unknown>
-  if (!isId(fields.copyId)) throw new DomainError('VALIDATION')
+  if (!isRowId(fields.copyId)) throw new DomainError('VALIDATION')
   return { ...fields, copyId: fields.copyId }
 }
 

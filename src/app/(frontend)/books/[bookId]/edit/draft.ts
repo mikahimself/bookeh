@@ -1,5 +1,7 @@
 import type { BookEdits, EditBookInput } from '@/lib/catalogue/editBook'
 
+import { isPlainObject } from '../../../plainObject'
+
 /**
  * Edit book's unsaved changes (EXPERIENCE.md, Edit book): a sparse
  * `BookEdits`, and under `copy` the change to the copy the screen was opened
@@ -11,12 +13,6 @@ import type { BookEdits, EditBookInput } from '@/lib/catalogue/editBook'
 export type Draft = BookEdits & { copy?: EditBookInput['copy'] }
 
 const keyFor = (bookId: number): string => `bookeh:edit-book:${bookId}`
-
-const isPlainObject = (value: unknown): value is Record<string, unknown> =>
-  typeof value === 'object' &&
-  value !== null &&
-  !Array.isArray(value) &&
-  Object.getPrototypeOf(value) === Object.prototype
 
 /** Whether `draft` holds any change. */
 export const isEmpty = (draft: Draft): boolean => Object.keys(draft).length === 0

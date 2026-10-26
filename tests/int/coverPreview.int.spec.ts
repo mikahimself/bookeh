@@ -26,7 +26,8 @@ import { randomIsbn } from '../helpers/isbn'
 
 // The pre-save cover preview, AD-9/AD-10/AD-14: `lookupBook` records every
 // candidate's cover URL per user; `/data/cover/[isbn13]?pick=` fetches one
-// with the cover download's checks, counting one lookup, and holds it. The
+// with the cover download's checks, counting one lookup per record (and
+// again after a failed fetch), and holds it. The
 // source is a local fixture server, which the mocked `coverPolicy` allows;
 // `lookupSources` is faked.
 
@@ -204,15 +205,20 @@ describe('cover preview', () => {
     expect(hits.get('/cover.jpg')).toBe(before + 1)
   })
 
-  it('answers 429 without a request past the lookup limit, and still serves a held cover', async () => {
+  it('counts one lookup per record, and answers 429 without a request past the limit', async () => {
     const { ctx, cookie } = await signedIn('Preview User Limited')
     const isbn = await lookUp(ctx, [at('/cover.jpg'), at('/other.png')])
-    expect((await get(isbn, cookie)).status).toBe(200)
-    // The lookup and the first fetch counted two.
+    // The lookup counted one; one lookup remains.
     for (let i = 2; i < LOOKUP_LIMIT; i++) limitLookups(ctx)
+
+    // Loading at once, the record's covers take the last lookup between them.
+    const both = await Promise.all([get(isbn, cookie), get(isbn, cookie, '?pick=1')])
+    expect(both.map((response) => response.status)).toEqual([200, 200])
     const before = totalHits()
 
-    const refused = await get(isbn, cookie, '?pick=1')
+    const other = randomIsbn()
+    recordCoverPreview(ctx, other, [at('/cover.jpg')])
+    const refused = await get(other, cookie)
     expect(refused.status).toBe(429)
     expect(await refused.text()).toBe('')
     const held = await get(isbn, cookie)
@@ -221,15 +227,16 @@ describe('cover preview', () => {
     expect(totalHits()).toBe(before)
   })
 
-  it('counts a failed fetch and does not hold it', async () => {
+  it('counts a cover whose fetch failed again, and does not hold it', async () => {
     const { ctx, cookie } = await signedIn('Preview User Failed')
     vi.spyOn(payload.logger, 'warn').mockImplementation(() => {})
-    const isbn = await lookUp(ctx, [at('/missing.jpg')])
+    const isbn = await lookUp(ctx, [at('/missing.jpg'), at('/cover.jpg')])
     const before = hits.get('/missing.jpg') ?? 0
     expect((await get(isbn, cookie)).status).toBe(404)
+    expect((await get(isbn, cookie, '?pick=1')).status).toBe(200)
     expect((await get(isbn, cookie)).status).toBe(404)
     expect(hits.get('/missing.jpg')).toBe(before + 2)
-    // The lookup and the two fetches counted three.
+    // The lookup, the first fetch and the failed URL's retry counted three; the other cover none.
     for (let i = 3; i < LOOKUP_LIMIT; i++) limitLookups(ctx)
     expect((await get(isbn, cookie)).status).toBe(429)
     expect(hits.get('/missing.jpg')).toBe(before + 2)

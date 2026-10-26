@@ -3,6 +3,7 @@ import { requireOwnBook } from '@/lib/books/requireOwnBook'
 import { DomainError } from '@/lib/errors'
 import type { Context } from '@/lib/payload/context'
 import * as gateway from '@/lib/payload/gateway'
+import { idOf } from '@/lib/payload/ref'
 import { assertLive, onRollback, withTransaction } from '@/lib/payload/transaction'
 
 import { attachCover, deleteMediaRow, discardCover, writeMediaFile } from './covers'
@@ -13,9 +14,6 @@ import { warpCover } from './warpCover'
 
 /** The largest upload accepted, before any decoding. */
 export const MAX_COVER_UPLOAD_BYTES = 5 * 1024 * 1024
-
-const idOf = (value: number | { id: number } | null | undefined): number | null =>
-  value == null ? null : typeof value === 'number' ? value : value.id
 
 /**
  * The cover gate, in the caller's transaction: `requireOwnBook()`, then the
@@ -37,7 +35,7 @@ async function coverGate(
   const allowed =
     book.visibility === 'shared' ? canEditShared(tx.user) : idOf(book.createdBy) === tx.user.id
   if (!allowed) throw new DomainError('NOT_FOUND')
-  return { visibility: book.visibility, cover: idOf(book.cover) }
+  return { visibility: book.visibility, cover: idOf(book.cover) ?? null }
 }
 
 async function setBookCover(tx: Context, bookId: number, cover: number | null): Promise<void> {

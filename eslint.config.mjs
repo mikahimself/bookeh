@@ -198,7 +198,7 @@ export const clientLibImports = {
  * shorthand included) whose value is not the literal `false`, and a value
  * import of the helper from outside src/lib/catalogue.
  */
-const systemPrivileges = {
+export const systemPrivileges = {
   meta: {
     type: 'problem',
     docs: {
@@ -424,7 +424,7 @@ const eslintConfig = defineConfig([
   },
   {
     // Spine, Design Paradigm: src/app/(frontend) imports from lib/payload only
-    // requireUser, requireUserOrThrow and types. It never calls the gateway,
+    // requireUser, requireUserOrThrow, isRowId and types. It never calls the gateway,
     // and never touches Payload, its config, its collections or the database.
     files: ['src/app/(frontend)/**'],
     rules: {
@@ -437,10 +437,10 @@ const eslintConfig = defineConfig([
           patterns: [
             {
               regex: '/lib/payload(/|$)',
-              allowImportNames: ['requireUser', 'requireUserOrThrow'],
+              allowImportNames: ['requireUser', 'requireUserOrThrow', 'isRowId'],
               allowTypeImports: true,
               message:
-                'Spine, Design Paradigm: src/app/(frontend) imports from lib/payload only requireUser, requireUserOrThrow and types.',
+                'Spine, Design Paradigm: src/app/(frontend) imports from lib/payload only requireUser, requireUserOrThrow, isRowId and types.',
             },
             ...[
               '^payload(/|$)',
@@ -478,6 +478,7 @@ const eslintConfig = defineConfig([
     },
   },
   globalIgnores([
+    '.claude/**',
     '.next/**',
     '.next-e2e/**',
     'media/**',

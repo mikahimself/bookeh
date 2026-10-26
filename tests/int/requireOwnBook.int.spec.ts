@@ -60,10 +60,10 @@ describe('requireOwnBook', () => {
     await expect(requireOwnBook(asB, own.id)).rejects.toMatchObject(new DomainError('NOT_FOUND'))
   })
 
-  it('fails with NOT_FOUND for an id that is not a positive integer, before any read', async () => {
+  it('fails with NOT_FOUND for an id that is not a row id, before any read', async () => {
     const count = vi.spyOn(payload, 'count')
     try {
-      for (const id of [0, -1, 1.5, Number.NaN]) {
+      for (const id of [0, -1, 1.5, Number.NaN, 2147483648]) {
         await expect(requireOwnBook(asA, id)).rejects.toMatchObject(new DomainError('NOT_FOUND'))
       }
       expect(count).not.toHaveBeenCalled()

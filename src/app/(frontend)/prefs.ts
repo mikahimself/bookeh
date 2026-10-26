@@ -1,5 +1,7 @@
 import { cookies } from 'next/headers'
 
+import { isPlainObject } from './plainObject'
+
 /**
  * Spine, Device preferences: what this device remembers, in one cookie.
  * Never on the profile; interface language is not one of them (AD-15).
@@ -45,12 +47,6 @@ export const PREFS_COOKIE_OPTIONS = {
 
 const isOption = <K extends keyof DevicePrefs>(field: K, value: unknown): value is DevicePrefs[K] =>
   (OPTIONS[field] as readonly unknown[]).includes(value)
-
-const isPlainObject = (value: unknown): value is Record<string, unknown> =>
-  typeof value === 'object' &&
-  value !== null &&
-  !Array.isArray(value) &&
-  [Object.prototype, null].includes(Object.getPrototypeOf(value))
 
 function pick<K extends keyof DevicePrefs>(
   stored: Record<string, unknown>,

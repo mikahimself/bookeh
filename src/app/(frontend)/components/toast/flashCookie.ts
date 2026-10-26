@@ -3,9 +3,10 @@ import type { ErrorCode } from '@/lib/errors'
 import type { ToastInput } from './store'
 
 /**
- * Spine, Toasts: the flash cookie. `flashToast()` sets it; the provider reads
- * it. The server sets plain JSON, Next percent-encodes it on the wire, the
- * browser hands it back verbatim and the client decodes it once. Never read
+ * The flash cookie. Not called in Phase 1; the spine no longer names it.
+ * `flashToast()` sets it; the provider reads it. The server sets plain JSON,
+ * Next percent-encodes it on the wire, the browser hands it back verbatim and
+ * the client decodes it once. Never read
  * it on the server with `cookies().get()`: that decodes once too, so
  * `decodeFlash` on its value would double-decode. Only the client reads it,
  * from `document.cookie`. (The prefs cookie is read server-side and differs

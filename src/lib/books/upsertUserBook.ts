@@ -1,7 +1,9 @@
 import { OVERRIDABLE_BOOK_FIELDS, type OverridableBookField } from '@/fields/bookFields'
+import { normaliseText } from '@/fields/sortName'
 import { DomainError, type ErrorCode } from '@/lib/errors'
 import type { Context } from '@/lib/payload/context'
 import * as gateway from '@/lib/payload/gateway'
+import { idOf } from '@/lib/payload/ref'
 import { withTransaction } from '@/lib/payload/transaction'
 import type { UserBook } from '@/payload-types'
 
@@ -41,14 +43,15 @@ type RowData = Partial<
 type Stored = BookOverrides[OverridableBookField]
 
 /**
- * Text input convention: trimmed and NFC-normalised, `''` stored as `null`
- * (cleared). A relation list is deduplicated: `user_books_rels` has no unique
- * index, and a repeated id would show the author twice.
+ * Spine, Text input: `normaliseText()`, the description multiline, `''`
+ * stored as `null` (cleared). A relation list is deduplicated:
+ * `user_books_rels` has no unique index, and a repeated id would show the
+ * author twice.
  */
-const normalise = (value: Stored): Stored => {
+const normalise = (key: OverridableBookField, value: Stored): Stored => {
   if (Array.isArray(value)) return [...new Set(value)]
   if (typeof value !== 'string') return value
-  const text = value.trim().normalize('NFC')
+  const text = normaliseText(value, { multiline: key === 'description' })
   return text === '' ? null : text
 }
 
@@ -90,7 +93,7 @@ export async function upsertUserBook(
   const touchesOverrides = overriding.length > 0 || drop.size > 0
   const hasState = read !== undefined || rating !== undefined
   if (!touchesOverrides && !hasState) return
-  if (overrides?.title !== undefined && normalise(overrides.title) === null) {
+  if (overrides?.title !== undefined && normalise('title', overrides.title) === null) {
     throw new DomainError('VALIDATION', { fields: { title: 'VALIDATION' } })
   }
 
@@ -101,7 +104,7 @@ export async function upsertUserBook(
     for (const key of OVERRIDABLE_BOOK_FIELDS) {
       const value = overrides?.[key]
       if (value !== undefined) {
-        entries.push([key, normalise(value)])
+        entries.push([key, normalise(key, value)])
         listed.add(key)
       } else if (drop.has(key)) {
         entries.push([key, null])
@@ -188,9 +191,8 @@ export async function mergeUserBook(
       limit: 2,
       pagination: false,
     })
-    const bookOf = (row: UserBook) => (typeof row.book === 'number' ? row.book : row.book.id)
-    const from = docs.find((row) => bookOf(row) === fromBookId)
-    const to = docs.find((row) => bookOf(row) === toBookId)
+    const from = docs.find((row) => idOf(row.book) === fromBookId)
+    const to = docs.find((row) => idOf(row.book) === toBookId)
 
     if (from && !to) {
       await gateway.updateByID(tx, {

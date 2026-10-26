@@ -287,29 +287,41 @@ describe('saveCopy of a held private Book', () => {
     expect(fetchSpy).not.toHaveBeenCalled()
   })
 
+  it("replaces a user's uploaded cover with the source cover and deletes the old row", async () => {
+    const { ctx, isbn, own } = await promoteSetup()
+    const uploaded = await upload(ctx, own.id)
+
+    await saveCopy(ctx, isbnInput(isbn))
+
+    expect(await exists('media', uploaded.id)).toBe(false)
+    const media = await trackCover(own.id)
+    expect(media.id).not.toBe(uploaded.id)
+    expect(media).toMatchObject({ visibility: 'shared' })
+    expect(fetchSpy).toHaveBeenCalledOnce()
+  })
+
   it.each([
-    ['the source cover', true],
-    ['none when the source has no cover', false],
-  ] as const)(
-    "replaces a user's uploaded cover with %s and deletes the old row",
-    async (_, sourceCover) => {
-      const { ctx, isbn, own } = await promoteSetup()
-      const uploaded = await upload(ctx, own.id)
-      if (!sourceCover) vi.mocked(heldOutcome).mockReturnValue(found({ isbn13: isbn }))
+    ['the source has no cover', 'none'],
+    ['the source cover fails to download', 'failed'],
+  ] as const)("shares a user's uploaded cover row in place when %s", async (_, source) => {
+    const { ctx, isbn, own } = await promoteSetup()
+    const uploaded = await upload(ctx, own.id)
+    if (source === 'none') vi.mocked(heldOutcome).mockReturnValue(found({ isbn13: isbn }))
+    else fetchSpy.mockImplementation(async () => new Response(null, { status: 500 }))
 
-      await saveCopy(ctx, isbnInput(isbn))
+    await saveCopy(ctx, isbnInput(isbn))
 
-      expect(await exists('media', uploaded.id)).toBe(false)
-      if (sourceCover) {
-        const media = await trackCover(own.id)
-        expect(media.id).not.toBe(uploaded.id)
-        expect(media).toMatchObject({ visibility: 'shared' })
-        expect(fetchSpy).toHaveBeenCalledOnce()
-      } else {
-        expect((await bookById(own.id)).cover ?? null).toBeNull()
-      }
-    },
-  )
+    expect((await bookById(own.id)).cover).toBe(uploaded.id)
+    const row = await payload.findByID({
+      collection: 'media',
+      id: uploaded.id,
+      depth: 0,
+      overrideAccess: true,
+    })
+    expect(row).toMatchObject({ visibility: 'shared', filename: uploaded.filename })
+    expect(row.createdBy ?? null).toBeNull()
+    if (source === 'failed') expect(fetchSpy).toHaveBeenCalled()
+  })
 
   it('deletes the private author a promote leaves unreferenced', async () => {
     const { ctx, isbn, own } = await promoteSetup()
@@ -515,12 +527,9 @@ describe('saveCopy of a held private Book', () => {
     expect((await copiesOf(b.user)).map((copy) => copy.id)).toEqual([copyOfB.id])
   })
 
-  it('deletes the private author and cover a merge leaves unreferenced', async () => {
-    const { ctx } = await freshUser()
-    const isbn = randomIsbn()
-    const author = `Juhani Aho ${suffix()}`
-    const own = await privateBook(ctx, isbn, 'T1', author)
-    const cover = await payload.create({
+  /** A media row without a file, tracked for cleanup; private rows are the context user's. */
+  const mediaRow = async (ctx: Context, visibility: 'shared' | 'private') => {
+    const row = await payload.create({
       collection: 'media',
       data: {
         filename: `${randomUUID()}.jpg`,
@@ -528,28 +537,65 @@ describe('saveCopy of a held private Book', () => {
         filesize: 1,
         width: 4,
         height: 6,
-        visibility: 'private',
+        visibility,
       },
       overrideAccess: true,
       depth: 0,
       req: ctx.req,
     })
-    mediaIds.push(cover.id)
-    await payload.update({
+    mediaIds.push(row.id)
+    return row
+  }
+
+  const setBookCover = (ctx: Context, bookId: number, cover: number) =>
+    payload.update({
       collection: 'books',
-      id: own.id,
-      data: { cover: cover.id },
+      id: bookId,
+      data: { cover },
       overrideAccess: true,
       depth: 0,
       req: ctx.req,
     })
+
+  it('deletes the private author and cover a merge into a covered shared Book leaves unreferenced', async () => {
+    const { ctx } = await freshUser()
+    const isbn = randomIsbn()
+    const author = `Juhani Aho ${suffix()}`
+    const own = await privateBook(ctx, isbn, 'T1', author)
+    const cover = await mediaRow(ctx, 'private')
+    await setBookCover(ctx, own.id, cover.id)
     // The same loose key: no `authors` override keeps the private author.
-    await sharedBook(isbn, 'T2', `${author}.`)
+    const shared = await sharedBook(isbn, 'T2', `${author}.`)
+    const sharedCover = await mediaRow(ctx, 'shared')
+    await setBookCover(ctx, shared.id, sharedCover.id)
 
     await saveCopy(ctx, isbnInput(isbn))
 
     expect(await exists('authors', (own.authors as number[])[0]!)).toBe(false)
     expect(await exists('media', cover.id)).toBe(false)
+    expect((await bookById(shared.id)).cover).toBe(sharedCover.id)
+  })
+
+  it('shares the private cover in place as the cover of a shared Book that has none', async () => {
+    const { ctx } = await freshUser()
+    const isbn = randomIsbn()
+    const author = `Juhani Aho ${suffix()}`
+    const own = await privateBook(ctx, isbn, 'T1', author)
+    const cover = await mediaRow(ctx, 'private')
+    await setBookCover(ctx, own.id, cover.id)
+    const shared = await sharedBook(isbn, 'T2', author)
+
+    await saveCopy(ctx, isbnInput(isbn))
+
+    expect((await bookById(shared.id)).cover).toBe(cover.id)
+    const row = await payload.findByID({
+      collection: 'media',
+      id: cover.id,
+      depth: 0,
+      overrideAccess: true,
+    })
+    expect(row).toMatchObject({ visibility: 'shared', filename: cover.filename })
+    expect(row.createdBy ?? null).toBeNull()
   })
 
   it("takes the private row's rating when the shared row has none", async () => {

@@ -82,6 +82,13 @@ describe('editBookAction with a cover', () => {
     expect((await stored()).cover ?? null).toBe(before)
   })
 
+  it('answers VALIDATION, not INTERNAL, for a book id above int4', async () => {
+    expect(await editBookAction({ bookId: 2147483648, edits: { year: 1965 } })).toEqual({
+      ok: false,
+      code: 'VALIDATION',
+    })
+  })
+
   it("sets the admin's edit and cover on Save, and `null` removes the cover", async () => {
     expect(
       await editBookAction({

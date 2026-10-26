@@ -5,11 +5,7 @@ import {
   type ProfileChanges,
 } from '@/lib/account/profile'
 
-const isPlainObject = (value: unknown): value is Record<string, unknown> =>
-  typeof value === 'object' &&
-  value !== null &&
-  !Array.isArray(value) &&
-  [Object.prototype, null].includes(Object.getPrototypeOf(value))
+import { isPlainObject } from './plainObject'
 
 const isOneOf = <V extends string>(values: readonly V[], value: unknown): value is V =>
   typeof value === 'string' && (values as readonly string[]).includes(value)

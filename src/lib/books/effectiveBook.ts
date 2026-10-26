@@ -1,6 +1,7 @@
 import { OVERRIDABLE_BOOK_FIELDS, type OverridableBookField } from '@/fields/bookFields'
 import type { Context } from '@/lib/payload/context'
 import * as gateway from '@/lib/payload/gateway'
+import { idOf } from '@/lib/payload/ref'
 import type { Book, UserBook } from '@/payload-types'
 
 import { coverUrl } from './coverUrl'
@@ -59,9 +60,6 @@ type Picked = { [K in OverridableBookField]: NonNullable<Overridable[K]> | null 
 const populated = <T extends { id: number }>(
   value: number | T | null | undefined,
 ): T | undefined => (typeof value === 'object' && value !== null ? value : undefined)
-
-const idOf = (value: number | { id: number }): number =>
-  typeof value === 'object' ? value.id : value
 
 const toNamed = ({ id, name }: Named): Named => ({ id, name })
 

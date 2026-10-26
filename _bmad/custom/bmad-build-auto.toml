@@ -1,0 +1,8 @@
+# Project overrides for bmad-build-auto (CLAUDE.md, Conventions: compact stories).
+# Lists append to the defaults in .claude/skills/bmad-build-auto/customize.toml.
+
+[workflow]
+
+persistent_facts = [
+  "The `oversized` spec warning threshold in this project is 2500 tokens of plan-time spec (the Spec Change Log, Review Triage Log and Auto Run Result excluded). Read it in place of every 1600-token threshold in this skill's steps and spec template. The warning is never a reason to split a story or to halt (CLAUDE.md, Conventions); split only when the hand-written diff would pass about 500 changed lines.",
+]

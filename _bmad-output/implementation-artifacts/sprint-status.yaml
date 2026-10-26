@@ -192,7 +192,7 @@ development_status:
   5-36-k6-back-office-tidy-up: done
   5-37-k14-last-backup-in-settings: done
   5-38-k19-collection-clean-up: done
-  5-39-k20-epic-4-leftovers: backlog
+  5-39-k20-epic-4-leftovers: done
   epic-5-retrospective: done
 
   epic-6: backlog
@@ -560,7 +560,7 @@ action_items:
       admin's cover in place when the shared Book has none; int cases for both (R1,
       R2; decision in item 11)"
     owner: 'Mika'
-    status: open
+    status: done
     ref: '_bmad-output/implementation-artifacts/epic-4-retro-2026-10-22.md'
   - id: 'epic-4-retro-item-39-one-row-id-bound-an-isrowid-helper-with'
     epic: 4
@@ -569,7 +569,7 @@ action_items:
       added to the requireOwnBook bad-id case; fold the idOf and isPlainObject copies
       into the same pass (R3, A3)'
     owner: 'Mika'
-    status: open
+    status: done
     ref: '_bmad-output/implementation-artifacts/epic-4-retro-2026-10-22.md'
   - id: 'epic-4-retro-item-40-edit-book-length-and-normalisation-editb'
     epic: 4
@@ -578,7 +578,7 @@ action_items:
       edit key; one normalisation rule (whitespace collapsed) in editBook, upsertUserBook
       and normaliseManual, named in the spine Text input row (R4, A1, A2)'
     owner: 'Mika'
-    status: open
+    status: done
     ref: '_bmad-output/implementation-artifacts/epic-4-retro-2026-10-22.md'
   - id: 'epic-4-retro-item-41-ruletester-for-bookeh-system-privileges'
     epic: 4
@@ -586,14 +586,14 @@ action_items:
       story 4.21 cases to tests/unit/clientLibImports.unit.spec.ts (A6, R20a; guards
       AD-3)'
     owner: 'Mika'
-    status: open
+    status: done
     ref: '_bmad-output/implementation-artifacts/epic-4-retro-2026-10-22.md'
   - id: 'epic-4-retro-item-42-ignore-claude-in-eslint-config-mjs-so-np'
     epic: 4
     action: 'Ignore .claude/** in eslint.config.mjs so npm run lint in the main checkout
       stops reading other worktrees (P7)'
     owner: 'Mika'
-    status: open
+    status: done
     ref: '_bmad-output/implementation-artifacts/epic-4-retro-2026-10-22.md'
   - id: 'epic-4-retro-item-43-push-the-three-unpushed-main-commits-2be'
     epic: 4
@@ -611,7 +611,7 @@ action_items:
       4.2 except title, 4.14 after the edits commit, 4.18 per cover URL (S12, S1,
       S4, S6, S8; Epic 3 item 27)'
     owner: 'Mika'
-    status: open
+    status: done
     ref: '_bmad-output/implementation-artifacts/epic-4-retro-2026-10-22.md'
   - id: 'epic-4-retro-item-45-process-add-to-claude-md-conventions-tha'
     epic: 4
@@ -620,14 +620,14 @@ action_items:
       deferred it, and that a story built beside others names the files it shares
       in Residual risks (P5, P7; closes Epic 3 items 32 and 34)'
     owner: 'Mika'
-    status: open
+    status: done
     ref: '_bmad-output/implementation-artifacts/epic-4-retro-2026-10-22.md'
   - id: 'epic-4-retro-item-46-process-run-docker-build-in-ci-check-job'
     epic: 4
     action: 'Process: run docker build in CI check job on every branch so a change
       to scripts/, package.json or the Dockerfile fails before main (P1)'
     owner: 'Mika'
-    status: open
+    status: done
     ref: '_bmad-output/implementation-artifacts/epic-4-retro-2026-10-22.md'
   - id: 'epic-4-retro-item-47-process-a-story-with-followup_review_rec'
     epic: 4
@@ -666,7 +666,7 @@ action_items:
       compares each normalised edit with the stored shared value and passes equal
       keys as dropOverrides; one int case (R6, retro decision 2)'
     owner: 'Mika'
-    status: open
+    status: done
     ref: '_bmad-output/implementation-artifacts/epic-4-retro-2026-10-22.md'
   - id: 'epic-4-retro-item-52-count-one-lookup-per-preview-record-the'
     epic: 4
@@ -674,7 +674,7 @@ action_items:
       a user and ISBN counts, further covers of the same Answer do not; keep the per-URL
       byte cache (R8, retro decision 3)'
     owner: 'Mika'
-    status: open
+    status: done
     ref: '_bmad-output/implementation-artifacts/epic-4-retro-2026-10-22.md'
   - id: "epic-5-retro-item-53-refresh-the-server-render-in-the-afterac"
     epic: 5
@@ -734,7 +734,7 @@ action_items:
       width; spec-5-18 frontmatter drops the deferred phone check when item 5 lands;
       epic-5 context recompiled (S1, S3, A4c, P8; extends Epic 4 item 44)"
     owner: "Mika"
-    status: open
+    status: done
     ref: "_bmad-output/implementation-artifacts/epic-5-retro-2026-10-23.md"
   - id: "epic-5-retro-item-59-housekeeping-push-89d2a79-and-2bd8265-se"
     epic: 5
@@ -786,5 +786,5 @@ action_items:
       of Epic 5 typical size passes, and note the new bound in the CLAUDE.md compact-stories
       line (retro decision 4)"
     owner: "Mika"
-    status: open
+    status: done
     ref: "_bmad-output/implementation-artifacts/epic-5-retro-2026-10-23.md"

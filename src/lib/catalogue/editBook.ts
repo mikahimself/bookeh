@@ -3,6 +3,8 @@ import { ValidationError } from 'payload'
 import { canEditShared } from '@/access/roles'
 import { OVERRIDABLE_BOOK_FIELDS, type OverridableBookField } from '@/fields/bookFields'
 import { toIsbn13 } from '@/fields/isbn'
+import { limits } from '@/fields/limits'
+import { normaliseName, normaliseText } from '@/fields/sortName'
 import { requireOwnBook } from '@/lib/books/requireOwnBook'
 import { type BookOverrides, upsertUserBook } from '@/lib/books/upsertUserBook'
 import { moveCopies } from '@/lib/copies/moveCopies'
@@ -10,8 +12,9 @@ import { setStatus } from '@/lib/copies/updateCopy'
 import { DomainError, type ErrorCode } from '@/lib/errors'
 import type { Context } from '@/lib/payload/context'
 import * as gateway from '@/lib/payload/gateway'
-import type { Ref } from '@/lib/payload/ref'
+import { idOf, type Ref } from '@/lib/payload/ref'
 import { assertLive, withTransaction } from '@/lib/payload/transaction'
+import type { Book } from '@/payload-types'
 
 import { findOrCreateByName, type NameScope } from './findOrCreateByName'
 import { system } from './system'
@@ -77,11 +80,19 @@ const isOverridable = (
 ): key is Exclude<EditKey, 'genres' | 'isbn13'> & OverridableBookField =>
   (OVERRIDABLE_BOOK_FIELDS as readonly string[]).includes(key)
 
-/** Text input convention: trimmed and NFC-normalised, `''` stored as `null`. */
-const normalise = <T>(value: T): T | null => {
+/** Spine, Text input: `normaliseText()`, the description multiline; `''` stored as `null`. */
+const normalise = <T>(key: EditKey, value: T): T | null => {
   if (typeof value !== 'string') return value
-  const text = value.trim().normalize('NFC')
+  const text = normaliseText(value, { multiline: key === 'description' })
   return text === '' ? null : (text as T)
+}
+
+/** `limits` for the text keys that have one, on the normalised value. */
+const LIMITS: Partial<Record<EditKey, number>> = {
+  title: limits.title,
+  subtitle: limits.subtitle,
+  description: limits.description,
+  series: limits.name,
 }
 
 const invalid = (keys: Iterable<string>): DomainError => {
@@ -101,19 +112,22 @@ const isIsbnClash = (err: unknown): boolean =>
 /**
  * Spine, AD-5, AD-6, D-8 and FR-14: the only path that changes a saved Book's
  * values. `edits` is sparse: only keys whose value is not `undefined` are
- * written, `null` clears, and nothing is compared with stored values. Text is
- * trimmed and NFC-normalised, `''` stored as `null`; `genres` is
- * deduplicated; `isbn13` is normalised to ISBN-13. `authors: []` and
- * `series: null` (or a blank series) clear.
+ * written and `null` clears. Text follows the Text input convention
+ * (`normaliseText()`: single-line text and names NFC, trimmed, whitespace
+ * runs collapsed; the description NFC and trimmed only), `''` stored as
+ * `null`; `genres` is deduplicated; `isbn13` is normalised to ISBN-13.
+ * `authors: []` and `series: null` (or a blank series) clear.
  *
  * Before any read, an unknown key (`themes` included: themes are never
- * edited), a cleared `title` and an author name blank after trimming fail
- * with `VALIDATION` naming each key, and an `isbn13` that is not an ISBN
- * (blank and `null` included) names it with `INVALID_ISBN`, so a rejected
- * edit reveals nothing about the Book. Then, in one transaction:
- * `requireOwnBook()` (`NOT_FOUND` unless the viewer holds the Book) and the
- * Book's visibility and creator as the viewer reads them. An empty edit
- * passes the gate and writes nothing. A held Book the viewer can no longer
+ * edited), a cleared `title` and an author name blank after normalising fail
+ * with `VALIDATION` naming each key; a `title`, `subtitle`, `description`,
+ * author or `series` over its `limits` after normalising names its key with
+ * `TOO_LONG`, never clipped, as `normaliseManual()` does; and an `isbn13`
+ * that is not an ISBN (blank and `null` included) names it with
+ * `INVALID_ISBN`, so a rejected edit reveals nothing about the Book. Then,
+ * in one transaction: `requireOwnBook()` (`NOT_FOUND` unless the viewer
+ * holds the Book) and the Book's visibility and creator as the viewer reads
+ * them. An empty edit passes the gate and writes nothing. A held Book the viewer can no longer
  * read (a shared Book the admin made private) fails that read with
  * `NOT_FOUND`. On a shared Book, `isbn13`, and `genres` from a non-admin,
  * then fail with `VALIDATION` naming each.
@@ -133,9 +147,12 @@ const isIsbnClash = (err: unknown): boolean =>
  * pre-check, and the new ISBN starts no share or merge (AD-5).
  *
  * On a shared Book, the admin (`canEditShared`) writes the shared Book with
- * system privileges and drops their own override of each edited field;
- * anyone else's edit becomes their overrides (`upsertUserBook()`), and the
- * shared Book does not change. Field limits stay with the collections.
+ * system privileges and drops their own override of each edited field.
+ * Anyone else's edit is compared, normalised and resolved, with the shared
+ * Book's stored value: a field that differs becomes their override, and one
+ * equal to it (scalars exactly, `authors` as the ordered ids, `series` by id)
+ * drops their override of that field, in one `upsertUserBook()` write. The
+ * shared Book does not change.
  *
  * `copy` (FR-13, FR-28) is written in the same transaction, after the Book's
  * edits, so a failure in either leaves both unchanged. A `status` goes
@@ -168,14 +185,20 @@ export async function editBook(
       else changes.isbn13 = isbn13
     } else if (key === 'authors') {
       const names: unknown = value
-      const named = (name: unknown): name is string =>
-        typeof name === 'string' && name.trim() !== ''
-      if (Array.isArray(names) && names.every(named)) changes.authors = names
-      else rejected.set(key, 'VALIDATION')
+      const normalised =
+        Array.isArray(names) && names.every((name) => typeof name === 'string')
+          ? names.map(normaliseName)
+          : undefined
+      if (normalised === undefined || normalised.includes('')) rejected.set(key, 'VALIDATION')
+      else if (normalised.some((name) => name.length > limits.name)) rejected.set(key, 'TOO_LONG')
+      else changes.authors = normalised
     } else {
-      const stored = normalise(value)
+      const stored = normalise(key, value)
+      const max = LIMITS[key]
       if (key === 'title' && stored === null) rejected.set(key, 'VALIDATION')
-      else Object.assign(changes, { [key]: stored })
+      else if (typeof stored === 'string' && max !== undefined && stored.length > max) {
+        rejected.set(key, 'TOO_LONG')
+      } else Object.assign(changes, { [key]: stored })
     }
   }
   if (copy?.status === 'ordered' && copy.location !== undefined)
@@ -200,16 +223,29 @@ async function writeBook(
 ): Promise<void> {
   const keys = EDIT_KEYS.filter((key) => changes[key] !== undefined)
   if (keys.length === 0) return
+  // The overridable values too: a non-admin's edit is compared with them.
   const book = await gateway.findByID(tx, {
     collection: 'books',
     id: bookId,
-    select: { visibility: true, createdBy: true },
+    select: {
+      visibility: true,
+      createdBy: true,
+      title: true,
+      subtitle: true,
+      authors: true,
+      series: true,
+      seriesIndex: true,
+      publisher: true,
+      year: true,
+      language: true,
+      pages: true,
+      description: true,
+    },
     depth: 0,
   })
   const own = book.visibility !== 'shared'
   if (own) {
-    const creator = typeof book.createdBy === 'object' ? book.createdBy?.id : book.createdBy
-    if (creator !== tx.user.id) throw new DomainError('NOT_FOUND')
+    if (idOf(book.createdBy) !== tx.user.id) throw new DomainError('NOT_FOUND')
   } else {
     const refused = keys.filter((key) => key === 'isbn13' || (key === 'genres' && !admin))
     if (refused.length > 0) throw invalid(refused)
@@ -264,9 +300,29 @@ async function writeBook(
     await upsertUserBook(tx, bookId, { dropOverrides: overridable })
   } else {
     // `genres` and `isbn13` were refused above, so every key is an override field.
-    const overrides: BookOverrides = Object.fromEntries(overridable.map((key) => [key, data[key]]))
-    await upsertUserBook(tx, bookId, { overrides })
+    const differs = overridable.filter((key) => !sameAsShared(key, data[key], book))
+    const overrides: BookOverrides = Object.fromEntries(differs.map((key) => [key, data[key]]))
+    const dropOverrides = overridable.filter((key) => !differs.includes(key))
+    await upsertUserBook(tx, bookId, { overrides, dropOverrides })
   }
+}
+
+/**
+ * Whether an edited, resolved value equals the shared Book's stored one (read
+ * at depth 0), stored text normalised as the edit is.
+ */
+function sameAsShared(
+  key: OverridableBookField,
+  value: Resolved[OverridableBookField],
+  book: Pick<Book, OverridableBookField>,
+): boolean {
+  if (key === 'authors') {
+    const ids = (book.authors ?? []).map(idOf)
+    const edited = (value ?? []) as number[]
+    return ids.length === edited.length && ids.every((id, i) => id === edited[i])
+  }
+  if (key === 'series') return (idOf(book.series) ?? null) === (value ?? null)
+  return (normalise(key, book[key]) ?? null) === (value ?? null)
 }
 
 /** The copy's part of `editBook()`, in its transaction. */

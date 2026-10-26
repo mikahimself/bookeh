@@ -5,6 +5,14 @@ export const normaliseName = (name: string): string =>
   name.normalize('NFC').trim().replace(/\s+/g, ' ')
 
 /**
+ * Spine, Text input: text a user types. Single-line text (a title, a name, a
+ * publisher) is `normaliseName()`d; multiline text (a description) is NFC and
+ * trimmed only, so it keeps its line breaks.
+ */
+export const normaliseText = (text: string, { multiline = false } = {}): string =>
+  multiline ? text.normalize('NFC').trim() : normaliseName(text)
+
+/**
  * Spine AD-4: an author's `sortName` is "Family, Given", derived from `name`
  * last word first when nothing better is given. The name is normalised like
  * `toNameKey` but keeps its case. A name with a comma is already inverted and

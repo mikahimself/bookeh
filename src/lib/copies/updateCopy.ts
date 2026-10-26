@@ -1,6 +1,7 @@
 import { DomainError } from '@/lib/errors'
 import type { Context } from '@/lib/payload/context'
 import * as gateway from '@/lib/payload/gateway'
+import { isRowId } from '@/lib/payload/ref'
 import { withTransaction } from '@/lib/payload/transaction'
 
 import { type CopyStatus, locationFor } from './locations'
@@ -49,7 +50,9 @@ export async function setNote(ctx: Context, copyId: number, note: string): Promi
 
 // `count` first: a failed `updateByID` (`NotFound`) would end the transaction.
 // The count filters on `owner` explicitly as well as through `ownerAccess` (FR-48).
+// A bad id (`isRowId()`) fails with no read.
 async function requireOwnCopy(ctx: Context, copyId: number): Promise<void> {
+  if (!isRowId(copyId)) throw new DomainError('NOT_FOUND')
   const { totalDocs } = await gateway.count(ctx, {
     collection: 'copies',
     where: { and: [{ id: { equals: copyId } }, { owner: { equals: ctx.user.id } }] },

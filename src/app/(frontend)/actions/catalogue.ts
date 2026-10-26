@@ -6,6 +6,7 @@ import { lookupAgain, type LookupAgainResult } from '@/lib/catalogue/lookupAgain
 import { type CandidateId, isCandidateId } from '@/lib/catalogue/pick'
 import { DomainError, runAction, type ActionResult } from '@/lib/errors'
 import { requireUserOrThrow } from '@/lib/payload/context'
+import { isRowId } from '@/lib/payload/ref'
 
 import { answerEditions, editionLines } from '../scan/answer'
 import type { EditionRow } from '../scan/EditionPicker'
@@ -19,9 +20,6 @@ export type LookUpAgainOutcome =
   | Exclude<LookupAgainResult, { kind: 'editions' }>
   | { kind: 'editions'; pick: number; rows: EditionRow[]; ids: CandidateId[] }
 
-const isId = (value: unknown): value is number =>
-  typeof value === 'number' && Number.isSafeInteger(value) && value > 0
-
 /**
  * FR-12, D-8: Look it up again from Book detail or the In library Answer.
  * Anything but `{ bookId }` with an optional `candidate` (the edition picked)
@@ -32,7 +30,7 @@ export async function lookUpAgainAction(input: unknown): Promise<ActionResult<Lo
     const ctx = await requireUserOrThrow()
     if (typeof input !== 'object' || input === null) throw new DomainError('VALIDATION')
     const { bookId, candidate } = input as Record<string, unknown>
-    if (!isId(bookId) || (candidate !== undefined && !isCandidateId(candidate))) {
+    if (!isRowId(bookId) || (candidate !== undefined && !isCandidateId(candidate))) {
       throw new DomainError('VALIDATION')
     }
     const result = await lookupAgain(ctx, {

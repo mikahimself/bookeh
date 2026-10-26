@@ -1,6 +1,7 @@
 import { DomainError } from '@/lib/errors'
 import type { Context } from '@/lib/payload/context'
 import * as gateway from '@/lib/payload/gateway'
+import { idOf, isRowId } from '@/lib/payload/ref'
 import { withTransaction } from '@/lib/payload/transaction'
 import type { Undone } from '@/lib/undo/undo'
 
@@ -20,7 +21,7 @@ type Changed = { bookId: number; previous: boolean }
  * callers wrap it in `withUndo()`.
  *
  * Copy ids: duplicates count once. An empty list, an id that is not a
- * positive safe integer, or one that is not the viewer's (a gone copy, or
+ * row id (`isRowId()`), or one that is not the viewer's (a gone copy, or
  * another user's, for the admin too) fails with `NOT_FOUND` before any write;
  * the find filters on `owner` explicitly as well as through `ownerAccess`
  * (FR-48). The Books are those copies' distinct `book` ids. A Book id passes
@@ -75,7 +76,7 @@ export async function setRead(
 
 async function booksOfCopies(tx: Context, copyIds: readonly number[]): Promise<number[]> {
   const ids = [...new Set(copyIds)]
-  if (ids.length === 0 || ids.some((id) => !Number.isSafeInteger(id) || id <= 0)) {
+  if (ids.length === 0 || !ids.every(isRowId)) {
     throw new DomainError('NOT_FOUND')
   }
   const { docs } = await gateway.find(tx, {
@@ -100,5 +101,3 @@ async function restoreRead(ctx: Context, changed: Changed[]): Promise<void> {
     await upsertUserBook(ctx, bookId, { read: previous })
   }
 }
-
-const idOf = (ref: number | { id: number }): number => (typeof ref === 'number' ? ref : ref.id)

@@ -223,7 +223,7 @@ describe('editBook', () => {
   const rejectsNaming = async (
     call: Promise<void>,
     keys: string[],
-    code: 'VALIDATION' | 'INVALID_ISBN' = 'VALIDATION',
+    code: 'VALIDATION' | 'INVALID_ISBN' | 'TOO_LONG' = 'VALIDATION',
   ) => {
     const err = await call.then(
       () => undefined,
@@ -274,6 +274,51 @@ describe('editBook', () => {
       ...(await named('authors', ghosts)),
       ...(await named('series', [ghostSeries])),
     ]).toEqual([])
+  })
+
+  const ghost = unique('Ghost Long')
+  it.each([
+    ['title', { title: 'x'.repeat(501) }],
+    ['subtitle', { subtitle: 'x'.repeat(501) }],
+    ['description', { description: 'x'.repeat(10_001) }],
+    ['authors', { authors: [ghost, 'x'.repeat(201)] }],
+    ['series', { series: 'x'.repeat(201) }],
+  ] satisfies [string, BookEdits][])(
+    'rejects an over-long %s with TOO_LONG and writes nothing',
+    async (key, edits) => {
+      const x = await sharedX()
+      const before = await seen(asB, x)
+
+      await rejectsNaming(editBook(asB, { bookId: x.id, edits }), [key], 'TOO_LONG')
+
+      expect(await seen(asB, x)).toEqual(before)
+      expect(await named('authors', [ghost])).toEqual([])
+    },
+  )
+
+  it('collapses whitespace runs in a single-line field, not in the description', async () => {
+    const x = await sharedX()
+    await editBook(asB, {
+      bookId: x.id,
+      edits: { title: '  Seitsemän   veljestä ', description: ' Eka.\n\nToka. ' },
+    })
+
+    expect(await seen(asB, x)).toMatchObject({
+      title: 'Seitsemän veljestä',
+      description: 'Eka.\n\nToka.',
+    })
+  })
+
+  it("drops a user's override when they retype the shared value", async () => {
+    const x = await sharedX()
+    await editBook(asB, { bookId: x.id, edits: { title: 'X' } })
+    expect(await seen(asB, x)).toMatchObject({ title: 'X', overridden: ['title'] })
+
+    await editBook(asB, { bookId: x.id, edits: { title: ' Kalevala ' } })
+
+    const after = await seen(asB, x)
+    expect(after).toMatchObject({ title: 'Kalevala' })
+    expect(after?.overridden).not.toContain('title')
   })
 
   // Story 4.9, FR-13/FR-28: the copy Edit book was opened for, in the Book edit's transaction.

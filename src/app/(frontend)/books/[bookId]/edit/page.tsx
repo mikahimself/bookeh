@@ -6,13 +6,14 @@ import type { EffectiveBook } from '@/lib/books/effectiveBook'
 import { listGenres } from '@/lib/catalogue/listGenres'
 import { listLocations } from '@/lib/copies/locations'
 import { requireUser } from '@/lib/payload/context'
+import { isRowId } from '@/lib/payload/ref'
 
 import { heldBook } from '../../../heldBook'
 
 import { EditBookScreen } from './EditBookScreen'
 import type { EffectiveEdits } from './MoreDetails'
 import { NotHeld } from './NotHeld'
-import { MAX_ID, savedCopy } from './savedCopy'
+import { savedCopy } from './savedCopy'
 
 /** The Book's values in the shape of `BookEdits`, which the draft is compared with. */
 function effectiveEdits(book: EffectiveBook): EffectiveEdits {
@@ -56,7 +57,7 @@ export default async function EditBookPage({
   const ctx = await requireUser()
   const { bookId: param } = await params
   // Above Postgres `integer` the count would fail rather than find nothing.
-  const bookId = /^\d+$/.test(param) && Number(param) <= MAX_ID ? Number(param) : Number.NaN
+  const bookId = /^\d+$/.test(param) && isRowId(Number(param)) ? Number(param) : Number.NaN
   const book = await heldBook(ctx, bookId)
   if (!book) return <NotHeld />
 

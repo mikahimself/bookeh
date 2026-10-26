@@ -14,7 +14,7 @@ jobs:
     # Pinned: Playwright 1.58.2 has no browser builds for ubuntu-latest's
     # 26.04. Unpin together with a Playwright bump that lists ubuntu26.04.
     runs-on: ubuntu-24.04
-    timeout-minutes: 20
+    timeout-minutes: 30
 
     services:
       postgres:
@@ -55,6 +55,9 @@ jobs:
       - run: npm ci
       - run: npm run lint
       - run: npm run typecheck
+
+      # The image builds on every branch, not only in publish on main; no push.
+      - run: docker build --build-arg DEPLOYMENT_ID=${{ github.sha }} .
 
       # Fails when the config differs from the newest committed migration
       # snapshot, i.e. a schema change was committed without its migration.

@@ -1,6 +1,7 @@
 import { OVERRIDABLE_BOOK_FIELDS, type OverridableBookField } from '@/fields/bookFields'
 import type { BookOverrides } from '@/lib/books/upsertUserBook'
 import type { SourceResult } from '@/lib/metadata/source'
+import { idOf } from '@/lib/payload/ref'
 import type { Author, Book, Series } from '@/payload-types'
 
 // D-8: which of a private Book's hand-entered values a share keeps as the
@@ -39,9 +40,6 @@ export const populated = <T extends Author | Series>(value: number | T | null | 
   if (typeof value !== 'object' || value === null) throw new Error('Relation not populated')
   return value
 }
-
-export const idOf = (value: number | { id: number }): number =>
-  typeof value === 'number' ? value : value.id
 
 export function fromBook(book: BookValues): Comparable {
   const scalars: Comparable['scalars'] = {}

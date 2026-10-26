@@ -8,9 +8,10 @@ import {
 } from '@/lib/copies/locations'
 import { DomainError, runAction, type ActionResult } from '@/lib/errors'
 import { requireUserOrThrow } from '@/lib/payload/context'
+import { isRowId } from '@/lib/payload/ref'
 
 // Settings → Locations (FR-31, UX-DR50). Client input is checked here, never
-// repaired: a name must be a string and an id a positive safe integer, else
+// repaired: a name must be a string and an id a row id (`isRowId()`), else
 // `VALIDATION` with no write. Normalising, the blank check and ownership are
 // the service's. The client calls `router.refresh()` on success; no Undo.
 
@@ -20,9 +21,7 @@ const name = (value: unknown): string => {
 }
 
 const id = (value: unknown): number => {
-  if (typeof value !== 'number' || !Number.isSafeInteger(value) || value <= 0) {
-    throw new DomainError('VALIDATION')
-  }
+  if (!isRowId(value)) throw new DomainError('VALIDATION')
   return value
 }
 

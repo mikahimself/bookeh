@@ -1,6 +1,7 @@
 import { DomainError } from '@/lib/errors'
 import type { Context } from '@/lib/payload/context'
 import * as gateway from '@/lib/payload/gateway'
+import { isRowId } from '@/lib/payload/ref'
 import { withTransaction } from '@/lib/payload/transaction'
 
 /** What one removal did: how many copies were deleted and the ordered ids skipped. */
@@ -9,13 +10,15 @@ export type RemoveResult = { removed: number; skipped: number[] }
 /**
  * Spine, AD-18: removes the viewer's owned copies by id in the caller's
  * transaction or one of its own (AD-16). Repeated ids count once; an empty
- * list returns `{ removed: 0, skipped: [] }` before any read. Unless every id
- * is one of the viewer's copies, it fails with `NOT_FOUND` before any delete;
- * the read filters on `owner` explicitly as well as through `ownerAccess`
- * (FR-48). An ordered copy is skipped rather than deleted (EXPERIENCE.md,
- * Your copies: an ordered line has only Received) and its id reported in
- * `skipped`; the owned copies go. The Book stays, even with no copy left. No
- * Undo (AD-20). Epic 6 deletes the copies' loans here as well.
+ * list returns `{ removed: 0, skipped: [] }` before any read, and an id that
+ * is not a row id (`isRowId()`) fails with `NOT_FOUND` before any read.
+ * Unless every id is one of the viewer's copies, it fails with `NOT_FOUND`
+ * before any delete; the read filters on `owner` explicitly as well as
+ * through `ownerAccess` (FR-48). An ordered copy is skipped rather than
+ * deleted (EXPERIENCE.md, Your copies: an ordered line has only Received) and
+ * its id reported in `skipped`; the owned copies go. The Book stays, even
+ * with no copy left. No Undo (AD-20). Epic 6 deletes the copies' loans here
+ * as well.
  */
 export async function removeCopies(
   ctx: Context,
@@ -23,6 +26,7 @@ export async function removeCopies(
 ): Promise<RemoveResult> {
   const ids = [...new Set(copyIds)]
   if (ids.length === 0) return { removed: 0, skipped: [] }
+  if (!ids.every(isRowId)) throw new DomainError('NOT_FOUND')
   return withTransaction(ctx, async (tx) => {
     const { docs } = await gateway.find(tx, {
       collection: 'copies',
