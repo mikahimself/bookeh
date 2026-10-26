@@ -300,7 +300,13 @@
     "returned": "Returned",
     "since": "{person} · since {date}",
     "nothingLent": "Nothing lent",
-    "nothingLentRemark": "Either everyone returns things or nobody asks."
+    "nothingLentRemark": "Either everyone returns things or nobody asks.",
+    "order": "Order",
+    "orders": {
+      "person": "By person",
+      "date": "By date"
+    },
+    "sinceDate": "Since {date}"
   },
   "progress": {
     "loading": "Loading"

@@ -10,13 +10,15 @@ import {
 } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import type { DevicePrefs } from '@/app/(frontend)/prefs'
 import type { EffectiveBook } from '@/lib/books/effectiveBook'
 import type { CopyLine, Holdings } from '@/lib/books/holdings'
 import type { LocationOption } from '@/lib/copies/locations'
 import type { OpenLoan } from '@/lib/loans/loans'
 
-// EXPERIENCE.md, Loans (by date) and States; FR-37: the open loans as one
-// list, longest out first; Nothing lent; Load failed; Book detail on `/loans`.
+// EXPERIENCE.md, Loans and States; FR-37: the open loans by person (groups
+// under the name as typed) or by date (one list, longest out first), the order
+// a device preference; Nothing lent; Load failed; Book detail on `/loans`.
 
 const router = { replace: vi.fn(), refresh: vi.fn(), push: vi.fn(), back: vi.fn() }
 const openLoans = vi.fn<(ctx: unknown) => Promise<OpenLoan[]>>()
@@ -27,6 +29,9 @@ const getHoldings = vi.fn<(ctx: unknown, ids: number[]) => Promise<Map<number, H
 const listLocations = vi.fn<(ctx: unknown) => Promise<LocationOption[]>>()
 const logError = vi.fn()
 const showToast = vi.fn()
+const devicePrefs = vi.fn<() => Promise<DevicePrefs>>()
+const setDevicePrefsAction = vi.fn()
+const interfaceLocale = vi.fn(() => 'en')
 
 const english = async () => {
   const { createTranslator } = await vi.importActual<typeof import('next-intl')>('next-intl')
@@ -48,7 +53,7 @@ vi.mock('next-intl/server', async () => {
   const translator = await english()
   return {
     getTranslations: async (namespace?: string) => translator(namespace),
-    getLocale: async () => 'en',
+    getLocale: async () => interfaceLocale(),
     getFormatter: async () => {
       const { createFormatter } = await vi.importActual<typeof import('next-intl')>('next-intl')
       return createFormatter({ locale: 'en', timeZone: 'Europe/Helsinki' })
@@ -82,6 +87,11 @@ vi.mock('@/app/(frontend)/(sections)/actions', () => ({
   toggleCopiesReadAction: vi.fn(),
   moveCopiesAction: vi.fn(),
 }))
+vi.mock('@/app/(frontend)/prefs', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/app/(frontend)/prefs')>()),
+  devicePrefs,
+}))
+vi.mock('@/app/(frontend)/actions/prefs', () => ({ setDevicePrefsAction }))
 vi.mock('@/app/(frontend)/heldBook', () => ({ heldBook }))
 vi.mock('@/lib/books/holdings', () => ({ getHoldings }))
 vi.mock('@/lib/books/userBookState', () => ({
@@ -131,6 +141,7 @@ vi.stubGlobal('matchMedia', (query: string) => ({
 }))
 
 const { default: LoansPage } = await import('@/app/(frontend)/(sections)/loans/page')
+const { DEFAULT_PREFS } = await import('@/app/(frontend)/prefs')
 
 /** The page's tree with its async server components awaited, as the server renderer does. */
 async function serverTree(node: ReactNode): Promise<ReactNode> {
@@ -174,11 +185,17 @@ const book = (bookId: number, title: string, authors: EffectiveBook['authors']):
 const puhdistus = book(7, 'Puhdistus', [{ id: 3, name: 'Sofi Oksanen' }])
 const sinuhe = book(8, 'Sinuhe', [])
 
-const loan = (loanId: number, bookId: number, name: string, since: string): OpenLoan => ({
+const loan = (
+  loanId: number,
+  bookId: number,
+  name: string,
+  since: string,
+  personId = loanId + 200,
+): OpenLoan => ({
   loanId,
   copyId: loanId + 100,
   bookId,
-  person: { id: loanId + 200, name },
+  person: { id: personId, name },
   since,
 })
 
@@ -197,6 +214,7 @@ const rowText = () =>
 describe('LoansPage', () => {
   beforeEach(() => {
     listLocations.mockResolvedValue([])
+    devicePrefs.mockResolvedValue({ ...DEFAULT_PREFS, loans: 'date' })
   })
 
   afterEach(() => {
@@ -242,6 +260,7 @@ describe('LoansPage', () => {
     await renderPage()
     expect(screen.getByText('Nothing lent')).toBeTruthy()
     expect(screen.getByText('Either everyone returns things or nobody asks.')).toBeTruthy()
+    expect(screen.getByRole('group', { name: 'Order' })).toBeTruthy()
     expect(screen.queryByRole('list')).toBeNull()
   })
 
@@ -250,6 +269,7 @@ describe('LoansPage', () => {
     await renderPage()
     expect(logError).toHaveBeenCalled()
     expect(screen.getByText("Couldn't load.")).toBeTruthy()
+    expect(screen.queryByRole('group', { name: 'Order' })).toBeNull()
     fireEvent.click(screen.getByRole('button', { name: 'Try again' }))
     expect(router.refresh).toHaveBeenCalledOnce()
   })
@@ -285,5 +305,114 @@ describe('LoansPage', () => {
     )
     expect(router.replace).toHaveBeenCalledWith('/loans', { scroll: false })
     expect(screen.queryByRole('dialog')).toBeNull()
+  })
+
+  describe('by person', () => {
+    const three = () =>
+      lent(
+        [
+          loan(2, 7, 'Leena', '2026-07-02'),
+          loan(4, 7, 'Antti', '2026-08-01', 301),
+          loan(5, 8, 'Antti', '2026-09-12', 301),
+        ],
+        [sinuhe, puhdistus],
+      )
+    const pressed = () =>
+      within(screen.getByRole('group', { name: 'Order' }))
+        .getAllByRole('button')
+        .map((button) => `${button.textContent}:${button.getAttribute('aria-pressed')}`)
+    const groups = () =>
+      screen.getAllByRole('heading', { level: 2 }).map((heading) => ({
+        name: heading.textContent,
+        rows: within(heading.parentElement!)
+          .getAllByRole('listitem')
+          .map((item) =>
+            Array.from(item.querySelectorAll('p'))
+              .map((p) => p.textContent)
+              .join(' | '),
+          ),
+      }))
+
+    beforeEach(() => {
+      devicePrefs.mockResolvedValue({ ...DEFAULT_PREFS })
+    })
+
+    afterEach(() => {
+      interfaceLocale.mockReturnValue('en')
+    })
+
+    it('is the default: a group per borrower by name, rows longest out first with Since {date}', async () => {
+      three()
+      await renderPage()
+
+      expect(pressed()).toEqual(['By person:true', 'By date:false'])
+      expect(groups()).toEqual([
+        {
+          name: 'Antti',
+          rows: ['Puhdistus | Sofi Oksanen | Since Aug 1, 2026', 'Sinuhe | Since Sep 12, 2026'],
+        },
+        { name: 'Leena', rows: ['Puhdistus | Sofi Oksanen | Since Jul 2, 2026'] },
+      ])
+      expect(screen.getAllByRole('link').map((link) => link.getAttribute('href'))).toEqual([
+        '/loans?book=7',
+        '/loans?book=8',
+        '/loans?book=7',
+      ])
+    })
+
+    it('heads a group with the name as typed, never lowercased', async () => {
+      lent([loan(2, 7, 'de Vries', '2026-07-02')], [puhdistus])
+      await renderPage()
+      const heading = screen.getByRole('heading', { level: 2 })
+      expect(heading.textContent).toBe('de Vries')
+    })
+
+    it('orders the groups in the interface locale', async () => {
+      interfaceLocale.mockReturnValue('fi')
+      lent(
+        [
+          loan(2, 7, 'Öhman', '2026-07-02'),
+          loan(3, 7, 'Ähtäri', '2026-07-03'),
+          loan(4, 7, 'Aalto', '2026-07-04'),
+        ],
+        [puhdistus],
+      )
+      await renderPage()
+      expect(groups().map((group) => group.name)).toEqual(['Aalto', 'Ähtäri', 'Öhman'])
+    })
+
+    it('renders the saved by date order on the first paint', async () => {
+      devicePrefs.mockResolvedValue({ ...DEFAULT_PREFS, loans: 'date' })
+      three()
+      await renderPage()
+      expect(pressed()).toEqual(['By person:false', 'By date:true'])
+      expect(screen.queryByRole('heading', { level: 2 })).toBeNull()
+    })
+
+    it('switches to by date at once and saves it on this device', async () => {
+      setDevicePrefsAction.mockResolvedValue({ ok: true, data: null })
+      three()
+      await renderPage()
+
+      fireEvent.click(screen.getByRole('button', { name: 'By date' }))
+      expect(rowText()).toEqual([
+        'Puhdistus | Sofi Oksanen | Leena · since Jul 2, 2026',
+        'Puhdistus | Sofi Oksanen | Antti · since Aug 1, 2026',
+        'Sinuhe | Antti · since Sep 12, 2026',
+      ])
+      expect(setDevicePrefsAction).toHaveBeenCalledWith({ loans: 'date' })
+      await waitFor(() => expect(pressed()).toEqual(['By person:false', 'By date:true']))
+    })
+
+    it('reports a failed save and returns the switch to by person', async () => {
+      setDevicePrefsAction.mockResolvedValue({ ok: false, code: 'NO_CONNECTION' })
+      three()
+      await renderPage()
+
+      fireEvent.click(screen.getByRole('button', { name: 'By date' }))
+      await waitFor(() => expect(pressed()).toEqual(['By person:true', 'By date:false']))
+      expect(showToast).toHaveBeenCalledWith(expect.objectContaining({ kind: 'error' }))
+      expect(screen.getAllByRole('heading', { level: 2 })).toHaveLength(2)
+    })
   })
 })

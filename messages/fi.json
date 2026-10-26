@@ -300,7 +300,13 @@
     "returned": "Palautettu",
     "since": "{person} · {date} alkaen",
     "nothingLent": "Ei mitään lainassa",
-    "nothingLentRemark": "Joko kaikki palauttavat tavaransa tai kukaan ei kysy."
+    "nothingLentRemark": "Joko kaikki palauttavat tavaransa tai kukaan ei kysy.",
+    "order": "Järjestys",
+    "orders": {
+      "person": "Henkilöittäin",
+      "date": "Päivämäärän mukaan"
+    },
+    "sinceDate": "{date} alkaen"
   },
   "progress": {
     "loading": "Ladataan"
