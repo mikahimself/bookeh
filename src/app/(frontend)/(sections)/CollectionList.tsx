@@ -77,6 +77,7 @@ export function CollectionList({ query, book }: { query: ShelfQuery; book: numbe
   const values = activeValues(query, shelf.labels, t, locale).join(', ')
   const count = t('count', { n: shelf.total })
   const parts: ReactNode[] = narrowed ? [...(values ? [values] : []), count, clear] : [count]
+  const lent = (person: string) => root('loans.lentMarker', { person })
   const opens = (row: ShelfRow) => ({
     href: shelfHref(query, { book: row.book.bookId }),
     replace: book !== null,
@@ -121,7 +122,7 @@ export function CollectionList({ query, book }: { query: ShelfQuery; book: numbe
       ) : layout === 'covers' ? (
         <ul className={`grid ${GRID[size]}`}>
           {shelf.rows.map((row) => (
-            <CoverTile key={row.copy.copyId} row={row} size={size} {...opens(row)} />
+            <CoverTile key={row.copy.copyId} row={row} size={size} lent={lent} {...opens(row)} />
           ))}
         </ul>
       ) : (
@@ -132,6 +133,7 @@ export function CollectionList({ query, book }: { query: ShelfQuery; book: numbe
               row={row}
               size={size}
               ordered={t('ordered')}
+              lent={lent}
               {...opens(row)}
             />
           ))}

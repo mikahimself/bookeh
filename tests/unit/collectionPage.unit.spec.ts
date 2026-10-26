@@ -219,6 +219,15 @@ const row = (
   book: b,
 })
 
+const antti: CopyLine['loan'] = {
+  loanId: 31,
+  person: { id: 32, name: 'Antti' },
+  since: '2026-10-01',
+}
+
+/** `r` with an open loan to Antti. */
+const lentRow = (r: ShelfRow): ShelfRow => ({ ...r, copy: { ...r.copy, loan: antti } })
+
 const copy = (copyId: number, extra: Partial<CopyLine> = {}): CopyLine => ({
   copyId,
   status: 'owned',
@@ -292,6 +301,52 @@ describe('CollectionPage', () => {
     // Owned with no location: no ending.
     expect(items[1].textContent?.endsWith('Väinö Linna · WSOY')).toBe(true)
     within(items[2]).getByText('Ordered')
+  })
+
+  it('ends a lent row with the marker and its borrower in place of the location', async () => {
+    const tampere = { id: 2, name: 'Tampere' }
+    getShelfRows.mockResolvedValue({
+      rows: [
+        lentRow(row(11, book(1, 'Tuntematon sotilas'), 'owned', tampere)),
+        row(12, book(2, 'Sinuhe'), 'owned', tampere),
+        lentRow(row(13, book(3, 'Seitsemän veljestä'), 'ordered')),
+        lentRow(row(14, book(4, 'Taikatalvi'))),
+      ],
+      total: 4,
+      labels: {},
+    })
+    await renderPage()
+
+    const items = screen.getAllByRole('listitem')
+    expect(items[0].textContent?.endsWith('Lent · Antti')).toBe(true)
+    expect(within(items[0]).queryByText('Tampere')).toBeNull()
+    expect(items[1].textContent?.endsWith('Tampere')).toBe(true)
+    expect(items[2].textContent?.endsWith('Ordered')).toBe(true)
+    expect(within(items[2]).queryByText(/Lent/)).toBeNull()
+    expect(items[3].textContent?.endsWith('Lent · Antti')).toBe(true)
+
+    // Select mode keeps the ending beside the checkbox.
+    fireEvent.click(screen.getByRole('button', { name: 'Select' }))
+    const ticking = screen.getAllByRole('listitem')
+    within(ticking[0]).getByRole('checkbox')
+    expect(ticking[0].textContent?.endsWith('Lent · Antti')).toBe(true)
+  })
+
+  it("shows a lent tile's borrower", async () => {
+    devicePrefs.mockResolvedValue({ ...DEFAULT_PREFS, layout: 'covers' })
+    getShelfRows.mockResolvedValue({
+      rows: [
+        lentRow(row(11, book(1, 'Tuntematon sotilas'))),
+        lentRow(row(12, book(2, 'Sinuhe'), 'ordered')),
+      ],
+      total: 2,
+      labels: {},
+    })
+    await renderPage()
+
+    const [lent, ordered] = screen.getAllByRole('listitem')
+    within(lent).getByText('Lent · Antti')
+    expect(within(ordered).queryByText(/Lent/)).toBeNull()
   })
 
   it('starts the list over for a new query, and keeps the rows held when only book changes', async () => {

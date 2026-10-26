@@ -49,8 +49,16 @@ export type AnswerBook = {
   editions: AnswerEdition[]
 }
 
-/** One of the viewer's copies on the In library Answer: its location's name, if any, and status. */
-export type AnswerCopy = { location: string | null; status: 'owned' | 'ordered' }
+/**
+ * One of the viewer's copies on the In library Answer: its location's name,
+ * if any, its status, and `lentTo`, the borrower's name when it is an owned
+ * copy with an open loan, else `null`.
+ */
+export type AnswerCopy = {
+  location: string | null
+  status: 'owned' | 'ordered'
+  lentTo: string | null
+}
 
 /**
  * What the In library Answer shows: the Book and the viewer's copies, oldest
@@ -158,9 +166,10 @@ export function inLibrary(result: LookupResult): InLibrary | null {
     ...existingBook(book, book.isbn13),
     bookId: book.bookId,
     lookAgain: book.visibility === 'private',
-    copies: mine.copies.map(({ location, status }) => ({
+    copies: mine.copies.map(({ location, status, loan }) => ({
       location: location?.name ?? null,
       status,
+      lentTo: status === 'owned' && loan !== null ? loan.person.name : null,
     })),
   }
 }
@@ -237,12 +246,27 @@ export function editionLines(editions: AnswerEdition[], text: EditionText): stri
 export type CopyText = {
   copy: (status: AnswerCopy['status']) => string
   copyAt: (location: string, status: AnswerCopy['status']) => string
+  lent: (person: string) => string
 }
 
-/** A line per copy, in order: its location and status, or the status alone with no location. */
-export function copyLines(copies: AnswerCopy[], text: CopyText): string[] {
-  return copies.map(({ location, status }) =>
-    location === null ? text.copy(status) : text.copyAt(location, status),
+/**
+ * One copy line: `text`, then the lent marker and `lent` when `lent` is not
+ * `null`. A lent copy's `text` is its location's name, `''` with none.
+ */
+export type AnswerLine = { text: string; lent: string | null }
+
+/**
+ * A line per copy, in order: its location and status, or the status alone
+ * with no location; a lent copy's is its location, if any, and "Lent · {person}".
+ */
+export function copyLines(copies: AnswerCopy[], text: CopyText): AnswerLine[] {
+  return copies.map(({ location, status, lentTo }) =>
+    lentTo !== null
+      ? { text: location ?? '', lent: text.lent(lentTo) }
+      : {
+          text: location === null ? text.copy(status) : text.copyAt(location, status),
+          lent: null,
+        },
   )
 }
 

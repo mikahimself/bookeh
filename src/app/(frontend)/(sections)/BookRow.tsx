@@ -4,6 +4,7 @@ import type { ShelfRow } from '@/lib/shelf/query'
 
 import { Checkbox } from '../components/Checkbox'
 import { Cover } from '../components/Cover'
+import { markerSlotClass } from '../components/ui/classes'
 import type { DevicePrefs } from '../prefs'
 
 type Size = DevicePrefs['size']
@@ -26,9 +27,11 @@ const joined = (parts: (string | number | null)[]) =>
  * `title`, then muted meta, then the ending. At l the authors and year ·
  * publisher are two lines; at m one; at s the meta follows the title on its
  * one line. A placeholder cover is its cloth alone in a row. At every size an ordered
- * copy's row ends with "Ordered" and an owned copy's with its location's name,
- * truncated when long. Nothing ends an owned row without a location, so a
- * user with no locations never sees a location there (FR-32). One row is one copy.
+ * copy's row ends with "Ordered", a lent owned copy's with the lent marker and
+ * "Lent · {person}" (`lent`) in place of its location, and any other owned
+ * copy's with its location's name, truncated when long. Nothing ends an owned
+ * row without a location or a loan, so a user with no locations never sees a
+ * location there (FR-32). One row is one copy.
  * Hook-free, so the server page and the client list share it; the caller
  * passes the words it needs. The whole row is a link to `href`, its Book's
  * detail; `open` marks it with the selection bar. In select mode (`select`)
@@ -39,6 +42,7 @@ export function BookRow({
   row: { copy, book },
   size,
   ordered,
+  lent,
   href,
   replace,
   open,
@@ -47,6 +51,7 @@ export function BookRow({
   row: ShelfRow
   size: Size
   ordered: string
+  lent: (person: string) => string
   href: string
   replace: boolean
   open: boolean
@@ -58,6 +63,7 @@ export function BookRow({
       ? [authors, joined([book.year, book.publisher])]
       : [joined([authors, book.year, book.publisher])]
   const meta = lines.filter((line) => line !== '')
+  const lentTo = copy.status === 'owned' && copy.loan !== null ? copy.loan.person.name : null
   const ending = copy.status === 'ordered' ? ordered : copy.location?.name
 
   const content = (
@@ -75,8 +81,15 @@ export function BookRow({
           </p>
         ))}
       </div>
-      {ending !== undefined && (
-        <span className="max-w-1/3 shrink-0 truncate text-meta text-text-muted">{ending}</span>
+      {lentTo !== null ? (
+        <span className="flex max-w-1/3 shrink-0 items-center gap-2 text-meta text-text">
+          <span aria-hidden="true" className={`${markerSlotClass} bg-accent`} />
+          <span className="min-w-0 truncate">{lent(lentTo)}</span>
+        </span>
+      ) : (
+        ending !== undefined && (
+          <span className="max-w-1/3 shrink-0 truncate text-meta text-text-muted">{ending}</span>
+        )
       )}
     </>
   )

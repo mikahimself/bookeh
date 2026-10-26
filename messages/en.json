@@ -296,6 +296,7 @@
     "personRequired": "Name a person.",
     "lentOnInvalid": "Can't be later than today.",
     "lentTo": "Lent to {person} since {date}",
+    "lentMarker": "Lent · {person}",
     "returned": "Returned"
   },
   "progress": {

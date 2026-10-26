@@ -64,6 +64,12 @@ const copy = (over: Partial<CopyLine> = {}): CopyLine => ({
   ...over,
 })
 
+const loan: CopyLine['loan'] = {
+  loanId: 11,
+  person: { id: 12, name: 'Antti' },
+  since: '2026-10-01',
+}
+
 const entry = { entryId: 1, wishlist: { id: 2, name: 'Toiveet' }, forPerson: null }
 
 describe('notInLibrary', () => {
@@ -186,6 +192,8 @@ describe('inLibrary', () => {
       copy({ copyId: 4, location: { id: 9, name: 'Tampere' } }),
       copy({ copyId: 2 }),
       copy({ copyId: 3, status: 'ordered' }),
+      copy({ copyId: 5, location: { id: 8, name: 'Mökki' }, loan }),
+      copy({ copyId: 6, status: 'ordered', loan }),
     ]
     expect(inLibrary({ kind: 'existing', book, mine: { copies, entries: [] } })).toEqual({
       isbn13: '9789510396358',
@@ -204,9 +212,11 @@ describe('inLibrary', () => {
       bookId: 7,
       lookAgain: false,
       copies: [
-        { location: 'Tampere', status: 'owned' },
-        { location: null, status: 'owned' },
-        { location: null, status: 'ordered' },
+        { location: 'Tampere', status: 'owned', lentTo: null },
+        { location: null, status: 'owned', lentTo: null },
+        { location: null, status: 'ordered', lentTo: null },
+        { location: 'Mökki', status: 'owned', lentTo: 'Antti' },
+        { location: null, status: 'ordered', lentTo: null },
       ],
     })
   })
@@ -246,16 +256,25 @@ describe('copyLines', () => {
     expect(
       copyLines(
         [
-          { location: 'Tampere', status: 'owned' },
-          { location: null, status: 'owned' },
-          { location: null, status: 'ordered' },
+          { location: 'Tampere', status: 'owned', lentTo: null },
+          { location: null, status: 'owned', lentTo: null },
+          { location: null, status: 'ordered', lentTo: null },
+          { location: 'Mökki', status: 'owned', lentTo: 'Antti' },
+          { location: null, status: 'owned', lentTo: 'Leena' },
         ],
         {
           copy: (status) => status,
           copyAt: (location, status) => `${location} · ${status}`,
+          lent: (person) => `Lent · ${person}`,
         },
       ),
-    ).toEqual(['Tampere · owned', 'owned', 'ordered'])
+    ).toEqual([
+      { text: 'Tampere · owned', lent: null },
+      { text: 'owned', lent: null },
+      { text: 'ordered', lent: null },
+      { text: 'Mökki', lent: 'Lent · Antti' },
+      { text: '', lent: 'Lent · Leena' },
+    ])
   })
 })
 

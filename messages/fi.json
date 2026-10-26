@@ -296,6 +296,7 @@
     "personRequired": "Anna henkilö.",
     "lentOnInvalid": "Ei voi olla tulevaisuudessa.",
     "lentTo": "Lainassa: {person} · {date} alkaen",
+    "lentMarker": "Lainassa · {person}",
     "returned": "Palautettu"
   },
   "progress": {

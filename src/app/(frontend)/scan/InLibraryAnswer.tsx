@@ -9,7 +9,8 @@ import { OpenBook } from './OpenBook'
 
 /**
  * The In library Answer (EXPERIENCE.md, Answer; FR-16, FR-20, FR-30): the
- * Book, a line per copy ("Tampere · owned", or "Owned" with no location),
+ * Book, a line per copy ("Tampere · owned", or "Owned" with no location; a lent
+ * copy's "Mökki · ■ Lent · Antti", the square being the lent marker),
  * Look it up again under them on the viewer's own private Book, and at the
  * foot Open book, then Add another copy, then Back, the one primary
  * (UX-DR46).
@@ -19,6 +20,7 @@ export async function InLibraryAnswer({ answer }: { answer: InLibrary }) {
   const lines = copyLines(answer.copies, {
     copy: (status) => t('answer.copy', { status }),
     copyAt: (location, status) => t('answer.copyAt', { location, status }),
+    lent: (person) => t('loans.lentMarker', { person }),
   })
 
   return (
