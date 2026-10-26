@@ -524,6 +524,7 @@ describe('CollectionPage', () => {
       tap('Kätilö')
       fireEvent.click(removeButton())
       const dialog = await screen.findByRole('dialog', { name: 'Remove 2 books from library?' })
+      expect(within(dialog).queryByText('Their loans go too.')).toBeNull()
       fireEvent.click(within(dialog).getByRole('button', { name: 'Cancel' }))
       await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
       expect(removeCopiesAction).not.toHaveBeenCalled()
@@ -542,6 +543,25 @@ describe('CollectionPage', () => {
       // AD-7: the bar's Remove refreshes the server render once the rows reloaded,
       // so Back to the collection finds the cached first page without the removed copies.
       await waitFor(() => expect(router.refresh).toHaveBeenCalledOnce())
+    })
+
+    it('says the loans go too when a ticked copy was lent, though out of view', async () => {
+      const page = (params: Record<string, string>) =>
+        CollectionPage({ searchParams: Promise.resolve(params) })
+      const lent = row(12, book(2, 'Kätilö'))
+      lent.copy.loan = { loanId: 31, person: { id: 41, name: 'Liisa' }, since: '2026-10-20' }
+      getShelfRows.mockResolvedValueOnce({ rows: [both.rows[0]!, lent], total: 2, labels: {} })
+      const { rerender } = render(await page({}))
+      fireEvent.click(screen.getByRole('button', { name: 'Select' }))
+      tap('Sinuhe')
+      tap('Kätilö')
+
+      getShelfRows.mockResolvedValueOnce({ rows: [both.rows[0]!], total: 1, labels: {} })
+      rerender(await page({ q: 'sinuhe' }))
+      await waitFor(() => expect(screen.queryByText('Kätilö', { selector: 'p' })).toBeNull())
+      fireEvent.click(removeButton())
+      const dialog = await screen.findByRole('dialog', { name: 'Remove 2 books from library?' })
+      within(dialog).getByText('Their loans go too.')
     })
 
     it('skips an ordered copy, which stays ticked, and says so in the toast', async () => {
@@ -1044,6 +1064,7 @@ describe('CollectionPage', () => {
       const confirmRemove = async (sheet: HTMLElement, line = 0) => {
         fireEvent.click(within(sheet).getAllByRole('button', { name: 'Remove' })[line]!)
         const dialog = await screen.findByRole('dialog', { name: 'Remove 1 book from library?' })
+        expect(within(dialog).queryByText('Its loans go too.')).toBeNull()
         fireEvent.click(within(dialog).getByRole('button', { name: 'Remove' }))
       }
 
@@ -1112,6 +1133,20 @@ describe('CollectionPage', () => {
         await detail('Tuntematon sotilas')
         expect(router.replace).not.toHaveBeenCalled()
         expect(router.back).not.toHaveBeenCalled()
+      })
+
+      it("says a lent copy's loans go too", async () => {
+        holds(linna, [
+          copy(21, { loan: { loanId: 31, person: { id: 41, name: 'Liisa' }, since: '2026-10-20' } }),
+        ])
+        await renderPage({ book: '5' })
+        const sheet = await detail('Tuntematon sotilas')
+
+        fireEvent.click(within(sheet).getByRole('button', { name: 'Remove' }))
+        const dialog = await screen.findByRole('dialog', { name: 'Remove 1 book from library?' })
+        within(dialog).getByText('Its loans go too.')
+        fireEvent.click(within(dialog).getByRole('button', { name: 'Cancel' }))
+        await waitFor(() => expect(dialog.isConnected).toBe(false))
       })
 
       it('closes Book detail after removing the last copy, and reloads the rows', async () => {

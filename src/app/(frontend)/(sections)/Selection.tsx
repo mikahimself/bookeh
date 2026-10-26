@@ -24,8 +24,15 @@ type SelectionValue = {
   selecting: boolean
   /** The ticked copies' ids (AD-18), in view or not. */
   ticked: ReadonlySet<number>
+  /**
+   * The ticked copies that were lent (`CopyLine.loan !== null`) when ticked,
+   * so ticked copies out of view still count for Remove's dialog. Always a
+   * subset of `ticked`.
+   */
+  lent: ReadonlySet<number>
   start: () => void
-  toggle: (copyId: number) => void
+  /** Ticks or unticks a copy; `lent` is its loan state at that moment. */
+  toggle: (copyId: number, lent: boolean) => void
   done: () => void
   /** Unticks these copies and keeps select mode. */
   untick: (copyIds: readonly number[]) => void
@@ -40,6 +47,7 @@ export function useSelection(): SelectionValue {
 }
 
 const NONE: ReadonlySet<number> = new Set()
+const CLEAR = { ticked: NONE, lent: NONE }
 
 /**
  * EXPERIENCE.md, Select mode: whether the collection is selecting, and the
@@ -56,33 +64,40 @@ export function SelectionProvider({ children }: { children: ReactNode }) {
   const { query, book } = parseShelfQuery(params)
   const closeBook = useTaskBack(shelfHref(query), true)
   const [selecting, setSelecting] = useState(false)
-  const [ticked, setTicked] = useState(NONE)
+  // One state, so `lent` stays a subset of `ticked` whatever a row says on untick.
+  const [{ ticked, lent }, setTicks] = useState(CLEAR)
 
   const start = useCallback(() => {
-    setTicked(NONE)
+    setTicks(CLEAR)
     setSelecting(true)
     if (book !== null) closeBook()
   }, [book, closeBook])
 
-  const toggle = useCallback((copyId: number) => {
-    setTicked((current) => {
-      const next = new Set(current)
-      if (!next.delete(copyId)) next.add(copyId)
-      return next
+  const toggle = useCallback((copyId: number, isLent: boolean) => {
+    setTicks((current) => {
+      const ticked = new Set(current.ticked)
+      const lent = new Set(current.lent)
+      if (ticked.delete(copyId)) lent.delete(copyId)
+      else {
+        ticked.add(copyId)
+        if (isLent) lent.add(copyId)
+      }
+      return { ticked, lent }
     })
   }, [])
 
   const done = useCallback(() => {
     setSelecting(false)
-    setTicked(NONE)
+    setTicks(CLEAR)
   }, [])
 
   const untick = useCallback((copyIds: readonly number[]) => {
-    setTicked((current) => {
+    const without = (current: ReadonlySet<number>) => {
       const next = new Set(current)
       for (const copyId of copyIds) next.delete(copyId)
       return next
-    })
+    }
+    setTicks((current) => ({ ticked: without(current.ticked), lent: without(current.lent) }))
   }, [])
 
   useEffect(() => {
@@ -102,8 +117,8 @@ export function SelectionProvider({ children }: { children: ReactNode }) {
   }, [selecting, done])
 
   const value = useMemo(
-    () => ({ selecting, ticked, start, toggle, done, untick }),
-    [selecting, ticked, start, toggle, done, untick],
+    () => ({ selecting, ticked, lent, start, toggle, done, untick }),
+    [selecting, ticked, lent, start, toggle, done, untick],
   )
   return <SelectionContext.Provider value={value}>{children}</SelectionContext.Provider>
 }

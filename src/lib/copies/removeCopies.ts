@@ -17,8 +17,13 @@ export type RemoveResult = { removed: number; skipped: number[] }
  * through `ownerAccess` (FR-48). An ordered copy is skipped rather than
  * deleted (EXPERIENCE.md, Your copies: an ordered line has only Received) and
  * its id reported in `skipped`; the owned copies go. The Book stays, even
- * with no copy left. No Undo (AD-20). Epic 6 deletes the copies' loans here
- * as well.
+ * with no copy left. No Undo (AD-20). Every loan of a removed copy, open and
+ * returned, is deleted through the gateway before the copies, in the same
+ * transaction; the read filters on `owner` too (FR-48). An ordered copy keeps
+ * its loans. `copies` does not import `loans` (spine, Module boundaries). A
+ * loan of a removed copy committed concurrently after the loans read makes the
+ * copy delete fail on `loans.copy_id` (NOT NULL with `ON DELETE set null`),
+ * and the whole call rolls back as `INTERNAL`.
  */
 export async function removeCopies(
   ctx: Context,
@@ -37,11 +42,22 @@ export async function removeCopies(
     })
     if (docs.length !== ids.length) throw new DomainError('NOT_FOUND')
     const skipped = docs.filter(({ status }) => status === 'ordered').map(({ id }) => id)
-    const owned = docs.filter(({ status }) => status !== 'ordered')
+    const ownedIds = docs.filter(({ status }) => status !== 'ordered').map(({ id }) => id)
+    if (ownedIds.length === 0) return { removed: 0, skipped }
+    const { docs: loans } = await gateway.find(tx, {
+      collection: 'loans',
+      where: { and: [{ copy: { in: ownedIds } }, { owner: { equals: tx.user.id } }] },
+      select: { copy: true },
+      depth: 0,
+      pagination: false,
+    })
     // One after the other: calls on one context never run concurrently (AD-16).
-    for (const { id } of owned) {
+    for (const { id } of loans) {
+      await gateway.deleteByID(tx, { collection: 'loans', id, depth: 0 })
+    }
+    for (const id of ownedIds) {
       await gateway.deleteByID(tx, { collection: 'copies', id, depth: 0 })
     }
-    return { removed: owned.length, skipped }
+    return { removed: ownedIds.length, skipped }
   })
 }

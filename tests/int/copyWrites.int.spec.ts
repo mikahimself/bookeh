@@ -1,3 +1,5 @@
+import { randomUUID } from 'node:crypto'
+
 import { getPayload, NotFound, type Payload } from 'payload'
 import { beforeAll, describe, expect, it } from 'vitest'
 
@@ -6,6 +8,8 @@ import { removeCopies } from '@/lib/copies/removeCopies'
 import { setNote, setStatus } from '@/lib/copies/updateCopy'
 import { DomainError } from '@/lib/errors'
 import type { Context } from '@/lib/payload/context'
+import * as gateway from '@/lib/payload/gateway'
+import { withTransaction } from '@/lib/payload/transaction'
 import config from '@/payload.config'
 import type { Book, User, UserLocation } from '@/payload-types'
 
@@ -16,8 +20,9 @@ import { randomIsbn } from '../helpers/isbn'
 // copies (an explicit `owner` filter, FR-48) and fail with NOT_FOUND, writing
 // nothing, on any other id. Status reuses `createCopy`'s location rule (AD-8):
 // ordered clears it, owned lands at the default unless one is given.
-// `removeCopies` deletes the owned copies in one transaction, skips ordered
-// ones and refuses the whole list when one id is not the viewer's.
+// `removeCopies` deletes the owned copies in one transaction, with their
+// loans open and returned (AD-18, Epic 6), skips ordered ones and refuses the
+// whole list when one id is not the viewer's.
 
 describe('copy writes', () => {
   let payload: Payload
@@ -43,6 +48,26 @@ describe('copy writes', () => {
     (await createCopy(ctx, { bookId: book.id, status: 'owned' })).data
 
   const notFound = new DomainError('NOT_FOUND')
+
+  /** A uniquely named Person of the context user's; `owner` and `nameKey` only satisfy the create type. */
+  const personOf = (ctx: Context) =>
+    gateway.create(ctx, {
+      collection: 'people',
+      data: { owner: ctx.user.id, name: `Liisa ${randomUUID()}`, nameKey: 'ignored' },
+      depth: 0,
+    })
+
+  /** A loan of `copy` to `person`, returned on `returnedOn` if given; `owner` only satisfies the create type. */
+  const loanOf = async (ctx: Context, copy: number, person: number, returnedOn?: string) =>
+    (
+      await gateway.create(ctx, {
+        collection: 'loans',
+        data: { owner: ctx.user.id, copy, person, lentOn: '2026-10-20', returnedOn },
+        depth: 0,
+      })
+    ).id
+
+  const loanRead = (id: number) => payload.findByID({ collection: 'loans', id, depth: 0 })
 
   beforeAll(async () => {
     payload = await getPayload({ config })
@@ -120,12 +145,58 @@ describe('copy writes', () => {
     )
   })
 
+  it("removes a lent copy's loans, open and returned, and leaves the rest alone", async () => {
+    const lent = await copyOf(asA)
+    const plain = await copyOf(asA)
+    const ordered = await copyOf(asA)
+    const kept = await copyOf(asA)
+    const person = await personOf(asA)
+    const orderedLoan = await loanOf(asA, ordered, person.id, '2026-10-21')
+    await setStatus(asA, ordered, { status: 'ordered' })
+    const returned = await loanOf(asA, lent, person.id, '2026-10-22')
+    const open = await loanOf(asA, lent, person.id)
+    const other = await loanOf(asA, kept, person.id)
+
+    expect(await removeCopies(asA, [lent, plain, ordered])).toEqual({
+      removed: 2,
+      skipped: [ordered],
+    })
+    await expect(systemRead(lent)).rejects.toThrow(NotFound)
+    await expect(systemRead(plain)).rejects.toThrow(NotFound)
+    await expect(loanRead(returned)).rejects.toThrow(NotFound)
+    await expect(loanRead(open)).rejects.toThrow(NotFound)
+    expect((await systemRead(ordered)).status).toBe('ordered')
+    expect((await loanRead(orderedLoan)).copy).toBe(ordered)
+    expect((await loanRead(other)).copy).toBe(kept)
+    expect((await payload.findByID({ collection: 'people', id: person.id, depth: 0 })).id).toBe(
+      person.id,
+    )
+  })
+
+  it("keeps a lent copy and its loans when the caller's transaction rolls back", async () => {
+    const lent = await copyOf(asA)
+    const loan = await loanOf(asA, lent, (await personOf(asA)).id)
+
+    const e = new Error('after')
+    await expect(
+      withTransaction(asA, async (tx) => {
+        await removeCopies(tx, [lent])
+        throw e
+      }),
+    ).rejects.toBe(e)
+
+    expect((await systemRead(lent)).id).toBe(lent)
+    expect((await loanRead(loan)).copy).toBe(lent)
+  })
+
   it("removes none when one id is another user's", async () => {
     const mine = await copyOf(asA)
     const theirs = await copyOf(asB)
+    const loan = await loanOf(asA, mine, (await personOf(asA)).id)
     await expect(removeCopies(asA, [mine, theirs])).rejects.toMatchObject(notFound)
     expect((await systemRead(mine)).id).toBe(mine)
     expect((await systemRead(theirs)).id).toBe(theirs)
+    expect((await loanRead(loan)).copy).toBe(mine)
   })
 
   it("refuses another user's copy on setStatus and setNote and leaves it unchanged", async () => {

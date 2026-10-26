@@ -199,7 +199,7 @@ development_status:
   6-1-j1-people-collection: done
   6-2-j2-loans-collection: done
   6-3-j7-people-service: done
-  6-4-j6-removing-a-copy-removes-its-loans: backlog
+  6-4-j6-removing-a-copy-removes-its-loans: done
   6-5-j3-lend-and-return: backlog
   6-6-j10-loans-in-holdings: backlog
   6-7-j4-lend-and-returned-in-book-detail: backlog

@@ -109,7 +109,7 @@ export async function BookDetail({
         <section tabIndex={-1} className="flex flex-col gap-2">
           <h3 className="text-heading-group text-text-muted ui-case">{t('detail.yourCopies')}</h3>
           <ul className="flex flex-col gap-4">
-            {copies.map(({ copyId, location, status, note }) => (
+            {copies.map(({ copyId, location, status, note, loan }) => (
               <li key={copyId}>
                 {/* Names the line's Move, Remove, Received and Note after the copy. */}
                 <div
@@ -138,7 +138,11 @@ export async function BookDetail({
                             locations={locations}
                           />
                         )}
-                        <RemoveCopy copyId={copyId} last={copies.length === 1} />
+                        <RemoveCopy
+                          copyId={copyId}
+                          last={copies.length === 1}
+                          lent={loan !== null}
+                        />
                       </div>
                     )}
                     {status === 'ordered' && <ReceiveCopy copyId={copyId} />}

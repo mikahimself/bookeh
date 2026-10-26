@@ -82,7 +82,10 @@ export function CollectionList({ query, book }: { query: ShelfQuery; book: numbe
     replace: book !== null,
     open: row.book.bookId === book,
     select: selecting
-      ? { ticked: ticked.has(row.copy.copyId), onToggle: () => toggle(row.copy.copyId) }
+      ? {
+          ticked: ticked.has(row.copy.copyId),
+          onToggle: () => toggle(row.copy.copyId, row.copy.loan !== null),
+        }
       : undefined,
   })
 

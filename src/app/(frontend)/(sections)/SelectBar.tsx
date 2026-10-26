@@ -30,9 +30,11 @@ import { useAfterAction } from './ShelfRows'
  * and is absent without locations (FR-32). Read toggles the distinct Books
  * at once (AD-18) and toasts "Marked {n} read" or "unread" with Undo
  * (AD-20); the toast's Undo reloads the rows through `onUndone` and leaves
- * the ticks alone. Remove asks first; no Undo. Move and Remove act on the
- * owned copies only: an ordered copy is skipped, stays ticked, and the toast
- * says how many were ("{n} removed · {m} ordered skipped", without Undo).
+ * the ticks alone. Remove asks first, adding that the loans go too when any
+ * ticked copy was lent when ticked (`useSelection().lent`); no Undo. Move
+ * and Remove act on the owned copies only: an ordered copy is skipped, stays
+ * ticked, and the toast says how many were ("{n} removed · {m} ordered
+ * skipped", without Undo).
  * For all three, `ok` unticks the ids acted on and `NOT_FOUND` every id sent
  * (a copy gone elsewhere cannot be unticked from the list), keeping select
  * mode; any other failure keeps the ticks. Focus goes to Done after Move and
@@ -43,13 +45,13 @@ export function SelectBar({ locations }: { locations: readonly LocationOption[] 
   const t = useTranslations('collection')
   const tToast = useTranslations('toast')
   const { show } = useToast()
-  const { selecting, ticked, done, untick } = useSelection()
+  const { selecting, ticked, lent, done, untick } = useSelection()
   const afterAction = useAfterAction()
   const [pending, startTransition] = useTransition()
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [moveOpen, setMoveOpen] = useState(false)
-  // Kept while the dialog closes, so its title does not change on the way out.
-  const [removing, setRemoving] = useState(0)
+  // Kept while the dialog closes, so its text does not change on the way out.
+  const [removing, setRemoving] = useState({ n: 0, lent: false })
   const doneButton = useRef<HTMLButtonElement>(null)
   const confirmed = useRef(false)
 
@@ -139,7 +141,7 @@ export function SelectBar({ locations }: { locations: readonly LocationOption[] 
           variant="destructive"
           disabled={ticked.size === 0 || pending}
           onClick={() => {
-            setRemoving(ticked.size)
+            setRemoving({ n: ticked.size, lent: lent.size > 0 })
             setConfirmOpen(true)
           }}
         >
@@ -167,7 +169,7 @@ export function SelectBar({ locations }: { locations: readonly LocationOption[] 
           confirmed.current = false
           doneButton.current?.focus()
         }}
-        title={t('removeTitle', { n: removing })}
+        title={t('removeTitle', { n: removing.n })}
         confirm={
           <Button
             variant="destructive"
@@ -181,7 +183,11 @@ export function SelectBar({ locations }: { locations: readonly LocationOption[] 
             {t('remove')}
           </Button>
         }
-      />
+      >
+        {removing.lent ? (
+          <p className="text-body">{t('removeLoans', { n: removing.n })}</p>
+        ) : null}
+      </Dialog>
     </div>
   )
 }

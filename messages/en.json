@@ -219,6 +219,7 @@
     "markRead": "Read",
     "remove": "Remove",
     "removeTitle": "{n, plural, one {Remove # book from library?} other {Remove # books from library?}}",
+    "removeLoans": "{n, plural, one {Its loans go too.} other {Their loans go too.}}",
     "move": "Move",
     "moveTitle": "Move to",
     "newLocation": "New location",

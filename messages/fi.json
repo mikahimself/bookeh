@@ -219,6 +219,7 @@
     "markRead": "Luettu",
     "remove": "Poista",
     "removeTitle": "{n, plural, one {Poistetaanko # kirja kirjastosta?} other {Poistetaanko # kirjaa kirjastosta?}}",
+    "removeLoans": "{n, plural, one {Myös sen lainat poistetaan.} other {Myös niiden lainat poistetaan.}}",
     "move": "Siirrä",
     "moveTitle": "Siirrä sijaintiin",
     "newLocation": "Uusi sijainti",

@@ -114,13 +114,22 @@ export function MoveCopy({
 
 /**
  * EXPERIENCE.md, Book detail: an owned copy's Remove, confirmed by the
- * one-copy dialog; no toast and no Undo. The removal starts once the
- * dialog's history entry is gone (`onClosed`), so closing Book detail after
- * the last copy never overlaps it. `ok` on the last copy closes Book detail;
- * otherwise `afterAction`'s refresh after `ok` or `NOT_FOUND` re-renders it
- * (a Book gone entirely then closes as "Not in library").
+ * one-copy dialog, which adds that its loans go too when the copy is `lent`;
+ * no toast and no Undo. The removal starts once the dialog's history entry
+ * is gone (`onClosed`), so closing Book detail after the last copy never
+ * overlaps it. `ok` on the last copy closes Book detail; otherwise
+ * `afterAction`'s refresh after `ok` or `NOT_FOUND` re-renders it (a Book
+ * gone entirely then closes as "Not in library").
  */
-export function RemoveCopy({ copyId, last }: { copyId: number; last: boolean }) {
+export function RemoveCopy({
+  copyId,
+  last,
+  lent,
+}: {
+  copyId: number
+  last: boolean
+  lent: boolean
+}) {
   const t = useTranslations('collection')
   const afterAction = useAfterAction()
   const closeDetail = useCloseDetail()
@@ -169,7 +178,9 @@ export function RemoveCopy({ copyId, last }: { copyId: number; last: boolean }) 
             {t('remove')}
           </Button>
         }
-      />
+      >
+        {lent ? <p className="text-body">{t('removeLoans', { n: 1 })}</p> : null}
+      </Dialog>
     </>
   )
 }
