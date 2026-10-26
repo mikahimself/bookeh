@@ -23,7 +23,7 @@ import type { OpenLoan, ReturnedLoan } from '@/lib/loans/loans'
 
 const router = { replace: vi.fn(), refresh: vi.fn(), push: vi.fn(), back: vi.fn() }
 const openLoans = vi.fn<(ctx: unknown) => Promise<OpenLoan[]>>()
-const returnedLoans = vi.fn<(ctx: unknown) => Promise<ReturnedLoan[]>>()
+const returnedLoans = vi.fn<(ctx: unknown, book?: number) => Promise<ReturnedLoan[]>>()
 const returnLoanAction = vi.fn()
 const undoneListeners = new Set<() => void>()
 const getEffectiveBooks =
@@ -318,6 +318,46 @@ describe('LoansPage', () => {
 
     fireEvent.click(within(sheet).getByRole('button', { name: 'Close' }))
     await waitFor(() => expect(router.replace).toHaveBeenCalledWith('/loans', { scroll: false }))
+  })
+
+  it("lists Book 7's returned loans under Lent before, as served; none or a failed read has no group", async () => {
+    lent([], [puhdistus])
+    heldBook.mockImplementation(async (_, id) => (id === 7 ? puhdistus : undefined))
+    const owned: CopyLine = { copyId: 102, status: 'owned', location: null, note: null, loan: null }
+    getHoldings.mockResolvedValue(new Map([[7, { copies: [owned], entries: [] }]]))
+    const forBook = (history: () => Promise<ReturnedLoan[]>) =>
+      returnedLoans.mockImplementation(async (_, book) => (book === 7 ? history() : []))
+
+    forBook(async () => [
+      returnedLoan(6, 7, 'Antti', '2026-03-03', '2026-04-20'),
+      returnedLoan(3, 7, 'Leena', '2026-01-14', '2026-02-02'),
+    ])
+    await renderPage({ book: '7' })
+    const sheet = await screen.findByRole('dialog', { name: 'Puhdistus' })
+    const heading = within(sheet).getByRole('heading', { name: 'Lent before' })
+    expect(
+      within(heading.parentElement!)
+        .getAllByRole('listitem')
+        .map((item) => item.textContent),
+    ).toEqual(['Antti · Mar 3, 2026 to Apr 20, 2026', 'Leena · Jan 14, 2026 to Feb 2, 2026'])
+    cleanup()
+
+    forBook(async () => [])
+    await renderPage({ book: '7' })
+    await screen.findByRole('dialog', { name: 'Puhdistus' })
+    expect(screen.queryByRole('heading', { name: 'Lent before' })).toBeNull()
+    cleanup()
+
+    forBook(async () => {
+      throw new Error('down')
+    })
+    await renderPage({ book: '7' })
+    await screen.findByRole('dialog', { name: 'Puhdistus' })
+    expect(screen.queryByRole('heading', { name: 'Lent before' })).toBeNull()
+    expect(logError).toHaveBeenCalledWith(
+      expect.objectContaining({ err: expect.any(Error) }),
+      'The loan history failed to load',
+    )
   })
 
   it('toasts Not in library for a Book not held and leaves book, staying on /loans', async () => {

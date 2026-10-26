@@ -516,7 +516,7 @@ type PersonUse = Named & { loans: number } // personUse(ctx): every Person of th
 // src/lib/loans
 type Lent = { loanId: number; person: Named } // lendCopy(ctx, copyId, person: Ref, lentOn?): Undone<Lent>; returnLoan(ctx, loanId, returnedOn?): Undone<{ loanId }>; dates default to helsinkiToday()
 type OpenLoan = { loanId: number; copyId: number; bookId: number; person: Named; since: string } // openLoans(ctx): the viewer's open loans, lentOn ascending then loan id (longest out first); since is the lending day YYYY-MM-DD
-type ReturnedLoan = { loanId: number; copyId: number; bookId: number; person: Named; lentOn: string; returnedOn: string } // returnedLoans(ctx): the viewer's returned loans, returnedOn, then lentOn, then loan id, all descending (newest first); both days YYYY-MM-DD
+type ReturnedLoan = { loanId: number; copyId: number; bookId: number; person: Named; lentOn: string; returnedOn: string } // returnedLoans(ctx, book?): the viewer's returned loans, returnedOn, then lentOn, then loan id, all descending (newest first); both days YYYY-MM-DD; book narrows it to the viewer's copies of that Book (Book detail's Lent before)
 
 // src/lib/undo
 type Restore = (ctx: Context) => Promise<void>

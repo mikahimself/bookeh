@@ -9,6 +9,7 @@ import { getUserBookState } from '@/lib/books/userBookState'
 import type { LocationOption } from '@/lib/copies/locations'
 import { logger } from '@/lib/errors'
 import { helsinkiToday } from '@/lib/loans/dates'
+import { returnedLoans } from '@/lib/loans/loans'
 import type { Context } from '@/lib/payload/context'
 import { lendingPeople } from '@/lib/people/people'
 
@@ -48,7 +49,10 @@ const DOT = ' · '
  * rows, so it stays open when its row leaves the list. `locations` are the
  * page's, for Move; none when that read failed. The viewer's People
  * (`lendingPeople()`) and today are read only when some copy can be lent; a
- * failed People read leaves the picker with New person alone.
+ * failed People read leaves the picker with New person alone. Lent before
+ * follows Your copies when the viewer's copies have returned loans
+ * (`returnedLoans(ctx, bookId)`), newest first as "{person} · {from} to
+ * {to}"; a failed read leaves it out.
  * A Book the viewer does not hold is "Not in library". The content is the
  * same at every width; only the frame differs: the bottom sheet on the
  * phone, the panel beside the list from 900px (`BookDetailFrame`). Opened on
@@ -78,9 +82,15 @@ export async function BookDetail({
       })
     : []
   const today = lendable ? helsinkiToday() : ''
+  const history = await returnedLoans(ctx, bookId).catch((err: unknown) => {
+    logger().error({ err }, 'The loan history failed to load')
+    return []
+  })
 
   const t = await getTranslations()
   const format = await getFormatter()
+  const day = (date: string) =>
+    format.dateTime(new Date(`${date}T12:00:00Z`), { dateStyle: 'medium' })
   const edition = [
     book.publisher,
     book.year === null ? null : String(book.year),
@@ -173,9 +183,7 @@ export async function BookDetail({
                       <span aria-hidden="true" className={`${markerSlotClass} bg-accent`} />
                       {t('loans.lentTo', {
                         person: loan.person.name,
-                        date: format.dateTime(new Date(`${loan.since}T12:00:00Z`), {
-                          dateStyle: 'medium',
-                        }),
+                        date: day(loan.since),
                       })}
                     </p>
                   )}
@@ -185,6 +193,22 @@ export async function BookDetail({
             ))}
           </ul>
         </section>
+        {history.length > 0 && (
+          <section className="flex flex-col gap-2">
+            <h3 className="text-heading-group text-text-muted ui-case">{t('detail.lentBefore')}</h3>
+            <ul className="flex flex-col gap-1">
+              {history.map(({ loanId, person, lentOn, returnedOn }) => (
+                <li key={loanId} className="text-body text-text">
+                  {t('loans.lentBetween', {
+                    person: person.name,
+                    from: day(lentOn),
+                    to: day(returnedOn),
+                  })}
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
         {book.genres.length > 0 && (
           <section className="flex flex-col gap-2">
             <h3 className="text-heading-group text-text-muted ui-case">{t('detail.genres')}</h3>

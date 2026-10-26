@@ -418,4 +418,75 @@ describe('loans service', () => {
       adminLoan.data.loanId,
     ])
   })
+
+  it("narrows returnedLoans to the viewer's copies of one Book, newest return first", async () => {
+    const { user, ctx, copy, person } = await lender('Lent Before Viewer')
+    const second = await copyAs(user)
+    const otherBook = await payload.create({
+      collection: 'books',
+      data: { title: 'Sinuhe egyptiläinen', isbn13: randomIsbn(), visibility: 'shared' },
+      overrideAccess: true,
+      depth: 0,
+      req: ctx.req,
+    })
+    const elsewhere = await gateway.create(ctx, {
+      collection: 'copies',
+      data: { owner: user.id, book: otherBook.id, status: 'owned', location: null },
+      depth: 0,
+    })
+    const lentReturned = async (
+      c: typeof ctx,
+      copyId: number,
+      who: number | { create: string },
+      lentOn: string,
+      returnedOn: string,
+    ) => {
+      const { data } = await lendCopy(c, copyId, who, lentOn)
+      await returnLoan(c, data.loanId, returnedOn)
+      return data.loanId
+    }
+    const older = await lentReturned(ctx, second.id, person.id, '2026-01-14', '2026-02-02')
+    const newer = await lentReturned(ctx, copy.id, person.id, '2026-03-03', '2026-04-20')
+    await lentReturned(ctx, elsewhere.id, person.id, '2026-05-01', '2026-06-01')
+    await lendCopy(ctx, copy.id, person.id, '2026-07-02')
+
+    const other = await lender('Lent Before Other')
+    await lentReturned(other.ctx, other.copy.id, other.person.id, '2026-01-01', '2026-05-01')
+    const admin = await createUser({ displayName: 'Lent Before Admin', roles: ['admin'] })
+    const adminCtx = await contextFor(admin)
+    await lentReturned(
+      adminCtx,
+      (await copyAs(admin)).id,
+      { create: 'Kalle' },
+      '2026-01-01',
+      '2026-05-01',
+    )
+
+    expect(await returnedLoans(ctx, shared.id)).toEqual([
+      {
+        loanId: newer,
+        copyId: copy.id,
+        bookId: shared.id,
+        person: { id: person.id, name: person.name },
+        lentOn: '2026-03-03',
+        returnedOn: '2026-04-20',
+      },
+      {
+        loanId: older,
+        copyId: second.id,
+        bookId: shared.id,
+        person: { id: person.id, name: person.name },
+        lentOn: '2026-01-14',
+        returnedOn: '2026-02-02',
+      },
+    ])
+    const unheld = await payload.create({
+      collection: 'books',
+      data: { title: 'Tuntematon sotilas', isbn13: randomIsbn(), visibility: 'shared' },
+      overrideAccess: true,
+      depth: 0,
+      req: ctx.req,
+    })
+    expect(await returnedLoans(ctx, unheld.id)).toEqual([])
+  })
 })

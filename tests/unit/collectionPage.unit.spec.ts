@@ -97,6 +97,7 @@ vi.mock('@/app/(frontend)/(sections)/actions', () => ({
 }))
 vi.mock('@/lib/copies/locations', () => ({ listLocations }))
 vi.mock('@/lib/people/people', () => ({ lendingPeople }))
+vi.mock('@/lib/loans/loans', () => ({ returnedLoans: async () => [] }))
 vi.mock('@/app/(frontend)/actions/loans', () => ({ lendCopyAction, returnLoanAction }))
 vi.mock('@/app/(frontend)/heldBook', () => ({ heldBook }))
 vi.mock('@/lib/books/holdings', () => ({ getHoldings }))

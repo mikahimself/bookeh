@@ -222,7 +222,10 @@ export async function openLoans(ctx: Context): Promise<OpenLoan[]> {
   }))
 }
 
-/** Spine, Shared shapes: a returned loan as the Loans section's returned group lists it. */
+/**
+ * Spine, Shared shapes: a returned loan as the Loans section's returned group
+ * and Book detail's Lent before list it.
+ */
 export type ReturnedLoan = {
   loanId: number
   copyId: number
@@ -239,12 +242,33 @@ export type ReturnedLoan = {
  * borrower and both days as `YYYY-MM-DD`. Every read filters on `owner`
  * explicitly as well as through `ownerAccess` (FR-48), so the admin sees only
  * their own. Read whole, at `depth: 0`: the caller hydrates the Books. A loan
- * whose copy or Person has gone between the reads is left out.
+ * whose copy or Person has gone between the reads is left out. With `book`,
+ * only the returned loans of the context user's copies of that Book (Book
+ * detail's Lent before), in the same order; none when they hold no copy of it.
  */
-export async function returnedLoans(ctx: Context): Promise<ReturnedLoan[]> {
+export async function returnedLoans(ctx: Context, book?: number): Promise<ReturnedLoan[]> {
+  const owner = { owner: { equals: ctx.user.id } }
+  let copyIds: number[] | undefined
+  if (book !== undefined) {
+    const { docs: copies } = await gateway.find(ctx, {
+      collection: 'copies',
+      where: { and: [owner, { book: { equals: book } }] },
+      select: {},
+      depth: 0,
+      pagination: false,
+    })
+    if (copies.length === 0) return []
+    copyIds = copies.map(({ id }) => id)
+  }
   const { docs } = await gateway.find(ctx, {
     collection: 'loans',
-    where: { and: [{ owner: { equals: ctx.user.id } }, { returnedOn: { exists: true } }] },
+    where: {
+      and: [
+        owner,
+        { returnedOn: { exists: true } },
+        ...(copyIds ? [{ copy: { in: copyIds } }] : []),
+      ],
+    },
     select: { copy: true, person: true, lentOn: true, returnedOn: true },
     sort: ['-returnedOn', '-lentOn', '-id'],
     depth: 0,
