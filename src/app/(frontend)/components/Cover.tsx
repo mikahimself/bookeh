@@ -2,30 +2,53 @@
 
 import { type CSSProperties, useState } from 'react'
 
-/** DESIGN.md, Colors: the six cloths, each with the ink its title reads in. */
-const CLOTHS = [
-  'bg-cloth-blue text-cloth-ink-light',
-  'bg-cloth-pink text-cloth-ink-dark',
-  'bg-cloth-green text-cloth-ink-light',
+/**
+ * DESIGN.md, Colors: the cloths in five equal shares, each cloth with the
+ * ink its title reads in: an accent, white, or one of the four base cloths
+ * for the other three fifths.
+ */
+const ACCENTS = [
   'bg-cloth-yellow text-cloth-ink-dark',
-  'bg-cloth-navy text-cloth-ink-light',
-  'bg-cloth-red text-cloth-ink-light',
+  'bg-cloth-pink text-cloth-ink-dark',
 ] as const
+const WHITE = 'bg-cloth-white text-cloth-ink-dark'
+const BASE = [
+  'bg-cloth-blue text-cloth-ink-light',
+  'bg-cloth-cyan text-cloth-ink-dark',
+  'bg-cloth-charcoal text-cloth-ink-light',
+  'bg-cloth-gray text-cloth-ink-dark',
+] as const
+
+/** MurmurHash3's finaliser: spreads a weak hash over all 32 bits. */
+function spread(h: number): number {
+  h ^= h >>> 16
+  h = Math.imul(h, 0x85ebca6b)
+  h ^= h >>> 13
+  h = Math.imul(h, 0xc2b2ae35)
+  return (h ^ (h >>> 16)) >>> 0
+}
 
 /**
  * A title's cloth and the part of the noise tile it shows. Keyed on the title,
  * not the Book id, so a Book not saved yet (the Answer, the edition picker)
- * wears the cloth it will have on the shelf.
+ * wears the cloth it will have on the shelf. The share comes from the high
+ * bits, the cloth within it from a second draw, so the two are independent.
  */
 function cloth(title: string): { className: string; style: CSSProperties } {
   let hash = 7
   for (const char of title) hash = (Math.imul(hash, 31) + char.charCodeAt(0)) >>> 0
-  const x = ((hash >>> 8) % 5) * 25
-  const y = ((hash >>> 16) % 5) * 25
-  return {
-    className: CLOTHS[hash % CLOTHS.length],
-    style: { '--cover-noise-at': `${x}% ${y}%` } as CSSProperties,
-  }
+  const first = spread(hash)
+  const second = spread(first ^ 0x9e3779b9)
+  const fifth = Math.floor((first / 2 ** 32) * 5)
+  const className =
+    fifth === 0
+      ? ACCENTS[second % ACCENTS.length]
+      : fifth === 1
+        ? WHITE
+        : BASE[second % BASE.length]
+  const x = ((second >>> 8) % 5) * 25
+  const y = ((second >>> 16) % 5) * 25
+  return { className, style: { '--cover-noise-at': `${x}% ${y}%` } as CSSProperties }
 }
 
 /**

@@ -28,12 +28,13 @@ colors:
   crop-dim: '#00000099'
   crop-halo: '#0000008C'
   # Cover placeholder cloth, the same in both themes (Components → Cover placeholder)
-  cloth-blue: '#2A4FD6'
-  cloth-pink: '#EC3D8C'
-  cloth-green: '#1F7A4D'
+  cloth-blue: '#012534'
+  cloth-cyan: '#3B8EA5'
+  cloth-charcoal: '#1C1C1C'
+  cloth-gray: '#A3A7AA'
+  cloth-white: '#FBFAF6'
   cloth-yellow: '#F7D117'
-  cloth-navy: '#1E3F73'
-  cloth-red: '#C4202F'
+  cloth-pink: '#E56195'
   cloth-ink-light: '#F5F2EA'
   cloth-ink-dark: '#15171A'
   cover-frame: '#1F293324'
@@ -163,7 +164,7 @@ components:
     caption-author: '{typography.label}'
     frame: '1px {colors.cover-frame} outline, inset by its own width'
   cover-placeholder:
-    cloth: '{colors.cloth-*}, one per Book, picked by a hash of its title'
+    cloth: '{colors.cloth-*}, one per Book, picked by a hash of its title: accent 1/5, white 1/5, base 3/5'
     title: '{typography.cover-title}'
     texture: 'one Perlin-noise tile, soft-light, position picked by the same hash'
   selection-bar:
@@ -268,14 +269,15 @@ Every colour has a light and a dark value. Dark tokens carry the `-dark` suffix 
 | `airmail-blue` | `#2251A3` | `#2251A3` | The blue stripes of the same band. Nothing else. |
 | `airmail-white` | `#FFFFFF` | `#FFFFFF` | The white stripes of the same band, white in both themes. Nothing else. |
 | `cover-frame` | `#1F293324` | `#FFFFFF1F` | The hairline inside every cover's edge (Components → Cover tile). Nothing else. |
-| `cloth-blue` | `#2A4FD6` | `#2A4FD6` | Cover placeholder cloth (Components → Cover placeholder), title in `cloth-ink-light`. Nothing else. |
-| `cloth-pink` | `#EC3D8C` | `#EC3D8C` | The same, title in `cloth-ink-dark`. |
-| `cloth-green` | `#1F7A4D` | `#1F7A4D` | The same, title in `cloth-ink-light`. |
-| `cloth-yellow` | `#F7D117` | `#F7D117` | The same, title in `cloth-ink-dark`. |
-| `cloth-navy` | `#1E3F73` | `#1E3F73` | The same, title in `cloth-ink-light`. |
-| `cloth-red` | `#C4202F` | `#C4202F` | The same, title in `cloth-ink-light`. |
-| `cloth-ink-light` | `#F5F2EA` | `#F5F2EA` | The cover title on the darker cloths. Nothing else. |
-| `cloth-ink-dark` | `#15171A` | `#15171A` | The cover title on pink and yellow cloth. Nothing else. |
+| `cloth-blue` | `#012534` | `#012534` | Cover placeholder cloth, base (Components → Cover placeholder), title in `cloth-ink-light`. Nothing else. |
+| `cloth-cyan` | `#3B8EA5` | `#3B8EA5` | The same, base, title in `cloth-ink-dark`. |
+| `cloth-charcoal` | `#1C1C1C` | `#1C1C1C` | The same, base, title in `cloth-ink-light`. |
+| `cloth-gray` | `#A3A7AA` | `#A3A7AA` | The same, base, title in `cloth-ink-dark`. |
+| `cloth-white` | `#FBFAF6` | `#FBFAF6` | The same, white, title in `cloth-ink-dark`. |
+| `cloth-yellow` | `#F7D117` | `#F7D117` | The same, accent, title in `cloth-ink-dark`. |
+| `cloth-pink` | `#E56195` | `#E56195` | The same, accent, title in `cloth-ink-dark`. |
+| `cloth-ink-light` | `#F5F2EA` | `#F5F2EA` | The cover title on blue and charcoal cloth. Nothing else. |
+| `cloth-ink-dark` | `#15171A` | `#15171A` | The cover title on every other cloth. Nothing else. |
 
 Rules for {colors.accent}:
 
@@ -296,7 +298,7 @@ Contrast against {colors.background}, approximate:
 
 {colors.accent} and {colors.text-dim} were strengthened to reach 3:1. The paler values in the early explorations under `.working/` are superseded; `.working/examples-contrast-red-filters.html` shows the difference.
 
-The cloth colours are the "mixtape" palette of `.working/cover-treatment-2.html`, drawn from the owner's references: the blue of Iida Rauma's *Hävitys*, the pink of Pontus Purokuru's *Mikä internetiä vaivaa*, the green of *Seven endless forests*, Plur1bus yellow, Severance's Lumon blue, Amélie's red. They are the same in both themes, and they are cover art, not interface colour: they never mark state or appear outside a placeholder. Every title ink reaches at least 4.5:1 on its flat cloth; the mottle moves that a little either way, which is acceptable because the placeholder is decorative and the caption repeats the title.
+The cloth colours are the palette of `.working/cover-treatment-4.html` (Mika, 2026-10-26), after a first, all-bold palette looked too colourful on a real shelf. Base: the blue of Iida Rauma's *Hävitys* (sampled from the cover), a pacific cyan, a near-black charcoal and a light gray after Saana Airtola's *Musta aalto*. White: the warm white of a plain paperback. Accents: the yellow and, slightly faded, the pink of the earlier mixtape (after Plur1bus and Pontus Purokuru's *Mikä internetiä vaivaa*). A Book falls in the accents one time in five, in white one time in five and in the base the other three, evenly across each group's colours. They are the same in both themes; on the dark ground the charcoal is set off only by the cover frame. They are cover art, not interface colour: they never mark state or appear outside a placeholder. Every title ink reaches at least 4.5:1 on its flat cloth; the mottle moves that a little either way, which is acceptable because the placeholder is decorative and the caption repeats the title.
 
 Avoid: a second accent for anything but errors, status colours, tinted backgrounds, gradients, coloured text in light mode.
 
@@ -390,7 +392,7 @@ Visual specs. Behaviour lives in `EXPERIENCE.md` → Component Patterns.
 | Text field | {typography.label} label in {colors.text-muted} above the value. The value sits on a {spacing.stroke-control} {colors.text} underline; an empty field's underline is {colors.text-dim}; a field with a mistake has a {colors.danger} underline and a {typography.meta} message beneath. No box. The search field is the same without a label. |
 | Book row | Cover, then title in {typography.title} and a {typography.meta} second line in {colors.text-muted}, then the location in {typography.meta}. No divider. Sizes per the density table. |
 | Cover tile | Cover at 2:3, square corners, with title and author beneath, for every cover, photo or placeholder. Every cover has the cover frame: a 1px {colors.cover-frame} hairline inside its edge, so a white or black cover still has an edge. A lent copy has the 8px marker before its title. An ordered copy's tile carries a red-white-blue airmail band across the top-left corner of its cover: a 10px strip of {colors.airmail-red}, {colors.airmail-white}, {colors.airmail-blue}, {colors.airmail-white} stripes at 45°, clipped by the cover's box, no word (the row layout still ends the row with "Ordered"). The open tile has the selection bar along the bottom edge of its cover. In select mode the checkbox sits before the title. [ASSUMPTION for the lent, open and select states] |
-| Cover placeholder | A book with no cover shows a cloth cover: one of the six `cloth-*` colours, picked by a hash of the title, so a Book wears the same cloth before it is saved (the Answer, the edition picker) and after, under a Perlin-noise mottle (one SVG `feTurbulence` fractal-noise tile at twice the cover's width, blended soft-light; the same hash picks which part shows) and the cover frame. The title only, never the author, in {typography.cover-title} in the cloth's ink, top-left, inset 13% of the cover's width at the top and 11% at the sides. Long words hyphenate in the Book's language (its stored code as `lang`; Finnish when it has none or holds free text; where the browser supports the limit, only words of nine letters or more, at least four letters each side); a word still too wide for the cover breaks where it must. By cover width: from 150px, 14px, 0.08em, at most five lines; from 96px, 10.5px, 0.06em, four lines; below that, 8.5px, 0.04em, three lines; under 48px wide (every row) the cloth alone. On an ordered copy the title starts below the airmail band, at least 40px down. → `.working/cover-treatment-2.html` |
+| Cover placeholder | A book with no cover shows a cloth cover: one of the seven `cloth-*` colours in the shares under Colors, picked by a hash of the title, so a Book wears the same cloth before it is saved (the Answer, the edition picker) and after, under a Perlin-noise mottle (one SVG `feTurbulence` fractal-noise tile at twice the cover's width, blended soft-light; the same hash picks which part shows) and the cover frame. The title only, never the author, in {typography.cover-title} in the cloth's ink, top-left, inset 13% of the cover's width at the top and 11% at the sides. Long words hyphenate in the Book's language (its stored code as `lang`; Finnish when it has none or holds free text; where the browser supports the limit, only words of nine letters or more, at least four letters each side); a word still too wide for the cover breaks where it must. By cover width: from 150px, 14px, 0.08em, at most five lines; from 96px, 10.5px, 0.06em, four lines; below that, 8.5px, 0.04em, three lines; under 48px wide (every row) the cloth alone. On an ordered copy the title starts below the airmail band, at least 40px down. → `.working/cover-treatment-2.html` |
 | Selection bar | A {spacing.stroke-selection} {colors.accent} bar on the left edge of the open row. The row is not tinted. |
 | Lent marker | An 8px {colors.accent} square before the text "Lent · {person}" in {colors.text}. |
 | Detail panel | {spacing.panel-width} wide on the plain ground, with the left border and shadow described under Elevation & Depth. Cover 72 × 108px beside the {typography.heading-detail} title. Groups headed in {typography.heading-group}. Values in rows with the label left and the value right in {colors.text-muted}. Buttons at the foot. |

@@ -46,12 +46,13 @@
   --color-airmail-white: #ffffff;
   /* Cover placeholder cloth and its title inks, the same in both themes
      (DESIGN.md, Cover placeholder). */
-  --color-cloth-blue: #2a4fd6;
-  --color-cloth-pink: #ec3d8c;
-  --color-cloth-green: #1f7a4d;
+  --color-cloth-blue: #012534;
+  --color-cloth-cyan: #3b8ea5;
+  --color-cloth-charcoal: #1c1c1c;
+  --color-cloth-gray: #a3a7aa;
+  --color-cloth-white: #fbfaf6;
   --color-cloth-yellow: #f7d117;
-  --color-cloth-navy: #1e3f73;
-  --color-cloth-red: #c4202f;
+  --color-cloth-pink: #e56195;
   --color-cloth-ink-light: #f5f2ea;
   --color-cloth-ink-dark: #15171a;
 

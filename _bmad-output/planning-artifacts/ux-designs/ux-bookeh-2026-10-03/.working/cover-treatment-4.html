@@ -1,0 +1,165 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>bookeh examples: cover treatment 4</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600&display=swap"><style>
+.L{--bg:#FFFFFF;--ink:#1F2933;--mu:#5F6B78;--co:#F0604F;--inset:#1F293324;--cink:#F5F2EA}
+.D{--bg:#14181D;--ink:#E3E8EE;--mu:#94A0AD;--co:#FF8E7F;--inset:#FFFFFF1F;--cink:#E3E8EE}
+*{box-sizing:border-box}body{margin:0;font:14px/1.45 system-ui,sans-serif;color:#222;background:#e4e4e4}
+main{max-width:1180px;margin:0 auto;padding:24px 16px 96px}main>h1{font-size:22px;margin:0 0 4px}
+h2.s{font:600 16px system-ui,sans-serif;margin:32px 0 2px}.note{color:#555;max-width:84ch;margin:2px 0 10px}
+.bar{position:sticky;top:0;z-index:5;background:#e4e4e4ee;backdrop-filter:blur(4px);padding:10px 0;display:flex;flex-wrap:wrap;gap:8px 22px;border-bottom:1px solid #ccc}
+.bar fieldset{border:0;margin:0;padding:0;display:flex;gap:4px;align-items:center;flex-wrap:wrap}
+.bar legend{float:left;font-weight:600;margin-right:6px;font-size:13px}
+.bar label{font-size:13px;padding:2px 8px;border:1px solid #aaa;cursor:pointer;background:#f4f4f4;display:inline-flex;gap:5px;align-items:center}
+.bar input{display:none}.bar label:has(input:checked){background:#222;color:#fff;border-color:#222}
+.sw{display:inline-flex}.sw i{width:10px;height:14px}
+.row{display:grid;grid-template-columns:1fr 390px;gap:12px;align-items:start}
+@media (max-width:900px){.row{grid-template-columns:1fr}}
+.pn{background:var(--bg);color:var(--ink);font-family:'Open Sans',"Segoe UI","Helvetica Neue",sans-serif;padding:20px 28px 28px}
+.pn.ph{padding:16px 20px 24px}
+.cap{font:12px system-ui,sans-serif;color:#777;margin:0 0 4px}
+.stack{display:grid;gap:12px}
+
+.grid{list-style:none;margin:0;padding:0;display:grid;align-items:start}
+.grid.l{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:24px}
+.grid.m{grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:18px}
+.grid.s{grid-template-columns:repeat(auto-fill,minmax(70px,1fr));gap:10px}
+.grid li{min-width:0}
+.t1{margin:0;padding-top:4px;font-size:13px;line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.grid.s .t1{font-size:12px;line-height:1.3}
+.t2{margin:0;font-size:12px;line-height:1.3;color:var(--mu);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mk{display:inline-block;width:8px;height:8px;background:var(--co);margin-right:6px;vertical-align:1px}
+
+.cv{position:relative;aspect-ratio:2/3;width:100%;overflow:hidden;isolation:isolate}
+.cv::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:3;box-shadow:inset 0 0 0 1px var(--inset)}
+
+/* Placeholder: cloth + Perlin mottle + the title, set like the Leviathan stand-in */
+.ph-cv{background:var(--cloth);color:var(--cink);padding:var(--top,13%) 11% 11%}
+.ph-cv::before{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;background-image:var(--noise);background-size:var(--nsize);mix-blend-mode:soft-light;opacity:.6}
+.pt{position:relative;z-index:1;display:-webkit-box;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:break-word;text-transform:uppercase;font-weight:600;letter-spacing:.08em;line-height:1.15;-webkit-line-clamp:5}
+[data-font=trebuchet] .pt{font-family:'Trebuchet MS','Open Sans',sans-serif}
+.grid.l .pt{font-size:14px}
+.grid.m .pt{font-size:10.5px;letter-spacing:.06em;-webkit-line-clamp:4}
+.grid.s .pt{display:none}
+[data-s=title] .grid.s .pt{display:-webkit-box;font-size:8.5px;letter-spacing:.04em;-webkit-line-clamp:3}
+.grid.s .ph-cv{padding:12% 10%}
+/* An ordered placeholder's title starts under the airmail band */
+.air.ph-cv{--top:40px}
+.grid.m .air.ph-cv,.grid.s .air.ph-cv{--top:36px}
+
+.band{position:absolute;z-index:4;top:0;left:0;width:80px;height:10px;transform:translate(-50%,-50%) translate(20px,20px) rotate(-45deg);background:repeating-linear-gradient(90deg,#D7282F 0 8px,#fff 8px 16px,#2251A3 16px 24px,#fff 24px 32px)}
+/* Long words: hyphenate as Finnish, and/or step the size down by the longest word's length */
+[data-fit=hyph] .pt,[data-fit=both] .pt{-webkit-hyphens:auto;hyphens:auto;hyphenate-limit-chars:9 4 4}
+[data-fit=shrink] .grid.l .pt.w2,[data-fit=both] .grid.l .pt.w2{font-size:12px;letter-spacing:.05em}
+[data-fit=shrink] .grid.l .pt.w3,[data-fit=both] .grid.l .pt.w3{font-size:11px;letter-spacing:.03em}
+[data-fit=shrink] .grid.m .pt.w2,[data-fit=both] .grid.m .pt.w2{font-size:9.5px;letter-spacing:.03em}
+[data-fit=shrink] .grid.m .pt.w3,[data-fit=both] .grid.m .pt.w3{font-size:8.5px;letter-spacing:.02em}
+
+/* Stand-in photo covers (CSS, not real images) */
+.ph1{background:#fbfaf6;color:#111;padding:16% 12%;display:flex;flex-direction:column;font-family:Georgia,serif}
+.ph1 b{font-weight:400;font-size:clamp(8px,1.2vw,16px);letter-spacing:.04em;text-transform:uppercase;line-height:1.15}
+.ph1 i{margin-top:auto;font-style:normal;color:#b3261e;font-size:clamp(6px,.8vw,11px);letter-spacing:.2em;text-transform:uppercase}
+.ph1 hr{border:0;border-top:2px solid #b3261e;width:30%;margin:10% 0}
+.ph2{background:#0c0c0c;color:#f4d03f;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;font:700 clamp(9px,1.6vw,22px)/1 Impact,'Arial Narrow',sans-serif;text-transform:uppercase;gap:8%}
+.ph2 small{font:400 clamp(5px,.75vw,10px)/1 system-ui;letter-spacing:.25em;color:#ddd}
+.ph3{background:radial-gradient(circle at 70% 30%,#ffb35c 0 9%,#d9480f 22%,#3b0d2b 55%,#0b0a1d 85%);color:#fff;display:flex;flex-direction:column;justify-content:space-between;padding:10%;font:600 clamp(7px,1.2vw,15px)/1.1 'Trebuchet MS',sans-serif;text-transform:uppercase;letter-spacing:.08em}
+.ph3 small{font-size:.65em;letter-spacing:.2em;opacity:.85}
+.ph4{background:linear-gradient(160deg,#e9c46a,#b5761c 60%,#6d3d0b);color:#2b1606;display:flex;flex-direction:column;justify-content:flex-end;padding:12%;font:italic clamp(8px,1.3vw,17px)/1.1 Georgia,serif}
+.ph4 small{font:400 clamp(5px,.75vw,10px)/1.2 system-ui;letter-spacing:.15em;text-transform:uppercase;margin-top:6%}
+code{font-size:12px;background:#0000000d;padding:0 3px}
+.grid.l{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+.pt{font-family:'Trebuchet MS','Open Sans',sans-serif;-webkit-hyphens:auto;hyphens:auto;hyphenate-limit-chars:9 4 4}
+.grid.s .pt{display:-webkit-box;font-size:8.5px;letter-spacing:.04em;-webkit-line-clamp:3}
+.sw i{width:9px;height:14px}
+</style></head><body><main>
+<h1>bookeh examples: cover treatment 4</h1>
+<p class="note"><b>Locked (Mika, 2026-10-26):</b> light gray, accents 1 in 5, white 1 in 5; the bar opens on these. DESIGN.md → Colors has the values.</p>
+<p class="note">Round 4, revised (2026-10-26). <b>Base</b>: the Hävitys blue (#012534, sampled from Iida Rauma's cover), a pacific cyan (#3B8EA5) in place of the Severance terminal, which sat too close to the Hävitys blue, a near-black charcoal (#1C1C1C), a gray after Saana Airtola's <i>Musta aalto</i> (the light candidate leads; none was sampled), and the warm white of the <i>Tuntematon sotilas</i> stand-in, now about 1 in 6. <b>Accents</b>: the mixtape yellow at full strength and its pink slightly faded.</p>
+<p class="note">A hash of the title fixes each book's colour, so it never changes with sorting or filtering; the price is that two whites can still land side by side now and then. "Rare" white keeps that unlikely; "never adjacent" picks again when the tile before it is white, which looks right in every view but means a book's colour can change when the order does.</p>
+<form class="bar" id="bar">
+  <fieldset><legend>gray</legend>
+    <label><input type="radio" name="gray" value="#8C9399"><span>cool</span><span class="sw"><i style="background:#8C9399"></i></span></label>
+    <label><input type="radio" name="gray" value="#9A9690"><span>warm</span><span class="sw"><i style="background:#9A9690"></i></span></label>
+    <label><input type="radio" name="gray" value="#A3A7AA" checked><span>light</span><span class="sw"><i style="background:#A3A7AA"></i></span></label></fieldset>
+  <fieldset><legend>accent share</legend>
+    <label><input type="radio" name="acc" value="12"><span>1 in 8</span></label>
+    <label><input type="radio" name="acc" value="20" checked><span>1 in 5</span></label>
+    <label><input type="radio" name="acc" value="33"><span>1 in 3</span></label></fieldset>
+  <fieldset><legend>white</legend>
+    <label><input type="radio" name="white" value="8"><span>1 in 12 (round 4)</span></label>
+    <label><input type="radio" name="white" value="16"><span>1 in 6</span></label>
+    <label><input type="radio" name="white" value="20" checked><span>1 in 5</span></label>
+    <label><input type="radio" name="white" value="adj"><span>1 in 6, never adjacent</span></label>
+    <label><input type="radio" name="white" value="0"><span>none</span></label></fieldset>
+</form>
+<h2 class="s">Light</h2>
+<div class="row" data-theme="L"></div>
+<h2 class="s">Dark</h2>
+<div class="row" data-theme="D"></div>
+<h2 class="s">Size s, phone</h2>
+<div class="row" data-only="s"></div>
+</main>
+<script>
+const T=(t,a)=>({t,a});
+const BOOKS=[
+ {t:'Tuntematon sotilas',a:'Väinö Linna',photo:'ph1'},
+ T('POSTITOIMISTO','Charles Bukowski, Kristiina Drews'),T('Pystyssä kaiken aikaa','Charles Bukowski'),{t:'Women',a:'Charles Bukowski',lent:1},
+ {t:'Naked lunch',a:'William Burroughs',photo:'ph2'},T('The Master and Margarita','Mikhail Bulgakov'),
+ {t:'Leviathan wakes',a:'James S. A. Corey',photo:'ph3'},{t:'Heavier than heaven',a:'Charles R. Cross',ordered:1},
+ T('Kansanvalistusseuran kalenteri','Kansanvalistusseura'),T('The English language','David Crystal'),
+ {t:'Sinuhe egyptiläinen',a:'Mika Waltari',photo:'ph4'},T('Python programming for the absolute beginner','Michael Dawson'),T('Oliver Twist','Charles Dickens'),
+ T('Hävitys','Iida Rauma'),T('Mikä internetiä vaivaa','Pontus Purokuru'),T('Seven endless forests','April Genevieve Tucholke'),
+ T('Kätilö','Katja Kettu'),T('Puhdistus','Sofi Oksanen'),T('Muumipeikko ja pyrstötähti','Tove Jansson'),T('Seitsemän veljestä','Aleksis Kivi'),
+ T('Täällä Pohjantähden alla','Väinö Linna'),T('Rikos ja rangaistus','Fjodor Dostojevski'),T('The road','Cormac McCarthy'),
+ T('Kafka rannalla','Haruki Murakami'),T('Neuromancer','William Gibson'),T('Tie Jerusalemiin','Jan Guillou'),
+ T('Ihmisen osa','Kari Hotakainen'),T('Lumikko ja yhdeksän muuta','Pasi Ilmari Jääskeläinen'),T('Dune','Frank Herbert'),
+ T('Maailman ympäri','Jules Verne'),T('Norwegian wood','Haruki Murakami'),T('Sapiens','Yuval Noah Harari'),
+ T('Kesäkirja','Tove Jansson'),T('Kaikki naiset näkevät unia','Anja Snellman'),
+];
+// MurmurHash3's finaliser: spreads the title hash so the shares hold on a small shelf.
+const mix=h=>{h^=h>>>16;h=Math.imul(h,0x85ebca6b);h^=h>>>13;h=Math.imul(h,0xc2b2ae35);return(h^h>>>16)>>>0};
+const lin=v=>(v/=255)<=.04045?v/12.92:((v+.055)/1.055)**2.4, gam=v=>Math.round(255*Math.min(1,Math.max(0,v<=.0031308?12.92*v:1.055*v**(1/2.4)-.055)));
+const toLab=h=>{const[r,g,b]=[1,3,5].map(i=>lin(parseInt(h.slice(i,i+2),16)));const l=Math.cbrt(.4122214708*r+.5363325363*g+.0514459929*b),m=Math.cbrt(.2119034982*r+.6806995451*g+.1073969566*b),s=Math.cbrt(.0883024619*r+.2817188376*g+.6299787005*b);return[.2104542553*l+.793617785*m-.0040720468*s,1.9779984951*l-2.428592205*m+.4505937099*s,.0259040371*l+.7827717662*m-.808675766*s]};
+const fromLab=([L,A,B])=>{const l=(L+.3963377774*A+.2158037573*B)**3,m=(L-.1055613458*A-.0638541728*B)**3,s=(L-.0894841775*A-1.291485548*B)**3;return'#'+[4.0767416621*l-3.3077115913*m+.2309699292*s,-1.2684380046*l+2.6097574011*m-.3413193965*s,-.0041960863*l-.7034186147*m+1.707614701*s].map(v=>gam(v).toString(16).padStart(2,'0')).join('')};
+const lum=h=>{const[r,g,b]=[1,3,5].map(i=>lin(parseInt(h.slice(i,i+2),16)));return .2126*r+.7152*g+.0722*b};
+const contrast=(a,b)=>{const[x,y]=[lum(a),lum(b)].sort((p,q)=>q-p);return(x+.05)/(y+.05)};
+const inkFor=c=>contrast(c,'#F5F2EA')>=contrast(c,'#15171A')?'#F5F2EA':'#15171A';
+const svg=s=>`url('data:image/svg+xml,${encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' width='200' height='300'>${s}</svg>`).replace(/'/g,'%27')}')`;
+const MOTTLE=seed=>svg(`<filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.012 .018' numOctaves='4' seed='${seed}' result='m'/><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' seed='${seed}' result='g'/><feBlend in='m' in2='g' mode='multiply'/><feColorMatrix type='saturate' values='0'/><feComponentTransfer><feFuncR type='linear' slope='1.6' intercept='-.15'/><feFuncG type='linear' slope='1.6' intercept='-.15'/><feFuncB type='linear' slope='1.6' intercept='-.15'/></feComponentTransfer></filter><rect width='100%' height='100%' filter='url(#n)'/>`);
+const hash=s=>[...s].reduce((h,c)=>(h*31+c.charCodeAt(0))>>>0,7);
+const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const PHOTO={
+ ph1:b=>`<div class="cv ph1"><b>Tuntematon<br>sotilas</b><hr><i>Väinö Linna</i></div>`,
+ ph2:b=>`<div class="cv ph2">Naked<br>Lunch<small>William S. Burroughs</small></div>`,
+ ph3:b=>`<div class="cv ph3"><small>James S. A. Corey</small>Leviathan<br>Wakes</div>`,
+ ph4:b=>`<div class="cv ph4">Sinuhe<br>egyptiläinen<small>Mika Waltari</small></div>`,
+};
+// Fade: a little less chroma and a little more light, hue kept.
+const fadeHex=(c,k)=>{const[L,A,B]=toLab(c),C=Math.hypot(A,B),h=Math.atan2(B,A),f=[1,.78,.6][k],C2=C*f,L2=Math.min(.95,L+[0,.03,.06][k]);return fromLab([L2,C2*Math.cos(h),C2*Math.sin(h)])};
+const WHITE='#FBFAF6';
+const base=o=>[{c:'#012534',n:'Hävitys blue'},{c:'#3B8EA5',n:'pacific cyan'},{c:'#1C1C1C',n:'charcoal'},{c:o.gray,n:'gray'}];
+const accents=o=>[{c:'#F7D117',n:'yellow'},{c:fadeHex('#EC3D8C',1),n:'pink, slightly faded'}];
+// One pick per title: accent, white or base by share, then the colour within the group.
+function pick(t,o,prevWhite){
+ // The group from the high bits, the colour from a second, independent draw.
+ const m=mix(hash(t)),u=m/2**32*100,v=mix(m^0x9e3779b9),acc=+o.acc,white=o.white==='adj'?16:+o.white;
+ if(u<acc){const a=accents(o);return a[v%a.length]}
+ if(u<acc+white&&!(o.white==='adj'&&prevWhite))return{c:WHITE,n:'white'};
+ const b=base(o);return b[v%b.length];
+}
+function cover(b,o,size,p){
+ if(b.photo)return PHOTO[b.photo](b);
+ const ink=p.ink||inkFor(p.c),h=hash(b.t),sc={s:.5,m:.7,l:1}[size];
+ const style=`--cloth:${p.c};--cink:${ink};--noise:${MOTTLE(h%97)};--nsize:${200*sc}px ${300*sc}px`;
+ return `<div class="cv ph-cv${b.ordered?' air':''}" style="${style}">${b.ordered?'<span class="band"></span>':''}<span class="pt" lang="fi">${esc(b.t)}</span></div>`;
+}
+const tile=(b,o,size,p)=>`<li>${cover(b,o,size,p)}<p class="t1">${b.lent?'<span class="mk"></span>':''}${esc(b.t)}</p><p class="t2">${esc(b.a)}</p></li>`;
+const grid=(o,size,n)=>{let prevWhite=false;return `<ul class="grid ${size}">${BOOKS.slice(0,n).map(b=>{const p=b.photo?null:pick(b.t,o,prevWhite);prevWhite=!!p&&p.c===WHITE;return tile(b,o,size,p)}).join('')}</ul>`};
+const panel=(o,theme,size,n,ph)=>`<div class="pn ${ph?'ph ':''}${theme}">${grid(o,size,n)}</div>`;
+function render(){
+ const o=Object.fromEntries(new FormData(document.getElementById('bar')));
+ for(const el of document.querySelectorAll('[data-theme]')){const T=el.dataset.theme;
+  el.innerHTML=`<div><p class="cap">wide, size l</p>${panel(o,T,'l',BOOKS.length)}</div><div><p class="cap">phone 390px, size m</p>${panel(o,T,'m',18,1)}</div>`}
+ document.querySelector('[data-only=s]').innerHTML=`<div><p class="cap">light, phone, size s</p>${panel(o,'L','s',20,1)}</div><div><p class="cap">dark, phone, size s</p>${panel(o,'D','s',20,1)}</div>`;
+}
+document.getElementById('bar').addEventListener('change',render);render();
+</script>
+</body></html>
