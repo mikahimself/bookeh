@@ -297,7 +297,10 @@
     "lentOnInvalid": "Ei voi olla tulevaisuudessa.",
     "lentTo": "Lainassa: {person} · {date} alkaen",
     "lentMarker": "Lainassa · {person}",
-    "returned": "Palautettu"
+    "returned": "Palautettu",
+    "since": "{person} · {date} alkaen",
+    "nothingLent": "Ei mitään lainassa",
+    "nothingLentRemark": "Joko kaikki palauttavat tavaransa tai kukaan ei kysy."
   },
   "progress": {
     "loading": "Ladataan"

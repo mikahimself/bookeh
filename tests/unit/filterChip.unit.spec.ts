@@ -5,9 +5,13 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 
 const router = { replace: vi.fn(), push: vi.fn() }
 let search = new URLSearchParams()
+let pathname = '/'
 let sheetChip: ((href: string) => void) | null = null
 
-vi.mock('next/navigation', () => ({ useSearchParams: () => search }))
+vi.mock('next/navigation', () => ({
+  usePathname: () => pathname,
+  useSearchParams: () => search,
+}))
 vi.mock('@/app/(frontend)/(sections)/BookDetailSheet', () => ({ useSheetChip: () => sheetChip }))
 // Next's Link: navigates unless the click handler prevented it.
 vi.mock('next/link', () => ({
@@ -49,6 +53,8 @@ afterEach(() => {
   cleanup()
   vi.clearAllMocks()
   sheetChip = null
+  pathname = '/'
+  search = new URLSearchParams()
 })
 
 describe('a Filter chip', () => {
@@ -73,5 +79,24 @@ describe('a Filter chip', () => {
     expect(close).toHaveBeenCalledWith('/?location=4&genre=2')
     expect(router.replace).not.toHaveBeenCalled()
     expect(router.push).not.toHaveBeenCalled()
+  })
+
+  it("off the collection opens it with only the chip's filter and no Book, pushing", () => {
+    pathname = '/loans'
+    // Not shelf params on `/loans`; the chip ignores them all the same.
+    search = new URLSearchParams('author=3&book=5')
+    chip('author', 7)
+    expect(link().getAttribute('href')).toBe('/?author=7')
+    fireEvent.click(link())
+    expect(router.push).toHaveBeenCalledWith('/?author=7', { scroll: undefined })
+    expect(router.replace).not.toHaveBeenCalled()
+    cleanup()
+
+    const close = vi.fn()
+    sheetChip = close
+    chip('author', 7)
+    fireEvent.click(link())
+    expect(close).toHaveBeenCalledWith('/?author=7')
+    expect(router.push).toHaveBeenCalledOnce()
   })
 })

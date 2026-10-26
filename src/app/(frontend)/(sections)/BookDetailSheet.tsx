@@ -10,8 +10,6 @@ import {
   type ReactNode,
 } from 'react'
 
-import { shelfHref, type ShelfQuery } from '@/lib/shelf/query'
-
 import { useTaskBack } from '../components/navigation'
 import { Sheet } from '../components/ui/Sheet'
 
@@ -22,7 +20,7 @@ import { DetailCloseContext } from './detailClose'
  * the dimmed list. `?book=` is the open state, so the sheet is `addressed`:
  * it opens on mount, sliding up, and X, Esc, the scrim or a drag down close
  * it, then leave the address: history back to the entry the row pushed from,
- * or, opened directly, the collection without `book`, replacing. The
+ * or, opened directly, the section without `book` (`back`), replacing. The
  * browser's Back removes `book` itself and the page drops the sheet.
  *
  * A Filter chip inside closes it the same way and lands on the chip's
@@ -32,15 +30,15 @@ import { DetailCloseContext } from './detailClose'
  */
 export function BookDetailSheet({
   label,
-  query,
+  back,
   children,
 }: {
   label: string
-  query: ShelfQuery
+  back: string
   children: ReactNode
 }) {
   const [open, setOpen] = useState(false)
-  const leave = useTaskBack(shelfHref(query), true)
+  const leave = useTaskBack(back, true)
   /** Where a chip asked the close to land; `undefined` for X, Esc, the scrim or a drag. */
   const landing = useRef<string | undefined>(undefined)
   const chip = useCallback((href: string) => {

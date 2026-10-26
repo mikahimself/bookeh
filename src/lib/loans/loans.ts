@@ -1,7 +1,7 @@
 import { DomainError } from '@/lib/errors'
 import type { Context } from '@/lib/payload/context'
 import * as gateway from '@/lib/payload/gateway'
-import { isRowId, type Ref } from '@/lib/payload/ref'
+import { idOf, isRowId, type Ref } from '@/lib/payload/ref'
 import { withTransaction } from '@/lib/payload/transaction'
 import { resolvePerson } from '@/lib/people/people'
 import type { Undone } from '@/lib/undo/undo'
@@ -182,5 +182,66 @@ async function reopenLoan(ctx: Context, id: number): Promise<void> {
     id,
     data: { returnedOn: null },
     depth: 0,
+  })
+}
+
+/** Spine, Shared shapes: an open loan as the Loans section lists it. */
+export type OpenLoan = {
+  loanId: number
+  copyId: number
+  bookId: number
+  person: Named
+  since: string
+}
+
+/**
+ * Spine, AD-7, FR-37: the context user's open loans (no `returnedOn`), the
+ * longest out first: by `lentOn`, then by loan id. Each with its copy, the
+ * copy's Book id, the borrower and `since`, the lending day as `YYYY-MM-DD`.
+ * Every read filters on `owner` explicitly as well as through `ownerAccess`
+ * (FR-48), so the admin sees only their own. Read whole, at `depth: 0`: the
+ * caller hydrates the Books (`getEffectiveBooks()`). A loan whose copy or
+ * Person has gone between the reads is left out.
+ */
+export async function openLoans(ctx: Context): Promise<OpenLoan[]> {
+  const owner = { owner: { equals: ctx.user.id } }
+  const { docs: loans } = await gateway.find(ctx, {
+    collection: 'loans',
+    where: { and: [owner, { returnedOn: { exists: false } }] },
+    select: { copy: true, person: true, lentOn: true },
+    sort: ['lentOn', 'id'],
+    depth: 0,
+    pagination: false,
+  })
+  if (loans.length === 0) return []
+
+  const [{ docs: copies }, { docs: people }] = await Promise.all([
+    gateway.find(ctx, {
+      collection: 'copies',
+      where: { and: [owner, { id: { in: [...new Set(loans.map((loan) => idOf(loan.copy)))] } }] },
+      select: { book: true },
+      depth: 0,
+      pagination: false,
+    }),
+    gateway.find(ctx, {
+      collection: 'people',
+      where: {
+        and: [owner, { id: { in: [...new Set(loans.map((loan) => idOf(loan.person)))] } }],
+      },
+      select: { name: true },
+      depth: 0,
+      pagination: false,
+    }),
+  ])
+  const bookByCopy = new Map(copies.map((copy) => [copy.id, idOf(copy.book)]))
+  const personById = new Map<number, Named>(people.map(({ id, name }) => [id, { id, name }]))
+
+  return loans.flatMap((loan) => {
+    const copyId = idOf(loan.copy)
+    const bookId = bookByCopy.get(copyId)
+    const person = personById.get(idOf(loan.person))
+    if (bookId === undefined || !person) return []
+    // Spine, Dates: `lentOn` is stored at 12:00 UTC and read back by its UTC date.
+    return [{ loanId: loan.id, copyId, bookId, person, since: loan.lentOn.slice(0, 10) }]
   })
 }

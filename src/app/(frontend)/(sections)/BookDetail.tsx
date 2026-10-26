@@ -11,7 +11,6 @@ import { logger } from '@/lib/errors'
 import { helsinkiToday } from '@/lib/loans/dates'
 import type { Context } from '@/lib/payload/context'
 import { lendingPeople } from '@/lib/people/people'
-import type { ShelfQuery } from '@/lib/shelf/query'
 
 import { buttonClass } from '../components/Button'
 import { Cover } from '../components/Cover'
@@ -52,21 +51,23 @@ const DOT = ' · '
  * failed People read leaves the picker with New person alone.
  * A Book the viewer does not hold is "Not in library". The content is the
  * same at every width; only the frame differs: the bottom sheet on the
- * phone, the panel beside the list from 900px (`BookDetailFrame`).
+ * phone, the panel beside the list from 900px (`BookDetailFrame`). Opened on
+ * `/` or `/loans`: `back` is that section's address without `book`, where
+ * closing it and "Not in library" land.
  */
 export async function BookDetail({
   ctx,
   bookId,
-  query,
+  back,
   locations,
 }: {
   ctx: Context
   bookId: number
-  query: ShelfQuery
+  back: string
   locations: readonly LocationOption[]
 }) {
   const book = await heldBook(ctx, bookId)
-  if (!book) return <NotInLibrary query={query} />
+  if (!book) return <NotInLibrary back={back} />
   const copies = (await getHoldings(ctx, [bookId])).get(bookId)?.copies ?? []
   const state = await getUserBookState(ctx, bookId)
   const lendable = copies.some(({ status, loan }) => status === 'owned' && loan === null)
@@ -90,7 +91,7 @@ export async function BookDetail({
     .join(' · ')
 
   return (
-    <BookDetailFrame label={book.title} query={query} bookId={bookId}>
+    <BookDetailFrame label={book.title} back={back} bookId={bookId}>
       <div className="flex flex-col gap-6">
         <div className="flex items-start gap-4">
           <div className="w-cover-detail shrink-0">

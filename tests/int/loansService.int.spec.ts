@@ -4,7 +4,7 @@ import { getPayload, type Payload } from 'payload'
 import { beforeAll, describe, expect, it } from 'vitest'
 
 import { helsinkiToday } from '@/lib/loans/dates'
-import { lendCopy, returnLoan } from '@/lib/loans/loans'
+import { lendCopy, openLoans, returnLoan } from '@/lib/loans/loans'
 import * as gateway from '@/lib/payload/gateway'
 import { undo, withUndo } from '@/lib/undo/undo'
 import config from '@/payload.config'
@@ -16,7 +16,8 @@ import { randomIsbn } from '../helpers/isbn'
 // `lib/loans`, AD-18/AD-19/AD-20, FR-35/FR-36: Lend opens a loan of my owned
 // copy without an open loan, Returned closes it and keeps the row, both
 // dated today in Helsinki by default and both undoable. Foreign and bad ids
-// write nothing, for the admin too.
+// write nothing, for the admin too. FR-37/FR-48: `openLoans` lists only the
+// viewer's open loans, longest out first.
 
 const noon = (date: string) => `${date}T12:00:00.000Z`
 
@@ -306,5 +307,56 @@ describe('loans service', () => {
       { id: loanId, returnedOn: noon(helsinkiToday()) },
       { id: again.data.loanId, returnedOn: null },
     ])
+  })
+
+  it("lists only the viewer's open loans, longest out first, ties by id", async () => {
+    const { user, ctx, copy, person } = await lender('Open Loans Viewer')
+    const second = await copyAs(user)
+    const third = await copyAs(user)
+    const returned = await copyAs(user)
+    const antti = await personAs(user, `Antti ${randomUUID()}`)
+    const first = await lendCopy(ctx, second.id, antti.id, '2026-09-01')
+    const next = await lendCopy(ctx, third.id, antti.id, '2026-09-12')
+    // Moved onto `next`'s day after it: the lower id is no longer the first row stored.
+    await gateway.updateByID(ctx, {
+      collection: 'loans',
+      id: first.data.loanId,
+      data: { lentOn: '2026-09-12' },
+      depth: 0,
+    })
+    const oldest = await lendCopy(ctx, copy.id, person.id, '2026-07-02')
+    const closed = await lendCopy(ctx, returned.id, person.id, '2026-06-01')
+    await returnLoan(ctx, closed.data.loanId, '2026-06-02')
+
+    const admin = await createUser({ displayName: 'Open Loans Admin', roles: ['admin'] })
+    const adminCtx = await contextFor(admin)
+    const adminCopy = await copyAs(admin)
+    const adminLoan = await lendCopy(adminCtx, adminCopy.id, { create: 'Kalle' }, '2026-01-01')
+
+    const named = (p: Person) => ({ id: p.id, name: p.name })
+    expect(await openLoans(ctx)).toEqual([
+      {
+        loanId: oldest.data.loanId,
+        copyId: copy.id,
+        bookId: shared.id,
+        person: named(person),
+        since: '2026-07-02',
+      },
+      {
+        loanId: first.data.loanId,
+        copyId: second.id,
+        bookId: shared.id,
+        person: named(antti),
+        since: '2026-09-12',
+      },
+      {
+        loanId: next.data.loanId,
+        copyId: third.id,
+        bookId: shared.id,
+        person: named(antti),
+        since: '2026-09-12',
+      },
+    ])
+    expect((await openLoans(adminCtx)).map((loan) => loan.loanId)).toEqual([adminLoan.data.loanId])
   })
 })

@@ -254,6 +254,26 @@ describe("a Filter chip in the phone's Book detail", () => {
     window.history.replaceState(null, '', '/')
   })
 
+  it('from /loans: goes back to the section, then pushes the chip on /', () => {
+    // The row pushed `/loans?book=5` over `/loans`.
+    traverseTo(stampPush({}, 1))
+    renderHook(() => useTaskBack('/loans', true)).result.current('/?author=7')
+    expect(back).toHaveBeenCalledTimes(1)
+
+    traverseTo(stampPush({}, 0))
+    vi.advanceTimersToNextFrame()
+    expect(push).toHaveBeenCalledExactlyOnceWith('/?author=7')
+    expect(replace).not.toHaveBeenCalled()
+  })
+
+  it('from /loans opened directly: pushes the chip on /', () => {
+    traverseTo(null)
+    renderHook(() => useTaskBack('/loans', true)).result.current('/?author=7')
+    expect(push).toHaveBeenCalledExactlyOnceWith('/?author=7')
+    expect(replace).not.toHaveBeenCalled()
+    expect(back).not.toHaveBeenCalled()
+  })
+
   it('opened directly: replaces to the chip', () => {
     traverseTo(null)
     leave()('/?location=4')

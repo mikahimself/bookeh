@@ -1,6 +1,6 @@
 'use client'
 
-import { useSearchParams } from 'next/navigation'
+import { usePathname, useSearchParams } from 'next/navigation'
 import type { ReactNode } from 'react'
 
 import { parseShelfQuery, shelfHref } from '@/lib/shelf/query'
@@ -17,7 +17,10 @@ import { addFilter, type ChipField } from './filterToggle'
  * rendered with: a Filter panel tap beside the wide panel can have moved it
  * since. In the wide panel it replaces the address and keeps the Book open;
  * in the phone sheet it closes the sheet onto the collection without `book`
- * (`useSheetChip`).
+ * (`useSheetChip`). Off `/` (Book detail on `/loans`) it starts from the
+ * empty shelf query instead, so the collection opens with only that filter
+ * and without the Book, and lands there pushing at both widths: a section
+ * change, so Back returns to the section.
  */
 export function FilterChip({
   field,
@@ -28,8 +31,10 @@ export function FilterChip({
   id: number
   children: ReactNode
 }) {
-  const { query, book } = parseShelfQuery(useSearchParams())
+  const address = parseShelfQuery(useSearchParams())
+  const onShelf = usePathname() === '/'
   const sheetChip = useSheetChip()
+  const query = onShelf ? address.query : parseShelfQuery(new URLSearchParams()).query
   const next = addFilter(query, field, id)
 
   if (sheetChip) {
@@ -47,8 +52,20 @@ export function FilterChip({
       </TextLink>
     )
   }
+  if (!onShelf) {
+    return (
+      <TextLink href={shelfHref(next)} prefetch={false}>
+        {children}
+      </TextLink>
+    )
+  }
   return (
-    <TextLink href={shelfHref(next, { book })} replace scroll={false} prefetch={false}>
+    <TextLink
+      href={shelfHref(next, { book: address.book })}
+      replace
+      scroll={false}
+      prefetch={false}
+    >
       {children}
     </TextLink>
   )

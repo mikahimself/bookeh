@@ -254,6 +254,8 @@ function staleBelow(href: string): boolean {
  * `to`: the back branch replaces the entry it reaches with `to` once the
  * traversal has settled, so neither the open Book nor the address below it
  * stays in history; the other branch replaces to `to` instead of `fallback`.
+ * A `to` on another pathname than `fallback`'s (a chip on `/loans` landing
+ * on `/`) is pushed instead in both branches, so Back returns to the section.
  * Without `to`, a back that reaches `fallback`'s pathname with other params
  * replaces that entry with `fallback`: filters changed while Book detail was
  * open (a chip in the wide panel, the Filter panel) stay as they are shown.
@@ -264,17 +266,24 @@ export function useTaskBack(fallback: string, keepScroll = false): (to?: string)
     (to?: string) => {
       const replace = (href: string) =>
         keepScroll ? router.replace(href, { scroll: false }) : router.replace(href)
+      // Another section's address is a section change, so Back comes back here.
+      const land = (href: string) =>
+        new URL(href, window.location.href).pathname ===
+        new URL(fallback, window.location.href).pathname
+          ? replace(href)
+          : router.push(href)
       if (closing) return
       if (depth > (taskBase ?? 0)) {
         closing = true
         traverseBack(
           () => router.back(),
           () => {
-            if (to !== undefined) replace(to)
+            if (to !== undefined) land(to)
             else if (staleBelow(fallback)) replace(fallback)
           },
         )
-      } else replace(to ?? fallback)
+      } else if (to !== undefined) land(to)
+      else replace(fallback)
     },
     [router, fallback, keepScroll],
   )

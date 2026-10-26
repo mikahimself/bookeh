@@ -72,6 +72,7 @@ vi.mock('next-intl/server', async () => {
 vi.mock('next/navigation', async (importOriginal) => ({
   ...(await importOriginal<typeof import('next/navigation')>()),
   useRouter: () => router,
+  usePathname: () => '/',
   useSearchParams: () => searchParams,
 }))
 vi.mock('@/lib/payload/context', () => ({ requireUser }))

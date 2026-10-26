@@ -297,7 +297,10 @@
     "lentOnInvalid": "Can't be later than today.",
     "lentTo": "Lent to {person} since {date}",
     "lentMarker": "Lent · {person}",
-    "returned": "Returned"
+    "returned": "Returned",
+    "since": "{person} · since {date}",
+    "nothingLent": "Nothing lent",
+    "nothingLentRemark": "Either everyone returns things or nobody asks."
   },
   "progress": {
     "loading": "Loading"

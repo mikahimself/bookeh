@@ -515,6 +515,7 @@ type PersonUse = Named & { loans: number } // personUse(ctx): every Person of th
 
 // src/lib/loans
 type Lent = { loanId: number; person: Named } // lendCopy(ctx, copyId, person: Ref, lentOn?): Undone<Lent>; returnLoan(ctx, loanId, returnedOn?): Undone<{ loanId }>; dates default to helsinkiToday()
+type OpenLoan = { loanId: number; copyId: number; bookId: number; person: Named; since: string } // openLoans(ctx): the viewer's open loans, lentOn ascending then loan id (longest out first); since is the lending day YYYY-MM-DD
 
 // src/lib/undo
 type Restore = (ctx: Context) => Promise<void>
@@ -593,7 +594,7 @@ src/
     tags/              # tags of every kind: changeTags, rename, merge, delete, tagUse; SYSTEM_NAME checks
     copies/            # createCopy, move, receive, status, note, remove; locations
     people/            # resolvePerson, createPerson, rename, merge, delete, personUse, lendingPeople
-    loans/             # lendCopy, returnLoan; dates: helsinkiToday, isCalendarDate
+    loans/             # lendCopy, returnLoan, openLoans; dates: helsinkiToday, isCalendarDate
     wishlists/
     account/           # profile read and update, visibility
     backup/            # readLastBackup: the nightly backup's status file (BACKUP_STATUS_FILE) for Settings

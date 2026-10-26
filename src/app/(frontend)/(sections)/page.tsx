@@ -9,6 +9,7 @@ import { getShelfRows } from '@/lib/shelf/getShelfRows'
 import {
   parseShelfQuery,
   SHELF_PAGE_SIZE,
+  shelfHref,
   type FilterValues,
   type ShelfRows,
 } from '@/lib/shelf/query'
@@ -88,7 +89,12 @@ export default async function CollectionPage({
                   )}
                 </div>
                 {book !== null && (
-                  <BookDetail ctx={ctx} bookId={book} query={query} locations={locations} />
+                  <BookDetail
+                    ctx={ctx}
+                    bookId={book}
+                    back={shelfHref(query)}
+                    locations={locations}
+                  />
                 )}
               </div>
               <SelectBar locations={locations} />

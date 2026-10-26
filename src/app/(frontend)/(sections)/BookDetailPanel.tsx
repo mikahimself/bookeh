@@ -3,8 +3,6 @@
 import { useTranslations } from 'next-intl'
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 
-import { shelfHref, type ShelfQuery } from '@/lib/shelf/query'
-
 import { CloseButton } from '../components/CloseButton'
 import { useTaskBack } from '../components/navigation'
 import { inDialog, useWide } from '../components/ui/overlay'
@@ -15,20 +13,21 @@ import { DetailCloseContext } from './detailClose'
 type FrameProps = {
   /** The Book's title: names the sheet or the panel. */
   label: string
-  query: ShelfQuery
+  /** The section's address without `book`: where closing lands. */
+  back: string
   bookId: number
   children: ReactNode
 }
 
 /** Book detail's frame: the panel from 900px, the bottom sheet under it. */
-export function BookDetailFrame({ label, query, bookId, children }: FrameProps) {
+export function BookDetailFrame({ label, back, bookId, children }: FrameProps) {
   const wide = useWide()
   return wide ? (
-    <BookDetailPanel label={label} query={query} bookId={bookId}>
+    <BookDetailPanel label={label} back={back} bookId={bookId}>
       {children}
     </BookDetailPanel>
   ) : (
-    <BookDetailSheet label={label} query={query}>
+    <BookDetailSheet label={label} back={back}>
       {children}
     </BookDetailSheet>
   )
@@ -54,9 +53,9 @@ const inField = (target: EventTarget | null): boolean =>
  * when there are none (reduce motion); focus inside the panel moves to the
  * open Book's row or tile first. A new Book during the close keeps it open.
  */
-function BookDetailPanel({ label, query, bookId, children }: FrameProps) {
+function BookDetailPanel({ label, back, bookId, children }: FrameProps) {
   const t = useTranslations('overlay')
-  const leave = useTaskBack(shelfHref(query), true)
+  const leave = useTaskBack(back, true)
   const frame = useRef<HTMLDivElement>(null)
   const content = useRef<HTMLDivElement>(null)
   const [leaving, setLeaving] = useState(false)
