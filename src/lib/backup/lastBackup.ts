@@ -2,8 +2,12 @@ import { readFile } from 'node:fs/promises'
 
 import { isAdmin, type RoleHolder } from '@/access/roles'
 
-/** The read-only mount of the backup status directory in `deploy/compose.prod.yml`. */
-export const BACKUP_STATUS_FILE = '/app/backup-status/last-backup.json'
+/**
+ * The nightly backup's status file: `BACKUP_STATUS_FILE`, or the read-only
+ * mount of the backup status directory in `deploy/compose.prod.yml`.
+ */
+export const BACKUP_STATUS_FILE =
+  process.env.BACKUP_STATUS_FILE?.trim() || '/app/backup-status/last-backup.json'
 
 /** A successful backup older than this is overdue. */
 const MAX_AGE_MS = 48 * 60 * 60 * 1000

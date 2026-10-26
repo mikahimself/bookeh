@@ -6,7 +6,8 @@
  * Design Paradigm).
  *
  * One parameter per field, named after it (`ratingMin` is `rating`); several
- * values repeat the parameter, since publishers and themes can hold commas.
+ * values repeat the parameter, since publishers can hold commas. `q` is
+ * NFC-normalised, as every text input is at its boundary.
  * Ranges are `from-to` with either end empty. Ids are positive integers,
  * rating 1–5. A bad value is dropped and its field falls back to the default;
  * for a single-valued parameter the first value counts. No page number.
@@ -23,8 +24,6 @@ export type ShelfQuery = {
     status: ('owned' | 'ordered')[]
     read: boolean
     genre: number[] // system genre ids and the user's genre tag ids
-    tag: number[]
-    theme: string[] // by text: system themes exactly, the user's themes by name
     language: string[]
     author: number[]
     series: number[]
@@ -154,8 +153,6 @@ export function parseShelfQuery(params: ShelfParams): ShelfAddress {
   set('status', list(all('status'), oneOf(STATUSES)))
   set('read', bool(one('read')))
   set('genre', list(all('genre'), id))
-  set('tag', list(all('tag'), id))
-  set('theme', list(all('theme'), text))
   set('language', list(all('language'), text))
   set('author', list(all('author'), id))
   set('series', list(all('series'), id))
@@ -164,7 +161,7 @@ export function parseShelfQuery(params: ShelfParams): ShelfAddress {
   set('year', range(one('year')))
   set('pages', range(one('pages')))
 
-  const q = text(one('q'))
+  const q = text(one('q')?.normalize('NFC'))
   const query: ShelfQuery = {
     ...(q === undefined ? {} : { q }),
     filters,
@@ -199,8 +196,6 @@ export function shelfSearchParams(
   add('status', f.status)
   add('read', one(f.read))
   add('genre', f.genre)
-  add('tag', f.tag)
-  add('theme', f.theme)
   add('language', f.language)
   add('author', f.author)
   add('series', f.series)

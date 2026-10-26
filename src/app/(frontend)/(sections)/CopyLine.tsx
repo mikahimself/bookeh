@@ -1,7 +1,6 @@
 'use client'
 
 import { useTranslations } from 'next-intl'
-import { useRouter } from 'next/navigation'
 import { useEffect, useEffectEvent, useRef, useState, useTransition } from 'react'
 
 import type { LocationOption } from '@/lib/copies/locations'
@@ -74,11 +73,12 @@ export function CopyNote({ copyId, note }: { copyId: number; note: string }) {
 /**
  * FR-33: an owned copy's Move, a Link before Remove that opens the Move
  * picker (`MovePicker`) on the copy's location; disabled while its move
- * runs. `ok` or `NOT_FOUND` refreshes Book detail, so the line shows its new
- * location or goes. Focus goes to the copies' section once the move
- * settles: the disabled Link would drop it to the body, outside the sheet.
- * After the toast's Undo, the line returns to its old location through
- * `ReadAndRating`'s `onUndone` refresh, while Book detail is mounted.
+ * runs. `afterAction`'s refresh after `ok` or `NOT_FOUND` re-renders Book
+ * detail, so the line shows its new location or goes. Focus goes to the
+ * copies' section once the move settles: the disabled Link would drop it to
+ * the body, outside the sheet. After the toast's Undo, the line returns to
+ * its old location through `ReadAndRating`'s `onUndone` refresh, while Book
+ * detail is mounted.
  */
 export function MoveCopy({
   copyId,
@@ -90,7 +90,6 @@ export function MoveCopy({
   locations: readonly LocationOption[]
 }) {
   const t = useTranslations('collection')
-  const router = useRouter()
   const [open, setOpen] = useState(false)
   const [pending, startTransition] = useTransition()
   const link = useRef<HTMLButtonElement>(null)
@@ -107,11 +106,7 @@ export function MoveCopy({
         value={location}
         copyIds={[copyId]}
         startTransition={startTransition}
-        onSettled={(result) => {
-          link.current?.closest('section')?.focus()
-          // `MovePicker` refreshes on `ok`.
-          if (!result.ok && result.code === 'NOT_FOUND') router.refresh()
-        }}
+        onSettled={() => link.current?.closest('section')?.focus()}
       />
     </>
   )
@@ -122,12 +117,11 @@ export function MoveCopy({
  * one-copy dialog; no toast and no Undo. The removal starts once the
  * dialog's history entry is gone (`onClosed`), so closing Book detail after
  * the last copy never overlaps it. `ok` on the last copy closes Book detail;
- * `ok` otherwise, or `NOT_FOUND`, refreshes it (a Book gone entirely then
- * closes as "Not in library").
+ * otherwise `afterAction`'s refresh after `ok` or `NOT_FOUND` re-renders it
+ * (a Book gone entirely then closes as "Not in library").
  */
 export function RemoveCopy({ copyId, last }: { copyId: number; last: boolean }) {
   const t = useTranslations('collection')
-  const router = useRouter()
   const afterAction = useAfterAction()
   const closeDetail = useCloseDetail()
   const [pending, startTransition] = useTransition()
@@ -139,13 +133,13 @@ export function RemoveCopy({ copyId, last }: { copyId: number; last: boolean }) 
     startTransition(async () => {
       const result = await settleAction(removeCopiesAction([copyId]))
       afterAction(result)
-      if (result.ok && last) {
+      // Removed nothing (the copy turned ordered elsewhere): the refresh shows its line.
+      if (result.ok && last && result.data.removed > 0) {
         closeDetail()
         return
       }
       // The line goes with the refresh; focus would fall to the body, outside the sheet.
       if (result.ok) link.current?.closest('section')?.focus()
-      if (result.ok || result.code === 'NOT_FOUND') router.refresh()
     })
   }
 
@@ -184,13 +178,13 @@ export function RemoveCopy({ copyId, last }: { copyId: number; last: boolean }) 
  * EXPERIENCE.md, Book detail: an ordered copy's Received (FR-28). The copy
  * becomes owned at the default location; the toast says where it landed
  * ("Saved to {location}", or "Saved" without one) with Undo, which orders it
- * again. Every result goes to `afterAction`. `ok` or `NOT_FOUND` moves focus
- * to Your copies and refreshes Book detail, which unmounts this Link. A toast
- * Undo is refreshed by `ReadAndRating`'s `onUndone` listener.
+ * again. Every result goes to `afterAction`, whose refresh after `ok` or
+ * `NOT_FOUND` re-renders Book detail and unmounts this Link, so focus moves
+ * to Your copies first. A toast Undo is refreshed by `ReadAndRating`'s
+ * `onUndone` listener.
  */
 export function ReceiveCopy({ copyId }: { copyId: number }) {
   const t = useTranslations()
-  const router = useRouter()
   const { show } = useToast()
   const afterAction = useAfterAction()
   const [pending, startTransition] = useTransition()
@@ -208,11 +202,8 @@ export function ReceiveCopy({ copyId }: { copyId: number }) {
         })
       }
       afterAction(result)
-      if (result.ok || result.code === 'NOT_FOUND') {
-        // The line changes with the refresh; focus would fall to the body, outside the sheet.
-        link.current?.closest('section')?.focus()
-        router.refresh()
-      }
+      // The line changes with the refresh; focus would fall to the body, outside the sheet.
+      if (result.ok || result.code === 'NOT_FOUND') link.current?.closest('section')?.focus()
     })
   }
 

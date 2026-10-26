@@ -21,6 +21,9 @@ import { locationFor, type LocationOption } from './locations'
  *
  * The restore writes the copy back to ordered with no location (AD-8)
  * through the gateway as the restoring user, and skips a copy that is gone.
+ * It names no relation target, so the AD-20 rule that a recorded target gone
+ * since (a deleted or merged location) is restored as none costs it nothing;
+ * `moveCopies()`' restore applies it.
  * Epic 6 makes the restore fail with `UNDO_FAILED` when the copy has gained
  * a loan since, as the save's does.
  */

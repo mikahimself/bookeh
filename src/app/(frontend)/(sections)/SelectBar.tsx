@@ -12,7 +12,7 @@ import { useToast } from '../components/toast/ToastProvider'
 import { Dialog } from '../components/ui/Dialog'
 
 import { removeCopiesAction, toggleCopiesReadAction } from './actions'
-import { MovePicker } from './MovePicker'
+import { MovePicker, type MoveSettled } from './MovePicker'
 import { useSelection } from './Selection'
 import { useAfterAction } from './ShelfRows'
 
@@ -30,12 +30,14 @@ import { useAfterAction } from './ShelfRows'
  * and is absent without locations (FR-32). Read toggles the distinct Books
  * at once (AD-18) and toasts "Marked {n} read" or "unread" with Undo
  * (AD-20); the toast's Undo reloads the rows through `onUndone` and leaves
- * the ticks alone. Remove asks first; no Undo. For all three, `ok` and
- * `NOT_FOUND` untick the ids sent and keep select mode (a copy gone
- * elsewhere cannot be unticked from the list); any other failure keeps them.
- * Focus goes to Done after Move and Read settle and after Remove's dialog
- * closes, whatever the result, since the pending state disables the button
- * that had it.
+ * the ticks alone. Remove asks first; no Undo. Move and Remove act on the
+ * owned copies only: an ordered copy is skipped, stays ticked, and the toast
+ * says how many were ("{n} removed · {m} ordered skipped", without Undo).
+ * For all three, `ok` unticks the ids acted on and `NOT_FOUND` every id sent
+ * (a copy gone elsewhere cannot be unticked from the list), keeping select
+ * mode; any other failure keeps the ticks. Focus goes to Done after Move and
+ * Read settle and after Remove's dialog closes, whatever the result, since
+ * the pending state disables the button that had it.
  */
 export function SelectBar({ locations }: { locations: readonly LocationOption[] }) {
   const t = useTranslations('collection')
@@ -53,18 +55,42 @@ export function SelectBar({ locations }: { locations: readonly LocationOption[] 
 
   if (!selecting) return null
 
+  /** `ok` unticks the ids acted on (the sent ones less `skipped`), `NOT_FOUND` every one sent. */
+  const untickActed = (
+    result: ActionResult<unknown>,
+    copyIds: number[],
+    skipped: readonly number[] = [],
+  ) => {
+    if (result.ok) untick(copyIds.filter((id) => !skipped.includes(id)))
+    else if (result.code === 'NOT_FOUND') untick(copyIds)
+  }
+
   const remove = (copyIds: number[]) => {
     startTransition(async () => {
       const result = await settleAction(removeCopiesAction(copyIds))
-      if (result.ok || result.code === 'NOT_FOUND') untick(copyIds)
+      const skipped = result.ok ? result.data.skipped : []
+      if (result.ok && skipped.length > 0) {
+        show({
+          kind: 'success',
+          message: tToast('removedSkipped', { n: result.data.removed, skipped: skipped.length }),
+        })
+      }
+      untickActed(result, copyIds, skipped)
       afterAction(result)
     })
   }
 
-  const settled = (result: ActionResult<unknown>, copyIds: number[]) => {
-    if (result.ok || result.code === 'NOT_FOUND') untick(copyIds)
+  const settled = (
+    result: ActionResult<unknown>,
+    copyIds: number[],
+    skipped?: readonly number[],
+  ) => {
+    untickActed(result, copyIds, skipped)
     doneButton.current?.focus()
   }
+
+  const moveSettled = (result: MoveSettled, copyIds: number[]) =>
+    settled(result, copyIds, result.ok ? result.data.skipped : [])
 
   const markRead = (copyIds: number[]) => {
     startTransition(async () => {
@@ -131,7 +157,7 @@ export function SelectBar({ locations }: { locations: readonly LocationOption[] 
         value={null}
         copyIds={[...ticked]}
         startTransition={startTransition}
-        onSettled={settled}
+        onSettled={moveSettled}
       />
       <Dialog
         open={confirmOpen}

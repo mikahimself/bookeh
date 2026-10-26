@@ -7,6 +7,7 @@ import {
   getProfile,
   PROFILE_VISIBILITIES,
 } from '@/lib/account/profile'
+import { readLastBackup } from '@/lib/backup/lastBackup'
 import { listLocations } from '@/lib/copies/locations'
 import { requireUser } from '@/lib/payload/context'
 import { filterValues } from '@/lib/shelf/filterValues'
@@ -16,7 +17,6 @@ import { devicePrefs, THEMES } from '../../prefs'
 import { DefaultLocationField } from './DefaultLocationField'
 import { DisplayNameField } from './DisplayNameField'
 import { LanguageSwitch } from './LanguageSwitch'
-import { readLastBackup } from './lastBackup'
 import { LocationsGroup } from './LocationsGroup'
 import { ThemeSwitch } from './ThemeSwitch'
 import { VisibilitySwitch } from './VisibilitySwitch'

@@ -241,6 +241,9 @@ Every colour has a light and a dark value. Dark tokens carry the `-dark` suffix 
 | `shadow` | `#1F293324` | `#00000073` | The detail panel's shadow, and nothing else. |
 | `crop-dim` | `#00000099` | `#00000099` | Dims the photo outside the four corners in the Corner crop, and nothing else. |
 | `crop-halo` | `#0000008C` | `#0000008C` | The 4px line under the Corner crop's outline and handles, so they show on any photo. Nothing else. |
+| `airmail-red` | `#D7282F` | `#D7282F` | The red stripes of the airmail band on an ordered copy's cover tile (Components → Cover tile). Nothing else. |
+| `airmail-blue` | `#2251A3` | `#2251A3` | The blue stripes of the same band. Nothing else. |
+| `airmail-white` | `#FFFFFF` | `#FFFFFF` | The white stripes of the same band, white in both themes. Nothing else. |
 
 Rules for {colors.accent}:
 
@@ -309,11 +312,11 @@ Three stroke weights exist: {spacing.stroke-control} for button outlines, field 
 | Rows | l | 44 × 66px | Title, author, and year · publisher on three lines | 10px above and below |
 | Rows | m | 32 × 48px | Title on one line; author · year · publisher on a second | 8px above and below |
 | Rows | s | 16 × 24px | Title, author, year · publisher on one line | 3px above and below |
-| Covers | l | Columns at least 160px wide | Title and author under the cover | 24px gap |
-| Covers | m | Columns at least 116px wide | Title and author under the cover | 18px gap |
-| Covers | s | Columns at least 76px wide | Title and author under the cover, at {typography.label} size | 10px gap |
+| Covers | l | Columns at least 150px wide | Title and author under the cover | 24px gap |
+| Covers | m | Columns at least 96px wide | Title and author under the cover | 18px gap |
+| Covers | s | Columns at least 70px wide | Title and author under the cover, at {typography.label} size | 10px gap |
 
-Covers keep a 2:3 shape. What a row ends with is specified in `EXPERIENCE.md` → Collection controls.
+Covers keep a 2:3 shape. Cover columns auto-fill the width at these minimums, so a 375–390px phone shows 4 / 3 / 2 columns at s / m / l (Epic 5 retrospective, decision 3). What a row ends with is specified in `EXPERIENCE.md` → Collection controls.
 
 On wide screens the detail panel is {spacing.panel-width} wide and sits beside the list, which narrows to make room.
 
@@ -351,8 +354,8 @@ Visual specs. Behaviour lives in `EXPERIENCE.md` → Component Patterns.
 | Filter chip | A value on an opened book that can be tapped to filter (author, series, genre, tag, location). [ASSUMPTION: styled as a Link, with no outline or fill.] |
 | Text field | {typography.label} label in {colors.text-muted} above the value. The value sits on a {spacing.stroke-control} {colors.text} underline; an empty field's underline is {colors.text-dim}; a field with a mistake has a {colors.danger} underline and a {typography.meta} message beneath. No box. The search field is the same without a label. |
 | Book row | Cover, then title in {typography.title} and a {typography.meta} second line in {colors.text-muted}, then the location in {typography.meta}. No divider. Sizes per the density table. |
-| Cover tile | Cover at 2:3, square corners, with title and author beneath. A lent copy has the 8px marker before its title. The open tile has the selection bar along the bottom edge of its cover. In select mode the checkbox sits before the title. [ASSUMPTION for these three states] |
-| Cover placeholder | [ASSUMPTION: a book with no cover shows an outlined rectangle in {colors.text-dim} with the title inside in {colors.text-muted}.] |
+| Cover tile | Cover at 2:3, square corners, with title and author beneath. A lent copy has the 8px marker before its title. An ordered copy's tile carries a red-white-blue airmail band across the top-left corner of its cover: a 10px strip of {colors.airmail-red}, {colors.airmail-white}, {colors.airmail-blue}, {colors.airmail-white} stripes at 45°, clipped by the cover's box, no word (the row layout still ends the row with "Ordered"). The open tile has the selection bar along the bottom edge of its cover. In select mode the checkbox sits before the title. [ASSUMPTION for the lent, open and select states] |
+| Cover placeholder | A book with no cover shows the typeset paperback: an outlined rectangle in {colors.text-dim} with the title bottom-left in {typography.label} {colors.text}, wrapped and clamped to four lines, and the author under it in {typography.label} {colors.text-muted}. At s and in rows the title only; a row at s keeps its empty box. |
 | Selection bar | A {spacing.stroke-selection} {colors.accent} bar on the left edge of the open row. The row is not tinted. |
 | Lent marker | An 8px {colors.accent} square before the text "Lent · {person}" in {colors.text}. |
 | Detail panel | {spacing.panel-width} wide on the plain ground, with the left border and shadow described under Elevation & Depth. Cover 72 × 108px beside the {typography.heading-detail} title. Groups headed in {typography.heading-group}. Values in rows with the label left and the value right in {colors.text-muted}. Buttons at the foot. |

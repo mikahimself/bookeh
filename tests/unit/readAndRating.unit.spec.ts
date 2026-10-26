@@ -73,6 +73,27 @@ describe('Read and rating in Book detail', () => {
     expect(chosen()).toBe('unread')
   })
 
+  it('rates with a star and clears, saving at once with no toast', async () => {
+    const result = { ok: true, data: null } as const
+    setRatingAction.mockResolvedValue(result)
+    render(createElement(ReadAndRating, { bookId: 7, initial: { read: false, rating: null } }))
+
+    await act(async () => fireEvent.click(screen.getByRole('button', { name: '4 stars' })))
+    expect(setRatingAction).toHaveBeenCalledExactlyOnceWith({ bookId: 7, rating: 4 })
+    expect(screen.getByRole('button', { name: '4 stars' }).getAttribute('aria-pressed')).toBe(
+      'true',
+    )
+
+    await act(async () => fireEvent.click(screen.getByRole('button', { name: /^Clear/ })))
+    expect(setRatingAction.mock.calls).toEqual([
+      [{ bookId: 7, rating: 4 }],
+      [{ bookId: 7, rating: null }],
+    ])
+    expect(screen.queryByRole('button', { name: /^Clear/ })).toBeNull()
+    expect(show).not.toHaveBeenCalled()
+    expect(afterAction.mock.calls).toEqual([[result], [result]])
+  })
+
   it('reports a failed save once, through afterAction, and falls back to the stored value', async () => {
     const failure = { ok: false, code: 'NOT_FOUND' } as const
     setReadAction.mockResolvedValue(failure)

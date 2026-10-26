@@ -1,6 +1,7 @@
 'use client'
 
 import { useTranslations } from 'next-intl'
+import { useRouter } from 'next/navigation'
 import {
   createContext,
   useCallback,
@@ -10,6 +11,7 @@ import {
   useMemo,
   useRef,
   useState,
+  useTransition,
   type ReactNode,
 } from 'react'
 
@@ -48,8 +50,8 @@ export function useShelfRows(): ShelfRowsValue {
 type ShelfActionsValue = {
   /** Returns the error toast it raised, if any, so a later success can withdraw it. */
   afterAction: (result: ActionResult<unknown>) => number | null
-  /** The mounted rows' reload; returns the unregister. */
-  register: (reload: () => void) => () => void
+  /** The mounted rows' reload, resolving once the rows answered; returns the unregister. */
+  register: (reload: () => Promise<void>) => () => void
 }
 
 const ShelfActionsContext = createContext<ShelfActionsValue | null>(null)
@@ -69,16 +71,22 @@ export function useAfterAction(): ShelfActionsValue['afterAction'] {
  * Spine, AD-7: `afterAction` above the list, unkeyed, so the action bar and
  * Book detail reach it and it outlives a query change. `ok` reloads the
  * mounted rows, `NOT_FOUND` shows "Not in library" and then reloads, any
- * other code goes to `reportFailure`. With no rows mounted (Load failed) it
- * only toasts.
+ * other code goes to `reportFailure`. Once the reload has answered (or at
+ * once, with no rows mounted after Load failed) the server render is
+ * refreshed in a transition, so the Filter panel's values, Book detail and
+ * the cached first page follow the write; the list never shows a page older
+ * than its rows. A toast Undo is not an action: it reloads through `onUndone`
+ * and `ReadAndRating` refreshes for it.
  */
 export function ShelfActionsProvider({ children }: { children: ReactNode }) {
   const t = useTranslations('answer')
   const { show } = useToast()
   const reportFailure = useReportFailure()
-  const reload = useRef<(() => void) | null>(null)
+  const router = useRouter()
+  const [, startTransition] = useTransition()
+  const reload = useRef<(() => Promise<void>) | null>(null)
 
-  const register = useCallback((next: () => void) => {
+  const register = useCallback((next: () => Promise<void>) => {
     reload.current = next
     return () => {
       if (reload.current === next) reload.current = null
@@ -89,10 +97,10 @@ export function ShelfActionsProvider({ children }: { children: ReactNode }) {
     (result: ActionResult<unknown>) => {
       if (!result.ok && result.code !== 'NOT_FOUND') return reportFailure(result.code)
       if (!result.ok) show({ kind: 'success', message: t('notInLibrary') })
-      reload.current?.()
+      void Promise.resolve(reload.current?.()).then(() => startTransition(() => router.refresh()))
       return null
     },
-    [reportFailure, show, t],
+    [reportFailure, router, show, t],
   )
 
   const value = useMemo(() => ({ afterAction, register }), [afterAction, register])
@@ -250,13 +258,13 @@ function ShelfRowsState({ query, initial, restore, children }: Props & { restore
     void run({ offset: rows.length, limit: SHELF_PAGE_SIZE }, false)
   }, [run])
 
-  const reload = useCallback(() => {
+  const reload = useCallback(async () => {
     const limit = Math.min(Math.max(held.current.rows.length, SHELF_PAGE_SIZE), SHELF_MAX_ROWS)
-    void run({ offset: 0, limit }, true)
+    await run({ offset: 0, limit }, true)
   }, [run])
 
   useEffect(() => register(reload), [register, reload])
-  useEffect(() => onUndone(reload), [onUndone, reload])
+  useEffect(() => onUndone(() => void reload()), [onUndone, reload])
 
   const value = useMemo(() => ({ shelf, loading, loadMore }), [shelf, loading, loadMore])
   return <ShelfRowsContext.Provider value={value}>{children}</ShelfRowsContext.Provider>

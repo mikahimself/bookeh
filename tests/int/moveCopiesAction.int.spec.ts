@@ -23,6 +23,7 @@ describe('moveCopiesAction', () => {
   let user: User
   let home: number
   let copyIds: number[]
+  let bookId: number
 
   const locationOf = async (id: number) =>
     (await payload.findByID({ collection: 'copies', id, depth: 0 })).location ?? null
@@ -42,6 +43,7 @@ describe('moveCopiesAction', () => {
       overrideAccess: true,
       depth: 0,
     })
+    bookId = book.id
     home = (
       await payload.create({
         collection: 'locations',
@@ -74,14 +76,42 @@ describe('moveCopiesAction', () => {
     const [a, b] = copyIds as [number, number]
     const result = await moveCopiesAction({ copyIds: [a, b, a], location: { create: ' Kellari ' } })
     if (!result.ok) throw new Error(`expected ok, got ${result.code}`)
-    expect(result.data).toMatchObject({ location: { name: 'Kellari' }, count: 2 })
+    expect(result.data).toMatchObject({ location: { name: 'Kellari' }, count: 2, skipped: [] })
     expect(result.data.undoSeconds).toBeGreaterThan(0)
-    expect(await locationOf(a)).toBe(result.data.location.id)
-    expect(await locationOf(b)).toBe(result.data.location.id)
+    expect(await locationOf(a)).toBe(result.data.location?.id)
+    expect(await locationOf(b)).toBe(result.data.location?.id)
 
     await undo(await contextFor(user), result.data.undoToken)
     expect(await locationOf(a)).toBe(home)
     expect(await locationOf(b)).toBe(home)
+  })
+
+  it('counts only the copies written and names the ordered ones skipped', async () => {
+    const [a, b] = copyIds as [number, number]
+    const { req } = await contextFor(user)
+    const ordered = (
+      await payload.create({
+        collection: 'copies',
+        data: { owner: user.id, book: bookId, status: 'ordered' },
+        overrideAccess: false,
+        depth: 0,
+        req,
+      })
+    ).id
+    // `b` is at the target already: neither moved nor skipped.
+    const cellar = await moveCopiesAction({ copyIds: [b], location: { create: 'Kellari' } })
+    if (!cellar.ok || !cellar.data.location) throw new Error('expected a move to Kellari')
+    const target = cellar.data.location.id
+
+    const mixed = await moveCopiesAction({ copyIds: [a, b, ordered], location: target })
+    expect(mixed).toMatchObject({ ok: true, data: { count: 1, skipped: [ordered] } })
+    expect(await locationOf(a)).toBe(target)
+    expect(await locationOf(ordered)).toBeNull()
+
+    expect(await moveCopiesAction({ copyIds: [ordered], location: target })).toMatchObject({
+      ok: true,
+      data: { location: null, count: 0, skipped: [ordered] },
+    })
   })
 
   it('answers VALIDATION for no location and writes nothing', async () => {

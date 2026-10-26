@@ -16,7 +16,8 @@ import { randomIsbn } from '../helpers/isbn'
 // copies (an explicit `owner` filter, FR-48) and fail with NOT_FOUND, writing
 // nothing, on any other id. Status reuses `createCopy`'s location rule (AD-8):
 // ordered clears it, owned lands at the default unless one is given.
-// `removeCopies` is all or none in one transaction.
+// `removeCopies` deletes the owned copies in one transaction, skips ordered
+// ones and refuses the whole list when one id is not the viewer's.
 
 describe('copy writes', () => {
   let payload: Payload
@@ -101,13 +102,19 @@ describe('copy writes', () => {
     expect((await systemRead(id)).notes ?? null).toBeNull()
   })
 
-  it('removes all the listed copies and keeps the Book', async () => {
+  it('removes the listed owned copies, skips an ordered one and keeps the Book', async () => {
     const first = await copyOf(asA)
     const second = await copyOf(asA)
-    await expect(removeCopies(asA, [])).resolves.toBeUndefined()
-    await removeCopies(asA, [first, second, first])
+    const ordered = await copyOf(asA)
+    await setStatus(asA, ordered, { status: 'ordered' })
+    await expect(removeCopies(asA, [])).resolves.toEqual({ removed: 0, skipped: [] })
+    expect(await removeCopies(asA, [first, second, first, ordered])).toEqual({
+      removed: 2,
+      skipped: [ordered],
+    })
     await expect(systemRead(first)).rejects.toThrow(NotFound)
     await expect(systemRead(second)).rejects.toThrow(NotFound)
+    expect((await systemRead(ordered)).status).toBe('ordered')
     expect((await payload.findByID({ collection: 'books', id: book.id, depth: 0 })).id).toBe(
       book.id,
     )

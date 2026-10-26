@@ -352,6 +352,19 @@ describe('editBook', () => {
         }),
         ['location'],
       )
+      // A location alone on an ordered copy: `moveCopies()` skips it, this caller refuses.
+      const { x: y, copy: unarrived } = await ordered(asB)
+      const yBefore = await seen(asB, y)
+      await rejectsNaming(
+        editBook(asB, {
+          bookId: y.id,
+          edits: { title: 'Y' },
+          copy: { id: unarrived.id, location },
+        }),
+        ['location'],
+      )
+      expect(await seen(asB, y)).toEqual(yBefore)
+      expect(await copyOf(asB, unarrived.id)).toMatchObject({ status: 'ordered', location: null })
       // Refused after the Book's write: another user's copy.
       const other = await holdCopy(asAdmin, x)
       await expect(

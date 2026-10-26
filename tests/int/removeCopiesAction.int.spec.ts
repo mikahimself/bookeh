@@ -15,8 +15,9 @@ const password = 'remove-copies-action-password'
 
 let requestHeaders: Headers
 
-// The action's own checks: the input shape and the session. All or none is
-// `removeCopies`'s, tested in copyWrites.int.spec.ts.
+// The action's own checks: the input shape, the session and the result shape.
+// Owned-only removal and `NOT_FOUND` are `removeCopies`'s, tested in
+// copyWrites.int.spec.ts.
 describe('removeCopiesAction', () => {
   let payload: Payload
   let copyId: number
@@ -63,5 +64,13 @@ describe('removeCopiesAction', () => {
     requestHeaders = new Headers()
     expect(await removeCopiesAction([copyId])).toEqual({ ok: false, code: 'UNAUTHENTICATED' })
     await stillThere()
+  })
+
+  it('removes the copy and answers how many went and which ordered ones were skipped', async () => {
+    expect(await removeCopiesAction([copyId])).toEqual({
+      ok: true,
+      data: { removed: 1, skipped: [] },
+    })
+    await expect(payload.findByID({ collection: 'copies', id: copyId, depth: 0 })).rejects.toThrow()
   })
 })

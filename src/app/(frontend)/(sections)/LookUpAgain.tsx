@@ -108,9 +108,9 @@ export function LookUpAgainLink({
 }
 
 /**
- * Book detail's Look it up again: every result goes to `afterAction`. A share
- * that merged into the shared Book replaces the address with that Book's;
- * a promote refreshes Book detail in place, as does `NOT_FOUND`.
+ * Book detail's Look it up again: every result goes to `afterAction`, whose
+ * refresh shows a promote, or `NOT_FOUND`, in Book detail in place. A share
+ * that merged into the shared Book replaces the address with that Book's.
  */
 export function DetailLookUpAgain({ bookId }: { bookId: number }) {
   const router = useRouter()
@@ -122,12 +122,9 @@ export function DetailLookUpAgain({ bookId }: { bookId: number }) {
       bookId={bookId}
       onSettled={(result) => {
         afterAction(result)
-        if (result.ok && result.data.kind === 'shared') {
+        if (result.ok && result.data.kind === 'shared' && result.data.bookId !== bookId) {
           const book = result.data.bookId
-          if (book === bookId) router.refresh()
-          else router.replace(shelfHref(parseShelfQuery(params).query, { book }), { scroll: false })
-        } else if (!result.ok && result.code === 'NOT_FOUND') {
-          router.refresh()
+          router.replace(shelfHref(parseShelfQuery(params).query, { book }), { scroll: false })
         }
       }}
     />

@@ -38,6 +38,10 @@
   /* The Corner crop stage, the same in both themes (DESIGN.md, Corner crop). */
   --color-crop-dim: #00000099;
   --color-crop-halo: #0000008c;
+  /* The airmail band on an ordered copy's tile, the same in both themes (DESIGN.md, Cover tile). */
+  --color-airmail-red: #d7282f;
+  --color-airmail-blue: #2251a3;
+  --color-airmail-white: #ffffff;
 
   /* Type roles */
   --text-heading-section: 44px;
@@ -103,10 +107,11 @@
      density); m is spacing-2. */
   --spacing-row-pad-s: 3px;
   --spacing-row-pad-l: 10px;
-  /* The narrowest cover column at s, m and l (DESIGN.md, Collection density). */
-  --spacing-tile-s: 76px;
-  --spacing-tile-m: 116px;
-  --spacing-tile-l: 160px;
+  /* The narrowest cover column at s, m and l (DESIGN.md, Collection density):
+     with auto-fill, a 375–390px phone shows 4 / 3 / 2 columns. */
+  --spacing-tile-s: 70px;
+  --spacing-tile-m: 96px;
+  --spacing-tile-l: 150px;
   /* Between cover columns at s, 10px, and at m, 18px (DESIGN.md, Collection
      density); l is spacing-6. */
   --spacing-tile-gap-s: 10px;
@@ -338,6 +343,35 @@
  */
 @utility selection-bar {
   box-shadow: inset var(--spacing-stroke-selection) 0 0 var(--color-accent);
+}
+
+/*
+ * DESIGN.md, Cover tile: an ordered copy's cover carries a red-white-blue
+ * airmail band across its top-left corner, no word. A 10px strip of
+ * red, white, blue, white stripes, centred 20px in from the corner and
+ * rotated −45°, drawn by a pseudo-element the cover's box clips.
+ */
+@utility airmail-band {
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 80px;
+    height: 10px;
+    transform: translate(-50%, -50%) translate(20px, 20px) rotate(-45deg);
+    background: repeating-linear-gradient(
+      90deg,
+      var(--color-airmail-red) 0 8px,
+      var(--color-airmail-white) 8px 16px,
+      var(--color-airmail-blue) 16px 24px,
+      var(--color-airmail-white) 24px 32px
+    );
+    pointer-events: none;
+  }
 }
 
 /*

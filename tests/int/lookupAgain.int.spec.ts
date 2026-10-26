@@ -141,9 +141,11 @@ describe('lookupAgain', () => {
     await untouched()
   })
 
-  it('merges into the shared Book with the ISBN without asking the sources', async () => {
+  it('merges into the shared Book with the ISBN without asking the sources or counting a lookup', async () => {
     const { user, ctx, isbn, own, untouched } = await setup()
     const shared = await sharedBook(isbn)
+    // AD-9: the limit is spent, yet the merge asks no source and so still runs.
+    for (let i = 0; i < LOOKUP_LIMIT; i++) limitLookups(ctx)
 
     const result = await lookupAgain(ctx, { bookId: own.id })
 
@@ -172,6 +174,9 @@ describe('lookupAgain', () => {
 
     vi.mocked(lookupSources).mockReset()
     vi.mocked(heldOutcome).mockReturnValue(outcome)
+    // AD-5, AD-9: the held outcome asks no source, so a spent limit does not refuse the pick.
+    // The first call above counted one lookup; spend the rest.
+    for (let i = 1; i < LOOKUP_LIMIT; i++) limitLookups(ctx)
     const candidate = { source: 'finna', recordId: 'finna.2' }
     expect(await lookupAgain(ctx, { bookId: own.id, candidate })).toEqual({
       kind: 'shared',

@@ -5,8 +5,9 @@ import { processState } from '@/lib/processState'
 // Spine, AD-9, AD-12 and FR-11: one per-user limit on lookups, held in process.
 // Every lookup and preview fetch in the user's name calls `limitLookups()`:
 // `lookupBook`, `saveCopy` (only when no outcome is held for the ISBN),
-// `refetchBook`, `lookupAgain` and `fetchCoverPreview` (only for an image it
-// does not hold). `searchBooks` (I10) must call it too when it arrives, so a
+// `refetchBook`, `lookupAgain` (only when it asks the sources: a merge into
+// a shared Book or a held outcome counts nothing) and `fetchCoverPreview`
+// (only for an image it does not hold). `searchBooks` (I10) must call it too when it arrives, so a
 // runaway client cannot ask Finna and Google Books in the user's name
 // unchecked. Not counted: the cover download that follows (`storeCover()`,
 // from `saveCopy`, `prepareShare` and `refetchBook`), one image per Book the
@@ -29,9 +30,10 @@ const windows = () => processState('catalogue.lookupLimit', () => new Map<number
  * current window. A refused call does not move the window's reset. Called
  * before a source is asked: by `lookupBook` before it reads anything, by
  * `saveCopy` on a held-outcome miss before `lookupSources()`, by
- * `refetchBook` before its fresh `lookupSources()`, by `lookupAgain` on
- * every call once its gate passes, and by `fetchCoverPreview` before it
- * fetches an image it does not hold. `searchBooks` (I10) must call it the
+ * `refetchBook` before its fresh `lookupSources()`, by `lookupAgain`
+ * immediately before its fresh `lookupSources()` (never on the merge or
+ * held-candidate paths), and by `fetchCoverPreview` before it fetches an
+ * image it does not hold. `searchBooks` (I10) must call it the
  * same way when it arrives.
  */
 export function limitLookups(ctx: Context): void {

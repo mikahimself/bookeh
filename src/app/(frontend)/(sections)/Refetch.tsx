@@ -1,7 +1,6 @@
 'use client'
 
 import { useFormatter, useTranslations } from 'next-intl'
-import { useRouter } from 'next/navigation'
 import { useTransition } from 'react'
 
 import type { RefetchResult } from '@/lib/catalogue/refetchBook'
@@ -18,13 +17,13 @@ import { useAfterAction } from './ShelfRows'
  * a shared Book, "Re-fetching…" and disabled while the sources run, with the
  * muted hint under it. The result is a success toast without Undo: what was
  * filled and from where, "Nothing to fill." or the sources that did not
- * answer. A fill refreshes Book detail; every result goes to `afterAction`.
+ * answer. Every result goes to `afterAction`, whose refresh shows a fill in
+ * Book detail.
  */
 export function Refetch({ bookId }: { bookId: number }) {
   const t = useTranslations('detail')
   const sourceLabels = useTranslations('sources')
   const format = useFormatter()
-  const router = useRouter()
   const { show } = useToast()
   const afterAction = useAfterAction()
   const [pending, startTransition] = useTransition()
@@ -54,7 +53,6 @@ export function Refetch({ bookId }: { bookId: number }) {
       const result = await settleAction(refetchBookAction({ bookId }))
       if (result.ok) show({ kind: 'success', message: message(result.data) })
       afterAction(result)
-      if (result.ok && result.data.kind === 'filled') router.refresh()
     })
   }
 

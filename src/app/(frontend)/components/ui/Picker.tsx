@@ -23,10 +23,15 @@ export type PickerProps<V extends string | number> = {
   /**
    * A field under the rows that names a value by typing it (Move: the
    * location of that name, created when none matches): `label` names the
-   * field, `submit` its Button. `onCreate` gets the value as typed and runs
-   * after the close, as `onChoose` does.
+   * field, `submit` its Button, `maxLength` the field's limit. `onCreate`
+   * gets the value as typed and runs after the close, as `onChoose` does.
    */
-  create?: { label: string; submit: string; onCreate: (name: string) => void }
+  create?: {
+    label: string
+    submit: string
+    maxLength?: number
+    onCreate: (name: string) => void
+  }
 }
 
 type Choice<V> = { value: V } | { create: string }
@@ -123,6 +128,7 @@ export function Picker<V extends string | number>({
             label={create.label}
             value={name}
             onChange={(event) => setName(event.target.value)}
+            maxLength={create.maxLength}
             autoComplete="off"
           />
         </div>

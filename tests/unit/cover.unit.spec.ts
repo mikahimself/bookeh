@@ -30,6 +30,20 @@ describe('Cover', () => {
     expect(img()?.getAttribute('src')).toBe('/api/media/file/a.jpg')
   })
 
+  it('shows the title and, when given, the author on the placeholder', () => {
+    const title = 'Kätilö'
+    const { container, rerender } = render(
+      createElement(Cover, { src: null, title, author: 'Katja Kettu' }),
+    )
+    expect(container.querySelector('img')).toBeNull()
+    screen.getByText(title)
+    screen.getByText('Katja Kettu')
+
+    rerender(createElement(Cover, { src: null, title }))
+    screen.getByText(title)
+    expect(screen.queryByText('Katja Kettu')).toBeNull()
+  })
+
   it('shows the placeholder for an image that failed before hydration', () => {
     vi.spyOn(HTMLImageElement.prototype, 'complete', 'get').mockReturnValue(true)
     vi.spyOn(HTMLImageElement.prototype, 'naturalWidth', 'get').mockReturnValue(0)

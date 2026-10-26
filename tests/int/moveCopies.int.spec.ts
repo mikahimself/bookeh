@@ -1,8 +1,8 @@
 import { getPayload, type Payload } from 'payload'
 import { beforeAll, describe, expect, it } from 'vitest'
 
+import { deleteLocation } from '@/lib/copies/locations'
 import { moveCopies } from '@/lib/copies/moveCopies'
-import { DomainError } from '@/lib/errors'
 import type { Context } from '@/lib/payload/context'
 import { undo, withUndo } from '@/lib/undo/undo'
 import config from '@/payload.config'
@@ -11,9 +11,10 @@ import type { Book, Copy, User, UserLocation } from '@/payload-types'
 import { contextFor, createUser } from '../helpers/harness'
 import { randomIsbn } from '../helpers/isbn'
 
-// `moveCopies()`, AD-18/AD-20/FR-33: one move of the viewer's selection to
-// one location, all or none, undoable through `withUndo()`. Each case uses a
-// fresh user so location names never collide.
+// `moveCopies()`, AD-18/AD-20/FR-33: one move of the viewer's owned copies in
+// a selection to one location, ordered copies skipped and reported, undoable
+// through `withUndo()`; a restore puts a copy whose previous location is gone
+// at none. Each case uses a fresh user so location names never collide.
 
 describe('moveCopies', () => {
   let payload: Payload
@@ -79,7 +80,7 @@ describe('moveCopies', () => {
     })
     const cabin = docs[0]?.id
     expect(cabin).toBeTypeOf('number')
-    expect(result.location).toBe(cabin)
+    expect(result).toMatchObject({ location: cabin, moved: 2, skipped: [] })
     expect(await locationOf(c1.id)).toBe(cabin)
     expect(await locationOf(c2.id)).toBe(cabin)
 
@@ -97,7 +98,16 @@ describe('moveCopies', () => {
     const c1 = await copyFor(a, 'owned', l1.id)
     const c2 = await copyFor(a, 'owned', l2.id)
 
-    const { undoToken } = await withUndo(asA, (tx) => moveCopies(tx, [c1.id, c2.id], l2.id))
+    // c2 is already at l2: written once, not restored.
+    const { undoToken, ...moved } = await withUndo(asA, (tx) =>
+      moveCopies(tx, [c1.id, c2.id], l2.id),
+    )
+    expect(moved).toEqual({
+      location: l2.id,
+      moved: 1,
+      skipped: [],
+      undoSeconds: moved.undoSeconds,
+    })
     const { data } = await moveCopies(asA, [c2.id], null)
     expect(data.location).toBeNull()
     expect(await locationOf(c2.id)).toBeNull()
@@ -107,23 +117,41 @@ describe('moveCopies', () => {
     expect(await locationOf(c2.id)).toBeNull()
   })
 
-  it('moves nothing and creates no location when the list holds an ordered copy', async () => {
+  it('restores a copy to no location when its previous location is gone', async () => {
+    const a = await createUser({ displayName: 'Move Copies Gone Location' })
+    const asA = await contextFor(a)
+    const l1 = await locationFor(a, 'Olohuone')
+    const l2 = await locationFor(a, 'Mökki')
+    const c1 = await copyFor(a, 'owned', l1.id)
+
+    const { undoToken } = await withUndo(asA, (tx) => moveCopies(tx, [c1.id], l2.id))
+    expect(await locationOf(c1.id)).toBe(l2.id)
+    await deleteLocation(asA, l1.id)
+
+    await expect(undo(asA, undoToken)).resolves.toBeUndefined()
+    expect(await locationOf(c1.id)).toBeNull()
+    expect(await locationsOf(a)).toBe(1)
+  })
+
+  it('moves the owned copies, skips the ordered ones and names them', async () => {
     const a = await createUser({ displayName: 'Move Copies Ordered' })
     const asA = await contextFor(a)
     const home = await locationFor(a, 'Olohuone')
     const owned = await copyFor(a, 'owned', home.id)
     const ordered = await copyFor(a, 'ordered')
 
-    const err = await failure(moveCopies(asA, [owned.id, ordered.id], { create: 'Mökki' }))
-    expect(err).toBeInstanceOf(DomainError)
-    expect(err).toMatchObject({ code: 'VALIDATION', fields: { location: 'VALIDATION' } })
-    expect(await failure(moveCopies(asA, [owned.id, ordered.id], null))).toMatchObject({
-      code: 'VALIDATION',
-      fields: { location: 'VALIDATION' },
-    })
-    expect(await locationOf(owned.id)).toBe(home.id)
+    const { data } = await moveCopies(asA, [owned.id, ordered.id], { create: 'Mökki' })
+    expect(data).toMatchObject({ moved: 1, skipped: [ordered.id] })
+    expect(data.location).toBeTypeOf('number')
+    expect(await locationOf(owned.id)).toBe(data.location)
     expect(await locationOf(ordered.id)).toBeNull()
-    expect(await locationsOf(a)).toBe(1)
+    expect(await locationsOf(a)).toBe(2)
+
+    // Nothing owned: nothing written, no location created, still a success.
+    const nothing = await moveCopies(asA, [ordered.id], { create: 'Kellari' })
+    expect(nothing.data).toEqual({ location: null, moved: 0, skipped: [ordered.id] })
+    expect(await locationOf(ordered.id)).toBeNull()
+    expect(await locationsOf(a)).toBe(2)
   })
 
   it("refuses another user's copy and bad ids with NOT_FOUND, moving nothing", async () => {

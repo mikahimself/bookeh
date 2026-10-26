@@ -131,7 +131,7 @@ Undo is offered where the action has a plain opposite. Removals are confirmed fi
 |---|---|---|
 | Add to library, Add another copy | "Saved to {location} · Edit · Undo" | Removes the copy, plus any Book, author or series it created that nothing else uses (FR-15). |
 | Add to wishlist | "Added to {list} · Undo" | Removes the entry, and the Book on the same rule. |
-| Move (one or many) | "{n} moved to {location} · Undo" | Puts each copy back where it was. |
+| Move (one or many) | "{n} moved to {location} · Undo" | Puts each copy back where it was; a copy whose previous location has since been deleted or merged away returns to no location. |
 | Tag (one or many, any kind) | "Tagged {n} · Undo" | Restores each Book's tags. |
 | Read (one or many) | "Marked {n} read · Undo" ("unread" when it marks them unread) | Restores each Book's read flag. |
 | Lend | "Lent to {person} · Undo" | Removes the loan. |
@@ -178,11 +178,11 @@ Fields combine with AND (FR-25); values within a field combine with OR. [ASSUMPT
 |---|---|
 | Entering | Closes Book detail if it is open. Checkboxes appear. |
 | What is selected | Only rows the user ticked. The selection survives searching, filtering and scrolling; the count shows all ticked rows, including ones no longer in view. There is no "select all". [ASSUMPTION] |
-| Move | Location picker. Applies to every ticked copy (FR-33). Rows that no longer match the active filters leave the list. |
+| Move | Location picker. Applies to every ticked owned copy (FR-33); an ordered copy has no location, so it is skipped and stays ticked, and the toast says how many were: "{n} moved to {location} · {m} ordered skipped", with Undo only when something moved. Rows that no longer match the active filters leave the list. |
 | Tag | Tag picker with two parts: add a tag to all, remove a tag from all. Tags belong to the Book, so both copies of a Book change together. |
 | Read | Marks every ticked Book read, or unread if all are already read. |
-| Remove | Dialog: "Remove 12 books from library?" with Remove and Cancel. If any are lent, the dialog says their loans go too. Removes those copies and their loans. |
-| Failure | A bulk action applies to all ticked rows or to none. [ASSUMPTION] |
+| Remove | Dialog: "Remove 12 books from library?" with Remove and Cancel (the count names the ticked copies). If any are lent, the dialog says their loans go too. Removes the ticked owned copies and their loans; an ordered copy is skipped and stays ticked, and the toast says how many were: "{n} removed · {m} ordered skipped", no Undo. |
+| Failure | A bulk action applies to all ticked rows or to none; an ordered copy skipped by Move or Remove is not a failure. [ASSUMPTION] |
 | Done | Leaves select mode and clears the selection. |
 
 ### Book detail

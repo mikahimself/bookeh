@@ -11,15 +11,15 @@ const isField = (value: string | null): value is SuggestField =>
 /**
  * Spine, AD-7 and AD-10: `?field=author|series|publisher&q=…` as an
  * `ActionResult<Suggestion[]>` from the signed-in user's collection. Signed
- * out is 401; a missing or unknown `field`, or a `q` over 200 characters, is
- * `VALIDATION`.
+ * out is 401; a missing or unknown `field`, or a `q` over 200 characters
+ * once NFC-normalised, is `VALIDATION`.
  */
 export function GET(request: Request): Promise<Response> {
   return runRoute(async () => {
     const ctx = await requireUserOrThrow()
     const params = new URL(request.url).searchParams
     const field = params.get('field')
-    const q = params.get('q') ?? ''
+    const q = (params.get('q') ?? '').normalize('NFC')
     if (!isField(field) || q.length > MAX_Q) throw new DomainError('VALIDATION')
     return suggest(ctx, field, q)
   })

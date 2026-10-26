@@ -247,6 +247,41 @@ describe('CollectionList', () => {
     expect(fetchStub.mock.calls[0]![0]).toBe('/data/shelf?offset=0&limit=50')
   })
 
+  it('refreshes the server render once, after the reload has answered', async () => {
+    mount({ rows: rows(1, 2), total: 2, labels: {} })
+    let settle: (body: ActionResult<ShelfRows>) => void = () => {}
+    fetchStub.mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          settle = (body) => resolve({ status: 200, json: async () => body })
+        }),
+    )
+    act(() => probe.afterAction({ ok: true, data: null }))
+
+    expect(fetchStub).toHaveBeenCalledOnce()
+    await act(async () => {})
+    expect(router.refresh).not.toHaveBeenCalled()
+
+    await act(async () => settle({ ok: true, data: { rows: rows(2, 2), total: 1, labels: {} } }))
+    await waitFor(() => expect(titles()).toEqual(['Book 2']))
+    await waitFor(() => expect(router.refresh).toHaveBeenCalledOnce())
+    expect(fetchStub).toHaveBeenCalledOnce()
+  })
+
+  it('refreshes at once when no rows are mounted (Load failed)', async () => {
+    render(
+      createElement(
+        ToastProvider,
+        null,
+        createElement(ShelfActionsProvider, null, createElement(Probe)),
+      ),
+    )
+    act(() => probe.afterAction({ ok: true, data: null }))
+
+    await waitFor(() => expect(router.refresh).toHaveBeenCalledOnce())
+    expect(fetchStub).not.toHaveBeenCalled()
+  })
+
   it('reports a failed load, keeps the rows and tries again on the next approach', async () => {
     mount({ rows: rows(1, 2), total: 3, labels: {} })
     answerWith({ ok: false, code: 'NO_CONNECTION' })

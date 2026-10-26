@@ -1,9 +1,10 @@
 import Link from 'next/link'
-import { getTranslations } from 'next-intl/server'
+import { getLocale, getTranslations } from 'next-intl/server'
 import { Fragment, type ReactNode } from 'react'
 
 import { canEditShared } from '@/access/roles'
 import { getHoldings } from '@/lib/books/holdings'
+import { languageName } from '@/lib/books/languageName'
 import { getUserBookState } from '@/lib/books/userBookState'
 import type { LocationOption } from '@/lib/copies/locations'
 import type { Context } from '@/lib/payload/context'
@@ -62,12 +63,11 @@ export async function BookDetail({
   const state = await getUserBookState(ctx, bookId)
 
   const t = await getTranslations()
-  // The stored language code until languages are named (Story 5.14).
   const edition = [
     book.publisher,
     book.year === null ? null : String(book.year),
     book.pages === null ? null : t('answer.pages', { pages: book.pages }),
-    book.language,
+    book.language === null ? null : languageName(book.language, await getLocale()),
   ]
     .filter((part) => part)
     .join(' · ')

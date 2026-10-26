@@ -31,8 +31,7 @@ export type LookupAgainResult =
  * Spine, AD-5, FR-12 and D-8: Look it up again on the creator's own private
  * Book. The gate is `refetchBook()`'s shape: `requireOwnBook()`, then a
  * gateway read; anything but the viewer's own private Book with an ISBN is
- * `NOT_FOUND` before any source is asked. Then `limitLookups()`
- * (`RATE_LIMITED`).
+ * `NOT_FOUND` before any source is asked.
  *
  * When a shared Book with the ISBN exists (`findBookByIsbn()`), the private
  * Book merges into it without asking the sources. Otherwise the sources are
@@ -40,6 +39,9 @@ export type LookupAgainResult =
  * the `none` of the scan that led here. With `candidate` (the second call of
  * the edition round trip) a held `found` outcome is used instead, and a fresh
  * lookup only when none is held, so the Book takes the edition shown.
+ * `limitLookups()` (`RATE_LIMITED`) counts one lookup immediately before that
+ * fresh `lookupSources()` and nowhere else: the merge and the held outcome
+ * ask no source, so they count nothing (AD-5, AD-9).
  * Without `candidate`, two or more candidates come back as `editions` with
  * their cover previews recorded (`recordCoverPreview()`), nothing written.
  *
@@ -72,13 +74,12 @@ export async function lookupAgain(
   const isbn13 = docs[0]?.isbn13
   if (!isbn13) throw new DomainError('NOT_FOUND')
 
-  limitLookups(ctx)
   const held = await findBookByIsbn(ctx, isbn13)
   if (!held) throw new DomainError('NOT_FOUND')
   if (held.visibility === 'shared') return share(ctx, isbn13, bookId, undefined)
 
   const kept = candidate ? heldOutcome(isbn13) : undefined
-  const outcome = kept?.kind === 'found' ? kept : await lookupSources(isbn13, { fresh: true })
+  const outcome = kept?.kind === 'found' ? kept : await askSources(ctx, isbn13)
   if (outcome.kind === 'none') return { kind: 'none' }
   if (outcome.kind === 'unavailable') return { kind: 'unavailable', failed: outcome.failed }
 
@@ -95,6 +96,12 @@ export async function lookupAgain(
 
   const pending = await prepareShare(ctx, isbn13, held, outcome, undefined, candidate)
   return share(ctx, isbn13, bookId, pending)
+}
+
+/** The one counted lookup: the limit is spent only when a source is asked. */
+async function askSources(ctx: Context, isbn13: string) {
+  limitLookups(ctx)
+  return lookupSources(isbn13, { fresh: true })
 }
 
 /** The share's transaction; the source is the candidate's on a promote, the shared Book's on a merge. */

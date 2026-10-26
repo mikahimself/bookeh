@@ -7,7 +7,7 @@ import { refetchBook, type RefetchResult } from '@/lib/catalogue/refetchBook'
 import { listLocations, type LocationOption } from '@/lib/copies/locations'
 import { moveCopies } from '@/lib/copies/moveCopies'
 import { receiveCopy } from '@/lib/copies/receiveCopy'
-import { removeCopies } from '@/lib/copies/removeCopies'
+import { removeCopies, type RemoveResult } from '@/lib/copies/removeCopies'
 import { setNote } from '@/lib/copies/updateCopy'
 import { DomainError, runAction, type ActionResult } from '@/lib/errors'
 import { requireUserOrThrow } from '@/lib/payload/context'
@@ -45,12 +45,15 @@ function copyInput(input: unknown): Record<string, unknown> & { copyId: number }
   return { ...fields, copyId: fields.copyId }
 }
 
-/** Removes the viewer's copies, all or none: one not theirs fails `NOT_FOUND`. No Undo. */
-export async function removeCopiesAction(copyIds: unknown): Promise<ActionResult<null>> {
+/**
+ * Removes the viewer's owned copies: one not theirs fails `NOT_FOUND`, an
+ * ordered one is skipped and named in `skipped`, so the bar can leave it
+ * ticked. No Undo.
+ */
+export async function removeCopiesAction(copyIds: unknown): Promise<ActionResult<RemoveResult>> {
   return runAction(async () => {
     const ctx = await requireUserOrThrow()
-    await removeCopies(ctx, ids(copyIds))
-    return null
+    return removeCopies(ctx, ids(copyIds))
   })
 }
 
@@ -135,14 +138,18 @@ export async function toggleCopiesReadAction(
 }
 
 /**
- * FR-33, AD-18: moves the viewer's copies to one location, an id or
- * `{ create }`, all or none, with Undo (AD-20). No `null`: the collection
- * offers no "no location". Answers the target as the toast names it, read in
- * the move's transaction, and `count`, the distinct copies sent.
+ * FR-33, AD-18: moves the viewer's owned copies to one location, an id or
+ * `{ create }`, with Undo (AD-20). No `null`: the collection offers no "no
+ * location". Answers the target as the toast names it, read in the move's
+ * transaction (`null` only when nothing was owned and so nothing created),
+ * `count`, the copies actually written, and `skipped`, the ordered copies
+ * left alone, so the bar can leave them ticked.
  */
 export async function moveCopiesAction(
   input: unknown,
-): Promise<ActionResult<Undoable<{ location: LocationOption; count: number }>>> {
+): Promise<
+  ActionResult<Undoable<{ location: LocationOption | null; count: number; skipped: number[] }>>
+> {
   return runAction(async () => {
     const ctx = await requireUserOrThrow()
     if (typeof input !== 'object' || input === null) throw new DomainError('VALIDATION')
@@ -152,9 +159,12 @@ export async function moveCopiesAction(
     if (location === undefined) throw new DomainError('VALIDATION')
     return withUndo(ctx, async (tx) => {
       const { data, restore } = await moveCopies(tx, copies, location)
-      const target = (await listLocations(tx)).find(({ id }) => id === data.location)
-      if (!target) throw new Error('moveCopies() answered no location of the viewer')
-      return { data: { location: target, count: new Set(copies).size }, restore }
+      const target =
+        data.location === null
+          ? null
+          : (await listLocations(tx)).find(({ id }) => id === data.location)
+      if (target === undefined) throw new Error('moveCopies() answered no location of the viewer')
+      return { data: { location: target, count: data.moved, skipped: data.skipped }, restore }
     })
   })
 }

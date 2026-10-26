@@ -1,11 +1,9 @@
 'use client'
 
 import { useTranslations } from 'next-intl'
-import { useRouter } from 'next/navigation'
 import type { TransitionStartFunction } from 'react'
 
 import type { LocationOption } from '@/lib/copies/locations'
-import type { ActionResult } from '@/lib/errors'
 import type { Ref } from '@/lib/payload/ref'
 
 import { settleAction } from '../components/request'
@@ -14,6 +12,9 @@ import { Picker } from '../components/ui/Picker'
 
 import { moveCopiesAction } from './actions'
 import { useAfterAction } from './ShelfRows'
+
+/** What a move settled with: `skipped` names the ordered copies left alone. */
+export type MoveSettled = Awaited<ReturnType<typeof moveCopiesAction>>
 
 type Props = {
   open: boolean
@@ -25,16 +26,19 @@ type Props = {
   /** The caller's transition, so its pending state covers the move. */
   startTransition: TransitionStartFunction
   /** Runs once the move settles, with the ids sent, before `afterAction`. */
-  onSettled?: (result: ActionResult<unknown>, copyIds: number[]) => void
+  onSettled?: (result: MoveSettled, copyIds: number[]) => void
 }
 
 /**
  * EXPERIENCE.md, Picker (Location); FR-33: Move's location Picker, a row per
- * location and a "New location" field under them. A choice moves `copyIds`
- * all or none (`moveCopiesAction`). On `ok` the success toast "{n} moved to
- * {location}" with Undo, then a refresh, so Book detail's lines and the
- * bar's locations read anew; every result goes to `afterAction`, which
- * reloads the rows. The toast's Undo reloads them through `onUndone`.
+ * location and a "New location" field (at most 200 characters, the name's
+ * limit) under them. A choice moves the owned copies among `copyIds`
+ * (`moveCopiesAction`). On `ok` the success toast "{n} moved to {location}"
+ * with Undo; when ordered copies were skipped it says how many, counts only
+ * what moved and offers Undo only when something did. Every result goes to
+ * `afterAction`, which reloads the rows and then refreshes the server render,
+ * so Book detail's lines and the bar's locations read anew. The toast's Undo
+ * reloads the rows through `onUndone`.
  */
 export function MovePicker({
   open,
@@ -48,7 +52,6 @@ export function MovePicker({
   const t = useTranslations('collection')
   const tToast = useTranslations('toast')
   const { show } = useToast()
-  const router = useRouter()
   const afterAction = useAfterAction()
 
   const move = (location: Ref) => {
@@ -56,13 +59,15 @@ export function MovePicker({
     startTransition(async () => {
       const result = await settleAction(moveCopiesAction({ copyIds: sent, location }))
       if (result.ok) {
-        const { location: target, count, undoToken, undoSeconds } = result.data
+        const { location: target, count, skipped, undoToken, undoSeconds } = result.data
+        const values = { n: count, location: target?.name ?? '', skipped: skipped.length }
+        const undo = { token: undoToken, seconds: undoSeconds }
+        // Nothing written (all ordered, or all at the target already): no Undo to offer.
         show({
           kind: 'success',
-          message: tToast('moved', { n: count, location: target.name }),
-          undo: { token: undoToken, seconds: undoSeconds },
+          message: tToast(skipped.length === 0 ? 'moved' : 'movedSkipped', values),
+          ...(count > 0 && { undo }),
         })
-        router.refresh()
       }
       onSettled?.(result, sent)
       afterAction(result)
@@ -80,6 +85,7 @@ export function MovePicker({
       create={{
         label: t('newLocation'),
         submit: t('move'),
+        maxLength: 200,
         onCreate: (name) => move({ create: name }),
       }}
     />

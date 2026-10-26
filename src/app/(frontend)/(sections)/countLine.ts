@@ -14,7 +14,7 @@ export type CountLineKey =
 
 export type CountLineT = (key: CountLineKey, values?: Record<string, string | number>) => string
 
-type IdField = 'location' | 'genre' | 'tag' | 'author' | 'series'
+type IdField = 'location' | 'genre' | 'author' | 'series'
 
 /** Whether a search or any filter is on: the count line then lists them with Clear. */
 export function isNarrowed(query: ShelfQuery): boolean {
@@ -54,8 +54,6 @@ export function activeValues(
     ...(f.status ?? []).map((status) => t(`statuses.${status}`)),
     ...(f.read === undefined ? [] : [t(f.read ? 'read' : 'unread')]),
     ...named('genre', f.genre),
-    ...named('tag', f.tag),
-    ...(f.theme ?? []),
     ...(f.language ?? []).map((code) => languageName(code, locale)),
     ...named('author', f.author),
     ...named('series', f.series),

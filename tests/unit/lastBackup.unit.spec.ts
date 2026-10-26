@@ -1,9 +1,9 @@
 import { mkdtemp, rm, writeFile } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { afterAll, beforeAll, describe, expect, it } from 'vitest'
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
 
-import { readLastBackup } from '@/app/(frontend)/(sections)/settings/lastBackup'
+import { readLastBackup } from '@/lib/backup/lastBackup'
 
 const admin = { roles: ['admin' as const] }
 const now = new Date('2026-10-22T12:00:00Z')
@@ -75,5 +75,29 @@ describe('readLastBackup', () => {
   it('gives a non-admin nothing', async () => {
     const file = await status(ago(HOUR).toISOString(), 'success')
     expect(await readLastBackup({ roles: ['user'] }, file, now)).toBeNull()
+  })
+
+  it('reads the file BACKUP_STATUS_FILE names, and the compose mount without it', async () => {
+    const time = ago(HOUR)
+    const file = await status(time.toISOString(), 'success')
+    const load = async () => {
+      vi.resetModules()
+      return import('@/lib/backup/lastBackup')
+    }
+    try {
+      vi.stubEnv('BACKUP_STATUS_FILE', file)
+      const named = await load()
+      expect(named.BACKUP_STATUS_FILE).toBe(file)
+      expect(await named.readLastBackup(admin, undefined, now)).toEqual({
+        kind: 'success',
+        time,
+        overdue: false,
+      })
+
+      vi.stubEnv('BACKUP_STATUS_FILE', '')
+      expect((await load()).BACKUP_STATUS_FILE).toBe('/app/backup-status/last-backup.json')
+    } finally {
+      vi.unstubAllEnvs()
+    }
   })
 })

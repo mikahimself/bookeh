@@ -18,8 +18,8 @@ import { readableBy, visibleCopies } from './visibleCopies'
  * author last both ways, then the effective title. Every sort ends on copy id
  * in the same direction. `q` (`textSearch`), the scalar filters
  * (`scalarFilters`) and the author, series and genre filters
- * (`relationFilters`) narrow the shared `from`, so the count applies them too;
- * tag and theme are not applied yet (Epic 9).
+ * (`relationFilters`) narrow the shared `from`, so the count applies them too.
+ * Tag and theme filters arrive with Epic 9, in `ShelfQuery` and here together.
  */
 export async function shelfIds(
   ctx: Context,

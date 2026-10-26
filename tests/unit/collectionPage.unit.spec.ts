@@ -34,6 +34,8 @@ const setNoteAction = vi.fn()
 const receiveCopyAction = vi.fn()
 const moveCopiesAction = vi.fn()
 const listLocations = vi.fn<(ctx: unknown) => Promise<LocationOption[]>>()
+/** The signed-in viewer: a plain user unless a case makes them the admin. */
+const requireUser = vi.fn<() => Promise<{ user: { roles: ('admin' | 'user')[] } }>>()
 
 // The English catalogue, so the assertions read the screen's words.
 const english = async () => {
@@ -43,11 +45,15 @@ const english = async () => {
     createTranslator({ locale: 'en', messages, namespace: namespace as 'collection' })
 }
 
-vi.mock('next-intl', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('next-intl')>()),
-  useTranslations: await english(),
-  useLocale: () => 'en',
-}))
+vi.mock('next-intl', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('next-intl')>()
+  return {
+    ...actual,
+    useTranslations: await english(),
+    useLocale: () => 'en',
+    useFormatter: () => actual.createFormatter({ locale: 'en' }),
+  }
+})
 vi.mock('next-intl/server', async () => {
   const translator = await english()
   return {
@@ -60,7 +66,7 @@ vi.mock('next/navigation', async (importOriginal) => ({
   useRouter: () => router,
   useSearchParams: () => searchParams,
 }))
-vi.mock('@/lib/payload/context', () => ({ requireUser: async () => ({}) }))
+vi.mock('@/lib/payload/context', () => ({ requireUser }))
 vi.mock('@/lib/shelf/getShelfRows', () => ({ getShelfRows }))
 vi.mock('@/lib/shelf/filterValues', () => ({
   filterValues: async () => ({ location: [], status: [], read: [], genre: [], language: [] }),
@@ -236,6 +242,7 @@ describe('CollectionPage', () => {
   beforeEach(() => {
     devicePrefs.mockResolvedValue({ ...DEFAULT_PREFS })
     listLocations.mockResolvedValue([])
+    requireUser.mockResolvedValue({ user: { roles: ['user'] } })
   })
 
   afterEach(() => {
@@ -339,7 +346,9 @@ describe('CollectionPage', () => {
     expect(setDevicePrefsAction.mock.calls).toEqual([[{ size: 'l' }], [{ layout: 'covers' }]])
     expect(pressed('Layout')).toBe('Covers')
     expect(pressed('Size')).toBe('L')
-    within(screen.getByRole('listitem')).getByText('Väinö Linna')
+    // The tile's line, and at l the placeholder cover's author as well.
+    within(screen.getByRole('listitem')).getByText('Väinö Linna', { selector: 'p' })
+    within(screen.getByRole('listitem')).getByText('Väinö Linna', { selector: 'span' })
     expect(fetchStub).not.toHaveBeenCalled()
   })
 
@@ -506,7 +515,7 @@ describe('CollectionPage', () => {
     it('asks first, then removes every ticked copy, in view or not, and keeps selecting', async () => {
       const page = (params: Record<string, string>) =>
         CollectionPage({ searchParams: Promise.resolve(params) })
-      removeCopiesAction.mockResolvedValue({ ok: true, data: null })
+      removeCopiesAction.mockResolvedValue({ ok: true, data: { removed: 2, skipped: [] } })
       reloadsWith({ rows: [], total: 0, labels: {} })
       getShelfRows.mockResolvedValueOnce(both)
       const { rerender } = render(await page({}))
@@ -532,6 +541,34 @@ describe('CollectionPage', () => {
       expect(fetchStub.mock.calls[0]![0]).toMatch(/^\/data\/shelf\?q=sinuhe&/)
       screen.getByRole('button', { name: 'Done' })
       expect(showToast).not.toHaveBeenCalled()
+      // AD-7: the bar's Remove refreshes the server render once the rows reloaded,
+      // so Back to the collection finds the cached first page without the removed copies.
+      await waitFor(() => expect(router.refresh).toHaveBeenCalledOnce())
+    })
+
+    it('skips an ordered copy, which stays ticked, and says so in the toast', async () => {
+      getShelfRows.mockResolvedValue({
+        rows: [both.rows[0]!, row(12, book(2, 'Kätilö'), 'ordered')],
+        total: 2,
+        labels: {},
+      })
+      removeCopiesAction.mockResolvedValue({ ok: true, data: { removed: 1, skipped: [12] } })
+      reloadsWith({ rows: [row(12, book(2, 'Kätilö'), 'ordered')], total: 1, labels: {} })
+      await renderPage()
+      fireEvent.click(screen.getByRole('button', { name: 'Select' }))
+      tap('Sinuhe')
+      tap('Kätilö')
+
+      await confirm('Remove 2 books from library?')
+      await waitFor(() => expect(selected()).toBe('1 selected'))
+      expect(removeCopiesAction).toHaveBeenCalledExactlyOnceWith([11, 12])
+      expect(showToast).toHaveBeenCalledExactlyOnceWith({
+        kind: 'success',
+        message: '1 removed · 1 ordered skipped',
+      })
+      expect((screen.getByRole('checkbox', { name: /Kätilö/ }) as HTMLInputElement).checked).toBe(
+        true,
+      )
     })
 
     it('keeps the ticks when the call fails, and clears them when a copy is gone', async () => {
@@ -568,9 +605,15 @@ describe('CollectionPage', () => {
     const tap = (title: string) => fireEvent.click(screen.getByText(title, { selector: 'p' }))
     const reloadsWith = (shelf: ShelfRows) =>
       fetchStub.mockResolvedValue({ status: 200, json: async () => ({ ok: true, data: shelf }) })
-    const moved = (id: number, name: string, count: number) => ({
+    const moved = (id: number, name: string, count: number, skipped: number[] = []) => ({
       ok: true,
-      data: { location: { id, name }, count, undoToken: `token-${name}`, undoSeconds: 1800 },
+      data: {
+        location: { id, name },
+        count,
+        skipped,
+        undoToken: `token-${name}`,
+        undoSeconds: 1800,
+      },
     })
     /** Opens the bar's Move picker. */
     const openMove = async () => {
@@ -587,7 +630,7 @@ describe('CollectionPage', () => {
       ])
     })
 
-    it('moves every ticked copy, to a location or a new one, all or none', async () => {
+    it('moves every ticked owned copy, to a location or a new one, skipping ordered ones', async () => {
       const page = (params: Record<string, string>) =>
         CollectionPage({ searchParams: Promise.resolve(params) })
       getShelfRows.mockResolvedValueOnce(both)
@@ -609,8 +652,9 @@ describe('CollectionPage', () => {
         message: '2 moved to Mökki',
         undo: { token: 'token-Mökki', seconds: 1800 },
       })
-      expect(router.refresh).toHaveBeenCalledOnce()
       await waitFor(() => expect(screen.queryByText('Sinuhe', { selector: 'p' })).toBeNull())
+      // The refresh follows the reload (AD-7).
+      await waitFor(() => expect(router.refresh).toHaveBeenCalledOnce())
       screen.getByRole('button', { name: 'Done' })
 
       // Create inline: the name as typed; the toast names the stored one.
@@ -639,13 +683,35 @@ describe('CollectionPage', () => {
         }),
       )
 
-      // Ordered ticked: nothing moves, the ticks stay.
+      // Ordered ticked too: the owned copy moves, the ordered one is skipped and stays ticked.
       await waitFor(() => expect(selected()).toBe('0 selected'))
       tap('Sinuhe')
-      moveCopiesAction.mockResolvedValueOnce({ ok: false, code: 'VALIDATION' })
+      tap('Kätilö')
+      moveCopiesAction.mockResolvedValueOnce(moved(4, 'Mökki', 1, [12]))
       await moveTo('Mökki')
       await waitFor(() =>
-        expect(showToast).toHaveBeenLastCalledWith({ kind: 'error', code: 'VALIDATION' }),
+        expect(showToast).toHaveBeenLastCalledWith({
+          kind: 'success',
+          message: '1 moved to Mökki · 1 ordered skipped',
+          undo: { token: 'token-Mökki', seconds: 1800 },
+        }),
+      )
+      await waitFor(() => expect(selected()).toBe('1 selected'))
+      expect((screen.getByRole('checkbox', { name: /Kätilö/ }) as HTMLInputElement).checked).toBe(
+        true,
+      )
+
+      // Nothing owned: nothing moves, no Undo.
+      moveCopiesAction.mockResolvedValueOnce({
+        ok: true,
+        data: { location: null, count: 0, skipped: [12], undoToken: 't0', undoSeconds: 1800 },
+      })
+      await moveTo('Mökki')
+      await waitFor(() =>
+        expect(showToast).toHaveBeenLastCalledWith({
+          kind: 'success',
+          message: 'Nothing moved · 1 ordered skipped',
+        }),
       )
       expect(selected()).toBe('1 selected')
 
@@ -656,7 +722,8 @@ describe('CollectionPage', () => {
       await waitFor(() => expect(selected()).toBe('0 selected'))
       expect(showToast).toHaveBeenLastCalledWith({ kind: 'success', message: 'Not in library' })
       await waitFor(() => expect(fetchStub.mock.calls.length).toBe(fetches + 1))
-      expect(router.refresh).toHaveBeenCalledTimes(2)
+      // One refresh per `ok` or `NOT_FOUND`, each after its reload.
+      await waitFor(() => expect(router.refresh).toHaveBeenCalledTimes(5))
     })
 
     it('closes only the picker on Esc', async () => {
@@ -765,7 +832,7 @@ describe('CollectionPage', () => {
       expect(chip('Tampere')).toBe('/?q=linna&location=3')
       within(sheet).getByRole('heading', { name: 'Genres' })
       expect(chip('Sotaromaani')).toBe('/?q=linna&genre=8')
-      within(sheet).getByText('WSOY · 1954 · 474 pages · fin')
+      within(sheet).getByText('WSOY · 1954 · 474 pages · Finnish')
       expect(
         within(sheet)
           .getAllByRole('listitem')
@@ -777,6 +844,23 @@ describe('CollectionPage', () => {
       expect(getHoldings).toHaveBeenCalledWith(expect.anything(), [5])
       // No locations: no Move.
       expect(within(sheet).queryByRole('button', { name: 'Move' })).toBeNull()
+    })
+
+    it('shows Re-fetch on a shared Book with an ISBN to the admin only', async () => {
+      const shared = book(5, 'Tuntematon sotilas', { isbn13: '9789510000000' })
+      getShelfRows.mockResolvedValue({ rows: [row(11, shared)], total: 1, labels: {} })
+      holds(shared, [copy(21)])
+
+      requireUser.mockResolvedValue({ user: { roles: ['admin', 'user'] } })
+      const { unmount } = await renderPage({ book: '5' })
+      within(await detail('Tuntematon sotilas')).getByRole('button', { name: 'Re-fetch' })
+      unmount()
+
+      requireUser.mockResolvedValue({ user: { roles: ['user'] } })
+      await renderPage({ book: '5' })
+      expect(
+        within(await detail('Tuntematon sotilas')).queryByRole('button', { name: 'Re-fetch' }),
+      ).toBeNull()
     })
 
     it('moves one copy from its line, with Undo', async () => {
@@ -791,7 +875,13 @@ describe('CollectionPage', () => {
       ])
       moveCopiesAction.mockResolvedValue({
         ok: true,
-        data: { location: { id: 4, name: 'Mökki' }, count: 1, undoToken: 't', undoSeconds: 1800 },
+        data: {
+          location: { id: 4, name: 'Mökki' },
+          count: 1,
+          skipped: [],
+          undoToken: 't',
+          undoSeconds: 1800,
+        },
       })
       fetchStub.mockResolvedValue({
         status: 200,
@@ -818,7 +908,8 @@ describe('CollectionPage', () => {
           undo: { token: 't', seconds: 1800 },
         }),
       )
-      expect(router.refresh).toHaveBeenCalledOnce()
+      // `afterAction`'s refresh, once the rows reloaded.
+      await waitFor(() => expect(router.refresh).toHaveBeenCalledOnce())
 
       // The refresh renders the line anew from the server.
       holds(linna, [
@@ -1011,7 +1102,7 @@ describe('CollectionPage', () => {
 
       it('removes one of two copies after the dialog and keeps Book detail open', async () => {
         holds(linna, [copy(21), copy(22)])
-        removeCopiesAction.mockResolvedValue({ ok: true, data: null })
+        removeCopiesAction.mockResolvedValue({ ok: true, data: { removed: 1, skipped: [] } })
         reloads()
         await renderPage({ book: '5' })
         const sheet = await detail('Tuntematon sotilas')
@@ -1027,7 +1118,7 @@ describe('CollectionPage', () => {
 
       it('closes Book detail after removing the last copy, and reloads the rows', async () => {
         holds(linna, [copy(21)])
-        removeCopiesAction.mockResolvedValue({ ok: true, data: null })
+        removeCopiesAction.mockResolvedValue({ ok: true, data: { removed: 1, skipped: [] } })
         reloads()
         await renderPage({ book: '5' })
         const sheet = await detail('Tuntematon sotilas')
@@ -1037,7 +1128,8 @@ describe('CollectionPage', () => {
         await waitFor(() => expect(router.replace).toHaveBeenCalledWith('/', { scroll: false }))
         expect(removeCopiesAction).toHaveBeenCalledExactlyOnceWith([21])
         expect(fetchStub.mock.calls[0]![0]).toMatch(/^\/data\/shelf\?/)
-        expect(router.refresh).not.toHaveBeenCalled()
+        // `afterAction`'s one refresh, after the reload; the line itself refreshes nothing.
+        await waitFor(() => expect(router.refresh).toHaveBeenCalledOnce())
         expect(showToast).not.toHaveBeenCalled()
       })
 
@@ -1187,7 +1279,7 @@ describe('CollectionPage', () => {
       it('closes after removing the only copy, and reloads the rows', async () => {
         // The dialog's pop lands here: an entry with no in-app one below, so closing replaces.
         window.history.replaceState(null, '', '/')
-        removeCopiesAction.mockResolvedValue({ ok: true, data: null })
+        removeCopiesAction.mockResolvedValue({ ok: true, data: { removed: 1, skipped: [] } })
         fetchStub.mockResolvedValue({
           status: 200,
           json: async () => ({ ok: true, data: { rows: [row(12, sinuhe)], total: 1, labels: {} } }),
@@ -1201,7 +1293,7 @@ describe('CollectionPage', () => {
         await waitFor(() => expect(router.replace).toHaveBeenCalledWith('/', { scroll: false }))
         expect(removeCopiesAction).toHaveBeenCalledExactlyOnceWith([25])
         expect(fetchStub.mock.calls[0]![0]).toMatch(/^\/data\/shelf\?/)
-        expect(router.refresh).not.toHaveBeenCalled()
+        await waitFor(() => expect(router.refresh).toHaveBeenCalledOnce())
       })
 
       it('toasts Not in library for a Book not held, with no panel', async () => {

@@ -17,14 +17,16 @@ const TITLE: Record<DevicePrefs['size'], string> = {
 
 /**
  * DESIGN.md, Cover tile: the cover at 2:3 across the column, then the title
- * and the authors in muted label, each on one truncated line. Hook-free, like
- * `BookRow`, and like it a link to `href`; `open` puts the selection bar
- * along the bottom edge of the cover. In select mode (`select`) the tile is
- * one `<label>` with the checkbox before the title instead, so a tap anywhere
- * ticks it and opens nothing.
+ * and the authors in muted label, each on one truncated line. A placeholder
+ * cover carries the authors too at m and l, the title alone at s. An ordered
+ * copy's cover wears the airmail band across its top-left corner
+ * (`airmail-band`); no word. Hook-free, like `BookRow`, and like it a link to
+ * `href`; `open` puts the selection bar along the bottom edge of the cover.
+ * In select mode (`select`) the tile is one `<label>` with the checkbox
+ * before the title instead, so a tap anywhere ticks it and opens nothing.
  */
 export function CoverTile({
-  row: { book },
+  row: { copy, book },
   size,
   href,
   replace,
@@ -40,15 +42,21 @@ export function CoverTile({
 }) {
   const authors = book.authors.map((author) => author.name).join(', ')
 
+  const coverClass = [
+    copy.status === 'ordered' ? 'airmail-band' : '',
+    open
+      ? 'relative after:absolute after:inset-x-0 after:bottom-0 after:h-stroke-selection after:bg-accent'
+      : '',
+  ]
+    .filter(Boolean)
+    .join(' ')
   const cover = (
-    <div
-      className={
-        open
-          ? 'relative after:absolute after:inset-x-0 after:bottom-0 after:h-stroke-selection after:bg-accent'
-          : undefined
-      }
-    >
-      <Cover src={book.coverUrl} title={book.title} />
+    <div className={coverClass || undefined}>
+      <Cover
+        src={book.coverUrl}
+        title={book.title}
+        author={size === 's' || !authors ? null : authors}
+      />
     </div>
   )
   const lines = (
