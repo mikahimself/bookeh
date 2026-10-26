@@ -1,3 +1,4 @@
+import { DomainError } from '@/lib/errors'
 import type { Context } from '@/lib/payload/context'
 import * as gateway from '@/lib/payload/gateway'
 import { withTransaction } from '@/lib/payload/transaction'
@@ -22,8 +23,10 @@ export type NewCopy = CopyStatus & { bookId: number }
  * insert.
  *
  * The restore deletes the copy through the gateway as the restoring user,
- * and does nothing when the copy is already gone. A location created inline
- * stays. It closes over the copy's id only.
+ * and does nothing when the copy is already gone. A copy with any loan, open
+ * or returned, is refused with `UNDO_FAILED` (AD-11), so a caller's restore
+ * that runs after it (the save's Book) never runs either. A location created
+ * inline stays. It closes over the copy's id only.
  */
 export async function createCopy(ctx: Context, input: NewCopy): Promise<Undone<number>> {
   return withTransaction(ctx, async (tx) => {
@@ -46,5 +49,7 @@ async function deleteCopy(ctx: Context, id: number): Promise<void> {
     where: { id: { equals: id } },
   })
   if (totalDocs === 0) return
+  const loans = await gateway.count(ctx, { collection: 'loans', where: { copy: { equals: id } } })
+  if (loans.totalDocs > 0) throw new DomainError('UNDO_FAILED')
   await gateway.deleteByID(ctx, { collection: 'copies', id, depth: 0 })
 }

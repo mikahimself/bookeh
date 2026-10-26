@@ -28,6 +28,7 @@ import {
   REQUEST_WINDOW_MS,
 } from '@/lib/catalogue/saveRequests'
 import { DomainError, logger } from '@/lib/errors'
+import { lendCopy } from '@/lib/loans/loans'
 import { heldOutcome, lookupSources } from '@/lib/metadata/lookup'
 import type { SourcesOutcome } from '@/lib/metadata/source'
 import { undo } from '@/lib/undo/undo'
@@ -765,6 +766,30 @@ describe('saveCopy', () => {
       expect(await countByName('series', names.series)).toBe(1)
       expect(await mediaCount(media.id)).toBe(1)
       expect((await copiesOf(b.user)).map((copy) => copy.id)).toEqual([ofB.copyId])
+    })
+
+    it('fails with UNDO_FAILED once the copy is lent, keeping the copy, Book and loan', async () => {
+      const { user, ctx } = await freshUser()
+      const isbn = randomIsbn()
+      const names = { author: unique('Minna Canth'), series: unique('Työmiehen vaimo') }
+      vi.mocked(lookupSources).mockResolvedValue(found(isbn, names))
+
+      const result = await saveCopy(ctx, inputFor(isbn))
+      await coverOf(result.bookId)
+      const { data } = await lendCopy(ctx, result.copyId, { create: 'Liisa' })
+      // The explicit check, not the `loans.copy_id` foreign key, refuses it; afterEach restores the spy.
+      const warn = vi.spyOn(logger(), 'warn').mockImplementation(() => {})
+
+      await expect(undo(ctx, result.undoToken)).rejects.toMatchObject({ code: 'UNDO_FAILED' })
+      const { err } = warn.mock.calls[0]?.[0] as { err: unknown }
+      expect(err).toBeInstanceOf(DomainError)
+      expect(err).toMatchObject({ code: 'UNDO_FAILED' })
+
+      expect((await copiesOf(user)).map((copy) => copy.id)).toEqual([result.copyId])
+      expect((await booksWithIsbn(isbn)).map((book) => book.id)).toEqual([result.bookId])
+      const loan = await payload.findByID({ collection: 'loans', id: data.loanId, depth: 0 })
+      expect(loan.copy).toBe(result.copyId)
+      expect(loan.returnedOn ?? null).toBeNull()
     })
 
     it('keeps a Book that existed before the save, even unreferenced', async () => {

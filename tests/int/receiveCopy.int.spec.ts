@@ -3,6 +3,7 @@ import { beforeAll, describe, expect, it } from 'vitest'
 
 import { receiveCopy } from '@/lib/copies/receiveCopy'
 import { DomainError } from '@/lib/errors'
+import { lendCopy } from '@/lib/loans/loans'
 import { undo, withUndo } from '@/lib/undo/undo'
 import config from '@/payload.config'
 import type { Book, Copy, User } from '@/payload-types'
@@ -91,6 +92,20 @@ describe('receiveCopy', () => {
     await payload.delete({ collection: 'copies', id: ordered.id })
 
     await expect(undo(asUser, result.undoToken)).resolves.toBeUndefined()
+  })
+
+  it('fails the Undo with UNDO_FAILED once the copy is lent, keeping it owned', async () => {
+    const { user, location } = await userWithDefault('Receive Copy Lent')
+    const asUser = await contextFor(user)
+    const ordered = await copyFor(user, 'ordered')
+
+    const result = await withUndo(asUser, (tx) => receiveCopy(tx, ordered.id))
+    const { data } = await lendCopy(asUser, ordered.id, { create: 'Liisa' })
+
+    expect(await failure(undo(asUser, result.undoToken))).toMatchObject({ code: 'UNDO_FAILED' })
+    expect(await stored(ordered.id)).toEqual({ status: 'owned', location: location.id })
+    const loan = await payload.findByID({ collection: 'loans', id: data.loanId, depth: 0 })
+    expect(loan.returnedOn ?? null).toBeNull()
   })
 
   it('receives with no location when there is no default', async () => {

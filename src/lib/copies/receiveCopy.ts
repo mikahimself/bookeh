@@ -22,11 +22,11 @@ import { locationFor, type LocationOption } from './locations'
  *
  * The restore writes the copy back to ordered with no location (AD-8)
  * through the gateway as the restoring user, and skips a copy that is gone.
+ * A copy with an open loan is refused with `UNDO_FAILED`: an ordered copy is
+ * never lent, while a returned loan on it is harmless history.
  * It names no relation target, so the AD-20 rule that a recorded target gone
  * since (a deleted or merged location) is restored as none costs it nothing;
  * `moveCopies()`' restore applies it.
- * Epic 6 makes the restore fail with `UNDO_FAILED` when the copy has gained
- * a loan since, as the save's does.
  */
 export async function receiveCopy(
   ctx: Context,
@@ -80,6 +80,11 @@ async function restoreOrdered(ctx: Context, copyId: number): Promise<void> {
     where: { id: { equals: copyId } },
   })
   if (totalDocs === 0) return
+  const open = await gateway.count(ctx, {
+    collection: 'loans',
+    where: { and: [{ copy: { equals: copyId } }, { returnedOn: { exists: false } }] },
+  })
+  if (open.totalDocs > 0) throw new DomainError('UNDO_FAILED')
   await gateway.updateByID(ctx, {
     collection: 'copies',
     id: copyId,

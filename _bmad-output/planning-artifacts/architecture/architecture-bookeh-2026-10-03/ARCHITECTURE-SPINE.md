@@ -280,7 +280,7 @@ Arrows are the only allowed import directions, and ESLint `no-restricted-imports
   - `lib/undo` holds a bounded in-process store (AD-12) of receipts keyed by an opaque `undoToken` and the user. The client holds only the token. Receipts live 30 minutes; a result carries the seconds remaining on its token and the toast hides Undo when they run out. After a restart or once the token has expired, Undo is unavailable.
   - An undoable service function is written once. It takes a context, opens no transaction, records nothing, and returns `Undone<T>`: its result and a restore function. The restore closes over ids and previous values only, never a context.
   - `withUndo(ctx, fn)` in `lib/undo` is the only recorder. It opens the transaction, runs `fn`, records the restore after the commit and returns the result with its `undoToken`. A server action wraps its one service call in it. A service that calls an undoable function of another service folds the returned restore into its own or drops it.
-  - `undo(ctx, token)` is the only entry point, behind one `undoAction`. It uses the token once and runs the restore in one transaction with the context of the undo request, through the owning services' writers (AD-18). A restore writes the recorded previous values to rows that still exist, whatever they hold now, and skips rows that are gone; a recorded relation target that no longer exists (a location deleted or merged away since the move) is restored as none. It never touches a row its action did not change. If any step fails, nothing is restored and the result is `UNDO_FAILED`.
+  - `undo(ctx, token)` is the only entry point, behind one `undoAction`. It uses the token once and runs the restore in one transaction with the context of the undo request, through the owning services' writers (AD-18). A restore writes the recorded previous values to rows that still exist, whatever they hold now, and skips rows that are gone; a recorded relation target that no longer exists (a location deleted or merged away since the move) is restored as none. A copy restore refuses with `UNDO_FAILED` once the copy has gained a loan: the save's on any loan (AD-11), Received's on an open loan. It never touches a row its action did not change. If any step fails, nothing is restored and the result is `UNDO_FAILED`.
   - The actions that are undoable are exactly those listed with an Undo in `EXPERIENCE.md` → Undo, whichever screen they are called from. Removals, deletes, merges, `editBook`, `setCover`, `lookupAgain`, `refetchBook` and genre administration are not.
 
 ## Consistency Conventions
@@ -512,6 +512,9 @@ type Suggestion = { id: number | null; name: string } // suggest(ctx, field, tex
 // src/lib/people
 type PersonUse = Named & { loans: number } // personUse(ctx): every Person of the viewer by name; Epic 7 adds entries
 
+// src/lib/loans
+type Lent = { loanId: number; person: Named } // lendCopy(ctx, copyId, person: Ref, lentOn?): Undone<Lent>; returnLoan(ctx, loanId, returnedOn?): Undone<{ loanId }>; dates default to helsinkiToday()
+
 // src/lib/undo
 type Restore = (ctx: Context) => Promise<void>
 type Undone<T> = { data: T; restore: Restore } // returned by an undoable service function
@@ -589,7 +592,8 @@ src/
     tags/              # tags of every kind: changeTags, rename, merge, delete, tagUse; SYSTEM_NAME checks
     copies/            # createCopy, move, receive, status, note, remove; locations
     people/            # resolvePerson, createPerson, rename, merge, delete, personUse
-    loans/  wishlists/
+    loans/             # lendCopy, returnLoan; dates: helsinkiToday, isCalendarDate
+    wishlists/
     account/           # profile read and update, visibility
     backup/            # readLastBackup: the nightly backup's status file (BACKUP_STATUS_FILE) for Settings
   migrations/
