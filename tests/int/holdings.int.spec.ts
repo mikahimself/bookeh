@@ -5,6 +5,7 @@ import { beforeAll, describe, expect, it } from 'vitest'
 
 import type { Named } from '@/lib/books/effectiveBook'
 import { getHoldings } from '@/lib/books/holdings'
+import { lendCopy, returnLoan } from '@/lib/loans/loans'
 import type { Context } from '@/lib/payload/context'
 import * as gateway from '@/lib/payload/gateway'
 import config from '@/payload.config'
@@ -16,13 +17,15 @@ import { randomIsbn } from '../helpers/isbn'
 // `getHoldings()`, AD-9/AD-17: a viewer's own copies of a Book with their
 // location names, seen by two users and the admin; every requested id is
 // present; another user's copies never appear. Location names are unique per
-// owner, so each carries a per-run suffix.
+// owner, so each carries a per-run suffix. A copy's open loan rides on its
+// line (J10); returned loans do not.
 
 const unique = (name: string) => `${name} ${randomUUID().slice(0, 8)}`
 
 describe('getHoldings', () => {
   let payload: Payload
   let a: User
+  let b: User
   let asA: Context
   let asB: Context
   let asAdmin: Context
@@ -65,7 +68,7 @@ describe('getHoldings', () => {
   beforeAll(async () => {
     payload = await getPayload({ config })
     a = await createUser({ displayName: 'Holdings User A' })
-    const b = await createUser({ displayName: 'Holdings User B' })
+    b = await createUser({ displayName: 'Holdings User B' })
     const admin = await createUser({ displayName: 'Holdings Admin', roles: ['admin'] })
     asA = await contextFor(a)
     asB = await contextFor(b)
@@ -133,5 +136,63 @@ describe('getHoldings', () => {
 
   it('returns an empty map for no ids', async () => {
     expect(await getHoldings(asB, [])).toEqual(new Map())
+  })
+
+  // Fresh Books: lending a copy on `x` would change the exact lines above.
+  describe('loans', () => {
+    const lend = async (ctx: Context, copyId: number, lentOn: string) =>
+      (await lendCopy(ctx, copyId, { create: unique('Liisa K') }, lentOn)).data
+
+    it('puts the open loan on its copy line only', async () => {
+      const book = await systemBook(a, 'shared')
+      const lent = await copyAs(a, { book: book.id })
+      const kept = await copyAs(a, { book: book.id })
+      const { loanId, person } = await lend(asA, lent.id, '2026-10-01')
+
+      const lines = (await getHoldings(asA, [book.id])).get(book.id)?.copies
+      expect(lines?.map((line) => [line.copyId, line.loan])).toEqual([
+        [lent.id, { loanId, person, since: '2026-10-01' }],
+        [kept.id, null],
+      ])
+      expect(person.name).toMatch(/^Liisa K /)
+    })
+
+    it('shows each user only their own loans, and the admin none', async () => {
+      const book = await systemBook(a, 'shared')
+      const ofA = await copyAs(a, { book: book.id })
+      const ofB = await copyAs(b, { book: book.id })
+      const byA = await lend(asA, ofA.id, '2026-09-20')
+      const byB = await lend(asB, ofB.id, '2026-10-02')
+
+      const loansOf = async (ctx: Context) =>
+        (await getHoldings(ctx, [book.id])).get(book.id)?.copies.map((l) => [l.copyId, l.loan])
+      expect(await loansOf(asA)).toEqual([
+        [ofA.id, { loanId: byA.loanId, person: byA.person, since: '2026-09-20' }],
+      ])
+      expect(await loansOf(asB)).toEqual([
+        [ofB.id, { loanId: byB.loanId, person: byB.person, since: '2026-10-02' }],
+      ])
+      expect((await getHoldings(asAdmin, [book.id])).get(book.id)).toEqual({
+        copies: [],
+        entries: [],
+      })
+    })
+
+    it('drops a returned loan and shows the next one with its own date', async () => {
+      const book = await systemBook(a, 'shared')
+      const copy = await copyAs(a, { book: book.id })
+      const loanOf = async () => (await getHoldings(asA, [book.id])).get(book.id)?.copies[0]?.loan
+
+      const first = await lend(asA, copy.id, '2026-09-01')
+      await returnLoan(asA, first.loanId, '2026-09-10')
+      expect(await loanOf()).toBeNull()
+
+      const again = await lend(asA, copy.id, '2026-10-03')
+      expect(await loanOf()).toEqual({
+        loanId: again.loanId,
+        person: again.person,
+        since: '2026-10-03',
+      })
+    })
   })
 })

@@ -1,8 +1,10 @@
 import { timeZone } from '@/i18n/locale'
 
 // Spine, Consistency Conventions → Dates: a loan date is a calendar date, sent
-// as `YYYY-MM-DD` and stored at 12:00 UTC by the `loans` collection. 6.6 adds
-// the read-back here.
+// as `YYYY-MM-DD` and stored at 12:00 UTC by the `loans` collection. The
+// read-back is the stored value's UTC date (`slice(0, 10)`), done where a date
+// is read: `returnLoan` here and `getHoldings` in `lib/books`, which imports no
+// other service.
 
 const helsinkiDate = new Intl.DateTimeFormat('en', {
   timeZone,
