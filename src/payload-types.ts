@@ -73,6 +73,7 @@ export interface Config {
     genres: Genre;
     locations: UserLocation;
     media: Media;
+    people: Person;
     series: Series;
     'user-books': UserBook;
     users: User;
@@ -89,6 +90,7 @@ export interface Config {
     genres: GenresSelect<false> | GenresSelect<true>;
     locations: LocationsSelect<false> | LocationsSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
+    people: PeopleSelect<false> | PeopleSelect<true>;
     series: SeriesSelect<false> | SeriesSelect<true>;
     'user-books': UserBooksSelect<false> | UserBooksSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
@@ -288,6 +290,18 @@ export interface Copy {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "people".
+ */
+export interface Person {
+  id: number;
+  owner: number | User;
+  name: string;
+  nameKey: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "user-books".
  */
 export interface UserBook {
@@ -371,6 +385,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'media';
         value: number | Media;
+      } | null)
+    | ({
+        relationTo: 'people';
+        value: number | Person;
       } | null)
     | ({
         relationTo: 'series';
@@ -519,6 +537,17 @@ export interface MediaSelect<T extends boolean = true> {
   height?: T;
   focalX?: T;
   focalY?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "people_select".
+ */
+export interface PeopleSelect<T extends boolean = true> {
+  owner?: T;
+  name?: T;
+  nameKey?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
