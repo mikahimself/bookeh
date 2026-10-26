@@ -31,6 +31,7 @@ const codes = Object.keys({
   INVALID_CORNERS: true,
   COVER_FAILED: true,
   NAME_TAKEN: true,
+  PERSON_IN_USE: true,
   NO_CONNECTION: true,
   APP_UPDATED: true,
 } satisfies Record<ErrorCode, true>)

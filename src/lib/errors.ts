@@ -19,6 +19,7 @@ export type ErrorCode =
   | 'INVALID_CORNERS'
   | 'COVER_FAILED'
   | 'NAME_TAKEN'
+  | 'PERSON_IN_USE'
   // Client-only: no server code returns these. `components/request.ts` maps
   // a dropped connection and a stale action (an older build's tab) to them.
   | 'NO_CONNECTION'

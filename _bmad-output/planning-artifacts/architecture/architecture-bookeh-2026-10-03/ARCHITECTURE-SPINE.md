@@ -255,9 +255,9 @@ Arrows are the only allowed import directions, and ESLint `no-restricted-imports
   - An input that picks one of these rows or creates it inline is a `Ref`: an id, or a name to create. The owning service resolves it inside the action's transaction. Undo leaves a row created this way.
   - Renaming onto a `nameKey` that exists fails with `NAME_TAKEN` and the existing row's id as `conflictId`. So does adding a row by name from a Settings list ("Add location", "Add person"); only a `Ref` matches an existing name instead.
   - A merge is one function in the owning service, in one transaction: every reference to the source row moves to the target, then the source row is deleted.
-  - Deletes that affect other rows are one function in the owning service, in one transaction: deleting a copy deletes its loans; a Person with a loan or a wishlist entry, open or closed, cannot be deleted; deleting a location clears it from copies and from the profile default; deleting a wishlist deletes its entries. A merge or delete updates referencing rows of other collections through the gateway.
+  - Deletes that affect other rows are one function in the owning service, in one transaction: deleting a copy deletes its loans; a Person with a loan or a wishlist entry, open or closed, cannot be deleted (`PERSON_IN_USE`); deleting a location clears it from copies and from the profile default; deleting a wishlist deletes its entries. A merge or delete updates referencing rows of other collections through the gateway.
   - Every action the interface offers on a selection (move, tag, read, remove) is a service function that takes a list of copy ids and runs in one transaction, all or none: an id that is not the viewer's fails the whole list before any write. Tag and read apply to the distinct Books of those copies. Move and remove act on the owned copies only: an ordered copy is skipped, not refused, and its id comes back in `skipped` with the count actually written, so the bar leaves it ticked and says how many were skipped. The single-row action calls the same function with one id.
-  - The use count shown beside a location or tag is its number of copies, from the shelf values (AD-7). A Person's count is loans and entries, from `lib/people`; a wishlist's is its open entries.
+  - The use count shown beside a location or tag is its number of copies, from the shelf values (AD-7). A Person's count is loans and entries, from `personUse()` in `lib/people`; a wishlist's is its open entries.
   - An invariant on one collection is enforced in that collection's hooks. An invariant across collections is enforced in the owning service.
 
 ### AD-19 — Invariants the database can express are database constraints
@@ -509,6 +509,9 @@ type FilterValues = { // filterValues(ctx, locale): values in use on the viewer'
 type SuggestField = 'author' | 'series' | 'publisher' // SUGGEST_FIELDS
 type Suggestion = { id: number | null; name: string } // suggest(ctx, field, text); id null for a publisher
 
+// src/lib/people
+type PersonUse = Named & { loans: number } // personUse(ctx): every Person of the viewer by name; Epic 7 adds entries
+
 // src/lib/undo
 type Restore = (ctx: Context) => Promise<void>
 type Undone<T> = { data: T; restore: Restore } // returned by an undoable service function
@@ -585,7 +588,7 @@ src/
     shelf/             # Drizzle query module, read-only: getShelfRows, values and suggestions; query.ts (pure): parseShelfQuery, shelfHref, shelfRowsPath
     tags/              # tags of every kind: changeTags, rename, merge, delete, tagUse; SYSTEM_NAME checks
     copies/            # createCopy, move, receive, status, note, remove; locations
-    people/            # People: match, rename, merge, delete
+    people/            # resolvePerson, createPerson, rename, merge, delete, personUse
     loans/  wishlists/
     account/           # profile read and update, visibility
     backup/            # readLastBackup: the nightly backup's status file (BACKUP_STATUS_FILE) for Settings

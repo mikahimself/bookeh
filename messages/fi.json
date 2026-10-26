@@ -302,6 +302,7 @@
     "INVALID_CORNERS": "Kulmat eivät muodosta kantta.",
     "COVER_FAILED": "Kannen tallennus ei onnistunut.",
     "NAME_TAKEN": "Nimi on jo käytössä.",
+    "PERSON_IN_USE": "Henkilöä ei voi poistaa, koska hänellä on lainoja.",
     "NO_CONNECTION": "Ei yhteyttä.",
     "APP_UPDATED": "bookeh päivittyi."
   }

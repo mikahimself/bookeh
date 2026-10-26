@@ -88,7 +88,8 @@ export const openLoanIndex: PostgresSchemaHook = ({ schema, extendTable }) => {
  * A loan is never a location or a copy status: the copy keeps its location
  * while lent. `returnedOn` is empty while the loan is open; a returned loan
  * stays as history, and `openLoanIndex` allows one open loan per copy. From
- * 6.5 on `lib/loans` is its only writer.
+ * 6.5 on `lib/loans` is its only writer, except that a People merge repoints
+ * `person` and a copy removal deletes the copy's loans (AD-18).
  */
 export const Loans: CollectionConfig = {
   slug: 'loans',
