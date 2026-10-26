@@ -65,7 +65,7 @@ Mock-ups, in the final tokens. The spines win on any conflict with a mock-up.
 | [mockups/key-wishlists.html](mockups/key-wishlists.html) | The list of wishlists, one wishlist, an entry opened. |
 | [mockups/key-settings.html](mockups/key-settings.html) | Settings on wide and phone. |
 
-Not mocked, built from this spine alone: Sign in, Lookup, the Filter panel on the phone, pickers and dialogs, select mode on the phone, and sizes s and l. The Genres group in Settings is not mocked either; its story starts with a rendered mock-up choice. So do the tag picker, the Lend picker and creating a list from the wishlist picker when there is none. The app icon and theme colour are settled in DESIGN.md → App Icon & Theme Colour, and the Corner crop in DESIGN.md → Components.
+Not mocked, built from this spine alone: Sign in, Lookup, the Filter panel on the phone, pickers and dialogs, select mode on the phone, and sizes s and l. The Genres group in Settings is not mocked either; its story starts with a rendered mock-up choice. So do the tag picker and creating a list from the wishlist picker when there is none. The app icon and theme colour are settled in DESIGN.md → App Icon & Theme Colour, and the Corner crop in DESIGN.md → Components.
 
 ## Voice and Tone
 
@@ -113,7 +113,7 @@ Behaviour. Visual specs live in `DESIGN.md` → Components.
 | Rating | Book detail; the Filter panel | Five stars. Tap a star to set that rating; tap another to change it; tapping the current star does nothing. A "Clear" Link beside the stars, shown only while a rating is set, clears it. Saved at once (FR-29). |
 | Detail panel | Book detail on wide screens | Slides out on the right and the list narrows beside it. Clicking another row swaps its content without closing it. It is not modal: the list stays usable and focus is not trapped. X and `Esc` close it. |
 | Bottom sheet | Book detail and a wishlist entry on the phone; the Filter panel on the phone [ASSUMPTION]; pickers on the phone | Slides up to a little over half the screen; the list stays visible above, dimmed. Dragging up or tapping the handle opens it fully. Tapping the dimmed list, dragging down, X or Back closes it. The list keeps its scroll position. Modal: focus is held inside. |
-| Picker | Location (Move), tags (Tag), Person and date (Lend), wishlist (Add to wishlist) | A bottom sheet on the phone; a dialog on wide screens. One choice, then it closes. Location ends with a "New location" field under its rows: a name and Move move to the location of that name, creating it when none matches. |
+| Picker | Location (Move), tags (Tag), Person and date (Lend), wishlist (Add to wishlist) | A bottom sheet on the phone; a dialog on wide screens. One choice, then it closes. Location ends with a "New location" field under its rows: a name and Move move to the location of that name, creating it when none matches. Person and date (Lend) does not close on a choice: see Loans → Lend. |
 | Dialog | Confirmations of removals and merges; "Discard changes?"; New list | Centred, modal, with the screen behind dimmed. The confirming button is on the right. `Esc` and tapping outside cancel. |
 | Toast | After a save or a reversible action | Sits above whatever is pinned to the bottom. Shows the result and its actions as Links. About 4 seconds, then gone; one at a time, a new one replacing the old. A toast raised on Scan has no timer: it stays until the next Answer opens, so Edit and Undo wait while the next book is lined up. Leaving Scan gives it the usual 4 seconds. An error toast has no timer and stays until dismissed or replaced. Every toast has a close (X). Undo is hidden once its receipt has expired (30 minutes). |
 | Action bar | Select mode | Pinned to the bottom. The count, then Move, Tag, Read, Remove, and Done. On the phone it takes the place of the pinned Scan book button and is two rows: the count and Done above, the four actions below. [ASSUMPTION] On wide screens Scan book stays in the header. Buttons other than Done are disabled while nothing is ticked. |
@@ -193,7 +193,7 @@ The same content in the panel and the sheet. Changes save at once; there is no S
 |---|---|
 | Header | Cover, title, author, series and number, edition line (publisher · year · pages · language). Author and series are Filter chips. |
 | Read and rating | A read / unread Text switch and the Rating (FR-29). Both belong to the Book, not a copy. |
-| Your copies | One line per copy: its location (a Filter chip) and its status. Each line has its own Links, by state: **owned** — Lend, Move, Remove; **lent** — the lent marker with "Lent to {person} since {date}", and Returned; **ordered** — "Ordered", and Received, which makes it owned at the default location (FR-28). A copy's note sits under its line and is edited in place. |
+| Your copies | One line per copy: its location (a Filter chip) and its status. Each line has its own Links, by state: **owned** — Lend, Move, Remove; **lent** — the lent marker with "Lent to {person} since {date}", and Returned only (no Move or Remove; Remove in select mode still takes a lent copy and its loans); **ordered** — "Ordered", and Received, which makes it owned at the default location (FR-28). A copy's note sits under its line and is edited in place. |
 | Lent before | The closed loans of this Book's copies, newest first: "{person} · {from} to {to}" (FR-36). Absent when there are none. |
 | On wishlists | One line per entry: "{list} · for {person}". Absent when there are none. |
 | Classification | System genres (in the user's language), the user's genres, system themes, the user's themes and personal tags as Filter chips; empty kinds are absent. "Add tag" opens the picker for tags, genres and themes. |
@@ -273,7 +273,7 @@ Under the Book, the Answer names the source ("From Finna") and any author, serie
 | Returned (Link on a row) | Closes the loan today (FR-36). The row moves to the returned group. |
 | Returned (group) | Below the open loans in both orders. Rows show the copy and "{person} · {from} to {to}", newest first. |
 | Tapping a row | Opens Book detail. |
-| Lend | Started from an owned copy's line in Book detail. A picker for the Person (existing or new, FR-34) and the date. |
+| Lend | Started from an owned copy's line in Book detail. One Picker holds the Person, the date and the confirm, titled "Lend" with "{title} · {location}" muted under it. People are rows, the most recently lent-to first, at most six, then a "Find a person…" row that opens the Person Combobox in place. A tap marks a row with the 8px marker and does not lend. Under the rows a "New person" Text field (existing or new, FR-34); typing in it clears the row's marker, and marking a row clears the field. Then the Date field "Lent on", today by default. Lend (primary, full width on the phone; right of Cancel in the dialog) is disabled until a Person is marked or typed, and lends with the toast "Lent to {person} · Undo". Returned on a lent line is a Link with no picker: it closes the loan today with "Returned · Undo". (Mock-up B, Mika, 2026-10-26; `.working/lend-picker.html`.) |
 
 ### Wishlists
 

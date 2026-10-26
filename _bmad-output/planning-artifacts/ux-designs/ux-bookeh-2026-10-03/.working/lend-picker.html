@@ -1,0 +1,237 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>bookeh lend picker</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400&display=swap">
+<style>
+/* Mock-up page for Story 6.7 [J4]. Governed by DESIGN.md (Picker, Bottom sheet, Dialog, Combobox, Date field, Buttons, Lent marker)
+   and EXPERIENCE.md (Picker: Person and date (Lend); Book detail → Your copies; Undo). Page chrome is neutral; each frame carries bookeh's tokens. */
+:root{--page:#ECEEF0;--pfg:#1F2933;--pmu:#5F6B78;--pln:#C9CFD5}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--page:#0E1115;--pfg:#E3E8EE;--pmu:#94A0AD;--pln:#2C343D;color-scheme:dark}}
+:root[data-theme="dark"]{--page:#0E1115;--pfg:#E3E8EE;--pmu:#94A0AD;--pln:#2C343D;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--pfg);font:14px/1.45 'Open Sans',"Segoe UI","Helvetica Neue",sans-serif}
+main{max-width:1120px;margin:0 auto;padding:28px 16px 80px}
+h1{font-weight:300;font-size:38px;line-height:1.1;letter-spacing:-.015em;margin:0 0 8px}
+h2{font-weight:300;font-size:26px;line-height:1.15;margin:52px 0 6px}
+.lede,.why{max-width:72ch;color:var(--pmu);margin:0 0 6px}
+.why strong{font-weight:400;color:var(--pfg)}
+.set{display:flex;flex-wrap:wrap;gap:28px;align-items:flex-start;margin-top:18px}
+.cap{font-size:13px;color:var(--pmu);margin:8px 2px 0;max-width:320px}
+
+/* Frame tokens */
+.L{--bg:#FFFFFF;--ink:#1F2933;--mu:#5F6B78;--dim:#87919C;--ln:#DDE2E7;--co:#F0604F;--rd:#9B1C31;--scrim:#00000033}
+.D{--bg:#14181D;--ink:#E3E8EE;--mu:#94A0AD;--dim:#626B76;--ln:#2C343D;--co:#FF8E7F;--rd:#E0566F;--scrim:#00000066}
+.fr{background:var(--bg);color:var(--ink);position:relative;overflow:hidden;font:14px/1.45 'Open Sans',"Segoe UI","Helvetica Neue",sans-serif}
+.ph{width:320px;max-width:100%;height:660px;border:2px solid #222;border-radius:30px;flex:none}
+.desk{width:640px;max-width:100%;height:520px;border:1px solid var(--pln)}
+
+/* What sits behind: Book detail */
+.bg{padding:22px 20px}
+.desk .bg{padding:22px 28px}
+.bg .hs{font-size:38px;font-weight:300;letter-spacing:-.015em;line-height:1.1;text-transform:lowercase;color:var(--dim);display:flex;gap:22px;white-space:nowrap}
+.bg .hs .on{color:var(--ink)}
+.bg .r{display:flex;gap:12px;padding:8px 0;align-items:center}
+.bg .r i,.dh i,.cl i{flex:none;display:block}
+.bg .r i{width:32px;height:48px}
+.bg .r b{font-weight:400;font-size:17px;display:block}.bg .r span{font-size:13px;color:var(--mu)}
+.c1{background:#2A4FD6}.c2{background:#1F7A4D}.c3{background:#C4202F}.c4{background:#F7D117}.c5{background:#1E3F73}
+.scrim{position:absolute;inset:0;background:var(--scrim)}
+
+/* Sheet */
+.sheet{position:absolute;left:0;right:0;bottom:0;background:var(--bg);border-top:2px solid var(--ink);padding:0 20px 18px}
+.grab{width:44px;border-top:2px solid var(--ink);margin:10px auto 10px}
+.x{position:absolute;top:16px;right:18px;width:18px;height:18px}
+.x::before,.x::after{content:"";position:absolute;left:8px;top:-2px;width:2px;height:22px;background:var(--ink)}
+.x::before{transform:rotate(45deg)}.x::after{transform:rotate(-45deg)}
+.t{font-size:20px;font-weight:300;line-height:1.3;text-transform:lowercase;margin:0 0 2px}
+.ctx{font-size:13px;color:var(--mu);margin:0 0 14px}
+
+/* Dialog */
+.dlg{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:400px;max-width:calc(100% - 32px);background:var(--bg);border:2px solid var(--ink);padding:18px 22px 18px}
+.foot{display:flex;justify-content:flex-end;gap:8px;margin-top:20px}
+.sheet .foot{margin-top:18px}
+
+/* Controls */
+.fld{margin:0 0 14px}
+.fld label{display:block;font-size:12px;color:var(--mu)}
+.in{border-bottom:2px solid var(--ink);padding:2px 0 4px;font-size:17px;min-height:30px;display:flex;justify-content:space-between;align-items:baseline}
+.in .ph-t{color:var(--dim)}
+.in .cal{font-size:13px;color:var(--mu)}
+.caret{display:inline-block;width:1px;height:18px;background:var(--ink);vertical-align:-3px;margin-left:1px}
+.pop{border:2px solid var(--ink);border-top:0;margin-top:-2px;margin-bottom:14px}
+.opt{display:flex;align-items:center;gap:8px;padding:9px 10px;font-size:17px;min-height:44px}
+.opt.hi{box-shadow:inset 4px 0 0 var(--co)}
+.opt .m,.row .m{flex:none;width:8px;height:8px}
+.opt .m.on,.row .m.on{background:var(--co)}
+.opt .n{margin-left:auto;font-size:13px;color:var(--mu)}
+.rows{margin:0 0 10px}
+.row{display:flex;align-items:center;gap:8px;padding:8px 0;min-height:44px;font-size:17px}
+.row .n{margin-left:auto;font-size:13px;color:var(--mu)}
+.mu{color:var(--mu)}
+.bt{border:2px solid var(--ink);padding:8px 16px;font-size:15px;line-height:1.3;text-transform:lowercase;white-space:nowrap;text-align:center;background:transparent;color:var(--ink)}
+.bt.pr{border-color:var(--co)}
+.bt.full{display:block;width:100%}
+.bt.off{color:var(--dim);border-color:var(--ln)}
+.inl{display:flex;gap:8px;align-items:flex-end}.inl .fld{flex:1;margin:0}
+u{text-decoration-color:var(--co);text-decoration-thickness:2px;text-underline-offset:3px}
+.dateln{display:flex;justify-content:space-between;align-items:baseline;font-size:15px;padding:4px 0 12px;border-bottom:1px solid var(--ln);margin-bottom:6px}
+.kb{position:absolute;left:0;right:0;bottom:0;height:200px;background:repeating-linear-gradient(90deg,transparent 0 28px,#00000010 28px 30px),#D1D5DB;display:flex;align-items:center;justify-content:center;font-size:12px;color:#555}
+.sheet.up{bottom:200px}
+
+/* After: copy lines and toasts */
+.after{display:flex;flex-wrap:wrap;gap:28px;margin-top:18px}
+.card{width:320px;max-width:100%;padding:16px 20px 18px;border:1px solid var(--pln)}
+.gh{font-size:20px;font-weight:300;line-height:1.3;text-transform:lowercase;color:var(--mu);margin:0 0 6px}
+.cl{padding:6px 0 10px}
+.cl .loc{font-size:15px}
+.ops{display:flex;gap:16px;font-size:13px;margin-top:4px}.ops u.d{text-decoration-color:var(--rd)}
+.lent::before{content:"";display:inline-block;width:8px;height:8px;background:var(--co);margin-right:7px}
+.toast{border:2px solid var(--ink);padding:9px 12px;display:flex;gap:16px;font-size:13px;margin-top:12px}
+.toast span:first-child{margin-right:auto}
+.cmp{border-collapse:collapse;margin-top:16px;font-size:13px;max-width:100%}
+.cmp th,.cmp td{text-align:left;padding:6px 14px 6px 0;border-bottom:1px solid var(--pln);vertical-align:top}
+.cmp th{font-weight:400;color:var(--pmu)}
+</style></head><body><main>
+
+<h1>Lend picker</h1>
+<p class="lede">Story 6.7 [J4]. Lend on an owned copy's line in Book detail opens one overlay holding the Person, the date (today by default) and the confirm: a bottom sheet on the phone, a dialog on wide screens. Three ways to arrange it. The scenario is EXPERIENCE.md's: Antti at the door, already in People, today's date. Strings in English; Finnish follows the same layout.</p>
+<table class="cmp"><tr><th></th><th>Antti, today</th><th>New person, today</th><th>Another date</th></tr>
+<tr><td>A · Form</td><td>Lend → type "an" → Antti → Lend (4)</td><td>Lend → type name → Add "…" → Lend</td><td>+ date field</td></tr>
+<tr><td>B · Rows, then confirm</td><td>Lend → Antti → Lend (3)</td><td>Lend → type in New person → Lend</td><td>+ date field</td></tr>
+<tr><td>C · Tap a name to lend</td><td>Lend → Antti (2)</td><td>Lend → type in New person → Lend</td><td>change the date first, then tap</td></tr></table>
+
+<!-- ============ A ============ -->
+<h2>A · Form: combobox, date, Lend</h2>
+<p class="why">The Person is the Combobox from EXPERIENCE.md, focused on open with the keyboard up. Typing narrows the People; a name that isn't there shows <strong>Add "{name}"</strong> as the last option. Under it the Date field (today), then <strong>Lend</strong>, the one primary button. <strong>Scales to any number of People</strong>, and is the only layout that reads the AC literally (combobox). It costs typing even for a regular borrower.</p>
+<div class="set">
+<div><div class="fr ph L">
+  <div class="bg"><div class="hs"><span class="on">Collection</span><span>Loans</span></div>
+    <div class="r"><i class="c1"></i><div><b>Sinuhe egyptiläinen</b><span>Mika Waltari</span></div></div>
+    <div class="r"><i class="c2"></i><div><b>Tuntematon sotilas</b><span>Väinö Linna</span></div></div></div>
+  <div class="scrim"></div>
+  <div class="kb">keyboard</div>
+  <div class="sheet up"><div class="grab"></div><span class="x"></span>
+    <p class="t">Lend</p><p class="ctx">Sinuhe egyptiläinen · Tampere</p>
+    <div class="fld" style="margin-bottom:0"><label>Person</label><div class="in"><span>An<span class="caret"></span></span></div></div>
+    <div class="pop"><div class="opt hi"><span class="m"></span>Antti</div><div class="opt"><span class="m"></span>Anna-Leena</div><div class="opt"><span class="m"></span>Add "An"</div></div>
+    <div class="fld"><label>Lent on</label><div class="in"><span>26.10.2026</span><span class="cal">▾</span></div></div>
+    <span class="bt pr full off">Lend</span>
+  </div>
+</div><p class="cap">Phone, typing. Lend stays disabled until a Person is chosen. The popup covers the date field while it is open.</p></div>
+
+<div><div class="fr ph L">
+  <div class="bg"><div class="hs"><span class="on">Collection</span><span>Loans</span></div>
+    <div class="r"><i class="c1"></i><div><b>Sinuhe egyptiläinen</b><span>Mika Waltari</span></div></div>
+    <div class="r"><i class="c2"></i><div><b>Tuntematon sotilas</b><span>Väinö Linna</span></div></div></div>
+  <div class="scrim"></div>
+  <div class="sheet"><div class="grab"></div><span class="x"></span>
+    <p class="t">Lend</p><p class="ctx">Sinuhe egyptiläinen · Tampere</p>
+    <div class="fld"><label>Person</label><div class="in"><span>Antti</span></div></div>
+    <div class="fld"><label>Lent on</label><div class="in"><span>26.10.2026</span><span class="cal">▾</span></div></div>
+    <span class="bt pr full">Lend</span>
+  </div>
+</div><p class="cap">Phone, Antti chosen, keyboard down: ready to confirm.</p></div>
+
+<div><div class="fr desk L">
+  <div class="bg"><div class="hs"><span class="on">Collection</span><span>Loans</span><span>Wishlists</span></div>
+    <div class="r"><i class="c1"></i><div><b>Sinuhe egyptiläinen</b><span>Mika Waltari</span></div></div>
+    <div class="r"><i class="c2"></i><div><b>Tuntematon sotilas</b><span>Väinö Linna</span></div></div>
+    <div class="r"><i class="c3"></i><div><b>Seitsemän veljestä</b><span>Aleksis Kivi</span></div></div></div>
+  <div class="scrim"></div>
+  <div class="dlg"><p class="t">Lend</p><p class="ctx">Sinuhe egyptiläinen · Tampere</p>
+    <div class="fld" style="margin-bottom:0"><label>Person</label><div class="in"><span>An<span class="caret"></span></span></div></div>
+    <div class="pop"><div class="opt hi"><span class="m"></span>Antti</div><div class="opt"><span class="m"></span>Anna-Leena</div><div class="opt"><span class="m"></span>Add "An"</div></div>
+    <div class="fld"><label>Lent on</label><div class="in"><span>26.10.2026</span><span class="cal">▾</span></div></div>
+    <div class="foot"><span class="bt">Cancel</span><span class="bt pr off">Lend</span></div></div>
+</div><p class="cap">Wide: the same in the dialog, Lend on the right. ↓ ↑ Enter pick from the popup; Enter in the form lends.</p></div>
+</div>
+
+<!-- ============ B ============ -->
+<h2>B · Rows, then confirm</h2>
+<p class="why">Like Move: People as rows (the ones lent to most recently first, at most six, then <strong>Find a person…</strong> opens the combobox in place). A tap marks the row with the 8px marker but does not lend. <strong>New person</strong> is a field under the rows, as "New location" is on Move. Date field, then <strong>Lend</strong>. No keyboard for a regular borrower, and you see the name before committing. One more tap than C.</p>
+<div class="set">
+<div><div class="fr ph L">
+  <div class="bg"><div class="hs"><span class="on">Collection</span><span>Loans</span></div>
+    <div class="r"><i class="c1"></i><div><b>Sinuhe egyptiläinen</b><span>Mika Waltari</span></div></div></div>
+  <div class="scrim"></div>
+  <div class="sheet"><div class="grab"></div><span class="x"></span>
+    <p class="t">Lend</p><p class="ctx">Sinuhe egyptiläinen · Tampere</p>
+    <div class="rows"><div class="row"><span class="m on"></span>Antti</div><div class="row"><span class="m"></span>Leena</div><div class="row"><span class="m"></span>Äiti</div><div class="row"><span class="m"></span><u style="font-size:15px">Find a person…</u></div></div>
+    <div class="fld"><label>New person</label><div class="in"><span class="ph-t"></span></div></div>
+    <div class="fld"><label>Lent on</label><div class="in"><span>26.10.2026</span><span class="cal">▾</span></div></div>
+    <span class="bt pr full">Lend</span>
+  </div>
+</div><p class="cap">Phone: Antti tapped and marked; Lend confirms. Typing in New person clears the row's marker, and vice versa.</p></div>
+
+<div><div class="fr desk L">
+  <div class="bg"><div class="hs"><span class="on">Collection</span><span>Loans</span><span>Wishlists</span></div>
+    <div class="r"><i class="c1"></i><div><b>Sinuhe egyptiläinen</b><span>Mika Waltari</span></div></div>
+    <div class="r"><i class="c2"></i><div><b>Tuntematon sotilas</b><span>Väinö Linna</span></div></div></div>
+  <div class="scrim"></div>
+  <div class="dlg" style="top:50%"><p class="t">Lend</p><p class="ctx">Sinuhe egyptiläinen · Tampere</p>
+    <div class="rows"><div class="row"><span class="m on"></span>Antti</div><div class="row"><span class="m"></span>Leena</div><div class="row"><span class="m"></span>Äiti</div></div>
+    <div class="fld"><label>New person</label><div class="in"></div></div>
+    <div class="fld"><label>Lent on</label><div class="in"><span>26.10.2026</span><span class="cal">▾</span></div></div>
+    <div class="foot" style="margin-top:8px"><span class="bt">Cancel</span><span class="bt pr">Lend</span></div></div>
+</div><p class="cap">Wide: rows are reachable with Tab and the arrow keys; Space marks, Enter lends.</p></div>
+</div>
+
+<!-- ============ C ============ -->
+<h2>C · Tap a name to lend</h2>
+<p class="why">The Move pattern as it is: <strong>one tap on a name lends</strong>, at the date shown at the top. The date line reads "Today · 26.10.2026" with a <strong>Change</strong> Link that turns it into the Date field. A new person is a field under the rows with a secondary <strong>Lend</strong> button beside it, as on Move. Fastest at the door (two taps), and the toast's Undo covers a wrong tap. The risk: a mis-tap lends at once, and a date change has to come before the name.</p>
+<div class="set">
+<div><div class="fr ph L">
+  <div class="bg"><div class="hs"><span class="on">Collection</span><span>Loans</span></div>
+    <div class="r"><i class="c1"></i><div><b>Sinuhe egyptiläinen</b><span>Mika Waltari</span></div></div></div>
+  <div class="scrim"></div>
+  <div class="sheet"><div class="grab"></div><span class="x"></span>
+    <p class="t">Lend</p><p class="ctx">Sinuhe egyptiläinen · Tampere</p>
+    <div class="dateln"><span>Today <span class="mu">· 26.10.2026</span></span><u style="font-size:13px">Change</u></div>
+    <div class="rows"><div class="row"><span class="m"></span>Antti<span class="n">1 out</span></div><div class="row"><span class="m"></span>Leena</div><div class="row"><span class="m"></span>Äiti</div><div class="row"><span class="m"></span><u style="font-size:15px">Find a person…</u></div></div>
+    <div class="inl"><div class="fld"><label>New person</label><div class="in"></div></div><span class="bt off">Lend</span></div>
+  </div>
+</div><p class="cap">Phone: tap Antti and the sheet closes with "Lent to Antti · Undo". "1 out" shows a Person already holding something.</p></div>
+
+<div><div class="fr ph L">
+  <div class="bg"><div class="hs"><span class="on">Collection</span><span>Loans</span></div>
+    <div class="r"><i class="c1"></i><div><b>Sinuhe egyptiläinen</b><span>Mika Waltari</span></div></div></div>
+  <div class="scrim"></div>
+  <div class="sheet"><div class="grab"></div><span class="x"></span>
+    <p class="t">Lend</p><p class="ctx">Sinuhe egyptiläinen · Tampere</p>
+    <div class="fld"><label>Lent on</label><div class="in"><span>24.10.2026</span><span class="cal">▾</span></div></div>
+    <div class="rows"><div class="row"><span class="m"></span>Antti<span class="n">1 out</span></div><div class="row"><span class="m"></span>Leena</div><div class="row"><span class="m"></span>Äiti</div></div>
+    <div class="inl"><div class="fld"><label>New person</label><div class="in"></div></div><span class="bt off">Lend</span></div>
+  </div>
+</div><p class="cap">After Change: the Date field, set to two days ago; the next tap on a name lends on that date.</p></div>
+
+<div><div class="fr desk L">
+  <div class="bg"><div class="hs"><span class="on">Collection</span><span>Loans</span><span>Wishlists</span></div>
+    <div class="r"><i class="c1"></i><div><b>Sinuhe egyptiläinen</b><span>Mika Waltari</span></div></div>
+    <div class="r"><i class="c2"></i><div><b>Tuntematon sotilas</b><span>Väinö Linna</span></div></div></div>
+  <div class="scrim"></div>
+  <div class="dlg"><p class="t">Lend</p><p class="ctx">Sinuhe egyptiläinen · Tampere</p>
+    <div class="dateln"><span>Today <span class="mu">· 26.10.2026</span></span><u style="font-size:13px">Change</u></div>
+    <div class="rows"><div class="row"><span class="m"></span>Antti<span class="n">1 out</span></div><div class="row"><span class="m"></span>Leena</div><div class="row"><span class="m"></span>Äiti</div></div>
+    <div class="inl"><div class="fld"><label>New person</label><div class="in"></div></div><span class="bt off">Lend</span></div>
+    <div class="foot" style="margin-top:14px"><span class="bt">Cancel</span></div></div>
+</div><p class="cap">Wide: the dialog has no primary button; Enter on a row lends.</p></div>
+</div>
+
+<!-- ============ After ============ -->
+<h2>After, the same for A, B and C</h2>
+<p class="why">The copy's line in Book detail before and after, and the two toasts. Returned is a Link on the lent line, closing the loan today; there is no picker for it. Drawn here with Returned only, as EXPERIENCE.md lists it; whether Move and Remove stay on a lent line is still open.</p>
+<div class="after">
+<div class="card fr L"><p class="gh">Your copies</p>
+  <div class="cl"><span class="loc"><u style="text-decoration-color:var(--ln)">Tampere</u></span><div class="ops"><u>Lend</u><u>Move</u><u class="d">Remove</u></div></div>
+  <p class="cap" style="margin:0">Owned.</p></div>
+<div class="card fr L"><p class="gh">Your copies</p>
+  <div class="cl"><span class="loc"><u style="text-decoration-color:var(--ln)">Tampere</u></span><div class="lent" style="margin-top:4px">Lent to Antti since 26 Oct 2026</div><div class="ops"><u>Returned</u></div></div>
+  <div class="toast"><span>Lent to Antti</span><u>Undo</u><span>✕</span></div></div>
+<div class="card fr L"><p class="gh">Your copies</p>
+  <div class="cl"><span class="loc"><u style="text-decoration-color:var(--ln)">Tampere</u></span><div class="ops"><u>Lend</u><u>Move</u><u class="d">Remove</u></div></div>
+  <div class="toast"><span>Returned</span><u>Undo</u><span>✕</span></div></div>
+<div class="card fr D"><p class="gh">Your copies</p>
+  <div class="cl"><span class="loc"><u style="text-decoration-color:var(--ln)">Tampere</u></span><div class="lent" style="margin-top:4px">Lent to Antti since 26 Oct 2026</div><div class="ops"><u>Returned</u></div></div>
+  <div class="toast"><span>Lent to Antti</span><u>Undo</u><span>✕</span></div></div>
+</div>
+
+</main></body></html>
