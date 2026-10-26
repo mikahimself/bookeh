@@ -71,6 +71,7 @@ export interface Config {
     books: Book;
     copies: Copy;
     genres: Genre;
+    loans: Loan;
     locations: UserLocation;
     media: Media;
     people: Person;
@@ -88,6 +89,7 @@ export interface Config {
     books: BooksSelect<false> | BooksSelect<true>;
     copies: CopiesSelect<false> | CopiesSelect<true>;
     genres: GenresSelect<false> | GenresSelect<true>;
+    loans: LoansSelect<false> | LoansSelect<true>;
     locations: LocationsSelect<false> | LocationsSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     people: PeopleSelect<false> | PeopleSelect<true>;
@@ -290,6 +292,20 @@ export interface Copy {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "loans".
+ */
+export interface Loan {
+  id: number;
+  owner: number | User;
+  copy: number | Copy;
+  person: number | Person;
+  lentOn: string;
+  returnedOn?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "people".
  */
 export interface Person {
@@ -377,6 +393,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'genres';
         value: number | Genre;
+      } | null)
+    | ({
+        relationTo: 'loans';
+        value: number | Loan;
       } | null)
     | ({
         relationTo: 'locations';
@@ -504,6 +524,19 @@ export interface GenresSelect<T extends boolean = true> {
   name?: T;
   nameFi?: T;
   nameKey?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "loans_select".
+ */
+export interface LoansSelect<T extends boolean = true> {
+  owner?: T;
+  copy?: T;
+  person?: T;
+  lentOn?: T;
+  returnedOn?: T;
   updatedAt?: T;
   createdAt?: T;
 }

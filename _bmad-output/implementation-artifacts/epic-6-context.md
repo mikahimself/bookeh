@@ -36,7 +36,7 @@ Answer "who has it?" from the phone. Mika keeps a private People list, lends an 
 ## Technical Decisions
 
 - **`people`:** has `ownerField()` and `nameKeyField()`, with `name` and a database-unique `(owner, nameKey)`. Read, update and delete are `owner = current user` for every role, admin included. It ships a two-user access test.
-- **`loans`:** has `ownerField()`. `copy` and `person` are `ownedRelation`s, so their validation re-reads the target and rejects foreign ids. `lentOn` and `returnedOn` are calendar dates: sent as `YYYY-MM-DD`, stored at 12:00 UTC and read back by their UTC date. `returnedOn` is empty while the loan is open. "One open loan per copy" is a partial unique constraint on `loans(copy)` where `returnedOn` is null, present from the table's first migration. A service check for the same rule exists only to raise a `DomainError` first. The access test uses foreign ids.
+- **`loans`:** has `ownerField()`. `copy` and `person` are `ownedRelation`s, so their validation re-reads the target and rejects foreign ids. `lentOn` and `returnedOn` are calendar dates: sent as `YYYY-MM-DD`, stored at 12:00 UTC and read back by their UTC date. `returnedOn` is empty while the loan is open. "One open loan per copy" is a partial unique constraint on `loans(copy)` where `returnedOn` is null, present from the table's first migration. A service check for the same rule exists only to raise a `DomainError` first. The access test uses foreign ids. Built in 6.2: a field hook stores any date at 12:00 UTC of its UTC date, the index is `loans_copy_open_idx` (its unique violation surfaces on path `copy_id`, not `copy`), and a collection hook already rejects a `returnedOn` before `lentOn` on path `returnedOn`; 6.5 adds only the future-lending-date and owned-copy checks.
 - **Schema stories** (6.1, 6.2) merge one at a time. Each commits its migration and the regenerated `payload-types.ts`, and regenerates its migration after a rebase.
 - **`lib/people`** is the only code that matches, creates, renames, merges and deletes People, and it imports no other service.
   - A Person `Ref` is an id (checked) or `{ create: name }`, which matches by `nameKey` or creates. It resolves inside the action's transaction.
@@ -68,7 +68,8 @@ Answer "who has it?" from the phone. Mika keeps a private People list, lends an 
   - ordered: "Ordered" and Received.
 
   Lend and Returned are reachable in the half-open sheet. A "Lent before" group lists the Book's closed loans newest first as "{person} · {from} to {to}". It is absent when there are none.
-- **Lent marker:** an 8px accent square, never a dot, always with its text. A row ends with "Lent · {person}" in place of the location. A tile has the marker before its title. The Answer's copy line shows the same.
+- **Lent marker:** an 8px accent square, never a dot, always with its text in the normal text colour. A row ends with "Lent · {person}" in place of the location. A tile has the marker before its title, below the cover. The Answer's copy line shows the same.
+- **Covers:** every cover on these screens (Loans rows, Book detail, the Answer) comes from the shared `Cover` component, which already draws the 1px cover frame and, for a Book without a cover, the cloth placeholder (colour picked by a hash of the title; at row size under 48px wide, cloth only, no title). Do not restyle covers or add a separate placeholder; the cloth colours are cover art and never mark loan state.
 - **Removal dialog:** when any copy being removed is lent, the dialog adds that its loans go too. This applies to one copy and to a selection.
 - **Loans section:**
   - A by person / by date text switch.
@@ -88,7 +89,7 @@ Answer "who has it?" from the phone. Mika keeps a private People list, lends an 
 
 ## Cross-Story Dependencies
 
-- **Status:** 6.1–6.13 are backlog. Epic 5, including its retrospective clean-ups 5.38 and 5.39, is done.
+- **Status:** 6.1 is done; 6.2–6.13 are backlog. Epic 5, including its retrospective clean-ups 5.38 and 5.39, is done, and so is the cloth-placeholder and cover-frame change to covers.
 - **Order:**
   - 6.1 comes before 6.2, because loans reference People.
   - 6.3 needs 6.1, and its merge moves loans, so it needs 6.2 too.

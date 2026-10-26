@@ -10,6 +10,7 @@ import * as migration_20261018_164917_locations from './20261018_164917_location
 import * as migration_20261021_072731_lean_finna_raw from './20261021_072731_lean_finna_raw'
 import * as migration_20261021_121736_media_visibility from './20261021_121736_media_visibility'
 import * as migration_20261026_045004_people from './20261026_045004_people'
+import * as migration_20261026_071554_loans from './20261026_071554_loans'
 
 export const migrations = [
   {
@@ -71,5 +72,10 @@ export const migrations = [
     up: migration_20261026_045004_people.up,
     down: migration_20261026_045004_people.down,
     name: '20261026_045004_people',
+  },
+  {
+    up: migration_20261026_071554_loans.up,
+    down: migration_20261026_071554_loans.down,
+    name: '20261026_071554_loans',
   },
 ]

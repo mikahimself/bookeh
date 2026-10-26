@@ -9,6 +9,7 @@ import { Books } from './collections/Books'
 import { isbnIndexes, nameKeyIndexes } from './collections/catalogueIndexes'
 import { Copies } from './collections/Copies'
 import { Genres } from './collections/Genres'
+import { Loans, openLoanIndex } from './collections/Loans'
 import { Locations } from './collections/Locations'
 import { People } from './collections/People'
 import { Series } from './collections/Series'
@@ -43,7 +44,19 @@ export default buildConfig({
       },
     },
   },
-  collections: [Authors, Books, Copies, Genres, Locations, Media, People, Series, UserBooks, Users],
+  collections: [
+    Authors,
+    Books,
+    Copies,
+    Genres,
+    Loans,
+    Locations,
+    Media,
+    People,
+    Series,
+    UserBooks,
+    Users,
+  ],
   graphQL: { disable: true },
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {
@@ -59,7 +72,12 @@ export default buildConfig({
     // Applied only when NODE_ENV=production, where the adapter disables push
     // (AD-13): the production container migrates at start, never pushes.
     prodMigrations: migrations,
-    afterSchemaInit: [nameKeyIndexes('authors'), nameKeyIndexes('series'), isbnIndexes],
+    afterSchemaInit: [
+      nameKeyIndexes('authors'),
+      nameKeyIndexes('series'),
+      isbnIndexes,
+      openLoanIndex,
+    ],
   }),
   sharp,
   plugins: [],
