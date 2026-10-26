@@ -31,6 +31,7 @@ export async function NotInLibraryAnswer({ answer }: { answer: AnswerBook }) {
             editions={editionLines(editions, text).map((line, index) => ({
               cover: editions[index]!.cover,
               title: editions[index]!.title,
+              language: editions[index]!.language,
               line,
             }))}
           />

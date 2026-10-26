@@ -2,7 +2,7 @@
 name: bookeh
 description: Type-led, line-only visual system for a personal book catalogue. White or dark slate ground, one coral accent used as lines, square corners, no fills, one soft shadow. Built with Tailwind CSS 4 tokens on headless primitives.
 status: final
-updated: 2026-10-06
+updated: 2026-10-26
 colors:
   # Light
   background: '#FFFFFF'
@@ -27,6 +27,17 @@ colors:
   # Corner crop stage, the same in both themes
   crop-dim: '#00000099'
   crop-halo: '#0000008C'
+  # Cover placeholder cloth, the same in both themes (Components → Cover placeholder)
+  cloth-blue: '#2A4FD6'
+  cloth-pink: '#EC3D8C'
+  cloth-green: '#1F7A4D'
+  cloth-yellow: '#F7D117'
+  cloth-navy: '#1E3F73'
+  cloth-red: '#C4202F'
+  cloth-ink-light: '#F5F2EA'
+  cloth-ink-dark: '#15171A'
+  cover-frame: '#1F293324'
+  cover-frame-dark: '#FFFFFF1F'
 typography:
   heading-section:
     fontFamily: 'Open Sans'
@@ -80,6 +91,12 @@ typography:
     fontSize: 12px
     fontWeight: '400'
     lineHeight: '1.3'
+  cover-title:
+    fontFamily: "'Trebuchet MS', 'Open Sans'"
+    fontWeight: '600'
+    lineHeight: '1.15'
+    letterSpacing: 0.08em
+    textTransform: uppercase
 rounded:
   DEFAULT: 0px
 spacing:
@@ -144,6 +161,11 @@ components:
     radius: '{rounded.DEFAULT}'
     caption-title: '{typography.meta}'
     caption-author: '{typography.label}'
+    frame: '1px {colors.cover-frame} outline, inset by its own width'
+  cover-placeholder:
+    cloth: '{colors.cloth-*}, one per Book, picked by a hash of its title'
+    title: '{typography.cover-title}'
+    texture: 'one Perlin-noise tile, soft-light, position picked by the same hash'
   selection-bar:
     width: '{spacing.stroke-selection}'
     color: '{colors.accent}'
@@ -217,7 +239,7 @@ The visual language takes its notes from Microsoft's Metro. Type does the work t
 
 Three rules define the look more than any others:
 
-- **No fills.** No area of the interface is filled with colour: no filled buttons, no tinted rows, no filled chips, no inverted segments, no filled stars. State and emphasis are shown with lines, weight and ink. The only solid marks are lines and the 8px marker. The only solid areas are the book covers and the {colors.scrim} behind a sheet or dialog.
+- **No fills.** No area of the interface is filled with colour: no filled buttons, no tinted rows, no filled chips, no inverted segments, no filled stars. State and emphasis are shown with lines, weight and ink. The only solid marks are lines and the 8px marker. The only solid areas are the book covers, the Cover placeholder's cloth included, and the {colors.scrim} behind a sheet or dialog.
 - **One accent, as lines.** {colors.accent} is the only colour in normal use. It is a line, a bar, an outline or an underline, never an area. {colors.danger} appears only when something has gone wrong or is about to be removed, and follows the same rule.
 - **One raised thing.** The look departs from Metro in one place on purpose: the book detail panel on wide screens has a dim border and a light shadow, because it is something extra that opens over the working view.
 
@@ -245,6 +267,15 @@ Every colour has a light and a dark value. Dark tokens carry the `-dark` suffix 
 | `airmail-red` | `#D7282F` | `#D7282F` | The red stripes of the airmail band on an ordered copy's cover tile (Components → Cover tile). Nothing else. |
 | `airmail-blue` | `#2251A3` | `#2251A3` | The blue stripes of the same band. Nothing else. |
 | `airmail-white` | `#FFFFFF` | `#FFFFFF` | The white stripes of the same band, white in both themes. Nothing else. |
+| `cover-frame` | `#1F293324` | `#FFFFFF1F` | The hairline inside every cover's edge (Components → Cover tile). Nothing else. |
+| `cloth-blue` | `#2A4FD6` | `#2A4FD6` | Cover placeholder cloth (Components → Cover placeholder), title in `cloth-ink-light`. Nothing else. |
+| `cloth-pink` | `#EC3D8C` | `#EC3D8C` | The same, title in `cloth-ink-dark`. |
+| `cloth-green` | `#1F7A4D` | `#1F7A4D` | The same, title in `cloth-ink-light`. |
+| `cloth-yellow` | `#F7D117` | `#F7D117` | The same, title in `cloth-ink-dark`. |
+| `cloth-navy` | `#1E3F73` | `#1E3F73` | The same, title in `cloth-ink-light`. |
+| `cloth-red` | `#C4202F` | `#C4202F` | The same, title in `cloth-ink-light`. |
+| `cloth-ink-light` | `#F5F2EA` | `#F5F2EA` | The cover title on the darker cloths. Nothing else. |
+| `cloth-ink-dark` | `#15171A` | `#15171A` | The cover title on pink and yellow cloth. Nothing else. |
 
 Rules for {colors.accent}:
 
@@ -265,11 +296,13 @@ Contrast against {colors.background}, approximate:
 
 {colors.accent} and {colors.text-dim} were strengthened to reach 3:1. The paler values in the early explorations under `.working/` are superseded; `.working/examples-contrast-red-filters.html` shows the difference.
 
+The cloth colours are the "mixtape" palette of `.working/cover-treatment-2.html`, drawn from the owner's references: the blue of Iida Rauma's *Hävitys*, the pink of Pontus Purokuru's *Mikä internetiä vaivaa*, the green of *Seven endless forests*, Plur1bus yellow, Severance's Lumon blue, Amélie's red. They are the same in both themes, and they are cover art, not interface colour: they never mark state or appear outside a placeholder. Every title ink reaches at least 4.5:1 on its flat cloth; the mottle moves that a little either way, which is acceptable because the placeholder is decorative and the caption repeats the title.
+
 Avoid: a second accent for anything but errors, status colours, tinted backgrounds, gradients, coloured text in light mode.
 
 ## Typography
 
-One typeface: **Open Sans**, self-hosted, in weights 300 and 400. There is no bold in the interface; hierarchy comes from size and from the light weight. Book titles use the same typeface as everything else.
+One typeface: **Open Sans**, self-hosted, in weights 300 and 400. There is no bold in the interface; hierarchy comes from size and from the light weight. Book titles use the same typeface as everything else. The one exception is the Cover placeholder, which is cover art, not interface: its title is set in {typography.cover-title}.
 
 | Role | Token | Used for |
 |---|---|---|
@@ -282,8 +315,9 @@ One typeface: **Open Sans**, self-hosted, in weights 300 and 400. There is no bo
 | Body | `body` (14px / 400) | Running text, values. |
 | Meta | `meta` (13px / 400) | Second line of a row, locations, toasts. |
 | Label | `label` (12px / 400) | Field labels, cover captions' second line. |
+| Cover title | `cover-title` (Trebuchet MS 600, caps, 0.08em; Open Sans 600 where Trebuchet is missing) | The title printed on a Cover placeholder, and nothing else. Size by the cover's width, under Components → Cover placeholder. |
 
-**Lowercase.** Section headings, screen headings, group headings and buttons are rendered lowercase with CSS `text-transform`, driven by one token or utility so the default can be changed in one place. Source strings are written in normal sentence case. Text switches follow the buttons and are lowercase too, except where the options are proper names, such as the languages. Labels, chips, messages and all book data (titles, authors, the user's own place names and tags) are shown as written. Text the user typed is never lowercased, even where it is a heading, such as a wishlist's name or a borrower's name.
+**Lowercase.** Section headings, screen headings, group headings and buttons are rendered lowercase with CSS `text-transform`, driven by one token or utility so the default can be changed in one place. Source strings are written in normal sentence case. Text switches follow the buttons and are lowercase too, except where the options are proper names, such as the languages. Labels, chips, messages and all book data (titles, authors, the user's own place names and tags) are shown as written, except the title printed on a Cover placeholder, which is in caps. Text the user typed is never lowercased, even where it is a heading, such as a wishlist's name or a borrower's name.
 
 Finnish text must render correctly at every size: å, ä and ö are letters, and Open Sans carries them in both weights.
 
@@ -355,8 +389,8 @@ Visual specs. Behaviour lives in `EXPERIENCE.md` → Component Patterns.
 | Filter chip | A value on an opened book that can be tapped to filter (author, series, genre, tag, location). [ASSUMPTION: styled as a Link, with no outline or fill.] |
 | Text field | {typography.label} label in {colors.text-muted} above the value. The value sits on a {spacing.stroke-control} {colors.text} underline; an empty field's underline is {colors.text-dim}; a field with a mistake has a {colors.danger} underline and a {typography.meta} message beneath. No box. The search field is the same without a label. |
 | Book row | Cover, then title in {typography.title} and a {typography.meta} second line in {colors.text-muted}, then the location in {typography.meta}. No divider. Sizes per the density table. |
-| Cover tile | Cover at 2:3, square corners, with title and author beneath. A lent copy has the 8px marker before its title. An ordered copy's tile carries a red-white-blue airmail band across the top-left corner of its cover: a 10px strip of {colors.airmail-red}, {colors.airmail-white}, {colors.airmail-blue}, {colors.airmail-white} stripes at 45°, clipped by the cover's box, no word (the row layout still ends the row with "Ordered"). The open tile has the selection bar along the bottom edge of its cover. In select mode the checkbox sits before the title. [ASSUMPTION for the lent, open and select states] |
-| Cover placeholder | A book with no cover shows the typeset paperback: an outlined rectangle in {colors.text-dim} with the title bottom-left in {typography.label} {colors.text}, wrapped and clamped to four lines, and the author under it in {typography.label} {colors.text-muted}. At s and in rows the title only; a row at s keeps its empty box. |
+| Cover tile | Cover at 2:3, square corners, with title and author beneath, for every cover, photo or placeholder. Every cover has the cover frame: a 1px {colors.cover-frame} hairline inside its edge, so a white or black cover still has an edge. A lent copy has the 8px marker before its title. An ordered copy's tile carries a red-white-blue airmail band across the top-left corner of its cover: a 10px strip of {colors.airmail-red}, {colors.airmail-white}, {colors.airmail-blue}, {colors.airmail-white} stripes at 45°, clipped by the cover's box, no word (the row layout still ends the row with "Ordered"). The open tile has the selection bar along the bottom edge of its cover. In select mode the checkbox sits before the title. [ASSUMPTION for the lent, open and select states] |
+| Cover placeholder | A book with no cover shows a cloth cover: one of the six `cloth-*` colours, picked by a hash of the title, so a Book wears the same cloth before it is saved (the Answer, the edition picker) and after, under a Perlin-noise mottle (one SVG `feTurbulence` fractal-noise tile at twice the cover's width, blended soft-light; the same hash picks which part shows) and the cover frame. The title only, never the author, in {typography.cover-title} in the cloth's ink, top-left, inset 13% of the cover's width at the top and 11% at the sides. Long words hyphenate in the Book's language (its stored code as `lang`; Finnish when it has none or holds free text; where the browser supports the limit, only words of nine letters or more, at least four letters each side); a word still too wide for the cover breaks where it must. By cover width: from 150px, 14px, 0.08em, at most five lines; from 96px, 10.5px, 0.06em, four lines; below that, 8.5px, 0.04em, three lines; under 48px wide (every row) the cloth alone. On an ordered copy the title starts below the airmail band, at least 40px down. → `.working/cover-treatment-2.html` |
 | Selection bar | A {spacing.stroke-selection} {colors.accent} bar on the left edge of the open row. The row is not tinted. |
 | Lent marker | An 8px {colors.accent} square before the text "Lent · {person}" in {colors.text}. |
 | Detail panel | {spacing.panel-width} wide on the plain ground, with the left border and shadow described under Elevation & Depth. Cover 72 × 108px beside the {typography.heading-detail} title. Groups headed in {typography.heading-group}. Values in rows with the label left and the value right in {colors.text-muted}. Buttons at the foot. |

@@ -1,0 +1,185 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>bookeh examples: cover treatment 2</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600&display=swap"><style>
+.L{--bg:#FFFFFF;--ink:#1F2933;--mu:#5F6B78;--co:#F0604F;--inset:#1F293324;--cink:#F5F2EA}
+.D{--bg:#14181D;--ink:#E3E8EE;--mu:#94A0AD;--co:#FF8E7F;--inset:#FFFFFF1F;--cink:#E3E8EE}
+*{box-sizing:border-box}body{margin:0;font:14px/1.45 system-ui,sans-serif;color:#222;background:#e4e4e4}
+main{max-width:1180px;margin:0 auto;padding:24px 16px 96px}main>h1{font-size:22px;margin:0 0 4px}
+h2.s{font:600 16px system-ui,sans-serif;margin:32px 0 2px}.note{color:#555;max-width:84ch;margin:2px 0 10px}
+.bar{position:sticky;top:0;z-index:5;background:#e4e4e4ee;backdrop-filter:blur(4px);padding:10px 0;display:flex;flex-wrap:wrap;gap:8px 22px;border-bottom:1px solid #ccc}
+.bar fieldset{border:0;margin:0;padding:0;display:flex;gap:4px;align-items:center;flex-wrap:wrap}
+.bar legend{float:left;font-weight:600;margin-right:6px;font-size:13px}
+.bar label{font-size:13px;padding:2px 8px;border:1px solid #aaa;cursor:pointer;background:#f4f4f4;display:inline-flex;gap:5px;align-items:center}
+.bar input{display:none}.bar label:has(input:checked){background:#222;color:#fff;border-color:#222}
+.sw{display:inline-flex}.sw i{width:10px;height:14px}
+.row{display:grid;grid-template-columns:1fr 390px;gap:12px;align-items:start}
+@media (max-width:900px){.row{grid-template-columns:1fr}}
+.pn{background:var(--bg);color:var(--ink);font-family:'Open Sans',"Segoe UI","Helvetica Neue",sans-serif;padding:20px 28px 28px}
+.pn.ph{padding:16px 20px 24px}
+.cap{font:12px system-ui,sans-serif;color:#777;margin:0 0 4px}
+.stack{display:grid;gap:12px}
+
+.grid{list-style:none;margin:0;padding:0;display:grid;align-items:start}
+.grid.l{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:24px}
+.grid.m{grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:18px}
+.grid.s{grid-template-columns:repeat(auto-fill,minmax(70px,1fr));gap:10px}
+.grid li{min-width:0}
+.t1{margin:0;padding-top:4px;font-size:13px;line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.grid.s .t1{font-size:12px;line-height:1.3}
+.t2{margin:0;font-size:12px;line-height:1.3;color:var(--mu);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mk{display:inline-block;width:8px;height:8px;background:var(--co);margin-right:6px;vertical-align:1px}
+
+.cv{position:relative;aspect-ratio:2/3;width:100%;overflow:hidden;isolation:isolate}
+.cv::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:3;box-shadow:inset 0 0 0 1px var(--inset)}
+
+/* Placeholder: cloth + Perlin mottle + the title, set like the Leviathan stand-in */
+.ph-cv{background:var(--cloth);color:var(--cink);padding:var(--top,13%) 11% 11%}
+.ph-cv::before{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;background-image:var(--noise);background-size:var(--nsize);mix-blend-mode:soft-light;opacity:.6}
+.pt{position:relative;z-index:1;display:-webkit-box;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:break-word;text-transform:uppercase;font-weight:600;letter-spacing:.08em;line-height:1.15;-webkit-line-clamp:5}
+[data-font=trebuchet] .pt{font-family:'Trebuchet MS','Open Sans',sans-serif}
+.grid.l .pt{font-size:14px}
+.grid.m .pt{font-size:10.5px;letter-spacing:.06em;-webkit-line-clamp:4}
+.grid.s .pt{display:none}
+[data-s=title] .grid.s .pt{display:-webkit-box;font-size:8.5px;letter-spacing:.04em;-webkit-line-clamp:3}
+.grid.s .ph-cv{padding:12% 10%}
+/* An ordered placeholder's title starts under the airmail band */
+.air.ph-cv{--top:40px}
+.grid.m .air.ph-cv,.grid.s .air.ph-cv{--top:36px}
+
+.band{position:absolute;z-index:4;top:0;left:0;width:80px;height:10px;transform:translate(-50%,-50%) translate(20px,20px) rotate(-45deg);background:repeating-linear-gradient(90deg,#D7282F 0 8px,#fff 8px 16px,#2251A3 16px 24px,#fff 24px 32px)}
+/* Long words: hyphenate as Finnish, and/or step the size down by the longest word's length */
+[data-fit=hyph] .pt,[data-fit=both] .pt{-webkit-hyphens:auto;hyphens:auto;hyphenate-limit-chars:9 4 4}
+[data-fit=shrink] .grid.l .pt.w2,[data-fit=both] .grid.l .pt.w2{font-size:12px;letter-spacing:.05em}
+[data-fit=shrink] .grid.l .pt.w3,[data-fit=both] .grid.l .pt.w3{font-size:11px;letter-spacing:.03em}
+[data-fit=shrink] .grid.m .pt.w2,[data-fit=both] .grid.m .pt.w2{font-size:9.5px;letter-spacing:.03em}
+[data-fit=shrink] .grid.m .pt.w3,[data-fit=both] .grid.m .pt.w3{font-size:8.5px;letter-spacing:.02em}
+
+/* Stand-in photo covers (CSS, not real images) */
+.ph1{background:#fbfaf6;color:#111;padding:16% 12%;display:flex;flex-direction:column;font-family:Georgia,serif}
+.ph1 b{font-weight:400;font-size:clamp(8px,1.2vw,16px);letter-spacing:.04em;text-transform:uppercase;line-height:1.15}
+.ph1 i{margin-top:auto;font-style:normal;color:#b3261e;font-size:clamp(6px,.8vw,11px);letter-spacing:.2em;text-transform:uppercase}
+.ph1 hr{border:0;border-top:2px solid #b3261e;width:30%;margin:10% 0}
+.ph2{background:#0c0c0c;color:#f4d03f;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;font:700 clamp(9px,1.6vw,22px)/1 Impact,'Arial Narrow',sans-serif;text-transform:uppercase;gap:8%}
+.ph2 small{font:400 clamp(5px,.75vw,10px)/1 system-ui;letter-spacing:.25em;color:#ddd}
+.ph3{background:radial-gradient(circle at 70% 30%,#ffb35c 0 9%,#d9480f 22%,#3b0d2b 55%,#0b0a1d 85%);color:#fff;display:flex;flex-direction:column;justify-content:space-between;padding:10%;font:600 clamp(7px,1.2vw,15px)/1.1 'Trebuchet MS',sans-serif;text-transform:uppercase;letter-spacing:.08em}
+.ph3 small{font-size:.65em;letter-spacing:.2em;opacity:.85}
+.ph4{background:linear-gradient(160deg,#e9c46a,#b5761c 60%,#6d3d0b);color:#2b1606;display:flex;flex-direction:column;justify-content:flex-end;padding:12%;font:italic clamp(8px,1.3vw,17px)/1.1 Georgia,serif}
+.ph4 small{font:400 clamp(5px,.75vw,10px)/1.2 system-ui;letter-spacing:.15em;text-transform:uppercase;margin-top:6%}
+code{font-size:12px;background:#0000000d;padding:0 3px}
+</style></head><body><main>
+<h1>bookeh examples: cover treatment 2</h1>
+<p class="note"><b>Chosen (2026-10-26):</b> layout C; mixtape palette with the Lumon blue in place of the MDR teal; full strength in dark mode too; Trebuchet 600 caps; Perlin mottle; inset hairline; Finnish hyphenation; the title on the cover at s too. The bar opens on these; the other options stay for the record.</p>
+<p class="note">Option C from <a href="cover-treatment.html">the first pass</a>, refined: every tile has the title and author underneath, and a placeholder cover carries the title only, in caps, set like the <i>Leviathan wakes</i> stand-in. Settled in this pass: Perlin mottle, inset hairline frame, no hinge. <b>Light mode</b> uses the palette at full strength. <b>Dark mode</b> darkens the same colour, so a book keeps its colour in both themes: "deep" lowers the lightness and keeps most of the saturation; "tint" mixes it into the dark ground, which greys it (yellow turns olive, pink turns mauve: the earthy look again); "full" is the light-mode colour unchanged.</p>
+<p class="note"><b>Round 3, less earthy.</b> Palettes drawn from your references: the blue of Iida Rauma's <i>Hävitys</i>, the pink of Pontus Purokuru's <i>Mikä internetiä vaivaa</i>, the green of <i>Seven endless forests</i>, Plur1bus black and yellow, Severance, Amélie. The hex values are from memory, not sampled; hover a swatch for its source. The title takes dark or light ink per colour, whichever reads better (hot pink and yellow get black caps), except Plur1bus black, which gets yellow, and the Severance terminal, which gets terminal cyan.</p>
+<p class="note">Long Finnish compounds are the hard case for caps: <i>POSTITOIMISTO</i> no longer fits a column at l. "Long words" compares breaking anywhere (today's <code>break-words</code>), hyphenating with <code>lang="fi"</code> (words of 9+ letters only, at least 4 each side), stepping the size down by the longest word's length, and both. Here every title hyphenates as Finnish; the app uses each Book's stored language, Finnish when it has none.</p>
+<p class="note">Each book gets one of the palette's four colours from a hash of its id (the title here), so the shelf is mixed but stable. A book never changes colour between visits, and the noise pattern is seeded from the same hash. Two neighbours can land on the same colour; with four colours that happens about one time in four.</p>
+
+<form class="bar" id="bar">
+  <fieldset><legend>palette</legend>
+    <label><input type="radio" name="pal" value="refs"><span>references</span><span class="sw" data-p="refs"></span></label>
+    <label><input type="radio" name="pal" value="pop"><span>pop</span><span class="sw" data-p="pop"></span></label>
+    <label><input type="radio" name="pal" value="lumon"><span>severance</span><span class="sw" data-p="lumon"></span></label>
+    <label><input type="radio" name="pal" value="amelie"><span>amélie</span><span class="sw" data-p="amelie"></span></label>
+    <label><input type="radio" name="pal" value="mix" checked><span>mixtape</span><span class="sw" data-p="mix"></span></label>
+    <label><input type="radio" name="pal" value="fjord"><span>fjord (round 2)</span><span class="sw" data-p="fjord"></span></label></fieldset>
+  <fieldset><legend>dark mode</legend>
+    <label><input type="radio" name="dk" value="deep" checked><span>deep (keeps saturation)</span></label>
+    <label><input type="radio" name="dk" value="tint"><span>tint (mix into ground)</span></label></fieldset>
+  <fieldset><legend>dark strength</legend>
+    <label><input type="radio" name="mix" value="24"><span>24%</span></label>
+    <label><input type="radio" name="mix" value="40"><span>40%</span></label>
+    <label><input type="radio" name="mix" value="60"><span>60%</span></label>
+    <label><input type="radio" name="mix" value="100" checked><span>full</span></label></fieldset>
+  <fieldset><legend>title face</legend>
+    <label><input type="radio" name="font" value="open"><span>Open Sans 600</span></label>
+    <label><input type="radio" name="font" value="trebuchet" checked><span>Trebuchet 600 (the stand-in's)</span></label></fieldset>
+  <fieldset><legend>long words</legend>
+    <label><input type="radio" name="fit" value="break"><span>break anywhere (today)</span></label>
+    <label><input type="radio" name="fit" value="hyph" checked><span>hyphenate (fi)</span></label>
+    <label><input type="radio" name="fit" value="shrink"><span>shrink</span></label>
+    <label><input type="radio" name="fit" value="both"><span>shrink + hyphenate</span></label></fieldset>
+  <fieldset><legend>title at s</legend>
+    <label><input type="radio" name="s" value="none"><span>none (cloth only)</span></label>
+    <label><input type="radio" name="s" value="title" checked><span>title</span></label></fieldset>
+</form>
+
+<h2 class="s">Light: bookcloth</h2>
+<div class="row" data-theme="L"></div>
+<h2 class="s">Dark: quiet tint</h2>
+<div class="row" data-theme="D"></div>
+<h2 class="s">Size s, phone</h2>
+<p class="note">At 70px the title in caps is too small to read, and the caption already shows it, so by default the cover is cloth only. Switch "title at s" to compare.</p>
+<div class="row" data-only="s"></div>
+</main>
+<script>
+const BOOKS=[
+ {t:'Tuntematon sotilas',a:'Väinö Linna',photo:'ph1'},
+ {t:'POSTITOIMISTO',a:'Charles Bukowski, Kristiina Drews'},
+ {t:'Pystyssä kaiken aikaa',a:'Charles Bukowski'},
+ {t:'Women',a:'Charles Bukowski',lent:1},
+ {t:'Naked lunch',a:'William Burroughs',photo:'ph2'},
+ {t:'The Master and Margarita',a:'Mikhail Bulgakov'},
+ {t:'Leviathan wakes',a:'James S. A. Corey',photo:'ph3'},
+ {t:'Heavier than heaven',a:'Charles R. Cross',ordered:1},
+ {t:'Kansanvalistusseuran kalenteri',a:'Kansanvalistusseura'},
+ {t:'The English language',a:'David Crystal'},
+ {t:'Sinuhe egyptiläinen',a:'Mika Waltari',photo:'ph4'},
+ {t:'Python programming for the absolute beginner',a:'Michael Dawson'},
+ {t:'Oliver Twist',a:'Charles Dickens'},
+];
+// Colours from the owner's references, from memory: check them against the real covers.
+// `ink` is the title colour; without one the title takes whichever of light or dark ink reads better.
+const PAL={
+ refs:[{c:'#2A4FD6',n:'Hävitys blue'},{c:'#EC3D8C',n:'Mikä internetiä vaivaa pink'},{c:'#1F7A4D',n:'Seven endless forests green'},{c:'#F7D117',n:'Plur1bus yellow'}],
+ pop:[{c:'#2A4FD6',n:'Hävitys blue'},{c:'#EC3D8C',n:'Purokuru pink'},{c:'#F7D117',n:'Plur1bus yellow'},{c:'#121212',ink:'#F7D117',n:'Plur1bus black'}],
+ lumon:[{c:'#1F5C58',n:'MDR teal'},{c:'#A8D4C4',n:'terminal mint'},{c:'#1E3F73',n:'Lumon blue'},{c:'#0E1F2B',ink:'#8FE3D0',n:'terminal screen'}],
+ amelie:[{c:'#1D6B3A',n:'café green'},{c:'#C4202F',n:'Amélie red'},{c:'#E9A82B',n:'golden light'},{c:'#0F5E66',n:'Paris teal'}],
+ mix:[{c:'#2A4FD6',n:'Hävitys blue'},{c:'#EC3D8C',n:'Purokuru pink'},{c:'#1F7A4D',n:'forest green'},{c:'#F7D117',n:'Plur1bus yellow'},{c:'#1E3F73',n:'Lumon blue'},{c:'#C4202F',n:'Amélie red'}],
+ fjord:[{c:'#1F5F66'},{c:'#A4452C'},{c:'#8C6A1E'},{c:'#2B4A80'}],
+};
+// Dark mode mixes the colour into the dark ground in OKLab, so the hue holds as it darkens.
+const lin=v=>(v/=255)<=.04045?v/12.92:((v+.055)/1.055)**2.4, gam=v=>Math.round(255*Math.min(1,Math.max(0,v<=.0031308?12.92*v:1.055*v**(1/2.4)-.055)));
+const toLab=h=>{const[r,g,b]=[1,3,5].map(i=>lin(parseInt(h.slice(i,i+2),16)));const l=Math.cbrt(.4122214708*r+.5363325363*g+.0514459929*b),m=Math.cbrt(.2119034982*r+.6806995451*g+.1073969566*b),s=Math.cbrt(.0883024619*r+.2817188376*g+.6299787005*b);return[.2104542553*l+.793617785*m-.0040720468*s,1.9779984951*l-2.428592205*m+.4505937099*s,.0259040371*l+.7827717662*m-.808675766*s]};
+const fromLab=([L,A,B])=>{const l=(L+.3963377774*A+.2158037573*B)**3,m=(L-.1055613458*A-.0638541728*B)**3,s=(L-.0894841775*A-1.291485548*B)**3;return'#'+[4.0767416621*l-3.3077115913*m+.2309699292*s,-1.2684380046*l+2.6097574011*m-.3413193965*s,-.0041960863*l-.7034186147*m+1.707614701*s].map(v=>gam(v).toString(16).padStart(2,'0')).join('')};
+const mixHex=(a,b,t)=>{const x=toLab(a),y=toLab(b);return fromLab(x.map((v,i)=>v*t+y[i]*(1-t)))};
+// Deep: lightness moves toward the ground's, chroma mostly stays, hue stays.
+const deepHex=(a,t)=>{const[L,A,B]=toLab(a),C=Math.hypot(A,B),h=Math.atan2(B,A),L2=.24+(L-.24)*t,C2=C*Math.min(1,.55+t*.6);return fromLab([L2,C2*Math.cos(h),C2*Math.sin(h)])};
+const lum=h=>{const[r,g,b]=[1,3,5].map(i=>lin(parseInt(h.slice(i,i+2),16)));return .2126*r+.7152*g+.0722*b};
+const contrast=(a,b)=>{const[x,y]=[lum(a),lum(b)].sort((p,q)=>q-p);return(x+.05)/(y+.05)};
+const inkFor=c=>contrast(c,'#F5F2EA')>=contrast(c,'#15171A')?'#F5F2EA':'#15171A';
+const svg=s=>`url('data:image/svg+xml,${encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' width='200' height='300'>${s}</svg>`).replace(/'/g,'%27')}')`;
+const MOTTLE=seed=>svg(`<filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.012 .018' numOctaves='4' seed='${seed}' result='m'/><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' seed='${seed}' result='g'/><feBlend in='m' in2='g' mode='multiply'/><feColorMatrix type='saturate' values='0'/><feComponentTransfer><feFuncR type='linear' slope='1.6' intercept='-.15'/><feFuncG type='linear' slope='1.6' intercept='-.15'/><feFuncB type='linear' slope='1.6' intercept='-.15'/></feComponentTransfer></filter><rect width='100%' height='100%' filter='url(#n)'/>`);
+// Longest word: up to 9 letters at full size, 10–12 one step down, 13+ two steps.
+const wcls=t=>{const n=Math.max(...t.split(/\s+/).map(w=>w.length));return n>=13?'w3':n>=10?'w2':''};
+const hash=s=>[...s].reduce((h,c)=>(h*31+c.charCodeAt(0))>>>0,7);
+const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const PHOTO={
+ ph1:b=>`<div class="cv ph1"><b>Tuntematon<br>sotilas</b><hr><i>Väinö Linna</i></div>`,
+ ph2:b=>`<div class="cv ph2">Naked<br>Lunch<small>William S. Burroughs</small></div>`,
+ ph3:b=>`<div class="cv ph3"><small>James S. A. Corey</small>Leviathan<br>Wakes</div>`,
+ ph4:b=>`<div class="cv ph4">Sinuhe<br>egyptiläinen<small>Mika Waltari</small></div>`,
+};
+function cover(b,o,theme,size){
+ if(b.photo)return PHOTO[b.photo](b);
+ const h=hash(b.t),pal=PAL[o.pal],p=pal[h%pal.length];
+ const full=theme==='L'||o.mix==='100';
+ const cloth=full?p.c:o.dk==='deep'?deepHex(p.c,o.mix/100):mixHex(p.c,'#14181D',o.mix/100);
+ const ink=full&&p.ink?p.ink:inkFor(cloth);
+ const sc={s:.5,m:.7,l:1}[size];
+ const style=`--cloth:${cloth};--cink:${ink};--noise:${MOTTLE(h%97)};--nsize:${200*sc}px ${300*sc}px`;
+ return `<div class="cv ph-cv${b.ordered?' air':''}" style="${style}">${b.ordered?'<span class="band"></span>':''}<span class="pt ${wcls(b.t)}" lang="fi">${esc(b.t)}</span></div>`;
+}
+const tile=(b,o,theme,size)=>`<li>${cover(b,o,theme,size)}<p class="t1">${b.lent?'<span class="mk"></span>':''}${esc(b.t)}</p><p class="t2">${esc(b.a)}</p></li>`;
+const grid=(o,theme,size,n)=>`<ul class="grid ${size}">${BOOKS.slice(0,n).map(b=>tile(b,o,theme,size)).join('')}</ul>`;
+const panel=(o,theme,size,n,ph)=>`<div class="pn ${ph?'ph ':''}${theme}" data-font="${o.font}" data-s="${o.s}" data-fit="${o.fit}">${grid(o,theme,size,n)}</div>`;
+function render(){
+ const o=Object.fromEntries(new FormData(document.getElementById('bar')));
+ for(const el of document.querySelectorAll('[data-theme]')){
+  const T=el.dataset.theme;
+  el.innerHTML=`<div><p class="cap">wide, size l</p>${panel(o,T,'l',13)}</div><div><p class="cap">phone 390px, size m</p>${panel(o,T,'m',10,1)}</div>`;
+ }
+ document.querySelector('[data-only=s]').innerHTML=`<div><p class="cap">light, phone, size s</p>${panel(o,'L','s',8,1)}</div><div><p class="cap">dark, phone, size s</p>${panel(o,'D','s',8,1)}</div>`;
+}
+for(const el of document.querySelectorAll('.sw'))el.innerHTML=PAL[el.dataset.p].map(p=>`<i title="${p.n||''}" style="background:${p.c}"></i>`).join('');
+document.getElementById('bar').addEventListener('change',render);render();
+</script>
+</body></html>

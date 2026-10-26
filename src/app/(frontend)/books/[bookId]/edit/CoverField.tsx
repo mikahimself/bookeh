@@ -44,6 +44,7 @@ export const isCoverCode = (code: ErrorCode): code is keyof typeof COVER_MESSAGE
 export function CoverField({
   saved,
   title,
+  language,
   editable,
   pending,
   change,
@@ -55,6 +56,8 @@ export function CoverField({
   /** The saved cover's URL, `null` without one. */
   saved: string | null
   title: string
+  /** The Book's language, which hyphenates a placeholder's title. */
+  language: string | null
   editable: boolean
   /** Save in flight: a change now would miss the request. */
   pending: boolean
@@ -107,7 +110,7 @@ export function CoverField({
     <div className="flex flex-col gap-2">
       <div className="flex items-start gap-4">
         <div className="w-cover-detail shrink-0">
-          <Cover src={shown} title={title} />
+          <Cover src={shown} title={title} language={language} />
         </div>
         <div className="flex min-w-0 flex-col gap-3">
           <div className="flex flex-col gap-1">{children}</div>

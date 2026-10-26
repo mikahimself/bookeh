@@ -346,9 +346,7 @@ describe('CollectionPage', () => {
     expect(setDevicePrefsAction.mock.calls).toEqual([[{ size: 'l' }], [{ layout: 'covers' }]])
     expect(pressed('Layout')).toBe('Covers')
     expect(pressed('Size')).toBe('L')
-    // The tile's line, and at l the placeholder cover's author as well.
     within(screen.getByRole('listitem')).getByText('Väinö Linna', { selector: 'p' })
-    within(screen.getByRole('listitem')).getByText('Väinö Linna', { selector: 'span' })
     expect(fetchStub).not.toHaveBeenCalled()
   })
 

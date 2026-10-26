@@ -8,10 +8,12 @@ import type { SourceId } from '@/lib/metadata/source'
 /**
  * One source candidate in the edition picker (EXPERIENCE.md, Answer, Several
  * editions; D-7), each part `null` when the candidate has none. `cover` is
- * its pre-save preview, `title` its own title for the cover placeholder.
+ * its pre-save preview, `title` and `language` its own, for the cover
+ * placeholder.
  */
 export type AnswerEdition = {
   title: string
+  language: string | null
   binding: string | null
   year: number | null
   publisher: string | null
@@ -33,6 +35,7 @@ export type AnswerEdition = {
 export type AnswerBook = {
   isbn13: string
   title: string
+  language: string | null
   authors: string[]
   publisher: string | null
   year: number | null
@@ -67,6 +70,7 @@ type ExistingResult = Extract<LookupResult, { kind: 'existing' }>
 export function answerEditions(isbn13: string, drafts: readonly Draft[]): AnswerEdition[] {
   return drafts.map((draft, i) => ({
     title: draft.title,
+    language: draft.language ?? null,
     binding: draft.binding ?? null,
     year: draft.year ?? null,
     publisher: draft.publisher ?? null,
@@ -79,6 +83,7 @@ export function answerEditions(isbn13: string, drafts: readonly Draft[]): Answer
 const existingBook = (book: ExistingResult['book'], isbn13: string): AnswerBook => ({
   isbn13,
   title: book.title,
+  language: book.language,
   authors: book.authors.map(({ name }) => name),
   publisher: book.publisher,
   year: book.year,
@@ -117,6 +122,7 @@ export function notInLibrary(result: LookupResult): AnswerBook | null {
       return {
         isbn13,
         title: draft.title,
+        language: draft.language ?? null,
         authors: draft.authors.map(({ name }) => name),
         publisher: draft.publisher ?? null,
         year: draft.year ?? null,

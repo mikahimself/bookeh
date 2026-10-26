@@ -13,7 +13,8 @@ import './styles.css'
 // Publishes `--font-open-sans`; `styles.css` applies it.
 const openSans = Open_Sans({
   subsets: ['latin'],
-  weight: ['300', '400'],
+  // 600 only for the Cover title, where Trebuchet MS is missing.
+  weight: ['300', '400', '600'],
   variable: '--font-open-sans',
 })
 

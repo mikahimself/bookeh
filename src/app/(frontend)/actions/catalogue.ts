@@ -52,7 +52,12 @@ export async function lookUpAgainAction(input: unknown): Promise<ActionResult<Lo
     return {
       kind: 'editions',
       pick,
-      rows: editions.map(({ cover, title }, i) => ({ cover, title, line: lines[i]! })),
+      rows: editions.map(({ cover, title, language }, i) => ({
+        cover,
+        title,
+        language,
+        line: lines[i]!,
+      })),
       ids: candidates.map(({ source, recordId }) => ({ source, recordId })),
     }
   })

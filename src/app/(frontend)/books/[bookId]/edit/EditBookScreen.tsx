@@ -268,6 +268,7 @@ export function EditBookScreen({
       <CoverField
         saved={cover}
         title={title}
+        language={effective.language}
         editable={coverEditable}
         pending={pending}
         change={coverChange}

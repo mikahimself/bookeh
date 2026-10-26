@@ -45,8 +45,8 @@ const editions: LookUpAgainOutcome = {
   kind: 'editions',
   pick: 0,
   rows: [
-    { cover: null, title: 'Kätilö', line: 'WSOY · 2011' },
-    { cover: null, title: 'Kätilö', line: 'Otava · 2012 · 348 pages' },
+    { cover: null, title: 'Kätilö', language: 'fi', line: 'WSOY · 2011' },
+    { cover: null, title: 'Kätilö', language: 'fi', line: 'Otava · 2012 · 348 pages' },
   ],
   ids,
 }

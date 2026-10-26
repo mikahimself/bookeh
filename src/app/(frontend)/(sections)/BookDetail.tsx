@@ -77,7 +77,7 @@ export async function BookDetail({
       <div className="flex flex-col gap-6">
         <div className="flex items-start gap-4">
           <div className="w-cover-detail shrink-0">
-            <Cover src={book.coverUrl} title={book.title} />
+            <Cover src={book.coverUrl} title={book.title} language={book.language} />
           </div>
           <div className="flex min-w-0 flex-col gap-1">
             <h2 className="text-heading-detail break-words text-text">{book.title}</h2>

@@ -97,3 +97,6 @@
 - source_spec: `_bmad-output/implementation-artifacts/spec-5-21-e22-filter-chips-on-book-detail.md`
   summary: Filter chips in Book detail on `/loans` (Story 6.9) and in an opened wishlist entry (Epic 7's entry sheet) open the collection with only that filter (UX-DR34).
   evidence: Neither surface renders Book detail yet. Today `FilterChip` builds on the current address's query (`useSearchParams()` → `parseShelfQuery`), which is right on `/` only; elsewhere it must start from an empty query and go to `/`.
+- source_spec: `_bmad-output/implementation-artifacts/spec-cover-treatment.md`
+  summary: Check paint cost of cloth placeholders on a large shelf on the phone.
+  evidence: Unverified (would be medium): each coverless tile is an isolated stacking context with a soft-light pseudo-element over an SVG `feTurbulence` background, rasterised per distinct tile width. Proven or cleared by scrolling a covers view with a few hundred coverless copies on the owner's iPhone.

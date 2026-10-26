@@ -13,12 +13,14 @@ describe('Cover', () => {
 
   it('shows the placeholder without a cover or once it fails, and retries a new one', () => {
     const title = 'Tuntematon sotilas'
-    const { container, rerender } = render(createElement(Cover, { src: null, title }))
+    const { container, rerender } = render(
+      createElement(Cover, { src: null, title, language: 'fi' }),
+    )
     const img = () => container.querySelector('img')
     expect(img()).toBeNull()
     expect(screen.getByText(title)).toBeTruthy()
 
-    rerender(createElement(Cover, { src: '/data/cover/9789510000000', title }))
+    rerender(createElement(Cover, { src: '/data/cover/9789510000000', title, language: 'fi' }))
     expect(img()?.getAttribute('src')).toBe('/data/cover/9789510000000')
     expect(screen.queryByText(title)).toBeNull()
 
@@ -26,22 +28,8 @@ describe('Cover', () => {
     expect(img()).toBeNull()
     expect(screen.getByText(title)).toBeTruthy()
 
-    rerender(createElement(Cover, { src: '/api/media/file/a.jpg', title }))
+    rerender(createElement(Cover, { src: '/api/media/file/a.jpg', title, language: 'fi' }))
     expect(img()?.getAttribute('src')).toBe('/api/media/file/a.jpg')
-  })
-
-  it('shows the title and, when given, the author on the placeholder', () => {
-    const title = 'Kätilö'
-    const { container, rerender } = render(
-      createElement(Cover, { src: null, title, author: 'Katja Kettu' }),
-    )
-    expect(container.querySelector('img')).toBeNull()
-    screen.getByText(title)
-    screen.getByText('Katja Kettu')
-
-    rerender(createElement(Cover, { src: null, title }))
-    screen.getByText(title)
-    expect(screen.queryByText('Katja Kettu')).toBeNull()
   })
 
   it('shows the placeholder for an image that failed before hydration', () => {
@@ -51,7 +39,9 @@ describe('Cover', () => {
       'http://localhost/data/cover/9789510000000',
     )
     const title = 'Seitsemän veljestä'
-    const { container } = render(createElement(Cover, { src: '/data/cover/9789510000000', title }))
+    const { container } = render(
+      createElement(Cover, { src: '/data/cover/9789510000000', title, language: 'fi' }),
+    )
     expect(container.querySelector('img')).toBeNull()
     expect(screen.getByText(title)).toBeTruthy()
   })

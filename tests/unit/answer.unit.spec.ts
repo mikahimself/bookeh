@@ -83,6 +83,7 @@ describe('notInLibrary', () => {
     expect(notInLibrary(result)).toEqual({
       isbn13: '9789510396358',
       title: 'Tuntematon sotilas',
+      language: null,
       authors: ['Väinö Linna'],
       publisher: 'WSOY',
       year: 2014,
@@ -96,6 +97,7 @@ describe('notInLibrary', () => {
       editions: [
         {
           title: 'Other edition',
+          language: null,
           binding: 'nidottu',
           year: null,
           publisher: null,
@@ -104,6 +106,7 @@ describe('notInLibrary', () => {
         },
         {
           title: 'Tuntematon sotilas',
+          language: null,
           binding: null,
           year: 2014,
           publisher: 'WSOY',
@@ -146,6 +149,7 @@ describe('notInLibrary', () => {
     ).toEqual({
       isbn13: '9789510396358',
       title: 'Tuntematon sotilas',
+      language: 'fi',
       authors: ['Väinö Linna'],
       publisher: 'WSOY',
       year: 2014,
@@ -186,6 +190,7 @@ describe('inLibrary', () => {
     expect(inLibrary({ kind: 'existing', book, mine: { copies, entries: [] } })).toEqual({
       isbn13: '9789510396358',
       title: 'Tuntematon sotilas',
+      language: 'fi',
       authors: ['Väinö Linna'],
       publisher: 'WSOY',
       year: 2014,
@@ -265,6 +270,7 @@ describe('answerLines', () => {
   const answer = (over: Partial<AnswerBook> = {}): AnswerBook => ({
     isbn13: '9789510396358',
     title: 'Muumipeikko ja pyrstötähti',
+    language: 'fi',
     authors: ['Tove Jansson', 'Kristiina Kivivuori'],
     publisher: 'WSOY',
     year: 2014,
@@ -339,6 +345,7 @@ describe('editionLine', () => {
   }
   const edition = (over: Partial<AnswerEdition>): AnswerEdition => ({
     title: 'A Game of Thrones',
+    language: 'en',
     binding: null,
     year: null,
     publisher: null,

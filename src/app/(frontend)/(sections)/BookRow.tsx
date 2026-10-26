@@ -25,7 +25,7 @@ const joined = (parts: (string | number | null)[]) =>
  * DESIGN.md, Book row and Collection density: the cover, the title in
  * `title`, then muted meta, then the ending. At l the authors and year ·
  * publisher are two lines; at m one; at s the meta follows the title on its
- * one line, and a placeholder cover is an empty box. At every size an ordered
+ * one line. A placeholder cover is its cloth alone in a row. At every size an ordered
  * copy's row ends with "Ordered" and an owned copy's with its location's name,
  * truncated when long. Nothing ends an owned row without a location, so a
  * user with no locations never sees a location there (FR-32). One row is one copy.
@@ -63,7 +63,7 @@ export function BookRow({
   const content = (
     <>
       <div className={`${ROW[size].cover} shrink-0`}>
-        <Cover src={book.coverUrl} title={size === 's' ? '' : book.title} />
+        <Cover src={book.coverUrl} title={book.title} language={book.language} />
       </div>
       <div className={`flex min-w-0 flex-1 ${size === 's' ? 'items-baseline gap-2' : 'flex-col'}`}>
         <p className={`truncate text-title text-text${size === 's' ? ' max-w-full shrink-0' : ''}`}>

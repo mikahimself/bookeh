@@ -1,0 +1,192 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>bookeh examples: cover treatment</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400&display=swap"><style>
+.L{--bg:#FFFFFF;--ink:#1F2933;--mu:#5F6B78;--dim:#87919C;--bd:#DDE2E7;--co:#F0604F;--inset:#1F293324}
+.D{--bg:#14181D;--ink:#E3E8EE;--mu:#94A0AD;--dim:#626B76;--bd:#2C343D;--co:#FF8E7F;--inset:#FFFFFF1F}
+*{box-sizing:border-box}body{margin:0;font:14px/1.45 system-ui,sans-serif;color:#222;background:#e4e4e4}
+main{max-width:1180px;margin:0 auto;padding:24px 16px 96px}main>h1{font-size:22px;margin:0 0 4px}
+h2.s{font:600 16px system-ui,sans-serif;margin:36px 0 2px}.note{color:#555;max-width:84ch;margin:2px 0 10px}
+.bar{position:sticky;top:0;z-index:5;background:#e4e4e4ee;backdrop-filter:blur(4px);padding:10px 0;display:flex;flex-wrap:wrap;gap:8px 22px;border-bottom:1px solid #ccc}
+.bar fieldset{border:0;margin:0;padding:0;display:flex;gap:4px;align-items:center;flex-wrap:wrap}
+.bar legend{float:left;font-weight:600;margin-right:6px;font-size:13px}
+.bar label{font-size:13px;padding:2px 8px;border:1px solid #aaa;cursor:pointer;background:#f4f4f4}
+.bar input{display:none}.bar input:checked+span{font-weight:700}
+.bar label:has(input:checked){background:#222;color:#fff;border-color:#222}
+.row{display:grid;grid-template-columns:1fr 390px;gap:12px;align-items:start}
+@media (max-width:900px){.row{grid-template-columns:1fr}}
+.pn{background:var(--bg);color:var(--ink);font-family:'Open Sans',"Segoe UI","Helvetica Neue",sans-serif;padding:20px 28px 28px}
+.pn.ph{padding:16px 20px 24px}
+.cap{font:12px system-ui,sans-serif;color:#777;margin:0 0 4px}
+
+/* Grid, per DESIGN.md Collection density */
+.grid{list-style:none;margin:0;padding:0;display:grid;align-items:start}
+.grid.l{grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:24px}
+.grid.m{grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:18px}
+.grid.s{grid-template-columns:repeat(auto-fill,minmax(70px,1fr));gap:10px}
+.grid li{min-width:0}
+.t1{margin:0;padding-top:4px;font-size:13px;line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.grid.s .t1{font-size:12px;line-height:1.3}
+.t2{margin:0;font-size:12px;line-height:1.3;color:var(--mu);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mk{display:inline-block;width:8px;height:8px;background:var(--co);margin-right:6px;vertical-align:1px}
+
+/* The cover box: same frame for photos and placeholders */
+.cv{position:relative;aspect-ratio:2/3;width:100%;overflow:hidden;isolation:isolate}
+.cv::after{content:"";position:absolute;inset:0;pointer-events:none;z-index:3}
+[data-frame=dim] .cv::after{border:1px solid var(--dim)}
+[data-frame=faint] .cv::after{border:1px solid var(--bd)}
+[data-frame=inset] .cv::after{box-shadow:inset 0 0 0 1px var(--inset)}
+
+/* Placeholder: cloth colour + noise + optional hinge */
+.ph-cv{display:flex;flex-direction:column;justify-content:flex-end;padding:8px;background:var(--cloth,transparent);color:var(--cink,var(--ink))}
+.ph-cv::before{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;background-image:var(--noise);background-size:var(--nsize,200px);mix-blend-mode:var(--blend,soft-light);opacity:var(--nop,0)}
+.ph-cv>*{position:relative;z-index:1}
+.ph-cv .pt{font-size:12px;line-height:1.3;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:break-word}
+.ph-cv .pa{font-size:12px;line-height:1.3;opacity:.72;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.grid.l .ph-cv{padding:12px 12px 12px 14px}
+.grid.l .ph-cv .pt{font-size:15px}
+[data-type=book] .ph-cv{justify-content:space-between}
+[data-type=book] .grid.l .ph-cv .pt{font-size:17px;font-weight:300;line-height:1.2;-webkit-line-clamp:5}
+[data-type=book] .grid.m .ph-cv .pt{font-size:13px;font-weight:300}
+[data-hinge=on] .ph-cv{padding-left:calc(var(--hp,8px) + 10%)}
+[data-hinge=on] .grid.l .ph-cv{--hp:10px}
+[data-hinge=on] .ph-cv>.hg{position:absolute;inset:0 auto 0 7%;width:5%;z-index:2;background:linear-gradient(90deg,#0000002e 0 1px,#ffffff14 1px 3px,#00000014 70%,transparent)}
+.hg{display:none}[data-hinge=on] .hg{display:block}
+[data-hinge=on] .ph-cv{box-shadow:inset 0 0 18px #00000026}
+[data-frame=none] [data-empty] .ph-cv{outline:1px dashed transparent}
+/* no colour → today's outlined paperback */
+[data-color=none] .ph-cv{background:transparent}
+[data-color=none][data-frame=none] .ph-cv{box-shadow:inset 0 0 0 1px var(--dim)}
+
+/* Airmail band */
+.air::before{content:"";position:absolute;z-index:4;left:-30%;top:14%;width:100%;height:10px;transform:rotate(-45deg);transform-origin:left top;background:repeating-linear-gradient(45deg,#D7282F 0 6px,#fff 6px 9px,#2251A3 9px 15px,#fff 15px 18px)}
+
+/* Stand-in photo covers (CSS, not real images) */
+.ph1{background:#fbfaf6;color:#111;padding:16% 12%;display:flex;flex-direction:column;font-family:Georgia,serif}
+.ph1 b{font-weight:400;font-size:clamp(9px,1.3vw,17px);letter-spacing:.06em;text-transform:uppercase;line-height:1.15}
+.ph1 i{margin-top:auto;font-style:normal;color:#b3261e;font-size:clamp(7px,.9vw,11px);letter-spacing:.2em;text-transform:uppercase}
+.ph1 hr{border:0;border-top:2px solid #b3261e;width:30%;margin:10% 0}
+.ph2{background:#0c0c0c;color:#f4d03f;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;font:700 clamp(10px,1.6vw,22px)/1 Impact,'Arial Narrow',sans-serif;text-transform:uppercase;gap:8%}
+.ph2 small{font:400 clamp(6px,.75vw,10px)/1 system-ui;letter-spacing:.25em;color:#ddd}
+.ph3{background:radial-gradient(circle at 70% 30%,#ffb35c 0 9%,#d9480f 22%,#3b0d2b 55%,#0b0a1d 85%);color:#fff;display:flex;flex-direction:column;justify-content:space-between;padding:10%;font:600 clamp(8px,1.2vw,15px)/1.1 'Trebuchet MS',sans-serif;text-transform:uppercase;letter-spacing:.08em}
+.ph3 small{font-size:.65em;letter-spacing:.2em;opacity:.85}
+.ph4{background:linear-gradient(160deg,#e9c46a,#b5761c 60%,#6d3d0b);color:#2b1606;display:flex;flex-direction:column;justify-content:flex-end;padding:12%;font:italic clamp(9px,1.3vw,17px)/1.1 Georgia,serif}
+.ph4 small{font:400 clamp(6px,.75vw,10px)/1.2 system-ui;letter-spacing:.15em;text-transform:uppercase;margin-top:6%}
+.pick{display:inline-block;font:600 12px system-ui;background:#222;color:#fff;padding:1px 6px;margin-left:6px;vertical-align:2px}
+code{font-size:12px;background:#0000000d;padding:0 3px}
+</style></head><body><main>
+<h1>bookeh examples: cover treatment</h1>
+<p class="note">Two questions in one page. <b>Layout</b> (sections A–C): where the title and author go now that the placeholder carries them itself. <b>Treatment</b> (the bar): the frame round every cover, photos included, and a coloured, noise-textured cloth for the placeholder. The bar applies to every panel, so you can try any layout with any treatment.</p>
+<p class="note">The four covers drawn in CSS stand in for photos: a white one and a black one on purpose, because those are the covers that disappear into the ground without a frame. The rest are placeholders. <i>Women</i> is lent; <i>Heavier than heaven</i> is ordered (airmail band). The noise is SVG <code>feTurbulence</code> (Perlin-based <code>fractalNoise</code>), one tiny data-URI tile blended over a per-book colour picked by hashing the title. No images, no canvas, no JS in the real thing.</p>
+
+<form class="bar" id="bar">
+  <fieldset><legend>theme</legend>
+    <label><input type="radio" name="theme" value="D" checked><span>dark</span></label>
+    <label><input type="radio" name="theme" value="L"><span>light</span></label></fieldset>
+  <fieldset><legend>frame</legend>
+    <label><input type="radio" name="frame" value="dim"><span>dim (today's placeholder line)</span></label>
+    <label><input type="radio" name="frame" value="faint"><span>faint (border token)</span></label>
+    <label><input type="radio" name="frame" value="inset" checked><span>inset hairline</span></label>
+    <label><input type="radio" name="frame" value="none"><span>none</span></label></fieldset>
+  <fieldset><legend>colour</legend>
+    <label><input type="radio" name="color" value="none"><span>none</span></label>
+    <label><input type="radio" name="color" value="quiet" checked><span>quiet tint</span></label>
+    <label><input type="radio" name="color" value="cloth"><span>bookcloth</span></label></fieldset>
+  <fieldset><legend>texture</legend>
+    <label><input type="radio" name="tex" value="off"><span>off</span></label>
+    <label><input type="radio" name="tex" value="grain"><span>paper grain</span></label>
+    <label><input type="radio" name="tex" value="mottle" checked><span>perlin mottle</span></label>
+    <label><input type="radio" name="tex" value="linen"><span>linen weave</span></label></fieldset>
+  <fieldset><legend>type</legend>
+    <label><input type="radio" name="type" value="bottom" checked><span>bottom-left (today)</span></label>
+    <label><input type="radio" name="type" value="book"><span>title top, author foot</span></label></fieldset>
+  <fieldset><legend>hinge</legend>
+    <label><input type="radio" name="hinge" value="off" checked><span>off</span></label>
+    <label><input type="radio" name="hinge" value="on"><span>on</span></label></fieldset>
+</form>
+
+<h2 class="s">A. Caption only under photos<span class="pick">my pick</span></h2>
+<p class="note">A photo keeps its title and author underneath. A placeholder already wears them, so it has nothing underneath. Each fact appears once. Rows go slightly ragged at the foot, because a placeholder ends at its cover's bottom edge. The grid aligns to the top, so that reads as books of different heights, not as a mistake. The lent marker moves onto the placeholder, before its title. In select mode a placeholder gets a short line under it holding only the checkbox.</p>
+<div class="row" data-layout="A"></div>
+
+<h2 class="s">B. Covers only</h2>
+<p class="note">No captions at all; the shelf is a wall of covers. Photos carry their title in the artwork, placeholders in type. The calmest of the three, but you lose the clean text title under photos, which matters for scanning at s and for photos whose type is tiny. The lent marker becomes an 8px square on the cover's top-right corner. The detail panel and rows view stay the place to read.</p>
+<div class="row" data-layout="B"></div>
+
+<h2 class="s">C. Caption under all, placeholder keeps the title only</h2>
+<p class="note">Rows stay even: every tile has the same caption. The placeholder drops the author and keeps only the title, as the cloth's "spine label". It still repeats the title. Included as the even-rows baseline, not recommended.</p>
+<div class="row" data-layout="C"></div>
+
+<h2 class="s">Size s, layout A</h2>
+<p class="note">At s (70px columns) the placeholder carries the title only, as today. The texture tile scales with the cover, so it stays a texture and does not become blotches.</p>
+<div class="row" data-layout="A" data-only="s"></div>
+</main>
+<script>
+const BOOKS=[
+ {t:'Tuntematon sotilas',a:'Väinö Linna',photo:'ph1'},
+ {t:'POSTITOIMISTO',a:'Charles Bukowski, Kristiina Drews'},
+ {t:'Pystyssä kaiken aikaa',a:'Charles Bukowski'},
+ {t:'Women',a:'Charles Bukowski',lent:1},
+ {t:'Naked lunch',a:'William Burroughs',photo:'ph2'},
+ {t:'The Master and Margarita',a:'Mikhail Bulgakov'},
+ {t:'Leviathan wakes',a:'James S. A. Corey',photo:'ph3'},
+ {t:'Heavier than heaven',a:'Charles R. Cross',ordered:1},
+ {t:'The English language',a:'David Crystal'},
+ {t:'Sinuhe egyptiläinen',a:'Mika Waltari',photo:'ph4'},
+ {t:'Python programming for the absolute beginner',a:'Michael Dawson'},
+ {t:'Oliver Twist',a:'Charles Dickens'},
+];
+const PAL={
+ quiet:{L:['#E6EAEE','#EEE6E2','#E3EAE4','#EFE9DC','#E9E4EE','#E1EAEB','#ECE8E3'],
+        D:['#1F2730','#2A2224','#1F2923','#2C271E','#26222E','#1D292C','#28251F'],ink:null},
+ cloth:{L:['#3E4F63','#6B3A3A','#3F5745','#7A6338','#54465F','#3D5859','#5C5650'],
+        D:['#33414F','#582F31','#34483A','#64512E','#45394E','#324849','#4B4641'],ink:'#EEF0F2'},
+};
+const svg=s=>`url('data:image/svg+xml,${encodeURIComponent(`<svg xmlns='http://www.w3.org/2000/svg' width='200' height='300'>${s}</svg>`).replace(/'/g,'%27')}')`;
+const NOISE={
+ grain:{img:svg(`<filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%' height='100%' filter='url(#n)'/>`),op:.55,blend:'soft-light'},
+ mottle:{img:svg(`<filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.012 .018' numOctaves='4' seed='SEED' result='m'/><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='2' seed='SEED' result='g'/><feBlend in='m' in2='g' mode='multiply'/><feColorMatrix type='saturate' values='0'/><feComponentTransfer><feFuncR type='linear' slope='1.6' intercept='-.15'/><feFuncG type='linear' slope='1.6' intercept='-.15'/><feFuncB type='linear' slope='1.6' intercept='-.15'/></feComponentTransfer></filter><rect width='100%' height='100%' filter='url(#n)'/>`),op:.6,blend:'soft-light'},
+ linen:{img:svg(`<filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.04 .9' numOctaves='2' seed='SEED' result='h'/><feTurbulence type='fractalNoise' baseFrequency='.9 .04' numOctaves='2' seed='SEED' result='v'/><feBlend in='h' in2='v' mode='multiply' result='w'/><feTurbulence type='fractalNoise' baseFrequency='.015' numOctaves='3' seed='SEED' result='m'/><feBlend in='w' in2='m' mode='multiply'/><feColorMatrix type='saturate' values='0'/><feComponentTransfer><feFuncR type='linear' slope='1.8' intercept='-.1'/><feFuncG type='linear' slope='1.8' intercept='-.1'/><feFuncB type='linear' slope='1.8' intercept='-.1'/></feComponentTransfer></filter><rect width='100%' height='100%' filter='url(#n)'/>`),op:.55,blend:'soft-light'},
+};
+const hash=s=>[...s].reduce((h,c)=>(h*31+c.charCodeAt(0))>>>0,7);
+const esc=s=>s.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const PHOTO={
+ ph1:b=>`<div class="cv ph1"><b>${b.t.replace(' ','<br>')}</b><hr><i>${b.a}</i></div>`,
+ ph2:b=>`<div class="cv ph2">Naked<br>Lunch<small>William S. Burroughs</small></div>`,
+ ph3:b=>`<div class="cv ph3"><small>James S. A. Corey</small>Leviathan<br>Wakes</div>`,
+ ph4:b=>`<div class="cv ph4">Sinuhe<br>egyptiläinen<small>Mika Waltari</small></div>`,
+};
+function cover(b,o,size,layout){
+ if(b.photo)return PHOTO[b.photo](b);
+ const h=hash(b.t),pal=PAL[o.color];
+ let style='';
+ if(pal){style+=`--cloth:${pal[o.theme][h%pal[o.theme].length]};`;if(pal.ink)style+=`--cink:${pal.ink};`}
+ const n=NOISE[o.tex];
+ if(n&&o.color!=='none'){
+  const scale={s:.5,m:.7,l:1}[size];
+  style+=`--noise:${n.img.replace(/SEED/g,h%97)};--nop:${n.op};--blend:${n.blend};--nsize:${Math.round(200*scale)}px ${Math.round(300*scale)}px;`;
+ }
+ const showAuthor=size!=='s'&&layout!=='C';
+ const mk=b.lent&&layout==='A'?'<span class="mk"></span>':'';
+ return `<div class="cv ph-cv${b.ordered?' air':''}" style="${style}"><span class="hg"></span><span class="pt">${mk}${esc(b.t)}</span>${showAuthor?`<span class="pa">${esc(b.a)}</span>`:''}</div>`;
+}
+function tile(b,o,size,layout){
+ let c=cover(b,o,size,layout);
+ if(b.photo&&b.ordered)c=c.replace('class="cv','class="cv air');
+ if(layout==='B'&&b.lent)c=c.replace('</div>','<span style="position:absolute;top:0;right:0;width:8px;height:8px;background:var(--co);z-index:4"></span></div>');
+ const cap=layout==='B'||(layout==='A'&&!b.photo)?'':
+  `<p class="t1">${b.lent?'<span class="mk"></span>':''}${esc(b.t)}</p><p class="t2">${esc(b.a)}</p>`;
+ return `<li>${c}${cap}</li>`;
+}
+function grid(o,size,layout,n){return `<ul class="grid ${size}">${BOOKS.slice(0,n).map(b=>tile(b,o,size,layout)).join('')}</ul>`}
+function render(){
+ const f=new FormData(document.getElementById('bar'));const o=Object.fromEntries(f);
+ for(const el of document.querySelectorAll('[data-layout]')){
+  const L=el.dataset.layout,only=el.dataset.only;
+  const attrs=`data-frame="${o.frame}" data-color="${o.color}" data-type="${o.type}" data-hinge="${o.hinge}"`;
+  el.innerHTML=only==='s'
+   ?`<div><p class="cap">wide, size s</p><div class="pn ${o.theme}" ${attrs}>${grid(o,'s',L,12)}</div></div><div><p class="cap">phone 390px, size s (4 columns)</p><div class="pn ph ${o.theme}" ${attrs}>${grid(o,'s',L,8)}</div></div>`
+   :`<div><p class="cap">wide, size l</p><div class="pn ${o.theme}" ${attrs}>${grid(o,'l',L,12)}</div></div><div><p class="cap">phone 390px, size m (3 columns)</p><div class="pn ph ${o.theme}" ${attrs}>${grid(o,'m',L,9)}</div></div>`;
+ }
+}
+document.getElementById('bar').addEventListener('change',render);render();
+</script>
+</body></html>

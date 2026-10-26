@@ -45,9 +45,10 @@ describe('EditionPicker', () => {
           {
             cover: `/data/cover/${ISBN}?pick=0`,
             title: 'A Game of Thrones',
+            language: 'en',
             line: 'nidottu · 2012',
           },
-          { cover: null, title: 'A Game of Thrones', line: '2012 · 690 pages' },
+          { cover: null, title: 'A Game of Thrones', language: 'en', line: '2012 · 690 pages' },
         ],
       }),
     )
