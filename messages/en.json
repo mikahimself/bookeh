@@ -74,7 +74,9 @@
     "sharedFrom": "Shared · from {source}",
     "shared": "Shared",
     "stillNotFound": "Still not found.",
-    "noAnswer": "{sources} didn't answer."
+    "noAnswer": "{sources} didn't answer.",
+    "lent": "Lent to {person}",
+    "returned": "Returned"
   },
   "sections": {
     "label": "Sections",
@@ -283,6 +285,18 @@
       "description": "description",
       "cover": "cover"
     }
+  },
+  "loans": {
+    "lend": "Lend",
+    "lendTitle": "Lend",
+    "lentOnLabel": "Lent on",
+    "newPerson": "New person",
+    "findPerson": "Find a person…",
+    "person": "Person",
+    "personRequired": "Name a person.",
+    "lentOnInvalid": "Can't be later than today.",
+    "lentTo": "Lent to {person} since {date}",
+    "returned": "Returned"
   },
   "progress": {
     "loading": "Loading"

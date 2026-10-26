@@ -14,6 +14,7 @@ import type { DevicePrefs } from '@/app/(frontend)/prefs'
 import type { EffectiveBook } from '@/lib/books/effectiveBook'
 import type { CopyLine, Holdings } from '@/lib/books/holdings'
 import type { LocationOption } from '@/lib/copies/locations'
+import { helsinkiToday } from '@/lib/loans/dates'
 import type { ShelfRow, ShelfRows } from '@/lib/shelf/query'
 
 import en from '../../messages/en.json'
@@ -34,6 +35,9 @@ const setNoteAction = vi.fn()
 const receiveCopyAction = vi.fn()
 const moveCopiesAction = vi.fn()
 const listLocations = vi.fn<(ctx: unknown) => Promise<LocationOption[]>>()
+const lendingPeople = vi.fn<(ctx: unknown) => Promise<{ id: number; name: string }[]>>()
+const lendCopyAction = vi.fn()
+const returnLoanAction = vi.fn()
 /** The signed-in viewer: a plain user unless a case makes them the admin. */
 const requireUser = vi.fn<() => Promise<{ user: { roles: ('admin' | 'user')[] } }>>()
 
@@ -59,6 +63,10 @@ vi.mock('next-intl/server', async () => {
   return {
     getTranslations: async (namespace?: string) => translator(namespace),
     getLocale: async () => 'en',
+    getFormatter: async () => {
+      const { createFormatter } = await vi.importActual<typeof import('next-intl')>('next-intl')
+      return createFormatter({ locale: 'en', timeZone: 'Europe/Helsinki' })
+    },
   }
 })
 vi.mock('next/navigation', async (importOriginal) => ({
@@ -87,6 +95,8 @@ vi.mock('@/app/(frontend)/(sections)/actions', () => ({
   moveCopiesAction,
 }))
 vi.mock('@/lib/copies/locations', () => ({ listLocations }))
+vi.mock('@/lib/people/people', () => ({ lendingPeople }))
+vi.mock('@/app/(frontend)/actions/loans', () => ({ lendCopyAction, returnLoanAction }))
 vi.mock('@/app/(frontend)/heldBook', () => ({ heldBook }))
 vi.mock('@/lib/books/holdings', () => ({ getHoldings }))
 vi.mock('@/lib/books/userBookState', () => ({
@@ -242,6 +252,7 @@ describe('CollectionPage', () => {
   beforeEach(() => {
     devicePrefs.mockResolvedValue({ ...DEFAULT_PREFS })
     listLocations.mockResolvedValue([])
+    lendingPeople.mockResolvedValue([])
     requireUser.mockResolvedValue({ user: { roles: ['user'] } })
   })
 
@@ -1135,18 +1146,148 @@ describe('CollectionPage', () => {
         expect(router.back).not.toHaveBeenCalled()
       })
 
-      it("says a lent copy's loans go too", async () => {
+      it('shows a lent copy with its borrower and date, and Returned only', async () => {
         holds(linna, [
-          copy(21, { loan: { loanId: 31, person: { id: 41, name: 'Liisa' }, since: '2026-10-20' } }),
+          copy(21, {
+            loan: { loanId: 31, person: { id: 41, name: 'Liisa' }, since: '2026-10-20' },
+          }),
         ])
         await renderPage({ book: '5' })
         const sheet = await detail('Tuntematon sotilas')
 
-        fireEvent.click(within(sheet).getByRole('button', { name: 'Remove' }))
-        const dialog = await screen.findByRole('dialog', { name: 'Remove 1 book from library?' })
-        within(dialog).getByText('Its loans go too.')
-        fireEvent.click(within(dialog).getByRole('button', { name: 'Cancel' }))
-        await waitFor(() => expect(dialog.isConnected).toBe(false))
+        within(sheet).getByText('Lent to Liisa since Oct 20, 2026')
+        within(sheet).getByRole('button', { name: 'Returned' })
+        for (const name of ['Lend', 'Move', 'Remove']) {
+          expect(within(sheet).queryByRole('button', { name })).toBeNull()
+        }
+      })
+
+      describe('Lend', () => {
+        const nine = ['Antti', 'Leena', 'Bea', 'Äiti', 'Kalle', 'Ville', 'Aino', 'Eero', 'Olli']
+        const lent = (name: string) => ({
+          ok: true,
+          data: { loanId: 31, person: { id: 41, name }, undoToken: 'tok', undoSeconds: 1800 },
+        })
+        const openPicker = async () => {
+          holds(linna, [copy(21, { location: { id: 3, name: 'Tampere' } })])
+          reloads()
+          await renderPage({ book: '5' })
+          const sheet = await detail('Tuntematon sotilas')
+          fireEvent.click(within(sheet).getByRole('button', { name: 'Lend' }))
+          return screen.findByRole('dialog', { name: 'Lend' })
+        }
+
+        it('shows six People and Find a person, and lends to the marked one with Undo', async () => {
+          lendingPeople.mockResolvedValue(nine.map((name, i) => ({ id: 40 + i, name })))
+          lendCopyAction.mockResolvedValue(lent('Antti'))
+          const picker = await openPicker()
+
+          within(picker).getByText('Tuntematon sotilas · Tampere')
+          const rows = within(picker).getAllByRole('button', { pressed: false })
+          expect(rows.map((row) => row.textContent)).toEqual(nine.slice(0, 6))
+          within(picker).getByRole('button', { name: 'Find a person…' })
+          const lend = within(picker).getByRole('button', { name: 'Lend' })
+          expect(lend).toHaveProperty('disabled', true)
+
+          fireEvent.click(within(picker).getByRole('button', { name: 'Antti' }))
+          expect(lend).toHaveProperty('disabled', false)
+          fireEvent.click(lend)
+
+          await waitFor(() => expect(router.refresh).toHaveBeenCalledOnce())
+          expect(lendCopyAction).toHaveBeenCalledExactlyOnceWith({
+            copyId: 21,
+            person: 40,
+            lentOn: helsinkiToday(),
+          })
+          expect(showToast).toHaveBeenCalledExactlyOnceWith({
+            kind: 'success',
+            message: 'Lent to Antti',
+            undo: { token: 'tok', seconds: 1800 },
+          })
+        })
+
+        it('finds any of the People in the Combobox and lends to the one chosen', async () => {
+          lendingPeople.mockResolvedValue(nine.map((name, i) => ({ id: 40 + i, name })))
+          lendCopyAction.mockResolvedValue(lent('Olli'))
+          const picker = await openPicker()
+
+          fireEvent.click(within(picker).getByRole('button', { name: 'Find a person…' }))
+          const person = await within(picker).findByRole('combobox', { name: 'Person' })
+          await waitFor(() => expect(document.activeElement).toBe(person))
+          fireEvent.keyDown(person, { key: 'ArrowDown' })
+          await waitFor(() => expect(screen.getAllByRole('option')).toHaveLength(9))
+          expect(screen.getAllByRole('option').map((option) => option.textContent)).toEqual(nine)
+
+          fireEvent.click(screen.getByRole('option', { name: 'Olli' }))
+          expect(within(picker).queryByRole('button', { pressed: true })).toBeNull()
+          fireEvent.click(within(picker).getByRole('button', { name: 'Lend' }))
+          await waitFor(() =>
+            expect(lendCopyAction).toHaveBeenCalledExactlyOnceWith({
+              copyId: 21,
+              person: 48,
+              lentOn: helsinkiToday(),
+            }),
+          )
+          await waitFor(() => expect(router.refresh).toHaveBeenCalledOnce())
+        })
+
+        it('sends a typed name and keeps the picker open on a field error', async () => {
+          lendCopyAction
+            .mockResolvedValueOnce({
+              ok: false,
+              code: 'VALIDATION',
+              fields: { lentOn: 'VALIDATION' },
+            })
+            .mockResolvedValueOnce({
+              ok: false,
+              code: 'VALIDATION',
+              fields: { person: 'TOO_LONG' },
+            })
+          const picker = await openPicker()
+
+          fireEvent.change(within(picker).getByLabelText('New person'), {
+            target: { value: 'Liisa' },
+          })
+          fireEvent.click(within(picker).getByRole('button', { name: 'Lend' }))
+          await within(picker).findByText("Can't be later than today.")
+          expect(lendCopyAction).toHaveBeenCalledWith(
+            expect.objectContaining({ copyId: 21, person: { create: 'Liisa' } }),
+          )
+
+          fireEvent.click(within(picker).getByRole('button', { name: 'Lend' }))
+          const tooLong = await within(picker).findByText('Too long.')
+          expect(within(picker).getByLabelText('New person').getAttribute('aria-describedby')).toBe(
+            tooLong.id,
+          )
+          expect(picker.isConnected).toBe(true)
+          expect(showToast).not.toHaveBeenCalled()
+          fireEvent.click(within(picker).getByRole('button', { name: 'Close' }))
+          await waitFor(() => expect(picker.isConnected).toBe(false))
+        })
+      })
+
+      it('returns a lent copy with a toast that undoes it', async () => {
+        holds(linna, [
+          copy(21, {
+            loan: { loanId: 31, person: { id: 41, name: 'Liisa' }, since: '2026-10-20' },
+          }),
+        ])
+        returnLoanAction.mockResolvedValue({
+          ok: true,
+          data: { loanId: 31, undoToken: 'tok', undoSeconds: 1800 },
+        })
+        reloads()
+        await renderPage({ book: '5' })
+        const sheet = await detail('Tuntematon sotilas')
+
+        fireEvent.click(within(sheet).getByRole('button', { name: 'Returned' }))
+        await waitFor(() => expect(router.refresh).toHaveBeenCalledOnce())
+        expect(returnLoanAction).toHaveBeenCalledExactlyOnceWith({ loanId: 31 })
+        expect(showToast).toHaveBeenCalledExactlyOnceWith({
+          kind: 'success',
+          message: 'Returned',
+          undo: { token: 'tok', seconds: 1800 },
+        })
       })
 
       it('closes Book detail after removing the last copy, and reloads the rows', async () => {

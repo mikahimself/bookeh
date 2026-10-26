@@ -3,7 +3,10 @@
 import { useTranslations } from 'next-intl'
 import { useEffect, useEffectEvent, useRef, useState, useTransition } from 'react'
 
+import type { Named } from '@/lib/books/effectiveBook'
 import type { LocationOption } from '@/lib/copies/locations'
+
+import { returnLoanAction } from '../actions/loans'
 
 import { Button } from '../components/Button'
 import { ActionLink } from '../components/Link'
@@ -14,6 +17,7 @@ import { Dialog } from '../components/ui/Dialog'
 
 import { receiveCopyAction, removeCopiesAction, setNoteAction } from './actions'
 import { useCloseDetail } from './detailClose'
+import { LendPicker } from './LendPicker'
 import { MovePicker } from './MovePicker'
 import { useAfterAction } from './ShelfRows'
 
@@ -113,23 +117,15 @@ export function MoveCopy({
 }
 
 /**
- * EXPERIENCE.md, Book detail: an owned copy's Remove, confirmed by the
- * one-copy dialog, which adds that its loans go too when the copy is `lent`;
- * no toast and no Undo. The removal starts once the dialog's history entry
+ * EXPERIENCE.md, Book detail: an owned, unlent copy's Remove, confirmed by
+ * the one-copy dialog; no toast and no Undo (a lent line offers Returned
+ * only). The removal starts once the dialog's history entry
  * is gone (`onClosed`), so closing Book detail after the last copy never
  * overlaps it. `ok` on the last copy closes Book detail; otherwise
  * `afterAction`'s refresh after `ok` or `NOT_FOUND` re-renders it (a Book
  * gone entirely then closes as "Not in library").
  */
-export function RemoveCopy({
-  copyId,
-  last,
-  lent,
-}: {
-  copyId: number
-  last: boolean
-  lent: boolean
-}) {
+export function RemoveCopy({ copyId, last }: { copyId: number; last: boolean }) {
   const t = useTranslations('collection')
   const afterAction = useAfterAction()
   const closeDetail = useCloseDetail()
@@ -178,9 +174,7 @@ export function RemoveCopy({
             {t('remove')}
           </Button>
         }
-      >
-        {lent ? <p className="text-body">{t('removeLoans', { n: 1 })}</p> : null}
-      </Dialog>
+      />
     </>
   )
 }
@@ -221,6 +215,85 @@ export function ReceiveCopy({ copyId }: { copyId: number }) {
   return (
     <ActionLink ref={link} disabled={pending} onClick={receive}>
       {t('detail.received')}
+    </ActionLink>
+  )
+}
+
+/**
+ * FR-35, EXPERIENCE.md, Loans → Lend: an owned, unlent copy's Lend, a Link
+ * before Move that opens the Lend picker (`LendPicker`); disabled while its
+ * lend runs. `afterAction`'s refresh re-renders Book detail with the lent
+ * line, so focus goes to the copies' section once the lend settles. The
+ * toast's Undo is refreshed by `ReadAndRating`'s `onUndone` listener.
+ */
+export function LendCopy({
+  copyId,
+  context,
+  people,
+  today,
+}: {
+  copyId: number
+  context: string
+  people: readonly Named[]
+  today: string
+}) {
+  const t = useTranslations('loans')
+  const [open, setOpen] = useState(false)
+  const [pending, startTransition] = useTransition()
+  const link = useRef<HTMLButtonElement>(null)
+
+  return (
+    <>
+      <ActionLink ref={link} disabled={pending} onClick={() => setOpen(true)}>
+        {t('lend')}
+      </ActionLink>
+      <LendPicker
+        open={open}
+        onOpenChange={setOpen}
+        context={context}
+        people={people}
+        today={today}
+        copyId={copyId}
+        startTransition={startTransition}
+        pending={pending}
+        onSettled={() => link.current?.closest('section')?.focus()}
+      />
+    </>
+  )
+}
+
+/**
+ * FR-36: a lent copy's Returned, a Link with no picker. It closes the loan
+ * today with the toast "Returned" and Undo, which reopens it. Every result
+ * goes to `afterAction`, whose refresh re-renders the line without this
+ * Link, so focus moves to Your copies first.
+ */
+export function ReturnLoan({ loanId }: { loanId: number }) {
+  const t = useTranslations()
+  const { show } = useToast()
+  const afterAction = useAfterAction()
+  const [pending, startTransition] = useTransition()
+  const link = useRef<HTMLButtonElement>(null)
+
+  const returned = () => {
+    startTransition(async () => {
+      const result = await settleAction(returnLoanAction({ loanId }))
+      if (result.ok) {
+        const { undoToken, undoSeconds } = result.data
+        show({
+          kind: 'success',
+          message: t('toast.returned'),
+          undo: { token: undoToken, seconds: undoSeconds },
+        })
+      }
+      afterAction(result)
+      link.current?.closest('section')?.focus()
+    })
+  }
+
+  return (
+    <ActionLink ref={link} disabled={pending} onClick={returned}>
+      {t('loans.returned')}
     </ActionLink>
   )
 }

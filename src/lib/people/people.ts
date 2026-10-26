@@ -254,3 +254,43 @@ export async function personUse(ctx: Context): Promise<PersonUse[]> {
   }
   return people.docs.map(({ id, name }) => ({ id, name, loans: counts.get(id) ?? 0 }))
 }
+
+/**
+ * Spine, AD-18, FR-35: the Lend picker's People. Every Person of the context
+ * user: those with a loan (open or returned) by their latest `lentOn`, newest
+ * first, then those never lent to; ties and the never-lent by name in the
+ * database's collation. Never another user's, for the admin too (FR-48).
+ */
+export async function lendingPeople(ctx: Context): Promise<Named[]> {
+  const own = { owner: { equals: ctx.user.id } }
+  const people = await gateway.find(ctx, {
+    collection: 'people',
+    where: own,
+    sort: 'name',
+    pagination: false,
+    depth: 0,
+    select: { name: true },
+  })
+  const loans = await gateway.find(ctx, {
+    collection: 'loans',
+    where: own,
+    pagination: false,
+    depth: 0,
+    select: { person: true, lentOn: true },
+  })
+
+  const latest = new Map<number, string>()
+  for (const { person, lentOn } of loans.docs) {
+    const id = idOf(person)
+    const seen = latest.get(id)
+    if (seen === undefined || lentOn > seen) latest.set(id, lentOn)
+  }
+  // Stable: People lent to on the same day, and the never-lent, keep the name order.
+  return people.docs
+    .map(({ id, name }) => ({ id, name }))
+    .sort((a, b) => {
+      const x = latest.get(a.id) ?? ''
+      const y = latest.get(b.id) ?? ''
+      return x === y ? 0 : x > y ? -1 : 1
+    })
+}

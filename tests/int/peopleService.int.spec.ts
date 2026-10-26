@@ -6,6 +6,7 @@ import { withTransaction } from '@/lib/payload/transaction'
 import {
   createPerson,
   deletePerson,
+  lendingPeople,
   mergePerson,
   personUse,
   renamePerson,
@@ -35,7 +36,12 @@ describe('people service', () => {
     })
 
   /** A loan of a fresh copy of `user`'s; `owner` only satisfies the create type. */
-  const loanAs = async (user: User, person: number, returnedOn?: string): Promise<Loan> => {
+  const loanAs = async (
+    user: User,
+    person: number,
+    returnedOn?: string,
+    lentOn = '2026-10-20',
+  ): Promise<Loan> => {
     const ctx = await contextFor(user)
     const copy = await gateway.create(ctx, {
       collection: 'copies',
@@ -48,7 +54,7 @@ describe('people service', () => {
         owner: user.id,
         copy: copy.id,
         person,
-        lentOn: '2026-10-20',
+        lentOn,
         ...(returnedOn && { returnedOn }),
       },
       depth: 0,
@@ -323,5 +329,28 @@ describe('people service', () => {
     expect(await personUse(await contextFor(admin))).toEqual([
       { id: kalle.id, name: 'Kalle', loans: 0 },
     ])
+  })
+
+  it('lists my People by latest loan, then by name, and never another user', async () => {
+    const a = await createUser({ displayName: 'Lending People' })
+    const b = await createUser({ displayName: 'Lending People Other' })
+    const admin = await createUser({ displayName: 'Lending People Admin', roles: ['admin'] })
+    const bea = await personAs(a, 'Bea')
+    const leena = await personAs(a, 'Leena')
+    const antti = await personAs(a, 'Antti')
+    await loanAs(a, leena.id, '2026-10-05', '2026-10-01')
+    await loanAs(a, antti.id, undefined, '2026-10-20')
+    // Older, and read after the newer one: the newest `lentOn` decides, not the last read.
+    await loanAs(a, antti.id, '2026-09-05', '2026-09-01')
+    const aino = await personAs(b, 'Aino')
+    await loanAs(b, aino.id)
+
+    expect(await lendingPeople(await contextFor(a))).toEqual([
+      { id: antti.id, name: 'Antti' },
+      { id: leena.id, name: 'Leena' },
+      { id: bea.id, name: 'Bea' },
+    ])
+    expect(await lendingPeople(await contextFor(b))).toEqual([{ id: aino.id, name: 'Aino' }])
+    expect(await lendingPeople(await contextFor(admin))).toEqual([])
   })
 })

@@ -202,7 +202,7 @@ development_status:
   6-4-j6-removing-a-copy-removes-its-loans: done
   6-5-j3-lend-and-return: done
   6-6-j10-loans-in-holdings: done
-  6-7-j4-lend-and-returned-in-book-detail: backlog
+  6-7-j4-lend-and-returned-in-book-detail: done
   6-8-j11-lent-marker-on-rows-and-the-answer: backlog
   6-9-j5-loans-section-by-date: backlog
   6-10-j12-loans-by-person: backlog

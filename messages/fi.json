@@ -74,7 +74,9 @@
     "sharedFrom": "Jaettu · lähteestä {source}",
     "shared": "Jaettu",
     "stillNotFound": "Ei vieläkään löytynyt.",
-    "noAnswer": "{count, plural, one {{sources} ei vastannut.} other {{sources} eivät vastanneet.}}"
+    "noAnswer": "{count, plural, one {{sources} ei vastannut.} other {{sources} eivät vastanneet.}}",
+    "lent": "Lainattu: {person}",
+    "returned": "Palautettu"
   },
   "sections": {
     "label": "Osiot",
@@ -283,6 +285,18 @@
       "description": "kuvaus",
       "cover": "kansi"
     }
+  },
+  "loans": {
+    "lend": "Lainaa",
+    "lendTitle": "Lainaa",
+    "lentOnLabel": "Lainattu",
+    "newPerson": "Uusi henkilö",
+    "findPerson": "Etsi henkilö…",
+    "person": "Henkilö",
+    "personRequired": "Anna henkilö.",
+    "lentOnInvalid": "Ei voi olla tulevaisuudessa.",
+    "lentTo": "Lainassa: {person} · {date} alkaen",
+    "returned": "Palautettu"
   },
   "progress": {
     "loading": "Ladataan"

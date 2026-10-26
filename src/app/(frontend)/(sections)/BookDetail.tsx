@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { getLocale, getTranslations } from 'next-intl/server'
+import { getFormatter, getLocale, getTranslations } from 'next-intl/server'
 import { Fragment, type ReactNode } from 'react'
 
 import { canEditShared } from '@/access/roles'
@@ -7,15 +7,19 @@ import { getHoldings } from '@/lib/books/holdings'
 import { languageName } from '@/lib/books/languageName'
 import { getUserBookState } from '@/lib/books/userBookState'
 import type { LocationOption } from '@/lib/copies/locations'
+import { logger } from '@/lib/errors'
+import { helsinkiToday } from '@/lib/loans/dates'
 import type { Context } from '@/lib/payload/context'
+import { lendingPeople } from '@/lib/people/people'
 import type { ShelfQuery } from '@/lib/shelf/query'
 
 import { buttonClass } from '../components/Button'
 import { Cover } from '../components/Cover'
+import { markerSlotClass } from '../components/ui/classes'
 import { heldBook } from '../heldBook'
 
 import { BookDetailFrame } from './BookDetailPanel'
-import { CopyNote, MoveCopy, ReceiveCopy, RemoveCopy } from './CopyLine'
+import { CopyNote, LendCopy, MoveCopy, ReceiveCopy, RemoveCopy, ReturnLoan } from './CopyLine'
 import { FilterChip } from './FilterChip'
 import { DetailLookUpAgain } from './LookUpAgain'
 import { NotInLibrary } from './NotInLibrary'
@@ -29,9 +33,11 @@ const DOT = ' · '
  * header (cover beside the title, then authors, series and number, and the
  * edition line, each left out when empty), the read switch and Rating (keyed
  * by the Book, so swapping it resets them), Your copies, one line per copy
- * with its location and status, an owned copy's Move and Remove (Move only
- * when the viewer has locations, FR-32) or an ordered copy's Received
- * beside it and the copy's note under it (`CopyLine`), Genres when the Book
+ * with its location and status and the copy's note under it (`CopyLine`):
+ * an owned copy's Lend, Move and Remove (Move only when the viewer has
+ * locations, FR-32); a lent one's marker with "Lent to {person} since
+ * {date}" under its line and Returned only (FR-35, FR-36); an ordered
+ * copy's Received, whatever its loans. Genres when the Book
  * has system genres, the admin's Re-fetch on a shared Book (`Refetch`,
  * `canEditShared`) or, in its place on a private Book, Look it up again
  * (`DetailLookUpAgain`; without an ISBN a muted line pointing to Edit book),
@@ -41,7 +47,9 @@ const DOT = ' · '
  * chip. The one component later groups are added to; it reads the Book, the
  * viewer's copies and their read flag and rating only, never the client
  * rows, so it stays open when its row leaves the list. `locations` are the
- * page's, for Move; none when that read failed.
+ * page's, for Move; none when that read failed. The viewer's People
+ * (`lendingPeople()`) and today are read only when some copy can be lent; a
+ * failed People read leaves the picker with New person alone.
  * A Book the viewer does not hold is "Not in library". The content is the
  * same at every width; only the frame differs: the bottom sheet on the
  * phone, the panel beside the list from 900px (`BookDetailFrame`).
@@ -61,8 +69,17 @@ export async function BookDetail({
   if (!book) return <NotInLibrary query={query} />
   const copies = (await getHoldings(ctx, [bookId])).get(bookId)?.copies ?? []
   const state = await getUserBookState(ctx, bookId)
+  const lendable = copies.some(({ status, loan }) => status === 'owned' && loan === null)
+  const people = lendable
+    ? await lendingPeople(ctx).catch((err: unknown) => {
+        logger().error({ err }, 'The People failed to load')
+        return []
+      })
+    : []
+  const today = lendable ? helsinkiToday() : ''
 
   const t = await getTranslations()
+  const format = await getFormatter()
   const edition = [
     book.publisher,
     book.year === null ? null : String(book.year),
@@ -105,13 +122,13 @@ export async function BookDetail({
           </div>
         </div>
         <ReadAndRating key={bookId} bookId={bookId} initial={state} />
-        {/* Focus lands here when a copy's line goes or changes (`RemoveCopy`, `ReceiveCopy`, `MoveCopy`). */}
+        {/* Focus lands here when a copy's line goes or changes (`RemoveCopy`, `ReceiveCopy`, `MoveCopy`, `LendCopy`, `ReturnLoan`). */}
         <section tabIndex={-1} className="flex flex-col gap-2">
           <h3 className="text-heading-group text-text-muted ui-case">{t('detail.yourCopies')}</h3>
           <ul className="flex flex-col gap-4">
             {copies.map(({ copyId, location, status, note, loan }) => (
               <li key={copyId}>
-                {/* Names the line's Move, Remove, Received and Note after the copy. */}
+                {/* Names the line's Links and Note after the copy. */}
                 <div
                   role="group"
                   aria-labelledby={`copy-${copyId}`}
@@ -129,8 +146,15 @@ export async function BookDetail({
                       )}
                       {t('answer.copy', { status })}
                     </p>
-                    {status === 'owned' && (
+                    {status === 'owned' && loan !== null && <ReturnLoan loanId={loan.loanId} />}
+                    {status === 'owned' && loan === null && (
                       <div className="flex shrink-0 gap-4">
+                        <LendCopy
+                          copyId={copyId}
+                          context={location ? `${book.title}${DOT}${location.name}` : book.title}
+                          people={people}
+                          today={today}
+                        />
                         {locations.length > 0 && (
                           <MoveCopy
                             copyId={copyId}
@@ -138,15 +162,22 @@ export async function BookDetail({
                             locations={locations}
                           />
                         )}
-                        <RemoveCopy
-                          copyId={copyId}
-                          last={copies.length === 1}
-                          lent={loan !== null}
-                        />
+                        <RemoveCopy copyId={copyId} last={copies.length === 1} />
                       </div>
                     )}
                     {status === 'ordered' && <ReceiveCopy copyId={copyId} />}
                   </div>
+                  {status === 'owned' && loan !== null && (
+                    <p className="flex items-center gap-2 text-body text-text">
+                      <span aria-hidden="true" className={`${markerSlotClass} bg-accent`} />
+                      {t('loans.lentTo', {
+                        person: loan.person.name,
+                        date: format.dateTime(new Date(`${loan.since}T12:00:00Z`), {
+                          dateStyle: 'medium',
+                        }),
+                      })}
+                    </p>
+                  )}
                   <CopyNote copyId={copyId} note={note ?? ''} />
                 </div>
               </li>
