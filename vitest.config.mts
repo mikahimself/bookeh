@@ -12,6 +12,7 @@ export default defineConfig({
           name: 'unit',
           environment: 'node',
           include: ['tests/unit/**/*.unit.spec.ts'],
+          setupFiles: ['./vitest.unit.setup.ts'],
           // No database in this lane. An unreachable URL makes a unit spec
           // that loads Payload fail loudly instead of inheriting CI's
           // job-wide `bookeh` URL.
