@@ -36,12 +36,12 @@ describe('createToastStore', () => {
     expect(createToastStore().getState()).toBeNull()
   })
 
-  it('shows a success, leaves at 8 s and is gone 200 ms later', () => {
+  it('shows a success, leaves at 4 s and is gone 200 ms later', () => {
     const store = createToastStore()
     store.show(success)
     expect(store.getState()).toMatchObject({ input: success, leaving: false })
 
-    vi.advanceTimersByTime(7999)
+    vi.advanceTimersByTime(3999)
     expect(store.getState()).toMatchObject({ leaving: false })
     vi.advanceTimersByTime(1)
     expect(store.getState()).toMatchObject({ input: success, leaving: true })
@@ -63,15 +63,15 @@ describe('createToastStore', () => {
     expect(store.getState()).toBeNull()
   })
 
-  it('gives a released held success the 8 s timer, once', () => {
+  it('gives a released held success the 4 s timer, once', () => {
     const store = createToastStore()
     store.show({ ...success, hold: true })
     vi.advanceTimersByTime(60_000)
     store.release()
-    vi.advanceTimersByTime(4000)
+    vi.advanceTimersByTime(2000)
     // A second release does not restart the timer.
     store.release()
-    vi.advanceTimersByTime(3999)
+    vi.advanceTimersByTime(1999)
     expect(store.getState()).toMatchObject({ leaving: false })
     vi.advanceTimersByTime(1)
     expect(store.getState()).toMatchObject({ leaving: true })
@@ -85,9 +85,9 @@ describe('createToastStore', () => {
     expect(store.getState()).toMatchObject({ input: error, leaving: false })
 
     store.show(success)
-    vi.advanceTimersByTime(4000)
+    vi.advanceTimersByTime(2000)
     store.release()
-    vi.advanceTimersByTime(4000)
+    vi.advanceTimersByTime(2000)
     expect(store.getState()).toMatchObject({ leaving: true })
   })
 
@@ -104,7 +104,7 @@ describe('createToastStore', () => {
     const first = store.getState()
     expect(first).not.toBeNull()
 
-    vi.advanceTimersByTime(7000)
+    vi.advanceTimersByTime(3000)
     store.show(error)
     const second = store.getState()
     expect(second).toMatchObject({ input: error, leaving: false })
@@ -128,8 +128,8 @@ describe('createToastStore', () => {
     vi.advanceTimersByTime(200)
     expect(store.getState()).toMatchObject({ leaving: false })
 
-    // The new 8 s timer runs from the replacement.
-    vi.advanceTimersByTime(7800)
+    // The new 4 s timer runs from the replacement.
+    vi.advanceTimersByTime(3800)
     expect(store.getState()).toMatchObject({ leaving: true })
     vi.advanceTimersByTime(200)
     expect(store.getState()).toBeNull()
@@ -230,7 +230,7 @@ describe('createToastStore', () => {
 
     store.show(success)
     expect(listener).toHaveBeenCalledTimes(1)
-    vi.advanceTimersByTime(8000)
+    vi.advanceTimersByTime(4000)
     expect(listener).toHaveBeenCalledTimes(2) // leaving
     vi.advanceTimersByTime(200)
     expect(listener).toHaveBeenCalledTimes(3) // gone

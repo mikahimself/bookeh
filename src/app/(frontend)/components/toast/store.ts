@@ -51,7 +51,7 @@ export type ToastStore = {
  * keeps its token for `undo.seconds`, then drops it and stays as it is: the
  * client-side expiry of the Undo Link lives here and nowhere else.
  */
-export function createToastStore(leaveMs = 200, successMs = 8000): ToastStore {
+export function createToastStore(leaveMs = 200, successMs = 4000): ToastStore {
   let state: ToastState = null
   let nextId = 0
   let timer: ReturnType<typeof setTimeout> | undefined
