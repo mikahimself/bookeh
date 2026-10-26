@@ -266,7 +266,7 @@ export function LendCopy({
  * FR-36: a lent copy's Returned, a Link with no picker. It closes the loan
  * today with the toast "Returned" and Undo, which reopens it. Every result
  * goes to `afterAction`, whose refresh re-renders the line without this
- * Link, so focus moves to Your copies first.
+ * Link, so focus moves first to its section (Your copies, or the Loans list).
  */
 export function ReturnLoan({ loanId }: { loanId: number }) {
   const t = useTranslations()

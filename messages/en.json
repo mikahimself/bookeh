@@ -306,7 +306,9 @@
       "person": "By person",
       "date": "By date"
     },
-    "sinceDate": "Since {date}"
+    "sinceDate": "Since {date}",
+    "returnedGroup": "Returned",
+    "lentBetween": "{person} · {from} to {to}"
   },
   "progress": {
     "loading": "Loading"

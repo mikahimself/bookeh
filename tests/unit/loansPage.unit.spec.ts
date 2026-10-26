@@ -14,14 +14,18 @@ import type { DevicePrefs } from '@/app/(frontend)/prefs'
 import type { EffectiveBook } from '@/lib/books/effectiveBook'
 import type { CopyLine, Holdings } from '@/lib/books/holdings'
 import type { LocationOption } from '@/lib/copies/locations'
-import type { OpenLoan } from '@/lib/loans/loans'
+import type { OpenLoan, ReturnedLoan } from '@/lib/loans/loans'
 
 // EXPERIENCE.md, Loans and States; FR-37: the open loans by person (groups
 // under the name as typed) or by date (one list, longest out first), the order
 // a device preference; Nothing lent; Load failed; Book detail on `/loans`.
+// FR-36: Returned on an open row with Undo, and the returned group below.
 
 const router = { replace: vi.fn(), refresh: vi.fn(), push: vi.fn(), back: vi.fn() }
 const openLoans = vi.fn<(ctx: unknown) => Promise<OpenLoan[]>>()
+const returnedLoans = vi.fn<(ctx: unknown) => Promise<ReturnedLoan[]>>()
+const returnLoanAction = vi.fn()
+const undoneListeners = new Set<() => void>()
 const getEffectiveBooks =
   vi.fn<(ctx: unknown, ids: readonly number[]) => Promise<Map<number, EffectiveBook>>>()
 const heldBook = vi.fn<(ctx: unknown, bookId: number) => Promise<EffectiveBook | undefined>>()
@@ -70,13 +74,13 @@ vi.mock('@/lib/payload/context', () => ({
   requireUser: async () => ({ user: { roles: ['user'] } }),
 }))
 vi.mock('@/lib/errors', () => ({ logger: () => ({ error: logError }) }))
-vi.mock('@/lib/loans/loans', () => ({ openLoans }))
+vi.mock('@/lib/loans/loans', () => ({ openLoans, returnedLoans }))
 vi.mock('@/lib/books/effectiveBook', () => ({ getEffectiveBooks }))
 vi.mock('@/lib/copies/locations', () => ({ listLocations }))
 vi.mock('@/lib/people/people', () => ({ lendingPeople: async () => [] }))
 vi.mock('@/app/(frontend)/actions/loans', () => ({
   lendCopyAction: vi.fn(),
-  returnLoanAction: vi.fn(),
+  returnLoanAction,
 }))
 vi.mock('@/app/(frontend)/(sections)/actions', () => ({
   removeCopiesAction: vi.fn(),
@@ -102,7 +106,10 @@ vi.mock('@/app/(frontend)/components/toast/ToastProvider', () => ({
     show: showToast,
     dismiss: vi.fn(),
     withdraw: vi.fn(),
-    onUndone: () => () => {},
+    onUndone: (listener: () => void) => {
+      undoneListeners.add(listener)
+      return () => undoneListeners.delete(listener)
+    },
   }),
 }))
 vi.mock('next/link', () => ({
@@ -199,6 +206,23 @@ const loan = (
   since,
 })
 
+const kaetiloe = book(9, 'Kätilö', [])
+
+const returnedLoan = (
+  loanId: number,
+  bookId: number,
+  name: string,
+  lentOn: string,
+  returnedOn: string,
+): ReturnedLoan => ({
+  loanId,
+  copyId: loanId + 100,
+  bookId,
+  person: { id: loanId + 200, name },
+  lentOn,
+  returnedOn,
+})
+
 const lent = (loans: OpenLoan[], books: EffectiveBook[]) => {
   openLoans.mockResolvedValue(loans)
   getEffectiveBooks.mockResolvedValue(new Map(books.map((b) => [b.bookId, b])))
@@ -214,6 +238,7 @@ const rowText = () =>
 describe('LoansPage', () => {
   beforeEach(() => {
     listLocations.mockResolvedValue([])
+    returnedLoans.mockResolvedValue([])
     devicePrefs.mockResolvedValue({ ...DEFAULT_PREFS, loans: 'date' })
   })
 
@@ -413,6 +438,92 @@ describe('LoansPage', () => {
       await waitFor(() => expect(pressed()).toEqual(['By person:true', 'By date:false']))
       expect(showToast).toHaveBeenCalledWith(expect.objectContaining({ kind: 'error' }))
       expect(screen.getAllByRole('heading', { level: 2 })).toHaveLength(2)
+    })
+  })
+  describe('returned', () => {
+    const history = () =>
+      returnedLoans.mockResolvedValue([
+        returnedLoan(6, 8, 'Antti', '2026-03-03', '2026-04-20'),
+        returnedLoan(3, 9, 'Leena', '2026-01-14', '2026-02-02'),
+      ])
+    const returnedGroup = () => {
+      const heading = screen.getByRole('heading', { level: 2, name: 'Returned' })
+      return within(heading.parentElement!)
+        .getAllByRole('listitem')
+        .map((item) =>
+          Array.from(item.querySelectorAll('p'))
+            .map((p) => p.textContent)
+            .join(' | '),
+        )
+    }
+    const servedOrder = [
+      'Sinuhe | Antti · Mar 3, 2026 to Apr 20, 2026',
+      'Kätilö | Leena · Jan 14, 2026 to Feb 2, 2026',
+    ]
+
+    it.each(['person', 'date'] as const)(
+      'lists the returned loans below the open ones by %s, as served, without Returned',
+      async (order) => {
+        devicePrefs.mockResolvedValue({ ...DEFAULT_PREFS, loans: order })
+        lent([loan(2, 7, 'Leena', '2026-07-02')], [puhdistus, sinuhe, kaetiloe])
+        history()
+        await renderPage()
+
+        expect(returnedGroup()).toEqual(servedOrder)
+        const items = screen.getAllByRole('listitem')
+        expect(items).toHaveLength(3)
+        expect(screen.getAllByRole('button', { name: 'Returned' })).toHaveLength(1)
+        expect(within(items[0]!).getByRole('button', { name: 'Returned' })).toBeTruthy()
+        expect(screen.getAllByRole('link').map((link) => link.getAttribute('href'))).toEqual([
+          '/loans?book=7',
+          '/loans?book=8',
+          '/loans?book=9',
+        ])
+      },
+    )
+
+    it('shows Nothing lent with the returned group below it', async () => {
+      lent([], [sinuhe, kaetiloe])
+      history()
+      await renderPage()
+      expect(screen.getByText('Nothing lent')).toBeTruthy()
+      expect(returnedGroup()).toEqual(servedOrder)
+    })
+
+    it('has no returned group without history', async () => {
+      lent([loan(2, 7, 'Leena', '2026-07-02')], [puhdistus])
+      await renderPage()
+      expect(screen.queryByRole('heading', { name: 'Returned' })).toBeNull()
+    })
+
+    it('shows Load failed alone when the returned read fails', async () => {
+      lent([loan(2, 7, 'Leena', '2026-07-02')], [puhdistus])
+      returnedLoans.mockRejectedValue(new Error('down'))
+      await renderPage()
+      expect(screen.getByText("Couldn't load.")).toBeTruthy()
+      expect(screen.queryByRole('listitem')).toBeNull()
+      expect(screen.queryByRole('heading', { name: 'Returned' })).toBeNull()
+    })
+
+    it('Returned closes the loan with an Undo toast and refreshes; a toast Undo refreshes again', async () => {
+      returnLoanAction.mockResolvedValue({
+        ok: true,
+        data: { loanId: 2, undoToken: 'token', undoSeconds: 10 },
+      })
+      lent([loan(2, 7, 'Leena', '2026-07-02')], [puhdistus])
+      await renderPage()
+
+      fireEvent.click(screen.getByRole('button', { name: 'Returned' }))
+      await waitFor(() => expect(router.refresh).toHaveBeenCalledOnce())
+      expect(returnLoanAction).toHaveBeenCalledWith({ loanId: 2 })
+      expect(showToast).toHaveBeenCalledWith({
+        kind: 'success',
+        message: 'Returned',
+        undo: { token: 'token', seconds: 10 },
+      })
+
+      for (const listener of undoneListeners) listener()
+      await waitFor(() => expect(router.refresh).toHaveBeenCalledTimes(2))
     })
   })
 })

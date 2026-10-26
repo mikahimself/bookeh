@@ -4,7 +4,7 @@ import { getPayload, type Payload } from 'payload'
 import { beforeAll, describe, expect, it } from 'vitest'
 
 import { helsinkiToday } from '@/lib/loans/dates'
-import { lendCopy, openLoans, returnLoan } from '@/lib/loans/loans'
+import { lendCopy, openLoans, returnedLoans, returnLoan } from '@/lib/loans/loans'
 import * as gateway from '@/lib/payload/gateway'
 import { undo, withUndo } from '@/lib/undo/undo'
 import config from '@/payload.config'
@@ -17,7 +17,8 @@ import { randomIsbn } from '../helpers/isbn'
 // copy without an open loan, Returned closes it and keeps the row, both
 // dated today in Helsinki by default and both undoable. Foreign and bad ids
 // write nothing, for the admin too. FR-37/FR-48: `openLoans` lists only the
-// viewer's open loans, longest out first.
+// viewer's open loans, longest out first; `returnedLoans` only the viewer's
+// returned ones, newest first.
 
 const noon = (date: string) => `${date}T12:00:00.000Z`
 
@@ -358,5 +359,63 @@ describe('loans service', () => {
       },
     ])
     expect((await openLoans(adminCtx)).map((loan) => loan.loanId)).toEqual([adminLoan.data.loanId])
+  })
+  it("lists only the viewer's returned loans, newest return first, ties by lentOn then id", async () => {
+    const { user, ctx, copy, person } = await lender('Returned Loans Viewer')
+    const [second, third, fourth] = [await copyAs(user), await copyAs(user), await copyAs(user)]
+    const antti = await personAs(user, `Antti ${randomUUID()}`)
+    const lentReturned = async (
+      copyId: number,
+      who: number,
+      lentOn: string,
+      returnedOn: string,
+    ) => {
+      const { data } = await lendCopy(ctx, copyId, who, lentOn)
+      await returnLoan(ctx, data.loanId, returnedOn)
+      return data.loanId
+    }
+    const older = await lentReturned(copy.id, person.id, '2026-01-14', '2026-02-02')
+    const tieLow = await lentReturned(second.id, antti.id, '2026-03-03', '2026-04-20')
+    const tieHigh = await lentReturned(third.id, antti.id, '2026-03-03', '2026-04-20')
+    const newest = await lentReturned(fourth.id, person.id, '2026-04-01', '2026-04-20')
+    await lendCopy(ctx, copy.id, person.id, '2026-07-02')
+
+    const other = await lender('Returned Loans Other')
+    const otherLoan = await lendCopy(other.ctx, other.copy.id, other.person.id, '2026-01-01')
+    await returnLoan(other.ctx, otherLoan.data.loanId, '2026-05-01')
+    const admin = await createUser({ displayName: 'Returned Loans Admin', roles: ['admin'] })
+    const adminCtx = await contextFor(admin)
+    const adminLoan = await lendCopy(
+      adminCtx,
+      (await copyAs(admin)).id,
+      { create: 'Kalle' },
+      '2026-01-01',
+    )
+    await returnLoan(adminCtx, adminLoan.data.loanId, '2026-05-01')
+
+    const named = (p: Person) => ({ id: p.id, name: p.name })
+    const row = (
+      loanId: number,
+      copyId: number,
+      p: Person,
+      lentOn: string,
+      returnedOn: string,
+    ) => ({
+      loanId,
+      copyId,
+      bookId: shared.id,
+      person: named(p),
+      lentOn,
+      returnedOn,
+    })
+    expect(await returnedLoans(ctx)).toEqual([
+      row(newest, fourth.id, person, '2026-04-01', '2026-04-20'),
+      row(tieHigh, third.id, antti, '2026-03-03', '2026-04-20'),
+      row(tieLow, second.id, antti, '2026-03-03', '2026-04-20'),
+      row(older, copy.id, person, '2026-01-14', '2026-02-02'),
+    ])
+    expect((await returnedLoans(adminCtx)).map((loan) => loan.loanId)).toEqual([
+      adminLoan.data.loanId,
+    ])
   })
 })

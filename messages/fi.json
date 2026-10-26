@@ -306,7 +306,9 @@
       "person": "Henkilöittäin",
       "date": "Päivämäärän mukaan"
     },
-    "sinceDate": "{date} alkaen"
+    "sinceDate": "{date} alkaen",
+    "returnedGroup": "Palautetut",
+    "lentBetween": "{person} · {from}–{to}"
   },
   "progress": {
     "loading": "Ladataan"

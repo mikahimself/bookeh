@@ -204,17 +204,82 @@ export type OpenLoan = {
  * Person has gone between the reads is left out.
  */
 export async function openLoans(ctx: Context): Promise<OpenLoan[]> {
-  const owner = { owner: { equals: ctx.user.id } }
-  const { docs: loans } = await gateway.find(ctx, {
+  const { docs } = await gateway.find(ctx, {
     collection: 'loans',
-    where: { and: [owner, { returnedOn: { exists: false } }] },
+    where: { and: [{ owner: { equals: ctx.user.id } }, { returnedOn: { exists: false } }] },
     select: { copy: true, person: true, lentOn: true },
     sort: ['lentOn', 'id'],
     depth: 0,
     pagination: false,
   })
-  if (loans.length === 0) return []
+  return (await withCopyAndPerson(ctx, docs)).map(({ loan, copyId, bookId, person }) => ({
+    loanId: loan.id,
+    copyId,
+    bookId,
+    person,
+    // Spine, Dates: `lentOn` is stored at 12:00 UTC and read back by its UTC date.
+    since: loan.lentOn.slice(0, 10),
+  }))
+}
 
+/** Spine, Shared shapes: a returned loan as the Loans section's returned group lists it. */
+export type ReturnedLoan = {
+  loanId: number
+  copyId: number
+  bookId: number
+  person: Named
+  lentOn: string
+  returnedOn: string
+}
+
+/**
+ * Spine, AD-7, FR-36, FR-37: the context user's returned loans (`returnedOn`
+ * set), the most recently returned first: by `returnedOn`, then `lentOn`,
+ * then loan id, all descending. Each with its copy, the copy's Book id, the
+ * borrower and both days as `YYYY-MM-DD`. Every read filters on `owner`
+ * explicitly as well as through `ownerAccess` (FR-48), so the admin sees only
+ * their own. Read whole, at `depth: 0`: the caller hydrates the Books. A loan
+ * whose copy or Person has gone between the reads is left out.
+ */
+export async function returnedLoans(ctx: Context): Promise<ReturnedLoan[]> {
+  const { docs } = await gateway.find(ctx, {
+    collection: 'loans',
+    where: { and: [{ owner: { equals: ctx.user.id } }, { returnedOn: { exists: true } }] },
+    select: { copy: true, person: true, lentOn: true, returnedOn: true },
+    sort: ['-returnedOn', '-lentOn', '-id'],
+    depth: 0,
+    pagination: false,
+  })
+  return (await withCopyAndPerson(ctx, docs)).flatMap(({ loan, copyId, bookId, person }) =>
+    loan.returnedOn
+      ? [
+          {
+            loanId: loan.id,
+            copyId,
+            bookId,
+            person,
+            // Spine, Dates: both are stored at 12:00 UTC and read back by their UTC date.
+            lentOn: loan.lentOn.slice(0, 10),
+            returnedOn: loan.returnedOn.slice(0, 10),
+          },
+        ]
+      : [],
+  )
+}
+
+type Relation = number | { id: number }
+
+/**
+ * The loans, in their order, each with its copy id, the copy's Book id and
+ * its borrower, read owner-filtered at `depth: 0`. A loan whose copy or
+ * Person has gone is left out.
+ */
+async function withCopyAndPerson<L extends { copy: Relation; person: Relation }>(
+  ctx: Context,
+  loans: L[],
+): Promise<{ loan: L; copyId: number; bookId: number; person: Named }[]> {
+  if (loans.length === 0) return []
+  const owner = { owner: { equals: ctx.user.id } }
   const [{ docs: copies }, { docs: people }] = await Promise.all([
     gateway.find(ctx, {
       collection: 'copies',
@@ -240,8 +305,6 @@ export async function openLoans(ctx: Context): Promise<OpenLoan[]> {
     const copyId = idOf(loan.copy)
     const bookId = bookByCopy.get(copyId)
     const person = personById.get(idOf(loan.person))
-    if (bookId === undefined || !person) return []
-    // Spine, Dates: `lentOn` is stored at 12:00 UTC and read back by its UTC date.
-    return [{ loanId: loan.id, copyId, bookId, person, since: loan.lentOn.slice(0, 10) }]
+    return bookId === undefined || !person ? [] : [{ loan, copyId, bookId, person }]
   })
 }
