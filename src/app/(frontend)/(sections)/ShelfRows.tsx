@@ -76,7 +76,7 @@ export function useAfterAction(): ShelfActionsValue['afterAction'] {
  * refreshed in a transition, so the Filter panel's values, Book detail and
  * the cached first page follow the write; the list never shows a page older
  * than its rows. A toast Undo is not an action: it reloads through `onUndone`
- * and `ReadAndRating` refreshes for it.
+ * and `ReadAndRating` refreshes for it (on `/loans`, `RefreshOnUndo` too).
  */
 export function ShelfActionsProvider({ children }: { children: ReactNode }) {
   const t = useTranslations('answer')

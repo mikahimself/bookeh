@@ -97,6 +97,26 @@ deferred: []
 
 ## Review Triage Log
 
+### 2026-10-26 — Review pass
+- verdicts: 16 findings — high 0, medium 0, low 11, false 5, maybe-false 0
+- findings:
+  - `[low]` `[reject]` Blind: every row of the open Book (open plus returned loans of it) gets the selection bar. Book detail is keyed by Book, so marking each of its rows is consistent with 6.9, where several open copies of one Book were already all marked. Keying it to one row would add state for a rare case.
+  - `[low]` `[reject]` Blind: one Undo fires two `router.refresh()` calls when Book detail is open (`RefreshOnUndo` and `ReadAndRating`). The result is one extra server render and no wrong state. Skipping one of them needs coordination between the components.
+  - `[low]` `[patch]` Blind: the `ShelfActionsProvider` and `LendCopy` doc comments name only `ReadAndRating` for the Undo refresh. Fixed: both now also name `RefreshOnUndo` on `/loans`.
+  - `[low]` `[reject]` Blind: the focus target `<section tabIndex={-1}>` has no accessible name. Book detail's copies section, the precedent, has none either. Naming it adds wiring that no criterion asks for.
+  - `[low]` `[reject]` Blind: a failed returned read blanks the open loans as well. This is stated under Always ("If either read fails, the page shows `LoadFailed` alone"). Both reads hit the same database in the same render, so one failing alone is unlikely, and splitting the failure adds a branch.
+  - `[low]` `[reject]` Blind / Edge: the returned history is unbounded (`pagination: false`). The spec's Never rules out a limit, and a person's lending history grows by dozens of loans a year at most. Noted in Residual risks.
+  - `[low]` `[patch]` Blind: `sinceDate` now formats `lentOn` and `returnedOn` too, so the name is wrong. Fixed: renamed to `day`. The suggested `dateTimeRange` is rejected: the line is "{person} · {from} to {to}" as EXPERIENCE.md and the epic word it.
+  - `[low]` `[patch]` Blind: the spine's `ReturnedLoan` line reads as if only `returnedOn` sorts descending. Fixed: "returnedOn, then lentOn, then loan id, all descending (newest first)".
+  - `[false]` `[reject]` Blind: the `loan.returnedOn ?` check is a dead guard that could silently drop rows. The rows come from a `returnedOn: { exists: true }` query, so it never drops one. The check is there to narrow the generated `string | null | undefined` type.
+  - `[false]` `[reject]` Blind: the spec change is missing from the diff and commit. The spec was left out of the review diff on purpose. It is committed with the story at finalization.
+  - `[low]` `[reject]` Edge: unbounded returned history. This is the same as the Blind row above, with the same reason.
+  - `[low]` `[reject]` Edge: two refreshes per Undo with Book detail open. This is the same as the Blind row above, with the same reason.
+  - `[low]` `[reject]` Verification gap: focus landing on the list `<section>` after Returned is not asserted. The finding only asks for a test, and no criterion or spine rule names focus here (CLAUDE.md, Tests).
+  - `[false]` `[reject]` Intent: "the copy" in EXPERIENCE.md might mean copy-level identity, such as the location. The open rows' "Rows show the copy" is already rendered as cover, title and authors (6.9, 6.10), and the returned rows use the same wording for the same row.
+  - `[false]` `[reject]` Intent: no test shows the row moving into the returned group end to end. The finding only asks for a test. The move is composed of a tested refresh, a tested `returnedLoans` order and a tested render, and CLAUDE.md keeps Playwright to scan-to-save and shop check.
+  - `[false]` `[reject]` Intent: the Finnish "{from}–{to}" is untested and not stated in the epic. The spec states it under Always, and strings are covered by key parity (CLAUDE.md, Tests).
+
 ## Design Notes
 
 **The returned group sits outside the switch.** 6.10 sends both orders to the client; the returned group is the same in both, so rendering it once after `LoansOrder` keeps the payload from doubling again (6.10 residual risk).
@@ -115,3 +135,65 @@ deferred: []
 
 **Manual checks (if no CLI):**
 - Phone and wide, light and dark: Returned on a row moves it to the group; Undo moves it back; the Link is tap-high and keyboard-reachable; titles still truncate beside the Link.
+
+## Auto Run Result
+
+Status: done
+
+**Summary.** `/loans` now shows a "Returned" group below the open loans in both orders, and under Nothing lent. It lists the newest return first, and each row shows the copy (cover, title, authors) and "{person} · {from} to {to}". Every open row has a Returned Link, which reuses Book detail's `ReturnLoan`. It closes the loan today with "Returned · Undo", and the refresh moves the row into the group. A toast Undo refreshes `/loans` through the new `RefreshOnUndo`, so the row moves back even with no Book detail open. `lib/loans` gains `returnedLoans(ctx)` and `ReturnedLoan`, which share the copy and Person lookup with `openLoans`. The spine is updated.
+
+**Files changed.**
+- `src/lib/loans/loans.ts`: `ReturnedLoan`, `returnedLoans`, and the shared private helper `withCopyAndPerson`.
+- `src/app/(frontend)/(sections)/loans/page.tsx`:
+  - one read for open and returned loans and their Books;
+  - Returned on open rows;
+  - the returned group, rendered once outside the switch;
+  - the list column is a focusable `<section>`;
+  - `RefreshOnUndo` mounted;
+  - the date helper is now `day`.
+- `src/app/(frontend)/(sections)/loans/LoanRow.tsx`: an optional `action` slot after the row's link.
+- `src/app/(frontend)/(sections)/loans/RefreshOnUndo.tsx`: new. It refreshes after a toast Undo.
+- `src/app/(frontend)/(sections)/CopyLine.tsx`, `ShelfRows.tsx`: doc comments only.
+- `messages/en.json`, `messages/fi.json`: `loans.returnedGroup` and `loans.lentBetween`.
+- `ARCHITECTURE-SPINE.md`: `ReturnedLoan` / `returnedLoans`.
+- `tests/int/loansService.int.spec.ts`: one test for `returnedLoans`: viewer only, admin only their own, order with both tie-breaks.
+- `tests/unit/loansPage.unit.spec.ts`: the returned group in both orders, under Nothing lent, absent with no history, and Load failed; Returned with its toast and refresh; Undo's refresh.
+- `sprint-status.yaml`: 6.11 is done.
+
+**Review.** One pass found 16 findings: 11 low and 5 false.
+- **Patched (all low):**
+  - Stale Undo-refresh doc comments in `ShelfRows.tsx` and `CopyLine.tsx`.
+  - `sinceDate` renamed to `day`.
+  - The spine's sort wording.
+- **Deferred:** none.
+- **Rejected, with reasons in the triage log:**
+  - The selection bar on every row of the open Book.
+  - Two refreshes per Undo with Book detail open (reported twice).
+  - No accessible name on the focus section.
+  - A failed returned read blanks the page (as specified).
+  - Unbounded history (reported twice).
+  - `dateTimeRange`.
+  - The narrowing guard (false).
+  - The spec missing from the diff (false).
+  - A focus test.
+  - "The copy" meaning location (false).
+  - An end-to-end move test (false).
+  - The untested Finnish dash (false).
+
+**Follow-up review:** not recommended (`false`). Patched by verdict: 0 high, 0 medium, 3 low.
+
+**Verification.**
+- `npm run typecheck`: clean.
+- `npm run lint`: 0 errors (the 48 warnings were already there).
+- `npm run test:unit`: 65 files and 959 tests pass.
+- `npm run test:int -- tests/int/loansService.int.spec.ts`: 15 pass.
+- No schema change.
+- Not run in a browser.
+
+**Residual risks.**
+- **Not checked in a browser:** phone and wide, light and dark, the row moving on Returned and back on Undo, the Link's tap height, and titles truncating beside the Link.
+- **The returned history is unbounded.** `/loans` reads and renders every returned loan on each render and refresh.
+- **Two refreshes per Undo** while Book detail is open on `/loans`.
+- **Finnish range wording** ("{from}–{to}") and "Palautetut" are worth a look by Mika.
+- **Parallel worktree:** a `bookeh-postgres-people-settings` container on port 5433 suggests 6.13 is in progress elsewhere. Files shared with it are likely `messages/*.json`, the spine's people and loans lines, and `sprint-status.yaml`.
+- **Process note:** the implementation subagent committed the code (`35f34b5`) before review, against the workflow. The review patches and this spec are in a second commit.

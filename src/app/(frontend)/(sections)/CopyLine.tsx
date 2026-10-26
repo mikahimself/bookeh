@@ -224,7 +224,8 @@ export function ReceiveCopy({ copyId }: { copyId: number }) {
  * before Move that opens the Lend picker (`LendPicker`); disabled while its
  * lend runs. `afterAction`'s refresh re-renders Book detail with the lent
  * line, so focus goes to the copies' section once the lend settles. The
- * toast's Undo is refreshed by `ReadAndRating`'s `onUndone` listener.
+ * toast's Undo is refreshed by `ReadAndRating`'s `onUndone` listener, and
+ * on `/loans` by `RefreshOnUndo` too.
  */
 export function LendCopy({
   copyId,

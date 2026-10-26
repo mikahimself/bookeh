@@ -97,8 +97,8 @@ export default async function LoansPage({
   const prefs = await devicePrefs()
   const locale = await getLocale()
 
-  const sinceDate = (since: string) =>
-    format.dateTime(new Date(`${since}T12:00:00Z`), { dateStyle: 'medium' })
+  const day = (date: string) =>
+    format.dateTime(new Date(`${date}T12:00:00Z`), { dateStyle: 'medium' })
   const row = ({ loan, book: lent }: LoanItem | ReturnedItem, line: string, action?: ReactNode) => (
     <LoanRow
       key={loan.loanId}
@@ -137,7 +137,7 @@ export default async function LoansPage({
                     <h2 className="text-heading-group text-text-muted">{person.name}</h2>
                     <ul>
                       {lent.map((item) =>
-                        openRow(item, t('sinceDate', { date: sinceDate(item.loan.since) })),
+                        openRow(item, t('sinceDate', { date: day(item.loan.since) })),
                       )}
                     </ul>
                   </div>
@@ -149,7 +149,7 @@ export default async function LoansPage({
                         item,
                         t('since', {
                           person: item.loan.person.name,
-                          date: sinceDate(item.loan.since),
+                          date: day(item.loan.since),
                         }),
                       ),
                     )}
@@ -166,8 +166,8 @@ export default async function LoansPage({
                       item,
                       t('lentBetween', {
                         person: item.loan.person.name,
-                        from: sinceDate(item.loan.lentOn),
-                        to: sinceDate(item.loan.returnedOn),
+                        from: day(item.loan.lentOn),
+                        to: day(item.loan.returnedOn),
                       }),
                     ),
                   )}
