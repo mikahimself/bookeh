@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState, type ReactNode } from 'react'
+import { useId, useRef, useState, type ReactNode } from 'react'
 
 import { Button } from '../Button'
 import { useSuspendSwipe } from '../swipe'
@@ -15,7 +15,8 @@ export type PickerOption<V extends string | number> = { value: V; label: ReactNo
 export type PickerProps<V extends string | number> = {
   open: boolean
   onOpenChange: (open: boolean) => void
-  title: string
+  /** A typed name inside it keeps its case: wrap it in `normal-case` (DESIGN.md, Lowercase). */
+  title: ReactNode
   options: readonly PickerOption<V>[]
   value: V | null
   /** Runs once the picker's history entry is gone, so a navigation lands on the entry before it. */
@@ -56,6 +57,7 @@ export function Picker<V extends string | number>({
   create,
 }: PickerProps<V>) {
   const wide = useWide()
+  const titleId = useId()
   const [heldWide, setHeldWide] = useState(wide)
   /** The choice waiting for the close to finish; `null` when the close is no choice. */
   const pending = useRef<Choice<V> | null>(null)
@@ -146,9 +148,11 @@ export function Picker<V extends string | number>({
       {body}
     </Dialog>
   ) : (
-    <Sheet open={open} onOpenChange={onOpenChange} label={title} onClosed={onClosed}>
+    <Sheet open={open} onOpenChange={onOpenChange} labelledBy={titleId} onClosed={onClosed}>
       <div className="flex flex-col gap-4">
-        <h2 className="text-heading-group ui-case">{title}</h2>
+        <h2 id={titleId} className="text-heading-group ui-case">
+          {title}
+        </h2>
         {body}
       </div>
     </Sheet>

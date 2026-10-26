@@ -11,7 +11,8 @@ import { useCloseOnBack, useOverlayLayer } from './overlay'
 export type DialogProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
-  title: string
+  /** A typed name inside it keeps its case: wrap it in `normal-case` (DESIGN.md, Lowercase). */
+  title: ReactNode
   children?: ReactNode
   /**
    * The confirming button, a primary or destructive Button; it sits right of

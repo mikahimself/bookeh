@@ -10,6 +10,7 @@ import {
 import { readLastBackup } from '@/lib/backup/lastBackup'
 import { listLocations } from '@/lib/copies/locations'
 import { requireUser } from '@/lib/payload/context'
+import { personUse } from '@/lib/people/people'
 import { filterValues } from '@/lib/shelf/filterValues'
 
 import { SignOutButton } from '../../components/SignOutButton'
@@ -18,6 +19,7 @@ import { DefaultLocationField } from './DefaultLocationField'
 import { DisplayNameField } from './DisplayNameField'
 import { LanguageSwitch } from './LanguageSwitch'
 import { LocationsGroup } from './LocationsGroup'
+import { PeopleGroup } from './PeopleGroup'
 import { ThemeSwitch } from './ThemeSwitch'
 import { VisibilitySwitch } from './VisibilitySwitch'
 
@@ -38,13 +40,13 @@ function Group({ heading, id, children }: { heading: string; id?: string; childr
 /**
  * Settings (EXPERIENCE.md, Settings): profile, language, theme, visibility,
  * default location and Sign out in the first of two columns on wide screens,
- * the managed lists (Locations) and, for admins only, Backup (NFR-6) in the
- * second; one column on the phone. Backup shows the last backup from
+ * the managed lists (Locations, People) and, for admins only, Backup (NFR-6)
+ * in the second; one column on the phone. Backup shows the last backup from
  * `readLastBackup()`, in `danger` with "Backup is overdue." when overdue.
- * Reads go through `getProfile()`, `listLocations()`, `filterValues()` and
- * `devicePrefs()`; the controls write through `updateProfileAction`,
- * `setDefaultLocationAction`, `setDevicePrefsAction` and the location actions
- * in `./actions`.
+ * Reads go through `getProfile()`, `listLocations()`, `filterValues()`,
+ * `personUse()` and `devicePrefs()`; the controls write through
+ * `updateProfileAction`, `setDefaultLocationAction`, `setDevicePrefsAction`
+ * and the location and People actions in `./actions`.
  */
 export default async function SettingsPage() {
   const ctx = await requireUser()
@@ -65,6 +67,7 @@ export default async function SettingsPage() {
     ...location,
     count: counts.get(location.id) ?? 0,
   }))
+  const people = await personUse(ctx)
   // A refresh after a rename, merge or delete remounts the field with the fresh default and list.
   const defaultLocationKey = [
     profile.defaultLocation,
@@ -113,10 +116,13 @@ export default async function SettingsPage() {
         </Group>
         <SignOutButton />
       </div>
-      {/* Second column: the managed lists, then Backup (admin only); People and tags arrive with later stories. */}
+      {/* Second column: the managed lists, then Backup (admin only); tags arrive with a later story. */}
       <div className="flex max-w-panel-width flex-col gap-7 max-wide:mt-7">
         <Group heading={t('locations')}>
           <LocationsGroup locations={counted} />
+        </Group>
+        <Group heading={t('people')}>
+          <PeopleGroup people={people} />
         </Group>
         {backup && (
           <Group heading={t('backup')}>

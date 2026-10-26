@@ -9,10 +9,12 @@ const mergeLocationAction = vi.fn()
 const deleteLocationAction = vi.fn()
 
 // Key-echo translator that also shows the values, so a test can read what a string was built from.
-vi.mock('next-intl', () => ({
-  useTranslations: () => (key: string, values?: Record<string, unknown>) =>
-    values ? `${key} ${JSON.stringify(values)}` : key,
-}))
+// `rich` echoes the same: `JSON.stringify` leaves out the tag functions.
+vi.mock('next-intl', () => {
+  const t = (key: string, values?: Record<string, unknown>) =>
+    values ? `${key} ${JSON.stringify(values)}` : key
+  return { useTranslations: () => Object.assign(t, { rich: t }) }
+})
 vi.mock('next/navigation', async (importOriginal) => ({
   ...(await importOriginal<typeof import('next/navigation')>()),
   useRouter: () => ({ replace: vi.fn(), refresh }),
@@ -62,7 +64,7 @@ describe('LocationsGroup', () => {
     render(createElement(LocationsGroup, { locations: [alpha, beta] }))
 
     fireEvent.click(screen.getAllByRole('button', { name: 'rename' })[0])
-    const field = screen.getByLabelText('settings.locationName')
+    const field = screen.getByLabelText('settings.name')
     fireEvent.change(field, { target: { value: 'beta' } })
     fireEvent.blur(field)
 

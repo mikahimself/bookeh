@@ -19,8 +19,12 @@ const SNAP_POINTS = [HALF_OPEN, 1]
 export type SheetProps = {
   open: boolean
   onOpenChange: (open: boolean) => void
-  /** Names the sheet for assistive technology; the content draws its own heading. */
-  label: string
+  /**
+   * Names the sheet for assistive technology; the content draws its own
+   * heading. `labelledBy` names it by that heading's id instead.
+   */
+  label?: string
+  labelledBy?: string
   children?: ReactNode
   /**
    * Runs once per close: after the sheet's history entry is gone
@@ -44,7 +48,15 @@ export type SheetProps = {
  * Back closes it. Modal, and the list underneath keeps its scroll position.
  * Every open starts half open.
  */
-export function Sheet({ open, onOpenChange, label, children, onClosed, addressed }: SheetProps) {
+export function Sheet({
+  open,
+  onOpenChange,
+  label,
+  labelledBy,
+  children,
+  onClosed,
+  addressed,
+}: SheetProps) {
   const t = useTranslations('overlay')
   const layer = useOverlayLayer('sheet')
   const [snapPoint, setSnapPoint] = useState<Drawer.Root.SnapPoint | null>(HALF_OPEN)
@@ -77,6 +89,7 @@ export function Sheet({ open, onOpenChange, label, children, onClosed, addressed
         <Drawer.Viewport className="fixed inset-0 flex touch-none items-end">
           <Drawer.Popup
             aria-label={label}
+            aria-labelledby={labelledBy}
             className="flex h-sheet-height w-full touch-none flex-col border-t-2 border-text bg-background sheet-motion"
           >
             <div className="relative flex shrink-0 justify-center">
