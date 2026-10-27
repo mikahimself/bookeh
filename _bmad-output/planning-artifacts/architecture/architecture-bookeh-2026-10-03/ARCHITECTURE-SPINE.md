@@ -194,7 +194,7 @@ Arrows are the only allowed import directions, and ESLint `no-restricted-imports
   - A save takes `SaveInput` and creates every needed document in one transaction (AD-16): ensure the Book, then either `closeEntriesForBook()` and `createCopy()` (AD-18) or the new entry. A copy saved this way is owned and at the default location. Status, location, tags, the recipient of an entry and Book values are changed afterwards through their own functions.
   - An Answer opened by ISBN sends `{ isbn13, pick?, candidate? }`, `candidate` being the shown candidate's `{ source, recordId }`. A `{ bookId }` target must pass `requireOwnBook()` (AD-7).
   - One rule for the sources: a save uses the held outcome and asks the sources only on a miss, at most once and before the transaction opens; no source is called inside a transaction. A save of a held Book never asks them (only the in-process cache, for an auto-share). `chooseCandidate()` in `lib/catalogue` takes the candidate for both the new shared Book and the auto-share: with `candidate`, the one with that `source` and `recordId` wherever it is in the list, or `NOT_FOUND` when the outcome lacks it, never another; without it, `pick` (none or out of range is the best). The chosen candidate and its raw metadata reach the cover download and the Book's creation, which ask nothing again.
-  - `SaveInput` carries a client-generated `requestId`. A repeat of a recent `requestId` by the same user returns the first result.
+  - `SaveInput` carries a client-generated `requestId`. A repeat of a recent `requestId` by the same user, of the same kind of save, returns the first result.
   - A save is undoable (AD-20). Its restore deletes the copy or entry and reopens closed entries. It deletes a created Book, author, series or media row only when `isUnreferenced()` (AD-3) finds no reference to it from any row of any user, and a created `user-books` row only when that user has no other copy or entry for the Book. After an auto-share (AD-5) it removes the copy and leaves the Book shared. If the copy has gained a loan since the save, the restore fails with `UNDO_FAILED` and changes nothing.
 
 ### AD-12 — Exactly one app instance
@@ -475,7 +475,8 @@ type SaveInput = {
   target: { bookId: number } | { isbn13: string; pick?: number; candidate?: { source: SourceId; recordId: string } } | { manual: { isbn?: string; title: string; authors: string[] } }
   save: { kind: 'copy' } | { kind: 'entry'; wishlist: Ref }
 }
-type SaveResult = { bookId: number; copyId?: number; entryId?: number; savedTo: Named | null } // location or wishlist
+type SaveResult = { bookId: number; copyId: number; savedTo: Named | null } // location
+type EntrySaveResult = { bookId: number; entryId: number; savedTo: Named } // the list
 type EditBookInput = {
   bookId: number
   edits: BookEdits // only fields the user changed
@@ -597,7 +598,7 @@ src/
     copies/            # createCopy, move, receive, status, note, remove; locations
     people/            # resolvePerson, createPerson, rename, merge, delete, personUse, lendingPeople
     loans/             # lendCopy, returnLoan, openLoans, returnedLoans; dates: helsinkiToday, isCalendarDate
-    wishlists/         # resolveWishlist, createWishlist, rename, delete
+    wishlists/         # resolveWishlist, createWishlist, rename, delete; createEntry
     account/           # profile read and update, visibility
     backup/            # readLastBackup: the nightly backup's status file (BACKUP_STATUS_FILE) for Settings
   migrations/

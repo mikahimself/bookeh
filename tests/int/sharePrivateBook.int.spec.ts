@@ -19,7 +19,7 @@ import {
 import { upsertUserBook } from '@/lib/books/upsertUserBook'
 import { mediaDir } from '@/lib/catalogue/covers'
 import { DomainError } from '@/lib/errors'
-import { saveCopy, type SaveInput } from '@/lib/catalogue/saveCopy'
+import { saveCopy, type CopySaveInput } from '@/lib/catalogue/saveCopy'
 import { setCover } from '@/lib/catalogue/setCover'
 import type { Context } from '@/lib/payload/context'
 import { heldOutcome, lookupSources } from '@/lib/metadata/lookup'
@@ -67,7 +67,7 @@ const found = (candidate: Partial<SourceResult> & { isbn13: string }): SourcesOu
   },
 })
 
-const isbnInput = (isbn13: string): SaveInput => ({
+const isbnInput = (isbn13: string): CopySaveInput => ({
   requestId: randomUUID(),
   target: { isbn13 },
   save: { kind: 'copy' },

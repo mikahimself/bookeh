@@ -21,7 +21,7 @@ import { toNameKey } from '@/fields/nameKey'
 import { mediaDir } from '@/lib/catalogue/covers'
 import { lookupBook } from '@/lib/catalogue/lookupBook'
 import { LOOKUP_LIMIT, limitLookups } from '@/lib/catalogue/lookupLimit'
-import { saveCopy, type SaveInput } from '@/lib/catalogue/saveCopy'
+import { saveCopy, type CopySaveInput } from '@/lib/catalogue/saveCopy'
 import {
   oncePerRequest,
   REQUEST_MEMORY_SIZE,
@@ -84,7 +84,7 @@ const found = (
   },
 })
 
-const inputFor = (isbn13: string): SaveInput => ({
+const inputFor = (isbn13: string): CopySaveInput => ({
   requestId: randomUUID(),
   target: { isbn13 },
   save: { kind: 'copy' },
@@ -329,7 +329,7 @@ describe('saveCopy', () => {
     const isbn = randomIsbn()
     const shared = await bookFor(undefined, isbn, 'shared')
     const first = await saveCopy(ctx, inputFor(isbn))
-    const byId = (bookId: number): SaveInput => ({
+    const byId = (bookId: number): CopySaveInput => ({
       requestId: randomUUID(),
       target: { bookId },
       save: { kind: 'copy' },
@@ -645,13 +645,13 @@ describe('saveCopy', () => {
     it('forgets the oldest id past REQUEST_MEMORY_SIZE', async () => {
       const { ctx } = await freshUser()
       const ids = Array.from({ length: REQUEST_MEMORY_SIZE + 1 }, () => randomUUID())
-      for (const [i, id] of ids.entries()) await oncePerRequest(ctx, id, async () => i)
+      for (const [i, id] of ids.entries()) await oncePerRequest(ctx, 'copy', id, async () => i)
       const run = vi.fn(async () => -1)
 
-      expect(await oncePerRequest(ctx, ids.at(-1)!, run)).toBe(REQUEST_MEMORY_SIZE)
-      expect(await oncePerRequest(ctx, ids[1]!, run)).toBe(1)
+      expect(await oncePerRequest(ctx, 'copy', ids.at(-1)!, run)).toBe(REQUEST_MEMORY_SIZE)
+      expect(await oncePerRequest(ctx, 'copy', ids[1]!, run)).toBe(1)
       expect(run).not.toHaveBeenCalled()
-      expect(await oncePerRequest(ctx, ids[0]!, run)).toBe(-1)
+      expect(await oncePerRequest(ctx, 'copy', ids[0]!, run)).toBe(-1)
       expect(run).toHaveBeenCalledTimes(1)
     })
 

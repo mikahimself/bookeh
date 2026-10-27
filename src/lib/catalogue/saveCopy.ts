@@ -6,7 +6,9 @@ import { DomainError } from '@/lib/errors'
 import { heldOutcome, lookupSources } from '@/lib/metadata/lookup'
 import type { Context } from '@/lib/payload/context'
 import * as gateway from '@/lib/payload/gateway'
+import type { Ref } from '@/lib/payload/ref'
 import { type Undoable, type Undone, withUndo } from '@/lib/undo/undo'
+import { createEntry } from '@/lib/wishlists/entries'
 
 import { storeCover } from './covers'
 import { createPrivateBook, type ManualEntry, normaliseManual } from './createPrivateBook'
@@ -14,23 +16,30 @@ import { ensureSharedBook } from './ensureSharedBook'
 import { findBookByIsbn } from './findBookByIsbn'
 import { limitLookups } from './lookupLimit'
 import { type CandidateId, chooseCandidate } from './pick'
-import { oncePerRequest } from './saveRequests'
+import { oncePerRequest, type SaveKind } from './saveRequests'
 import { prepareShare, settleHeldBook } from './sharePrivateBook'
 
-// Spine, Structural Seed (Shared shapes, `src/lib/catalogue`), narrowed to
-// what exists now: wishlist entries arrive with Epic 7.
+// Spine, Structural Seed (Shared shapes, `src/lib/catalogue`).
 
-export type SaveInput = {
-  requestId: string
-  target:
-    | { isbn13: string; pick?: number; candidate?: CandidateId }
-    | { manual: ManualEntry }
-    | { bookId: number }
-  save: { kind: 'copy' }
-}
+/** What a save is for: a Book by ISBN, typed by hand, or one the user holds. */
+export type SaveTarget =
+  | { isbn13: string; pick?: number; candidate?: CandidateId }
+  | { manual: ManualEntry }
+  | { bookId: number }
+
+type SaveOf<S> = { requestId: string; target: SaveTarget; save: S }
+
+/** Add to library. */
+export type CopySaveInput = SaveOf<{ kind: 'copy' }>
+/** Add to wishlist. */
+export type EntrySaveInput = SaveOf<{ kind: 'entry'; wishlist: Ref }>
+export type SaveInput = CopySaveInput | EntrySaveInput
 
 /** The saved Book and copy, and where the copy landed (`null`: no location). */
 export type SaveResult = { bookId: number; copyId: number; savedTo: Named | null }
+
+/** The saved Book and entry, and the list it landed on. */
+export type EntrySaveResult = { bookId: number; entryId: number; savedTo: Named }
 
 /**
  * Spine, AD-11 and FR-21: Add to library. Saves the Book and an owned copy at
@@ -109,22 +118,95 @@ export type SaveResult = { bookId: number; copyId: number; savedTo: Named | null
  * left now. An Undo keeps the `requestId` remembered, so a retry within the
  * window returns the undone result and saves nothing.
  */
-export async function saveCopy(ctx: Context, input: SaveInput): Promise<Undoable<SaveResult>> {
-  const { result, storedAt } = await oncePerRequest(ctx, input.requestId, async () => {
-    const saved = await save(ctx, input)
+export async function saveCopy(ctx: Context, input: CopySaveInput): Promise<Undoable<SaveResult>> {
+  return remembered(ctx, 'copy', input.requestId, () =>
+    saveBook(ctx, input.target, (tx, bookId) => saveOwnedCopy(tx, bookId)),
+  )
+}
+
+/**
+ * Spine, AD-11, AD-18 and FR-21: Add to wishlist. Saves the Book exactly as
+ * `saveCopy()` does, for each target with the same rules, errors and Undo of
+ * the Book, then puts it on the user's wishlist `save.wishlist` as an open
+ * entry for the user (`createEntry()`, no recipient) instead of saving a
+ * copy. Book and entry are one transaction, or nothing at all. The list's
+ * `Ref` is resolved inside it (`VALIDATION` on `wishlist`), so on a source
+ * miss it fails after the lookup and the cover download, and the rollback
+ * removes the cover. It never creates a copy or closes an entry.
+ *
+ * `requestId` is remembered apart from `saveCopy()`'s: a repeat of one by a
+ * `saveEntry` returns the first `saveEntry` result and token, never a copy
+ * save's. Undo deletes the entry, then the rows the save created that nothing
+ * references any more; a list created by the `Ref` stays.
+ */
+export async function saveEntry(
+  ctx: Context,
+  input: EntrySaveInput,
+): Promise<Undoable<EntrySaveResult>> {
+  const { wishlist } = input.save
+  return remembered(ctx, 'entry', input.requestId, () =>
+    saveBook(ctx, input.target, async (tx, bookId) => {
+      const entry = await createEntry(tx, { wishlist, bookId })
+      return {
+        data: { bookId, entryId: entry.data.entryId, savedTo: entry.data.wishlist },
+        restore: entry.restore,
+      }
+    }),
+  )
+}
+
+/**
+ * `oncePerRequest()` with the Undo seconds counted down from the first save:
+ * a repeat returns the first token with the seconds left now.
+ */
+async function remembered<R extends object>(
+  ctx: Context,
+  kind: SaveKind,
+  requestId: string,
+  save: () => Promise<Undoable<R>>,
+): Promise<Undoable<R>> {
+  const { result, storedAt } = await oncePerRequest(ctx, kind, requestId, async () => {
+    const saved = await save()
     return { result: saved, storedAt: Date.now() }
   })
   const elapsed = Math.floor((Date.now() - storedAt) / 1000)
   return { ...result, undoSeconds: Math.max(0, result.undoSeconds - elapsed) }
 }
 
-async function save(ctx: Context, input: SaveInput): Promise<Undoable<SaveResult>> {
-  const { target } = input
+/** What a save puts in place for the ensured Book, inside the save's transaction. */
+type Place<R> = (tx: Context, bookId: number) => Promise<Undone<R>>
+
+/**
+ * Ensures the Book for `target` and runs `place` for it in one `withUndo()`
+ * transaction. The restore runs `place`'s, then the restore of the Book this
+ * save created, if any: the copy or entry first, so the Book it referenced
+ * can be found unreferenced.
+ */
+async function saveBook<R extends object>(
+  ctx: Context,
+  target: SaveTarget,
+  place: Place<R>,
+): Promise<Undoable<R>> {
+  const placed = async (
+    tx: Context,
+    bookId: number,
+    book: Undone<unknown> | undefined,
+  ): Promise<Undone<R>> => {
+    const done = await place(tx, bookId)
+    return {
+      data: done.data,
+      restore: async (rtx) => {
+        await done.restore(rtx)
+        await book?.restore(rtx)
+      },
+    }
+  }
+
   if ('bookId' in target) {
     const { bookId } = target
     return withUndo(ctx, async (tx) => {
       await requireOwnBook(tx, bookId)
-      return saveOwnedCopy(tx, bookId, undefined)
+      return placed(tx, bookId, undefined)
     })
   }
   if ('manual' in target) {
@@ -133,7 +215,7 @@ async function save(ctx: Context, input: SaveInput): Promise<Undoable<SaveResult
     return withUndo(ctx, async (tx) => {
       const held = manual.isbn13 === undefined ? undefined : await findBookByIsbn(tx, manual.isbn13)
       const book = held ? undefined : await createPrivateBook(tx, manual)
-      return saveOwnedCopy(tx, held ? held.id : book!.data.id, book)
+      return placed(tx, held ? held.id : book!.data.id, book)
     })
   }
 
@@ -159,7 +241,7 @@ async function save(ctx: Context, input: SaveInput): Promise<Undoable<SaveResult
       // A shared Book created between the read and here is found again by
       // `ensureSharedBook()`, which then discards the cover and ignores `chosen`.
       const book = await ensureSharedBook(tx, isbn13, chosen, cover)
-      return saveOwnedCopy(tx, book.data.id, book)
+      return placed(tx, book.data.id, book)
     })
   }
 
@@ -175,20 +257,15 @@ async function save(ctx: Context, input: SaveInput): Promise<Undoable<SaveResult
   return withUndo(ctx, async (tx) => {
     const bookId = await settleHeldBook(tx, isbn13, pending)
     // No Book restore: a shared or merged Book stays shared after an Undo.
-    return saveOwnedCopy(tx, bookId, undefined)
+    return placed(tx, bookId, undefined)
   })
 }
 
 /**
  * The owned copy at the default location and where it landed, inside the
- * save's transaction. Its restore deletes the copy, then runs `book`'s (the
- * Book this save created, if any).
+ * save's transaction. Its restore deletes the copy.
  */
-async function saveOwnedCopy(
-  tx: Context,
-  bookId: number,
-  book: Undone<unknown> | undefined,
-): Promise<Undone<SaveResult>> {
+async function saveOwnedCopy(tx: Context, bookId: number): Promise<Undone<SaveResult>> {
   const copy = await createCopy(tx, { bookId, status: 'owned' })
   const copyId = copy.data
   const row = await gateway.findByID(tx, {
@@ -203,12 +280,5 @@ async function saveOwnedCopy(
     typeof location === 'object' && location !== null
       ? { id: location.id, name: location.name }
       : null
-  return {
-    data: { bookId, copyId, savedTo },
-    // The copy first, so the Book it referenced can be found unreferenced.
-    restore: async (rtx) => {
-      await copy.restore(rtx)
-      await book?.restore(rtx)
-    },
-  }
+  return { data: { bookId, copyId, savedTo }, restore: copy.restore }
 }

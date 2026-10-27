@@ -15,7 +15,7 @@ import {
 import { toNameKey } from '@/fields/nameKey'
 import { type ManualEntry, normaliseManual } from '@/lib/catalogue/createPrivateBook'
 import { lookupBook } from '@/lib/catalogue/lookupBook'
-import { saveCopy, type SaveInput } from '@/lib/catalogue/saveCopy'
+import { saveCopy, type CopySaveInput } from '@/lib/catalogue/saveCopy'
 import { DomainError } from '@/lib/errors'
 import { lookupSources } from '@/lib/metadata/lookup'
 import { undo } from '@/lib/undo/undo'
@@ -35,7 +35,7 @@ vi.mock('@/lib/metadata/lookup', () => ({ lookupSources: vi.fn(), heldOutcome: v
 
 const unique = (name: string) => `${name} ${randomUUID().slice(0, 8)}`
 
-const manualInput = (manual: ManualEntry): SaveInput => ({
+const manualInput = (manual: ManualEntry): CopySaveInput => ({
   requestId: randomUUID(),
   target: { manual },
   save: { kind: 'copy' },

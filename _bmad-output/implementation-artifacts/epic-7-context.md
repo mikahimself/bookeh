@@ -4,7 +4,7 @@
 
 ## Goal
 
-Mika keeps several named, private wishlists ("Me", "Christmas") of Books he does not own yet, adds to them from the Answer and Book detail without rescanning, marks entries for a Person as gift ideas, and closes them as bought or ordered, which puts a copy on his own shelf only when the wish was his own. Adding a Book to the library ticks off his own matching wishes. Entries count as holding a Book, so a wished-for Book opens in Book detail and shows up in holdings. This completes the "do I want it / have I got it" half that Epic 8's shop check relies on.
+Mika keeps several named, private wishlists of Books he doesn't own yet. He adds to them from the Answer and from Book detail without rescanning, marks an entry as a gift idea for a Person, and closes entries as bought or ordered. Closing puts a copy on his own shelf only when the wish was his own. Adding a Book to the library ticks off his own matching wishes. Entries count as holding a Book, so a wished-for Book opens in Book detail and shows up in holdings. Epic 8's shop check builds on this.
 
 ## Stories
 
@@ -26,48 +26,46 @@ Mika keeps several named, private wishlists ("Me", "Christmas") of Books he does
 
 ## Requirements & Constraints
 
-- Several named wishlists per user, all private. Admin cannot read them (admin role never reads users' private data). Sharing lists with friends or by link is Phase 2–3: do not build, do not rule out (no share collections now).
-- An entry is a Book on one list, optionally *for* a Person; empty recipient means for the user. The recipient can be set, changed or cleared any time after adding.
-- The wishlists page lists every list with its open-entry count; a list shows its open entries with recipients.
-- Add to wishlist is offered for a Book the user doesn't own (Not in library and Not found Answers, Book detail foot); Not found saves the typed title and author as a private Book. Lookup stays read-only; the Book is created on save.
-- Adding a Book to the library closes the user's own open entries for it (no recipient); entries for a Person stay open.
-- Bought/Ordered close the entry; for the user they create an owned copy at the default location (bought) or an ordered copy (ordered); for a Person no copy is made.
-- Undoable: Add to wishlist, Bought, Ordered (and the save's closing of wishes). Remove entry and delete list are confirmed, no Undo. Undo of a save removes any Book, author, series or media row nothing else references.
-- A Person with any entry, open or closed, cannot be deleted; merging People moves entries; a Person's use count includes entries ("2 loans, 1 wish").
-- Every story: English and Finnish strings in the terse voice (user-typed names placed where they need no inflection), accessibility floor, design tokens only.
+- Each user has several named wishlists, all private. The admin role cannot read them. Sharing lists is Phase 2–3: don't build it, don't rule it out, and add no share collections now.
+- An entry is a Book on one list, optionally *for* a Person. An empty recipient means it is for the user. The recipient can be set, changed or cleared at any time.
+- Add to wishlist appears on the Not in library and Not found Answers and in Book detail's foot. From Not found it saves the typed title and author as a private Book. Lookup stays read-only, and the Book is created on save.
+- Adding a Book to the library closes the user's own open entries for it (those with no recipient). Entries for a Person stay open.
+- Bought and Ordered close the entry. For the user's own entry, Bought creates an owned copy at the default location and Ordered creates an ordered copy. For a Person's entry, no copy is made.
+- Add to wishlist, Bought, Ordered and the save's closing of wishes can be undone. Removing an entry or deleting a list is confirmed by a dialog and has no Undo. Undoing a save removes any Book, author, series or media row that nothing else references.
+- A Person with any entry, open or closed, cannot be deleted. Merging People moves their entries. A Person's use count includes entries.
+- Every story: English and Finnish strings in the terse voice (user-typed names placed where they need no inflection), the accessibility floor, and design tokens only.
 
 ## Technical Decisions
 
-- **Collections:** `wishlists` (`ownerField()`, `nameKeyField()`, `name`; `(owner, nameKey)` unique as a DB constraint) and `wishlist-entries` (`ownerField()`, `wishlist` and optional `forPerson` as `ownedRelation`, `book` as `readableRelation`, `closedAt` empty while open). Read/update/delete access is `owner = current user` for every role, admin included. Each collection's access test covers a foreign id.
-- **An entry is never a copy** and never a copy status. Closing keeps the row with `closedAt`; Remove deletes it. "Entry" means open entry unless stated. Entries are addressed by their own id (the same Book can be on a list twice).
-- **One writer:** `lib/wishlists` is the only writer of `wishlist-entries` and owns wishlists by `nameKey` (resolve `Ref`, create, rename, delete). Rename onto an existing `nameKey` fails `NAME_TAKEN` with `conflictId`; a case-only rename is allowed. Deleting a list deletes its entries (open and closed) in one transaction. Screens never match names; pickers send a `Ref` (`number | { create: string }`), resolved in the action's transaction; Undo leaves a row created this way.
-- **Functions:** `closeEntriesForBook()` (called by `saveCopy()` before `createCopy()` in the same transaction, folded into the save's restore); `closeEntry(ctx, entryId, 'bought' | 'ordered')` (calls `createCopy()` unless for a Person); `setEntryRecipient(ctx, entryId, Ref | null)` (inline Person via `lib/people`); `removeEntry(ctx, entryId)`. `saveEntry` lives in `lib/catalogue`, takes `SaveInput` with `save: { kind: 'entry', wishlist: Ref }`, returns `SaveResult` with `entryId` and the list as `savedTo`; same `requestId` idempotency, target kinds (`isbn13`/`bookId`/`manual`), held-outcome and transaction rules as `saveCopy`.
-- **Import direction:** `catalogue` may import `wishlists`; `wishlists` may import `copies` and `people`. Nothing else new.
-- **Private-Book merge:** when a save or Look it up again merges a private Book into an existing shared Book, the user's entries move to the shared Book first.
-- **Holdings and access:** `getHoldings()` in `lib/books` returns `entries: EntryLine[]` (`{ entryId, wishlist: Named, forPerson: Named | null }`, open only, viewer's own). `requireOwnBook()` passes for a Book held only through an open entry. `upsertUserBook()` remains the only `user-books` writer; read/tags work for wishlist-only Books. A save's restore deletes a created `user-books` row only when the user has no other copy or entry for the Book.
-- **Lists that are not copies** (a wishlist) hydrate Books through `getEffectiveBooks()` and don't sort or filter on Book fields.
-- **Undo (AD-20):** service functions return `Undone<T>`, open no transaction, record nothing; the action wraps one call in `withUndo`. Closing restores reopen the entry and delete the copy made; the save's copy restore refuses `UNDO_FAILED` once the copy has a loan.
-- **People:** `PersonUse` gains entries; `PERSON_IN_USE` covers entries.
-- **Foreign keys:** decided in the Epic 6 retro: references refuse (`ON DELETE restrict` with a readable `beforeDelete` refusal), `owner_id` cascades. New entry FKs to people/wishlists/books should follow it.
-- **Routes:** `/wishlists`, `/wishlists/[listId]`, `?entry=<entryId>` on its list. Opening an entry pushes history; closing is history back.
+- **Entry is never a copy** and never a copy status. Closing keeps the row and sets `closedAt`. Remove deletes the row. "Entry" means an open entry unless stated otherwise. Entries are addressed by their own id, because one Book can be on a list twice.
+- **Access:** read, update and delete are `owner = current user` for every role, admin included. Relations: `wishlist` and `forPerson` are owned relations, and `book` is a readable relation. Access tests cover foreign ids.
+- **One writer:** `lib/wishlists` is the only writer of `wishlist-entries`, and it owns wishlists by `nameKey`. Renaming onto a taken `nameKey` fails with `NAME_TAKEN` and `conflictId`; a rename that only changes case is allowed. Deleting a list deletes all its entries in one transaction. Screens never match names: pickers send a `Ref` (`number | { create: string }`), which is resolved inside the action's transaction. Undo leaves a row created that way in place.
+- **Entry services:** `closeEntriesForBook()` is called by `saveCopy()` before `createCopy()`, in the same transaction, and what it closed goes into the save's restore. `closeEntry(ctx, id, 'bought' | 'ordered')` calls `createCopy()` unless the entry is for a Person. `setEntryRecipient(ctx, id, Ref | null)` resolves an inline-created Person through `lib/people`. `removeEntry(ctx, id)` deletes the row.
+- **`saveEntry`** lives in `lib/catalogue` and takes `save: { kind: 'entry', wishlist: Ref }`. It returns `entryId` with the list as `savedTo`. It follows the same `requestId` idempotency, target kinds (`isbn13` / `bookId` / `manual`), held-outcome rule and single-transaction rule as `saveCopy`.
+- **Imports:** `catalogue` may import `wishlists`, and `wishlists` may import `copies` and `people`. No other new import directions.
+- **Private-Book merge:** when a save or Look it up again merges the user's private Book into an existing shared Book, the user's entries move to the shared Book first.
+- **Holdings and access:** `Holdings.entries` holds the viewer's own open entries only, as `EntryLine` (`entryId`, `wishlist`, `forPerson`). `requireOwnBook()` passes for a Book held only through an open entry. `setRead()` and `changeTags()` work for a Book that is only on a wishlist. A save's restore deletes a `user-books` row it created only when the user has no other copy or entry for that Book.
+- **Lists that are not copies** (a wishlist) load their Books through `getEffectiveBooks()` and don't sort or filter on Book fields. A wishlist's count is its open entries.
+- **Undo:** service functions return `Undone<T>`, open no transaction and record nothing. The action wraps a single call in `withUndo`. A close's restore reopens the entry and deletes the copy it made. A save's copy restore refuses with `UNDO_FAILED` once the copy has a loan.
+- **Routes:** `/wishlists`, `/wishlists/[listId]`, and `?entry=<entryId>` on the entry's own list. Opening an entry pushes a history entry. Closing it goes back in history.
 - A story that changes a spine contract (shared types, service functions, imports) updates ARCHITECTURE-SPINE.md in the same commit. Schema stories merge one at a time.
 
 ## UX & Interaction Patterns
 
-- **Wishlists section:** List rows with name and count; "New list" dialog, a name in use rejected under the field; empty: "No wishlists" + "New list"; load failure "Couldn't load. Try again." with retry Link.
-- **One wishlist:** Back link, heading is the name as typed (never lowercased), Links Rename (in place) and Delete (destructive Link, dialog says entries go too). Entry rows: cover, title, author, "For {person}" at the end. Empty: "Nothing on this list."
-- **Opened entry:** bottom sheet on phone, side panel on wide; Book header, "On {list}", "For" combobox of People saving at once; Bought (the layer's one primary), Ordered, Remove (destructive button, confirmed). Closed/foreign entry at `?entry=` opens the list without it and toasts "Not on this list". Filter chips from here open the collection with only that filter (start from an empty query, go to `/`).
-- **Toasts:** "Added to {list} · Undo"; Bought for me "Saved to {location} · Undo"; Ordered "Ordered · Undo"; Bought for a Person "Bought · Undo".
-- **Add to wishlist:** opens the wishlist picker every time (sheet on phone, dialog on wide; one choice then closes); skipped with exactly one list; with none it offers only "New list". How a list is created from an empty picker is decided by Mika from rendered mock-ups, within one overlay, and recorded in EXPERIENCE.md before building. From the Answer it returns to Scan. Recipient is set later on the entry.
-- **Answer lines:** "On {list}" per entry; the On wishlist heading (Add to library · Back) is Epic 8's full Answer.
-- **Book detail:** "On wishlists" group, "{list} · for {person}" or "{list}" alone, absent when none; a Book held only through entries opens with no copies group, and removing its last copy while open entries remain keeps Book detail open on it. Foot: Edit and Add to wishlist, no primary.
-- One overlay deep: a sheet may open one picker or dialog, nothing on top. Modals hold and return focus; the side panel is not modal. Mock-up: `ux-designs/ux-bookeh-2026-10-03/mockups/key-wishlists.html`.
+- **Wishlists section:** each list is a List row with its name and count. "New list" opens a dialog, and a name already in use is rejected under the field. With no lists: "No wishlists" and "New list". On a load failure: "Couldn't load. Try again." with a retry Link.
+- **One wishlist:** a Back link sits above the heading. The heading is the list's name as typed, never lowercased. Under it are the Links Rename (edits in place) and Delete (destructive Link; its dialog says the entries go too). Entry rows show cover, title, author, and "For {person}" at the end. An empty list shows "Nothing on this list."
+- **Opened entry:** a bottom sheet on the phone and a side panel on wide screens. It shows the Book header, "On {list}" and a "For" combobox of People that saves at once. Buttons: Bought (the layer's one primary), Ordered, and Remove (destructive, confirmed). A closed or foreign entry at `?entry=` opens the list without it and toasts "Not on this list". A filter chip opened from here goes to `/` with only that filter.
+- **Toasts:** "Added to {list} · Undo"; Bought for the user: "Saved to {location} · Undo"; Ordered: "Ordered · Undo"; Bought for a Person: "Bought · Undo".
+- **Add to wishlist:** opens the wishlist picker every time (a sheet on the phone, a dialog on wide screens; one choice, then it closes). The picker is skipped when there is exactly one list. With no lists it offers only "New list". How a list is created from the empty picker is not decided yet: Mika picks it from rendered mock-ups, within one overlay, and the pick is recorded in EXPERIENCE.md before the screen is built. From the Answer, it returns to Scan.
+- **Book detail:** an "On wishlists" group shows "{list} · for {person}", or "{list}" alone for the user's own entries, and is absent when there are none. A Book held only through entries opens with no copies group. Removing the last copy while open entries remain keeps Book detail open. The foot has Edit and Add to wishlist, with no primary button.
+- Overlays go only one deep: a sheet may open one picker or dialog, and nothing goes on top of that. Modals hold and return focus; the side panel is not modal. Mock-up: `ux-designs/ux-bookeh-2026-10-03/mockups/key-wishlists.html`.
 
 ## Cross-Story Dependencies
 
-- 7.1 → 7.2 → 7.3 / 7.4 → 7.5 → 7.6–7.9 (services) → 7.10–7.15 (screens). 7.6 needs 7.5's `Ref` resolution; 7.8 and 7.13 need `createCopy` and the default location; 7.9 and 7.12 need `lib/people` (Epic 6). 7.12–7.13 build on 7.11; 7.14 on 7.6; 7.15 on 7.3, and takes over 7.3's hand-off: `RemoveCopy`'s `last` must count open entries too.
+- Order: 7.1 → 7.2 → 7.3 / 7.4 → 7.5 → 7.6–7.9 (services) → 7.10–7.15 (screens). Stories 7.1–7.5 are done.
+- 7.6 uses 7.5's `Ref` resolution. 7.8 and 7.13 need `createCopy` and the default location. 7.9 and 7.12 use `lib/people` and the Person combobox from Epic 6. 7.12 and 7.13 build on 7.11, and 7.14 builds on 7.6.
+- 7.15 builds on 7.3 and takes over 7.3's hand-off: `RemoveCopy`'s `last` must count open entries too.
 - 7.7 touches `saveCopy` (Epic 3) and the private-Book merge paths of Story 3.39 and Look it up again (Story 5.35).
-- 7.4 extends Epic 6's `lib/people` delete, merge and `personUse`, and the People group in Settings.
-- Reuses Epic 5's Book detail content component, sheet/panel, Book row, Filter chip; Epic 6's Person combobox and Picker wrappers.
-- Epic 8 builds on this: `visibleEntries(viewer)` in Lookup's own-library search, the On wishlist Answer heading, and Add to wishlist from Lookup results.
-- Open Epic 6 retro item: foreign-key rule (restrict references, cascade owners) is not applied yet; coordinate if it lands during this epic.
+- The screens reuse Epic 5's Book detail content, sheet/panel, Book row and Filter chip, and Epic 6's Picker wrappers.
+- Epic 8 builds on this epic: `visibleEntries(viewer)` in Lookup's own-library search, the On wishlist Answer heading, and Add to wishlist from Lookup results.
+- Open item from the Epic 6 retro: foreign keys should refuse on references (`ON DELETE restrict` with a readable `beforeDelete` refusal) and cascade on `owner_id`. This isn't applied yet: the `wishlists` and `wishlist-entries` migrations still use `ON DELETE set null` on every FK. Coordinate if the fix lands during this epic.
