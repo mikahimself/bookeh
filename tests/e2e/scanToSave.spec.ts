@@ -7,7 +7,7 @@ import { E2E_EMAIL, E2E_ISBN, E2E_ISBN_TYPED, E2E_LOCATION, E2E_PASSWORD } from 
 // "Not in library".
 
 async function enterIsbn(page: Page) {
-  const field = page.getByLabel('Or type an ISBN')
+  const field = page.getByLabel('Or type an ISBN', { exact: true })
   await field.fill(E2E_ISBN_TYPED)
   await field.press('Enter')
 }
@@ -36,8 +36,8 @@ test('scan to save, undo, save again', async ({ page, context, baseURL }) => {
   await page.request.get(`/data/cover/${E2E_ISBN}`)
 
   await page.goto('/login')
-  await page.getByLabel('Email').fill(E2E_EMAIL)
-  await page.getByLabel('Password').fill(E2E_PASSWORD)
+  await page.getByLabel('Email', { exact: true }).fill(E2E_EMAIL)
+  await page.getByLabel('Password', { exact: true }).fill(E2E_PASSWORD)
   await page.getByRole('button', { name: 'Sign in' }).click()
   // The header copy: an empty shelf draws a second Scan book in the content.
   await page.locator('header').getByRole('link', { name: 'Scan book' }).click()

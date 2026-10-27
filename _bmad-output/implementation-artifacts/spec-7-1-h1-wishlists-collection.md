@@ -155,3 +155,5 @@ deferred:
 - 7.2 must generate its migration after this one (AD-13).
 - The implementer committed (`dcafcfd`) and marked the spec done before review; the review patches and finalization are a second commit.
 
+
+**Added after finalization (owner request): e2e locators.** CI's `scanToSave.spec.ts` failed on `b29585d`: the clear X it added carries `aria-label="Clear field: Email"`, and `getByLabel('Email')` matches substrings, so it resolved to the input and the X (strict mode violation). The component's label stays; the three `getByLabel` calls in `tests/e2e/scanToSave.spec.ts` now pass `{ exact: true }` (the ISBN field is clearable too and would have failed next; Password is not clearable and is made exact for consistency). `npm run test:e2e`: 1 passed locally.
