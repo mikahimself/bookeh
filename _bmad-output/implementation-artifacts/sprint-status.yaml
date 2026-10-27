@@ -213,7 +213,7 @@ development_status:
 
   epic-7: in-progress
   7-1-h1-wishlists-collection: done
-  7-2-h2-wishlist-entries-collection: backlog
+  7-2-h2-wishlist-entries-collection: done
   7-3-h14-entries-in-holdings-and-book-access: backlog
   7-4-h15-people-with-wishlist-entries-can-t-be-deleted: backlog
   7-5-h9-wishlist-service-create-rename-delete: backlog
@@ -804,7 +804,9 @@ action_items:
     action: "Foreign keys: loans.copy_id and person_id ON DELETE restrict with a readable
       beforeDelete refusal on Copies and People in the back office; every owner_id
       cascades so a user delete removes their private rows; spine records the rule;
-      closes the 3.21, 6.1 and 6.4 deferrals (X3; decision 3)"
+      closes the 3.21, 6.1 and 6.4 deferrals (X3; decision 3). Includes wishlists.owner_id
+      (7.1) and wishlist-entries owner_id, wishlist_id, book_id and for_person_id (7.2),
+      generated as ON DELETE set null with wishlist_id and book_id NOT NULL"
     owner: "Mika"
     status: open
     ref: "_bmad-output/implementation-artifacts/epic-6-retro-2026-10-26.md"

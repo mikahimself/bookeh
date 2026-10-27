@@ -12,6 +12,7 @@ import * as migration_20261021_121736_media_visibility from './20261021_121736_m
 import * as migration_20261026_045004_people from './20261026_045004_people'
 import * as migration_20261026_071554_loans from './20261026_071554_loans'
 import * as migration_20261027_115654_wishlists from './20261027_115654_wishlists'
+import * as migration_20261027_125540_wishlist_entries from './20261027_125540_wishlist_entries'
 
 export const migrations = [
   {
@@ -83,5 +84,10 @@ export const migrations = [
     up: migration_20261027_115654_wishlists.up,
     down: migration_20261027_115654_wishlists.down,
     name: '20261027_115654_wishlists',
+  },
+  {
+    up: migration_20261027_125540_wishlist_entries.up,
+    down: migration_20261027_125540_wishlist_entries.down,
+    name: '20261027_125540_wishlist_entries',
   },
 ]

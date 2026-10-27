@@ -15,6 +15,7 @@ import { People } from './collections/People'
 import { Series } from './collections/Series'
 import { UserBooks } from './collections/UserBooks'
 import { Users } from './collections/Users'
+import { WishlistEntries } from './collections/WishlistEntries'
 import { Wishlists } from './collections/Wishlists'
 import { Media } from './collections/Media'
 import { seedFirstUser } from './lib/account/seedFirstUser'
@@ -57,6 +58,7 @@ export default buildConfig({
     Series,
     UserBooks,
     Users,
+    WishlistEntries,
     Wishlists,
   ],
   graphQL: { disable: true },

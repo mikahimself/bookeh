@@ -78,6 +78,7 @@ export interface Config {
     series: Series;
     'user-books': UserBook;
     users: User;
+    'wishlist-entries': WishlistEntry;
     wishlists: Wishlist;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
@@ -97,6 +98,7 @@ export interface Config {
     series: SeriesSelect<false> | SeriesSelect<true>;
     'user-books': UserBooksSelect<false> | UserBooksSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
+    'wishlist-entries': WishlistEntriesSelect<false> | WishlistEntriesSelect<true>;
     wishlists: WishlistsSelect<false> | WishlistsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -358,6 +360,20 @@ export interface UserBook {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "wishlist-entries".
+ */
+export interface WishlistEntry {
+  id: number;
+  owner: number | User;
+  wishlist: number | Wishlist;
+  book: number | Book;
+  forPerson?: (number | null) | Person;
+  closedAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "wishlists".
  */
 export interface Wishlist {
@@ -435,6 +451,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'users';
         value: number | User;
+      } | null)
+    | ({
+        relationTo: 'wishlist-entries';
+        value: number | WishlistEntry;
       } | null)
     | ({
         relationTo: 'wishlists';
@@ -664,6 +684,19 @@ export interface UsersSelect<T extends boolean = true> {
         createdAt?: T;
         expiresAt?: T;
       };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "wishlist-entries_select".
+ */
+export interface WishlistEntriesSelect<T extends boolean = true> {
+  owner?: T;
+  wishlist?: T;
+  book?: T;
+  forPerson?: T;
+  closedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

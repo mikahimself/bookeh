@@ -25,6 +25,19 @@ type Scope = {
   overrideAccess: false
   showHiddenFields: false
 }
+/**
+ * Payload's own collections (`payload-kv`, `payload-preferences`, ...) are
+ * never reached through the gateway. Leaving them out also keeps the
+ * generic `TypedCollectionSelect[S]` checks small: TypeScript relates a
+ * select to the intersection of every slug's `XSelect<false> | XSelect<true>`,
+ * 2^n members for n slugs, and past 16 slugs that exceeds its 100 000-member
+ * union limit (TS2590). `wishlist-entries` made 17 with Payload's four.
+ * Excluding them, the limit is now 16 app slugs and 13 are in use: a 17th
+ * app collection hits TS2590 again and needs the generics reworked (e.g. not
+ * constraining `Sel` to `TypedCollectionSelect[S]` on a generic `S`).
+ */
+type AppSlug = Exclude<CollectionSlug, `payload-${string}`>
+
 type Scoped<T> = T extends unknown ? Omit<T, keyof Scope> : never
 
 // The functions are `async` so a dead context rejects like any failed call.
@@ -38,28 +51,28 @@ const scope = (ctx: Context): Scope => {
   }
 }
 
-export async function find<S extends CollectionSlug, Sel extends TypedCollectionSelect[S]>(
+export async function find<S extends AppSlug, Sel extends TypedCollectionSelect[S]>(
   ctx: Context,
   options: Scoped<Parameters<typeof ctx.req.payload.find<S, Sel>>[0]>,
 ) {
   return ctx.req.payload.find<S, Sel>({ ...options, ...scope(ctx) })
 }
 
-export async function findByID<S extends CollectionSlug, Sel extends TypedCollectionSelect[S]>(
+export async function findByID<S extends AppSlug, Sel extends TypedCollectionSelect[S]>(
   ctx: Context,
   options: Scoped<Parameters<typeof ctx.req.payload.findByID<S, false, Sel>>[0]>,
 ) {
   return ctx.req.payload.findByID<S, false, Sel>({ ...options, ...scope(ctx) })
 }
 
-export async function count<S extends CollectionSlug>(
+export async function count<S extends AppSlug>(
   ctx: Context,
   options: Scoped<Parameters<typeof ctx.req.payload.count<S>>[0]>,
 ) {
   return ctx.req.payload.count<S>({ ...options, ...scope(ctx) })
 }
 
-export async function create<S extends CollectionSlug, Sel extends TypedCollectionSelect[S]>(
+export async function create<S extends AppSlug, Sel extends TypedCollectionSelect[S]>(
   ctx: Context,
   options: Scoped<Parameters<typeof ctx.req.payload.create<S, Sel>>[0]>,
 ) {
@@ -71,7 +84,7 @@ const refuseWhere = (options: object): void => {
 }
 
 // `update` is overloaded and `Parameters` takes the last overload, the by-ID one.
-export async function updateByID<S extends CollectionSlug, Sel extends TypedCollectionSelect[S]>(
+export async function updateByID<S extends AppSlug, Sel extends TypedCollectionSelect[S]>(
   ctx: Context,
   options: Scoped<Parameters<typeof ctx.req.payload.update<S, Sel>>[0]> & { id: number },
 ) {
@@ -81,7 +94,7 @@ export async function updateByID<S extends CollectionSlug, Sel extends TypedColl
 
 // `delete` is overloaded and its last overload is the `where` one, so its
 // `id` and `where` are swapped for a numeric `id`.
-export async function deleteByID<S extends CollectionSlug, Sel extends TypedCollectionSelect[S]>(
+export async function deleteByID<S extends AppSlug, Sel extends TypedCollectionSelect[S]>(
   ctx: Context,
   options: Scoped<Omit<Parameters<typeof ctx.req.payload.delete<S, Sel>>[0], 'id' | 'where'>> & {
     id: number
