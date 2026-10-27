@@ -38,8 +38,8 @@ function effectiveEdits(book: EffectiveBook): EffectiveEdits {
  * Edit book (EXPERIENCE.md, Edit book), a full-screen task at
  * `/books/[bookId]/edit`. The wrapper sits in the page, as on `/scan`, so the
  * task slides in and away with the route. An id that is not digits, a Book
- * the viewer holds no copy of, or one they can no longer read is "not held":
- * the toast "Not in library" over the section.
+ * the viewer holds neither a copy nor an open entry of, or one they can no
+ * longer read is "not held": the toast "Not in library" over the section.
  *
  * With `?copy=` naming one of the viewer's copies of this Book (Edit on the
  * save toast), the first screen also shows that copy's status and location,

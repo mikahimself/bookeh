@@ -3098,6 +3098,7 @@ So that I see my wishes next to my copies (FR-26, UX-DR43).
 **Then** an "On wishlists" group lists each entry as "{list} · for {person}" ("{list}" alone when it's for me)
 **And** the group is absent when there are none
 **And** a Book held only through entries opens in Book detail too, with no copies group
+**And** removing the last copy of a Book that still has open entries keeps Book detail open on it (`RemoveCopy`'s `last` counts entries too; handed on by Story 7.3)
 
 ## Epic 8: Shop check — "do I already have this?"
 

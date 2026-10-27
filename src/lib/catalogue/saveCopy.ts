@@ -76,10 +76,10 @@ export type SaveResult = { bookId: number; copyId: number; savedTo: Named | null
  *
  * A `{ bookId }` target (AD-7, AD-11) saves one more owned copy of a Book the
  * user already holds. `requireOwnBook()` guards it in the save's transaction:
- * `NOT_FOUND`, with nothing written, unless the user has a copy of the Book.
- * It never asks the sources and changes nothing on the Book: no auto-share
- * or merge, which are keyed on the ISBN and run on an `{ isbn13 }` save
- * (AD-5). The target is for Books without an ISBN (I12); an Answer for a
+ * `NOT_FOUND`, with nothing written, unless the user has a copy or an open
+ * wishlist entry of the Book. It never asks the sources and changes nothing
+ * on the Book: no auto-share or merge, which are keyed on the ISBN and run
+ * on an `{ isbn13 }` save (AD-5). The target is for Books without an ISBN (I12); an Answer for a
  * Book with one sends `{ isbn13 }`. A held Book the user can no longer read
  * (a shared Book the admin made private) fails in `createCopy()`.
  *

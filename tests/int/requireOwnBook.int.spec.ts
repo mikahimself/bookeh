@@ -1,3 +1,5 @@
+import { randomUUID } from 'node:crypto'
+
 import { getPayload, type Payload } from 'payload'
 import { beforeAll, describe, expect, it, vi } from 'vitest'
 
@@ -12,14 +14,18 @@ import { contextFor, createUser } from '../helpers/harness'
 import { randomIsbn } from '../helpers/isbn'
 
 // `requireOwnBook()`, AD-7: a Book reached by id opens only for a viewer who
-// has a copy of it. A holds a shared and a private Book; B holds neither.
+// has a copy or an open wishlist entry of it (H14). A holds a shared and a
+// private Book, wishes for a third and once wished for a fourth; B holds none.
 
 describe('requireOwnBook', () => {
   let payload: Payload
   let asA: Context
   let asB: Context
+  let asAdmin: Context
   let shared: Book
   let own: Book
+  let wished: Book
+  let wishedOnce: Book
 
   /** A system write, as `lib/catalogue` makes it, with `user` on the request. */
   const systemBook = async (user: User, visibility: Book['visibility']) =>
@@ -37,6 +43,9 @@ describe('requireOwnBook', () => {
     const b = await createUser({ displayName: 'Own Book User B' })
     asA = await contextFor(a)
     asB = await contextFor(b)
+    asAdmin = await contextFor(
+      await createUser({ displayName: 'Own Book Admin', roles: ['admin'] }),
+    )
 
     shared = await systemBook(a, 'shared')
     own = await systemBook(a, 'private')
@@ -48,11 +57,53 @@ describe('requireOwnBook', () => {
         depth: 0,
       })
     }
+
+    wished = await systemBook(a, 'shared')
+    wishedOnce = await systemBook(a, 'shared')
+    // `owner` and `nameKey` only satisfy the create type.
+    const list = await gateway.create(asA, {
+      collection: 'wishlists',
+      data: { owner: a.id, name: `Toiveet ${randomUUID()}`, nameKey: 'ignored' },
+      depth: 0,
+    })
+    await gateway.create(asA, {
+      collection: 'wishlist-entries',
+      data: { owner: a.id, wishlist: list.id, book: wished.id },
+      depth: 0,
+    })
+    await gateway.create(asA, {
+      collection: 'wishlist-entries',
+      data: {
+        owner: a.id,
+        wishlist: list.id,
+        book: wishedOnce.id,
+        closedAt: '2026-10-27T18:45:12.345Z',
+      },
+      depth: 0,
+    })
   })
 
   it('passes for the viewer who holds a shared or a private Book', async () => {
     await expect(requireOwnBook(asA, shared.id)).resolves.toBeUndefined()
     await expect(requireOwnBook(asA, own.id)).resolves.toBeUndefined()
+  })
+
+  it('passes for a Book held only through an open entry', async () => {
+    await expect(requireOwnBook(asA, wished.id)).resolves.toBeUndefined()
+  })
+
+  it('fails with NOT_FOUND for a Book with only a closed entry', async () => {
+    await expect(requireOwnBook(asA, wishedOnce.id)).rejects.toMatchObject(
+      new DomainError('NOT_FOUND'),
+    )
+  })
+
+  it("fails with NOT_FOUND for another user's wish-only Book", async () => {
+    for (const ctx of [asB, asAdmin]) {
+      await expect(requireOwnBook(ctx, wished.id)).rejects.toMatchObject(
+        new DomainError('NOT_FOUND'),
+      )
+    }
   })
 
   it("fails with NOT_FOUND for another user's shared or private Book", async () => {

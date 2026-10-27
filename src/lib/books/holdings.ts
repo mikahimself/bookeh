@@ -20,8 +20,8 @@ export type CopyLine = {
 }
 
 /**
- * An open wishlist entry of the viewer's on a Book. Typed now; filled when
- * the wishlist reader arrives (H14, Epic 7).
+ * An open wishlist entry of the viewer's on a Book (H14): the list it is on,
+ * and its recipient, or `null` when the wish is the viewer's own.
  */
 export type EntryLine = { entryId: number; wishlist: Named; forPerson: Named | null }
 
@@ -45,7 +45,11 @@ const empty = (): Holdings => ({ copies: [], entries: [] })
  * the distinct ids. Their open loans (`returnedOn` unset, at most one per
  * copy, AD-19) come from one read on the copy ids, and the borrowers from one
  * read of the distinct Person ids. Oldest copy first, ties by id (AD-7).
- * `entries` stays empty until Epic 7.
+ * `entries` are the viewer's open wishlist entries (`closedAt` unset, H14),
+ * read whether or not they hold copies, at `depth: 0`, oldest first, ties
+ * by id. The gateway's reads of `wishlist-entries` and `wishlists` reach the
+ * viewer's own rows alone (`ownerAccess`, the admin included). List and
+ * recipient names come from one read each of the distinct ids.
  */
 export async function getHoldings(
   ctx: Context,
@@ -62,42 +66,83 @@ export async function getHoldings(
     depth: 0,
     pagination: false,
   })
-  if (copies.length === 0) return result
+  if (copies.length > 0) {
+    const locationById = await namesOf(
+      ctx,
+      'locations',
+      copies.flatMap((copy) => (copy.location == null ? [] : [idOf(copy.location)])),
+    )
+    const loanByCopy = await openLoansOf(
+      ctx,
+      copies.map((copy) => copy.id),
+    )
 
-  const locationIds = [
-    ...new Set(copies.flatMap((copy) => (copy.location == null ? [] : [idOf(copy.location)]))),
-  ]
-  const locationById = new Map<number, Named>()
-  if (locationIds.length > 0) {
-    const { docs: locations } = await gateway.find(ctx, {
-      collection: 'locations',
-      where: { id: { in: locationIds } },
-      select: { name: true },
-      depth: 0,
-      pagination: false,
-    })
-    for (const { id, name } of locations) locationById.set(id, { id, name })
+    for (const copy of copies) {
+      const line: CopyLine = {
+        copyId: copy.id,
+        status: copy.status,
+        location: copy.location == null ? null : (locationById.get(idOf(copy.location)) ?? null),
+        // An omitted `notes` is stored as `null`; a form submitting the field
+        // empty stores `''`. Both are no note here.
+        note: copy.notes ? copy.notes : null,
+        loan: loanByCopy.get(copy.id) ?? null,
+      }
+      // Never missing: the `where` is `book in bookIds` and every id was seeded.
+      result.get(idOf(copy.book))!.copies.push(line)
+    }
   }
 
-  const loanByCopy = await openLoansOf(
-    ctx,
-    copies.map((copy) => copy.id),
-  )
+  const { docs: entries } = await gateway.find(ctx, {
+    collection: 'wishlist-entries',
+    where: { book: { in: [...bookIds] }, closedAt: { exists: false } },
+    select: { book: true, wishlist: true, forPerson: true },
+    sort: ['createdAt', 'id'],
+    depth: 0,
+    pagination: false,
+  })
+  if (entries.length > 0) {
+    const wishlistById = await namesOf(
+      ctx,
+      'wishlists',
+      entries.map((entry) => idOf(entry.wishlist)),
+    )
+    const personById = await namesOf(
+      ctx,
+      'people',
+      entries.flatMap((entry) => (entry.forPerson == null ? [] : [idOf(entry.forPerson)])),
+    )
 
-  for (const copy of copies) {
-    const line: CopyLine = {
-      copyId: copy.id,
-      status: copy.status,
-      location: copy.location == null ? null : (locationById.get(idOf(copy.location)) ?? null),
-      // An omitted `notes` is stored as `null`; a form submitting the field
-      // empty stores `''`. Both are no note here.
-      note: copy.notes ? copy.notes : null,
-      loan: loanByCopy.get(copy.id) ?? null,
+    for (const entry of entries) {
+      const wishlist = wishlistById.get(idOf(entry.wishlist))
+      // Cannot miss under the foreign key; dropped like a loan without its borrower.
+      if (!wishlist) continue
+      result.get(idOf(entry.book))!.entries.push({
+        entryId: entry.id,
+        wishlist,
+        forPerson: entry.forPerson == null ? null : (personById.get(idOf(entry.forPerson)) ?? null),
+      })
     }
-    // Never missing: the `where` is `book in bookIds` and every id was seeded.
-    result.get(idOf(copy.book))!.copies.push(line)
   }
   return result
+}
+
+/** The names of the viewer's rows among `ids` (duplicates allowed), by id; one read, none for no ids. */
+async function namesOf(
+  ctx: Context,
+  collection: 'locations' | 'people' | 'wishlists',
+  ids: number[],
+): Promise<Map<number, Named>> {
+  const byId = new Map<number, Named>()
+  if (ids.length === 0) return byId
+  const { docs } = await gateway.find(ctx, {
+    collection,
+    where: { id: { in: [...new Set(ids)] } },
+    select: { name: true },
+    depth: 0,
+    pagination: false,
+  })
+  for (const { id, name } of docs) byId.set(id, { id, name })
+  return byId
 }
 
 /** The open loan of each of `copyIds` that has one, with its borrower. */
@@ -115,14 +160,11 @@ async function openLoansOf(
   })
   if (loans.length === 0) return loanByCopy
 
-  const { docs: people } = await gateway.find(ctx, {
-    collection: 'people',
-    where: { id: { in: [...new Set(loans.map((loan) => idOf(loan.person)))] } },
-    select: { name: true },
-    depth: 0,
-    pagination: false,
-  })
-  const personById = new Map<number, Named>(people.map(({ id, name }) => [id, { id, name }]))
+  const personById = await namesOf(
+    ctx,
+    'people',
+    loans.map((loan) => idOf(loan.person)),
+  )
 
   for (const loan of loans) {
     const person = personById.get(idOf(loan.person))

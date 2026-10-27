@@ -9,7 +9,7 @@ import { lendCopy, returnLoan } from '@/lib/loans/loans'
 import type { Context } from '@/lib/payload/context'
 import * as gateway from '@/lib/payload/gateway'
 import config from '@/payload.config'
-import type { Book, Copy, User } from '@/payload-types'
+import type { Book, Copy, User, WishlistEntry } from '@/payload-types'
 
 import { contextFor, createUser } from '../helpers/harness'
 import { randomIsbn } from '../helpers/isbn'
@@ -18,7 +18,8 @@ import { randomIsbn } from '../helpers/isbn'
 // location names, seen by two users and the admin; every requested id is
 // present; another user's copies never appear. Location names are unique per
 // owner, so each carries a per-run suffix. A copy's open loan rides on its
-// line (J10); returned loans do not.
+// line (J10); returned loans do not. Open wishlist entries are holdings too
+// (H14), with or without copies; closed ones are not.
 
 const unique = (name: string) => `${name} ${randomUUID().slice(0, 8)}`
 
@@ -193,6 +194,82 @@ describe('getHoldings', () => {
         person: again.person,
         since: '2026-10-03',
       })
+    })
+  })
+  // Fresh Books: an entry on `x` would change the exact lines above.
+  describe('entries', () => {
+    /** A uniquely named list of A's; `owner` and `nameKey` only satisfy the create type. */
+    const wishlistOfA = async (): Promise<Named> => {
+      const { id, name } = await gateway.create(asA, {
+        collection: 'wishlists',
+        data: { owner: a.id, name: unique('Toiveet'), nameKey: 'ignored' },
+        depth: 0,
+      })
+      return { id, name }
+    }
+
+    /** An entry of A's through the gateway; `owner` only satisfies the create type. */
+    const entryOfA = async (
+      data: Pick<WishlistEntry, 'wishlist' | 'book'> & Partial<WishlistEntry>,
+    ) =>
+      gateway.create(asA, {
+        collection: 'wishlist-entries',
+        data: { owner: a.id, ...data },
+        depth: 0,
+      })
+
+    it('lists open entries oldest first without copies, with list and recipient', async () => {
+      const book = await systemBook(a, 'shared')
+      const list = await wishlistOfA()
+      const person = await gateway.create(asA, {
+        collection: 'people',
+        data: { owner: a.id, name: unique('Liisa K'), nameKey: 'ignored' },
+        depth: 0,
+      })
+      const forPerson = await entryOfA({ wishlist: list.id, book: book.id, forPerson: person.id })
+      const own = await entryOfA({ wishlist: list.id, book: book.id })
+
+      expect((await getHoldings(asA, [book.id])).get(book.id)).toEqual({
+        copies: [],
+        entries: [
+          {
+            entryId: forPerson.id,
+            wishlist: list,
+            forPerson: { id: person.id, name: person.name },
+          },
+          { entryId: own.id, wishlist: list, forPerson: null },
+        ],
+      })
+    })
+
+    it('fills copies and entries together', async () => {
+      const book = await systemBook(a, 'shared')
+      const copy = await copyAs(a, { book: book.id })
+      const list = await wishlistOfA()
+      const entry = await entryOfA({ wishlist: list.id, book: book.id })
+
+      const seen = (await getHoldings(asA, [book.id])).get(book.id)
+      expect(seen?.copies.map((line) => line.copyId)).toEqual([copy.id])
+      expect(seen?.entries).toEqual([{ entryId: entry.id, wishlist: list, forPerson: null }])
+    })
+
+    it('leaves out a closed entry', async () => {
+      const book = await systemBook(a, 'shared')
+      const list = await wishlistOfA()
+      await entryOfA({ wishlist: list.id, book: book.id, closedAt: '2026-10-27T18:45:12.345Z' })
+      expect((await getHoldings(asA, [book.id])).get(book.id)).toEqual({ copies: [], entries: [] })
+    })
+
+    it("shows B and the admin none of A's entries", async () => {
+      const book = await systemBook(a, 'shared')
+      const list = await wishlistOfA()
+      await entryOfA({ wishlist: list.id, book: book.id })
+      for (const ctx of [asB, asAdmin]) {
+        expect((await getHoldings(ctx, [book.id])).get(book.id)).toEqual({
+          copies: [],
+          entries: [],
+        })
+      }
     })
   })
 })
