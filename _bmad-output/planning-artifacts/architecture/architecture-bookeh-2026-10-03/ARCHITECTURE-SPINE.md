@@ -441,6 +441,7 @@ type CopyLine = {
 type EntryLine = { entryId: number; wishlist: Named; forPerson: Named | null }
 type Holdings = { copies: CopyLine[]; entries: EntryLine[] } // open entries only
 type ReadTarget = { copyIds: readonly number[] } | { bookId: number } // setRead(ctx, target, value | 'toggle'): Undone<{ read; count }>
+// Only select mode's copyIds path is undoable (withUndo). Book detail's bookId path is not: setReadAction drops the restore (PRD FR-15).
 // setRating(ctx, bookId, rating | null): void — no Undo
 // getUserBookState(ctx, bookId): Pick<UserBookState, 'read' | 'rating'> — the caller gates the Book id (AD-7)
 

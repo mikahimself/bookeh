@@ -83,15 +83,21 @@ export async function receiveCopyAction(
   })
 }
 
-/** Book detail's read switch: marks one Book read or unread, with Undo. */
+/**
+ * Book detail's read switch: marks one Book read or unread. No Undo, so no
+ * receipt (PRD FR-15): one tap puts it back. The `Undone` shape `setRead`
+ * returns is for select mode's undoable path and is dropped here.
+ */
 export async function setReadAction(
   input: unknown,
-): Promise<ActionResult<Undoable<{ read: boolean; count: number }>>> {
+): Promise<ActionResult<{ read: boolean; count: number }>> {
   return runAction(async () => {
     const ctx = await requireUserOrThrow()
     const { bookId, read } = bookInput(input)
     if (typeof read !== 'boolean') throw new DomainError('VALIDATION')
-    return withUndo(ctx, (tx) => setRead(tx, { bookId }, read))
+    // `setRead` opens its own transaction (AD-16).
+    const { data } = await setRead(ctx, { bookId }, read)
+    return data
   })
 }
 

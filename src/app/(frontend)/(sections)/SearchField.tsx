@@ -7,7 +7,7 @@ import { useEffect, useRef, useState, useTransition } from 'react'
 import { parseShelfQuery, shelfHref, type ShelfParams } from '@/lib/shelf/query'
 
 import { ProgressLine } from '../components/ProgressLine'
-import { fieldClass } from '../components/TextField'
+import { ClearButton, clearPeerClass, fieldClass } from '../components/TextField'
 import { WIDE_QUERY } from '../components/ui/overlay'
 
 /** How long typing pauses before the search applies. */
@@ -100,22 +100,25 @@ export function SearchField() {
       }}
     >
       {pending && <ProgressLine label={t('progress.loading')} />}
-      <input
-        ref={input}
-        type="search"
-        value={text}
-        onChange={(event) => {
-          const value = event.target.value
-          setText(value)
-          clearTimeout(timer.current)
-          timer.current = setTimeout(() => apply(value), PAUSE_MS)
-        }}
-        placeholder={t('collection.search')}
-        aria-label={t('collection.search')}
-        autoComplete="off"
-        enterKeyHint="search"
-        className={fieldClass(false)}
-      />
+      <div className="relative">
+        <input
+          ref={input}
+          type="search"
+          value={text}
+          onChange={(event) => {
+            const value = event.target.value
+            setText(value)
+            clearTimeout(timer.current)
+            timer.current = setTimeout(() => apply(value), PAUSE_MS)
+          }}
+          placeholder={t('collection.search')}
+          aria-label={t('collection.search')}
+          autoComplete="off"
+          enterKeyHint="search"
+          className={`${fieldClass(false)} ${clearPeerClass}`}
+        />
+        <ClearButton label={t('collection.search')} />
+      </div>
     </form>
   )
 }

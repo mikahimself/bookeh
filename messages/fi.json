@@ -93,7 +93,8 @@
     "collection": "Kokoelma",
     "loans": "Lainat",
     "wishlists": "Toivelistat",
-    "settings": "Asetukset"
+    "settings": "Asetukset",
+    "backToTop": "Takaisin ylös"
   },
   "scan": {
     "open": "Skannaa kirja",
@@ -101,7 +102,8 @@
     "cameraHint": "Osoita kameralla viivakoodia",
     "isbn": "Tai kirjoita ISBN",
     "noCamera": "Ei kameraa. Kirjoita ISBN.",
-    "addWithoutIsbn": "Lisää ilman ISBN:ää"
+    "addWithoutIsbn": "Lisää ilman ISBN:ää",
+    "find": "Hae"
   },
   "answer": {
     "notInLibrary": "Ei kirjastossa",
@@ -182,6 +184,9 @@
     "close": "Sulje",
     "cancel": "Peruuta",
     "expand": "Avaa kokonaan"
+  },
+  "field": {
+    "clear": "Tyhjennä kenttä: {label}"
   },
   "combobox": {
     "create": "Uusi: {name}",

@@ -48,25 +48,19 @@ describe('Read and rating in Book detail', () => {
     vi.clearAllMocks()
   })
 
-  it('marks read with an Undo toast, and a toast Undo refreshes and shows unread again', async () => {
-    const result = {
-      ok: true,
-      data: { read: true, count: 1, undoToken: 'token', undoSeconds: 1800 },
-    } as const
+  it('marks read with no toast, and a select-mode (bulk) Undo still refreshes the switch to unread', async () => {
+    const result = { ok: true, data: { read: true, count: 1 } } as const
     setReadAction.mockResolvedValue(result)
     render(createElement(ReadAndRating, { bookId: 7, initial: { read: false, rating: null } }))
 
     await act(async () => fireEvent.click(screen.getByRole('button', { name: 'read' })))
 
     expect(setReadAction).toHaveBeenCalledExactlyOnceWith({ bookId: 7, read: true })
-    expect(show).toHaveBeenCalledExactlyOnceWith({
-      kind: 'success',
-      message: 'Marked 1 read',
-      undo: { token: 'token', seconds: 1800 },
-    })
+    expect(show).not.toHaveBeenCalled()
     expect(afterAction).toHaveBeenCalledExactlyOnceWith(result)
     expect(chosen()).toBe('read')
 
+    // A bulk Undo can still restore the flag while Book detail is open.
     await act(async () => undoneListeners.forEach((listener) => listener()))
 
     expect(router.refresh).toHaveBeenCalledOnce()

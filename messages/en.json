@@ -93,7 +93,8 @@
     "collection": "Collection",
     "loans": "Loans",
     "wishlists": "Wishlists",
-    "settings": "Settings"
+    "settings": "Settings",
+    "backToTop": "Back to top"
   },
   "scan": {
     "open": "Scan book",
@@ -101,7 +102,8 @@
     "cameraHint": "Point the camera at the barcode",
     "isbn": "Or type an ISBN",
     "noCamera": "No camera. Type the ISBN.",
-    "addWithoutIsbn": "Add without ISBN"
+    "addWithoutIsbn": "Add without ISBN",
+    "find": "Find"
   },
   "answer": {
     "notInLibrary": "Not in library",
@@ -182,6 +184,9 @@
     "close": "Close",
     "cancel": "Cancel",
     "expand": "Open fully"
+  },
+  "field": {
+    "clear": "Clear field: {label}"
   },
   "combobox": {
     "create": "New: {name}",

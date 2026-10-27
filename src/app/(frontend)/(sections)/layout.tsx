@@ -9,13 +9,16 @@ import { SectionNav } from '../components/SectionNav'
 import { SectionTransition } from '../components/SectionTransition'
 import { SectionSwipe } from '../components/swipe'
 
+import { BackToTop } from './BackToTop'
+
 /**
  * The section shell (EXPERIENCE.md, Navigation): the headings row and Scan
  * book, on every section. Scan book is rendered once per width, the other
- * copy `hidden`: pinned full width at the bottom under 900px, top right from
- * 900px. Each keeps DOM and focus order in step with what is drawn. The
- * header and the content slide together on a section change; Scan book, in
- * either place, stays put. Under 900px a sideways swipe changes section.
+ * copy `hidden`: pinned at the bottom under 900px, full width but for the
+ * back-to-top square once that shows, top right from 900px. Each keeps DOM
+ * and focus order in step with what is drawn. The header and the content
+ * slide together on a section change; Scan book, in either place, stays put.
+ * Under 900px a sideways swipe changes section.
  */
 export default async function SectionsLayout({ children }: { children: ReactNode }) {
   await requireUser()
@@ -46,9 +49,10 @@ export default async function SectionsLayout({ children }: { children: ReactNode
       <SectionSwipe />
       <div
         data-pinned-bottom
-        className="sticky bottom-0 bg-background px-page-margin-phone pt-4 pb-[calc(var(--spacing-4)+env(safe-area-inset-bottom))] wide:hidden"
+        className="sticky bottom-0 flex gap-3 bg-background px-page-margin-phone pt-4 pb-[calc(var(--spacing-4)+env(safe-area-inset-bottom))] wide:hidden"
       >
-        {scanBook('flex w-full')}
+        {scanBook('flex flex-1')}
+        <BackToTop />
       </div>
     </div>
   )

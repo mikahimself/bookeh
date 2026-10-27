@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl'
 import { useRouter } from 'next/navigation'
 import { useEffect, useEffectEvent, useRef, useTransition, type FormEvent } from 'react'
 
+import { buttonClass } from '../components/Button'
 import { TextLink } from '../components/Link'
 import { ProgressLine } from '../components/ProgressLine'
 import { TextField } from '../components/TextField'
@@ -20,7 +21,7 @@ const SCAN_SUCCESS_MS = 500
 /**
  * The Scan screen (EXPERIENCE.md, Scan): the camera frame reading ISBN
  * barcodes, and the ISBN field under it. A read goes straight to
- * `/scan?isbn=` with no tap; the field submits on Go. Both navigate in a
+ * `/scan?isbn=` with no tap; the field submits on Go or "find". Both navigate in a
  * transition, with the progress line while the server looks the ISBN up, and
  * replace when the address already carries an `isbn` (a corrected entry). The
  * text goes as typed: the browser never normalises it. Without JS the field
@@ -155,7 +156,7 @@ export function ScanScreen({ isbn, error }: { isbn?: string; error?: string }) {
           <p className="text-meta text-text-muted">{t('scan.cameraHint')}</p>
         </div>
       )}
-      <form action="/scan" onSubmit={submit} className="flex flex-col gap-2">
+      <form action="/scan" onSubmit={submit}>
         <TextField
           // A new address resets the field to its text.
           key={isbn ?? ''}
@@ -172,6 +173,12 @@ export function ScanScreen({ isbn, error }: { isbn?: string; error?: string }) {
           autoComplete="off"
           autoCapitalize="off"
           autoCorrect="off"
+          // The number pad has no Return, so "find" submits like the Go key.
+          action={
+            <button type="submit" className={buttonClass('secondary', { compact: true })}>
+              {t('scan.find')}
+            </button>
+          }
         />
       </form>
       {/* A block around the Link, so it is only as wide as its text. */}

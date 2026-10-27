@@ -18,7 +18,8 @@ type Changed = { bookId: number; previous: boolean }
  * for the context user, in the caller's transaction or one of its own
  * (AD-16), and resolves to the value set and the number of distinct Books,
  * with the restore that puts each changed flag back. Records nothing:
- * callers wrap it in `withUndo()`.
+ * select mode wraps it in `withUndo()`; Book detail's switch drops the
+ * restore (no Undo, PRD FR-15).
  *
  * Copy ids: duplicates count once. An empty list, an id that is not a
  * row id (`isRowId()`), or one that is not the viewer's (a gone copy, or

@@ -102,7 +102,7 @@ Behaviour. Visual specs live in `DESIGN.md` → Components.
 | Link, destructive | Delete in settings; Remove on a copy's line; Delete on a wishlist | Always confirmed by a dialog. No Undo afterwards. |
 | Back link | An opened wishlist | Returns to the list of wishlists. |
 | Filter chip | Author, series, genre, theme, tag and location on an opened Book | Tapping one adds that value to the collection's filters; filters already active stay, and a second value in the same field widens that field (see Filter panel). The sheet closes on the phone. From loans or a wishlist it goes to the collection with that one filter. |
-| Text field | Search, ISBN, Edit book, settings, notes | Search filters as the user types, after a short pause. A field that failed validation shows its message beneath it. |
+| Text field | Search, ISBN, Edit book, settings, notes | Search filters as the user types, after a short pause. A field that failed validation shows its message beneath it. A single-line field with text has a clear X at its right end: tapping it empties the field and keeps focus there. Not on notes or other multi-line fields, passwords, dates or the Filter panel's years; the Combobox keeps its "Clear" Link. |
 | Combobox | Location, Person, tags, author, series, theme | Type to narrow the options. A value that does not exist can be created from the same field (FR-31, FR-34). Its popup is not an overlay for the one-level rule. |
 | Date field | Lend | The platform's own date control. Defaults to today. |
 | Book row / Cover tile | Collection, loans, wishlists, Lookup results | Tap opens Book detail (Lookup results open the Answer). In select mode, tap ticks it and does not open. |
@@ -133,7 +133,7 @@ Undo is offered where the action has a plain opposite. Removals are confirmed fi
 | Add to wishlist | "Added to {list} · Undo" | Removes the entry, and the Book on the same rule. |
 | Move (one or many) | "{n} moved to {location} · Undo" | Puts each copy back where it was; a copy whose previous location has since been deleted or merged away returns to no location. |
 | Tag (one or many, any kind) | "Tagged {n} · Undo" | Restores each Book's tags. |
-| Read (one or many) | "Marked {n} read · Undo" ("unread" when it marks them unread) | Restores each Book's read flag. |
+| Read (a selection, in select mode) | "Marked {n} read · Undo" ("unread" when it marks them unread) | Restores each Book's read flag. |
 | Lend | "Lent to {person} · Undo" | Removes the loan. |
 | Returned | "Returned · Undo" | Reopens the loan. |
 | Bought (wishlist entry, for me) | "Saved to {location} · Undo" | Removes the copy and reopens the entry. |
@@ -155,7 +155,7 @@ Undo is offered where the action has a plain opposite. Removals are confirmed fi
 | Filter | Opens and closes the Filter panel. |
 | Count line | Always under the search. With nothing active: "{n} books". With a search or filter active: the active values, the count, and "Clear", for example "Tampere, unread · 14 books · Clear". |
 | Select | Enters select mode. |
-| Scrolling | Endless: the next page loads as the end approaches. |
+| Scrolling | Endless: the next page loads as the end approaches. On the phone, in every section (collection, loans, wishlists, settings), once the page is scrolled past two screens, a back-to-top square (↑) shows beside Scan book in the pinned bar; tapping it returns to the top (instantly under reduced motion), and it hides again within one screen of the top. Not on wide screens, and not while the action bar replaces Scan book. |
 | Row ending | The copy's location; or the lent marker and "Lent · {person}"; or "Ordered" for an ordered copy. Blank when the user has no locations. |
 
 ### Filter panel
@@ -192,7 +192,7 @@ The same content in the panel and the sheet. Changes save at once; there is no S
 | Group | Content and behaviour |
 |---|---|
 | Header | Cover, title, author, series and number, edition line (publisher · year · pages · language). Author and series are Filter chips. |
-| Read and rating | A read / unread Text switch and the Rating (FR-29). Both belong to the Book, not a copy. |
+| Read and rating | A read / unread Text switch and the Rating (FR-29). Both belong to the Book, not a copy. Each saves in place with no toast and no Undo: one tap puts it back (FR-15). |
 | Your copies | One line per copy: its location (a Filter chip) and its status. Each line has its own Links, by state: **owned** — Lend, Move, Remove; **lent** — the lent marker with "Lent to {person} since {date}", and Returned only (no Move or Remove; Remove in select mode still takes a lent copy and its loans); **ordered** — "Ordered", and Received, which makes it owned at the default location (FR-28). A copy's note sits under its line and is edited in place. |
 | Lent before | The closed loans of this Book's copies, newest first: "{person} · {from} to {to}" (FR-36). Absent when there are none. |
 | On wishlists | One line per entry: "{list} · for {person}". Absent when there are none. |
@@ -210,7 +210,7 @@ The half-open sheet shows the header, read and rating, and the first copies, so 
 | Camera | Starts when Scan opens and stays on across Scan, Answer and back, until the task is closed. |
 | Reading | Only ISBN barcodes count (EAN-13 starting 978 or 979); anything else is ignored. Reading pauses while a lookup is running and while an Answer is showing. |
 | The same book twice | After an Answer closes, the ISBN just handled is ignored until it has left the camera's view. |
-| ISBN field | Accepts ISBN-10 and ISBN-13 with hyphens or spaces (FR-10). Submitted with the keyboard's Go key. |
+| ISBN field | Accepts ISBN-10 and ISBN-13 with hyphens or spaces (FR-10). Submitted with the "find" button beside it or the keyboard's Go key (the phone's number pad has no Return). Never on the 13th digit alone. |
 | No camera | The frame is replaced by "No camera. Type the ISBN." and the field takes focus. This is the normal state on a desktop. |
 | Add without ISBN | A Link that opens the Not found Answer with an empty title field and no ISBN, so a book with no barcode can be catalogued. |
 
@@ -424,7 +424,7 @@ Decisions here that differed from, or added to, the PRD and the architecture whe
 | PRD FR-20 | Chips on the result | The first fact is the heading; the rest are lines under the Book. |
 | PRD FR-33 | Bulk change of location | Bulk tag, read and remove as well. |
 | PRD FR-25 | Filter and sort by any field | The same, plus Filter chips on an opened Book. |
-| PRD FR-15; architecture AD-11 | Undo after a save | Undo also after move, tag, read, lend, returned, received, bought and ordered. Each needs its own reverse action in the services. |
+| PRD FR-15; architecture AD-11 | Undo after a save | Undo also after move, tag, read (a selection), lend, returned, received, bought and ordered. Each needs its own reverse action in the services. |
 | Architecture AD-18 and the settings slices | Rename and delete for locations, People and tags | Merge as well. |
 | Architecture, routes | `/` home, `/books` collection, `/books/new` review, `/books/[bookId]` detail | The addresses in the Information Architecture table. Book detail is an overlay on a section, not a page; the architecture added `?entry=` for an opened wishlist entry. |
 | Architecture AD-7 | One fixed page size; page in the URL | The page size stays as the fetch unit. Scrolling is endless, so the page number leaves the URL; search, filters and sort stay. |

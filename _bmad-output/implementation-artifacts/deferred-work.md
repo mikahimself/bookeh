@@ -100,3 +100,7 @@
 - source_spec: `_bmad-output/implementation-artifacts/spec-cover-treatment.md`
   summary: Check paint cost of cloth placeholders on a large shelf on the phone.
   evidence: Unverified (would be medium): each coverless tile is an isolated stacking context with a soft-light pseudo-element over an SVG `feTurbulence` background, rasterised per distinct tile width. Proven or cleared by scrolling a covers view with a few hundred coverless copies on the owner's iPhone.
+
+- source_spec: none
+  summary: Let a user mark a Book as "Currently reading" — a third reading state beside unread and read (UserBooks read flag, FR-29), with its shelf filter and marker.
+  evidence: Split from the phone-polish sidequest (2026-10-27); it changes the data model, PRD FR-29 and the spine, so it is its own story after the polish story.

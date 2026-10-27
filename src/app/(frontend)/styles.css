@@ -590,3 +590,9 @@
     --spacing-pinned-bar: calc(2 * var(--spacing-tap) + 3 * var(--spacing-4));
   }
 }
+
+/* The search field draws its own clear X (TextField.tsx, ClearButton); one X, not two. */
+input[type='search']::-webkit-search-cancel-button {
+  -webkit-appearance: none;
+  appearance: none;
+}

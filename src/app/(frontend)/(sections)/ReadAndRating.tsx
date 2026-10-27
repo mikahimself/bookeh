@@ -20,8 +20,8 @@ type Props = { bookId: number; initial: Pick<UserBookState, 'read' | 'rating'> }
  * EXPERIENCE.md, Book detail: the read / unread switch and the Rating,
  * stacked, with no heading. Each change saves at once and shows the tapped
  * value, falling back to the stored one on failure (`useSavedSwitch`). Every
- * result goes to `afterAction`. Read toasts "Marked 1 read" (or "unread")
- * with Undo; rating has neither.
+ * result goes to `afterAction`. Neither toasts nor offers Undo: one tap puts
+ * either back (PRD FR-15); select mode's mark read keeps its Undo.
  *
  * After a successful Undo from the toast the route is refreshed and the
  * group remounted in the same transition, so the switch seeds from the
@@ -52,21 +52,13 @@ export function ReadAndRating(props: Props) {
 
 function Group({ bookId, initial }: Props) {
   const t = useTranslations()
-  const { show } = useToast()
   const afterAction = useAfterAction()
   const ratingId = useId()
 
   const [read, setRead] = useSavedSwitch(
     initial.read,
     (next) => setReadAction({ bookId, read: next }),
-    (data) => {
-      show({
-        kind: 'success',
-        message: t(data.read ? 'toast.markedRead' : 'toast.markedUnread', { n: data.count }),
-        undo: { token: data.undoToken, seconds: data.undoSeconds },
-      })
-      afterAction({ ok: true, data })
-    },
+    (data) => afterAction({ ok: true, data }),
     afterAction,
   )
   const [rating, setRating] = useSavedSwitch(
