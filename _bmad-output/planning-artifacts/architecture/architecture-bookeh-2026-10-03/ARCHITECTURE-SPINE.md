@@ -597,7 +597,7 @@ src/
     copies/            # createCopy, move, receive, status, note, remove; locations
     people/            # resolvePerson, createPerson, rename, merge, delete, personUse, lendingPeople
     loans/             # lendCopy, returnLoan, openLoans, returnedLoans; dates: helsinkiToday, isCalendarDate
-    wishlists/
+    wishlists/         # resolveWishlist, createWishlist, rename, delete
     account/           # profile read and update, visibility
     backup/            # readLastBackup: the nightly backup's status file (BACKUP_STATUS_FILE) for Settings
   migrations/
