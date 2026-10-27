@@ -29,7 +29,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 10-06-2026 17:50
-last_updated: 10-24-2026 16:24
+last_updated: 10-26-2026 20:57
 project: bookeh
 project_key: NOKEY
 tracking_system: file-system
@@ -209,7 +209,7 @@ development_status:
   6-11-j13-returned-loans: done
   6-12-j9-lent-before: done
   6-13-j8-people-in-settings: done
-  epic-6-retrospective: optional
+  epic-6-retrospective: done
 
   epic-7: backlog
   7-1-h1-wishlists-collection: backlog
@@ -511,7 +511,7 @@ action_items:
     action: "Process: a deferred item handed to a later story becomes that story's
       acceptance criterion, or stays with the story that deferred it (P5)"
     owner: 'Mika'
-    status: open
+    status: done
     ref: '_bmad-output/implementation-artifacts/epic-3-retro-2026-10-20.md'
   - id: 'epic-3-retro-item-33-process-decide-the-story-size-convention'
     epic: 3
@@ -525,7 +525,7 @@ action_items:
     action: 'Process: when two lanes run in parallel, the lane plan names the files
       both touch and which lane owns each (P7)'
     owner: 'Mika'
-    status: open
+    status: done
     ref: '_bmad-output/implementation-artifacts/epic-3-retro-2026-10-20.md'
   - id: 'epic-3-retro-item-35-d-8-a-hand-typed-value-that-differs-from'
     epic: 3
@@ -600,7 +600,7 @@ action_items:
     action: 'Push the three unpushed main commits (2bef9c3, 01a021a, a8fa090) and
       set epic-4: done in sprint-status.yaml (P2, P3)'
     owner: 'Mika'
-    status: in-progress
+    status: done
     ref: '_bmad-output/implementation-artifacts/epic-4-retro-2026-10-22.md'
   - id: 'epic-4-retro-item-44-spec-reconciliation-spine-ad-5-names-edi'
     epic: 4
@@ -684,7 +684,7 @@ action_items:
       Move, Received and rating; AD-7 updated in the same commit; one unit case for
       Remove then Back (R1, R2; observed in the browser)"
     owner: "Mika"
-    status: open
+    status: done
     ref: "_bmad-output/implementation-artifacts/epic-5-retro-2026-10-23.md"
   - id: "epic-5-retro-item-54-move-and-its-undo-skip-or-block-ordered"
     epic: 5
@@ -695,7 +695,7 @@ action_items:
       field; lookupAgain counts limitLookups only on the path that asks the sources
       (S7/R3, R4, R5, R6, R7)"
     owner: "Mika"
-    status: open
+    status: done
     ref: "_bmad-output/implementation-artifacts/epic-5-retro-2026-10-23.md"
   - id: "epic-5-retro-item-55-small-code-reconciliations-parseshelfque"
     epic: 5
@@ -705,7 +705,7 @@ action_items:
       NFC-normalised at the route boundary (S5, S6, A4a, A4b; fold the q rule into
       Epic 4 item 40)"
     owner: "Mika"
-    status: open
+    status: done
     ref: "_bmad-output/implementation-artifacts/epic-5-retro-2026-10-23.md"
   - id: "epic-5-retro-item-56-ac-named-test-gaps-rating-handlers-paylo"
     epic: 5
@@ -714,7 +714,7 @@ action_items:
       rendered for a non-admin and an admin (5.34); /data/suggest answers 401 when
       signed out (Errors convention) (V1-V4)"
     owner: "Mika"
-    status: open
+    status: done
     ref: "_bmad-output/implementation-artifacts/epic-5-retro-2026-10-23.md"
   - id: "epic-5-retro-item-57-one-phone-session-recorded-in-one-place"
     epic: 5
@@ -743,7 +743,7 @@ action_items:
       land Epic 4 item 42 (ignore .claude/** in lint) before the next parallel lane
       (P3, P7)"
     owner: "Mika"
-    status: open
+    status: in-progress
     ref: "_bmad-output/implementation-artifacts/epic-5-retro-2026-10-23.md"
   - id: "epic-5-retro-item-60-process-a-red-main-run-gets-a-recorded-c"
     epic: 5
@@ -751,14 +751,14 @@ action_items:
       or the story Auto Run Result, so a flaky e2e lane is named rather than ridden
       out (P1: three red runs at the Playwright step during Epic 5)"
     owner: "Mika"
-    status: open
+    status: done
     ref: "_bmad-output/implementation-artifacts/epic-5-retro-2026-10-23.md"
   - id: "epic-5-retro-item-61-process-give-the-17-open-previous-epic-i"
     epic: 5
     action: "Process: give the 17 open previous-epic items a slot: a clean-up story
       before Epic 6 or a decision that closes them (P4; open question 5)"
     owner: "Mika"
-    status: open
+    status: done
     ref: "_bmad-output/implementation-artifacts/epic-5-retro-2026-10-23.md"
   - id: "epic-5-retro-item-62-process-act-on-the-oversized-warning-14"
     epic: 5
@@ -766,7 +766,7 @@ action_items:
       none was split; decide whether the rule holds or the threshold moves (P2; open
       question 4)"
     owner: "Mika"
-    status: open
+    status: done
     ref: "_bmad-output/implementation-artifacts/epic-5-retro-2026-10-23.md"
   - id: "epic-5-retro-item-63-covers-on-the-phone-the-placeholder-and"
     epic: 5
@@ -778,7 +778,7 @@ action_items:
       styles.css tokens, Cover.tsx and CoverTile.tsx follow; closes 5.13 deferred
       items"
     owner: "Mika"
-    status: open
+    status: done
     ref: "_bmad-output/implementation-artifacts/epic-5-retro-2026-10-23.md"
   - id: "epic-5-retro-item-64-raise-the-oversized-threshold-in-the-spe"
     epic: 5
@@ -788,3 +788,71 @@ action_items:
     owner: "Mika"
     status: done
     ref: "_bmad-output/implementation-artifacts/epic-5-retro-2026-10-23.md"
+  - id: "epic-6-retro-item-65-loan-integrity-across-stories-setstatus"
+    epic: 6
+    action: "Loan integrity across stories: setStatus refuses Ordered on a copy with
+      an open loan (VALIDATION on status, field error on the Edit screen); Lend Undo
+      refuses with UNDO_FAILED once the loan is returned; receiveCopy and createCopy
+      loan counts filter on owner; the Lend picker computes today and max in Europe/Helsinki
+      on open with lib/loans/dates on the client allowlist and the spine updated;
+      one int case each (X1, X2, X4, S3, A4, V3; decisions 1, 2, 4)"
+    owner: "Mika"
+    status: open
+    ref: "_bmad-output/implementation-artifacts/epic-6-retro-2026-10-26.md"
+  - id: "epic-6-retro-item-66-foreign-keys-loans-copy_id-and-person_id"
+    epic: 6
+    action: "Foreign keys: loans.copy_id and person_id ON DELETE restrict with a readable
+      beforeDelete refusal on Copies and People in the back office; every owner_id
+      cascades so a user delete removes their private rows; spine records the rule;
+      closes the 3.21, 6.1 and 6.4 deferrals (X3; decision 3)"
+    owner: "Mika"
+    status: open
+    ref: "_bmad-output/implementation-artifacts/epic-6-retro-2026-10-26.md"
+  - id: "epic-6-retro-item-67-ad-20-test-gaps-received-undo-succeeds-w"
+    epic: 6
+    action: "AD-20 test gaps: Received Undo succeeds with only a returned loan; the
+      save Undo refuses with UNDO_FAILED after a returned loan by the explicit check
+      (V1, V2)"
+    owner: "Mika"
+    status: open
+    ref: "_bmad-output/implementation-artifacts/epic-6-retro-2026-10-26.md"
+  - id: "epic-6-retro-item-68-spec-reconciliation-experience-md-lend-p"
+    epic: 6
+    action: "Spec reconciliation: EXPERIENCE.md Lend picker row says Find a person
+      appears past six People; DESIGN.md Cover tile row carries the Lent person line;
+      deferred-work.md 5.21 chip entry closed by 6.9; epic-6-context.md recompiled;
+      spine import table notes loans/dates to i18n/locale and the Named re-declarations
+      (S2, S4, S6, A1)"
+    owner: "Mika"
+    status: open
+    ref: "_bmad-output/implementation-artifacts/epic-6-retro-2026-10-26.md"
+  - id: "epic-6-retro-item-69-phone-session-add-6-7-half-open-sheet-wi"
+    epic: 6
+    action: "Phone session: add 6.7 half-open sheet with Lend and Returned reachable
+      to the checks owed by Epic 5 item 57 and Epic 4 item 47 (S1, P4)"
+    owner: "Mika"
+    status: open
+    ref: "_bmad-output/implementation-artifacts/epic-6-retro-2026-10-26.md"
+  - id: "epic-6-retro-item-70-deferred-refactor-when-a-story-next-touc"
+    epic: 6
+    action: "Deferred refactor when a story next touches them: compose LendPicker
+      on ui/Picker; one isLent predicate; a shared tests/helpers int builder for copies,
+      People and loans; split collectionPage.unit.spec.ts by surface (A2, A3)"
+    owner: "Mika"
+    status: open
+    ref: "_bmad-output/implementation-artifacts/epic-6-retro-2026-10-26.md"
+  - id: "epic-6-retro-item-71-housekeeping-set-epic-5-and-epic-6-to-do"
+    epic: 6
+    action: "Housekeeping: set epic-5 and epic-6 to done in sprint-status.yaml; docker
+      rm bookeh-postgres-last-backup (P7)"
+    owner: "Mika"
+    status: open
+    ref: "_bmad-output/implementation-artifacts/epic-6-retro-2026-10-26.md"
+  - id: "epic-6-retro-item-72-process-a-deferral-that-touches-a-rule-t"
+    epic: 6
+    action: "Process: a deferral that touches a rule the spine states (an AD) is fixed
+      in the story or written into the next story ACs at plan time, never left in
+      the context Known open items (P1)"
+    owner: "Mika"
+    status: open
+    ref: "_bmad-output/implementation-artifacts/epic-6-retro-2026-10-26.md"
