@@ -15,6 +15,7 @@ import { People } from './collections/People'
 import { Series } from './collections/Series'
 import { UserBooks } from './collections/UserBooks'
 import { Users } from './collections/Users'
+import { Wishlists } from './collections/Wishlists'
 import { Media } from './collections/Media'
 import { seedFirstUser } from './lib/account/seedFirstUser'
 import { sweepOrphanMedia } from './lib/catalogue/covers'
@@ -56,6 +57,7 @@ export default buildConfig({
     Series,
     UserBooks,
     Users,
+    Wishlists,
   ],
   graphQL: { disable: true },
   secret: process.env.PAYLOAD_SECRET || '',
