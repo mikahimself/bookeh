@@ -14,7 +14,7 @@ import { TextField } from '../../components/TextField'
 import { Dialog } from '../../components/ui/Dialog'
 import { Picker } from '../../components/ui/Picker'
 
-/** A managed name as Settings lists it: its name and its use (a location's copies, a Person's loans). */
+/** A managed name as Settings lists it: its name and its use (a location's copies, a Person's loans and wishes). */
 export type ManagedItem = { id: number; name: string; count: number }
 
 /** The group's server actions; each answers `null` and the list refreshes on success. */
@@ -45,7 +45,7 @@ export type ManagedListStrings = {
 }
 
 /**
- * An item that cannot be deleted (a Person with loans): Delete opens a dialog
+ * An item that cannot be deleted (a Person with loans or wishes): Delete opens a dialog
  * titled `title` with `body` instead, and, with another item in the list,
  * `mergeOffer` and a Merge that opens the merge Picker once it has closed.
  */

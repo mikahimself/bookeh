@@ -14,7 +14,7 @@ const deletePersonAction = vi.fn()
 vi.mock('next-intl', () => {
   const t = (key: string, values?: Record<string, unknown>) =>
     values ? `${key} ${JSON.stringify(values)}` : key
-  return { useTranslations: () => Object.assign(t, { rich: t }) }
+  return { useTranslations: () => Object.assign(t, { rich: t }), useLocale: () => 'en' }
 })
 vi.mock('next/navigation', async (importOriginal) => ({
   ...(await importOriginal<typeof import('next/navigation')>()),
@@ -35,8 +35,10 @@ const { PeopleGroup } = await import('@/app/(frontend)/(sections)/settings/Peopl
 
 installNavigationTracking()
 
-const antti = { id: 1, name: 'Antti', loans: 2 }
-const leena = { id: 2, name: 'Leena', loans: 0 }
+const antti = { id: 1, name: 'Antti', loans: 2, entries: 1 }
+const leena = { id: 2, name: 'Leena', loans: 0, entries: 0 }
+const meta = 'personCount {"count":2}, personWishes {"count":1}'
+const uses = 'personCount {"count":2} and personWishes {"count":1}'
 
 describe('PeopleGroup', () => {
   beforeEach(() => {
@@ -67,7 +69,9 @@ describe('PeopleGroup', () => {
     const blocked = await screen.findByRole('dialog', {
       name: 'personInUseTitle {"name":"Antti"}',
     })
-    expect(within(blocked).getByText(/personInUseBody \{"count":2\}/)).toBeTruthy()
+    expect(
+      within(blocked).getByText(`personInUseBody ${JSON.stringify({ uses })}`, { exact: false }),
+    ).toBeTruthy()
     fireEvent.click(within(blocked).getByRole('button', { name: 'merge' }))
 
     const picker = await screen.findByRole('dialog', {
@@ -79,15 +83,36 @@ describe('PeopleGroup', () => {
     const confirm = await screen.findByRole('dialog', {
       name: 'personMergeTitle {"source":"Antti","target":"Leena"}',
     })
+    expect(
+      within(confirm).getByText(`personMergeBody ${JSON.stringify({ uses, target: 'Leena' })}`),
+    ).toBeTruthy()
     fireEvent.click(within(confirm).getByRole('button', { name: 'merge' }))
 
     await waitFor(() => expect(mergePersonAction).toHaveBeenCalledExactlyOnceWith(1, 2))
     expect(deletePersonAction).not.toHaveBeenCalled()
   })
 
-  it('lists each Person with their loans, offers Merge only with another Person, and says when there are none', () => {
+  it("a wish-only Person shows its wishes, and Delete says they can't be deleted", async () => {
+    const aino = { id: 3, name: 'Aino', loans: 0, entries: 1 }
+    render(createElement(PeopleGroup, { people: [aino, leena] }))
+    expect(screen.getByText('personWishes {"count":1}')).toBeTruthy()
+
+    fireEvent.click(screen.getAllByRole('button', { name: 'delete' })[0])
+    const blocked = await screen.findByRole('dialog', {
+      name: 'personInUseTitle {"name":"Aino"}',
+    })
+    expect(
+      within(blocked).getByText(
+        `personInUseBody ${JSON.stringify({ uses: 'personWishes {"count":1}' })}`,
+        { exact: false },
+      ),
+    ).toBeTruthy()
+    expect(screen.queryByRole('dialog', { name: 'deleteTitle {"name":"Aino"}' })).toBeNull()
+  })
+
+  it('lists each Person with their loans and wishes, offers Merge only with another Person, and says when there are none', () => {
     const { rerender } = render(createElement(PeopleGroup, { people: [antti, leena] }))
-    expect(screen.getByText('personCount {"count":2}')).toBeTruthy()
+    expect(screen.getByText(meta)).toBeTruthy()
     expect(screen.getByText('personCount {"count":0}')).toBeTruthy()
     expect(screen.getAllByRole('button', { name: 'merge' })).toHaveLength(2)
 

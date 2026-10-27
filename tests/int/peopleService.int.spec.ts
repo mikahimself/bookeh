@@ -1,3 +1,5 @@
+import { randomUUID } from 'node:crypto'
+
 import { getPayload, type Payload } from 'payload'
 import { beforeAll, describe, expect, it } from 'vitest'
 
@@ -13,16 +15,17 @@ import {
   resolvePerson,
 } from '@/lib/people/people'
 import config from '@/payload.config'
-import type { Book, Loan, Person, User } from '@/payload-types'
+import type { Book, Loan, Person, User, WishlistEntry } from '@/payload-types'
 
 import { contextFor, createUser } from '../helpers/harness'
 import { randomIsbn } from '../helpers/isbn'
 
 // `lib/people`, AD-18/FR-34: a Person `Ref` resolves only to my own People or
 // matches a name of mine; "Add person" and rename fail `NAME_TAKEN` with the
-// other's id; a merge moves every loan in one transaction; a Person with any
-// loan cannot be deleted; `personUse` counts my loans per Person. Foreign and
-// bad ids write nothing, for the admin too.
+// other's id; a merge moves every loan and wishlist entry in one transaction; a
+// Person with any loan or entry (open or closed) cannot be deleted;
+// `personUse` counts my loans and entries per Person. Foreign and bad ids
+// write nothing, for the admin too.
 
 describe('people service', () => {
   let payload: Payload
@@ -59,6 +62,37 @@ describe('people service', () => {
       },
       depth: 0,
     })
+  }
+
+  /** A uniquely named list; `owner` and `nameKey` only satisfy the create type. */
+  const wishlistAs = async (user: User) =>
+    gateway.create(await contextFor(user), {
+      collection: 'wishlists',
+      data: { owner: user.id, name: `Wishes ${randomUUID()}`, nameKey: 'ignored' },
+      depth: 0,
+    })
+
+  /** An entry of `user`'s for `forPerson` (null: their own wish), closed when `closedAt` is given. */
+  const entryAs = async (
+    user: User,
+    forPerson: number | null,
+    closedAt?: string,
+  ): Promise<WishlistEntry> =>
+    gateway.create(await contextFor(user), {
+      collection: 'wishlist-entries',
+      data: {
+        owner: user.id,
+        wishlist: (await wishlistAs(user)).id,
+        book: shared.id,
+        forPerson,
+        ...(closedAt && { closedAt }),
+      },
+      depth: 0,
+    })
+
+  const entryRead = async (entry: WishlistEntry) => {
+    const doc = await payload.findByID({ collection: 'wishlist-entries', id: entry.id, depth: 0 })
+    return { forPerson: doc.forPerson, closedAt: doc.closedAt ?? null }
   }
 
   const stored = async (id: number) => {
@@ -243,7 +277,7 @@ describe('people service', () => {
     expect(await stored(mineAsAdmin.id)).toEqual({ name: 'Liisa', nameKey: 'liisa' })
   })
 
-  it('moves every loan of the source to the target, then deletes the source', async () => {
+  it('moves every loan and entry of the source to the target, then deletes the source', async () => {
     const a = await createUser({ displayName: 'Merge Person' })
     const source = await personAs(a, 'Antti')
     const target = await personAs(a, 'Antti K')
@@ -252,6 +286,11 @@ describe('people service', () => {
     const returned = await loanAs(a, source.id, '2026-10-22')
     const targets = await loanAs(a, target.id)
     const others = await loanAs(a, other.id)
+    const closedAt = '2026-10-23T10:00:00.000Z'
+    const openEntry = await entryAs(a, source.id)
+    const closedEntry = await entryAs(a, source.id, closedAt)
+    const targetsEntry = await entryAs(a, target.id)
+    const othersEntry = await entryAs(a, other.id)
 
     await mergePerson(await contextFor(a), source.id, target.id)
 
@@ -260,6 +299,10 @@ describe('people service', () => {
     expect(await personOf(returned)).toBe(target.id)
     expect(await personOf(targets)).toBe(target.id)
     expect(await personOf(others)).toBe(other.id)
+    expect(await entryRead(openEntry)).toEqual({ forPerson: target.id, closedAt: null })
+    expect(await entryRead(closedEntry)).toEqual({ forPerson: target.id, closedAt })
+    expect(await entryRead(targetsEntry)).toEqual({ forPerson: target.id, closedAt: null })
+    expect(await entryRead(othersEntry)).toEqual({ forPerson: other.id, closedAt: null })
   })
 
   it('refuses to merge a Person into itself with VALIDATION', async () => {
@@ -279,6 +322,7 @@ describe('people service', () => {
     const source = await personAs(a, 'Antti')
     const target = await personAs(a, 'Liisa')
     const loan = await loanAs(a, source.id)
+    const entry = await entryAs(a, source.id)
 
     const e = new Error('after')
     await expect(
@@ -290,27 +334,36 @@ describe('people service', () => {
 
     expect(await stored(source.id)).not.toBeNull()
     expect(await personOf(loan)).toBe(source.id)
+    expect((await entryRead(entry)).forPerson).toBe(source.id)
   })
 
-  it('deletes a Person without loans and refuses one with any loan with PERSON_IN_USE', async () => {
+  it('deletes an unused Person and refuses one with any loan or entry with PERSON_IN_USE', async () => {
     const a = await createUser({ displayName: 'Delete Person' })
     const asA = await contextFor(a)
     const unused = await personAs(a, 'Antti')
     const returned = await personAs(a, 'Liisa')
     const open = await personAs(a, 'Kalle')
+    const wished = await personAs(a, 'Aino')
+    const wishedOnce = await personAs(a, 'Bea')
     await loanAs(a, returned.id, '2026-10-22')
     await loanAs(a, open.id)
+    const openEntry = await entryAs(a, wished.id)
+    const closedEntry = await entryAs(a, wishedOnce.id, '2026-10-23T10:00:00.000Z')
+    // An own wish (no recipient) names no one.
+    await entryAs(a, null)
 
     await deletePerson(asA, unused.id)
     expect(await stored(unused.id)).toBeNull()
 
-    for (const p of [returned, open]) {
+    for (const p of [returned, open, wished, wishedOnce]) {
       expect(await failure(deletePerson(asA, p.id))).toMatchObject({ code: 'PERSON_IN_USE' })
       expect(await stored(p.id)).not.toBeNull()
     }
+    expect((await entryRead(openEntry)).forPerson).toBe(wished.id)
+    expect((await entryRead(closedEntry)).forPerson).toBe(wishedOnce.id)
   })
 
-  it('counts loans per Person by name, zero included, and never lists another user', async () => {
+  it('counts loans and entries per Person by name, zero included, and never lists another user', async () => {
     const a = await createUser({ displayName: 'Person Use' })
     const b = await createUser({ displayName: 'Person Use Other' })
     const admin = await createUser({ displayName: 'Person Use Admin', roles: ['admin'] })
@@ -319,15 +372,19 @@ describe('people service', () => {
     const antti = await personAs(a, 'Antti')
     await loanAs(a, antti.id)
     await loanAs(a, antti.id, '2026-10-22')
+    await entryAs(a, antti.id)
+    await entryAs(a, antti.id, '2026-10-23T10:00:00.000Z')
+    await entryAs(a, null)
     const theirs = await personAs(b, 'Aino')
     await loanAs(b, theirs.id)
+    await entryAs(b, theirs.id)
 
     expect(await personUse(await contextFor(a))).toEqual([
-      { id: antti.id, name: 'Antti', loans: 2 },
-      { id: liisa.id, name: 'Liisa', loans: 0 },
+      { id: antti.id, name: 'Antti', loans: 2, entries: 2 },
+      { id: liisa.id, name: 'Liisa', loans: 0, entries: 0 },
     ])
     expect(await personUse(await contextFor(admin))).toEqual([
-      { id: kalle.id, name: 'Kalle', loans: 0 },
+      { id: kalle.id, name: 'Kalle', loans: 0, entries: 0 },
     ])
   })
 

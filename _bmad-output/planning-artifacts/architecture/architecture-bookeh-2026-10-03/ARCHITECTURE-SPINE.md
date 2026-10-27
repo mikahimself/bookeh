@@ -511,7 +511,7 @@ type SuggestField = 'author' | 'series' | 'publisher' // SUGGEST_FIELDS
 type Suggestion = { id: number | null; name: string } // suggest(ctx, field, text); id null for a publisher
 
 // src/lib/people
-type PersonUse = Named & { loans: number } // personUse(ctx): every Person of the viewer by name; Epic 7 adds entries
+type PersonUse = Named & { loans: number; entries: number } // personUse(ctx): every Person of the viewer by name; loans open and returned, entries (wishlist entries for them) open and closed
 // lendingPeople(ctx): Named[]: every Person of the viewer by latest loan (lentOn, newest first), then by name; the Lend picker's rows
 
 // src/lib/loans

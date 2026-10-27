@@ -60,12 +60,12 @@ Mika keeps several named, private wishlists ("Me", "Christmas") of Books he does
 - **Toasts:** "Added to {list} · Undo"; Bought for me "Saved to {location} · Undo"; Ordered "Ordered · Undo"; Bought for a Person "Bought · Undo".
 - **Add to wishlist:** opens the wishlist picker every time (sheet on phone, dialog on wide; one choice then closes); skipped with exactly one list; with none it offers only "New list". How a list is created from an empty picker is decided by Mika from rendered mock-ups, within one overlay, and recorded in EXPERIENCE.md before building. From the Answer it returns to Scan. Recipient is set later on the entry.
 - **Answer lines:** "On {list}" per entry; the On wishlist heading (Add to library · Back) is Epic 8's full Answer.
-- **Book detail:** "On wishlists" group, "{list} · for {person}" or "{list}" alone, absent when none; a Book held only through entries opens with no copies group. Foot: Edit and Add to wishlist, no primary.
+- **Book detail:** "On wishlists" group, "{list} · for {person}" or "{list}" alone, absent when none; a Book held only through entries opens with no copies group, and removing its last copy while open entries remain keeps Book detail open on it. Foot: Edit and Add to wishlist, no primary.
 - One overlay deep: a sheet may open one picker or dialog, nothing on top. Modals hold and return focus; the side panel is not modal. Mock-up: `ux-designs/ux-bookeh-2026-10-03/mockups/key-wishlists.html`.
 
 ## Cross-Story Dependencies
 
-- 7.1 → 7.2 → 7.3 / 7.4 → 7.5 → 7.6–7.9 (services) → 7.10–7.15 (screens). 7.6 needs 7.5's `Ref` resolution; 7.8 and 7.13 need `createCopy` and the default location; 7.9 and 7.12 need `lib/people` (Epic 6). 7.12–7.13 build on 7.11; 7.14 on 7.6; 7.15 on 7.3.
+- 7.1 → 7.2 → 7.3 / 7.4 → 7.5 → 7.6–7.9 (services) → 7.10–7.15 (screens). 7.6 needs 7.5's `Ref` resolution; 7.8 and 7.13 need `createCopy` and the default location; 7.9 and 7.12 need `lib/people` (Epic 6). 7.12–7.13 build on 7.11; 7.14 on 7.6; 7.15 on 7.3, and takes over 7.3's hand-off: `RemoveCopy`'s `last` must count open entries too.
 - 7.7 touches `saveCopy` (Epic 3) and the private-Book merge paths of Story 3.39 and Look it up again (Story 5.35).
 - 7.4 extends Epic 6's `lib/people` delete, merge and `personUse`, and the People group in Settings.
 - Reuses Epic 5's Book detail content component, sheet/panel, Book row, Filter chip; Epic 6's Person combobox and Picker wrappers.

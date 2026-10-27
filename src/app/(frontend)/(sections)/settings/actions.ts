@@ -102,7 +102,7 @@ export async function mergePersonAction(
   })
 }
 
-/** Deletes a Person; one with any loan fails `PERSON_IN_USE`. */
+/** Deletes a Person; one with any loan or wishlist entry fails `PERSON_IN_USE`. */
 export async function deletePersonAction(person: unknown): Promise<ActionResult<null>> {
   return runAction(async () => {
     const ctx = await requireUserOrThrow()

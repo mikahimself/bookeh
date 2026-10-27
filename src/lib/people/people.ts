@@ -10,8 +10,11 @@ import { withTransaction } from '@/lib/payload/transaction'
 /** Spine, Shared shapes. Declared here: `lib/people` imports no other service. */
 type Named = { id: number; name: string }
 
-/** Spine, Shared shapes: a Person with their number of loans, open and returned. Epic 7 adds entries. */
-export type PersonUse = Named & { loans: number }
+/**
+ * Spine, Shared shapes: a Person with their number of loans, open and
+ * returned, and of wishlist entries for them, open and closed.
+ */
+export type PersonUse = Named & { loans: number; entries: number }
 
 /**
  * A typed name, normalised (NFC, trimmed, whitespace collapsed). Blank after
@@ -167,17 +170,31 @@ async function loansOf(tx: Context, id: number): Promise<number[]> {
   return docs.map((doc) => doc.id)
 }
 
+/** The ids of the context user's wishlist entries, open or closed, for Person `id`. */
+async function entriesOf(tx: Context, id: number): Promise<number[]> {
+  const { docs } = await gateway.find(tx, {
+    collection: 'wishlist-entries',
+    where: { and: [{ forPerson: { equals: id } }, { owner: { equals: tx.user.id } }] },
+    select: { forPerson: true },
+    depth: 0,
+    pagination: false,
+  })
+  return docs.map((doc) => doc.id)
+}
+
 /**
  * Spine, AD-18, FR-34: merges one of the context user's People into another
  * in the caller's transaction or one of its own (AD-16). Either id not a row
  * id, or not the viewer's Person (the admin's included), fails with
  * `NOT_FOUND`; merging a Person into itself fails with `VALIDATION`; both
- * before any write. Every loan of the source, open or returned, moves to the
- * target through the gateway, then the source is deleted. Epic 7 moves
- * wishlist entries too. No Undo. A loan to the
- * Person committed concurrently after the check makes the delete fail on
- * `loans.person_id` (NOT NULL with `ON DELETE set null`), and the whole call
- * rolls back as `INTERNAL`.
+ * before any write. Every loan of the source, open or returned, then every
+ * wishlist entry for it, open or closed, moves to the target through the
+ * gateway (only `forPerson` changes), then the source is deleted. No Undo. A
+ * loan to the Person committed concurrently after the check makes the delete
+ * fail on `loans.person_id` (NOT NULL with `ON DELETE set null`), and the
+ * whole call rolls back as `INTERNAL`; an entry for it committed concurrently
+ * is cleared by `wishlist_entries.for_person_id` (`ON DELETE set null`) and
+ * silently becomes the owner's own wish.
  */
 export async function mergePerson(ctx: Context, sourceId: number, targetId: number): Promise<void> {
   if (!isRowId(sourceId) || !isRowId(targetId)) throw new DomainError('NOT_FOUND')
@@ -194,6 +211,14 @@ export async function mergePerson(ctx: Context, sourceId: number, targetId: numb
         depth: 0,
       })
     }
+    for (const entry of await entriesOf(tx, sourceId)) {
+      await gateway.updateByID(tx, {
+        collection: 'wishlist-entries',
+        id: entry,
+        data: { forPerson: targetId },
+        depth: 0,
+      })
+    }
     await gateway.deleteByID(tx, { collection: 'people', id: sourceId, depth: 0 })
   })
 }
@@ -202,22 +227,29 @@ export async function mergePerson(ctx: Context, sourceId: number, targetId: numb
  * Spine, AD-18, FR-34: deletes one of the context user's People in the
  * caller's transaction or one of its own (AD-16). An id that is not a row id,
  * or not the viewer's Person (the admin's included), fails with `NOT_FOUND`; a
- * Person with any loan, open or returned, fails with `PERSON_IN_USE`; both
- * before any write. Epic 7 adds wishlist entries to the rule. No Undo. A loan to the
- * Person committed concurrently after the check makes the delete fail on
- * `loans.person_id` (NOT NULL with `ON DELETE set null`), and the whole call
- * rolls back as `INTERNAL`.
+ * Person with any loan, open or returned, or any wishlist entry for them,
+ * open or closed, fails with `PERSON_IN_USE`; both before any write. No Undo.
+ * A loan to the Person committed concurrently after the check makes the delete
+ * fail on `loans.person_id` (NOT NULL with `ON DELETE set null`), and the
+ * whole call rolls back as `INTERNAL`; an entry for them committed
+ * concurrently is cleared by `wishlist_entries.for_person_id` (`ON DELETE set
+ * null`) and silently becomes the owner's own wish.
  */
 export async function deletePerson(ctx: Context, id: number): Promise<void> {
   if (!isRowId(id)) throw new DomainError('NOT_FOUND')
 
   await withTransaction(ctx, async (tx) => {
     await assertOwnPeople(tx, [id])
-    const { totalDocs } = await gateway.count(tx, {
+    const loans = await gateway.count(tx, {
       collection: 'loans',
       where: { and: [{ person: { equals: id } }, { owner: { equals: tx.user.id } }] },
     })
-    if (totalDocs > 0) throw new DomainError('PERSON_IN_USE')
+    if (loans.totalDocs > 0) throw new DomainError('PERSON_IN_USE')
+    const entries = await gateway.count(tx, {
+      collection: 'wishlist-entries',
+      where: { and: [{ forPerson: { equals: id } }, { owner: { equals: tx.user.id } }] },
+    })
+    if (entries.totalDocs > 0) throw new DomainError('PERSON_IN_USE')
 
     await gateway.deleteByID(tx, { collection: 'people', id, depth: 0 })
   })
@@ -225,9 +257,10 @@ export async function deletePerson(ctx: Context, id: number): Promise<void> {
 
 /**
  * Spine, AD-18, FR-34: every Person of the context user, sorted by name in the
- * database's collation, with their number of loans, open and returned, zero
- * included. Never another user's, for the admin too (FR-48). Epic 7 adds
- * entries.
+ * database's collation, with their number of loans, open and returned, and
+ * of wishlist entries for them, open and closed, zero included. An entry
+ * without a recipient counts for no one. Never another user's, for the admin
+ * too (FR-48).
  */
 export async function personUse(ctx: Context): Promise<PersonUse[]> {
   const own = { owner: { equals: ctx.user.id } }
@@ -247,12 +280,31 @@ export async function personUse(ctx: Context): Promise<PersonUse[]> {
     select: { person: true },
   })
 
-  const counts = new Map<number, number>()
+  const entries = await gateway.find(ctx, {
+    collection: 'wishlist-entries',
+    where: { and: [own, { forPerson: { exists: true } }] },
+    pagination: false,
+    depth: 0,
+    select: { forPerson: true },
+  })
+
+  const loanCounts = new Map<number, number>()
   for (const { person } of loans.docs) {
     const id = idOf(person)
-    counts.set(id, (counts.get(id) ?? 0) + 1)
+    loanCounts.set(id, (loanCounts.get(id) ?? 0) + 1)
   }
-  return people.docs.map(({ id, name }) => ({ id, name, loans: counts.get(id) ?? 0 }))
+  const entryCounts = new Map<number, number>()
+  for (const { forPerson } of entries.docs) {
+    if (forPerson == null) continue
+    const id = idOf(forPerson)
+    entryCounts.set(id, (entryCounts.get(id) ?? 0) + 1)
+  }
+  return people.docs.map(({ id, name }) => ({
+    id,
+    name,
+    loans: loanCounts.get(id) ?? 0,
+    entries: entryCounts.get(id) ?? 0,
+  }))
 }
 
 /**
