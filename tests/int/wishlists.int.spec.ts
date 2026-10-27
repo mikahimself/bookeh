@@ -27,7 +27,7 @@ describe('wishlists', () => {
   const wishlistAs = async (user: User, data: Partial<Wishlist> = {}) =>
     gateway.create(await contextFor(user), {
       collection: 'wishlists',
-      data: { owner: user.id, name: 'Me', nameKey: 'ignored', ...data },
+      data: { owner: user.id, name: 'Wishes', nameKey: 'ignored', ...data },
       depth: 0,
     })
 

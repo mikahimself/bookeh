@@ -1,8 +1,8 @@
 /**
  * The length limits of the Book, author, series, Person and wishlist text
  * fields, in UTF-16 units as Payload's `maxLength` counts them. The schema
- * declares them and `lib/catalogue` clips source values to them before a
- * shared Book is written.
+ * declares them; `lib/catalogue` clips source values to them before a shared
+ * Book is written, and the owning services check typed names against them.
  */
 export const limits = {
   title: 500,
