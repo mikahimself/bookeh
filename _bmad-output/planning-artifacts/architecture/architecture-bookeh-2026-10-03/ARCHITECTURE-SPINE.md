@@ -517,6 +517,8 @@ type PersonUse = Named & { loans: number; entries: number } // personUse(ctx): e
 
 // src/lib/wishlists
 type WishlistLine = Named & { count: number } // listWishlists(ctx): the viewer's lists by name, count = open entries
+type ListEntry = { entryId: number; bookId: number; forPerson: Named | null }
+type WishlistView = Named & { entries: ListEntry[] } // getWishlist(ctx, id): one of the viewer's lists with its open entries, newest first; null when not theirs
 
 // src/lib/loans
 type Lent = { loanId: number; person: Named } // lendCopy(ctx, copyId, person: Ref, lentOn?): Undone<Lent>; returnLoan(ctx, loanId, returnedOn?): Undone<{ loanId }>; dates default to helsinkiToday()
@@ -601,7 +603,7 @@ src/
     copies/            # createCopy, move, receive, status, note, remove; locations
     people/            # resolvePerson, createPerson, rename, merge, delete, personUse, lendingPeople
     loans/             # lendCopy, returnLoan, openLoans, returnedLoans; dates: helsinkiToday, isCalendarDate
-    wishlists/         # resolveWishlist, listWishlists, createWishlist, rename, delete; createEntry, closeEntriesForBook, closeEntry, moveEntriesToBook, setEntryRecipient, removeEntry
+    wishlists/         # resolveWishlist, listWishlists, getWishlist, createWishlist, rename, delete; createEntry, closeEntriesForBook, closeEntry, moveEntriesToBook, setEntryRecipient, removeEntry
     account/           # profile read and update, visibility
     backup/            # readLastBackup: the nightly backup's status file (BACKUP_STATUS_FILE) for Settings
   migrations/

@@ -331,7 +331,11 @@
   "wishlists": {
     "empty": "No wishlists",
     "newList": "New list",
-    "create": "Create"
+    "create": "Create",
+    "emptyList": "Nothing on this list.",
+    "forPerson": "For {person}",
+    "deleteTitle": "Delete <typed>{name}</typed>?",
+    "deleteBody": "{count, plural, =0 {The list goes.} one {The list and its # book go.} other {The list and its # books go.}}"
   },
   "progress": {
     "loading": "Loading"

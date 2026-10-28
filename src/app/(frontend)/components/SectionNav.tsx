@@ -15,11 +15,19 @@ const heading =
  * the right edge. The live region is in the server HTML, so only a client
  * section change is announced. Every other heading follows the current one,
  * so a tap always slides forward (`section-next`).
+ *
+ * On a path below a section root (`/wishlists/{id}`) the page brings its own
+ * Back link and `h1` (the mock-up's "One list opened"), so the row steps
+ * aside: only the empty `flex-1` slot, which keeps the wide Scan book right,
+ * and no live region, so the page's heading is the only one.
  */
 export function SectionNav() {
   const t = useTranslations('sections')
-  const current = sectionOf(usePathname())
+  const pathname = usePathname()
+  const current = sectionOf(pathname)
   const [, ...others] = sectionRow(current.key)
+
+  if (pathname !== current.href) return <div className="flex-1" />
 
   return (
     // Clipped sideways only: `overflow-hidden` would also cut off the focus

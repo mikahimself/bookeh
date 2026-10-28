@@ -128,6 +128,79 @@ export async function listWishlists(ctx: Context): Promise<WishlistLine[]> {
   return lists.map(({ id, name }) => ({ id, name, count: counts.get(id) ?? 0 }))
 }
 
+type Named = { id: number; name: string }
+
+/** An open entry as one list shows it: its Book, and its recipient, or `null` when it is the viewer's own wish. */
+export type ListEntry = { entryId: number; bookId: number; forPerson: Named | null }
+
+/** One of the viewer's wishlists with its open entries. */
+export type WishlistView = Named & { entries: ListEntry[] }
+
+/**
+ * Spine, AD-7, AD-18, FR-38: one of the context user's wishlists with its
+ * open entries (`closedAt` empty), newest first, ties by id (the order comes
+ * from the entries, never from a Book field). `null` when `id` is not a row
+ * id (no read) or not the viewer's list: gone, or another user's, for the
+ * admin too. Every read filters on `owner` explicitly as well as through
+ * `ownerAccess` (FR-48). Recipient names come from one read of the distinct
+ * ids; a recipient missing from it gives `forPerson: null`. Three reads at
+ * most, no transaction.
+ */
+export async function getWishlist(ctx: Context, id: number): Promise<WishlistView | null> {
+  if (!isRowId(id)) return null
+
+  const { docs: lists } = await gateway.find(ctx, {
+    collection: 'wishlists',
+    where: { and: [{ id: { equals: id } }, { owner: { equals: ctx.user.id } }] },
+    select: { name: true },
+    limit: 1,
+    pagination: false,
+    depth: 0,
+  })
+  const list = lists[0]
+  if (!list) return null
+
+  const { docs: entries } = await gateway.find(ctx, {
+    collection: 'wishlist-entries',
+    where: {
+      and: [
+        { wishlist: { equals: id } },
+        { owner: { equals: ctx.user.id } },
+        { closedAt: { exists: false } },
+      ],
+    },
+    select: { book: true, forPerson: true },
+    sort: ['-createdAt', '-id'],
+    depth: 0,
+    pagination: false,
+  })
+
+  const personIds = [
+    ...new Set(entries.flatMap(({ forPerson }) => (forPerson == null ? [] : [idOf(forPerson)]))),
+  ]
+  const personById = new Map<number, Named>()
+  if (personIds.length > 0) {
+    const { docs: people } = await gateway.find(ctx, {
+      collection: 'people',
+      where: { and: [{ id: { in: personIds } }, { owner: { equals: ctx.user.id } }] },
+      select: { name: true },
+      depth: 0,
+      pagination: false,
+    })
+    for (const person of people) personById.set(person.id, { id: person.id, name: person.name })
+  }
+
+  return {
+    id: list.id,
+    name: list.name,
+    entries: entries.map((entry) => ({
+      entryId: entry.id,
+      bookId: idOf(entry.book),
+      forPerson: entry.forPerson == null ? null : (personById.get(idOf(entry.forPerson)) ?? null),
+    })),
+  }
+}
+
 /**
  * Spine, AD-18, FR-38: "New list". Adds a wishlist for the context user in
  * the caller's transaction or one of its own (AD-16) and answers its id.

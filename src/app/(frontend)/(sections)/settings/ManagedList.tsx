@@ -69,9 +69,10 @@ type FieldError = { message: ReactNode; sent: string }
  * a Merge Link);
  * leaving the field again with the same name sends nothing. Any other
  * failure is reported, and `NOT_FOUND` refreshes the list. Success refreshes
- * and closes the field in one transition, so the new list replaces it.
+ * and closes the field in one transition, so the new list replaces it. The
+ * caller places it (an `li` in a Settings group, a heading's place on a list).
  */
-function NameField({
+export function NameField({
   initial,
   save,
   onDone,
@@ -150,24 +151,22 @@ function NameField({
   }
 
   return (
-    <li className="py-1">
-      <TextField
-        label={t('settings.name')}
-        name="name"
-        autoComplete="off"
-        maxLength={200}
-        enterKeyHint="done"
-        autoFocus
-        value={value}
-        onChange={(event) => {
-          setValue(event.target.value)
-          setError(null)
-        }}
-        onBlur={commit}
-        onKeyDown={keys}
-        error={error?.message}
-      />
-    </li>
+    <TextField
+      label={t('settings.name')}
+      name="name"
+      autoComplete="off"
+      maxLength={200}
+      enterKeyHint="done"
+      autoFocus
+      value={value}
+      onChange={(event) => {
+        setValue(event.target.value)
+        setError(null)
+      }}
+      onBlur={commit}
+      onKeyDown={keys}
+      error={error?.message}
+    />
   )
 }
 
@@ -257,17 +256,22 @@ export function ManagedList({
       )}
       {(adding || items.length > 0) && (
         <ul>
-          {adding && <NameField initial="" save={actions.create} onDone={() => setAdding(false)} />}
+          {adding && (
+            <li className="py-1">
+              <NameField initial="" save={actions.create} onDone={() => setAdding(false)} />
+            </li>
+          )}
           {items.map((item) =>
             renaming === item.id ? (
-              <NameField
-                key={item.id}
-                initial={item.name}
-                save={(name) => actions.rename(item.id, name)}
-                // Only this row's field: another row's Rename may have opened meanwhile.
-                onDone={() => setRenaming((open) => (open === item.id ? null : open))}
-                mergeInto={offerMerge(item)}
-              />
+              <li key={item.id} className="py-1">
+                <NameField
+                  initial={item.name}
+                  save={(name) => actions.rename(item.id, name)}
+                  // Only this row's field: another row's Rename may have opened meanwhile.
+                  onDone={() => setRenaming((open) => (open === item.id ? null : open))}
+                  mergeInto={offerMerge(item)}
+                />
+              </li>
             ) : (
               <ListRow key={item.id} title={item.name} meta={strings.count(item)}>
                 <ActionLink disabled={pending} onClick={() => setRenaming(item.id)}>

@@ -5,9 +5,11 @@ import { limits } from '@/fields/limits'
 import * as gateway from '@/lib/payload/gateway'
 import { MAX_ROW_ID } from '@/lib/payload/ref'
 import { withTransaction } from '@/lib/payload/transaction'
+import { createPerson } from '@/lib/people/people'
 import {
   createWishlist,
   deleteWishlist,
+  getWishlist,
   listWishlists,
   renameWishlist,
   resolveWishlist,
@@ -22,6 +24,7 @@ import { randomIsbn } from '../helpers/isbn'
 // lists or matches a name of mine; "New list" and rename fail `NAME_TAKEN`
 // with the other's id; deleting a list deletes its entries, open and closed,
 // in one transaction. Foreign and bad ids write nothing, for the admin too.
+// `getWishlist` shows one of my lists with its open entries, newest first.
 
 describe('wishlists service', () => {
   let payload: Payload
@@ -39,6 +42,13 @@ describe('wishlists service', () => {
     gateway.create(await contextFor(user), {
       collection: 'wishlist-entries',
       data: { owner: user.id, wishlist, book: shared.id, ...(closedAt && { closedAt }) },
+      depth: 0,
+    })
+
+  const entryFor = async (user: User, wishlist: number, forPerson: number) =>
+    gateway.create(await contextFor(user), {
+      collection: 'wishlist-entries',
+      data: { owner: user.id, wishlist, book: shared.id, forPerson },
       depth: 0,
     })
 
@@ -145,6 +155,42 @@ describe('wishlists service', () => {
     expect(await listWishlists(await contextFor(admin))).toEqual([
       { id: admins.id, name: 'Admin', count: 1 },
     ])
+  })
+
+  it('shows one list with its open entries newest first, recipients named, closed ones not', async () => {
+    const a = await createUser({ displayName: 'Get Wishlist' })
+    const asA = await contextFor(a)
+    const christmas = await wishlistAs(a, 'Christmas')
+    const other = await wishlistAs(a, 'Me')
+    const aiti = await createPerson(asA, 'Äiti')
+    const forAiti = await entryFor(a, christmas.id, aiti)
+    const own = await entryAs(a, christmas.id)
+    const again = await entryAs(a, christmas.id)
+    await entryAs(a, christmas.id, '2026-10-23T10:00:00.000Z')
+    await entryAs(a, other.id)
+
+    expect(await getWishlist(asA, christmas.id)).toEqual({
+      id: christmas.id,
+      name: 'Christmas',
+      entries: [
+        { entryId: again.id, bookId: shared.id, forPerson: null },
+        { entryId: own.id, bookId: shared.id, forPerson: null },
+        { entryId: forAiti.id, bookId: shared.id, forPerson: { id: aiti, name: 'Äiti' } },
+      ],
+    })
+  })
+
+  it("answers null for another user's list and bad ids, for the admin too", async () => {
+    const a = await createUser({ displayName: 'Get Wishlist Viewer' })
+    const admin = await createUser({ displayName: 'Get Wishlist Admin', roles: ['admin'] })
+    const theirs = await wishlistAs(a, 'Joulu')
+    await entryAs(a, theirs.id)
+
+    const b = await createUser({ displayName: 'Get Wishlist Other' })
+    for (const viewer of [b, admin]) {
+      const ctx = await contextFor(viewer)
+      for (const bad of [theirs.id, 0, -1, 1.5]) expect(await getWishlist(ctx, bad)).toBeNull()
+    }
   })
 
   it("creates a list, and fails NAME_TAKEN with the existing one's id", async () => {
