@@ -13,7 +13,10 @@ vi.mock('next/navigation', async (importOriginal) => ({
   useRouter: () => ({ refresh, replace: vi.fn() }),
 }))
 vi.mock('@/app/(frontend)/components/navigation', () => ({ useTaskBack: () => vi.fn() }))
-vi.mock('@/app/(frontend)/scan/actions', () => ({ saveManualAction: vi.fn() }))
+vi.mock('@/app/(frontend)/scan/actions', () => ({
+  saveManualAction: vi.fn(),
+  saveEntryAction: vi.fn(),
+}))
 vi.mock('@/app/(frontend)/components/toast/ToastProvider', () => ({
   useToast: () => ({ show: vi.fn(), dismiss: vi.fn() }),
 }))
@@ -22,12 +25,23 @@ const { UnavailableActions } = await import('@/app/(frontend)/scan/UnavailableAc
 
 describe('UnavailableActions', () => {
   beforeEach(() => {
-    render(createElement(UnavailableActions, { isbn13: '9789510397077' }))
+    // The picker under Add to wishlist reads the wide query.
+    vi.stubGlobal(
+      'matchMedia',
+      vi.fn((query: string) => ({
+        media: query,
+        matches: false,
+        addEventListener: () => {},
+        removeEventListener: () => {},
+      })),
+    )
+    render(createElement(UnavailableActions, { isbn13: '9789510397077', lists: [] }))
   })
 
   afterEach(() => {
     cleanup()
     vi.clearAllMocks()
+    vi.unstubAllGlobals()
   })
 
   it('re-renders the same address on Try again', () => {

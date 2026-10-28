@@ -17,6 +17,8 @@ export type PickerProps<V extends string | number> = {
   onOpenChange: (open: boolean) => void
   /** A typed name inside it keeps its case: wrap it in `normal-case` (DESIGN.md, Lowercase). */
   title: ReactNode
+  /** A line under the title (Add to wishlist: the Book's title, muted). */
+  description?: ReactNode
   options: readonly PickerOption<V>[]
   value: V | null
   /** Runs once the picker's history entry is gone, so a navigation lands on the entry before it. */
@@ -45,12 +47,15 @@ type Choice<V> = { value: V } | { create: string }
  * close, so a resize never swaps the overlay while it is open. With `create`,
  * a field and a secondary Button under the rows: a value blank after
  * trimming does nothing (the Button is disabled), any other closes and is
- * the choice. The field starts empty at each open.
+ * the choice. The field starts empty at each open, and with no rows it has
+ * the focus on open. `description` goes under the title in the sheet and
+ * first in the dialog's body.
  */
 export function Picker<V extends string | number>({
   open,
   onOpenChange,
   title,
+  description,
   options,
   value,
   onChoose,
@@ -62,6 +67,9 @@ export function Picker<V extends string | number>({
   /** The choice waiting for the close to finish; `null` when the close is no choice. */
   const pending = useRef<Choice<V> | null>(null)
   const [name, setName] = useState('')
+  const field = useRef<HTMLInputElement>(null)
+  // With nothing to choose from, the field is the picker.
+  const initialFocus = create && options.length === 0 ? field : undefined
   const [wasOpen, setWasOpen] = useState(open)
   if (open !== wasOpen) {
     setWasOpen(open)
@@ -108,7 +116,7 @@ export function Picker<V extends string | number>({
                 aria-hidden="true"
                 className={chosen ? `${markerSlotClass} bg-accent` : markerSlotClass}
               />
-              <span>{option.label}</span>
+              <span className="min-w-0 flex-1">{option.label}</span>
             </button>
           </li>
         )
@@ -122,11 +130,14 @@ export function Picker<V extends string | number>({
         className="flex items-end gap-2"
         onSubmit={(event) => {
           event.preventDefault()
+          // React events cross the portal: a form around the picker's caller (Not found) is not this one.
+          event.stopPropagation()
           submit()
         }}
       >
         <div className="min-w-0 flex-1">
           <TextField
+            ref={field}
             label={create.label}
             value={name}
             onChange={(event) => setName(event.target.value)}
@@ -144,15 +155,37 @@ export function Picker<V extends string | number>({
   )
 
   return heldWide ? (
-    <Dialog open={open} onOpenChange={onOpenChange} title={title} onClosed={onClosed}>
-      {body}
+    <Dialog
+      open={open}
+      onOpenChange={onOpenChange}
+      title={title}
+      onClosed={onClosed}
+      initialFocus={initialFocus}
+    >
+      {description != null ? (
+        <div className="flex flex-col gap-4">
+          {description}
+          {body}
+        </div>
+      ) : (
+        body
+      )}
     </Dialog>
   ) : (
-    <Sheet open={open} onOpenChange={onOpenChange} labelledBy={titleId} onClosed={onClosed}>
+    <Sheet
+      open={open}
+      onOpenChange={onOpenChange}
+      labelledBy={titleId}
+      onClosed={onClosed}
+      initialFocus={initialFocus}
+    >
       <div className="flex flex-col gap-4">
-        <h2 id={titleId} className="text-heading-group ui-case">
-          {title}
-        </h2>
+        <div className="flex flex-col gap-1">
+          <h2 id={titleId} className="text-heading-group ui-case">
+            {title}
+          </h2>
+          {description}
+        </div>
         {body}
       </div>
     </Sheet>

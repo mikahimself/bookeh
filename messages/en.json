@@ -74,6 +74,7 @@
     "close": "Close",
     "savedTo": "Saved to {location}",
     "saved": "Saved",
+    "addedTo": "Added to {list}",
     "edit": "Edit",
     "undo": "Undo",
     "undone": "Undone",
@@ -333,6 +334,8 @@
   "wishlists": {
     "empty": "No wishlists",
     "newList": "New list",
+    "addToWishlist": "Add to wishlist",
+    "add": "Add",
     "create": "Create",
     "emptyList": "Nothing on this list.",
     "forPerson": "For {person}",

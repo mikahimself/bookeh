@@ -74,6 +74,7 @@
     "close": "Sulje",
     "savedTo": "Tallennettu · {location}",
     "saved": "Tallennettu",
+    "addedTo": "Lisätty · {list}",
     "edit": "Muokkaa",
     "undo": "Kumoa",
     "undone": "Kumottu",
@@ -333,6 +334,8 @@
   "wishlists": {
     "empty": "Ei toivelistoja",
     "newList": "Uusi lista",
+    "addToWishlist": "Lisää toivelistalle",
+    "add": "Lisää",
     "create": "Luo",
     "emptyList": "Tällä listalla ei ole mitään.",
     "forPerson": "Kenelle: {person}",

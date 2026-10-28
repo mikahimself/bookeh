@@ -2,7 +2,7 @@
 
 import { Drawer } from '@base-ui/react/drawer'
 import { useTranslations } from 'next-intl'
-import { useState, type ReactNode } from 'react'
+import { useState, type ReactNode, type RefObject } from 'react'
 
 import { CloseButton } from '../CloseButton'
 import { useSuspendSwipe } from '../swipe'
@@ -38,6 +38,8 @@ export type SheetProps = {
    * Back changes the address itself and the caller unmounts the sheet.
    */
   addressed?: boolean
+  /** The element focused on open, in place of Base UI's default (`Drawer.Popup`'s `initialFocus`). */
+  initialFocus?: RefObject<HTMLElement | null>
 }
 
 /**
@@ -56,6 +58,7 @@ export function Sheet({
   children,
   onClosed,
   addressed,
+  initialFocus,
 }: SheetProps) {
   const t = useTranslations('overlay')
   const layer = useOverlayLayer('sheet')
@@ -90,6 +93,7 @@ export function Sheet({
           <Drawer.Popup
             aria-label={label}
             aria-labelledby={labelledBy}
+            initialFocus={initialFocus}
             className="flex h-sheet-height w-full touch-none flex-col border-t-2 border-text bg-background sheet-motion"
           >
             <div className="relative flex shrink-0 justify-center">

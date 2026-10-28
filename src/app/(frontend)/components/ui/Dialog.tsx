@@ -2,7 +2,7 @@
 
 import { Dialog as BaseDialog } from '@base-ui/react/dialog'
 import { useTranslations } from 'next-intl'
-import type { ReactNode } from 'react'
+import type { ReactNode, RefObject } from 'react'
 
 import { Button } from '../Button'
 import { useSuspendSwipe } from '../swipe'
@@ -23,6 +23,8 @@ export type DialogProps = {
   confirm?: ReactNode
   /** Runs once per close, after the dialog's history entry is gone (`useCloseOnBack`). */
   onClosed?: () => void
+  /** The element focused on open, in place of Base UI's default (`Dialog.Popup`'s `initialFocus`). */
+  initialFocus?: RefObject<HTMLElement | null>
 }
 
 /**
@@ -35,7 +37,15 @@ export type DialogProps = {
  * within the screen. The backdrop is drawn even inside a sheet, so the
  * dialog always sits over the scrim. Nothing opens on top of a dialog.
  */
-export function Dialog({ open, onOpenChange, title, children, confirm, onClosed }: DialogProps) {
+export function Dialog({
+  open,
+  onOpenChange,
+  title,
+  children,
+  confirm,
+  onClosed,
+  initialFocus,
+}: DialogProps) {
   const t = useTranslations('overlay')
   const layer = useOverlayLayer('dialog')
   useSuspendSwipe(open)
@@ -46,7 +56,10 @@ export function Dialog({ open, onOpenChange, title, children, confirm, onClosed 
       <BaseDialog.Portal>
         <BaseDialog.Backdrop forceRender className="fixed inset-0 bg-scrim overlay-fade" />
         <BaseDialog.Viewport className="fixed inset-0 flex items-center justify-center p-page-margin-phone">
-          <BaseDialog.Popup className="flex max-h-full w-full max-w-dialog-width flex-col gap-6 overflow-y-auto border-2 border-text bg-background p-6 overlay-fade">
+          <BaseDialog.Popup
+            initialFocus={initialFocus}
+            className="flex max-h-full w-full max-w-dialog-width flex-col gap-6 overflow-y-auto border-2 border-text bg-background p-6 overlay-fade"
+          >
             <BaseDialog.Title className="text-heading-group ui-case">{title}</BaseDialog.Title>
             {/* A confirm's body describes it; a choice's rows (a Picker) are no description. */}
             {children != null &&

@@ -2,7 +2,9 @@ import { getTranslations } from 'next-intl/server'
 import { ViewTransition } from 'react'
 
 import { lookupBook } from '@/lib/catalogue/lookupBook'
+import { logger } from '@/lib/errors'
 import { requireUser } from '@/lib/payload/context'
+import { listWishlists, type WishlistLine } from '@/lib/wishlists/wishlists'
 
 import { FullScreenTask } from '../components/FullScreenTask'
 import { DismissToast } from '../components/toast/DismissToast'
@@ -34,6 +36,10 @@ import { UnavailableAnswer } from './UnavailableAnswer'
  *
  * `&pick=` is the edition picked (D-7); `lookupBook` falls back to the best
  * for one out of range.
+ *
+ * The Answers with Add to wishlist (Not in library, Not found, and Couldn't
+ * look it up through Add by hand) get the viewer's wishlists; a failed read
+ * is logged and leaves the picker with New list alone.
  */
 export default async function ScanPage({
   searchParams,
@@ -49,6 +55,13 @@ export default async function ScanPage({
       : title !== undefined
         ? { kind: 'notFound', isbn13: null, title }
         : { kind: 'scan' }
+  const lists: WishlistLine[] =
+    outcome.kind === 'notInLibrary' || outcome.kind === 'notFound' || outcome.kind === 'unavailable'
+      ? await listWishlists(ctx).catch((err: unknown) => {
+          logger().error({ err }, 'The wishlists failed to load')
+          return []
+        })
+      : []
 
   return (
     <ViewTransition enter="task-enter" exit="task-exit" default="none">
@@ -68,11 +81,11 @@ export default async function ScanPage({
           {outcome.kind === 'inLibrary' ? (
             <InLibraryAnswer answer={outcome.answer} />
           ) : outcome.kind === 'notInLibrary' ? (
-            <NotInLibraryAnswer answer={outcome.answer} />
+            <NotInLibraryAnswer answer={outcome.answer} lists={lists} />
           ) : outcome.kind === 'unavailable' ? (
-            <UnavailableAnswer isbn13={outcome.isbn13} failed={outcome.failed} />
+            <UnavailableAnswer isbn13={outcome.isbn13} failed={outcome.failed} lists={lists} />
           ) : (
-            <NotFoundAnswer isbn13={outcome.isbn13} title={outcome.title} />
+            <NotFoundAnswer isbn13={outcome.isbn13} title={outcome.title} lists={lists} />
           )}
           {/* The next Answer removes the toast on screen, the held save toast included. */}
           <DismissToast />

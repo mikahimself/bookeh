@@ -10,10 +10,12 @@ import { helsinkiToday } from '@/lib/loans/dates'
 import { returnedLoans } from '@/lib/loans/loans'
 import type { Context } from '@/lib/payload/context'
 import { lendingPeople } from '@/lib/people/people'
+import { listWishlists } from '@/lib/wishlists/wishlists'
 
 import { buttonClass } from '../components/Button'
 import { markerSlotClass } from '../components/ui/classes'
 import { heldBook } from '../heldBook'
+import { AddToWishlist } from '../scan/AddToWishlist'
 
 import { BookDetailFrame } from './BookDetailPanel'
 import { BookHeader, joined } from './BookHeader'
@@ -38,7 +40,9 @@ const DOT = ' · '
  * has system genres, the admin's Re-fetch on a shared Book (`Refetch`,
  * `canEditShared`) or, in its place on a private Book, Look it up again
  * (`DetailLookUpAgain`; without an ISBN a muted line pointing to Edit book),
- * and the foot with Edit. Each genre and each copy's location, like the
+ * and the foot with Edit and Add to wishlist, both secondary, no primary
+ * (`AddToWishlist`, staying open after the save; a failed read of the
+ * viewer's wishlists leaves its picker with New list alone). Each genre and each copy's location, like the
  * header's authors and series, is a Filter chip (`FilterChip`) that adds
  * it to the current filters; an ordered copy has no location and so no
  * chip. The one component later groups are added to; it reads the Book, the
@@ -81,6 +85,11 @@ export async function BookDetail({
   const today = lendable ? helsinkiToday() : ''
   const history = await returnedLoans(ctx, bookId).catch((err: unknown) => {
     logger().error({ err }, 'The loan history failed to load')
+    return []
+  })
+
+  const lists = await listWishlists(ctx).catch((err: unknown) => {
+    logger().error({ err }, 'The wishlists failed to load')
     return []
   })
 
@@ -204,6 +213,7 @@ export async function BookDetail({
           >
             {t('detail.edit')}
           </Link>
+          <AddToWishlist lists={lists} title={book.title} target={{ bookId }} stay />
         </div>
       </div>
     </BookDetailFrame>

@@ -1,11 +1,12 @@
 // @vitest-environment jsdom
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { createElement } from 'react'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 const back = vi.fn()
 const show = vi.fn()
 const saveManualAction = vi.fn()
+const saveEntryAction = vi.fn()
 
 vi.mock('next-intl', () => ({
   useTranslations: () => (key: string, values?: { location: string }) =>
@@ -16,7 +17,7 @@ vi.mock('next/navigation', async (importOriginal) => ({
   useRouter: () => ({ replace: vi.fn() }),
 }))
 vi.mock('@/app/(frontend)/components/navigation', () => ({ useTaskBack: () => back }))
-vi.mock('@/app/(frontend)/scan/actions', () => ({ saveManualAction }))
+vi.mock('@/app/(frontend)/scan/actions', () => ({ saveManualAction, saveEntryAction }))
 vi.mock('@/app/(frontend)/components/toast/ToastProvider', () => ({
   useToast: () => ({ show, dismiss: vi.fn() }),
 }))
@@ -30,9 +31,23 @@ const type = (label: string, value: string) =>
 const add = () => fireEvent.click(screen.getByRole('button', { name: 'answer.addToLibrary' }))
 
 describe('NotFoundForm', () => {
+  beforeEach(() => {
+    // The picker under Add to wishlist reads the wide query.
+    vi.stubGlobal(
+      'matchMedia',
+      vi.fn((query: string) => ({
+        media: query,
+        matches: false,
+        addEventListener: () => {},
+        removeEventListener: () => {},
+      })),
+    )
+  })
+
   afterEach(() => {
     cleanup()
     vi.resetAllMocks()
+    vi.unstubAllGlobals()
   })
 
   it.each([
@@ -51,7 +66,7 @@ describe('NotFoundForm', () => {
           undoSeconds: 1800,
         },
       })
-      render(createElement(NotFoundForm, { isbn13, title: '' }))
+      render(createElement(NotFoundForm, { isbn13, title: '', lists: [] }))
       type('answer.title', 'Kotiseutu')
       type('answer.author', 'A. Kirjoittaja')
       add()
@@ -81,7 +96,7 @@ describe('NotFoundForm', () => {
       code: 'VALIDATION',
       fields: { title: 'VALIDATION', authors: 'VALIDATION' },
     })
-    render(createElement(NotFoundForm, { isbn13: null, title: ' ' }))
+    render(createElement(NotFoundForm, { isbn13: null, title: ' ', lists: [] }))
     add()
 
     expect(await screen.findByText('answer.titleRequired')).toBeTruthy()
@@ -97,7 +112,7 @@ describe('NotFoundForm', () => {
       code: 'VALIDATION',
       fields: { title: 'VALIDATION', authors: 'VALIDATION' },
     })
-    render(createElement(NotFoundForm, { isbn13: null, title: '' }))
+    render(createElement(NotFoundForm, { isbn13: null, title: '', lists: [] }))
     add()
     expect(await screen.findByText('answer.titleRequired')).toBeTruthy()
     // The marks can render before the first save settles; a click on the
@@ -123,7 +138,7 @@ describe('NotFoundForm', () => {
       code: 'VALIDATION',
       fields: { authors: 'VALIDATION' },
     })
-    render(createElement(NotFoundForm, { isbn13: null, title: 'Kotiseutu' }))
+    render(createElement(NotFoundForm, { isbn13: null, title: 'Kotiseutu', lists: [] }))
     add()
 
     expect(await screen.findByText('answer.authorRequired')).toBeTruthy()
@@ -137,7 +152,7 @@ describe('NotFoundForm', () => {
       fields: { title: 'TOO_LONG' },
     })
     const long = 'a'.repeat(501)
-    render(createElement(NotFoundForm, { isbn13: null, title: long }))
+    render(createElement(NotFoundForm, { isbn13: null, title: long, lists: [] }))
     type('answer.author', 'A. Kirjoittaja')
     screen.getByLabelText<HTMLInputElement>('answer.author').focus()
     add()
@@ -151,16 +166,59 @@ describe('NotFoundForm', () => {
   })
 
   it('opens with the title focused', () => {
-    render(createElement(NotFoundForm, { isbn13: null, title: '' }))
+    render(createElement(NotFoundForm, { isbn13: null, title: '', lists: [] }))
 
     expect(document.activeElement).toBe(screen.getByLabelText('answer.title'))
   })
 
   it('moves to Author on Enter in Title without submitting', () => {
-    render(createElement(NotFoundForm, { isbn13: null, title: 'Kotiseutu' }))
+    render(createElement(NotFoundForm, { isbn13: null, title: 'Kotiseutu', lists: [] }))
     fireEvent.keyDown(screen.getByLabelText('answer.title'), { key: 'Enter' })
 
     expect(document.activeElement).toBe(screen.getByLabelText('answer.author'))
     expect(saveManualAction).not.toHaveBeenCalled()
+  })
+
+  it('adds the typed text to the one wishlist as a manual target', async () => {
+    saveEntryAction.mockResolvedValue({
+      ok: true,
+      data: {
+        bookId: 1,
+        entryId: 2,
+        savedTo: { id: 4, name: 'Joululahjat' },
+        undoToken: 't',
+        undoSeconds: 1800,
+      },
+    })
+    render(
+      createElement(NotFoundForm, {
+        isbn13: ISBN,
+        title: '',
+        lists: [{ id: 4, name: 'Joululahjat', count: 0 }],
+      }),
+    )
+    type('answer.title', 'Sinuhe')
+    type('answer.author', 'Waltari')
+    fireEvent.click(screen.getByRole('button', { name: 'wishlists.addToWishlist' }))
+
+    await waitFor(() => expect(back).toHaveBeenCalledTimes(1))
+    expect(saveEntryAction).toHaveBeenCalledExactlyOnceWith({
+      requestId: expect.any(String),
+      wishlist: 4,
+      target: { manual: { title: 'Sinuhe', author: 'Waltari', isbn13: ISBN } },
+    })
+    expect(saveManualAction).not.toHaveBeenCalled()
+  })
+
+  it('marks a blank title, focuses it and opens no picker', () => {
+    render(createElement(NotFoundForm, { isbn13: null, title: '  ', lists: [] }))
+    type('answer.author', 'Waltari')
+    fireEvent.click(screen.getByRole('button', { name: 'wishlists.addToWishlist' }))
+
+    expect(screen.getByText('answer.titleRequired')).toBeTruthy()
+    expect(screen.queryByText('answer.authorRequired')).toBeNull()
+    expect(document.activeElement).toBe(screen.getByLabelText('answer.title'))
+    expect(screen.queryByRole('dialog')).toBeNull()
+    expect(saveEntryAction).not.toHaveBeenCalled()
   })
 })
