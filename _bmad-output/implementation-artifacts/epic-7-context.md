@@ -41,9 +41,11 @@ Mika keeps several named, private wishlists of Books he doesn't own yet. He adds
 - **Access:** read, update and delete are `owner = current user` for every role, admin included. Relations: `wishlist` and `forPerson` are owned relations, and `book` is a readable relation. Access tests cover foreign ids.
 - **One writer:** `lib/wishlists` is the only writer of `wishlist-entries`, and it owns wishlists by `nameKey`. Renaming onto a taken `nameKey` fails with `NAME_TAKEN` and `conflictId`; a rename that only changes case is allowed. Deleting a list deletes all its entries in one transaction. Screens never match names: pickers send a `Ref` (`number | { create: string }`), which is resolved inside the action's transaction. Undo leaves a row created that way in place.
 - **Entry services:** `closeEntriesForBook()` is called by `saveCopy()` before `createCopy()`, in the same transaction, and what it closed goes into the save's restore. `closeEntry(ctx, id, 'bought' | 'ordered')` calls `createCopy()` unless the entry is for a Person. `setEntryRecipient(ctx, id, Ref | null)` resolves an inline-created Person through `lib/people`. `removeEntry(ctx, id)` deletes the row.
-- **`saveEntry`** lives in `lib/catalogue` and takes `save: { kind: 'entry', wishlist: Ref }`. It returns `entryId` with the list as `savedTo`. It follows the same `requestId` idempotency, target kinds (`isbn13` / `bookId` / `manual`), held-outcome rule and single-transaction rule as `saveCopy`.
+- **`saveEntry`** lives in `lib/catalogue` and takes `save: { kind: 'entry', wishlist: Ref }`. It returns `EntrySaveResult` (`bookId`, `entryId`, `savedTo`: the list, never null); `saveCopy` returns `SaveResult` (`bookId`, `copyId`, `savedTo`: the location or null). It follows the same target kinds (`isbn13` / `bookId` / `manual`), held-outcome rule and single-transaction rule as `saveCopy`. A repeated `requestId` returns the first result only for the same user and the same kind of save.
 - **Imports:** `catalogue` may import `wishlists`, and `wishlists` may import `copies` and `people`. No other new import directions.
-- **Private-Book merge:** when a save or Look it up again merges the user's private Book into an existing shared Book, the user's entries move to the shared Book first.
+- **Private-Book merge:** when a save or Look it up again merges the user's private Book into an existing shared Book, `moveEntriesToBook()` in `lib/wishlists` moves the user's entries to the shared Book first.
+- **`lib/wishlists` surface so far:** `resolveWishlist`, `createWishlist`, rename, delete; `createEntry`, `closeEntriesForBook`, `moveEntriesToBook`. Still to come: `closeEntry`, `setEntryRecipient`, `removeEntry`.
+- **People use count:** `personUse()` returns `PersonUse` with `loans` and `entries`, both counting open and closed rows.
 - **Holdings and access:** `Holdings.entries` holds the viewer's own open entries only, as `EntryLine` (`entryId`, `wishlist`, `forPerson`). `requireOwnBook()` passes for a Book held only through an open entry. `setRead()` and `changeTags()` work for a Book that is only on a wishlist. A save's restore deletes a `user-books` row it created only when the user has no other copy or entry for that Book.
 - **Lists that are not copies** (a wishlist) load their Books through `getEffectiveBooks()` and don't sort or filter on Book fields. A wishlist's count is its open entries.
 - **Undo:** service functions return `Undone<T>`, open no transaction and record nothing. The action wraps a single call in `withUndo`. A close's restore reopens the entry and deletes the copy it made. A save's copy restore refuses with `UNDO_FAILED` once the copy has a loan.
@@ -62,10 +64,9 @@ Mika keeps several named, private wishlists of Books he doesn't own yet. He adds
 
 ## Cross-Story Dependencies
 
-- Order: 7.1 → 7.2 → 7.3 / 7.4 → 7.5 → 7.6–7.9 (services) → 7.10–7.15 (screens). Stories 7.1–7.5 are done.
-- 7.6 uses 7.5's `Ref` resolution. 7.8 and 7.13 need `createCopy` and the default location. 7.9 and 7.12 use `lib/people` and the Person combobox from Epic 6. 7.12 and 7.13 build on 7.11, and 7.14 builds on 7.6.
+- Order: 7.1 → 7.2 → 7.3 / 7.4 → 7.5 → 7.6–7.9 (services) → 7.10–7.15 (screens). Stories 7.1–7.7 are done.
+- 7.8 and 7.13 need `createCopy` and the default location. 7.9 and 7.12 use `lib/people` and the Person combobox from Epic 6. 7.12 and 7.13 build on 7.11, and 7.14 builds on 7.6.
 - 7.15 builds on 7.3 and takes over 7.3's hand-off: `RemoveCopy`'s `last` must count open entries too.
-- 7.7 touches `saveCopy` (Epic 3) and the private-Book merge paths of Story 3.39 and Look it up again (Story 5.35).
 - The screens reuse Epic 5's Book detail content, sheet/panel, Book row and Filter chip, and Epic 6's Picker wrappers.
 - Epic 8 builds on this epic: `visibleEntries(viewer)` in Lookup's own-library search, the On wishlist Answer heading, and Add to wishlist from Lookup results.
 - Open item from the Epic 6 retro: foreign keys should refuse on references (`ON DELETE restrict` with a readable `beforeDelete` refusal) and cascade on `owner_id`. This isn't applied yet: the `wishlists` and `wishlist-entries` migrations still use `ON DELETE set null` on every FK. Coordinate if the fix lands during this epic.

@@ -1,6 +1,9 @@
+import { createCopy } from '@/lib/copies/createCopy'
+import type { LocationOption } from '@/lib/copies/locations'
+import { DomainError } from '@/lib/errors'
 import type { Context } from '@/lib/payload/context'
 import * as gateway from '@/lib/payload/gateway'
-import type { Ref } from '@/lib/payload/ref'
+import { idOf, isRowId, type Ref } from '@/lib/payload/ref'
 import { withTransaction } from '@/lib/payload/transaction'
 import type { Undone } from '@/lib/undo/undo'
 
@@ -95,6 +98,102 @@ export async function closeEntriesForBook(ctx: Context, bookId: number): Promise
       })
     }
     return { data: ids, restore: (rtx) => reopenEntries(rtx, ids) }
+  })
+}
+
+/**
+ * What Bought or Ordered made: the copy (`null` for a Person's entry) and
+ * where a bought own copy landed.
+ */
+export type ClosedEntry = { copyId: number | null; savedTo: LocationOption | null }
+
+/**
+ * Spine, AD-18 and AD-20, FR-28: Bought and Ordered on one of the context
+ * user's open entries. Sets its `closedAt` and, only for an entry with no
+ * recipient (`forPerson` empty), creates a copy through `createCopy()`: owned
+ * at the default location (none without one) for bought, ordered for
+ * ordered. A gift bought for a Person never lands on the user's shelf. All in
+ * one `withTransaction()` joining the caller's, so a failed copy rolls the
+ * close back and the entry stays open. A Book the user can no longer read is
+ * refused by `createCopy()` (`readableRelation`, a `ValidationError` on
+ * `book`), and the close rolls back with it. Resolves to the copy and, for a
+ * bought own copy, where it landed. Other entries for the Book and
+ * `user-books` are left alone. Records nothing: callers wrap it in
+ * `withUndo()`.
+ *
+ * An id that is not a row id (`isRowId()`), or not one of the user's open
+ * entries (gone, closed, or another user's, for the admin too), fails with
+ * `NOT_FOUND` before any write; the find filters on `owner` explicitly as
+ * well as through `ownerAccess` (FR-48).
+ *
+ * The restore runs the copy's restore first, which refuses with
+ * `UNDO_FAILED` once the copy has any loan, then clears `closedAt` on the
+ * entry if it is still present. It closes over ids only.
+ */
+export async function closeEntry(
+  ctx: Context,
+  entryId: number,
+  as: 'bought' | 'ordered',
+): Promise<Undone<ClosedEntry>> {
+  if (!isRowId(entryId)) throw new DomainError('NOT_FOUND')
+
+  return withTransaction(ctx, async (tx) => {
+    const { docs } = await gateway.find(tx, {
+      collection: 'wishlist-entries',
+      where: {
+        and: [
+          { id: { equals: entryId } },
+          { owner: { equals: tx.user.id } },
+          { closedAt: { exists: false } },
+        ],
+      },
+      select: { forPerson: true, book: true },
+      limit: 1,
+      depth: 0,
+      pagination: false,
+    })
+    const entry = docs[0]
+    if (!entry) throw new DomainError('NOT_FOUND')
+
+    await gateway.updateByID(tx, {
+      collection: 'wishlist-entries',
+      id: entryId,
+      data: { closedAt: new Date().toISOString() },
+      depth: 0,
+    })
+    const reopen = (rtx: Context) => reopenEntries(rtx, [entryId])
+
+    if (entry.forPerson != null) {
+      return { data: { copyId: null, savedTo: null }, restore: reopen }
+    }
+
+    const bookId = idOf(entry.book)
+    const copy = await createCopy(
+      tx,
+      as === 'bought' ? { bookId, status: 'owned' } : { bookId, status: 'ordered' },
+    )
+    const copyId = copy.data
+    let savedTo: LocationOption | null = null
+    if (as === 'bought') {
+      // Read back: the landed location's name, as the save does.
+      const row = await gateway.findByID(tx, {
+        collection: 'copies',
+        id: copyId,
+        depth: 1,
+        select: { location: true },
+        populate: { locations: { name: true } },
+      })
+      const landed = row.location
+      savedTo =
+        typeof landed === 'object' && landed !== null ? { id: landed.id, name: landed.name } : null
+    }
+    return {
+      data: { copyId, savedTo },
+      restore: async (rtx) => {
+        await copy.restore(rtx)
+        await reopen(rtx)
+      },
+    }
   })
 }
 
