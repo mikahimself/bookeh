@@ -1,0 +1,206 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>bookeh wishlist picker</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400&display=swap">
+<style>
+/* Mock-up page for Story 7.14 [H10]. Governed by DESIGN.md (Picker, Bottom sheet, Dialog, Text field, Buttons, Toast)
+   and EXPERIENCE.md (Picker: wishlist (Add to wishlist); Answer; No wishlists; Undo). Page chrome is neutral; each frame carries bookeh's tokens. */
+:root{--page:#ECEEF0;--pfg:#1F2933;--pmu:#5F6B78;--pln:#C9CFD5}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--page:#0E1115;--pfg:#E3E8EE;--pmu:#94A0AD;--pln:#2C343D;color-scheme:dark}}
+:root[data-theme="dark"]{--page:#0E1115;--pfg:#E3E8EE;--pmu:#94A0AD;--pln:#2C343D;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--pfg);font:14px/1.45 'Open Sans',"Segoe UI","Helvetica Neue",sans-serif}
+main{max-width:1120px;margin:0 auto;padding:28px 16px 80px}
+h1{font-weight:300;font-size:38px;line-height:1.1;letter-spacing:-.015em;margin:0 0 8px}
+h2{font-weight:300;font-size:26px;line-height:1.15;margin:52px 0 6px}
+.lede,.why{max-width:72ch;color:var(--pmu);margin:0 0 6px}
+.why strong{font-weight:400;color:var(--pfg)}
+.set{display:flex;flex-wrap:wrap;gap:28px;align-items:flex-start;margin-top:18px}
+.cap{font-size:13px;color:var(--pmu);margin:8px 2px 0;max-width:320px}
+
+/* Frame tokens */
+.L{--bg:#FFFFFF;--ink:#1F2933;--mu:#5F6B78;--dim:#87919C;--ln:#DDE2E7;--co:#F0604F;--rd:#9B1C31;--scrim:#00000033}
+.D{--bg:#14181D;--ink:#E3E8EE;--mu:#94A0AD;--dim:#626B76;--ln:#2C343D;--co:#FF8E7F;--rd:#E0566F;--scrim:#00000066}
+.fr{background:var(--bg);color:var(--ink);position:relative;overflow:hidden;font:14px/1.45 'Open Sans',"Segoe UI","Helvetica Neue",sans-serif}
+.ph{width:320px;max-width:100%;height:660px;border:2px solid #222;border-radius:30px;flex:none}
+.desk{width:640px;max-width:100%;height:520px;border:1px solid var(--pln)}
+
+/* What sits behind: the Not in library Answer */
+.ans{padding:22px 20px}
+.desk .ans{padding:22px 28px}
+.ans .bk{display:flex;gap:14px;align-items:flex-start;margin:10px 0 12px}
+.ans .bk i{flex:none;display:block;width:72px;height:108px}
+.ans .bk b{font-weight:400;font-size:20px;line-height:1.25;display:block}
+.ans .bk span{font-size:13px;color:var(--mu);display:block}
+.ans .hd{font-size:26px;font-weight:300;text-transform:lowercase;margin:0}
+.ans .btns{display:flex;flex-direction:column;gap:8px;margin-top:16px}
+.c1{background:#2A4FD6}.c2{background:#1F7A4D}.c3{background:#C4202F}
+.scrim{position:absolute;inset:0;background:var(--scrim)}
+
+/* Sheet */
+.sheet{position:absolute;left:0;right:0;bottom:0;background:var(--bg);border-top:2px solid var(--ink);padding:0 20px 18px}
+.grab{width:44px;border-top:2px solid var(--ink);margin:10px auto 10px}
+.x{position:absolute;top:16px;right:18px;width:18px;height:18px}
+.x::before,.x::after{content:"";position:absolute;left:8px;top:-2px;width:2px;height:22px;background:var(--ink)}
+.x::before{transform:rotate(45deg)}.x::after{transform:rotate(-45deg)}
+.t{font-size:20px;font-weight:300;line-height:1.3;text-transform:lowercase;margin:0 0 2px}
+.ctx{font-size:13px;color:var(--mu);margin:0 0 14px}
+.bk-l{font-size:13px;color:var(--mu);margin:0 0 10px}
+
+/* Dialog */
+.dlg{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:400px;max-width:calc(100% - 32px);background:var(--bg);border:2px solid var(--ink);padding:18px 22px 18px}
+.foot{display:flex;justify-content:flex-end;gap:8px;margin-top:20px}
+
+/* Controls */
+.fld{margin:0 0 14px}
+.fld label{display:block;font-size:12px;color:var(--mu)}
+.in{border-bottom:2px solid var(--ink);padding:2px 0 4px;font-size:17px;min-height:30px;display:flex;justify-content:space-between;align-items:baseline}
+.in .ph-t{color:var(--dim)}
+.caret{display:inline-block;width:1px;height:18px;background:var(--ink);vertical-align:-3px;margin-left:1px}
+.err{font-size:13px;color:var(--rd);margin-top:4px}
+.rows{margin:0 0 10px}
+.row{display:flex;align-items:center;gap:8px;padding:8px 0;min-height:44px;font-size:17px}
+.row .n{margin-left:auto;font-size:13px;color:var(--mu)}
+.empty{font-size:15px;color:var(--mu);margin:4px 0 14px}
+.mu{color:var(--mu)}
+.bt{border:2px solid var(--ink);padding:8px 16px;font-size:15px;line-height:1.3;text-transform:lowercase;white-space:nowrap;text-align:center;background:transparent;color:var(--ink)}
+.bt.pr{border-color:var(--co)}
+.bt.full{display:block;width:100%}
+.bt.off{color:var(--dim);border-color:var(--ln)}
+.inl{display:flex;gap:8px;align-items:flex-end}.inl .fld{flex:1;margin:0}
+u{text-decoration-color:var(--co);text-decoration-thickness:2px;text-underline-offset:3px}
+.back{font-size:13px;margin:0 0 8px}
+.kb{position:absolute;left:0;right:0;bottom:0;height:200px;background:repeating-linear-gradient(90deg,transparent 0 28px,#00000010 28px 30px),#D1D5DB;display:flex;align-items:center;justify-content:center;font-size:12px;color:#555}
+.sheet.up{bottom:200px}
+
+/* After: toast */
+.after{display:flex;flex-wrap:wrap;gap:28px;margin-top:18px}
+.card{width:320px;max-width:100%;padding:16px 20px 18px;border:1px solid var(--pln)}
+.toast{border:2px solid var(--ink);padding:9px 12px;display:flex;gap:16px;font-size:13px;margin-top:12px}
+.toast span:first-child{margin-right:auto}
+.cmp{border-collapse:collapse;margin-top:16px;font-size:13px;max-width:100%}
+.cmp th,.cmp td{text-align:left;padding:6px 14px 6px 0;border-bottom:1px solid var(--pln);vertical-align:top}
+.cmp th{font-weight:400;color:var(--pmu)}
+</style></head><body><main>
+
+<h1>Wishlist picker, no lists yet</h1>
+<p class="lede">Story 7.14 [H10]. Add to wishlist opens the wishlist picker (a bottom sheet on the phone, a dialog on wide screens); with one list it is skipped. With <strong>no</strong> lists it offers only "New list". How that list gets its name has to stay inside this one overlay, because overlays go one deep: no New list dialog on top of the picker sheet. Three ways. The scenario: Mika scans <em>Sinuhe egyptiläinen</em> in a shop, Not in library, and he has never made a wishlist. Strings in English; Finnish follows the same layout.</p>
+<table class="cmp"><tr><th></th><th>No lists: first save</th><th>With lists: a new one</th><th>What changes in the picker with lists</th></tr>
+<tr><td>A · Name field under the rows</td><td>Add to wishlist → type name → Add (3)</td><td>the same field under the rows</td><td>a "New list" field + Add under the rows, as Move's "New location"</td></tr>
+<tr><td>B · New list turns into a field</td><td>Add to wishlist → New list → type → Add (4)</td><td>New list row → field in place</td><td>a "New list" row last; tapping it swaps the rows for a field</td></tr>
+<tr><td>C · Name prefilled</td><td>Add to wishlist → Add (2), list named "Wishlist"</td><td>as A</td><td>as A; the prefill only when there are no lists</td></tr></table>
+<p class="why">In every option the new list is created inside the save's transaction (a <code>{ create: name }</code> Ref), a name already in use is rejected under the field and the overlay stays open, and Undo on "Added to {list} · Undo" removes the entry but keeps the list.</p>
+
+<!-- ============ A ============ -->
+<h2>A · Name field under the rows</h2>
+<p class="why">The Move picker as it is. Rows of lists, then a <strong>New list</strong> Text field with a secondary <strong>Add</strong> button beside it, disabled while the field is blank. With no lists, the rows are simply absent and the field is focused on open with the keyboard up. <strong>One pattern for both cases</strong>, nothing to learn, and already built for locations. A new list is one Add away even when lists exist.</p>
+<div class="set">
+<div><div class="fr ph L">
+  <div class="ans"><p class="hd">Not in library</p>
+    <div class="bk"><i class="c1"></i><div><b>Sinuhe egyptiläinen</b><span>Mika Waltari</span><span>From Finna</span></div></div>
+    <div class="btns"><span class="bt">Add to wishlist</span><span class="bt pr">Add to library</span></div></div>
+  <div class="scrim"></div>
+  <div class="kb">keyboard</div>
+  <div class="sheet up"><div class="grab"></div><span class="x"></span>
+    <p class="t">Add to wishlist</p><p class="ctx">Sinuhe egyptiläinen</p>
+    <div class="inl"><div class="fld"><label>New list</label><div class="in"><span>Joululahjat<span class="caret"></span></span></div></div><span class="bt">Add</span></div>
+  </div>
+</div><p class="cap">Phone, no lists: only the field, focused. Add creates "Joululahjat", saves the entry and returns to Scan.</p></div>
+
+<div><div class="fr ph L">
+  <div class="ans"><p class="hd">Not in library</p>
+    <div class="bk"><i class="c1"></i><div><b>Sinuhe egyptiläinen</b><span>Mika Waltari</span><span>From Finna</span></div></div>
+    <div class="btns"><span class="bt">Add to wishlist</span><span class="bt pr">Add to library</span></div></div>
+  <div class="scrim"></div>
+  <div class="sheet"><div class="grab"></div><span class="x"></span>
+    <p class="t">Add to wishlist</p><p class="ctx">Sinuhe egyptiläinen</p>
+    <div class="rows"><div class="row">Joululahjat<span class="n">4</span></div><div class="row">Antikvariaatti<span class="n">11</span></div></div>
+    <div class="inl"><div class="fld"><label>New list</label><div class="in"></div></div><span class="bt off">Add</span></div>
+  </div>
+</div><p class="cap">Phone, later, with two lists: tap a row to save there, or type a new name. The field takes no focus on open here.</p></div>
+
+<div><div class="fr desk L">
+  <div class="ans"><p class="hd">Not in library</p>
+    <div class="bk"><i class="c1"></i><div><b>Sinuhe egyptiläinen</b><span>Mika Waltari</span><span>From Finna</span></div></div></div>
+  <div class="scrim"></div>
+  <div class="dlg"><p class="t">Add to wishlist</p><p class="ctx">Sinuhe egyptiläinen</p>
+    <div class="inl"><div class="fld"><label>New list</label><div class="in"><span>Joululahjat<span class="caret"></span></span></div></div><span class="bt">Add</span></div>
+    <div class="foot"><span class="bt">Cancel</span></div></div>
+</div><p class="cap">Wide, no lists: the dialog. Enter in the field adds.</p></div>
+</div>
+
+<!-- ============ B ============ -->
+<h2>B · New list turns into a field</h2>
+<p class="why">The picker stays a list of choices. With no lists it says <strong>No wishlists</strong> (the empty state EXPERIENCE.md already names) and shows one row, <strong>New list</strong>. Tapping it swaps the picker's content, in the same sheet, for a name field and a primary <strong>Add</strong>, with a Back link to the rows. With lists, New list is the last row and does the same. <strong>The calmest picker</strong> when lists exist, and the empty state reads the same as on the Wishlists section. One more tap than A.</p>
+<div class="set">
+<div><div class="fr ph L">
+  <div class="ans"><p class="hd">Not in library</p>
+    <div class="bk"><i class="c1"></i><div><b>Sinuhe egyptiläinen</b><span>Mika Waltari</span><span>From Finna</span></div></div>
+    <div class="btns"><span class="bt">Add to wishlist</span><span class="bt pr">Add to library</span></div></div>
+  <div class="scrim"></div>
+  <div class="sheet"><div class="grab"></div><span class="x"></span>
+    <p class="t">Add to wishlist</p><p class="ctx">Sinuhe egyptiläinen</p>
+    <p class="empty">No wishlists</p>
+    <div class="rows"><div class="row"><u>New list</u></div></div>
+  </div>
+</div><p class="cap">Phone, no lists: the empty state and one row.</p></div>
+
+<div><div class="fr ph L">
+  <div class="ans"><p class="hd">Not in library</p>
+    <div class="bk"><i class="c1"></i><div><b>Sinuhe egyptiläinen</b><span>Mika Waltari</span><span>From Finna</span></div></div></div>
+  <div class="scrim"></div>
+  <div class="kb">keyboard</div>
+  <div class="sheet up"><div class="grab"></div><span class="x"></span>
+    <p class="back"><u>Back</u></p>
+    <p class="t">New list</p><p class="ctx">Sinuhe egyptiläinen goes on it</p>
+    <div class="fld"><label>Name</label><div class="in"><span>Joululahjat<span class="caret"></span></span></div></div>
+    <span class="bt pr full">Add</span>
+  </div>
+</div><p class="cap">After New list, same sheet: name, then Add. Back returns to the rows (or to the empty state).</p></div>
+
+<div><div class="fr desk L">
+  <div class="ans"><p class="hd">Not in library</p>
+    <div class="bk"><i class="c1"></i><div><b>Sinuhe egyptiläinen</b><span>Mika Waltari</span><span>From Finna</span></div></div></div>
+  <div class="scrim"></div>
+  <div class="dlg"><p class="back"><u>Back</u></p><p class="t">New list</p><p class="ctx">Sinuhe egyptiläinen goes on it</p>
+    <div class="fld"><label>Name</label><div class="in"><span>Antikvariaatti</span></div><p class="err">Name already in use.</p></div>
+    <div class="foot"><span class="bt">Cancel</span><span class="bt pr">Add</span></div></div>
+</div><p class="cap">Wide, the name step in the dialog, with a taken name rejected under the field.</p></div>
+</div>
+
+<!-- ============ C ============ -->
+<h2>C · Name prefilled with "Wishlist"</h2>
+<p class="why">A's field, but with no lists it opens <strong>prefilled with "Wishlist"</strong> ("Toivelista") and all of it selected, so <strong>Add</strong> is the one tap, and typing replaces the name. With lists it is exactly A, with an empty field. <strong>Fastest in the shop</strong> (two taps, no keyboard), and a first list with a plain name; it can be renamed later on the list. The risk: a list named by default stays "Wishlist" for good.</p>
+<div class="set">
+<div><div class="fr ph L">
+  <div class="ans"><p class="hd">Not in library</p>
+    <div class="bk"><i class="c1"></i><div><b>Sinuhe egyptiläinen</b><span>Mika Waltari</span><span>From Finna</span></div></div>
+    <div class="btns"><span class="bt">Add to wishlist</span><span class="bt pr">Add to library</span></div></div>
+  <div class="scrim"></div>
+  <div class="sheet"><div class="grab"></div><span class="x"></span>
+    <p class="t">Add to wishlist</p><p class="ctx">Sinuhe egyptiläinen</p>
+    <div class="fld"><label>New list</label><div class="in"><span style="background:#F0604F33">Wishlist</span></div></div>
+    <span class="bt pr full">Add</span>
+  </div>
+</div><p class="cap">Phone, no lists: the name is selected, the keyboard stays down until the field is tapped. Add saves to "Wishlist".</p></div>
+
+<div><div class="fr desk L">
+  <div class="ans"><p class="hd">Not in library</p>
+    <div class="bk"><i class="c1"></i><div><b>Sinuhe egyptiläinen</b><span>Mika Waltari</span><span>From Finna</span></div></div></div>
+  <div class="scrim"></div>
+  <div class="dlg"><p class="t">Add to wishlist</p><p class="ctx">Sinuhe egyptiläinen</p>
+    <div class="fld"><label>New list</label><div class="in"><span style="background:#F0604F33">Wishlist</span></div></div>
+    <div class="foot"><span class="bt">Cancel</span><span class="bt pr">Add</span></div></div>
+</div><p class="cap">Wide, no lists: Enter adds.</p></div>
+</div>
+
+<!-- ============ After ============ -->
+<h2>After, the same for A, B and C</h2>
+<p class="why">From the Answer the save returns to Scan; from Book detail the overlay closes and Book detail stays. The toast is the one every option shares. Undo removes the entry; the list made on the way stays.</p>
+<div class="after">
+<div class="card fr L"><p class="t" style="color:var(--mu)">Scan</p>
+  <div class="toast"><span>Added to Joululahjat</span><u>Undo</u><span>✕</span></div></div>
+<div class="card fr D"><p class="t" style="color:var(--mu)">Scan</p>
+  <div class="toast"><span>Added to Joululahjat</span><u>Undo</u><span>✕</span></div></div>
+</div>
+
+</main></body></html>
