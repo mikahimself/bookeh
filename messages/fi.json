@@ -88,7 +88,9 @@
     "stillNotFound": "Ei vieläkään löytynyt.",
     "noAnswer": "{count, plural, one {{sources} ei vastannut.} other {{sources} eivät vastanneet.}}",
     "lent": "Lainattu: {person}",
-    "returned": "Palautettu"
+    "returned": "Palautettu",
+    "bought": "Ostettu",
+    "ordered": "Tilattu"
   },
   "sections": {
     "label": "Osiot",
@@ -338,7 +340,11 @@
     "deleteBody": "Lista ja sen kirjat poistuvat.",
     "onList": "Listalla {list}",
     "for": "Kenelle",
-    "notOnList": "Ei tällä listalla"
+    "notOnList": "Ei tällä listalla",
+    "bought": "Ostettu",
+    "ordered": "Tilattu",
+    "remove": "Poista",
+    "removeTitle": "Poistetaanko listalta <typed>{list}</typed>?"
   },
   "progress": {
     "loading": "Ladataan"

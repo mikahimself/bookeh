@@ -11,6 +11,7 @@ import { getWishlist, type ListEntry, type WishlistView } from '@/lib/wishlists/
 
 import { BackLink } from '../../../components/Link'
 import { LoadFailed } from '../../LoadFailed'
+import { RefreshOnUndo } from '../../RefreshOnUndo'
 
 import { EntryDetail } from './EntryDetail'
 import { EntryRow } from './EntryRow'
@@ -54,7 +55,10 @@ async function load(ctx: Context, id: number): Promise<Loaded | null> {
  * Entry opened; FR-38, UX-DR49), that entry opens (`EntryDetail`) beside the
  * list from 900px and as the sheet on the phone, closing back to the list,
  * with the viewer's People by name (`personUse()`; the entry's recipient
- * alone when that read fails) for its "For". The match is by entry id, never
+ * alone when that read fails) for its "For". Its Bought, Ordered and Remove
+ * close the layer onto a freshly rendered list without the entry; with the
+ * list loaded, `RefreshOnUndo` re-renders it after a toast Undo, so an undone
+ * Bought or Ordered brings the entry back. The match is by entry id, never
  * by Book, so one Book twice opens each entry as itself. An `entry` that names no loaded row (not
  * digits, closed, removed, another list's, another user's, Book unreadable)
  * shows the list alone and "Not on this list" (`NotOnList`; EXPERIENCE.md,
@@ -107,6 +111,7 @@ export default async function WishlistPage({
         <LoadFailed />
       ) : (
         <div className="wide:flex wide:flex-1 wide:gap-6">
+          <RefreshOnUndo />
           <section tabIndex={-1} className="min-w-0 flex-1">
             <ListHeading id={loaded.list.id} name={loaded.list.name} count={loaded.rows.length} />
             {loaded.rows.length === 0 ? (

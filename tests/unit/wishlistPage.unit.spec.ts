@@ -21,6 +21,8 @@ import type { WishlistView } from '@/lib/wishlists/wishlists'
 // Wishlists → Entry opened, States → Entry gone; FR-38, UX-DR49: `?entry=`
 // opens that entry, never another of its Book's; "For" saves at once; an id
 // that names no open entry of this list toasts "Not on this list".
+// FR-28: Bought and Ordered toast by outcome with Undo and land on a fresh
+// list; Remove confirms, toasts nothing and lands; a toast Undo refreshes.
 
 const router = { replace: vi.fn(), refresh: vi.fn(), push: vi.fn(), back: vi.fn() }
 const getWishlist = vi.fn<(ctx: unknown, id: number) => Promise<WishlistView | null>>()
@@ -29,6 +31,9 @@ const getEffectiveBooks =
 const deleteWishlistAction = vi.fn()
 const renameWishlistAction = vi.fn()
 const setEntryRecipientAction = vi.fn()
+const closeEntryAction = vi.fn()
+const removeEntryAction = vi.fn()
+const onUndone = vi.fn((_listener: () => void) => () => {})
 const personUse = vi.fn<(ctx: unknown) => Promise<PersonUse[]>>()
 const showToast = vi.fn()
 const logError = vi.fn()
@@ -98,9 +103,11 @@ vi.mock('@/app/(frontend)/actions/wishlists', () => ({
   renameWishlistAction,
   deleteWishlistAction,
   setEntryRecipientAction,
+  closeEntryAction,
+  removeEntryAction,
 }))
 vi.mock('@/app/(frontend)/components/toast/ToastProvider', () => ({
-  useToast: () => ({ show: showToast, dismiss: vi.fn(), withdraw: vi.fn() }),
+  useToast: () => ({ show: showToast, dismiss: vi.fn(), withdraw: vi.fn(), onUndone }),
 }))
 
 const { installNavigationTracking } = await import('@/app/(frontend)/components/navigation')
@@ -164,12 +171,15 @@ const christmas: WishlistView = {
   ],
 }
 
+// The phone unless a case widens the screen.
+let wide = false
+
 describe('One wishlist', () => {
   beforeEach(() => {
     window.history.pushState({ page: 'list' }, '', '/wishlists/7')
     vi.stubGlobal('matchMedia', (query: string) => ({
       media: query,
-      matches: false,
+      matches: wide,
       addEventListener: () => {},
       removeEventListener: () => {},
     }))
@@ -383,6 +393,114 @@ describe('One wishlist', () => {
       expect(within(sheet).getByRole('link', { name: 'Sofi Oksanen' }).getAttribute('href')).toBe(
         '/?author=3',
       )
+    })
+
+    describe('Bought, Ordered and Remove', () => {
+      const hylly = { id: 4, name: 'Hylly' }
+      const sheet = () => screen.findByRole('dialog', { name: 'Puhdistus' })
+      const landed = () =>
+        waitFor(() =>
+          expect(router.replace).toHaveBeenCalledWith('/wishlists/7', { scroll: false }),
+        )
+
+      it.each([
+        ['13', 'Bought', 'bought', { copyId: 30, savedTo: hylly }, 'Saved to Hylly'],
+        ['13', 'Bought', 'bought', { copyId: 30, savedTo: null }, 'Saved'],
+        ['12', 'Bought', 'bought', { copyId: null, savedTo: null }, 'Bought'],
+        ['13', 'Ordered', 'ordered', { copyId: 31, savedTo: null }, 'Ordered'],
+      ])(
+        'entry %s, %s: toasts by outcome with Undo and lands on the list',
+        async (entry, button, as, data, message) => {
+          closeEntryAction.mockResolvedValue({
+            ok: true,
+            data: { ...data, undoToken: 'u1', undoSeconds: 10 },
+          })
+          await renderPage('7', { entry })
+          fireEvent.click(within(await sheet()).getByRole('button', { name: button }))
+
+          await landed()
+          expect(closeEntryAction).toHaveBeenCalledExactlyOnceWith(Number(entry), as)
+          expect(showToast).toHaveBeenCalledExactlyOnceWith({
+            kind: 'success',
+            message,
+            undo: { token: 'u1', seconds: 10 },
+          })
+          expect(router.refresh).not.toHaveBeenCalled()
+        },
+      )
+
+      it('refreshes with no success toast on NOT_FOUND; stays open and reports INTERNAL', async () => {
+        closeEntryAction.mockResolvedValueOnce({ ok: false, code: 'NOT_FOUND' })
+        await renderPage('7', { entry: '13' })
+        const opened = await sheet()
+        fireEvent.click(within(opened).getByRole('button', { name: 'Bought' }))
+        await waitFor(() => expect(router.refresh).toHaveBeenCalledOnce())
+        expect(showToast).not.toHaveBeenCalled()
+
+        closeEntryAction.mockResolvedValueOnce({ ok: false, code: 'INTERNAL' })
+        fireEvent.click(within(opened).getByRole('button', { name: 'Bought' }))
+        await waitFor(() =>
+          expect(showToast).toHaveBeenCalledExactlyOnceWith({ kind: 'error', code: 'INTERNAL' }),
+        )
+        expect(router.refresh).toHaveBeenCalledOnce()
+        expect(router.replace).not.toHaveBeenCalled()
+        expect(router.back).not.toHaveBeenCalled()
+        expect(screen.getByRole('dialog', { name: 'Puhdistus' })).toBe(opened)
+      })
+
+      it('Remove asks first: Cancel calls nothing, confirm removes with no toast and lands', async () => {
+        removeEntryAction.mockResolvedValue({ ok: true, data: null })
+        await renderPage('7', { entry: '13' })
+        const opened = await sheet()
+
+        fireEvent.click(within(opened).getByRole('button', { name: 'Remove' }))
+        const ask = await screen.findByRole('dialog', { name: 'Remove from Christmas list?' })
+        fireEvent.click(within(ask).getByRole('button', { name: 'Cancel' }))
+        await waitFor(() =>
+          expect(screen.queryByRole('dialog', { name: 'Remove from Christmas list?' })).toBeNull(),
+        )
+        expect(removeEntryAction).not.toHaveBeenCalled()
+
+        fireEvent.click(within(opened).getByRole('button', { name: 'Remove' }))
+        const again = await screen.findByRole('dialog', { name: 'Remove from Christmas list?' })
+        fireEvent.click(within(again).getByRole('button', { name: 'Remove' }))
+
+        await landed()
+        expect(removeEntryAction).toHaveBeenCalledExactlyOnceWith(13)
+        expect(showToast).not.toHaveBeenCalled()
+      })
+
+      it('refreshes after a toast Undo', async () => {
+        await renderPage('7', { entry: '13' })
+        await sheet()
+        const listener = onUndone.mock.calls.at(-1)?.[0]
+        expect(listener).toBeDefined()
+        act(() => listener?.())
+        await waitFor(() => expect(router.refresh).toHaveBeenCalledOnce())
+      })
+
+      describe('at 1300px', () => {
+        beforeEach(() => {
+          wide = true
+        })
+
+        afterEach(() => {
+          wide = false
+        })
+
+        it('Bought closes the panel and lands on the list', async () => {
+          closeEntryAction.mockResolvedValue({
+            ok: true,
+            data: { copyId: 30, savedTo: hylly, undoToken: 'u1', undoSeconds: 10 },
+          })
+          await renderPage('7', { entry: '13' })
+          const aside = await screen.findByRole('complementary', { name: 'Puhdistus' })
+          fireEvent.click(within(aside).getByRole('button', { name: 'Bought' }))
+
+          await landed()
+          expect(router.refresh).not.toHaveBeenCalled()
+        })
+      })
     })
   })
 })

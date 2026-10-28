@@ -6,6 +6,7 @@ import type { ListEntry } from '@/lib/wishlists/wishlists'
 import { BookDetailFrame } from '../../BookDetailPanel'
 import { BookHeader } from '../../BookHeader'
 
+import { EntryActions } from './EntryActions'
 import { EntryFor } from './EntryFor'
 
 /**
@@ -13,8 +14,9 @@ import { EntryFor } from './EntryFor'
  * in Book detail's frame: the bottom sheet on the phone, the panel beside the
  * list from 900px, closing back to the list. The Book's header
  * (`BookHeader`), "On {list}" with the name as typed, and "For" (`EntryFor`)
- * over the viewer's `people`. Not Book detail: no read switch, copies, genres
- * or foot.
+ * over the viewer's `people`, then the Buttons Bought (the one primary),
+ * Ordered and Remove (`EntryActions`), each closing back to a fresh list. Not
+ * Book detail: no read switch, copies, genres or foot.
  */
 export async function EntryDetail({
   listId,
@@ -30,8 +32,9 @@ export async function EntryDetail({
   people: Named[]
 }) {
   const t = await getTranslations('wishlists')
+  const back = `/wishlists/${listId}`
   return (
-    <BookDetailFrame label={book.title} back={`/wishlists/${listId}`} openId={entry.entryId}>
+    <BookDetailFrame label={book.title} back={back} openId={entry.entryId}>
       <div className="flex flex-col gap-6">
         <BookHeader book={book}>
           <p className="text-meta text-text-muted">{t('onList', { list: listName })}</p>
@@ -42,6 +45,7 @@ export async function EntryDetail({
           people={people}
           initial={entry.forPerson?.id ?? null}
         />
+        <EntryActions entryId={entry.entryId} listName={listName} back={back} />
       </div>
     </BookDetailFrame>
   )

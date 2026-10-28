@@ -26,7 +26,9 @@ import { DetailCloseContext } from './detailClose'
  * A Filter chip inside closes it the same way and lands on the chip's
  * address instead (`useSheetChip`): the leave goes back, then replaces the
  * entry it reached, so Back afterwards reopens neither the Book nor the
- * unfiltered list.
+ * unfiltered list. `useCloseDetail(to)` lands the same way (an opened
+ * entry's Bought, Ordered or Remove: the replace renders the list afresh,
+ * where a history restore would show the cached one with the entry).
  */
 export function BookDetailSheet({
   label,
@@ -39,15 +41,21 @@ export function BookDetailSheet({
 }) {
   const [open, setOpen] = useState(false)
   const leave = useTaskBack(back, true)
-  /** Where a chip asked the close to land; `undefined` for X, Esc, the scrim or a drag. */
+  /**
+   * Where a chip or `useCloseDetail(to)` asked the close to land; `undefined`
+   * for X, Esc, the scrim, a drag or `useCloseDetail()`.
+   */
   const landing = useRef<string | undefined>(undefined)
   const chip = useCallback((href: string) => {
     landing.current = href
     setOpen(false)
   }, [])
-  /** `useCloseDetail()`: as X does, landing on the collection without `book`. */
-  const close = useCallback(() => {
-    landing.current = undefined
+  /**
+   * `useCloseDetail()`: as X does, landing on the collection without `book`;
+   * with `to`, as a chip does, landing on `to`.
+   */
+  const close = useCallback((to?: string) => {
+    landing.current = to
     setOpen(false)
   }, [])
 

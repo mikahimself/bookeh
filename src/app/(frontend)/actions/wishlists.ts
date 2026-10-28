@@ -3,7 +3,13 @@
 import { DomainError, runAction, type ActionResult } from '@/lib/errors'
 import { requireUserOrThrow } from '@/lib/payload/context'
 import { isRowId, type Ref } from '@/lib/payload/ref'
-import { setEntryRecipient } from '@/lib/wishlists/entries'
+import { withUndo, type Undoable } from '@/lib/undo/undo'
+import {
+  closeEntry,
+  removeEntry,
+  setEntryRecipient,
+  type ClosedEntry,
+} from '@/lib/wishlists/entries'
 import { createWishlist, deleteWishlist, renameWishlist } from '@/lib/wishlists/wishlists'
 
 import { parseRef } from '../ref'
@@ -13,7 +19,8 @@ import { parseRef } from '../ref'
 // id a row id (`isRowId()`) and a recipient `null` or a `Ref` (`parseRef()`),
 // else `VALIDATION` with no write. Normalising, the blank and length checks,
 // resolving a Person and ownership are `lib/wishlists`'s. The client
-// refreshes or navigates on success; no Undo, no toast.
+// refreshes or navigates on success. Bought and Ordered are undoable (AD-20)
+// and toast; everything else, Remove included, has no Undo and no toast.
 
 const name = (value: unknown): string => {
   if (typeof value !== 'string') throw new DomainError('VALIDATION')
@@ -79,5 +86,42 @@ export async function setEntryRecipientAction(
     const entryId = id(entry)
     const ref = recipient(person)
     return setEntryRecipient(ctx, entryId, ref)
+  })
+}
+
+/** How an entry closes: Bought or Ordered. */
+const closing = (value: unknown): 'bought' | 'ordered' => {
+  if (value !== 'bought' && value !== 'ordered') throw new DomainError('VALIDATION')
+  return value
+}
+
+/**
+ * FR-28: Bought or Ordered on one of the viewer's open entries, with Undo.
+ * The viewer's own entry gets an owned copy at the default location (Bought)
+ * or an ordered copy (Ordered); a Person's entry gets none (`copyId` null).
+ * An entry that is gone, closed or another user's fails `NOT_FOUND`.
+ */
+export async function closeEntryAction(
+  entry: unknown,
+  as: unknown,
+): Promise<ActionResult<Undoable<ClosedEntry>>> {
+  return runAction(async () => {
+    const ctx = await requireUserOrThrow()
+    const entryId = id(entry)
+    const how = closing(as)
+    return withUndo(ctx, (tx) => closeEntry(tx, entryId, how))
+  })
+}
+
+/**
+ * Remove, confirmed by the client: deletes one of the viewer's open entries;
+ * the Book stays. No Undo. An entry that is gone, closed or another user's
+ * fails `NOT_FOUND`.
+ */
+export async function removeEntryAction(entry: unknown): Promise<ActionResult<null>> {
+  return runAction(async () => {
+    const ctx = await requireUserOrThrow()
+    await removeEntry(ctx, id(entry))
+    return null
   })
 }

@@ -50,7 +50,9 @@ const inField = (target: EventTarget | null): boolean =>
  * place and scrolls it to the top.
  * It grows in on mount (`panel-motion`); X, `Esc` anywhere outside a field
  * or a dialog, or `useCloseDetail()` (removing the last copy) shrinks it
- * away, then leaves the address as the sheet's close does.
+ * away, then leaves the address as the sheet's close does;
+ * `useCloseDetail(to)` (an opened entry's Bought, Ordered or Remove) lands
+ * on `to` instead, replacing, so the list renders afresh.
  * The leave waits on the frame's running transitions, so it goes at once
  * when there are none (reduce motion); focus inside the panel moves to the
  * open Book's (or entry's) row or tile first. A new one during the close
@@ -62,11 +64,17 @@ function BookDetailPanel({ label, back, openId, children }: FrameProps) {
   const frame = useRef<HTMLDivElement>(null)
   const content = useRef<HTMLDivElement>(null)
   const [leaving, setLeaving] = useState(false)
+  /** Where `useCloseDetail(to)` asked the leave to land; `undefined` for X, `Esc` or `useCloseDetail()`. */
+  const landing = useRef<string | undefined>(undefined)
   const [shown, setShown] = useState(openId)
   if (openId !== shown) {
     setShown(openId)
     setLeaving(false)
   }
+
+  useEffect(() => {
+    landing.current = undefined
+  }, [openId])
 
   useEffect(() => {
     if (content.current) content.current.scrollTop = 0
@@ -82,6 +90,7 @@ function BookDetailPanel({ label, back, openId, children }: FrameProps) {
       ) {
         // Taken here: select mode's `Esc` stays for the next press.
         event.preventDefault()
+        landing.current = undefined
         setLeaving(true)
       }
     }
@@ -103,14 +112,18 @@ function BookDetailPanel({ label, back, openId, children }: FrameProps) {
           .querySelector<HTMLElement>('a[aria-current="true"]')
           ?.focus({ preventScroll: true })
       }
-      leave()
+      leave(landing.current)
     })
     return () => {
       current = false
     }
   }, [leaving, leave])
 
-  const close = useCallback(() => setLeaving(true), [])
+  /** X and `useCloseDetail()` leave as `Esc` does; `useCloseDetail(to)` lands on `to`. */
+  const close = useCallback((to?: string) => {
+    landing.current = to
+    setLeaving(true)
+  }, [])
 
   return (
     <div
@@ -124,7 +137,7 @@ function BookDetailPanel({ label, back, openId, children }: FrameProps) {
       >
         <div className="sticky top-0 flex max-h-dvh flex-col">
           <div className="flex shrink-0 justify-end px-4 pt-3">
-            <CloseButton label={t('close')} onClick={close} />
+            <CloseButton label={t('close')} onClick={() => close()} />
           </div>
           <div ref={content} className="min-h-0 flex-1 overflow-y-auto px-6 pt-1 pb-6">
             <DetailCloseContext value={close}>{children}</DetailCloseContext>

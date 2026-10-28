@@ -88,7 +88,9 @@
     "stillNotFound": "Still not found.",
     "noAnswer": "{sources} didn't answer.",
     "lent": "Lent to {person}",
-    "returned": "Returned"
+    "returned": "Returned",
+    "bought": "Bought",
+    "ordered": "Ordered"
   },
   "sections": {
     "label": "Sections",
@@ -338,7 +340,11 @@
     "deleteBody": "The list and its entries go.",
     "onList": "On {list}",
     "for": "For",
-    "notOnList": "Not on this list"
+    "notOnList": "Not on this list",
+    "bought": "Bought",
+    "ordered": "Ordered",
+    "remove": "Remove",
+    "removeTitle": "Remove from <typed>{list}</typed>?"
   },
   "progress": {
     "loading": "Loading"

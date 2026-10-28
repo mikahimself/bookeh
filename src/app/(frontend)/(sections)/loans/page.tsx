@@ -13,11 +13,11 @@ import { devicePrefs } from '../../prefs'
 import { BookDetail } from '../BookDetail'
 import { ReturnLoan } from '../CopyLine'
 import { LoadFailed } from '../LoadFailed'
+import { RefreshOnUndo } from '../RefreshOnUndo'
 import { ShelfActionsProvider } from '../ShelfRows'
 
 import { LoanRow } from './LoanRow'
 import { LoansOrder } from './LoansOrder'
-import { RefreshOnUndo } from './RefreshOnUndo'
 
 type LoanItem = { loan: OpenLoan; book: EffectiveBook }
 type ReturnedItem = { loan: ReturnedLoan; book: EffectiveBook }
