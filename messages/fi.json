@@ -335,7 +335,10 @@
     "emptyList": "Tällä listalla ei ole mitään.",
     "forPerson": "Kenelle: {person}",
     "deleteTitle": "Poistetaanko <typed>{name}</typed>?",
-    "deleteBody": "Lista ja sen kirjat poistuvat."
+    "deleteBody": "Lista ja sen kirjat poistuvat.",
+    "onList": "Listalla {list}",
+    "for": "Kenelle",
+    "notOnList": "Ei tällä listalla"
   },
   "progress": {
     "loading": "Ladataan"

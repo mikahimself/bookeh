@@ -1,10 +1,8 @@
 import Link from 'next/link'
-import { getFormatter, getLocale, getTranslations } from 'next-intl/server'
-import { Fragment, type ReactNode } from 'react'
+import { getFormatter, getTranslations } from 'next-intl/server'
 
 import { canEditShared } from '@/access/roles'
 import { getHoldings } from '@/lib/books/holdings'
-import { languageName } from '@/lib/books/languageName'
 import { getUserBookState } from '@/lib/books/userBookState'
 import type { LocationOption } from '@/lib/copies/locations'
 import { logger } from '@/lib/errors'
@@ -14,11 +12,11 @@ import type { Context } from '@/lib/payload/context'
 import { lendingPeople } from '@/lib/people/people'
 
 import { buttonClass } from '../components/Button'
-import { Cover } from '../components/Cover'
 import { markerSlotClass } from '../components/ui/classes'
 import { heldBook } from '../heldBook'
 
 import { BookDetailFrame } from './BookDetailPanel'
+import { BookHeader, joined } from './BookHeader'
 import { CopyNote, LendCopy, MoveCopy, ReceiveCopy, RemoveCopy, ReturnLoan } from './CopyLine'
 import { FilterChip } from './FilterChip'
 import { DetailLookUpAgain } from './LookUpAgain'
@@ -30,8 +28,7 @@ const DOT = ' · '
 
 /**
  * Book detail (EXPERIENCE.md, Book detail; DESIGN.md, Detail panel): the
- * header (cover beside the title, then authors, series and number, and the
- * edition line, each left out when empty), the read switch and Rating (keyed
+ * header (`BookHeader`), the read switch and Rating (keyed
  * by the Book, so swapping it resets them), Your copies, one line per copy
  * with its location and status and the copy's note under it (`CopyLine`):
  * an owned copy's Lend, Move and Remove (Move only when the viewer has
@@ -41,8 +38,8 @@ const DOT = ' · '
  * has system genres, the admin's Re-fetch on a shared Book (`Refetch`,
  * `canEditShared`) or, in its place on a private Book, Look it up again
  * (`DetailLookUpAgain`; without an ISBN a muted line pointing to Edit book),
- * and the foot with Edit. Each author, the series, each
- * genre and each copy's location is a Filter chip (`FilterChip`) that adds
+ * and the foot with Edit. Each genre and each copy's location, like the
+ * header's authors and series, is a Filter chip (`FilterChip`) that adds
  * it to the current filters; an ordered copy has no location and so no
  * chip. The one component later groups are added to; it reads the Book, the
  * viewer's copies and their read flag and rating only, never the client
@@ -91,47 +88,11 @@ export async function BookDetail({
   const format = await getFormatter()
   const day = (date: string) =>
     format.dateTime(new Date(`${date}T12:00:00Z`), { dateStyle: 'medium' })
-  const edition = [
-    book.publisher,
-    book.year === null ? null : String(book.year),
-    book.pages === null ? null : t('answer.pages', { pages: book.pages }),
-    book.language === null ? null : languageName(book.language, await getLocale()),
-  ]
-    .filter((part) => part)
-    .join(' · ')
 
   return (
-    <BookDetailFrame label={book.title} back={back} bookId={bookId}>
+    <BookDetailFrame label={book.title} back={back} openId={bookId}>
       <div className="flex flex-col gap-6">
-        <div className="flex items-start gap-4">
-          <div className="w-cover-detail shrink-0">
-            <Cover src={book.coverUrl} title={book.title} language={book.language} />
-          </div>
-          <div className="flex min-w-0 flex-col gap-1">
-            <h2 className="text-heading-detail break-words text-text">{book.title}</h2>
-            {book.authors.length > 0 && (
-              <p className="text-body text-text">
-                {joined(
-                  book.authors.map(({ id, name }) => (
-                    <FilterChip key={id} field="author" id={id}>
-                      {name}
-                    </FilterChip>
-                  )),
-                  ', ',
-                )}
-              </p>
-            )}
-            {book.series && (
-              <p className="text-body text-text">
-                <FilterChip field="series" id={book.series.id}>
-                  {book.series.name}
-                </FilterChip>
-                {book.seriesIndex !== null && ` ${book.seriesIndex}`}
-              </p>
-            )}
-            {edition && <p className="text-meta text-text-muted">{edition}</p>}
-          </div>
-        </div>
+        <BookHeader book={book} />
         <ReadAndRating key={bookId} bookId={bookId} initial={state} />
         {/* Focus lands here when a copy's line goes or changes (`RemoveCopy`, `ReceiveCopy`, `MoveCopy`, `LendCopy`, `ReturnLoan`). */}
         <section tabIndex={-1} className="flex flex-col gap-2">
@@ -247,14 +208,4 @@ export async function BookDetail({
       </div>
     </BookDetailFrame>
   )
-}
-
-/** `items` with `separator` as plain text between each two. */
-function joined(items: ReactNode[], separator: string): ReactNode[] {
-  return items.map((item, index) => (
-    <Fragment key={index}>
-      {index > 0 && separator}
-      {item}
-    </Fragment>
-  ))
 }

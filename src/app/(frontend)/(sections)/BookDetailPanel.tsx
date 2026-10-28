@@ -13,17 +13,18 @@ import { DetailCloseContext } from './detailClose'
 type FrameProps = {
   /** The Book's title: names the sheet or the panel. */
   label: string
-  /** The section's address without `book`: where closing lands. */
+  /** The section's address without `book` or `entry`: where closing lands. */
   back: string
-  bookId: number
+  /** The open Book's or entry's id: a new one swaps the content in place and scrolls it to the top. */
+  openId: number
   children: ReactNode
 }
 
-/** Book detail's frame: the panel from 900px, the bottom sheet under it. */
-export function BookDetailFrame({ label, back, bookId, children }: FrameProps) {
+/** Book detail's frame, also the opened wishlist entry's: the panel from 900px, the bottom sheet under it. */
+export function BookDetailFrame({ label, back, openId, children }: FrameProps) {
   const wide = useWide()
   return wide ? (
-    <BookDetailPanel label={label} back={back} bookId={bookId}>
+    <BookDetailPanel label={label} back={back} openId={openId}>
       {children}
     </BookDetailPanel>
   ) : (
@@ -44,30 +45,32 @@ const inField = (target: EventTarget | null): boolean =>
  * panel): the last column of the collection's row, flush with the screen's
  * right edge, its content in view while the list scrolls. Plain layout, not
  * an overlay: the list stays operable beside it, so there is no scrim, no
- * focus trap and nothing made inert. `?book=` is the open state, as with the
- * sheet: a new `bookId` swaps the content in place and scrolls it to the top.
+ * focus trap and nothing made inert. `?book=` (or a wishlist's `?entry=`) is
+ * the open state, as with the sheet: a new `openId` swaps the content in
+ * place and scrolls it to the top.
  * It grows in on mount (`panel-motion`); X, `Esc` anywhere outside a field
  * or a dialog, or `useCloseDetail()` (removing the last copy) shrinks it
  * away, then leaves the address as the sheet's close does.
  * The leave waits on the frame's running transitions, so it goes at once
  * when there are none (reduce motion); focus inside the panel moves to the
- * open Book's row or tile first. A new Book during the close keeps it open.
+ * open Book's (or entry's) row or tile first. A new one during the close
+ * keeps it open.
  */
-function BookDetailPanel({ label, back, bookId, children }: FrameProps) {
+function BookDetailPanel({ label, back, openId, children }: FrameProps) {
   const t = useTranslations('overlay')
   const leave = useTaskBack(back, true)
   const frame = useRef<HTMLDivElement>(null)
   const content = useRef<HTMLDivElement>(null)
   const [leaving, setLeaving] = useState(false)
-  const [shown, setShown] = useState(bookId)
-  if (bookId !== shown) {
-    setShown(bookId)
+  const [shown, setShown] = useState(openId)
+  if (openId !== shown) {
+    setShown(openId)
     setLeaving(false)
   }
 
   useEffect(() => {
     if (content.current) content.current.scrollTop = 0
-  }, [bookId])
+  }, [openId])
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {

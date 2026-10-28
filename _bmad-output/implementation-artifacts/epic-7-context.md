@@ -44,7 +44,7 @@ Mika keeps several named, private wishlists of Books he doesn't own yet. He adds
 - **`saveEntry`** lives in `lib/catalogue` and takes `save: { kind: 'entry', wishlist: Ref }`. It returns `EntrySaveResult` (`bookId`, `entryId`, `savedTo`: the list, never null); `saveCopy` returns `SaveResult` (`bookId`, `copyId`, `savedTo`: the location or null). It follows the same target kinds (`isbn13` / `bookId` / `manual`), held-outcome rule and single-transaction rule as `saveCopy`. A repeated `requestId` returns the first result only for the same user and the same kind of save.
 - **Imports:** `catalogue` may import `wishlists`, and `wishlists` may import `copies` and `people`. No other new import directions.
 - **Private-Book merge:** when a save or Look it up again merges the user's private Book into an existing shared Book, `moveEntriesToBook()` in `lib/wishlists` moves the user's entries to the shared Book first.
-- **`lib/wishlists` surface (complete for this epic):** `resolveWishlist`, `createWishlist`, rename, delete; `createEntry`, `closeEntriesForBook`, `closeEntry`, `moveEntriesToBook`, `setEntryRecipient`, `removeEntry`. The screen stories (7.10–7.15) call these through server actions and add no new writers.
+- **`lib/wishlists` surface (complete for this epic):** writers `resolveWishlist`, `createWishlist`, rename, delete; `createEntry`, `closeEntriesForBook`, `closeEntry`, `moveEntriesToBook`, `setEntryRecipient`, `removeEntry`. Readers: `listWishlists(ctx)` returns `WishlistLine[]` (`Named & { count }`, the viewer's lists by name, count = open entries); `getWishlist(ctx, id)` returns `WishlistView` (`Named & { entries: ListEntry[] }`, open entries newest first, each `{ entryId, bookId, forPerson: Named | null }`), or null when the list is not the viewer's. The screen stories call these through server actions and add no new writers.
 - **People use count:** `personUse()` returns `PersonUse` with `loans` and `entries`, both counting open and closed rows.
 - **Holdings and access:** `Holdings.entries` holds the viewer's own open entries only, as `EntryLine` (`entryId`, `wishlist`, `forPerson`). `requireOwnBook()` passes for a Book held only through an open entry. `setRead()` and `changeTags()` work for a Book that is only on a wishlist. A save's restore deletes a `user-books` row it created only when the user has no other copy or entry for that Book.
 - **Lists that are not copies** (a wishlist) load their Books through `getEffectiveBooks()` and don't sort or filter on Book fields. A wishlist's count is its open entries.
@@ -64,7 +64,7 @@ Mika keeps several named, private wishlists of Books he doesn't own yet. He adds
 
 ## Cross-Story Dependencies
 
-- Order: 7.1 → 7.2 → 7.3 / 7.4 → 7.5 → 7.6–7.9 (services) → 7.10–7.15 (screens). Stories 7.1–7.9 (all schema and service stories) are done; the screens remain.
+- Order: 7.1 → 7.2 → 7.3 / 7.4 → 7.5 → 7.6–7.9 (services) → 7.10–7.15 (screens). Stories 7.1–7.11 are done (all schema and service stories, the Wishlists section and One wishlist); 7.12–7.15 remain.
 - 7.8 and 7.13 need `createCopy` and the default location. 7.9 and 7.12 use `lib/people` and the Person combobox from Epic 6. 7.12 and 7.13 build on 7.11, and 7.14 builds on 7.6.
 - 7.15 builds on 7.3 and takes over 7.3's hand-off: `RemoveCopy`'s `last` must count open entries too.
 - The screens reuse Epic 5's Book detail content, sheet/panel, Book row and Filter chip, and Epic 6's Picker wrappers.

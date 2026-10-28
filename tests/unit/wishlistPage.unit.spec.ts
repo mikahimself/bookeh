@@ -1,22 +1,36 @@
 // @vitest-environment jsdom
-import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
-import type { ReactElement } from 'react'
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
+import {
+  cloneElement,
+  createElement,
+  isValidElement,
+  type ComponentProps,
+  type ReactElement,
+  type ReactNode,
+} from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import type { EffectiveBook } from '@/lib/books/effectiveBook'
+import type { PersonUse } from '@/lib/people/people'
 import type { WishlistView } from '@/lib/wishlists/wishlists'
 
 // EXPERIENCE.md, Wishlists and States; FR-38, FR-39, FR-48: one list under a
 // Back link, its name as typed as the `h1`; a row per open entry with "For
 // {person}" only when it has a recipient; "Nothing on this list."; Load
 // failed; a foreign or bad id redirects; Delete confirms, deletes and leaves.
+// Wishlists → Entry opened, States → Entry gone; FR-38, UX-DR49: `?entry=`
+// opens that entry, never another of its Book's; "For" saves at once; an id
+// that names no open entry of this list toasts "Not on this list".
 
-const router = { replace: vi.fn(), refresh: vi.fn() }
+const router = { replace: vi.fn(), refresh: vi.fn(), push: vi.fn(), back: vi.fn() }
 const getWishlist = vi.fn<(ctx: unknown, id: number) => Promise<WishlistView | null>>()
 const getEffectiveBooks =
   vi.fn<(ctx: unknown, ids: readonly number[]) => Promise<Map<number, EffectiveBook>>>()
 const deleteWishlistAction = vi.fn()
 const renameWishlistAction = vi.fn()
+const setEntryRecipientAction = vi.fn()
+const personUse = vi.fn<(ctx: unknown) => Promise<PersonUse[]>>()
+const showToast = vi.fn()
 const logError = vi.fn()
 const redirect = vi.fn((href: string) => {
   throw new Error(`redirect ${href}`)
@@ -32,26 +46,61 @@ const english = async () => {
 vi.mock('next-intl', async (importOriginal) => ({
   ...(await importOriginal<typeof import('next-intl')>()),
   useTranslations: await english(),
+  useLocale: () => 'en',
 }))
 vi.mock('next-intl/server', async () => {
   const translator = await english()
-  return { getTranslations: async (namespace?: string) => translator(namespace) }
+  return {
+    getTranslations: async (namespace?: string) => translator(namespace),
+    getLocale: async () => 'en',
+  }
 })
 vi.mock('next/navigation', async (importOriginal) => ({
   ...(await importOriginal<typeof import('next/navigation')>()),
   useRouter: () => router,
+  usePathname: () => '/wishlists/7',
+  useSearchParams: () => new URLSearchParams(),
   redirect,
+}))
+vi.mock('next/link', () => ({
+  default: ({
+    href,
+    replace,
+    scroll,
+    prefetch: _prefetch,
+    transitionTypes: _transitionTypes,
+    onClick,
+    ...rest
+  }: ComponentProps<'a'> & {
+    href: string
+    replace?: boolean
+    scroll?: boolean
+    prefetch?: boolean
+    transitionTypes?: string[]
+  }) =>
+    createElement('a', {
+      ...rest,
+      href,
+      onClick: (event: Parameters<NonNullable<typeof onClick>>[0]) => {
+        onClick?.(event)
+        if (event.defaultPrevented) return
+        event.preventDefault()
+        router[replace ? 'replace' : 'push'](href, { scroll })
+      },
+    }),
 }))
 vi.mock('@/lib/payload/context', () => ({ requireUser: async () => ({ user: { id: 1 } }) }))
 vi.mock('@/lib/errors', () => ({ logger: () => ({ error: logError }) }))
 vi.mock('@/lib/wishlists/wishlists', () => ({ getWishlist }))
 vi.mock('@/lib/books/effectiveBook', () => ({ getEffectiveBooks }))
+vi.mock('@/lib/people/people', () => ({ personUse }))
 vi.mock('@/app/(frontend)/actions/wishlists', () => ({
   renameWishlistAction,
   deleteWishlistAction,
+  setEntryRecipientAction,
 }))
 vi.mock('@/app/(frontend)/components/toast/ToastProvider', () => ({
-  useToast: () => ({ show: vi.fn(), dismiss: vi.fn(), withdraw: vi.fn() }),
+  useToast: () => ({ show: showToast, dismiss: vi.fn(), withdraw: vi.fn() }),
 }))
 
 const { installNavigationTracking } = await import('@/app/(frontend)/components/navigation')
@@ -60,8 +109,30 @@ const { default: WishlistPage } =
 
 installNavigationTracking()
 
-const renderPage = async (listId = '7') =>
-  render((await WishlistPage({ params: Promise.resolve({ listId }) })) as ReactElement)
+/** The page's tree with its async server components awaited, as the server renderer does. */
+async function serverTree(node: ReactNode): Promise<ReactNode> {
+  if (Array.isArray(node)) return Promise.all(node.map(serverTree))
+  if (!isValidElement(node)) return node
+  const { type, props } = node as ReactElement<{ children?: ReactNode }>
+  if (typeof type === 'function' && type.constructor.name === 'AsyncFunction') {
+    return serverTree(await (type as (props: unknown) => Promise<ReactNode>)(props))
+  }
+  if (props.children === undefined) return node
+  const children = await serverTree(props.children)
+  return Array.isArray(children)
+    ? cloneElement(node, undefined, ...(children as ReactNode[]))
+    : cloneElement(node, undefined, children)
+}
+
+const renderPage = async (listId = '7', search: Record<string, string> = {}) =>
+  render(
+    await serverTree(
+      await WishlistPage({
+        params: Promise.resolve({ listId }),
+        searchParams: Promise.resolve(search),
+      }),
+    ),
+  )
 
 const book = (bookId: number, title: string, authors: EffectiveBook['authors']): EffectiveBook => ({
   bookId,
@@ -134,6 +205,15 @@ describe('One wishlist', () => {
     ])
     expect(within(rows[0]).getByText('Sofi Oksanen')).toBeTruthy()
     expect(getWishlist).toHaveBeenCalledWith(expect.anything(), 7)
+
+    const links = rows.map((row) => within(row).getByRole('link'))
+    expect(links.map((link) => link.getAttribute('href'))).toEqual([
+      '/wishlists/7?entry=2',
+      '/wishlists/7?entry=1',
+    ])
+    fireEvent.click(links[1]!)
+    expect(router.push).toHaveBeenCalledWith('/wishlists/7?entry=1', { scroll: false })
+    expect(showToast).not.toHaveBeenCalled()
   })
 
   it('shows Nothing on this list. with no open entries', async () => {
@@ -203,5 +283,88 @@ describe('One wishlist', () => {
 
     await waitFor(() => expect(router.replace).toHaveBeenCalledWith('/wishlists'))
     expect(deleteWishlistAction).toHaveBeenCalledExactlyOnceWith(7)
+  })
+
+  describe('opened entry', () => {
+    // One Book twice: entry 12 for Äiti, entry 13 for the viewer.
+    const twice: WishlistView = {
+      id: 7,
+      name: 'Christmas list',
+      entries: [
+        { entryId: 13, bookId: 10, forPerson: null },
+        { entryId: 12, bookId: 10, forPerson: { id: 5, name: 'Äiti' } },
+      ],
+    }
+
+    beforeEach(() => {
+      getWishlist.mockResolvedValue(twice)
+      personUse.mockResolvedValue([
+        { id: 5, name: 'Äiti', loans: 0, entries: 1 },
+        { id: 6, name: 'Leena', loans: 2, entries: 0 },
+      ])
+    })
+
+    const forField = (sheet: HTMLElement) =>
+      within(sheet).getByRole<HTMLInputElement>('combobox', { name: 'For' })
+
+    it("opens the entry ?entry= names, not its Book's other entry, with its row marked", async () => {
+      await renderPage('7', { entry: '13' })
+
+      const sheet = await screen.findByRole('dialog', { name: 'Puhdistus' })
+      expect(within(sheet).getByRole('heading', { name: 'Puhdistus' })).toBeTruthy()
+      expect(within(sheet).getByText('On Christmas list')).toBeTruthy()
+      expect(forField(sheet).value).toBe('')
+      const links = screen.getAllByRole('link', { hidden: true })
+      const current = links.filter((link) => link.getAttribute('aria-current') === 'true')
+      expect(current.map((link) => link.getAttribute('href'))).toEqual(['/wishlists/7?entry=13'])
+      expect(showToast).not.toHaveBeenCalled()
+      cleanup()
+
+      await renderPage('7', { entry: '12' })
+      expect(forField(await screen.findByRole('dialog', { name: 'Puhdistus' })).value).toBe('Äiti')
+    })
+
+    it.each(['99', 'abc'])(
+      'shows the list alone for ?entry=%s, toasts Not on this list and replaces to the list',
+      async (entry) => {
+        await renderPage('7', { entry })
+
+        await waitFor(() =>
+          expect(showToast).toHaveBeenCalledWith({ kind: 'success', message: 'Not on this list' }),
+        )
+        expect(router.replace).toHaveBeenCalledWith('/wishlists/7', { scroll: false })
+        expect(screen.queryByRole('dialog')).toBeNull()
+        expect(screen.getAllByRole('listitem')).toHaveLength(2)
+        expect(personUse).not.toHaveBeenCalled()
+      },
+    )
+
+    it('saves a chosen Person at once and refreshes; Clear sends null', async () => {
+      setEntryRecipientAction
+        .mockResolvedValueOnce({ ok: true, data: 6 })
+        .mockResolvedValueOnce({ ok: true, data: null })
+      await renderPage('7', { entry: '13' })
+      const sheet = await screen.findByRole('dialog', { name: 'Puhdistus' })
+
+      act(() => forField(sheet).focus())
+      fireEvent.keyDown(forField(sheet), { key: 'ArrowDown' })
+      fireEvent.click(await screen.findByRole('option', { name: 'Leena' }))
+
+      await waitFor(() => expect(router.refresh).toHaveBeenCalledOnce())
+      expect(setEntryRecipientAction).toHaveBeenCalledExactlyOnceWith(13, 6)
+      expect(forField(sheet).value).toBe('Leena')
+
+      fireEvent.click(within(sheet).getByRole('button', { name: 'Clear' }))
+      await waitFor(() => expect(router.refresh).toHaveBeenCalledTimes(2))
+      expect(setEntryRecipientAction).toHaveBeenLastCalledWith(13, null)
+    })
+
+    it("links the entry's author chip to the collection with only that author", async () => {
+      await renderPage('7', { entry: '13' })
+      const sheet = await screen.findByRole('dialog', { name: 'Puhdistus' })
+      expect(within(sheet).getByRole('link', { name: 'Sofi Oksanen' }).getAttribute('href')).toBe(
+        '/?author=3',
+      )
+    })
   })
 })

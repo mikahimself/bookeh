@@ -335,7 +335,10 @@
     "emptyList": "Nothing on this list.",
     "forPerson": "For {person}",
     "deleteTitle": "Delete <typed>{name}</typed>?",
-    "deleteBody": "The list and its entries go."
+    "deleteBody": "The list and its entries go.",
+    "onList": "On {list}",
+    "for": "For",
+    "notOnList": "Not on this list"
   },
   "progress": {
     "loading": "Loading"
