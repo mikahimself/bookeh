@@ -12,7 +12,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import type { DevicePrefs } from '@/app/(frontend)/prefs'
 import type { EffectiveBook } from '@/lib/books/effectiveBook'
-import type { CopyLine, Holdings } from '@/lib/books/holdings'
+import type { CopyLine, EntryLine, Holdings } from '@/lib/books/holdings'
 import type { LocationOption } from '@/lib/copies/locations'
 import { helsinkiToday } from '@/lib/loans/dates'
 import type { ShelfRow, ShelfRows } from '@/lib/shelf/query'
@@ -239,13 +239,23 @@ const copy = (copyId: number, extra: Partial<CopyLine> = {}): CopyLine => ({
   ...extra,
 })
 
-/** The viewer holds `copies` of `b`: Book detail's reads. */
-function holds(b: EffectiveBook, copies: CopyLine[]) {
+/** The viewer holds `copies` and open `entries` of `b`: Book detail's reads. */
+function holds(b: EffectiveBook, copies: CopyLine[], entries: EntryLine[] = []) {
   heldBook.mockImplementation(async (_, bookId) => (bookId === b.bookId ? b : undefined))
   getHoldings.mockImplementation(
-    async (_, ids) => new Map(ids.map((id) => [id, { copies, entries: [] }])),
+    async (_, ids) => new Map(ids.map((id) => [id, { copies, entries }])),
   )
 }
+
+/** Liisa's entry on Joululahjat, then the viewer's own on Luettavat. */
+const ENTRIES: EntryLine[] = [
+  { entryId: 51, wishlist: { id: 4, name: 'Joululahjat' }, forPerson: { id: 41, name: 'Liisa' } },
+  { entryId: 52, wishlist: { id: 7, name: 'Luettavat' }, forPerson: null },
+]
+
+/** Book detail's On wishlists group, by its heading. */
+const onWishlists = (sheet: HTMLElement) =>
+  within(sheet).getByRole('heading', { name: 'On wishlists' }).closest('section') as HTMLElement
 
 async function renderPage(params: Record<string, string> = {}) {
   return render(await page(params))
@@ -938,6 +948,38 @@ describe('CollectionPage', () => {
       expect(getHoldings).toHaveBeenCalledWith(expect.anything(), [5])
       // No locations: no Move.
       expect(within(sheet).queryByRole('button', { name: 'Move' })).toBeNull()
+      // No entries: no On wishlists group.
+      expect(within(sheet).queryByRole('heading', { name: 'On wishlists' })).toBeNull()
+    })
+
+    it('lists the open entries under On wishlists, after Your copies', async () => {
+      getShelfRows.mockResolvedValue({ rows: [row(11, linna)], total: 1, labels: {} })
+      holds(linna, [copy(21)], ENTRIES)
+      await renderPage({ book: '5' })
+
+      const sheet = await detail('Tuntematon sotilas')
+      const headings = within(sheet)
+        .getAllByRole('heading', { level: 3 })
+        .map(({ textContent }) => textContent)
+      expect(headings.indexOf('On wishlists')).toBe(headings.indexOf('Your copies') + 1)
+      expect(
+        within(onWishlists(sheet))
+          .getAllByRole('listitem')
+          .map(({ textContent }) => textContent),
+      ).toEqual(['Joululahjat · for Liisa', 'Luettavat'])
+      expect(within(onWishlists(sheet)).queryByRole('link')).toBeNull()
+    })
+
+    it('opens a Book held only through an entry, with no Your copies', async () => {
+      getShelfRows.mockResolvedValue({ rows: [], total: 0, labels: {} })
+      holds(linna, [], [ENTRIES[1]!])
+      await renderPage({ book: '5' })
+
+      const sheet = await detail('Tuntematon sotilas')
+      expect(within(sheet).queryByRole('heading', { name: 'Your copies' })).toBeNull()
+      expect(within(onWishlists(sheet)).getByRole('listitem').textContent).toBe('Luettavat')
+      within(sheet).getByRole('link', { name: 'Edit' })
+      within(sheet).getByRole('button', { name: 'Add to wishlist' })
     })
 
     it('shows Re-fetch on a shared Book with an ISBN to the admin only', async () => {
@@ -1373,6 +1415,22 @@ describe('CollectionPage', () => {
         // `afterAction`'s one refresh, after the reload; the line itself refreshes nothing.
         await waitFor(() => expect(router.refresh).toHaveBeenCalledOnce())
         expect(showToast).not.toHaveBeenCalled()
+      })
+
+      it('keeps Book detail open after removing the only copy while an entry remains', async () => {
+        holds(linna, [copy(21)], [ENTRIES[1]!])
+        removeCopiesAction.mockResolvedValue({ ok: true, data: { removed: 1, skipped: [] } })
+        reloads()
+        await renderPage({ book: '5' })
+        const sheet = await detail('Tuntematon sotilas')
+
+        await confirmRemove(sheet)
+        await waitFor(() => expect(router.refresh).toHaveBeenCalledOnce())
+        expect(removeCopiesAction).toHaveBeenCalledExactlyOnceWith([21])
+        await waitFor(() => expect(document.activeElement).toBe(onWishlists(sheet)))
+        expect(router.replace).not.toHaveBeenCalled()
+        expect(router.back).not.toHaveBeenCalled()
+        expect(sheet.isConnected).toBe(true)
       })
 
       it('receives an ordered copy with a toast that undoes it, and refreshes Book detail', async () => {

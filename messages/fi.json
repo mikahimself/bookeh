@@ -278,6 +278,7 @@
   "detail": {
     "yourCopies": "Kappaleesi",
     "lentBefore": "Lainassa aiemmin",
+    "onWishlists": "Toivelistoilla",
     "genres": "Lajityypit",
     "edit": "Muokkaa",
     "read": "Luettu",
@@ -339,6 +340,7 @@
     "create": "Luo",
     "emptyList": "Tällä listalla ei ole mitään.",
     "forPerson": "Kenelle: {person}",
+    "entryFor": "{list} · kenelle: {person}",
     "deleteTitle": "Poistetaanko <typed>{name}</typed>?",
     "deleteBody": "Lista ja sen kirjat poistuvat.",
     "onList": "Listalla {list}",

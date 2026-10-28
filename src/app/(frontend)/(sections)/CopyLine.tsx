@@ -121,11 +121,22 @@ export function MoveCopy({
  * the one-copy dialog; no toast and no Undo (a lent line offers Returned
  * only). The removal starts once the dialog's history entry
  * is gone (`onClosed`), so closing Book detail after the last copy never
- * overlaps it. `ok` on the last copy closes Book detail; otherwise
+ * overlaps it. `last` means removing it leaves the viewer holding nothing
+ * (no other copy, no open entry): `ok` then closes Book detail. Otherwise
  * `afterAction`'s refresh after `ok` or `NOT_FOUND` re-renders it (a Book
- * gone entirely then closes as "Not in library").
+ * gone entirely then closes as "Not in library"), and focus goes to the
+ * copies' section, or, with `focusAfter` (the only copy, entries remaining),
+ * to that element, since the copies' section unmounts with the refresh.
  */
-export function RemoveCopy({ copyId, last }: { copyId: number; last: boolean }) {
+export function RemoveCopy({
+  copyId,
+  last,
+  focusAfter,
+}: {
+  copyId: number
+  last: boolean
+  focusAfter?: string
+}) {
   const t = useTranslations('collection')
   const afterAction = useAfterAction()
   const closeDetail = useCloseDetail()
@@ -144,7 +155,10 @@ export function RemoveCopy({ copyId, last }: { copyId: number; last: boolean }) 
         return
       }
       // The line goes with the refresh; focus would fall to the body, outside the sheet.
-      if (result.ok) link.current?.closest('section')?.focus()
+      if (!result.ok) return
+      const after = focusAfter !== undefined && result.data.removed > 0
+      const target = after ? document.getElementById(focusAfter) : link.current?.closest('section')
+      target?.focus()
     })
   }
 

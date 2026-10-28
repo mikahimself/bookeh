@@ -127,6 +127,7 @@ describe('AddToWishlist', () => {
     expect(sent()).toEqual([
       { requestId: expect.any(String), wishlist: 4, target: { isbn13: ISBN } },
     ])
+    expect(refresh).not.toHaveBeenCalled()
   })
 
   it('saves to the row chosen among several', async () => {
@@ -153,6 +154,7 @@ describe('AddToWishlist', () => {
     )
     press()
     await waitFor(() => expect(show).toHaveBeenCalledTimes(1))
+    expect(refresh).toHaveBeenCalledTimes(1)
     expect(show).toHaveBeenCalledWith({
       kind: 'success',
       message: 'toast.addedTo:Joululahjat',
@@ -170,6 +172,8 @@ describe('AddToWishlist', () => {
     expect(first).toMatchObject({ target: { bookId: 9 } })
     expect(second!.requestId).not.toBe(first!.requestId)
     expect(back).not.toHaveBeenCalled()
+    // One refresh per save: Book detail's On wishlists group follows it.
+    await waitFor(() => expect(refresh).toHaveBeenCalledTimes(2))
   })
 
   it('re-renders the address on NOT_FOUND, with no toast and no return', async () => {

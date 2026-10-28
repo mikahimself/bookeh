@@ -46,14 +46,21 @@ const DOT = ' · '
  * each copy's location, like the header's authors and series, is a Filter
  * chip (`FilterChip`) that adds it to the current filters; an ordered copy
  * has no location and so no chip. The one component later groups are added
- * to; it reads the Book, the viewer's copies and their read flag and rating
- * only, never the client rows, so it stays open when its row leaves the
- * list. `locations` are the page's, for Move; none when that read failed.
+ * to; it reads the Book, the viewer's copies and entries and their read flag
+ * and rating only, never the client rows, so it stays open when its row
+ * leaves the list. `locations` are the page's, for Move; none when that
+ * read failed.
  * The viewer's People (`lendingPeople()`) and today are read only when some
  * copy can be lent; a failed People read leaves the picker with New person
  * alone. Lent before follows Your copies when the viewer's copies have
  * returned loans (`returnedLoans(ctx, bookId)`), newest first as
- * "{person} · {from} to {to}"; a failed read leaves it out. A Book the
+ * "{person} · {from} to {to}"; a failed read leaves it out. On wishlists
+ * follows it (FR-26): the viewer's open entries from the same holdings read,
+ * oldest first, each "{list} · for {person}" or the list's name alone for
+ * the viewer's own, no links or chips; absent with no entries. A Book held
+ * only through entries has no Your copies group. Remove's `last` counts
+ * entries: removing the only copy while entries remain keeps Book detail
+ * open, with focus on On wishlists (`focusAfter`). A Book the
  * viewer does not hold is "Not in library". The content is the same at
  * every width; only the frame differs: the bottom sheet on the phone, the
  * panel beside the list from 900px (`BookDetailFrame`). Opened on `/` or
@@ -75,7 +82,10 @@ export async function BookDetail({
   if (!book) return <NotInLibrary back={back} />
   // Started now, awaited at the foot: it runs alongside the reads below.
   const wishlists = viewerWishlists(ctx)
-  const copies = (await getHoldings(ctx, [bookId])).get(bookId)?.copies ?? []
+  const { copies, entries } = (await getHoldings(ctx, [bookId])).get(bookId) ?? {
+    copies: [],
+    entries: [],
+  }
   const state = await getUserBookState(ctx, bookId)
   const lendable = copies.some(({ status, loan }) => status === 'owned' && loan === null)
   const people = lendable
@@ -97,71 +107,81 @@ export async function BookDetail({
   const day = (date: string) =>
     format.dateTime(new Date(`${date}T12:00:00Z`), { dateStyle: 'medium' })
 
+  // Focus lands here when the only copy goes while entries keep Book detail open.
+  const onWishlistsId = `on-wishlists-${bookId}`
+
   return (
     <BookDetailFrame label={book.title} back={back} openId={bookId}>
       <div className="flex flex-col gap-6">
         <BookHeader book={book} />
         <ReadAndRating key={bookId} bookId={bookId} initial={state} />
         {/* Focus lands here when a copy's line goes or changes (`RemoveCopy`, `ReceiveCopy`, `MoveCopy`, `LendCopy`, `ReturnLoan`). */}
-        <section tabIndex={-1} className="flex flex-col gap-2">
-          <h3 className="text-heading-group text-text-muted ui-case">{t('detail.yourCopies')}</h3>
-          <ul className="flex flex-col gap-4">
-            {copies.map(({ copyId, location, status, note, loan }) => (
-              <li key={copyId}>
-                {/* Names the line's Links and Note after the copy. */}
-                <div
-                  role="group"
-                  aria-labelledby={`copy-${copyId}`}
-                  className="flex flex-col gap-2"
-                >
-                  <div className="flex items-center justify-between gap-4">
-                    <p id={`copy-${copyId}`} className="text-body text-text">
-                      {location && (
-                        <>
-                          <FilterChip field="location" id={location.id}>
-                            {location.name}
-                          </FilterChip>
-                          {DOT}
-                        </>
-                      )}
-                      {t('answer.copy', { status })}
-                    </p>
-                    {status === 'owned' && loan !== null && <ReturnLoan loanId={loan.loanId} />}
-                    {status === 'owned' && loan === null && (
-                      <div className="flex shrink-0 gap-4">
-                        <LendCopy
-                          copyId={copyId}
-                          context={location ? `${book.title}${DOT}${location.name}` : book.title}
-                          people={people}
-                          today={today}
-                        />
-                        {locations.length > 0 && (
-                          <MoveCopy
-                            copyId={copyId}
-                            location={location?.id ?? null}
-                            locations={locations}
-                          />
+        {copies.length > 0 && (
+          <section tabIndex={-1} className="flex flex-col gap-2">
+            <h3 className="text-heading-group text-text-muted ui-case">{t('detail.yourCopies')}</h3>
+            <ul className="flex flex-col gap-4">
+              {copies.map(({ copyId, location, status, note, loan }) => (
+                <li key={copyId}>
+                  {/* Names the line's Links and Note after the copy. */}
+                  <div
+                    role="group"
+                    aria-labelledby={`copy-${copyId}`}
+                    className="flex flex-col gap-2"
+                  >
+                    <div className="flex items-center justify-between gap-4">
+                      <p id={`copy-${copyId}`} className="text-body text-text">
+                        {location && (
+                          <>
+                            <FilterChip field="location" id={location.id}>
+                              {location.name}
+                            </FilterChip>
+                            {DOT}
+                          </>
                         )}
-                        <RemoveCopy copyId={copyId} last={copies.length === 1} />
-                      </div>
+                        {t('answer.copy', { status })}
+                      </p>
+                      {status === 'owned' && loan !== null && <ReturnLoan loanId={loan.loanId} />}
+                      {status === 'owned' && loan === null && (
+                        <div className="flex shrink-0 gap-4">
+                          <LendCopy
+                            copyId={copyId}
+                            context={location ? `${book.title}${DOT}${location.name}` : book.title}
+                            people={people}
+                            today={today}
+                          />
+                          {locations.length > 0 && (
+                            <MoveCopy
+                              copyId={copyId}
+                              location={location?.id ?? null}
+                              locations={locations}
+                            />
+                          )}
+                          <RemoveCopy
+                            copyId={copyId}
+                            last={copies.length === 1 && entries.length === 0}
+                            {...(copies.length === 1 &&
+                              entries.length > 0 && { focusAfter: onWishlistsId })}
+                          />
+                        </div>
+                      )}
+                      {status === 'ordered' && <ReceiveCopy copyId={copyId} />}
+                    </div>
+                    {status === 'owned' && loan !== null && (
+                      <p className="flex items-center gap-2 text-body text-text">
+                        <span aria-hidden="true" className={`${markerSlotClass} bg-accent`} />
+                        {t('loans.lentTo', {
+                          person: loan.person.name,
+                          date: day(loan.since),
+                        })}
+                      </p>
                     )}
-                    {status === 'ordered' && <ReceiveCopy copyId={copyId} />}
+                    <CopyNote copyId={copyId} note={note ?? ''} />
                   </div>
-                  {status === 'owned' && loan !== null && (
-                    <p className="flex items-center gap-2 text-body text-text">
-                      <span aria-hidden="true" className={`${markerSlotClass} bg-accent`} />
-                      {t('loans.lentTo', {
-                        person: loan.person.name,
-                        date: day(loan.since),
-                      })}
-                    </p>
-                  )}
-                  <CopyNote copyId={copyId} note={note ?? ''} />
-                </div>
-              </li>
-            ))}
-          </ul>
-        </section>
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
         {history.length > 0 && (
           <section className="flex flex-col gap-2">
             <h3 className="text-heading-group text-text-muted ui-case">{t('detail.lentBefore')}</h3>
@@ -173,6 +193,22 @@ export async function BookDetail({
                     from: day(lentOn),
                     to: day(returnedOn),
                   })}
+                </li>
+              ))}
+            </ul>
+          </section>
+        )}
+        {entries.length > 0 && (
+          <section id={onWishlistsId} tabIndex={-1} className="flex flex-col gap-2">
+            <h3 className="text-heading-group text-text-muted ui-case">
+              {t('detail.onWishlists')}
+            </h3>
+            <ul className="flex flex-col gap-1">
+              {entries.map(({ entryId, wishlist, forPerson }) => (
+                <li key={entryId} className="text-body text-text">
+                  {forPerson
+                    ? t('wishlists.entryFor', { list: wishlist.name, person: forPerson.name })
+                    : wishlist.name}
                 </li>
               ))}
             </ul>

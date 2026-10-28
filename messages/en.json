@@ -278,6 +278,7 @@
   "detail": {
     "yourCopies": "Your copies",
     "lentBefore": "Lent before",
+    "onWishlists": "On wishlists",
     "genres": "Genres",
     "edit": "Edit",
     "read": "Read",
@@ -339,6 +340,7 @@
     "create": "Create",
     "emptyList": "Nothing on this list.",
     "forPerson": "For {person}",
+    "entryFor": "{list} · for {person}",
     "deleteTitle": "Delete <typed>{name}</typed>?",
     "deleteBody": "The list and its entries go.",
     "onList": "On {list}",

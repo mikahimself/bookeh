@@ -35,9 +35,10 @@ const SEPARATOR = ', '
  * The save (`saveEntryAction`) has Add to library's press semantics
  * (`useSavePress()`): the toast "Added to {list}" with Undo, held, and back
  * to Scan. `stay` (Book detail): the toast is not held, nothing navigates,
- * and the next press is a new save. `NOT_FOUND` re-renders the address with
- * no toast, as Add to library does; any other failure goes to `onRefused`
- * first, then is reported.
+ * the server render refreshes (`router.refresh()`), so the new entry and any
+ * list made on the way show, and the next press is a new save. `NOT_FOUND`
+ * re-renders the address with no toast, as Add to library does; any other
+ * failure goes to `onRefused` first, then is reported.
  *
  * `target` as a function is read at the press (the Not found form's typed
  * text): `null` saves nothing and opens no picker.
@@ -73,7 +74,13 @@ export function AddToWishlist({
         ...(!stay && { hold: true }),
         undo: { token: undoToken, seconds: undoSeconds },
       })
-      if (!stay && mounted) back()
+      if (!mounted) return
+      if (stay) {
+        // Book detail's On wishlists group and the picker's lists follow the save.
+        startTransition(() => {
+          router.refresh()
+        })
+      } else back()
     },
     { latch: !stay },
   )
