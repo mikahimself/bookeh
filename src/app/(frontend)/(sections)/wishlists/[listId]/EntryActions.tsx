@@ -15,7 +15,7 @@ import { typed } from '../../settings/ManagedList'
 /**
  * The opened entry's Buttons (EXPERIENCE.md, Wishlists → Entry opened;
  * FR-28, UX-DR49): Bought (the layer's one primary), Ordered and Remove
- * (destructive), all disabled while one runs.
+ * (destructive), all disabled while one runs and once one has succeeded.
  *
  * Bought and Ordered close the entry at once, with Undo. The toast follows
  * the outcome, not the shown recipient: Ordered reads "Ordered"; Bought with
@@ -46,6 +46,9 @@ export function EntryActions({
   const closeDetail = useCloseDetail()
   const [pending, startTransition] = useTransition()
   const [removeOpen, setRemoveOpen] = useState(false)
+  /** Set on success: the layer is closing, so a second tap must not send again. */
+  const [done, setDone] = useState(false)
+  const busy = pending || done
   const confirmed = useRef(false)
 
   const close = (as: 'bought' | 'ordered') => {
@@ -65,6 +68,7 @@ export function EntryActions({
                   : t('toast.saved'),
           undo: { token: undoToken, seconds: undoSeconds },
         })
+        setDone(true)
         closeDetail(back)
       } else if (result.code === 'NOT_FOUND') {
         router.refresh()
@@ -77,21 +81,23 @@ export function EntryActions({
   const remove = () => {
     startTransition(async () => {
       const result = await settleAction(removeEntryAction(entryId))
-      if (result.ok) closeDetail(back)
-      else if (result.code === 'NOT_FOUND') router.refresh()
+      if (result.ok) {
+        setDone(true)
+        closeDetail(back)
+      } else if (result.code === 'NOT_FOUND') router.refresh()
       else report(result.code)
     })
   }
 
   return (
     <div className="flex flex-wrap gap-2">
-      <Button variant="primary" disabled={pending} onClick={() => close('bought')}>
+      <Button variant="primary" disabled={busy} onClick={() => close('bought')}>
         {t('wishlists.bought')}
       </Button>
-      <Button variant="secondary" disabled={pending} onClick={() => close('ordered')}>
+      <Button variant="secondary" disabled={busy} onClick={() => close('ordered')}>
         {t('wishlists.ordered')}
       </Button>
-      <Button variant="destructive" disabled={pending} onClick={() => setRemoveOpen(true)}>
+      <Button variant="destructive" disabled={busy} onClick={() => setRemoveOpen(true)}>
         {t('wishlists.remove')}
       </Button>
       <Dialog

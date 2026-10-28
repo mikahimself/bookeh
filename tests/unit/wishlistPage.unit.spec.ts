@@ -471,8 +471,7 @@ describe('One wishlist', () => {
       })
 
       it('refreshes after a toast Undo', async () => {
-        await renderPage('7', { entry: '13' })
-        await sheet()
+        await renderPage('7')
         const listener = onUndone.mock.calls.at(-1)?.[0]
         expect(listener).toBeDefined()
         act(() => listener?.())

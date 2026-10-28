@@ -140,6 +140,30 @@ deferred: []
 
 ## Review Triage Log
 
+### 2026-10-28 — Review pass
+- verdicts: 20 findings — high 0, medium 0, low 13, false 7, maybe-false 0
+- findings:
+  - `[false]` `[reject]` Blind: For and Bought can run at once, so `closeEntry` may read a stale recipient — Next runs server actions one at a time from a client (as 7.12's triage recorded), so a For save settles before the close is sent; the toast follows the service's outcome either way.
+  - `[low]` `[patch]` Blind: the buttons come back on while the layer slides out; a second tap gets `NOT_FOUND`, refreshes at `?entry=` and replaces "Saved to …" and its Undo with "Not on this list" — `EntryActions` keeps a `done` state set on success and disables all three on `pending || done`.
+  - `[low]` `[reject]` Blind: between confirming Remove and `onClosed`, Bought or Ordered can be tapped — the modal Dialog covers the layer while it closes; reaching a button needs a tap through its exit, and the fix adds state for a path not shown reachable.
+  - `[low]` `[reject]` Blind: focus drops to the body after landing, because the row the panel focuses goes with the replace — real for keyboard users, but the fix needs focus handling after a navigation (new timing plumbing in the frame); recorded as a residual risk.
+  - `[low]` `[patch]` Blind: the Undo-refresh test runs with the entry open, not on the list where Undo happens (AC: Undo puts the entry back) — the case now renders `/wishlists/7` with no `entry`.
+  - `[low]` `[reject]` Blind: Remove's `NOT_FOUND` and other failure paths are untested — test-only, and no acceptance criterion or spine rule names it (CLAUDE.md, Tests); the branch mirrors Bought's tested one.
+  - `[low]` `[patch]` Blind: `vi.mock('@/lib/payload/context')` is declared twice in `wishlistActions.unit.spec.ts` — duplicate deleted, fixtures kept together.
+  - `[low]` `[reject]` Blind: the Remove dialog names no Book and has no body — it matches the copy's Remove dialog (title only, destructive confirm), and the layer behind it already shows the Book; adding a body is a UX change no source asks for.
+  - `[false]` `[reject]` Blind: the panel resets `landing` in two places, which is fragile — both resets are needed (Esc bypasses `close`, and a new `openId` cancels a pending leave at render), and no failing sequence was shown.
+  - `[low]` `[reject]` Edge: X or Esc while `closeEntryAction` is pending goes back to the cached list, and the late `closeDetail(back)` is a no-op, so the closed entry stays shown — it needs a manual close within the action's round trip; tapping the stale row then shows "Not on this list". The fix adds a frame-left branch.
+  - `[low]` `[reject]` Edge: the same for Remove pending after confirmation — same root and reasoning as the row above.
+  - `[low]` `[reject]` Edge: `close(to)` after a drag or scrim close has already started ignores the late landing — same race as the two rows above.
+  - `[low]` `[reject]` Edge (claim): "the list is re-rendered without the entry" fails when the `closing` flag is set or the frame has unmounted mid-action — same race as the rows above; the normal path is tested at both widths.
+  - `[low]` `[patch]` Edge: the duplicated `vi.mock` — same fix as the Blind row.
+  - `[low]` `[reject]` Verification gap: Remove's `NOT_FOUND` branch is never run by a test (filed disposition: defer) — test-only, and the matrix is not an acceptance criterion or spine rule, so CLAUDE.md's Tests rule rejects it.
+  - `[low]` `[patch]` Verification gap (other): the duplicated `vi.mock` — same fix as the Blind row.
+  - `[false]` `[reject]` Intent: the data effects (a copy made or not, Undo reopens it and removes the copy) are only mocked here — `tests/int/closeEntry.int.spec.ts` (7.8) covers both recipients and the restore through `withUndo`, and it ran green in this pass.
+  - `[false]` `[reject]` Intent: the toast follows the outcome while the criteria phrase it by recipient — `closeEntry` makes a copy exactly when the entry has no recipient, so the two coincide; the outcome is the safer source of truth.
+  - `[false]` `[reject]` Intent: "Saved" with no default location is not in the criteria — the criteria's "Saved to {location}" has no location to name; "Saved" is the Received toast's existing fallback (EXPERIENCE.md, Received), not a new behaviour.
+  - `[false]` `[reject]` Intent: the landing close and the `RefreshOnUndo` move touch Book detail and Loans beyond the criteria — without `to`, the close is unchanged, and the collection and loans suites, which cover the last-copy close and Undo refresh, pass.
+
 ## Design Notes
 
 **Why land with a replace.** Next restores back/forward navigation from its client cache (`staleTimes.md`: back/forward caching is unchanged by `staleTimes`). A plain history back after Bought would show the cached list with the entry still on it. Refreshing first is worse: the page re-renders at `?entry=13`, finds no open entry and toasts "Not on this list" over "Saved to …". The sheet's chip landing already goes back and then replaces the entry it reached. With `to = back`, that replace is a fresh render of the list on the same history slot: closing still goes back in history, and Back afterwards does not reopen the entry.
@@ -156,3 +180,63 @@ deferred: []
 
 **Manual checks:**
 - On a list, open your own entry and tap Bought (sheet and panel): the toast names the location, the entry leaves the list, and Undo brings it back. Then Ordered on an entry for a Person: "Ordered", and no copy appears on `/`. Remove: the dialog appears, and confirming removes the entry with no toast.
+
+## Auto Run Result
+
+**Summary.** An opened wishlist entry (`?entry=` on its list) now has Bought (the layer's one primary), Ordered and Remove (destructive) under For (FR-28, UX-DR49).
+- **Bought / Ordered.** The new `closeEntryAction` wraps the existing `closeEntry()` in `withUndo`. The toast follows the outcome:
+  - Ordered: "Ordered".
+  - Bought with no copy made (an entry for a Person): "Bought".
+  - Bought with a copy: "Saved to {location}", or "Saved" with no default location.
+  - All of them have Undo.
+- **Closing.** The layer closes and lands on the list through the new `useCloseDetail(to)`. That is a history back, then a replace, so the list renders fresh from the server rather than from Next's back/forward cache. The page's `RefreshOnUndo` brings the entry back after an Undo.
+- **Remove.** A dialog ("Remove from {list}?") confirms first. Then `removeEntryAction` deletes the entry, with no toast and no Undo, and the layer lands on the list.
+- **Failures.** `NOT_FOUND` refreshes into "Not on this list". Other failures are reported and the layer stays. The buttons stay disabled while an action runs and once one has succeeded.
+
+**Files changed.**
+- `src/app/(frontend)/actions/wishlists.ts` -- `closeEntryAction`, `removeEntryAction`.
+- `src/app/(frontend)/(sections)/wishlists/[listId]/EntryActions.tsx` -- new: the three Buttons, the toasts and the Remove dialog.
+- `src/app/(frontend)/(sections)/wishlists/[listId]/EntryDetail.tsx` -- renders `EntryActions`.
+- `src/app/(frontend)/(sections)/wishlists/[listId]/page.tsx` -- mounts `RefreshOnUndo`.
+- `src/app/(frontend)/(sections)/detailClose.ts`, `BookDetailSheet.tsx`, `BookDetailPanel.tsx` -- `useCloseDetail(to?)` lands on `to`. The panel's X now calls `close()`, so the click event is never passed as `to`.
+- `src/app/(frontend)/(sections)/RefreshOnUndo.tsx` -- moved from `loans/`; `loans/page.tsx` imports it from there.
+- `messages/en.json`, `messages/fi.json` -- `wishlists.bought|ordered|remove|removeTitle`, `toast.bought|ordered`.
+- `tests/unit/wishlistPage.unit.spec.ts` -- the toast table, `NOT_FOUND` and `INTERNAL`, Remove cancel and confirm, Undo refresh, and the 1300px panel.
+- `tests/unit/wishlistActions.unit.spec.ts` -- the input checks and the pass-through for both actions.
+- `sprint-status.yaml` -- 7.13 done.
+
+**Review.** One pass, 20 findings (low 13, false 7).
+- **Patched (low entries; 4 rows across reviewers):**
+  - The buttons stay disabled after a success, so a second tap during the slide-out cannot replace the toast and its Undo.
+  - The Undo-refresh test now runs on the list with no entry open.
+  - The duplicated `vi.mock` is gone.
+- **Rejected, with reasons in the triage log:**
+  - Concurrent For and Bought.
+  - The Remove-confirm gap.
+  - Focus after landing (kept as a residual risk).
+  - Remove's failure paths untested (test-only).
+  - The dialog body.
+  - The panel's double reset.
+  - Manual-close races while an action is pending (4 rows).
+  - The intent auditor's four descriptive points.
+- Nothing deferred.
+
+**Follow-up review:** not recommended. Patched entries this pass: high 0, medium 0, low 3.
+
+**Verification.** After the patches:
+- `npm run typecheck`: clean.
+- `npm run lint`: 0 errors (56 existing warnings).
+- `npm run test:unit`: 1014 passed (71 files).
+- `npm run test:reset && npm run test:int`: 663 passed (78 files).
+- **Matrix audit:**
+  - Every Bought/Ordered toast row, Entry gone, Other failure, Remove and Remove cancelled: `wishlistPage` cases.
+  - Undo: the page refresh case, plus `closeEntry.int.spec.ts` (7.8) for the reopen and copy removal.
+  - Bad input: `wishlistActions` cases.
+- The manual browser checks were not done.
+
+**Residual risks.**
+- That the back-then-replace renders a fresh list (not Next's cached one) holds only in a real browser. In jsdom both paths end in the same `router.replace`. Worth a manual check.
+- After landing, keyboard focus falls to the page body, because the focused row is gone from the fresh list.
+- If the layer is closed by hand while Bought, Ordered or Remove is still in flight, the list can show the closed entry until the next navigation.
+- The implementation subagent committed early (`252acda`) and set the spec to done before review. Status went back through review; the patches and the finished spec land in a follow-up commit.
+- Built in a cloud session against a local Postgres 16 cluster (ICU fi-FI, port 5433, gitignored `.env`), not the Docker Compose database. Not built beside other stories, so no shared files.

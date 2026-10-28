@@ -9,8 +9,6 @@ import type { Ref } from '@/lib/payload/ref'
 const ctx = { user: { id: 1 } }
 const setEntryRecipient =
   vi.fn<(ctx: unknown, entry: number, person: Ref | null) => Promise<number | null>>()
-
-vi.mock('@/lib/payload/context', () => ({ requireUserOrThrow: async () => ctx }))
 const tx = { user: { id: 1 }, tx: true }
 const closeEntry = vi.fn<(ctx: unknown, entry: number, as: 'bought' | 'ordered') => unknown>()
 const removeEntry = vi.fn<(ctx: unknown, entry: number) => Promise<void>>()
