@@ -359,6 +359,24 @@ describe('One wishlist', () => {
       expect(setEntryRecipientAction).toHaveBeenLastCalledWith(13, null)
     })
 
+    it('restores For on a failure: a bad name under the field, a gone entry refreshes', async () => {
+      setEntryRecipientAction
+        .mockResolvedValueOnce({ ok: false, code: 'VALIDATION', fields: { person: 'TOO_LONG' } })
+        .mockResolvedValueOnce({ ok: false, code: 'NOT_FOUND' })
+      await renderPage('7', { entry: '12' })
+      const sheet = await screen.findByRole('dialog', { name: 'Puhdistus' })
+
+      fireEvent.click(within(sheet).getByRole('button', { name: 'Clear' }))
+      expect(await within(sheet).findByText('Too long.')).toBeTruthy()
+      expect(forField(sheet).value).toBe('Äiti')
+      expect(router.refresh).not.toHaveBeenCalled()
+
+      fireEvent.click(within(sheet).getByRole('button', { name: 'Clear' }))
+      await waitFor(() => expect(router.refresh).toHaveBeenCalledOnce())
+      expect(forField(sheet).value).toBe('Äiti')
+      expect(showToast).not.toHaveBeenCalled()
+    })
+
     it("links the entry's author chip to the collection with only that author", async () => {
       await renderPage('7', { entry: '13' })
       const sheet = await screen.findByRole('dialog', { name: 'Puhdistus' })

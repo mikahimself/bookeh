@@ -53,9 +53,9 @@ async function load(ctx: Context, id: number): Promise<Loaded | null> {
  * With `?entry=` naming one of the loaded rows (EXPERIENCE.md, Wishlists →
  * Entry opened; FR-38, UX-DR49), that entry opens (`EntryDetail`) beside the
  * list from 900px and as the sheet on the phone, closing back to the list,
- * with the viewer's People by name (`personUse()`; none when that read
- * fails) for its "For". The match is by entry id, never by Book, so one Book
- * twice opens each entry as itself. An `entry` that names no loaded row (not
+ * with the viewer's People by name (`personUse()`; the entry's recipient
+ * alone when that read fails) for its "For". The match is by entry id, never
+ * by Book, so one Book twice opens each entry as itself. An `entry` that names no loaded row (not
  * digits, closed, removed, another list's, another user's, Book unreadable)
  * shows the list alone and "Not on this list" (`NotOnList`; EXPERIENCE.md,
  * States → Entry gone). A failed read ignores `entry`.
@@ -92,7 +92,7 @@ export default async function WishlistPage({
         .then((rows) => rows.map(({ id: personId, name }) => ({ id: personId, name })))
         .catch((err: unknown): Named[] => {
           logger().error({ err }, 'The People failed to load')
-          return []
+          return opened.entry.forPerson ? [opened.entry.forPerson] : []
         })
     : []
 

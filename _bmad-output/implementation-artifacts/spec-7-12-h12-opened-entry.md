@@ -123,6 +123,29 @@ deferred: []
 
 ## Review Triage Log
 
+### 2026-10-28 — Review pass
+- verdicts: 19 findings — high 0, medium 0, low 14, false 5, maybe-false 0
+- findings:
+  - `[low]` `[patch]` Blind: after "New: {name}" the For field goes blank until the refresh lands (a numeric value not yet in `people` has no label) — `EntryFor` no longer swaps in the returned id; it keeps the chosen value and adopts the refreshed `initial`.
+  - `[low]` `[patch]` Blind: a failed `personUse()` makes an entry with a recipient show For empty — the `.catch` now falls back to the opened entry's own recipient.
+  - `[low]` `[patch]` Blind: `disabled={pending}` blurs the focused combobox input after every choice, so keyboard users lose their place — `disabled` removed (Next runs server actions one at a time).
+  - `[low]` `[reject]` Blind: on `NOT_FOUND` the panel unmounts without its leave path, so focus falls to the body — needs the entry removed from another tab while it is open; the fix adds focus handling to `NotOnList` for a rare path.
+  - `[low]` `[reject]` Blind: `NotOnList` can toast twice under StrictMode — dev-only double effect, the same as `NotInLibrary`'s; a once-guard adds state for no production case.
+  - `[false]` `[reject]` Blind: `EntryDetail` rebuilds the list address, two sources for the close target — both are `/wishlists/${id}` from the same `id`, so they cannot diverge.
+  - `[low]` `[reject]` Blind: the test helper `serverTree` detects server components by `AsyncFunction` — Vitest's transform keeps native async functions; switching to thenable detection is a rewrite for a hypothetical toolchain change.
+  - `[low]` `[reject]` Blind: no tests for the create path end to end, the NOT_FOUND re-render, or the wide panel — the create path is covered piecewise (`combobox.unit.spec.ts` sends `{ create }`, the action test passes it through, `entryRecipient.int.spec.ts` creates the Person); the NOT_FOUND branch's refresh is tested and the re-render is the tested `?entry=99` path; the panel is the shared frame tested in `collectionPage.unit.spec.ts` (CLAUDE.md, Tests).
+  - `[low]` `[patch]` Edge: For shows blank after a created Person until the refresh — duplicate of the first Blind row.
+  - `[low]` `[patch]` Edge: a failed People read hides the current recipient — duplicate of the second Blind row.
+  - `[low]` `[patch]` Edge: For keeps a stale value when the refresh brings a recipient changed elsewhere — fixed by adopting a new `initial` (same patch as the first row).
+  - `[low]` `[reject]` Edge: `?entry=013` opens entry 13 at a non-canonical address — nobody types leading zeros, and opening the entry is the right outcome.
+  - `[low]` `[reject]` Verification gap: no test for an unexpected failure code on For (restore and report) — the filed disposition is defer, but the behaviour is this story's; no acceptance criterion or spine rule names it, so CLAUDE.md's Tests rule rejects a test-only finding.
+  - `[false]` `[reject]` Intent: AC4 could mean opening full Book detail from the entry — Story 5.21 ("or in an opened wishlist entry") and EXPERIENCE.md ("It is the entry, not Book detail") settle it on the entry's own header chips, which the diff implements.
+  - `[low]` `[reject]` Intent: the wide panel is never rendered by the new tests — the panel is `BookDetailFrame`, unchanged apart from the prop rename and tested at width in `collectionPage.unit.spec.ts`; test-only finding.
+  - `[false]` `[reject]` Intent: the owner-scoped write is not exercised — `setEntryRecipient` is unchanged and `tests/int/entryRecipient.int.spec.ts` (7.9) covers closed, foreign and bad ids.
+  - `[low]` `[reject]` Intent: closed and foreign entry ids are covered only by equivalence with `?entry=99` — the page has one rule (no matching open row); a second fixture restates the same branch.
+  - `[false]` `[reject]` Intent: the chip test checks the href only, not the tap — the tap and sheet landing are `FilterChip`/`useSheetChip` behaviour, unchanged and covered by `filterChip.unit.spec.ts` (5.21).
+  - `[false]` `[reject]` Intent: the `BookHeader` extraction changes Book detail with no test in this diff — `collectionPage.unit.spec.ts` asserts the header's title, series chip and edition line at both widths and passes.
+
 ## Design Notes
 
 **Resolve against the loaded rows.** `getWishlist` already returns the viewer's open entries of this list. Matching `?entry=` against them covers closed, removed, foreign and other-list ids in one rule, with no extra read. An entry whose Book is unreadable has no row, so it is "Not on this list" as well.
@@ -143,3 +166,65 @@ deferred: []
 
 **Manual checks:**
 - On a list, open an entry on the phone width (sheet) and wide (panel); set, change and clear For; open `?entry=<closed id>`; tap the author chip.
+
+## Auto Run Result
+
+**Summary.** On `/wishlists/[listId]`, each entry row now opens the entry at `?entry=<entryId>` (FR-38, UX-DR49).
+- **Layer.** The opened entry uses Book detail's frame: a bottom sheet on the phone, a panel beside the list from 900px, closing back to the list. It shows:
+  - the Book's header, shared with Book detail;
+  - "On {list}", with the name as typed;
+  - a "For" combobox of the viewer's People, by name.
+- **For.** Choosing, typing a new name or Clear saves at once through the new `setEntryRecipientAction` over `setEntryRecipient()`. The page then refreshes, so the row's "For" line follows. A failure restores the old value:
+  - a bad name shows its message under the field;
+  - an entry gone meanwhile refreshes into "Not on this list";
+  - anything else is reported.
+- **Addressing.** The entry is matched by its own id against the list's open rows, so one Book twice opens each entry as itself. Any `entry` that matches no open row shows the list alone, the toast "Not on this list", and replaces the address with the list's. That covers ids that are not digits, closed, removed, on another list or another user's.
+- **Chips.** The header's author and series chips are the existing `FilterChip`. Away from `/`, they open the collection with only that filter (5.21).
+
+**Files changed.**
+- `src/app/(frontend)/(sections)/BookHeader.tsx` -- new: Book detail's header and `joined`, shared with the opened entry.
+- `src/app/(frontend)/(sections)/BookDetail.tsx` -- uses `BookHeader`; passes `openId`.
+- `src/app/(frontend)/(sections)/BookDetailPanel.tsx` -- frame prop `bookId` renamed to `openId`.
+- `src/app/(frontend)/actions/wishlists.ts` -- `setEntryRecipientAction`.
+- `src/app/(frontend)/(sections)/wishlists/[listId]/page.tsx` -- `?entry=` handling, Loans-style wide layout, People read.
+- `src/app/(frontend)/(sections)/wishlists/[listId]/EntryRow.tsx` -- the row is a link with `aria-current` and the selection bar.
+- `src/app/(frontend)/(sections)/wishlists/[listId]/EntryDetail.tsx`, `EntryFor.tsx`, `NotOnList.tsx` -- new: the entry layer, the For combobox, the "Not on this list" notice.
+- `messages/en.json`, `messages/fi.json` -- `wishlists.onList`, `for`, `notOnList`.
+- `tests/unit/wishlistPage.unit.spec.ts` -- the row links, opening the right entry of one Book twice, Not on this list, For save and Clear, For failures, and the author chip.
+- `tests/unit/wishlistActions.unit.spec.ts` -- new: the action's input checks.
+- `sprint-status.yaml` -- 7.12 done. `epic-7-context.md` -- regenerated after the 7.11 spine change.
+
+**Review.** One pass, 19 findings (low 14, false 5).
+- **Patched (3 low entries):**
+  - For keeps the chosen value after a save and adopts the refreshed `initial`. A new Person no longer blanks the field, and a recipient changed elsewhere shows up.
+  - `disabled` was removed from the combobox, so a choice no longer blurs the field.
+  - A failed People read falls back to the entry's own recipient.
+- **Rejected, with reasons in the triage log:**
+  - Focus on the NOT_FOUND unmount.
+  - The StrictMode double toast.
+  - The duplicated address.
+  - The `serverTree` detection.
+  - The test-only gaps: create end to end, the wide panel, failure codes, closed or foreign ids, the chip tap.
+  - `?entry=013`.
+  - The AC4 alternative reading.
+  - The owner-scoped write.
+  - The `BookHeader` coverage.
+- Nothing deferred.
+
+**Follow-up review:** not recommended. Patched entries this pass: high 0, medium 0, low 3.
+
+**Verification.** After the patches:
+- `npm run typecheck`: clean.
+- `npm run lint`: 0 errors (56 existing warnings).
+- `npm run test:unit`: 996 passed (71 files).
+- `npm run test:reset && npm run test:int`: 663 passed (78 files).
+- **Matrix audit:**
+  - Open entry, Same Book twice, Not on this list (`99`, `abc`), Set/change (choose), Clear and Entry gone meanwhile: the `wishlistPage` cases.
+  - The `{ create }` path and Bad input: `wishlistActions.unit.spec.ts`, plus the existing combobox and `entryRecipient` int tests.
+- The manual browser checks were not done.
+
+**Residual risks.**
+- The wide panel with an entry open, including focus back on the row at close, is covered only through the shared frame's existing tests.
+- An entry removed elsewhere while it is open unmounts the layer without its animated close, so focus falls to the page.
+- The implementation subagent again committed early (`f6ef59b`), before review. The review patches and the finished spec land in a follow-up commit.
+- Built in a cloud session against a local Postgres 16 cluster (ICU fi-FI), not the Docker Compose database. Not built beside other stories, so no shared files.
