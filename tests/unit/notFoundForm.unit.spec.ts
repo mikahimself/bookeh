@@ -16,13 +16,20 @@ vi.mock('next/navigation', async (importOriginal) => ({
   ...(await importOriginal<typeof import('next/navigation')>()),
   useRouter: () => ({ replace: vi.fn() }),
 }))
-vi.mock('@/app/(frontend)/components/navigation', () => ({ useTaskBack: () => back }))
+// The picker's overlay needs the real history tracking; only the task's Back is mocked.
+vi.mock('@/app/(frontend)/components/navigation', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/app/(frontend)/components/navigation')>()),
+  useTaskBack: () => back,
+}))
 vi.mock('@/app/(frontend)/scan/actions', () => ({ saveManualAction, saveEntryAction }))
 vi.mock('@/app/(frontend)/components/toast/ToastProvider', () => ({
   useToast: () => ({ show, dismiss: vi.fn() }),
 }))
 
+const { installNavigationTracking } = await import('@/app/(frontend)/components/navigation')
 const { NotFoundForm } = await import('@/app/(frontend)/scan/NotFoundForm')
+
+installNavigationTracking()
 
 const ISBN = '9789510397077'
 
@@ -210,6 +217,27 @@ describe('NotFoundForm', () => {
     expect(saveManualAction).not.toHaveBeenCalled()
   })
 
+  it("marks the server's refusal of Add to wishlist under the field", async () => {
+    saveEntryAction.mockResolvedValue({
+      ok: false,
+      code: 'VALIDATION',
+      fields: { title: 'TOO_LONG' },
+    })
+    render(
+      createElement(NotFoundForm, {
+        isbn13: null,
+        title: 'a'.repeat(501),
+        lists: [{ id: 4, name: 'Joululahjat', count: 0 }],
+      }),
+    )
+    type('answer.author', 'Waltari')
+    fireEvent.click(screen.getByRole('button', { name: 'wishlists.addToWishlist' }))
+
+    expect(await screen.findByText('errors.TOO_LONG')).toBeTruthy()
+    expect(show).not.toHaveBeenCalled()
+    expect(back).not.toHaveBeenCalled()
+  })
+
   it('marks a blank title, focuses it and opens no picker', () => {
     render(createElement(NotFoundForm, { isbn13: null, title: '  ', lists: [] }))
     type('answer.author', 'Waltari')
@@ -220,5 +248,33 @@ describe('NotFoundForm', () => {
     expect(document.activeElement).toBe(screen.getByLabelText('answer.title'))
     expect(screen.queryByRole('dialog')).toBeNull()
     expect(saveEntryAction).not.toHaveBeenCalled()
+  })
+
+  it("saves only the entry when the picker's New list is submitted inside the form", async () => {
+    saveEntryAction.mockResolvedValue({
+      ok: true,
+      data: {
+        bookId: 1,
+        entryId: 2,
+        savedTo: { id: 5, name: 'Joululahjat' },
+        undoToken: 't',
+        undoSeconds: 1800,
+      },
+    })
+    render(createElement(NotFoundForm, { isbn13: null, title: '', lists: [] }))
+    type('answer.title', 'Sinuhe')
+    type('answer.author', 'Waltari')
+    fireEvent.click(screen.getByRole('button', { name: 'wishlists.addToWishlist' }))
+    const field = await screen.findByLabelText('wishlists.newList')
+    fireEvent.change(field, { target: { value: 'Joululahjat' } })
+    fireEvent.submit(field)
+
+    await waitFor(() => expect(saveEntryAction).toHaveBeenCalledTimes(1))
+    expect(saveEntryAction).toHaveBeenCalledWith({
+      requestId: expect.any(String),
+      wishlist: { create: 'Joululahjat' },
+      target: { manual: { title: 'Sinuhe', author: 'Waltari' } },
+    })
+    expect(saveManualAction).not.toHaveBeenCalled()
   })
 })

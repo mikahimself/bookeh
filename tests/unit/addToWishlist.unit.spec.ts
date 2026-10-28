@@ -51,14 +51,20 @@ const press = () =>
 const picker = () => screen.queryByRole('dialog', { name: 'wishlists.addToWishlist' })
 const sent = () => saveEntryAction.mock.calls.map(([input]) => input as Record<string, unknown>)
 
+/** Whether the wide query matches: the Dialog form of the picker, else the Sheet. */
+let wide = false
+
 describe('AddToWishlist', () => {
   beforeEach(() => {
+    wide = false
     window.history.pushState({ page: 'answer' }, '', `/scan?isbn=${ISBN}`)
     vi.stubGlobal(
       'matchMedia',
       vi.fn((query: string) => ({
         media: query,
-        matches: false,
+        get matches() {
+          return wide
+        },
         addEventListener: () => undefined,
         removeEventListener: () => undefined,
       })),
@@ -71,32 +77,39 @@ describe('AddToWishlist', () => {
     vi.unstubAllGlobals()
   })
 
-  it('with no lists offers only New list, focused, and saves the typed name', async () => {
-    saveEntryAction.mockResolvedValue(saved('Joululahjat'))
-    render(createElement(AddToWishlist, { lists: [], title: 'Sinuhe', target: { isbn13: ISBN } }))
-    press()
+  it.each([
+    ['Sheet', false],
+    ['Dialog', true],
+  ])(
+    'with no lists offers only New list, focused, and saves the typed name (%s)',
+    async (_, isWide) => {
+      wide = isWide
+      saveEntryAction.mockResolvedValue(saved('Joululahjat'))
+      render(createElement(AddToWishlist, { lists: [], title: 'Sinuhe', target: { isbn13: ISBN } }))
+      press()
 
-    const field = await screen.findByLabelText<HTMLInputElement>('wishlists.newList')
-    await waitFor(() => expect(document.activeElement).toBe(field))
-    expect(screen.getByText('Sinuhe')).toBeTruthy()
-    fireEvent.change(field, { target: { value: 'Joululahjat' } })
-    fireEvent.click(screen.getByRole('button', { name: 'wishlists.add' }))
+      const field = await screen.findByLabelText<HTMLInputElement>('wishlists.newList')
+      await waitFor(() => expect(document.activeElement).toBe(field))
+      expect(screen.getByText('Sinuhe')).toBeTruthy()
+      fireEvent.change(field, { target: { value: 'Joululahjat' } })
+      fireEvent.click(screen.getByRole('button', { name: 'wishlists.add' }))
 
-    await waitFor(() => expect(back).toHaveBeenCalledTimes(1))
-    expect(sent()).toEqual([
-      {
-        requestId: expect.any(String),
-        wishlist: { create: 'Joululahjat' },
-        target: { isbn13: ISBN },
-      },
-    ])
-    expect(show).toHaveBeenCalledWith({
-      kind: 'success',
-      message: 'toast.addedTo:Joululahjat',
-      hold: true,
-      undo: { token: 'token', seconds: 1800 },
-    })
-  })
+      await waitFor(() => expect(back).toHaveBeenCalledTimes(1))
+      expect(sent()).toEqual([
+        {
+          requestId: expect.any(String),
+          wishlist: { create: 'Joululahjat' },
+          target: { isbn13: ISBN },
+        },
+      ])
+      expect(show).toHaveBeenCalledWith({
+        kind: 'success',
+        message: 'toast.addedTo:Joululahjat',
+        hold: true,
+        undo: { token: 'token', seconds: 1800 },
+      })
+    },
+  )
 
   it('saves straight to the one list, with no picker', async () => {
     saveEntryAction.mockResolvedValue(saved('Joululahjat'))

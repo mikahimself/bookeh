@@ -20,12 +20,12 @@ import { type OnRefused, useAddToLibrary } from './useAddToLibrary'
  * The Not found Answer's form: Title (focused; Enter moves to Author) and
  * Author (Enter submits), then Add to wishlist (`lists`), Add to library
  * and Back. The text goes as typed with the ISBN, if any; the service
- * checks it, and a missing or too
- * long title or author shows its message under the field (the field's code:
- * `VALIDATION` is the required message, `TOO_LONG` "Too long."), the text
- * kept and the first marked field focused. The save, toast and return are
- * Add to library's (`useAddToLibrary()`). No `required`: the browser's own
- * bubbles would show instead.
+ * checks it, and a missing or too long title or author shows its message
+ * under the field (the field's code: `VALIDATION` is the required message,
+ * `TOO_LONG` "Too long."), the text kept and the first marked field
+ * focused. The save, toast and return are Add to library's
+ * (`useAddToLibrary()`). No `required`: the browser's own bubbles would
+ * show instead.
  *
  * Add to wishlist saves the same typed text to a list, with the typed title
  * under the picker's heading. A title or author blank after trimming is

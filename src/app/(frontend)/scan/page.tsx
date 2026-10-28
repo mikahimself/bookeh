@@ -2,9 +2,7 @@ import { getTranslations } from 'next-intl/server'
 import { ViewTransition } from 'react'
 
 import { lookupBook } from '@/lib/catalogue/lookupBook'
-import { logger } from '@/lib/errors'
 import { requireUser } from '@/lib/payload/context'
-import { listWishlists, type WishlistLine } from '@/lib/wishlists/wishlists'
 
 import { FullScreenTask } from '../components/FullScreenTask'
 import { DismissToast } from '../components/toast/DismissToast'
@@ -16,6 +14,7 @@ import { NotInLibraryAnswer } from './NotInLibraryAnswer'
 import { answerFor, scanParams, type ScanOutcome } from './answer'
 import { ScanScreen } from './ScanScreen'
 import { UnavailableAnswer } from './UnavailableAnswer'
+import { viewerWishlists } from './viewerWishlists'
 
 /**
  * Scan and its Answer, a full-screen task. The wrapper sits in the page, not
@@ -55,12 +54,9 @@ export default async function ScanPage({
       : title !== undefined
         ? { kind: 'notFound', isbn13: null, title }
         : { kind: 'scan' }
-  const lists: WishlistLine[] =
+  const lists =
     outcome.kind === 'notInLibrary' || outcome.kind === 'notFound' || outcome.kind === 'unavailable'
-      ? await listWishlists(ctx).catch((err: unknown) => {
-          logger().error({ err }, 'The wishlists failed to load')
-          return []
-        })
+      ? await viewerWishlists(ctx)
       : []
 
   return (

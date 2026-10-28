@@ -20,6 +20,9 @@ import { saveEntryAction } from './actions'
 import type { EntryTarget } from './entryTarget'
 import { type OnRefused, useSavePress } from './useAddToLibrary'
 
+/** Between a row's name and its count, for assistive technology only. */
+const SEPARATOR = ', '
+
 /**
  * Add to wishlist (EXPERIENCE.md, Answer → Add to wishlist; FR-21, FR-22):
  * a secondary Button that opens the wishlist Picker on every press, titled
@@ -116,6 +119,7 @@ export function AddToWishlist({
           label: (
             <span className="flex items-baseline justify-between gap-4">
               <span>{name}</span>
+              <span className="sr-only">{SEPARATOR}</span>
               <span className="text-meta text-text-muted">{count}</span>
             </span>
           ),

@@ -31,7 +31,7 @@ describe('saveEntryAction', () => {
     ['a pick of -1', { ...valid, target: { isbn13: ISBN, pick: -1 } }],
     ['a manual target with no author', { ...valid, target: { manual: { title: 'Sinuhe' } } }],
   ])('refuses %s before saveEntry', async (_, input) => {
-    expect(await saveEntryAction(input)).toEqual({ ok: false, code: 'SAVE_FAILED' })
+    expect(await saveEntryAction(input)).toEqual({ ok: false, code: 'VALIDATION' })
     expect(saveEntry).not.toHaveBeenCalled()
   })
 
@@ -67,6 +67,7 @@ describe('saveEntryAction', () => {
 
   it.each([
     ['NOT_FOUND', new DomainError('NOT_FOUND'), { ok: false, code: 'NOT_FOUND' }],
+    ['RATE_LIMITED', new DomainError('RATE_LIMITED'), { ok: false, code: 'RATE_LIMITED' }],
     [
       'a title refusal',
       new DomainError('VALIDATION', { fields: { title: 'TOO_LONG', isbn13: 'VALIDATION' } }),

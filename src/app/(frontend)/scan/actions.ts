@@ -148,7 +148,8 @@ function manualFields(
  * ISBN's (`{ isbn13 }` with `pick` and `candidate` checked as in
  * `saveCopyAction`), the Not found form's (`{ manual: { title, author } }`
  * strings with an optional `isbn13` string) or a held Book's (`{ bookId }`, a
- * row id) is `VALIDATION` before `saveEntry()` sees it. The typed text goes
+ * row id) is `VALIDATION` before `saveEntry()` sees it, and comes back as
+ * `VALIDATION`, unlike the copy saves' bad input. The typed text goes
  * as `saveManualAction` sends it. A `{ create }` name is matched to the
  * user's list of that name, or makes one, inside the save's transaction
  * (`resolveWishlist`). `NOT_FOUND` and `RATE_LIMITED` come back as they are,
@@ -160,14 +161,15 @@ function manualFields(
 export async function saveEntryAction(
   input: unknown,
 ): Promise<ActionResult<Undoable<EntrySaveResult>>> {
+  const parsed = parseEntryInput(input)
   const result = await runAction(async () => {
     const ctx = await requireUserOrThrow()
-    const parsed = parseEntryInput(input)
     if (!parsed) throw new DomainError('VALIDATION')
     const { requestId, target, wishlist } = parsed
     return saveEntry(ctx, { requestId, target, save: { kind: 'entry', wishlist } })
   })
-  if (result.ok || result.code === 'UNAUTHENTICATED') return result
+  // Bad input stays `VALIDATION`: nothing reached the save, so "try again" would not help.
+  if (result.ok || result.code === 'UNAUTHENTICATED' || !parsed) return result
   const marked = manualFields(result)
   if (marked) return marked
   if (result.code !== 'INTERNAL') logger().warn({ code: result.code }, 'saveEntryAction failed')

@@ -10,12 +10,12 @@ import { helsinkiToday } from '@/lib/loans/dates'
 import { returnedLoans } from '@/lib/loans/loans'
 import type { Context } from '@/lib/payload/context'
 import { lendingPeople } from '@/lib/people/people'
-import { listWishlists } from '@/lib/wishlists/wishlists'
 
 import { buttonClass } from '../components/Button'
 import { markerSlotClass } from '../components/ui/classes'
 import { heldBook } from '../heldBook'
 import { AddToWishlist } from '../scan/AddToWishlist'
+import { viewerWishlists } from '../scan/viewerWishlists'
 
 import { BookDetailFrame } from './BookDetailPanel'
 import { BookHeader, joined } from './BookHeader'
@@ -42,23 +42,23 @@ const DOT = ' · '
  * (`DetailLookUpAgain`; without an ISBN a muted line pointing to Edit book),
  * and the foot with Edit and Add to wishlist, both secondary, no primary
  * (`AddToWishlist`, staying open after the save; a failed read of the
- * viewer's wishlists leaves its picker with New list alone). Each genre and each copy's location, like the
- * header's authors and series, is a Filter chip (`FilterChip`) that adds
- * it to the current filters; an ordered copy has no location and so no
- * chip. The one component later groups are added to; it reads the Book, the
- * viewer's copies and their read flag and rating only, never the client
- * rows, so it stays open when its row leaves the list. `locations` are the
- * page's, for Move; none when that read failed. The viewer's People
- * (`lendingPeople()`) and today are read only when some copy can be lent; a
- * failed People read leaves the picker with New person alone. Lent before
- * follows Your copies when the viewer's copies have returned loans
- * (`returnedLoans(ctx, bookId)`), newest first as "{person} · {from} to
- * {to}"; a failed read leaves it out.
- * A Book the viewer does not hold is "Not in library". The content is the
- * same at every width; only the frame differs: the bottom sheet on the
- * phone, the panel beside the list from 900px (`BookDetailFrame`). Opened on
- * `/` or `/loans`: `back` is that section's address without `book`, where
- * closing it and "Not in library" land.
+ * viewer's wishlists leaves its picker with New list alone). Each genre and
+ * each copy's location, like the header's authors and series, is a Filter
+ * chip (`FilterChip`) that adds it to the current filters; an ordered copy
+ * has no location and so no chip. The one component later groups are added
+ * to; it reads the Book, the viewer's copies and their read flag and rating
+ * only, never the client rows, so it stays open when its row leaves the
+ * list. `locations` are the page's, for Move; none when that read failed.
+ * The viewer's People (`lendingPeople()`) and today are read only when some
+ * copy can be lent; a failed People read leaves the picker with New person
+ * alone. Lent before follows Your copies when the viewer's copies have
+ * returned loans (`returnedLoans(ctx, bookId)`), newest first as
+ * "{person} · {from} to {to}"; a failed read leaves it out. A Book the
+ * viewer does not hold is "Not in library". The content is the same at
+ * every width; only the frame differs: the bottom sheet on the phone, the
+ * panel beside the list from 900px (`BookDetailFrame`). Opened on `/` or
+ * `/loans`: `back` is that section's address without `book`, where closing
+ * it and "Not in library" land.
  */
 export async function BookDetail({
   ctx,
@@ -73,6 +73,8 @@ export async function BookDetail({
 }) {
   const book = await heldBook(ctx, bookId)
   if (!book) return <NotInLibrary back={back} />
+  // Started now, awaited at the foot: it runs alongside the reads below.
+  const wishlists = viewerWishlists(ctx)
   const copies = (await getHoldings(ctx, [bookId])).get(bookId)?.copies ?? []
   const state = await getUserBookState(ctx, bookId)
   const lendable = copies.some(({ status, loan }) => status === 'owned' && loan === null)
@@ -88,10 +90,7 @@ export async function BookDetail({
     return []
   })
 
-  const lists = await listWishlists(ctx).catch((err: unknown) => {
-    logger().error({ err }, 'The wishlists failed to load')
-    return []
-  })
+  const lists = await wishlists
 
   const t = await getTranslations()
   const format = await getFormatter()

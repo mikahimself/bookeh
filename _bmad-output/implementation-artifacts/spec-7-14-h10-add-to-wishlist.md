@@ -3,7 +3,7 @@ title: '7.14 [H10] Add to wishlist'
 type: 'feature'
 created: '2026-10-28'
 baseline_revision: '05c75987a327498015f975c95011be72b824e0a9'
-status: 'in-progress'
+status: 'done'
 review_loop_iteration: 0
 followup_review_recommended: false
 context:
@@ -168,6 +168,35 @@ deferred: []
 
 ## Review Triage Log
 
+### 2026-10-28 — Review pass
+- verdicts: 25 findings — high 0, medium 0, low 16, false 8, maybe-false 1
+- findings:
+  - `[low]` `[reject]` Blind: Add to wishlist and Add to library can both run on one Answer (an entry and a copy, two toasts, two `back()`) — needs two different buttons tapped within one save's round trip; the fix is shared busy state lifted across a server component, more than a direct correction.
+  - `[false]` `[reject]` Blind: repeated Add to wishlist in Book detail with one list makes duplicate entries — one Book on a list twice is allowed by the data model (epic context: entries are addressed by their own id because a Book can be on a list twice); each save has its own Undo toast.
+  - `[low]` `[reject]` Blind: Book detail's `lists` go stale after a save (a list made by New list missing, counts off by one) — the typed name still lands on the list of that name; the fix is a refresh the spec's Never excludes (7.15 owns refreshing Book detail), so it would edit this build's spec.
+  - `[false]` `[reject]` Blind: the field focus and `stopPropagation` change existing Picker callers — Move's picker opens only when the viewer has locations (FR-32, `BookDetail`/`SelectBar`), so it never renders with no rows, and no other `create` Picker sits inside a form; no caller's behaviour changes.
+  - `[low]` `[reject]` Blind: `description` is not announced (no `aria-describedby`) and its spacing differs between sheet and dialog — the heading still names the picker and the rows are the choice; wiring a description needs new props on Sheet and Dialog.
+  - `[low]` `[patch]` Blind: a row's accessible name runs name and count together ("Joululahjat2") — a visually hidden ", " (`SEPARATOR` constant) now sits between them.
+  - `[low]` `[patch]` Blind: `BookDetail` reads the wishlists after every other read, adding a round trip — the read now starts right after the `heldBook` check and is awaited at the foot.
+  - `[low]` `[reject]` Blind: `AddToWishlist` and `viewerWishlists` live under `scan/` but Book detail imports them — `(sections)` already imports from `scan/` (`EditionLabel`); moving files is churn with no named breakage.
+  - `[low]` `[patch]` Blind: two edited doc comments are badly wrapped (`BookDetail.tsx`, `NotFoundForm.tsx`) — both paragraphs rewrapped, wording unchanged.
+  - `[low]` `[reject]` Blind: `typedTitle` state duplicates the form's text for the picker's muted line — one re-render per keystroke, no named harm; removing it changes `AddToWishlist`'s props.
+  - `[low]` `[reject]` Edge: Book detail's `lists` stale after a stay save — same claim and reasoning as the Blind row above.
+  - `[low]` `[reject]` Edge: Not found form, Add to library enabled while a wishlist save runs — same root as the first Blind row.
+  - `[low]` `[reject]` Edge: Not in library, the two buttons don't see each other's pending save — same root as the first Blind row.
+  - `[maybe-false]` `[reject]` Edge: an ISBN or `bookId` target refused with `VALIDATION` naming `title` would surface as a raw `VALIDATION` toast — would need a source record whose title fails the Book's own checks inside `ensureSharedBook`; if true it is only `low` (an error toast either way), so rejected with this note.
+  - `[low]` `[patch]` Verification gap: submitting New list inside the Not found form saving only the entry (Picker's `stopPropagation`) is untested — guards the criterion "choosing saves through `saveEntry`" on the Not found Answer; new `notFoundForm` case submits New list and asserts one `saveEntryAction` and no `saveManualAction` (fails with the line removed).
+  - `[low]` `[patch]` Verification gap: the Dialog branch's `initialFocus` is unverified — guards "with none it offers only New list, focused" at wide widths; the no-lists case is now an `it.each` over Sheet and Dialog.
+  - `[low]` `[patch]` Verification gap: `RATE_LIMITED` passing through `saveEntryAction` is untested — guards AD-9's lookup-limit toast; row added to the failure table.
+  - `[low]` `[reject]` Verification gap (other): two save buttons running at once — same root as the first Blind row.
+  - `[low]` `[patch]` Intent: the wide dialog is never rendered in a test — same fix as the Dialog `initialFocus` row.
+  - `[false]` `[reject]` Intent: Enter-to-add untested — Enter in the field submits the same form the New list submit case drives; the new `notFoundForm` case covers that path.
+  - `[false]` `[reject]` Intent: a taken name and Undo keeping the list are untested here — `tests/int/saveEntry.int.spec.ts` (7.6) covers "creates a list named by the Ref and reuses it for the same name in another case" and "keeps a list the save created by name"; it ran green in this pass.
+  - `[false]` `[reject]` Intent: no end-to-end test — CLAUDE.md's Tests convention limits Playwright to scan-to-save and the shop check.
+  - `[false]` `[reject]` Intent: Add to wishlist on Couldn't look it up → Add by hand goes beyond the intent — EXPERIENCE.md, Answer: Add by hand "unfolds the title and author fields and the Not found buttons in place", so it is the Not found form.
+  - `[false]` `[reject]` Intent: the `useSavePress` refactor is unasked — the spec's Always asks for it, and `addToLibrary.unit.spec.ts` passes unchanged.
+  - `[false]` `[reject]` Intent: skipping the picker with one list conflicts with mock-up A's "one Add away" — the epic's criterion and EXPERIENCE.md both say the picker is skipped with exactly one list; the mock-up note describes the picker when it opens.
+
 ## Design Notes
 
 **Why a function target for Not found.** The Answer and Book detail know their target when they render. The Not found form knows it only at press time. `target: EntryTarget | (() => EntryTarget | null)` keeps one component, and the form's blank check stays where its marks live.
@@ -184,3 +213,85 @@ deferred: []
 
 **Manual checks:**
 - With no lists, scan a Book not in the library and tap Add to wishlist. The field is focused, and Add returns to Scan with "Added to {list}". With one list, nothing opens. Then from Book detail, the toast shows and Book detail stays open.
+
+## Auto Run Result
+
+**Summary.** Add to wishlist is a secondary button on three surfaces (FR-21, FR-22, UX-DR46), built on Mika's mock-up A (recorded in EXPERIENCE.md in `05c7598`):
+- the Not in library Answer;
+- the Not found form, which is also Couldn't look it up → Add by hand;
+- Book detail's foot, beside Edit.
+
+**The picker.** It opens on every press, titled "Add to wishlist" with the Book's title muted under it. It shows a row per list with its count, and a "New list" field with Add under the rows.
+- With exactly one list, the picker is skipped.
+- With no lists, only the field shows, focused, at both phone and wide widths.
+- A typed name goes to the server as `{ create }`. The server saves to the list of that name, or makes one.
+
+**The save.** The new `saveEntryAction` checks its input (bad input is `VALIDATION`, with nothing saved) and calls the existing `saveEntry`.
+- The toast reads "Added to {list} · Undo".
+- From the Answer, the toast is held and the press returns to Scan. In Book detail, the toast is not held and Book detail stays open.
+- Undo follows the save's rule from 7.6: the entry goes, and a list made on the way stays.
+- On the Not found form, a blank title or author is marked before any picker opens.
+
+**Files changed.**
+- `src/app/(frontend)/scan/actions.ts` -- `saveEntryAction`, plus input checks shared with the two copy actions.
+- `src/app/(frontend)/scan/entryTarget.ts` -- new: the `EntryTarget` type.
+- `src/app/(frontend)/scan/useAddToLibrary.ts` -- the generic `useSavePress<T>`. `useAddToLibrary` keeps its signature.
+- `src/app/(frontend)/scan/AddToWishlist.tsx` -- new: the button and the picker.
+- `src/app/(frontend)/scan/viewerWishlists.ts` -- new: the lists read, logged, with a failure read as none.
+- `src/app/(frontend)/scan/NotInLibraryAnswer.tsx`, `NotFoundAnswer.tsx`, `NotFoundForm.tsx`, `UnavailableAnswer.tsx`, `UnavailableActions.tsx`, `page.tsx` -- the lists and the button.
+- `src/app/(frontend)/(sections)/BookDetail.tsx` -- the foot, with the lists read running alongside the other reads.
+- `src/app/(frontend)/components/ui/Picker.tsx`, `Sheet.tsx`, `Dialog.tsx` -- `description` and `initialFocus`.
+- `messages/en.json`, `messages/fi.json` -- `wishlists.addToWishlist`, `wishlists.add`, `toast.addedTo`.
+- Tests:
+  - `tests/unit/addToWishlist.unit.spec.ts` (new)
+  - `tests/unit/scanActions.unit.spec.ts` (new)
+  - `tests/unit/viewerWishlists.unit.spec.ts` (new)
+  - `tests/unit/notFoundForm.unit.spec.ts` and `tests/unit/unavailableActions.unit.spec.ts` (extended)
+- `epic-7-context.md` -- recompiled for the mock-up A pick. `sprint-status.yaml` -- 7.14 done.
+
+**Changes made at verification, before review.**
+- Bad input to `saveEntryAction` answered `SAVE_FAILED`; the spec's matrix says `VALIDATION`, so the code was changed to match it.
+- The lists read was duplicated in two places, and the "List read fails" row had no test. The read was moved into `viewerWishlists` with a test.
+- A test was added: a server refusal on Add to wishlist marks the field.
+
+**Review.** One pass, 25 findings: low 16, false 8, maybe-false 1.
+- **Patched (low, 6 entries):**
+  - a row's accessible name now separates the name from the count;
+  - Book detail reads the lists in parallel with its other reads;
+  - two doc comments rewrapped;
+  - new test: New list inside the Not found form saves only the entry;
+  - new test: the Dialog-width focus;
+  - new test: `RATE_LIMITED` passes through.
+- **Rejected, with reasons in the triage log:**
+  - two save buttons pressed within one round trip;
+  - stale lists in Book detail after a save (the refresh belongs to 7.15);
+  - repeated entries (allowed by the data model);
+  - picker-wide changes that no existing caller can observe;
+  - an unannounced description;
+  - files living under `scan/`;
+  - the `typedTitle` state;
+  - a raw `VALIDATION` toast for a non-manual target (maybe-false, low if true);
+  - the intent auditor's descriptive points.
+- Nothing deferred.
+
+**Follow-up review:** not recommended. Patched entries this pass: high 0, medium 0, low 6.
+
+**Verification.** After the patches:
+- `npm run typecheck`: clean.
+- `npm run lint`: 0 errors (56 existing warnings).
+- `npm run test:unit`: 1043 passed (74 files).
+- `npm run test:reset && npm run test:int`: 663 passed (78 files).
+- **Matrix audit:** every row is covered by a test that ran:
+  - `addToWishlist` cases: no lists, one list, several lists, Book detail, gone meanwhile, other failure.
+  - `notFoundForm` cases: Not found filled, blank title, the server's refusal.
+  - `scanActions` cases: bad input.
+  - `viewerWishlists`: the list read failing.
+  - `saveEntry.int.spec.ts` (7.6): a typed name of an existing list, and Undo.
+- The manual browser checks were not done.
+
+**Residual risks.**
+- Two different save buttons on one Answer, tapped within a round trip, can save both an entry and a copy.
+- After Add to wishlist in Book detail, the picker's lists and counts are stale until the next render. A list just made by New list is missing from the next press, though typing its name again lands on it. Story 7.15 adds the "On wishlists" group and its refresh.
+- The Picker's `description` is visual only; screen readers hear the heading and the rows.
+- Built in a cloud session against a local Postgres 16 cluster (ICU fi-FI, port 5433, gitignored `.env`), not the Docker Compose database. Not built beside other stories, so no shared files.
+- The implementation subagent committed early (`9924a66`). The verification and review patches and the finished spec land in a follow-up commit.
