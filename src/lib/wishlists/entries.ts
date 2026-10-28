@@ -254,7 +254,8 @@ export async function setEntryRecipient(
 /**
  * Spine, AD-18, FR-38: Remove on the opened entry. Deletes one of the context
  * user's open entries in one `withTransaction()` joining the caller's;
- * `user-books` and the list are left alone. No Undo and no restore: the
+ * `user-books` and the list are left alone. The Book stays, even with no
+ * copy or entry left (as `removeCopies()`). No Undo and no restore: the
  * screen confirms Remove with a dialog.
  *
  * An id that is not a row id (`isRowId()`), or not one of the user's open

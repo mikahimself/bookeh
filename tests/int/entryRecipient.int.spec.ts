@@ -145,15 +145,23 @@ describe('entry recipient and removal', () => {
       await closeByHand(a.ctx, closed)
       const foreign = await ownEntry(b.ctx, x.id)
 
+      const open = await ownEntry(a.ctx, x.id)
+      const admin = await createUser({ displayName: 'Entry Admin', roles: ['admin'] })
+
       for (const id of [closed, foreign, 0, 2147483647]) {
         await expect(setEntryRecipient(a.ctx, id, { create: 'Uusi' })).rejects.toMatchObject({
           code: 'NOT_FOUND',
         })
       }
+      // FR-48: the admin is held to their own entries.
+      await expect(
+        setEntryRecipient(await contextFor(admin), open, { create: 'Uusi' }),
+      ).rejects.toMatchObject({ code: 'NOT_FOUND' })
 
       expect(await peopleOf(a.user)).toEqual([])
       expect(await peopleOf(b.user)).toEqual([])
-      expect(await recipientsOf(a.user)).toEqual({ [closed]: null })
+      expect(await peopleOf(admin)).toEqual([])
+      expect(await recipientsOf(a.user)).toEqual({ [closed]: null, [open]: null })
       expect(await recipientsOf(b.user)).toEqual({ [foreign]: null })
     })
   })
@@ -178,11 +186,18 @@ describe('entry recipient and removal', () => {
       await closeByHand(a.ctx, closed)
       const foreign = await ownEntry(b.ctx, x.id)
 
+      const open = await ownEntry(a.ctx, x.id)
+      const admin = await createUser({ displayName: 'Entry Admin', roles: ['admin'] })
+
       for (const id of [closed, foreign, 0, 2147483647]) {
         await expect(removeEntry(a.ctx, id)).rejects.toMatchObject({ code: 'NOT_FOUND' })
       }
+      // FR-48: the admin is held to their own entries.
+      await expect(removeEntry(await contextFor(admin), open)).rejects.toMatchObject({
+        code: 'NOT_FOUND',
+      })
 
-      expect(await recipientsOf(a.user)).toEqual({ [closed]: null })
+      expect(await recipientsOf(a.user)).toEqual({ [closed]: null, [open]: null })
       expect(await recipientsOf(b.user)).toEqual({ [foreign]: null })
     })
   })
