@@ -328,6 +328,11 @@
     "returnedGroup": "Palautetut",
     "lentBetween": "{person} · {from}–{to}"
   },
+  "wishlists": {
+    "empty": "Ei toivelistoja",
+    "newList": "Uusi lista",
+    "create": "Luo"
+  },
   "progress": {
     "loading": "Ladataan"
   },

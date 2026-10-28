@@ -328,6 +328,11 @@
     "returnedGroup": "Returned",
     "lentBetween": "{person} · {from} to {to}"
   },
+  "wishlists": {
+    "empty": "No wishlists",
+    "newList": "New list",
+    "create": "Create"
+  },
   "progress": {
     "loading": "Loading"
   },

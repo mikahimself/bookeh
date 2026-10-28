@@ -4,7 +4,7 @@ import { normaliseName } from '@/fields/sortName'
 import { DomainError } from '@/lib/errors'
 import type { Context } from '@/lib/payload/context'
 import * as gateway from '@/lib/payload/gateway'
-import { isRowId, type Ref } from '@/lib/payload/ref'
+import { idOf, isRowId, type Ref } from '@/lib/payload/ref'
 import { withTransaction } from '@/lib/payload/transaction'
 
 /**
@@ -90,6 +90,42 @@ export async function resolveWishlist(ctx: Context, ref: Ref): Promise<number> {
     depth: 0,
   })
   return created.id
+}
+
+/** A wishlist as the Wishlists section lists it: its name and its open entries. */
+export type WishlistLine = { id: number; name: string; count: number }
+
+/**
+ * Spine, AD-18, FR-39: the context user's wishlists, sorted by name in the
+ * database's collation (Finnish ICU), each with its open entries (`closedAt`
+ * empty) counted; closed entries never count. Both reads filter on `owner`
+ * explicitly as well as through `ownerAccess`, so the admin sees only their
+ * own lists (FR-48). Two reads, counted in memory.
+ */
+export async function listWishlists(ctx: Context): Promise<WishlistLine[]> {
+  const { docs: lists } = await gateway.find(ctx, {
+    collection: 'wishlists',
+    where: { owner: { equals: ctx.user.id } },
+    sort: 'name',
+    select: { name: true },
+    depth: 0,
+    pagination: false,
+  })
+  if (lists.length === 0) return []
+
+  const { docs: entries } = await gateway.find(ctx, {
+    collection: 'wishlist-entries',
+    where: { and: [{ owner: { equals: ctx.user.id } }, { closedAt: { exists: false } }] },
+    select: { wishlist: true },
+    depth: 0,
+    pagination: false,
+  })
+  const counts = new Map<number, number>()
+  for (const { wishlist } of entries) {
+    const id = idOf(wishlist)
+    counts.set(id, (counts.get(id) ?? 0) + 1)
+  }
+  return lists.map(({ id, name }) => ({ id, name, count: counts.get(id) ?? 0 }))
 }
 
 /**

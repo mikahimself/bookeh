@@ -515,6 +515,9 @@ type Suggestion = { id: number | null; name: string } // suggest(ctx, field, tex
 type PersonUse = Named & { loans: number; entries: number } // personUse(ctx): every Person of the viewer by name; loans open and returned, entries (wishlist entries for them) open and closed
 // lendingPeople(ctx): Named[]: every Person of the viewer by latest loan (lentOn, newest first), then by name; the Lend picker's rows
 
+// src/lib/wishlists
+type WishlistLine = Named & { count: number } // listWishlists(ctx): the viewer's lists by name, count = open entries
+
 // src/lib/loans
 type Lent = { loanId: number; person: Named } // lendCopy(ctx, copyId, person: Ref, lentOn?): Undone<Lent>; returnLoan(ctx, loanId, returnedOn?): Undone<{ loanId }>; dates default to helsinkiToday()
 type OpenLoan = { loanId: number; copyId: number; bookId: number; person: Named; since: string } // openLoans(ctx): the viewer's open loans, lentOn ascending then loan id (longest out first); since is the lending day YYYY-MM-DD
@@ -598,7 +601,7 @@ src/
     copies/            # createCopy, move, receive, status, note, remove; locations
     people/            # resolvePerson, createPerson, rename, merge, delete, personUse, lendingPeople
     loans/             # lendCopy, returnLoan, openLoans, returnedLoans; dates: helsinkiToday, isCalendarDate
-    wishlists/         # resolveWishlist, createWishlist, rename, delete; createEntry, closeEntriesForBook, closeEntry, moveEntriesToBook, setEntryRecipient, removeEntry
+    wishlists/         # resolveWishlist, listWishlists, createWishlist, rename, delete; createEntry, closeEntriesForBook, closeEntry, moveEntriesToBook, setEntryRecipient, removeEntry
     account/           # profile read and update, visibility
     backup/            # readLastBackup: the nightly backup's status file (BACKUP_STATUS_FILE) for Settings
   migrations/

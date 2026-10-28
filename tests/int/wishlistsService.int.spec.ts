@@ -8,6 +8,7 @@ import { withTransaction } from '@/lib/payload/transaction'
 import {
   createWishlist,
   deleteWishlist,
+  listWishlists,
   renameWishlist,
   resolveWishlist,
 } from '@/lib/wishlists/wishlists'
@@ -109,6 +110,41 @@ describe('wishlists service', () => {
 
     expect(await listsOf(a)).toEqual([])
     expect(await listsOf(admin)).toEqual([])
+  })
+
+  it('lists my lists by name with their open entries counted, closed ones not', async () => {
+    const a = await createUser({ displayName: 'List Wishlists' })
+    const me = await wishlistAs(a, 'Me')
+    const christmas = await wishlistAs(a, 'Christmas')
+    await entryAs(a, me.id)
+    await entryAs(a, me.id)
+    await entryAs(a, me.id, '2026-10-23T10:00:00.000Z')
+
+    expect(await listWishlists(await contextFor(a))).toEqual([
+      { id: christmas.id, name: 'Christmas', count: 0 },
+      { id: me.id, name: 'Me', count: 2 },
+    ])
+    expect(
+      await listWishlists(await contextFor(await createUser({ displayName: 'No Wishlists' }))),
+    ).toEqual([])
+  })
+
+  it("lists only the viewer's own lists, for the admin too", async () => {
+    const a = await createUser({ displayName: 'List Wishlists Viewer' })
+    const b = await createUser({ displayName: 'List Wishlists Other' })
+    const admin = await createUser({ displayName: 'List Wishlists Admin', roles: ['admin'] })
+    const mine = await wishlistAs(a, 'Joulu')
+    const theirs = await wishlistAs(b, 'Joulu')
+    const admins = await wishlistAs(admin, 'Admin')
+    await entryAs(b, theirs.id)
+    await entryAs(admin, admins.id)
+
+    expect(await listWishlists(await contextFor(a))).toEqual([
+      { id: mine.id, name: 'Joulu', count: 0 },
+    ])
+    expect(await listWishlists(await contextFor(admin))).toEqual([
+      { id: admins.id, name: 'Admin', count: 1 },
+    ])
   })
 
   it("creates a list, and fails NAME_TAKEN with the existing one's id", async () => {
