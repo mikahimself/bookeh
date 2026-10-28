@@ -267,11 +267,17 @@ describe('CollectionPage', () => {
     requireUser.mockResolvedValue({ user: { roles: ['user'] } })
   })
 
-  afterEach(() => {
+  afterEach(async () => {
     cleanup()
-    vi.clearAllMocks()
-    heldBook.mockReset()
-    getHoldings.mockReset()
+    // A reset, not a clear: a case that fails early leaves `…Once` results
+    // queued, and a clear would hand them to the next case.
+    vi.resetAllMocks()
+    // An overlay unmounted while open leaves its history entry, and a back
+    // with no traversal stays in flight: settle both as a browser back would,
+    // so the next case's close starts at depth 0 and replaces.
+    window.history.replaceState(null, '')
+    window.dispatchEvent(new PopStateEvent('popstate', { state: null }))
+    await new Promise((resolve) => requestAnimationFrame(resolve))
     // The list keeps its place per query; each case starts without one.
     window.sessionStorage.clear()
     searchParams = new URLSearchParams()
@@ -701,9 +707,11 @@ describe('CollectionPage', () => {
         undoSeconds: 1800,
       },
     })
-    /** Opens the bar's Move picker. */
+    /** Opens the bar's Move picker, once the last action's reload has let go of the bar. */
     const openMove = async () => {
-      fireEvent.click(screen.getByRole('button', { name: 'Move' }))
+      const button = screen.getByRole<HTMLButtonElement>('button', { name: 'Move' })
+      await waitFor(() => expect(button.disabled).toBe(false))
+      fireEvent.click(button)
       return screen.findByRole('dialog', { name: 'Move to' })
     }
     const moveTo = async (name: string) =>
@@ -745,8 +753,8 @@ describe('CollectionPage', () => {
 
       // Create inline: the name as typed; the toast names the stored one.
       reloadsWith(both)
-      rerender(await page({}))
       getShelfRows.mockResolvedValueOnce(both)
+      rerender(await page({}))
       await waitFor(() => screen.getByText('Sinuhe', { selector: 'p' }))
       tap('Sinuhe')
       moveCopiesAction.mockResolvedValueOnce(moved(5, 'Kellari', 1))
@@ -1311,7 +1319,10 @@ describe('CollectionPage', () => {
             expect.objectContaining({ copyId: 21, person: { create: 'Liisa' } }),
           )
 
-          fireEvent.click(within(picker).getByRole('button', { name: 'Lend' }))
+          // The error shows before the lend's transition lets go of the button.
+          const lend = within(picker).getByRole<HTMLButtonElement>('button', { name: 'Lend' })
+          await waitFor(() => expect(lend.disabled).toBe(false))
+          fireEvent.click(lend)
           const tooLong = await within(picker).findByText('Too long.')
           expect(within(picker).getByLabelText('New person').getAttribute('aria-describedby')).toBe(
             tooLong.id,
