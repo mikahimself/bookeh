@@ -92,6 +92,29 @@ Screen-only behaviour (rows, dialog messages, empty and Load failed states) is i
 
 ## Review Triage Log
 
+### 2026-10-28 — Review pass
+- verdicts: 19 findings — high 0, medium 0, low 14, false 5, maybe-false 0
+- findings:
+  - `[low]` `[reject]` Blind: rows link to `/wishlists/{id}`, which 404s until 7.11 — real only between this commit and 7.11, whose first AC builds that route; a stub page would add a route 7.11 replaces. Recorded as a residual risk.
+  - `[low]` `[patch]` Blind: `NewList` rendered in two branches, so creating the first list unmounts the dialog's focus-return trigger — `NewList` now renders once at a stable position after the empty/list content.
+  - `[low]` `[reject]` Blind: the dialog can be cancelled while a create is pending, losing a late field error or creating a list after Cancel — a sub-second window; `LendPicker` behaves the same, and refusing a close fights `useCloseOnBack`'s history handling.
+  - `[false]` `[reject]` Blind: borrowed keys `settings.name`, `settings.nameRequired`, `collection.count` — the spec reuses them deliberately: the same word in the same voice, so a rewording should follow everywhere; no bad outcome occurs.
+  - `[false]` `[reject]` Blind: no dry remark on the empty state — EXPERIENCE.md says empty states *may* carry one; its States row for No wishlists names only "No wishlists" and "New list".
+  - `[low]` `[reject]` Blind: `listWishlists` reads every open entry and runs two reads outside a transaction — one user's open entries are hundreds at most; a count skewed by a close between two reads self-corrects on the next render. Not worth a grouped query.
+  - `[low]` `[patch]` Blind: `ListRow`'s link aligns with `items-center` while plain rows use `items-baseline` — the link now uses `items-baseline content-center`. (The half asking for a spine entry is false: the spine lists no components.)
+  - `[low]` `[patch]` Blind: the dialog's error mapping is untested — same root as the verification-gap NewList finding; covered by the new unit test.
+  - `[false]` `[reject]` Blind: no 7.10 spec in the diff — the spec exists at `_bmad-output/implementation-artifacts/spec-7-10-h5-wishlists-section.md`; it was left out of the review diff on purpose.
+  - `[low]` `[reject]` Edge: NAME_TAKEN/VALIDATION result set on a closed dialog after Cancel — duplicate of the pending-Cancel row, same grounds.
+  - `[low]` `[reject]` Edge: Cancel doesn't abort an in-flight create — duplicate of the pending-Cancel row.
+  - `[low]` `[reject]` Edge: row link 404 — duplicate of the first Blind row.
+  - `[low]` `[reject]` Edge: a concurrent same-name create surfaces the unique index's `ValidationError` as INTERNAL — documented behaviour of `createWishlist` (7.5); needs one user creating the same name twice at once.
+  - `[false]` `[reject]` Edge: `collection.count` coupling — duplicate of the borrowed-keys row.
+  - `[low]` `[reject]` Edge (claim): "tapping goes to `/wishlists/{id}`" passes only as navigation — duplicate of the 404 row.
+  - `[low]` `[patch]` Verification gap: no test renders the page's rows, empty state or Load failed — added `tests/unit/wishlistsPage.unit.spec.ts` on the `loansPage.unit.spec.ts` pattern (named ACs, CLAUDE.md Tests).
+  - `[low]` `[patch]` Verification gap: NewList's NAME_TAKEN-under-the-field and success paths untested — cases added to the same unit spec.
+  - `[false]` `[reject]` Intent: R3 divergence (the tapped row's page is missing) — not a separate defect; duplicate of the 404 row, and 7.11 owns the route.
+  - `[low]` `[patch]` Intent: the ACs are checked only at the service level — same root as the verification-gap rows; fixed by the unit spec.
+
 ## Design Notes
 
 **Local row type, not `Counted`.** `Counted<T>` lives in `lib/shelf`; `wishlists` may not import `shelf` (spine import rules), so `WishlistLine` is declared in `lib/wishlists` with the same shape.
@@ -109,3 +132,51 @@ Screen-only behaviour (rows, dialog messages, empty and Load failed states) is i
 
 **Manual checks:**
 - Run the app, open `/wishlists`: empty state, create a list, duplicate name error under the field, row links to `/wishlists/{id}`.
+
+## Auto Run Result
+
+**Summary.** `/wishlists` now lists the viewer's wishlists (FR-39, UX-DR49). `listWishlists(ctx)` in `lib/wishlists` answers `WishlistLine[]`: the lists by name in the database collation, each with its open entries counted (closed ones never count). Both reads filter on `owner` explicitly as well as through access, so the admin sees only their own lists (FR-48). The page shows one tappable List row per list, with the name as typed, "{n} books", and a link to `/wishlists/{id}`. "New list" sits under the rows, or under "No wishlists" when there are none. It opens a Dialog with a Name field that calls `createWishlist()` through `createWishlistAction`. A taken, blank or too-long name keeps the dialog open with its message under the field. Success closes the dialog and refreshes the list. A failed read shows the shared Load failed ("Couldn't load." with Try again).
+
+**Files changed.**
+- `src/lib/wishlists/wishlists.ts` -- `WishlistLine`, `listWishlists`.
+- `src/app/(frontend)/actions/wishlists.ts` -- new: `createWishlistAction`.
+- `src/app/(frontend)/components/ListRow.tsx` -- optional `href` makes the row one link; Settings rows unchanged.
+- `src/app/(frontend)/(sections)/wishlists/NewList.tsx` -- new: the New list Link and Dialog.
+- `src/app/(frontend)/(sections)/wishlists/page.tsx` -- the section, replacing the stub.
+- `messages/en.json`, `messages/fi.json` -- `wishlists.empty`, `newList`, `create`.
+- `tests/int/wishlistsService.int.spec.ts` -- two `listWishlists` cases: order and open-entry counts; own lists only, admin included.
+- `tests/unit/wishlistsPage.unit.spec.ts` -- new, 5 cases: rows, empty state, Load failed, NAME_TAKEN under the field, create success.
+- `ARCHITECTURE-SPINE.md` -- `// src/lib/wishlists` shared shape `WishlistLine`; `listWishlists` on the `wishlists/` source-tree line.
+- `epic-7-context.md` -- recompiled at the start of the run to include 7.9's spine change.
+- `sprint-status.yaml` -- 7.10 done.
+
+**Review.** One pass, 19 findings (low 14, false 5).
+- Patched (5 low entries):
+  - `NewList` is now rendered once at a stable position, so focus returns after the first create.
+  - The `ListRow` link uses baseline alignment, like Settings rows.
+  - The unit spec covers the screen's acceptance criteria: rows, empty state, Load failed and the dialog's NAME_TAKEN and success paths.
+- Rejected, with reasons in the triage log:
+  - The row link 404s until 7.11 builds `/wishlists/[listId]`.
+  - The dialog can be cancelled while a create is still pending; `LendPicker` behaves the same.
+  - Shared strings are reused on purpose.
+  - The empty state has no dry remark; EXPERIENCE.md makes one optional.
+  - Two reads with in-memory counts.
+  - A concurrent same-name create surfaces as INTERNAL (7.5's documented behaviour).
+  - The spec was left out of the review diff on purpose.
+- Nothing deferred.
+
+**Follow-up review:** not recommended. Patched entries this pass: high 0, medium 0, low 5.
+
+**Verification.** After the patches:
+- `npm run typecheck`: clean.
+- `npm run lint`: 0 errors (56 existing warnings).
+- `npm run test:unit`: 974 passed (68 files).
+- `npm run test:reset && npm run test:int`: 661 passed (78 files). During the implementation run, `shelfTiming`'s text search once took 2.9 s against its 1 s limit under load. It passed alone and passed in this full run, and the shelf code is untouched.
+- Matrix audit: rows 1–3 are covered by the new `listWishlists` int cases; row 4 by 7.5's existing NAME_TAKEN test, plus the new unit case for the dialog.
+- The manual check in a running app was not done: no browser run of `/wishlists`.
+
+**Residual risks.**
+- Tapping a row leads to a 404 until 7.11 adds `/wishlists/[listId]`; that route is 7.11's first acceptance criterion.
+- The New list dialog can be closed while a create is pending. The list may then appear without its dialog, or a field error may be lost.
+- The implementation subagent committed the code early (`13e4e47`) before review. The review patches, tests and finished spec land in a follow-up commit.
+- Built in a cloud session against a locally created Postgres 16 cluster (ICU fi-FI), not the Docker Compose database. Not built beside other stories, so no shared files.

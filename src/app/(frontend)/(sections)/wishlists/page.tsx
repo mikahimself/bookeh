@@ -27,23 +27,22 @@ export default async function WishlistsPage() {
     <div className="flex flex-1 flex-col px-page-margin-phone wide:px-page-margin">
       {lists === null ? (
         <LoadFailed />
-      ) : lists.length === 0 ? (
-        <div className="flex flex-col items-start gap-2 py-6">
-          <p className="text-heading-group">{t('wishlists.empty')}</p>
-          <NewList />
-        </div>
       ) : (
-        <div className="flex flex-col gap-2 pt-4">
-          <ul>
-            {lists.map((list) => (
-              <ListRow
-                key={list.id}
-                title={list.name}
-                meta={t('collection.count', { n: list.count })}
-                href={`/wishlists/${list.id}`}
-              />
-            ))}
-          </ul>
+        <div className="flex flex-col items-start gap-2 py-4">
+          {lists.length === 0 ? (
+            <p className="pt-2 text-heading-group">{t('wishlists.empty')}</p>
+          ) : (
+            <ul className="self-stretch">
+              {lists.map((list) => (
+                <ListRow
+                  key={list.id}
+                  title={list.name}
+                  meta={t('collection.count', { n: list.count })}
+                  href={`/wishlists/${list.id}`}
+                />
+              ))}
+            </ul>
+          )}
           <NewList />
         </div>
       )}

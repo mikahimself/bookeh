@@ -33,7 +33,7 @@ export function ListRow({
       ) : (
         <NextLink
           href={href}
-          className="flex min-w-0 flex-1 flex-wrap items-center gap-x-4 max-wide:min-h-tap"
+          className="flex min-w-0 flex-1 flex-wrap content-center items-baseline gap-x-4 max-wide:min-h-tap"
         >
           {content}
         </NextLink>
