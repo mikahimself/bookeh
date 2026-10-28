@@ -16,6 +16,7 @@ const getWishlist = vi.fn<(ctx: unknown, id: number) => Promise<WishlistView | n
 const getEffectiveBooks =
   vi.fn<(ctx: unknown, ids: readonly number[]) => Promise<Map<number, EffectiveBook>>>()
 const deleteWishlistAction = vi.fn()
+const renameWishlistAction = vi.fn()
 const logError = vi.fn()
 const redirect = vi.fn((href: string) => {
   throw new Error(`redirect ${href}`)
@@ -46,7 +47,7 @@ vi.mock('@/lib/errors', () => ({ logger: () => ({ error: logError }) }))
 vi.mock('@/lib/wishlists/wishlists', () => ({ getWishlist }))
 vi.mock('@/lib/books/effectiveBook', () => ({ getEffectiveBooks }))
 vi.mock('@/app/(frontend)/actions/wishlists', () => ({
-  renameWishlistAction: vi.fn(),
+  renameWishlistAction,
   deleteWishlistAction,
 }))
 vi.mock('@/app/(frontend)/components/toast/ToastProvider', () => ({
@@ -120,9 +121,8 @@ describe('One wishlist', () => {
     await renderPage()
 
     expect(screen.getByRole('link', { name: 'Wishlists' }).getAttribute('href')).toBe('/wishlists')
-    const headings = screen.getAllByRole('heading', { level: 1 })
-    expect(headings.map((h) => [h.textContent, h.className.includes('ui-case')])).toEqual([
-      ['Christmas list', false],
+    expect(screen.getAllByRole('heading', { level: 1 }).map((h) => h.textContent)).toEqual([
+      'Christmas list',
     ])
     expect(screen.getByText('2 books')).toBeTruthy()
     expect(screen.getByRole('button', { name: 'Rename' })).toBeTruthy()
@@ -164,6 +164,32 @@ describe('One wishlist', () => {
     expect(getWishlist).toHaveBeenCalledOnce()
   })
 
+  it('Rename keeps the field open for a taken name and brings the heading back on success', async () => {
+    getWishlist.mockResolvedValue(christmas)
+    renameWishlistAction.mockResolvedValueOnce({ ok: false, code: 'NAME_TAKEN', conflictId: 9 })
+    await renderPage()
+
+    fireEvent.click(screen.getByRole('button', { name: 'Rename' }))
+    const field = screen.getByLabelText('Name')
+    fireEvent.change(field, { target: { value: 'New name' } })
+    fireEvent.keyDown(field, { key: 'Enter' })
+
+    expect(await screen.findByText('That name is already in use.')).toBeTruthy()
+    expect(renameWishlistAction).toHaveBeenCalledExactlyOnceWith(7, 'New name')
+    expect(screen.queryByRole('heading', { level: 1 })).toBeNull()
+
+    renameWishlistAction.mockResolvedValueOnce({ ok: true, data: null })
+    const again = screen.getByLabelText('Name')
+    again.focus()
+    fireEvent.change(again, { target: { value: 'Newer name' } })
+    fireEvent.keyDown(again, { key: 'Enter' })
+
+    await waitFor(() => expect(router.refresh).toHaveBeenCalledOnce())
+    expect(renameWishlistAction).toHaveBeenLastCalledWith(7, 'Newer name')
+    expect(screen.getByRole('heading', { level: 1 }).textContent).toBe('Christmas list')
+    expect(screen.queryByLabelText('Name')).toBeNull()
+  })
+
   it('Delete confirms in a dialog, deletes the list and replaces to /wishlists', async () => {
     getWishlist.mockResolvedValue(christmas)
     deleteWishlistAction.mockResolvedValue({ ok: true, data: null })
@@ -171,7 +197,7 @@ describe('One wishlist', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Delete' }))
     const dialog = await screen.findByRole('dialog')
-    expect(within(dialog).getByText('The list and its 2 books go.')).toBeTruthy()
+    expect(within(dialog).getByText('The list and its entries go.')).toBeTruthy()
     expect(deleteWishlistAction).not.toHaveBeenCalled()
     fireEvent.click(within(dialog).getByRole('button', { name: 'Delete' }))
 

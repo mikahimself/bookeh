@@ -43,8 +43,8 @@ async function load(ctx: Context, id: number): Promise<Loaded | null> {
  * with Rename and Delete (`ListHeading`), then one row per open entry, newest
  * first, with "For {person}" when it has a recipient; "Nothing on this list."
  * with none. A `listId` that is not a row id, or a list that is gone or
- * another user's (FR-48), redirects to `/wishlists`. A failed read, the Back
- * link and Load failed. Books come from `getEffectiveBooks()` and are never
+ * another user's (FR-48), redirects to `/wishlists`. A failed read shows the
+ * Back link and Load failed. Books come from `getEffectiveBooks()` and are never
  * sorted or filtered on.
  */
 export default async function WishlistPage({ params }: { params: Promise<{ listId: string }> }) {

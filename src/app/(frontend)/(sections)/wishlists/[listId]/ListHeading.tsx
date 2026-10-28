@@ -59,7 +59,7 @@ export function ListHeading({ id, name, count }: { id: number; name: string; cou
         <ActionLink disabled={pending || renaming} onClick={() => setRenaming(true)}>
           {t('settings.rename')}
         </ActionLink>
-        <ActionLink destructive disabled={pending} onClick={() => setDeleteOpen(true)}>
+        <ActionLink destructive disabled={pending || renaming} onClick={() => setDeleteOpen(true)}>
           {t('settings.delete')}
         </ActionLink>
       </div>
@@ -73,7 +73,7 @@ export function ListHeading({ id, name, count }: { id: number; name: string; cou
           </Button>
         }
       >
-        <p className="text-body">{t('wishlists.deleteBody', { count })}</p>
+        <p className="text-body">{t('wishlists.deleteBody')}</p>
       </Dialog>
     </div>
   )

@@ -122,6 +122,34 @@ deferred: []
 
 ## Review Triage Log
 
+### 2026-10-28 — Review pass
+- verdicts: 24 findings — high 0, medium 0, low 21, false 3, maybe-false 0
+- findings:
+  - `[low]` `[patch]` Blind: the delete dialog counts only the open entries shown, while `deleteWishlist()` also deletes closed ones; a list with only closed entries says "The list goes." — `deleteBody` is now count-free: "The list and its entries go." / "Lista ja sen kirjat poistuvat.".
+  - `[low]` `[reject]` Blind: the page's "{n} books" can differ from the section's count when a Book is unreadable — an entry's Book is readable by the collection's `readableRelation`, so a gap needs a shared Book going away under an open entry; not everyday use, and the fix adds a second count.
+  - `[low]` `[reject]` Blind: no `h1` while the rename field is open — transient during an edit the user started; keeping a hidden heading adds a branch for a moment nobody navigates by heading.
+  - `[low]` `[patch]` Blind: Delete is enabled while renaming, so a tap blurs the field (sending the rename) and opens the dialog, racing both calls — Delete is now `disabled={pending || renaming}`.
+  - `[low]` `[patch]` Blind: AC 1 and AC 8 (no section headings on the list, roots unchanged) have no test — same root as the verification-gap SectionNav row; covered by the new `sectionNav.unit.spec.ts`.
+  - `[low]` `[patch]` Blind: the heading test asserts `className.includes('ui-case')`, which CLAUDE.md's Tests convention forbids — the assertion now checks the single h1's text only.
+  - `[low]` `[reject]` Blind: `pathname !== current.href` is fragile for future nested routes, and the live region is absent on nested paths — no other nested path exists under `(sections)`; the doc comment states the rule for the next one, and a live region mounting with its text is not announced.
+  - `[low]` `[reject]` Blind: `getWishlist` reads every open entry with no page — one user's list is tens to hundreds of entries; Loans reads the same way; paging adds a cursor no story asks for.
+  - `[low]` `[patch]` Blind: a long "For {person}" is `shrink-0` and can squeeze the title on the phone — it now truncates within half the row.
+  - `[low]` `[reject]` Blind: `NameField` and `typed` are imported from a Settings module — the spec chose this reuse; moving files grows the diff with no named caller that breaks.
+  - `[low]` `[patch]` Blind: garbled doc-comment sentence in `page.tsx` — reworded.
+  - `[low]` `[patch]` Edge: Delete during an open rename races — duplicate of the Delete-while-renaming row.
+  - `[low]` `[patch]` Edge: the delete count understates what goes — duplicate of the delete-count row.
+  - `[low]` `[reject]` Edge: `NOT_FOUND` on Delete is reported although the page then leaves — the spec reports every failure; "Not found." tells the user why the list vanished.
+  - `[false]` `[reject]` Edge: a swipe on `/wishlists/{id}` still changes section — deliberate (Design Notes); it matches swiping with a Book open on Loans.
+  - `[low]` `[patch]` Verification gap: `SectionNav`'s nested-path branch is rendered by no test — added `tests/unit/sectionNav.unit.spec.ts` (nested path: no heading, no nav; root: h1 and nav).
+  - `[low]` `[patch]` Verification gap: Rename on one wishlist is not exercised — added a Rename case (action called with the id and name, `NAME_TAKEN` under the field, success restores the h1).
+  - `[low]` `[patch]` Intent: the "no section headings"/"roots unchanged" ACs are not checked on their surface — duplicate of the SectionNav gap row.
+  - `[low]` `[patch]` Intent: rename in place is not exercised — duplicate of the Rename gap row.
+  - `[low]` `[patch]` Intent: the dialog's stated count is not what is deleted — duplicate of the delete-count row.
+  - `[low]` `[reject]` Intent: a failure of the Book read is not exercised — both reads sit in the one `load().catch` the list-read test covers; a second case restates the same branch.
+  - `[false]` `[reject]` Intent: Settings is checked only by existing suites — the `li className="py-1"` wrapper moved to the callers unchanged, and the Settings suites pass.
+  - `[low]` `[reject]` Intent: the `SectionNav` rule is app-wide — duplicate of the fragility row.
+  - `[false]` `[reject]` Intent: `sprint-status.yaml` says done while the spec says in-review — the spec is set to done at finalize, in the same commit.
+
 ## Design Notes
 
 **No section headings on a nested page.** The mock-up (`key-wishlists.html`, "One list opened") replaces the headings row with the Back link and the list's name as the screen heading. The page lives under `(sections)` so the pinned Scan book stays, as the mock-up shows. `SectionNav` therefore steps aside on paths below a section root. Swiping still moves to the neighbouring section, which needs no change.
@@ -142,3 +170,68 @@ deferred: []
 
 **Manual checks:**
 - Open a list from `/wishlists`: Back link, heading as typed, rows with For, Rename in place, Delete back to `/wishlists`; the section roots still show their headings row.
+
+## Auto Run Result
+
+**Summary.** `/wishlists/[listId]` now opens one of the viewer's wishlists (FR-38, FR-39, UX-DR49):
+- **Service.** `getWishlist(ctx, id)` in `lib/wishlists` returns the list with its open entries, newest first, each with its recipient's name. It returns `null` for a bad id or a list that isn't the viewer's (the admin included, FR-48). Closed entries are never listed.
+- **Page.**
+  - Top to bottom: a Back link "Wishlists", the list's name as typed as the `h1`, then "{n} books · Rename · Delete".
+  - One row per entry: cover, title, authors and, when the entry has a recipient, "For {person}" at the end.
+  - Empty list: "Nothing on this list.". Failed read: the Back link and "Couldn't load." with Try again.
+  - A bad id or a list that isn't the viewer's redirects to `/wishlists`.
+- **Rename and Delete.**
+  - Rename swaps the heading for Settings' `NameField`, now exported. Enter or leaving the field saves; a taken name stays open with its message.
+  - Delete is confirmed by a Dialog ("The list and its entries go."), then goes to `/wishlists`.
+  - Both use the new `renameWishlistAction` and `deleteWishlistAction`.
+- **Headings row.** On a path below a section root, `SectionNav` leaves out the section headings, so the list's name is the only `h1`.
+
+**Files changed.**
+- `src/lib/wishlists/wishlists.ts` -- `ListEntry`, `WishlistView`, `getWishlist`.
+- `src/app/(frontend)/actions/wishlists.ts` -- `renameWishlistAction`, `deleteWishlistAction`; shared input checks.
+- `src/app/(frontend)/(sections)/settings/ManagedList.tsx` -- `NameField` exported, its `li` lifted to the two callers.
+- `src/app/(frontend)/components/SectionNav.tsx` -- no headings below a section root.
+- `src/app/(frontend)/(sections)/wishlists/[listId]/page.tsx`, `ListHeading.tsx`, `EntryRow.tsx` -- new: the page, its heading with Rename and Delete, and the entry row.
+- `messages/en.json`, `messages/fi.json` -- `wishlists.emptyList`, `forPerson`, `deleteTitle`, `deleteBody`.
+- `tests/int/wishlistsService.int.spec.ts` -- two `getWishlist` cases.
+- `tests/unit/wishlistPage.unit.spec.ts` -- new, 6 cases: heading and rows, empty list, Load failed, redirect, Rename, Delete.
+- `tests/unit/sectionNav.unit.spec.ts` -- new: headings at a section root, none on a nested path.
+- `ARCHITECTURE-SPINE.md` -- `ListEntry`, `WishlistView` shared shapes; `getWishlist` on the `wishlists/` source-tree line.
+- `sprint-status.yaml` -- 7.11 done.
+
+**Review.** One pass, 24 findings (low 21, false 3).
+- Patched (7 low entries):
+  - Delete is disabled while renaming.
+  - The delete dialog no longer gives a count of open entries; it says "The list and its entries go.", since closed entries go too. This departs from the plural `deleteBody` wording in the intent contract, which the review may not edit.
+  - "For {person}" truncates.
+  - A doc comment was reworded.
+  - The class-name assertion was dropped.
+  - New tests cover Rename and `SectionNav`.
+- Rejected, with reasons in the triage log:
+  - The page and section counts can differ for unreadable Books.
+  - The heading is missing while renaming.
+  - `SectionNav`'s rule is not future-proof.
+  - The list is not paged.
+  - `NameField` lives in the Settings module.
+  - `NOT_FOUND` is reported on Delete.
+  - The swipe on a nested page is deliberate.
+  - The Book-read failure has no case of its own.
+  - Settings is covered by the existing suites.
+  - The sprint-status order.
+- Nothing deferred.
+
+**Follow-up review:** not recommended. Patched entries this pass: high 0, medium 0, low 7.
+
+**Verification.** After the patches:
+- `npm run typecheck`: clean.
+- `npm run lint`: 0 errors (56 existing warnings).
+- `npm run test:unit`: 982 passed (70 files).
+- `npm run test:reset && npm run test:int`: 663 passed (78 files). Before the review, `shelfTiming`'s text search once went over its limit under load; it passed alone and passed in this run.
+- Matrix audit: rows 1–4 are covered by the `getWishlist` int cases and the page's redirect case; row 5 by 7.5's existing `NAME_TAKEN` test plus the new Rename unit case.
+- The manual check in a running app was not done: no browser run of `/wishlists/{id}`.
+
+**Residual risks.**
+- `SectionNav` hides the headings row on any path below a section root, so a future nested page under `(sections)` must bring its own `h1`.
+- While the rename field is open, the page has no `h1`.
+- The implementation subagent committed the code early (`ccb312e`) before review. The review patches, tests and finished spec land in a follow-up commit.
+- Built in a cloud session against a locally created Postgres 16 cluster (ICU fi-FI), not the Docker Compose database. Not built beside other stories, so no shared files.

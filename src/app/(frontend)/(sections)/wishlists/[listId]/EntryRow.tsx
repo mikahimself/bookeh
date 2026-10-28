@@ -20,7 +20,9 @@ export function EntryRow({ book, forLine }: { book: EffectiveBook; forLine: stri
         <p className="truncate text-title text-text">{book.title}</p>
         {authors && <p className="min-w-0 truncate text-meta text-text-muted">{authors}</p>}
       </div>
-      {forLine !== null && <p className="shrink-0 text-meta text-text-muted">{forLine}</p>}
+      {forLine !== null && (
+        <p className="min-w-0 max-w-1/2 truncate text-meta text-text-muted">{forLine}</p>
+      )}
     </li>
   )
 }
