@@ -5,6 +5,7 @@ import type { Context } from '@/lib/payload/context'
 import * as gateway from '@/lib/payload/gateway'
 import { idOf, isRowId, type Ref } from '@/lib/payload/ref'
 import { withTransaction } from '@/lib/payload/transaction'
+import { resolvePerson } from '@/lib/people/people'
 import type { Undone } from '@/lib/undo/undo'
 
 import { resolveWishlist } from './wishlists'
@@ -194,6 +195,78 @@ export async function closeEntry(
         await reopen(rtx)
       },
     }
+  })
+}
+
+/**
+ * The context user's open entry `entryId` (explicit `owner` filter as well as
+ * `ownerAccess`, FR-48), or `NOT_FOUND`: gone, closed, or another user's, for
+ * the admin too. Runs on the caller's transaction.
+ */
+async function assertOpenEntry(tx: Context, entryId: number): Promise<void> {
+  const { totalDocs } = await gateway.count(tx, {
+    collection: 'wishlist-entries',
+    where: {
+      and: [
+        { id: { equals: entryId } },
+        { owner: { equals: tx.user.id } },
+        { closedAt: { exists: false } },
+      ],
+    },
+  })
+  if (totalDocs === 0) throw new DomainError('NOT_FOUND')
+}
+
+/**
+ * Spine, AD-18, FR-38: the opened entry's "For". Sets, changes or clears the
+ * recipient (`forPerson`) of one of the context user's open entries and
+ * resolves to the recipient's Person id, `null` once cleared. A `Ref` goes
+ * through `resolvePerson()` (`lib/people`, `VALIDATION` on `person`), so an
+ * inline name matching one of the user's People by `nameKey` reuses it and a
+ * new name creates one. The entry is checked first, so a `NOT_FOUND` never
+ * creates a Person. All in one `withTransaction()` joining the caller's.
+ * Nothing else on the entry changes. No Undo: the combobox saves at once.
+ *
+ * An id that is not a row id (`isRowId()`), or not one of the user's open
+ * entries (gone, closed, or another user's, for the admin too), fails with
+ * `NOT_FOUND` before any write.
+ */
+export async function setEntryRecipient(
+  ctx: Context,
+  entryId: number,
+  person: Ref | null,
+): Promise<number | null> {
+  if (!isRowId(entryId)) throw new DomainError('NOT_FOUND')
+
+  return withTransaction(ctx, async (tx) => {
+    await assertOpenEntry(tx, entryId)
+    const personId = person === null ? null : await resolvePerson(tx, person)
+    await gateway.updateByID(tx, {
+      collection: 'wishlist-entries',
+      id: entryId,
+      data: { forPerson: personId },
+      depth: 0,
+    })
+    return personId
+  })
+}
+
+/**
+ * Spine, AD-18, FR-38: Remove on the opened entry. Deletes one of the context
+ * user's open entries in one `withTransaction()` joining the caller's;
+ * `user-books` and the list are left alone. No Undo and no restore: the
+ * screen confirms Remove with a dialog.
+ *
+ * An id that is not a row id (`isRowId()`), or not one of the user's open
+ * entries (gone, closed, or another user's, for the admin too), fails with
+ * `NOT_FOUND` before any write.
+ */
+export async function removeEntry(ctx: Context, entryId: number): Promise<void> {
+  if (!isRowId(entryId)) throw new DomainError('NOT_FOUND')
+
+  await withTransaction(ctx, async (tx) => {
+    await assertOpenEntry(tx, entryId)
+    await gateway.deleteByID(tx, { collection: 'wishlist-entries', id: entryId, depth: 0 })
   })
 }
 
