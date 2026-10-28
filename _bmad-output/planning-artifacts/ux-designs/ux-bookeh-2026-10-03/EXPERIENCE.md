@@ -65,7 +65,7 @@ Mock-ups, in the final tokens. The spines win on any conflict with a mock-up.
 | [mockups/key-wishlists.html](mockups/key-wishlists.html) | The list of wishlists, one wishlist, an entry opened. |
 | [mockups/key-settings.html](mockups/key-settings.html) | Settings on wide and phone. |
 
-Not mocked, built from this spine alone: Sign in, Lookup, the Filter panel on the phone, pickers and dialogs, select mode on the phone, and sizes s and l. The Genres group in Settings is not mocked either; its story starts with a rendered mock-up choice. So do the tag picker and creating a list from the wishlist picker when there is none. The app icon and theme colour are settled in DESIGN.md → App Icon & Theme Colour, and the Corner crop in DESIGN.md → Components.
+Not mocked, built from this spine alone: Sign in, Lookup, the Filter panel on the phone, pickers and dialogs, select mode on the phone, and sizes s and l. The Genres group in Settings is not mocked either; its story starts with a rendered mock-up choice. So does the tag picker. The app icon and theme colour are settled in DESIGN.md → App Icon & Theme Colour, and the Corner crop in DESIGN.md → Components.
 
 ## Voice and Tone
 
@@ -113,7 +113,7 @@ Behaviour. Visual specs live in `DESIGN.md` → Components.
 | Rating | Book detail; the Filter panel | Five stars. Tap a star to set that rating; tap another to change it; tapping the current star does nothing. A "Clear" Link beside the stars, shown only while a rating is set, clears it. Saved at once (FR-29). |
 | Detail panel | Book detail on wide screens | Slides out on the right and the list narrows beside it. Clicking another row swaps its content without closing it. It is not modal: the list stays usable and focus is not trapped. X and `Esc` close it. |
 | Bottom sheet | Book detail and a wishlist entry on the phone; the Filter panel on the phone [ASSUMPTION]; pickers on the phone | Slides up to a little over half the screen; the list stays visible above, dimmed. Dragging up or tapping the handle opens it fully. Tapping the dimmed list, dragging down, X or Back closes it. The list keeps its scroll position. Modal: focus is held inside. |
-| Picker | Location (Move), tags (Tag), Person and date (Lend), wishlist (Add to wishlist) | A bottom sheet on the phone; a dialog on wide screens. One choice, then it closes. Location ends with a "New location" field under its rows: a name and Move move to the location of that name, creating it when none matches. Person and date (Lend) does not close on a choice: see Loans → Lend. |
+| Picker | Location (Move), tags (Tag), Person and date (Lend), wishlist (Add to wishlist) | A bottom sheet on the phone; a dialog on wide screens. One choice, then it closes. Location ends with a "New location" field under its rows: a name and Move move to the location of that name, creating it when none matches. Wishlist ends the same way with a "New list" field and Add: see Answer → Add to wishlist. Person and date (Lend) does not close on a choice: see Loans → Lend. |
 | Dialog | Confirmations of removals and merges; "Discard changes?"; New list | Centred, modal, with the screen behind dimmed. The confirming button is on the right. `Esc` and tapping outside cancel. |
 | Toast | After a save or a reversible action | Sits above whatever is pinned to the bottom. Shows the result and its actions as Links. About 4 seconds, then gone; one at a time, a new one replacing the old. A toast raised on Scan has no timer: it stays until the next Answer opens, so Edit and Undo wait while the next book is lined up. Leaving Scan gives it the usual 4 seconds. An error toast has no timer and stays until dismissed or replaced. Every toast has a close (X). Undo is hidden once its receipt has expired (30 minutes). |
 | Action bar | Select mode | Pinned to the bottom. The count, then Move, Tag, Read, Remove, and Done. On the phone it takes the place of the pinned Scan book button and is two rows: the count and Done above, the four actions below. [ASSUMPTION] On wide screens Scan book stays in the header. Buttons other than Done are disabled while nothing is ticked. |
@@ -247,7 +247,7 @@ Under the Book, the Answer names the source ("From Finna") and any author, serie
 
 - **Add to library** and **Add another copy** save an owned copy as fetched, at the default location, and return to Scan with the save toast. There is no review step in between. With no default location the copy has no location and the toast reads "Saved".
 - **Edit** on the save toast opens Edit book for that Book, with the new copy's status and location on its first screen. This is also how a copy is marked ordered at the moment it is added.
-- **Add to wishlist** opens the wishlist picker every time; the user taps a list. With exactly one list the picker is skipped. [ASSUMPTION] With no lists the picker offers only "New list". The recipient is set later, on the entry.
+- **Add to wishlist** opens the wishlist picker every time; the user taps a list. With exactly one list the picker is skipped. The picker is titled "Add to wishlist" with the Book's title muted under it, then one row per list with its count, then a "New list" Text field with a secondary Add button beside it, disabled while the field is blank, as Move's "New location". A name and Add save to the list of that name, creating it when none matches. With no lists the rows are absent and the field is focused on open. Enter in the field adds. The save toasts "Added to {list} · Undo"; Undo removes the entry and keeps a list made on the way. The recipient is set later, on the entry. (Mock-up A, Mika, 2026-10-28; `.working/wishlist-picker-new-list.html`.)
 - **Open book** leaves scanning and shows that Book's detail in the collection.
 - **Back** returns to Scan with nothing saved. Lookup is read-only: nothing is created until a button is pressed (FR-11).
 - **Couldn't look it up** says which sources did not answer ("Finna and Google Books didn't answer."). **Try again** runs the lookup once more. **Add by hand** unfolds the title and author fields and the Not found buttons in place.
@@ -333,7 +333,7 @@ Two columns on wide screens: profile, language, theme, visibility, default locat
 | Undo expired | Toast | The Undo Link is hidden once the receipt has expired. |
 | Still not found | Book detail, after Look it up again | Toast "Still not found." |
 | Nothing lent | Loans | "Nothing lent" and one dry remark. Returned loans still show below. |
-| No wishlists | Wishlists; the wishlist picker | "No wishlists" and "New list". |
+| No wishlists | Wishlists; the wishlist picker | Wishlists: "No wishlists" and "New list". The picker: only its "New list" field, focused. |
 | Empty wishlist | Wishlist | "Nothing on this list." |
 | No locations | Everywhere | Location fields, the location filter, Move, and the row ending are absent (FR-32). The first location is added in settings, which shows "No locations" and "Add location". |
 | First use of the camera | Scan | The device asks for permission. Until it is given, Scan shows the no-camera state. |

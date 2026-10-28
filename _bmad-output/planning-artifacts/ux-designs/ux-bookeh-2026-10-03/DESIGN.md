@@ -406,7 +406,7 @@ Visual specs. Behaviour lives in `EXPERIENCE.md` → Component Patterns.
 | Option list | The values of a filter field, one per line in {typography.body}. A value that is switched on is {colors.text} with the 8px {colors.accent} marker before it; the others are {colors.text-muted}. |
 | Combobox | A Text field. Its popup is an outlined box ({spacing.stroke-control} {colors.text}) directly under the field, as wide as the field. The highlighted option has the selection bar on its left; the chosen option has the 8px marker. [ASSUMPTION] |
 | Date field | A Text field holding the platform's date control. |
-| Picker | The Bottom sheet on the phone; the Dialog on wide screens. Location ends with a "New location" Text field under the rows and a secondary button beside it, disabled while the field is blank. |
+| Picker | The Bottom sheet on the phone; the Dialog on wide screens. Location ends with a "New location" Text field under the rows and a secondary button beside it, disabled while the field is blank. The wishlist picker ends the same way with "New list" and Add. |
 | Dialog | An outlined box ({spacing.stroke-control} {colors.text}) on the plain ground, centred, at most 400px wide, over the {colors.scrim}. Title in {typography.heading-group}, buttons right-aligned at the foot. [ASSUMPTION] |
 | Progress line | [ASSUMPTION: a {spacing.stroke-control} {colors.accent} line moving across the top edge of the screen while something loads.] |
 | Close (X) | Two {spacing.stroke-control} {colors.text} strokes forming an X, in the top right corner. No circle and no box around it. |

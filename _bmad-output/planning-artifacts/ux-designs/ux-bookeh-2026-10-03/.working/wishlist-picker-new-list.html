@@ -88,7 +88,7 @@ u{text-decoration-color:var(--co);text-decoration-thickness:2px;text-underline-o
 <tr><td>A · Name field under the rows</td><td>Add to wishlist → type name → Add (3)</td><td>the same field under the rows</td><td>a "New list" field + Add under the rows, as Move's "New location"</td></tr>
 <tr><td>B · New list turns into a field</td><td>Add to wishlist → New list → type → Add (4)</td><td>New list row → field in place</td><td>a "New list" row last; tapping it swaps the rows for a field</td></tr>
 <tr><td>C · Name prefilled</td><td>Add to wishlist → Add (2), list named "Wishlist"</td><td>as A</td><td>as A; the prefill only when there are no lists</td></tr></table>
-<p class="why">In every option the new list is created inside the save's transaction (a <code>{ create: name }</code> Ref), a name already in use is rejected under the field and the overlay stays open, and Undo on "Added to {list} · Undo" removes the entry but keeps the list.</p>
+<p class="why">In every option the new list is created inside the save's transaction (a <code>{ create: name }</code> Ref), a name already in use saves to that list (as Move does with locations), and Undo on "Added to {list} · Undo" removes the entry but keeps the list.</p>
 
 <!-- ============ A ============ -->
 <h2>A · Name field under the rows</h2>
@@ -162,9 +162,9 @@ u{text-decoration-color:var(--co);text-decoration-thickness:2px;text-underline-o
     <div class="bk"><i class="c1"></i><div><b>Sinuhe egyptiläinen</b><span>Mika Waltari</span><span>From Finna</span></div></div></div>
   <div class="scrim"></div>
   <div class="dlg"><p class="back"><u>Back</u></p><p class="t">New list</p><p class="ctx">Sinuhe egyptiläinen goes on it</p>
-    <div class="fld"><label>Name</label><div class="in"><span>Antikvariaatti</span></div><p class="err">Name already in use.</p></div>
+    <div class="fld"><label>Name</label><div class="in"><span>Antikvariaatti<span class="caret"></span></span></div></div>
     <div class="foot"><span class="bt">Cancel</span><span class="bt pr">Add</span></div></div>
-</div><p class="cap">Wide, the name step in the dialog, with a taken name rejected under the field.</p></div>
+</div><p class="cap">Wide, the name step in the dialog.</p></div>
 </div>
 
 <!-- ============ C ============ -->
