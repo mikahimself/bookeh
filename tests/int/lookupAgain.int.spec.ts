@@ -10,6 +10,8 @@ import { DomainError } from '@/lib/errors'
 import { heldOutcome, lookupSources } from '@/lib/metadata/lookup'
 import type { SourceResult, SourcesOutcome } from '@/lib/metadata/source'
 import type { Context } from '@/lib/payload/context'
+import { createEntry } from '@/lib/wishlists/entries'
+import { createWishlist } from '@/lib/wishlists/wishlists'
 import config from '@/payload.config'
 import type { Book, User } from '@/payload-types'
 
@@ -155,6 +157,29 @@ describe('lookupAgain', () => {
       { totalDocs: 0 },
     )
     expect((await ofOwner('copies', user)).map((copy) => copy.book)).toEqual([shared.id])
+    await untouched()
+  })
+
+  it('moves my entries in a merge and closes none of them', async () => {
+    const { user, ctx, isbn, own, untouched } = await setup()
+    const list = await createWishlist(ctx, `Toiveet ${suffix()}`)
+    const { entryId } = (await createEntry(ctx, { wishlist: list, bookId: own.id })).data
+    const shared = await sharedBook(isbn)
+
+    const result = await lookupAgain(ctx, { bookId: own.id })
+
+    expect(result).toEqual({ kind: 'shared', bookId: shared.id, source: 'google' })
+    expect(await payload.count({ collection: 'books', where: { id: { equals: own.id } } })).toEqual(
+      { totalDocs: 0 },
+    )
+    expect((await ofOwner('copies', user)).map((copy) => copy.book)).toEqual([shared.id])
+    const entry = await payload.findByID({
+      collection: 'wishlist-entries',
+      id: entryId,
+      overrideAccess: true,
+      depth: 0,
+    })
+    expect([entry.book, entry.closedAt ?? null]).toEqual([shared.id, null])
     await untouched()
   })
 

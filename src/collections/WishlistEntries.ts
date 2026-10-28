@@ -15,8 +15,7 @@ import { ownedRelation, readableRelation } from '@/fields/relation'
  * closed entry keeps its row, Remove deletes it. The same Book may appear on a
  * list more than once, so entries are addressed by id. From 7.5 on
  * `lib/wishlists` is its only writer, except that a People merge repoints
- * `forPerson` (7.4) and a private-Book merge moves entries to the shared Book
- * (7.7).
+ * `forPerson` (7.4).
  */
 export const WishlistEntries: CollectionConfig = {
   slug: 'wishlist-entries',

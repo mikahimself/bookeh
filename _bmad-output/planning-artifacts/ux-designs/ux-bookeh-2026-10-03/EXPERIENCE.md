@@ -129,7 +129,7 @@ Undo is offered where the action has a plain opposite. Removals are confirmed fi
 
 | Action | Toast | Undo does |
 |---|---|---|
-| Add to library, Add another copy | "Saved to {location} · Edit · Undo" | Removes the copy, plus any Book, author or series it created that nothing else uses (FR-15). |
+| Add to library, Add another copy | "Saved to {location} · Edit · Undo" | Removes the copy, plus any Book, author or series it created that nothing else uses (FR-15). Also reopens the user's own wishes the save ticked off (FR-28). |
 | Add to wishlist | "Added to {list} · Undo" | Removes the entry, and the Book on the same rule. |
 | Move (one or many) | "{n} moved to {location} · Undo" | Puts each copy back where it was; a copy whose previous location has since been deleted or merged away returns to no location. |
 | Tag (one or many, any kind) | "Tagged {n} · Undo" | Restores each Book's tags. |

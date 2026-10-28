@@ -8,7 +8,7 @@ import type { Context } from '@/lib/payload/context'
 import * as gateway from '@/lib/payload/gateway'
 import type { Ref } from '@/lib/payload/ref'
 import { type Undoable, type Undone, withUndo } from '@/lib/undo/undo'
-import { createEntry } from '@/lib/wishlists/entries'
+import { closeEntriesForBook, createEntry } from '@/lib/wishlists/entries'
 
 import { storeCover } from './covers'
 import { createPrivateBook, type ManualEntry, normaliseManual } from './createPrivateBook'
@@ -66,7 +66,8 @@ export type EntrySaveResult = { bookId: number; entryId: number; savedTo: Named 
  * the Book has none): it keeps its id and takes the values of the candidate
  * `chooseCandidate()` takes for `pick` and `candidate`.
  * When a shared Book with the ISBN exists and the user also has a private
- * one, the private Book merges into it: its copies and the user's row move,
+ * one, the private Book merges into it: its copies, the user's wishlist
+ * entries and the user's row move,
  * and it is deleted, the save failing when anything else still references
  * it. Either way the user's hand-entered values that differ beyond case,
  * whitespace and punctuation become their overrides; an admin's are dropped.
@@ -92,6 +93,12 @@ export type EntrySaveResult = { bookId: number; entryId: number; savedTo: Named 
  * Book with one sends `{ isbn13 }`. A held Book the user can no longer read
  * (a shared Book the admin made private) fails in `createCopy()`.
  *
+ * For every target, before the copy is created and in the same transaction,
+ * the user's own open wishlist entries for the saved Book (no recipient) are
+ * closed (`closeEntriesForBook()`, FR-28, AD-18). Entries for a Person,
+ * closed entries and other users' entries stay. After a merge that is the
+ * shared Book, so the user's entries moved from the private Book close there.
+ *
  * A repeat of a recent `requestId` by the same user returns the first result
  * and writes nothing, even with another `target`: the id identifies the press
  * (AD-11, AD-12, `oncePerRequest()`). A failed save is not remembered, so a
@@ -109,11 +116,15 @@ export type EntrySaveResult = { bookId: number; entryId: number; savedTo: Named 
  *
  * Undo (AD-11, AD-20): the transaction is `withUndo()`'s, so the result
  * carries an `undoToken` and the whole seconds left on it, and `undo()` with
- * the token deletes the copy, then the rows `ensureSharedBook()` or
- * `createPrivateBook()` created that no row of any user references any more.
+ * the token deletes the copy, reopens the entries the save closed that still
+ * exist, then deletes the rows `ensureSharedBook()` or `createPrivateBook()`
+ * created that no row of any user references any more. A copy with a loan
+ * fails the Undo with `UNDO_FAILED` and nothing changes: the undo
+ * transaction rolls back.
  * A Book that existed before the save stays, even when nothing references
  * it, and a share or a merge is not undone: the Book stays shared, and the
- * moved copies, the row and the overrides stay. A repeat of the `requestId`
+ * moved copies, entries, the row and the overrides stay; reopened entries
+ * stay on the shared Book. A repeat of the `requestId`
  * records no second receipt: it returns the first token with the seconds
  * left now. An Undo keeps the `requestId` remembered, so a retry within the
  * window returns the undone result and saves nothing.
@@ -262,10 +273,14 @@ async function saveBook<R extends object>(
 }
 
 /**
- * The owned copy at the default location and where it landed, inside the
- * save's transaction. Its restore deletes the copy.
+ * The user's own open wishes for the Book closed (`closeEntriesForBook()`),
+ * then the owned copy at the default location and where it landed, inside
+ * the save's transaction. Its restore deletes the copy, then reopens the
+ * entries. A lent copy fails the Undo with `UNDO_FAILED` and nothing
+ * changes: the undo transaction rolls back.
  */
 async function saveOwnedCopy(tx: Context, bookId: number): Promise<Undone<SaveResult>> {
+  const closed = await closeEntriesForBook(tx, bookId)
   const copy = await createCopy(tx, { bookId, status: 'owned' })
   const copyId = copy.data
   const row = await gateway.findByID(tx, {
@@ -280,5 +295,11 @@ async function saveOwnedCopy(tx: Context, bookId: number): Promise<Undone<SaveRe
     typeof location === 'object' && location !== null
       ? { id: location.id, name: location.name }
       : null
-  return { data: { bookId, copyId, savedTo }, restore: copy.restore }
+  return {
+    data: { bookId, copyId, savedTo },
+    restore: async (rtx) => {
+      await copy.restore(rtx)
+      await closed.restore(rtx)
+    },
+  }
 }

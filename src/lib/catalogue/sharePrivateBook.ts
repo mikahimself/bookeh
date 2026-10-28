@@ -7,6 +7,7 @@ import type { Context } from '@/lib/payload/context'
 import * as gateway from '@/lib/payload/gateway'
 import { idOf } from '@/lib/payload/ref'
 import { assertLive, onRollback } from '@/lib/payload/transaction'
+import { moveEntriesToBook } from '@/lib/wishlists/entries'
 import type { Author, Series } from '@/payload-types'
 
 import {
@@ -86,13 +87,13 @@ export async function prepareShare(
  * (`findBookByIsbn()`):
  *
  * - The shared Book: the user's own private Book with the ISBN, if any, is
- *   merged into it (its copies and `user-books` row move, then it is
- *   deleted), and the cover is discarded at once. When the shared Book has
- *   no cover, the private Book's cover row is shared in place and becomes
- *   the shared Book's. No held outcome is needed: the shared Book's values
- *   are the target. When any row still references the private Book after
- *   the move, the merge throws a plain `Error`, which rolls the save back,
- *   rather than let Postgres null that reference.
+ *   merged into it (the user's copies, wishlist entries and `user-books` row
+ *   move, then it is deleted), and the cover is discarded at once. When the
+ *   shared Book has no cover, the private Book's cover row is shared in
+ *   place and becomes the shared Book's. No held outcome is needed: the
+ *   shared Book's values are the target. When any row still references the
+ *   private Book after the move, the merge throws a plain `Error`, which
+ *   rolls the save back, rather than let Postgres null that reference.
  * - The user's private Book with `pending`: promoted in place. It keeps its
  *   id and takes the candidate's values, with authors and series matched or
  *   created among shared rows; `visibility` becomes shared and the field hook
@@ -256,15 +257,17 @@ async function shareCoverRow(tx: Context, id: number): Promise<void> {
 }
 
 /**
- * FR-12 and D-8: the private Book's copies and row move to the shared Book,
- * then it is deleted, only when nothing references it any more. A shared
- * Book without a cover takes the private Book's, shared in place (AD-5).
+ * FR-12 and D-8: the private Book's copies, the user's wishlist entries (open
+ * or closed, AD-18) and row move to the shared Book, then it is deleted, only
+ * when nothing references it any more. A shared Book without a cover takes
+ * the private Book's, shared in place (AD-5).
  */
 async function merge(tx: Context, ownId: number, sharedId: number): Promise<void> {
   const own = await readBook(tx, ownId)
   const shared = await readBook(tx, sharedId)
   const overrides = isAdmin(tx.user) ? {} : differing(own, fromBook(shared))
   await moveCopiesToBook(tx, ownId, sharedId)
+  await moveEntriesToBook(tx, ownId, sharedId)
   await mergeUserBook(tx, ownId, sharedId, overrides)
   // Postgres would null a remaining reference on delete; the throw rolls the save back.
   if (!(await isUnreferenced(tx, 'books', ownId))) {

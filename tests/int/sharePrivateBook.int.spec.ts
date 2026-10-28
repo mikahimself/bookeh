@@ -19,12 +19,14 @@ import {
 import { upsertUserBook } from '@/lib/books/upsertUserBook'
 import { mediaDir } from '@/lib/catalogue/covers'
 import { DomainError } from '@/lib/errors'
-import { saveCopy, type CopySaveInput } from '@/lib/catalogue/saveCopy'
+import { saveCopy, type CopySaveInput, saveEntry } from '@/lib/catalogue/saveCopy'
 import { setCover } from '@/lib/catalogue/setCover'
 import type { Context } from '@/lib/payload/context'
+import * as gateway from '@/lib/payload/gateway'
 import { heldOutcome, lookupSources } from '@/lib/metadata/lookup'
 import type { SourceResult, SourcesOutcome } from '@/lib/metadata/source'
 import { undo } from '@/lib/undo/undo'
+import { createWishlist } from '@/lib/wishlists/wishlists'
 import config from '@/payload.config'
 import type { Book, User } from '@/payload-types'
 
@@ -502,6 +504,47 @@ describe('saveCopy of a held private Book', () => {
     expect(rows[0]!.authors).toEqual(own.authors)
     // The override still references the private author, so it stays.
     expect(await exists('authors', (own.authors as number[])[0]!)).toBe(true)
+  })
+
+  it('moves my entries in a merge, closing my own and keeping a Person’s open', async () => {
+    const { user, ctx } = await freshUser()
+    const isbn = randomIsbn()
+    const author = `Aleksis Kivi ${suffix()}`
+    const list = await createWishlist(ctx, `Toiveet ${suffix()}`)
+    const { bookId: ownId, entryId: own } = await saveEntry(ctx, {
+      requestId: randomUUID(),
+      target: { manual: { isbn, title: 'T1', authors: [author] } },
+      save: { kind: 'entry', wishlist: list },
+    })
+    const person = await gateway.create(ctx, {
+      collection: 'people',
+      data: { owner: user.id, name: `Liisa ${suffix()}`, nameKey: 'ignored' },
+      depth: 0,
+    })
+    const forP = await gateway.create(ctx, {
+      collection: 'wishlist-entries',
+      data: { owner: user.id, wishlist: list, book: ownId, forPerson: person.id },
+      depth: 0,
+    })
+    const shared = await sharedBook(isbn, 'T2', author)
+
+    const result = await saveCopy(ctx, isbnInput(isbn))
+
+    expect(result.bookId).toBe(shared.id)
+    expect((await booksWithIsbn(isbn)).map((book) => book.id)).toEqual([shared.id])
+    expect((await copiesOf(user)).map((copy) => copy.book)).toEqual([shared.id])
+    const entries = await payload.find({
+      collection: 'wishlist-entries',
+      where: { owner: { equals: user.id } },
+      overrideAccess: true,
+      depth: 0,
+      pagination: false,
+      sort: 'id',
+    })
+    expect(entries.docs.map((e) => [e.id, e.book, e.closedAt ?? null])).toEqual([
+      [own, shared.id, expect.any(String)],
+      [forP.id, shared.id, null],
+    ])
   })
 
   it('refuses a merge while another row still references the private Book', async () => {

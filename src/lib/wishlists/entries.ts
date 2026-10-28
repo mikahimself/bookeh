@@ -55,6 +55,105 @@ export async function createEntry(
   })
 }
 
+/**
+ * Spine, AD-18 and FR-28: Add to library ticks off the user's own wishes.
+ * Closes the context user's open entries for the Book that have no recipient
+ * (`forPerson` empty), all with one `closedAt`, in one `withTransaction()`
+ * joining the caller's, and resolves to the ids closed with the restore that
+ * reopens them (AD-20). Entries for a Person, closed entries and other
+ * users' entries are left alone: the find filters on `owner` explicitly as
+ * well as through `ownerAccess`, so the admin is held to their own.
+ *
+ * The restore clears `closedAt` on each closed entry still present, as the
+ * restoring user; one deleted since is skipped. It closes over the ids only.
+ */
+export async function closeEntriesForBook(ctx: Context, bookId: number): Promise<Undone<number[]>> {
+  return withTransaction(ctx, async (tx) => {
+    const { docs } = await gateway.find(tx, {
+      collection: 'wishlist-entries',
+      where: {
+        and: [
+          { owner: { equals: tx.user.id } },
+          { book: { equals: bookId } },
+          { forPerson: { exists: false } },
+          { closedAt: { exists: false } },
+        ],
+      },
+      select: { book: true },
+      depth: 0,
+      pagination: false,
+    })
+    const ids = docs.map((doc) => doc.id)
+    const closedAt = new Date().toISOString()
+    // One after the other: calls on one context never run concurrently (AD-16).
+    for (const id of ids) {
+      await gateway.updateByID(tx, {
+        collection: 'wishlist-entries',
+        id,
+        data: { closedAt },
+        depth: 0,
+      })
+    }
+    return { data: ids, restore: (rtx) => reopenEntries(rtx, ids) }
+  })
+}
+
+async function reopenEntries(ctx: Context, ids: number[]): Promise<void> {
+  if (ids.length === 0) return
+  // A find first: a failed `updateByID` (`NotFound`) would end the transaction.
+  const { docs } = await gateway.find(ctx, {
+    collection: 'wishlist-entries',
+    where: { id: { in: ids } },
+    select: { book: true },
+    depth: 0,
+    pagination: false,
+  })
+  for (const { id } of docs) {
+    await gateway.updateByID(ctx, {
+      collection: 'wishlist-entries',
+      id,
+      data: { closedAt: null },
+      depth: 0,
+    })
+  }
+}
+
+/**
+ * Spine, AD-5 and AD-18: moves the context user's entries for one Book,
+ * open or closed, to another, in the caller's transaction or one of its own
+ * (AD-16), and resolves to the number moved. Used when a private Book merges
+ * into the shared Book with its ISBN (FR-12, D-8). `wishlist`, `forPerson`
+ * and `closedAt` stay. As `moveCopiesToBook()`, the find filters on `owner`
+ * explicitly, so no other user's entry is read or changed; a target the user
+ * cannot read is refused by `readableRelation` with a `ValidationError` on
+ * `book`.
+ */
+export async function moveEntriesToBook(
+  ctx: Context,
+  fromBookId: number,
+  toBookId: number,
+): Promise<number> {
+  return withTransaction(ctx, async (tx) => {
+    const { docs } = await gateway.find(tx, {
+      collection: 'wishlist-entries',
+      where: { and: [{ owner: { equals: tx.user.id } }, { book: { equals: fromBookId } }] },
+      select: { book: true },
+      depth: 0,
+      pagination: false,
+    })
+    // One after the other: calls on one context never run concurrently (AD-16).
+    for (const { id } of docs) {
+      await gateway.updateByID(tx, {
+        collection: 'wishlist-entries',
+        id,
+        data: { book: toBookId },
+        depth: 0,
+      })
+    }
+    return docs.length
+  })
+}
+
 // `count` first: a failed `deleteByID` (`NotFound`) would end the transaction.
 async function deleteEntry(ctx: Context, id: number): Promise<void> {
   const { totalDocs } = await gateway.count(ctx, {
