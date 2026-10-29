@@ -29,7 +29,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 10-06-2026 17:50
-last_updated: 10-26-2026 20:57
+last_updated: 10-29-2026 14:52
 project: bookeh
 project_key: NOKEY
 tracking_system: file-system
@@ -227,7 +227,7 @@ development_status:
   7-13-h8-bought-ordered-and-remove: done
   7-14-h10-add-to-wishlist: done
   7-15-h17-on-wishlists-in-book-detail: done
-  epic-7-retrospective: optional
+  epic-7-retrospective: done
 
   epic-8: backlog
   8-1-i1-answer-heading-and-fact-lines: backlog
@@ -240,6 +240,7 @@ development_status:
   8-8-i6-lookup-by-title-or-author: backlog
   8-9-i7-add-by-hand-from-lookup: backlog
   8-10-i8-end-to-end-shop-check: backlog
+  8-11-k21-page-not-found: backlog
   epic-8-retrospective: optional
 
   epic-9: backlog
@@ -805,8 +806,8 @@ action_items:
       beforeDelete refusal on Copies and People in the back office; every owner_id
       cascades so a user delete removes their private rows; spine records the rule;
       closes the 3.21, 6.1 and 6.4 deferrals (X3; decision 3). Includes wishlists.owner_id
-      (7.1) and wishlist-entries owner_id, wishlist_id, book_id and for_person_id (7.2),
-      generated as ON DELETE set null with wishlist_id and book_id NOT NULL"
+      (7.1) and wishlist-entries owner_id, wishlist_id, book_id and for_person_id
+      (7.2), generated as ON DELETE set null with wishlist_id and book_id NOT NULL"
     owner: "Mika"
     status: open
     ref: "_bmad-output/implementation-artifacts/epic-6-retro-2026-10-26.md"
@@ -856,5 +857,67 @@ action_items:
       in the story or written into the next story ACs at plan time, never left in
       the context Known open items (P1)"
     owner: "Mika"
-    status: open
+    status: in-progress
     ref: "_bmad-output/implementation-artifacts/epic-6-retro-2026-10-26.md"
+  - id: "epic-7-retro-item-73-wishlist-seams-a-scan-of-a-book-held-onl"
+    epic: 7
+    action: "Wishlist seams: a scan of a Book held only through entries gives the
+      Not in library Answer, not a silent reset (X1); Bought/Ordered on an own entry
+      closes all the user own open entries for the Book via closeEntriesForBook, folded
+      into the restore, AD-18 updated (X2, decision 1); NotFoundForm disables Add
+      to library while the wishlist press is pending (X3); one case each"
+    owner: "Mika"
+    status: open
+    ref: "_bmad-output/implementation-artifacts/epic-7-retro-2026-10-29.md"
+  - id: "epic-7-retro-item-74-foreign-keys-wishlists-and-wishlist-entr"
+    epic: 7
+    action: "Foreign keys: wishlists and wishlist-entries columns join the Epic 6
+      item 66 restrict/cascade migration; closes the 7.1, 7.2 and 7.4 deferrals (X5)"
+    owner: "Mika"
+    status: open
+    ref: "_bmad-output/implementation-artifacts/epic-7-retro-2026-10-29.md"
+  - id: "epic-7-retro-item-75-spec-reconciliation-ad-18-names-mergeper"
+    epic: 7
+    action: "Spec reconciliation: AD-18 names mergePerson as writer of loans.person
+      and wishlist-entries.forPerson on a merge; spine gains ClosedEntry, setEntryRecipient
+      return and useCloseDetail(to); EXPERIENCE.md:198 {list} alone line; epic-7-context.md
+      recompiled; deferred-work.md 48 and 97-99 closed (S1, S3, S4)"
+    owner: "Mika"
+    status: open
+    ref: "_bmad-output/implementation-artifacts/epic-7-retro-2026-10-29.md"
+  - id: "epic-7-retro-item-76-deferred-refactor-when-a-story-next-touc"
+    epic: 7
+    action: "Deferred refactor when a story next touches them (joins Epic 6 item 70):
+      saveEntryAction, AddToWishlist and viewerWishlists out of scan/; one owned-name
+      resolver for locations, People and wishlists; one open-entry where-clause; limits.name
+      in ManagedList and MovePicker; shared serverTree and int builder in tests/helpers;
+      split collectionPage.unit.spec.ts (S2, A2, A3)"
+    owner: "Mika"
+    status: open
+    ref: "_bmad-output/implementation-artifacts/epic-7-retro-2026-10-29.md"
+  - id: "epic-7-retro-item-77-process-a-story-that-adds-or-changes-a-s"
+    epic: 7
+    action: "Process: a story that adds or changes a screen runs one uncommitted Playwright
+      walk of its ACs against the e2e server before done and records what it saw in
+      the Auto Run Result; written into _bmad/custom bmad-build and bmad-build-auto
+      (P1)"
+    owner: "Mika"
+    status: open
+    ref: "_bmad-output/implementation-artifacts/epic-7-retro-2026-10-29.md"
+  - id: "epic-7-retro-item-78-process-a-clean-up-story-before-epic-8-t"
+    epic: 7
+    action: "Process: a clean-up story before Epic 8 takes items 1 and 2 of this retro,
+      Epic 6 items 65 and 67, and writes Epic 6 item 72 into CLAUDE.md Conventions;
+      8.1/8.2 ACs gain: a scan never resets silently (P2, P3, decision 2)"
+    owner: "Mika"
+    status: open
+    ref: "_bmad-output/implementation-artifacts/epic-7-retro-2026-10-29.md"
+  - id: "epic-7-retro-item-79-housekeeping-set-epic-5-epic-6-and-epic"
+    epic: 7
+    action: "Housekeeping: set epic-5, epic-6 and epic-7 to done in sprint-status.yaml
+      (closes Epic 6 item 71); run the phone session owed by Epic 4 item 47, Epic
+      5 item 57 and Epic 6 item 69, adding the Wishlists sheet and picker at phone
+      width"
+    owner: "Mika"
+    status: open
+    ref: "_bmad-output/implementation-artifacts/epic-7-retro-2026-10-29.md"

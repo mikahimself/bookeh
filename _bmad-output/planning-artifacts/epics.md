@@ -443,7 +443,7 @@ Named lists with counts, Add to wishlist from the Answer and Book detail with Un
 
 ### Epic 8: Shop check — "do I already have this?"
 The full Answer: In library, Ordered, On wishlist or Not in library as the heading, every other fact as a line; Lookup by title or author with "In your library" and "Elsewhere"; lookup of a Book without an ISBN; the shop-check end-to-end test.
-**Slices:** I1, I2, I4–I8, I10–I12.
+**Slices:** I1, I2, I4–I8, I10–I12, K21 (page not found, added at the Epic 7 retro).
 **FRs covered:** FR-20, FR-21, FR-22 (complete).
 **NFRs covered:** NFR-1.
 
@@ -3241,6 +3241,31 @@ So that "do I already have this?" can't silently break (Tests convention).
 **When** the test runs
 **Then** it adds one book to the library, scans it again and sees "in library" with the copy's location; scans another, taps Add to wishlist, picks a list and sees "Added to {list}"; scans that one again and sees "on wishlist"
 **And** it makes no network call outside the app
+
+### Story 8.11: [K21] Page not found
+
+As Mika,
+I want an address the app doesn't know to land on bookeh's own page with a way back,
+So that a mistyped or stale link doesn't drop me on Next.js's unstyled default 404.
+
+**Acceptance Criteria:**
+
+**Given** a frontend address no route answers (for example `/nothing-here` or `/wishlists/1/extra`)
+**When** it is opened, signed in or not
+**Then** the response is HTTP 404 and the page is the app's own `not-found` page, in the frontend layout with the design tokens, both themes and the terse voice: a heading ("Not found") and one Link back, to Collection (`/`)
+**And** it shows no user data and calls no service, so it is the same page signed out (where the Link leads on to sign-in as any page does)
+
+**Given** the page's strings
+**When** the language is English or Finnish
+**Then** both languages have them, and the page meets the accessibility floor (one `h1`, the Link reachable by keyboard, focus visible)
+
+**Given** the screens that already handle a missing or foreign id (a wishlist that isn't the viewer's redirects to `/wishlists`; Edit book shows Not held)
+**When** this story lands
+**Then** they are unchanged, and the Payload admin keeps its own not-found under `/admin`
+
+**Given** the spine's Routes table
+**When** the page lands
+**Then** a row names the not-found page and when it applies, in the same commit
 
 ## Epic 9: Tag, genre and theme my books
 
