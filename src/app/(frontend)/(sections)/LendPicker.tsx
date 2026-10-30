@@ -6,6 +6,7 @@ import { useEffect, useId, useRef, useState, type TransitionStartFunction } from
 import { limits } from '@/fields/limits'
 import type { Named } from '@/lib/books/effectiveBook'
 import type { ActionResult } from '@/lib/errors'
+import { helsinkiToday } from '@/lib/loans/dates'
 import type { Ref } from '@/lib/payload/ref'
 
 import { lendCopyAction } from '../actions/loans'
@@ -33,8 +34,6 @@ type Props = {
   context: string
   /** The viewer's People, most recently lent-to first (`lendingPeople()`). */
   people: readonly Named[]
-  /** Today in Helsinki, as `YYYY-MM-DD`: the date's default and its `max`. */
-  today: string
   copyId: number
   /** The caller's transition, so its pending state covers the lend. */
   startTransition: TransitionStartFunction
@@ -52,7 +51,9 @@ type Props = {
  * the Person Combobox over every Person. A "New person" field takes a name
  * (matched or created by `lib/people`); typing clears the row and the
  * Combobox, and marking or choosing clears the field. Then "Lent on",
- * today by default. Lend (or Enter) needs a Person and a date and sends
+ * today by default and at most: today in `Europe/Helsinki` when the picker
+ * opens, so a screen left open past midnight offers the new day (Epic 6
+ * retro decision 4). Lend (or Enter) needs a Person and a date and sends
  * them; the picker stays open
  * meanwhile and on a field error it can show, and closes on anything else.
  * After the close, `ok` shows "Lent to {person}" with Undo, and every result
@@ -63,7 +64,6 @@ export function LendPicker({
   onOpenChange,
   context,
   people,
-  today,
   copyId,
   startTransition,
   pending,
@@ -79,6 +79,7 @@ export function LendPicker({
   const [finding, setFinding] = useState(false)
   const [found, setFound] = useState<number | null>(null)
   const [typed, setTyped] = useState('')
+  const [today, setToday] = useState(helsinkiToday)
   const [lentOn, setLentOn] = useState(today)
   const [errors, setErrors] = useState<{ person?: string; lentOn?: string; inCombobox?: boolean }>(
     {},
@@ -92,7 +93,9 @@ export function LendPicker({
       setFinding(false)
       setFound(null)
       setTyped('')
-      setLentOn(today)
+      const now = helsinkiToday()
+      setToday(now)
+      setLentOn(now)
       setErrors({})
     }
   }

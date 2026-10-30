@@ -3,7 +3,7 @@ import { beforeAll, describe, expect, it } from 'vitest'
 
 import { receiveCopy } from '@/lib/copies/receiveCopy'
 import { DomainError } from '@/lib/errors'
-import { lendCopy } from '@/lib/loans/loans'
+import { lendCopy, returnLoan } from '@/lib/loans/loans'
 import { undo, withUndo } from '@/lib/undo/undo'
 import config from '@/payload.config'
 import type { Book, Copy, User } from '@/payload-types'
@@ -106,6 +106,20 @@ describe('receiveCopy', () => {
     expect(await stored(ordered.id)).toEqual({ status: 'owned', location: location.id })
     const loan = await payload.findByID({ collection: 'loans', id: data.loanId, depth: 0 })
     expect(loan.returnedOn ?? null).toBeNull()
+  })
+
+  // AD-20: a returned loan is harmless history, so it does not refuse the Undo.
+  it('orders it again on Undo when its only loan is returned', async () => {
+    const { user } = await userWithDefault('Receive Copy Returned')
+    const asUser = await contextFor(user)
+    const ordered = await copyFor(user, 'ordered')
+
+    const result = await withUndo(asUser, (tx) => receiveCopy(tx, ordered.id))
+    const { data } = await lendCopy(asUser, ordered.id, { create: 'Liisa' })
+    await returnLoan(asUser, data.loanId)
+
+    await expect(undo(asUser, result.undoToken)).resolves.toBeUndefined()
+    expect(await stored(ordered.id)).toEqual({ status: 'ordered', location: null })
   })
 
   it('receives with no location when there is no default', async () => {

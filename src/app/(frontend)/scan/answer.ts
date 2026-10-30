@@ -108,14 +108,16 @@ const existingBook = (book: ExistingResult['book'], isbn13: string): AnswerBook 
 /**
  * The Not in library Answer for a lookup, or `null` when another Answer
  * applies: the picked source candidate, or a Book the viewer can read and
- * holds nothing of. Epic 8's `answerFacts` takes over heading precedence.
- * A Book with no ISBN has none: the lookup found it by its ISBN.
+ * holds no copy of. A Book held only through open entries, the viewer's own
+ * or for a Person, answers here until Story 8.2's On wishlist heading. Epic
+ * 8's `answerFacts` takes over heading precedence. A Book with no ISBN has
+ * none: the lookup found it by its ISBN.
  */
 export function notInLibrary(result: LookupResult): AnswerBook | null {
   switch (result.kind) {
     case 'existing': {
       const { book, mine } = result
-      if (book.isbn13 === null || mine.copies.length > 0 || mine.entries.length > 0) return null
+      if (book.isbn13 === null || mine.copies.length > 0) return null
       return existingBook(book, book.isbn13)
     }
     case 'source': {
@@ -152,8 +154,8 @@ export function notInLibrary(result: LookupResult): AnswerBook | null {
 /**
  * The In library Answer (FR-16, FR-20, FR-30): a Book the viewer holds at
  * least one copy of, with each copy's location and status in Holdings order.
- * `null` for anything else; a Book held only by wishlist entries is On
- * wishlist's (Epic 7/8). A Book with no ISBN has none, as in `notInLibrary`.
+ * `null` for anything else; a Book held only by wishlist entries is Not in
+ * library's (`notInLibrary`). A Book with no ISBN has none, as there.
  * Any copy counts, ordered included, so an ordered-only holding shows In
  * library with an "Ordered" line until the Ordered heading arrives (Story
  * 8.2, as Story 4.9's AC says).

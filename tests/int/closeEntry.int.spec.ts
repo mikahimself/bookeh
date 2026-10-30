@@ -118,11 +118,13 @@ describe('closeEntry', () => {
     vi.restoreAllMocks()
   })
 
-  it('bought, own: closes the entry and saves an owned copy at the default location', async () => {
+  // FR-28, decision 1: as a save, every own wish for the Book closes, on any list.
+  it('bought, own: closes every own entry for the Book and saves one owned copy at the default location', async () => {
     const { user, ctx, location } = await userWithDefault()
     const x = await sharedBook()
     const entry = await ownEntry(ctx, x.id)
     const other = await ownEntry(ctx, x.id)
+    const forPerson = await entryForPerson(ctx, x.id)
 
     const result = await withUndo(ctx, (tx) => closeEntry(tx, entry, 'bought'))
 
@@ -132,7 +134,22 @@ describe('closeEntry', () => {
     ])
     const after = await closedAtOf(user)
     expect(after[entry]).toEqual(expect.any(String))
-    expect(after[other]).toBeNull()
+    expect(after[other]).toEqual(expect.any(String))
+    expect(after[forPerson]).toBeNull()
+  })
+
+  it('for a Person: closes that entry alone and leaves own entries open', async () => {
+    const { user, ctx } = await userWithDefault()
+    const x = await sharedBook()
+    const gift = await entryForPerson(ctx, x.id)
+    const own = await ownEntry(ctx, x.id)
+
+    await withUndo(ctx, (tx) => closeEntry(tx, gift, 'bought'))
+
+    expect(await copiesOf(user)).toEqual([])
+    const after = await closedAtOf(user)
+    expect(after[gift]).toEqual(expect.any(String))
+    expect(after[own]).toBeNull()
   })
 
   it('ordered, own: closes the entry and saves an ordered copy with no location', async () => {
@@ -199,6 +216,19 @@ describe('closeEntry', () => {
         expect(await closedAtOf(user)).toEqual({ [entry]: null })
       },
     )
+
+    it('deletes the one copy and reopens every own entry the close closed, across two lists', async () => {
+      const { user, ctx } = await userWithDefault()
+      const x = await sharedBook()
+      const entry = await ownEntry(ctx, x.id)
+      const other = await ownEntry(ctx, x.id)
+
+      const result = await withUndo(ctx, (tx) => closeEntry(tx, entry, 'ordered'))
+      await undo(ctx, result.undoToken)
+
+      expect(await copiesOf(user)).toEqual([])
+      expect(await closedAtOf(user)).toEqual({ [entry]: null, [other]: null })
+    })
 
     it.each(['bought', 'ordered'] as const)('%s: reopens a Person entry', async (as) => {
       const { user, ctx } = await userWithDefault()

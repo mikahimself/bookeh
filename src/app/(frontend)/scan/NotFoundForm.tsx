@@ -30,7 +30,8 @@ import { type OnRefused, useAddToLibrary } from './useAddToLibrary'
  * Add to wishlist saves the same typed text to a list, with the typed title
  * under the picker's heading. A title or author blank after trimming is
  * marked required and focused before any picker opens; the server's marks
- * show as Add to library's do.
+ * show as Add to library's do. While it saves, and once it has saved, Add to
+ * library is disabled and Enter submits nothing.
  */
 export function NotFoundForm({
   isbn13,
@@ -47,6 +48,8 @@ export function NotFoundForm({
   const authorField = useRef<HTMLInputElement>(null)
   const [marks, setMarks] = useState<{ title?: ErrorCode; author?: ErrorCode }>({})
   const [typedTitle, setTypedTitle] = useState(title)
+  /** Add to wishlist is saving or leaving: Add to library would add a second private Book. */
+  const [wishing, setWishing] = useState(false)
 
   const typed = () => ({
     title: titleField.current?.value ?? '',
@@ -70,6 +73,8 @@ export function NotFoundForm({
 
   const submit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
+    // Enter in Author submits even with the button disabled in some browsers.
+    if (wishing) return
     setMarks({})
     const text = typed()
     add(
@@ -135,8 +140,9 @@ export function NotFoundForm({
           target={entryTarget}
           onRefused={onRefused}
           disabled={pending}
+          onBusyChange={setWishing}
         />
-        <Button variant="primary" type="submit" disabled={pending}>
+        <Button variant="primary" type="submit" disabled={pending || wishing}>
           {t('answer.addToLibrary')}
         </Button>
         <AnswerBack label={t('answer.back')} />

@@ -296,6 +296,16 @@ describe('loans service', () => {
     await expect(undo(other.ctx, returned.undoToken)).resolves.toBeUndefined()
   })
 
+  // AD-20, decision 2: a returned loan is history; the lend's Undo keeps it.
+  it('fails the Undo of a lend with UNDO_FAILED once the loan is returned, keeping it', async () => {
+    const { ctx, copy, person } = await lender('Lend Undo Returned')
+    const lent = await withUndo(ctx, (tx) => lendCopy(tx, copy.id, person.id, '2026-10-01'))
+    await returnLoan(ctx, lent.loanId, '2026-10-02')
+
+    expect(await failure(undo(ctx, lent.undoToken))).toMatchObject({ code: 'UNDO_FAILED' })
+    expect(await loansOf(copy.id)).toEqual([{ id: lent.loanId, returnedOn: noon('2026-10-02') }])
+  })
+
   it('fails the Undo of a return with UNDO_FAILED once the copy is lent again', async () => {
     const { ctx, copy, person, loanId } = await lentOnFirst('Return Undo Lent Again')
     const result = await withUndo(ctx, (tx) => returnLoan(tx, loanId))

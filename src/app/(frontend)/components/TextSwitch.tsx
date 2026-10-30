@@ -17,6 +17,8 @@ export type TextSwitchProps<V extends string> = (
   properNames?: boolean
   /** Every option disabled; the chosen one stays in text. */
   disabled?: boolean
+  /** The id of a message about the group, such as its error (`aria-describedby`). */
+  describedBy?: string
 }
 
 /**
@@ -34,12 +36,14 @@ export function TextSwitch<V extends string>({
   onChange,
   properNames = false,
   disabled = false,
+  describedBy,
 }: TextSwitchProps<V>) {
   return (
     <div
       role="group"
       aria-label={label}
       aria-labelledby={labelledBy}
+      aria-describedby={describedBy}
       className="flex flex-wrap gap-4"
     >
       {options.map((option) => {

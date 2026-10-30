@@ -174,9 +174,6 @@ describe('notInLibrary', () => {
     expect(
       notInLibrary({ kind: 'existing', book, mine: { copies: [copy()], entries: [] } }),
     ).toBeNull()
-    expect(
-      notInLibrary({ kind: 'existing', book, mine: { copies: [], entries: [entry] } }),
-    ).toBeNull()
     // The lookup found the Book by its ISBN, so this cannot happen.
     expect(
       notInLibrary({ kind: 'existing', book: { ...book, isbn13: null }, mine: nothing }),
@@ -403,7 +400,7 @@ describe('editionLine', () => {
 })
 
 describe('answerFor', () => {
-  it('answers In library for a held copy, Not in library for nothing held, else Scan', async () => {
+  it('answers In library for a held copy, else Not in library, entries only included', async () => {
     await expect(
       answerFor(ISBN, async () => ({
         kind: 'existing',
@@ -423,7 +420,7 @@ describe('answerFor', () => {
         book,
         mine: { copies: [], entries: [entry] },
       })),
-    ).resolves.toEqual({ kind: 'scan' })
+    ).resolves.toMatchObject({ kind: 'notInLibrary', answer: { title: 'Tuntematon sotilas' } })
   })
 
   it('answers Not found with the ISBN in 13 digits when no source knows it', async () => {

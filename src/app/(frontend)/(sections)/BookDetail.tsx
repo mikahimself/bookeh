@@ -6,7 +6,6 @@ import { getHoldings } from '@/lib/books/holdings'
 import { getUserBookState } from '@/lib/books/userBookState'
 import type { LocationOption } from '@/lib/copies/locations'
 import { logger } from '@/lib/errors'
-import { helsinkiToday } from '@/lib/loans/dates'
 import { returnedLoans } from '@/lib/loans/loans'
 import type { Context } from '@/lib/payload/context'
 import { lendingPeople } from '@/lib/people/people'
@@ -50,8 +49,8 @@ const DOT = ' · '
  * and rating only, never the client rows, so it stays open when its row
  * leaves the list. `locations` are the page's, for Move; none when that
  * read failed.
- * The viewer's People (`lendingPeople()`) and today are read only when some
- * copy can be lent; a failed People read leaves the picker with New person
+ * The viewer's People (`lendingPeople()`) are read only when some copy can
+ * be lent; the picker reads today itself; a failed People read leaves it with New person
  * alone. Lent before follows Your copies when the viewer's copies have
  * returned loans (`returnedLoans(ctx, bookId)`), newest first as
  * "{person} · {from} to {to}"; a failed read leaves it out. On wishlists
@@ -94,7 +93,6 @@ export async function BookDetail({
         return []
       })
     : []
-  const today = lendable ? helsinkiToday() : ''
   const history = await returnedLoans(ctx, bookId).catch((err: unknown) => {
     logger().error({ err }, 'The loan history failed to load')
     return []
@@ -147,7 +145,6 @@ export async function BookDetail({
                             copyId={copyId}
                             context={location ? `${book.title}${DOT}${location.name}` : book.title}
                             people={people}
-                            today={today}
                           />
                           {locations.length > 0 && (
                             <MoveCopy

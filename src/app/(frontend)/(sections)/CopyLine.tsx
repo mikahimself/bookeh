@@ -245,12 +245,10 @@ export function LendCopy({
   copyId,
   context,
   people,
-  today,
 }: {
   copyId: number
   context: string
   people: readonly Named[]
-  today: string
 }) {
   const t = useTranslations('loans')
   const [open, setOpen] = useState(false)
@@ -267,7 +265,6 @@ export function LendCopy({
         onOpenChange={setOpen}
         context={context}
         people={people}
-        today={today}
         copyId={copyId}
         startTransition={startTransition}
         pending={pending}

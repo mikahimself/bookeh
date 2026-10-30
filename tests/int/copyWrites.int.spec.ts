@@ -119,6 +119,33 @@ describe('copy writes', () => {
     expect((await systemRead(id)).location ?? null).toBeNull()
   })
 
+  // Spine, `copies.status`: an ordered copy is never lent.
+  it('refuses ordered on a copy with an open loan on status, writing nothing', async () => {
+    const id = await copyOf(asA)
+    await loanOf(asA, id, (await personOf(asA)).id)
+    const before = await systemRead(id)
+
+    await expect(setStatus(asA, id, { status: 'ordered' })).rejects.toMatchObject({
+      code: 'VALIDATION',
+      fields: { status: 'VALIDATION' },
+    })
+    expect(await systemRead(id)).toMatchObject({
+      status: 'owned',
+      location: home.id,
+      updatedAt: before.updatedAt,
+    })
+  })
+
+  it('sets ordered on a copy whose loan is returned', async () => {
+    const id = await copyOf(asA)
+    await loanOf(asA, id, (await personOf(asA)).id, '2026-10-22')
+
+    await setStatus(asA, id, { status: 'ordered' })
+    const ordered = await systemRead(id)
+    expect(ordered.status).toBe('ordered')
+    expect(ordered.location ?? null).toBeNull()
+  })
+
   it('stores the note trimmed and NFC-normalised, and an empty one as null', async () => {
     const id = await copyOf(asA)
     await setNote(asA, id, '  Cafe\u0301  ')

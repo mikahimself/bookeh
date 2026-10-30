@@ -33,13 +33,15 @@ function changeOf(saved: SavedCopy, status: Status, location: Ref | null): CopyC
  * ones). Choosing ordered hides the combobox and keeps the location it
  * showed, so owned again shows it and returns to the saved values. With no
  * locations the combobox is absent; the first location is added in Settings
- * (FR-32, EXPERIENCE.md No locations).
+ * (FR-32, EXPERIENCE.md No locations). `statusError` shows under the switch,
+ * which stays when Ordered hides the combobox and its `error`.
  */
 export function CopyFields({
   saved,
   locations,
   value,
   error,
+  statusError,
   onChange,
 }: {
   saved: SavedCopy
@@ -47,10 +49,13 @@ export function CopyFields({
   value: CopyChange | undefined
   /** A message for the location; draws the danger underline. */
   error?: string
+  /** A message for the status (a lent copy set to Ordered). */
+  statusError?: string
   onChange: (copy: CopyChange | undefined) => void
 }) {
   const t = useTranslations('editBook')
   const statusLabel = useId()
+  const statusErrorId = `${statusLabel}-error`
   const options = useMemo(() => locations.map(({ id, name }) => ({ id, label: name })), [locations])
   // The location while ordered hides it, or one the draft does not carry.
   const [kept, setKept] = useState<Ref | null>(saved.location)
@@ -65,6 +70,7 @@ export function CopyFields({
         </p>
         <TextSwitch
           labelledBy={statusLabel}
+          describedBy={statusError ? statusErrorId : undefined}
           value={status}
           options={[
             { value: 'owned', label: t('owned') },
@@ -75,6 +81,11 @@ export function CopyFields({
             onChange(changeOf(saved, next, location))
           }}
         />
+        {statusError && (
+          <p id={statusErrorId} className="text-meta">
+            {statusError}
+          </p>
+        )}
       </div>
       {status === 'owned' && locations.length > 0 && (
         <Combobox

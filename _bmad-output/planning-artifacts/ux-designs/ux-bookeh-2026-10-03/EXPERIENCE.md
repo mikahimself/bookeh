@@ -136,8 +136,8 @@ Undo is offered where the action has a plain opposite. Removals are confirmed fi
 | Read (a selection, in select mode) | "Marked {n} read · Undo" ("unread" when it marks them unread) | Restores each Book's read flag. |
 | Lend | "Lent to {person} · Undo" | Removes the loan. |
 | Returned | "Returned · Undo" | Reopens the loan. |
-| Bought (wishlist entry, for me) | "Saved to {location} · Undo" | Removes the copy and reopens the entry. |
-| Ordered (wishlist entry) | "Ordered · Undo" | Removes the ordered copy, if one was made, and reopens the entry. |
+| Bought (wishlist entry, for me) | "Saved to {location} · Undo" | Removes the copy and reopens every entry the press closed. |
+| Ordered (wishlist entry) | "Ordered · Undo" | Removes the ordered copy, if one was made, and reopens every entry the press closed. |
 | Bought (wishlist entry, for a Person) | "Bought · Undo" | Reopens the entry. No copy is made. |
 | Received | "Saved to {location} · Undo" | Sets the copy back to ordered. |
 | Save on Edit book | "Saved" | No Undo. |
@@ -284,7 +284,7 @@ Under the Book, the Answer names the source ("From Finna") and any author, serie
 | Entry row | Cover, title, author, and "For {person}" at the end. No recipient means the entry is for the user (FR-38). |
 | Entry opened | Tapping an entry opens it at `?entry={entryId}`: a sheet or panel with the Book's header, "On {list}", and a "For" combobox of People that can be set, changed or cleared at any time. It is the entry, not Book detail. |
 | Closed entries | A bought, ordered or removed entry leaves the list. |
-| Bought | Closes the entry. If it is for the user, an owned copy is created at the default location; if it is for someone else, no copy is created (FR-28). |
+| Bought | If the entry is for the user, it closes with every other open entry of theirs for the Book, on any list, as Add to library does, and one owned copy is created at the default location; if it is for someone else, only that entry closes and no copy is created (FR-28). |
 | Ordered | Closes the entry and creates an ordered copy, on the same rule. |
 | Remove | Destructive. Removes the entry. |
 

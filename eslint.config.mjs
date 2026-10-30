@@ -95,14 +95,14 @@ export const clientLibImports = {
     type: 'problem',
     docs: {
       description:
-        'Client components import from src/lib only types, lib/shelf/query, lib/catalogue/corners and lib/books/languageName.',
+        'Client components import from src/lib only types, lib/shelf/query, lib/catalogue/corners, lib/books/languageName and lib/loans/dates.',
     },
     schema: [],
     messages: {
       restricted:
-        "Spine, Design Paradigm: a 'use client' component imports from src/lib only types, lib/shelf/query, lib/catalogue/corners and lib/books/languageName. Remove the import, or make it `import type`.",
+        "Spine, Design Paradigm: a 'use client' component imports from src/lib only types, lib/shelf/query, lib/catalogue/corners, lib/books/languageName and lib/loans/dates. Remove the import, or make it `import type`.",
       reexport:
-        'Spine, Design Paradigm: client components import from src/lib only types, lib/shelf/query, lib/catalogue/corners and lib/books/languageName, so a module under src/app may not re-export src/lib values: a client component could import it. Import the value from src/lib in server code, or make it `export type`.',
+        'Spine, Design Paradigm: client components import from src/lib only types, lib/shelf/query, lib/catalogue/corners, lib/books/languageName and lib/loans/dates, so a module under src/app may not re-export src/lib values: a client component could import it. Import the value from src/lib in server code, or make it `export type`.',
     },
   },
   create(context) {
@@ -112,6 +112,7 @@ export const clientLibImports = {
       path.join(libDir, 'shelf', 'query'),
       path.join(libDir, 'catalogue', 'corners'),
       path.join(libDir, 'books', 'languageName'),
+      path.join(libDir, 'loans', 'dates'),
     ])
     const inApp = filename.startsWith(appDir + path.sep)
 

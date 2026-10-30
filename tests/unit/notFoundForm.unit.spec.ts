@@ -217,6 +217,28 @@ describe('NotFoundForm', () => {
     expect(saveManualAction).not.toHaveBeenCalled()
   })
 
+  it('disables Add to library while the wishlist press is pending, and Enter saves nothing', async () => {
+    saveEntryAction.mockReturnValue(new Promise(() => {}))
+    render(
+      createElement(NotFoundForm, {
+        isbn13: null,
+        title: '',
+        lists: [{ id: 4, name: 'Joululahjat', count: 0 }],
+      }),
+    )
+    type('answer.title', 'Sinuhe')
+    type('answer.author', 'Waltari')
+    fireEvent.click(screen.getByRole('button', { name: 'wishlists.addToWishlist' }))
+
+    await waitFor(() =>
+      expect(
+        screen.getByRole<HTMLButtonElement>('button', { name: 'answer.addToLibrary' }).disabled,
+      ).toBe(true),
+    )
+    fireEvent.submit(screen.getByLabelText('answer.author'))
+    expect(saveManualAction).not.toHaveBeenCalled()
+  })
+
   it("marks the server's refusal of Add to wishlist under the field", async () => {
     saveEntryAction.mockResolvedValue({
       ok: false,

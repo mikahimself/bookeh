@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
-import { useRef, useState, useTransition } from 'react'
+import { useEffect, useRef, useState, useTransition } from 'react'
 
 import type { EntrySaveResult } from '@/lib/catalogue/saveCopy'
 import { limits } from '@/fields/limits'
@@ -42,6 +42,10 @@ const SEPARATOR = ', '
  *
  * `target` as a function is read at the press (the Not found form's typed
  * text): `null` saves nothing and opens no picker.
+ *
+ * `onBusyChange` hears whether a save is in flight, or, without `stay`, has
+ * succeeded and is leaving: the Not found form disables Add to library
+ * meanwhile, so no second private Book lands beside the wish.
  */
 export function AddToWishlist({
   lists,
@@ -50,6 +54,7 @@ export function AddToWishlist({
   stay = false,
   onRefused,
   disabled = false,
+  onBusyChange,
 }: {
   lists: readonly WishlistLine[]
   title: string
@@ -57,12 +62,14 @@ export function AddToWishlist({
   stay?: boolean
   onRefused?: OnRefused
   disabled?: boolean
+  onBusyChange?: (busy: boolean) => void
 }) {
   const t = useTranslations()
   const router = useRouter()
   const { show } = useToast()
   const back = useTaskBack('/scan')
   const [open, setOpen] = useState(false)
+  const [leaving, setLeaving] = useState(false)
   const [refreshing, startTransition] = useTransition()
   /** The target read at the press, saved when the picker's choice comes. */
   const chosen = useRef<EntryTarget | null>(null)
@@ -80,10 +87,21 @@ export function AddToWishlist({
         startTransition(() => {
           router.refresh()
         })
-      } else back()
+      } else {
+        setLeaving(true)
+        back()
+      }
     },
     { latch: !stay },
   )
+
+  // Hidden under Activity, the press's latch is released; so is this, for a revived instance.
+  useEffect(() => () => setLeaving(false), [])
+
+  const saving = pending || leaving
+  useEffect(() => {
+    onBusyChange?.(saving)
+  }, [saving, onBusyChange])
 
   const save = (wishlist: Ref) => {
     const sent = chosen.current

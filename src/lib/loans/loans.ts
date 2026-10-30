@@ -41,7 +41,9 @@ function dateOrToday(value: string | undefined, field: 'lentOn' | 'returnedOn'):
  * on `copy_id`, unchanged.
  *
  * The restore deletes the loan through the gateway as the restoring user and
- * skips a loan that is gone. It closes over the loan's id only.
+ * skips a loan that is gone. A loan returned since is refused with
+ * `UNDO_FAILED` and kept, as the save's restore refuses a copy with a loan.
+ * It closes over the loan's id only.
  */
 export async function lendCopy(
   ctx: Context,
@@ -170,8 +172,20 @@ async function loanExists(ctx: Context, id: number): Promise<boolean> {
   return totalDocs > 0
 }
 
+// A find first: a failed `deleteByID` (`NotFound`) would end the transaction.
 async function deleteLoan(ctx: Context, id: number): Promise<void> {
-  if (!(await loanExists(ctx, id))) return
+  const { docs } = await gateway.find(ctx, {
+    collection: 'loans',
+    where: { and: [{ id: { equals: id } }, { owner: { equals: ctx.user.id } }] },
+    select: { returnedOn: true },
+    limit: 1,
+    depth: 0,
+    pagination: false,
+  })
+  const loan = docs[0]
+  if (!loan) return
+  // AD-20: a returned loan is history; the lend's Undo does not erase it.
+  if (loan.returnedOn) throw new DomainError('UNDO_FAILED')
   await gateway.deleteByID(ctx, { collection: 'loans', id, depth: 0 })
 }
 

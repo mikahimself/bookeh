@@ -28,7 +28,7 @@ import {
   REQUEST_WINDOW_MS,
 } from '@/lib/catalogue/saveRequests'
 import { DomainError, logger } from '@/lib/errors'
-import { lendCopy } from '@/lib/loans/loans'
+import { lendCopy, returnLoan } from '@/lib/loans/loans'
 import { heldOutcome, lookupSources } from '@/lib/metadata/lookup'
 import type { SourcesOutcome } from '@/lib/metadata/source'
 import { undo } from '@/lib/undo/undo'
@@ -790,6 +790,29 @@ describe('saveCopy', () => {
       const loan = await payload.findByID({ collection: 'loans', id: data.loanId, depth: 0 })
       expect(loan.copy).toBe(result.copyId)
       expect(loan.returnedOn ?? null).toBeNull()
+    })
+
+    // AD-20: any loan refuses, a returned one too, by the explicit check.
+    it('fails with UNDO_FAILED after a returned loan, keeping the copy and the loan', async () => {
+      const { user, ctx } = await freshUser()
+      const isbn = randomIsbn()
+      const names = { author: unique('Aleksis Kivi'), series: unique('Nummisuutarit') }
+      vi.mocked(lookupSources).mockResolvedValue(found(isbn, names))
+
+      const result = await saveCopy(ctx, inputFor(isbn))
+      await coverOf(result.bookId)
+      const { data } = await lendCopy(ctx, result.copyId, { create: 'Liisa' })
+      await returnLoan(ctx, data.loanId)
+      const warn = vi.spyOn(logger(), 'warn').mockImplementation(() => {})
+
+      await expect(undo(ctx, result.undoToken)).rejects.toMatchObject({ code: 'UNDO_FAILED' })
+      const { err } = warn.mock.calls[0]?.[0] as { err: unknown }
+      expect(err).toBeInstanceOf(DomainError)
+      expect(err).toMatchObject({ code: 'UNDO_FAILED' })
+
+      expect((await copiesOf(user)).map((copy) => copy.id)).toEqual([result.copyId])
+      const loan = await payload.findByID({ collection: 'loans', id: data.loanId, depth: 0 })
+      expect(loan.returnedOn).toEqual(expect.any(String))
     })
 
     it('keeps a Book that existed before the save, even unreferenced', async () => {

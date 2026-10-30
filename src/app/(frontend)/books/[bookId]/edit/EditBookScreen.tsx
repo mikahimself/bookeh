@@ -52,8 +52,9 @@ const onServer = () => false
  * `effective` values, the copy fields with `setEdit(draft, 'copy', change)`,
  * and every change is written through `writeDraft`; it drives `dirty` and
  * the guard. The fields show the `marks` a rejected Save left under them
- * (the copy's `location` under its combobox); editing a field clears its
- * mark.
+ * (the copy's `location` under its combobox, its `status`, a lent copy set
+ * to Ordered, under the Status switch); editing a field clears its mark, and
+ * either copy field clears both.
  *
  * Save sends the draft (`editBookAction`), `copy` apart from the Book's
  * `edits`: "Saved", the draft cleared and the task closed (history back, so
@@ -169,8 +170,10 @@ export function EditBookScreen({
   }
 
   const edit: OnEdit = (key, value) => update(setEdit(draft, key, value, effective[key]), key)
-  const editCopy = (change: CopyChange | undefined) =>
+  const editCopy = (change: CopyChange | undefined) => {
     update(setEdit(draft, 'copy', change, undefined), 'location')
+    setMark('status', undefined)
+  }
 
   const guarding = dirty && armed
   useCloseOnBack(
@@ -286,6 +289,7 @@ export function EditBookScreen({
           locations={locations}
           value={copyChange}
           error={marks.location === undefined ? undefined : t('editBook.checkField')}
+          statusError={marks.status === undefined ? undefined : t('editBook.returnFirst')}
           onChange={editCopy}
         />
       )}

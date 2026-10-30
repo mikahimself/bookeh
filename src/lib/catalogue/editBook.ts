@@ -158,7 +158,9 @@ const isIsbnClash = (err: unknown): boolean =>
  * edits, so a failure in either leaves both unchanged. A `status` goes
  * through `setStatus()` (owned without a `location` takes the default), a
  * `location` alone through `moveCopies()`, whose restore is dropped; both
- * refuse a copy that is not the viewer's with `NOT_FOUND`. `moveCopies()`
+ * refuse a copy that is not the viewer's with `NOT_FOUND`. Ordered on a copy
+ * with an open loan fails in `setStatus()` with `VALIDATION` on `status`, and
+ * the Book's edit rolls back with it. `moveCopies()`
  * skips an ordered copy, which this one caller turns back into `VALIDATION`
  * on `location` (the Book's edit rolls back with it). Ordered together with a
  * `location` fails with `VALIDATION` on `location` before any read. An empty

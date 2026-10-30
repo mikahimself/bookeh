@@ -12,12 +12,29 @@ import { type CopyStatus, locationFor } from './locations'
  * location; owned takes the given location (`Ref` or `null`) or, without one,
  * the default, as `createCopy()` does. Owned with no location always means
  * the default, so the caller sends a status only when it changes. A copy that
- * is not the viewer's fails with `NOT_FOUND` before any write. No Undo
- * (AD-20).
+ * is not the viewer's fails with `NOT_FOUND` before any write. An ordered
+ * copy is never lent: ordered on a copy with an open loan fails with
+ * `VALIDATION` on `status` and writes nothing; a returned loan is history
+ * and does not refuse. No Undo (AD-20).
  */
 export async function setStatus(ctx: Context, copyId: number, change: CopyStatus): Promise<void> {
   await withTransaction(ctx, async (tx) => {
     await requireOwnCopy(tx, copyId)
+    if (change.status === 'ordered') {
+      const open = await gateway.count(tx, {
+        collection: 'loans',
+        where: {
+          and: [
+            { copy: { equals: copyId } },
+            { owner: { equals: tx.user.id } },
+            { returnedOn: { exists: false } },
+          ],
+        },
+      })
+      if (open.totalDocs > 0) {
+        throw new DomainError('VALIDATION', { fields: { status: 'VALIDATION' } })
+      }
+    }
     const location = await locationFor(tx, change)
     await gateway.updateByID(tx, {
       collection: 'copies',

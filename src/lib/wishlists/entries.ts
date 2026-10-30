@@ -110,17 +110,18 @@ export type ClosedEntry = { copyId: number | null; savedTo: LocationOption | nul
 
 /**
  * Spine, AD-18 and AD-20, FR-28: Bought and Ordered on one of the context
- * user's open entries. Sets its `closedAt` and, only for an entry with no
- * recipient (`forPerson` empty), creates a copy through `createCopy()`: owned
- * at the default location (none without one) for bought, ordered for
- * ordered. A gift bought for a Person never lands on the user's shelf. All in
- * one `withTransaction()` joining the caller's, so a failed copy rolls the
- * close back and the entry stays open. A Book the user can no longer read is
- * refused by `createCopy()` (`readableRelation`, a `ValidationError` on
- * `book`), and the close rolls back with it. Resolves to the copy and, for a
- * bought own copy, where it landed. Other entries for the Book and
- * `user-books` are left alone. Records nothing: callers wrap it in
- * `withUndo()`.
+ * user's open entries. An entry for a Person (`forPerson` set) is closed
+ * alone and makes no copy: a gift never lands on the user's shelf. An entry
+ * with no recipient closes as a save does: `closeEntriesForBook()` closes
+ * every one of the user's own open entries for its Book, on any list, then
+ * `createCopy()` makes one copy, owned at the default location (none without
+ * one) for bought, ordered for ordered. All in one `withTransaction()`
+ * joining the caller's, so a failed copy rolls the close back and the
+ * entries stay open. A Book the user can no longer read is refused by
+ * `createCopy()` (`readableRelation`, a `ValidationError` on `book`), and the
+ * close rolls back with it. Resolves to the copy and, for a bought own copy,
+ * where it landed. Entries for a Person and `user-books` are left alone.
+ * Records nothing: callers wrap it in `withUndo()`.
  *
  * An id that is not a row id (`isRowId()`), or not one of the user's open
  * entries (gone, closed, or another user's, for the admin too), fails with
@@ -128,8 +129,8 @@ export type ClosedEntry = { copyId: number | null; savedTo: LocationOption | nul
  * well as through `ownerAccess` (FR-48).
  *
  * The restore runs the copy's restore first, which refuses with
- * `UNDO_FAILED` once the copy has any loan, then clears `closedAt` on the
- * entry if it is still present. It closes over ids only.
+ * `UNDO_FAILED` once the copy has any loan, then clears `closedAt` on every
+ * entry the close closed that is still present. It closes over ids only.
  */
 export async function closeEntry(
   ctx: Context,
@@ -156,19 +157,22 @@ export async function closeEntry(
     const entry = docs[0]
     if (!entry) throw new DomainError('NOT_FOUND')
 
-    await gateway.updateByID(tx, {
-      collection: 'wishlist-entries',
-      id: entryId,
-      data: { closedAt: new Date().toISOString() },
-      depth: 0,
-    })
-    const reopen = (rtx: Context) => reopenEntries(rtx, [entryId])
-
     if (entry.forPerson != null) {
-      return { data: { copyId: null, savedTo: null }, restore: reopen }
+      await gateway.updateByID(tx, {
+        collection: 'wishlist-entries',
+        id: entryId,
+        data: { closedAt: new Date().toISOString() },
+        depth: 0,
+      })
+      return {
+        data: { copyId: null, savedTo: null },
+        restore: (rtx) => reopenEntries(rtx, [entryId]),
+      }
     }
 
     const bookId = idOf(entry.book)
+    // FR-28, decision 1: as a save, every own wish for the Book, this one included.
+    const closed = await closeEntriesForBook(tx, bookId)
     const copy = await createCopy(
       tx,
       as === 'bought' ? { bookId, status: 'owned' } : { bookId, status: 'ordered' },
@@ -192,7 +196,7 @@ export async function closeEntry(
       data: { copyId, savedTo },
       restore: async (rtx) => {
         await copy.restore(rtx)
-        await reopen(rtx)
+        await closed.restore(rtx)
       },
     }
   })

@@ -82,7 +82,13 @@ async function restoreOrdered(ctx: Context, copyId: number): Promise<void> {
   if (totalDocs === 0) return
   const open = await gateway.count(ctx, {
     collection: 'loans',
-    where: { and: [{ copy: { equals: copyId } }, { returnedOn: { exists: false } }] },
+    where: {
+      and: [
+        { copy: { equals: copyId } },
+        { owner: { equals: ctx.user.id } },
+        { returnedOn: { exists: false } },
+      ],
+    },
   })
   if (open.totalDocs > 0) throw new DomainError('UNDO_FAILED')
   await gateway.updateByID(ctx, {

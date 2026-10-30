@@ -29,7 +29,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 10-06-2026 17:50
-last_updated: 10-30-2026 15:10
+last_updated: 10-30-2026 16:40
 project: bookeh
 project_key: NOKEY
 tracking_system: file-system
@@ -228,7 +228,7 @@ development_status:
   7-14-h10-add-to-wishlist: done
   7-15-h17-on-wishlists-in-book-detail: done
   7-16-k22-conventions-builds-read: done
-  7-17-k23-wishlist-and-loan-clean-up: backlog
+  7-17-k23-wishlist-and-loan-clean-up: review
   7-18-k24-foreign-keys-that-refuse-or-cascade: backlog
   7-19-k25-own-email-and-password-closed-over-rest: backlog
   7-20-k26-scan-and-collection-leftovers: backlog
@@ -810,7 +810,8 @@ action_items:
       on open with lib/loans/dates on the client allowlist and the spine updated;
       one int case each (X1, X2, X4, S3, A4, V3; decisions 1, 2, 4)"
     owner: "Mika"
-    status: open
+    status: done
+    resolution: "2026-10-30: story 7.17. setStatus refuses Ordered on a lent copy (field error under the Status switch); Lend Undo refuses a returned loan; the two loan counts filter on owner; the Lend picker reads today at open, lib/loans/dates on the client allowlist; spine updated."
     ref: "_bmad-output/implementation-artifacts/epic-6-retro-2026-10-26.md"
   - id: "epic-6-retro-item-66-foreign-keys-loans-copy_id-and-person_id"
     epic: 6
@@ -829,7 +830,8 @@ action_items:
       save Undo refuses with UNDO_FAILED after a returned loan by the explicit check
       (V1, V2)"
     owner: "Mika"
-    status: open
+    status: done
+    resolution: "2026-10-30: story 7.17. Both int cases added (receiveCopy, saveCopy)."
     ref: "_bmad-output/implementation-artifacts/epic-6-retro-2026-10-26.md"
   - id: "epic-6-retro-item-68-spec-reconciliation-experience-md-lend-p"
     epic: 6
@@ -880,7 +882,8 @@ action_items:
       into the restore, AD-18 updated (X2, decision 1); NotFoundForm disables Add
       to library while the wishlist press is pending (X3); one case each"
     owner: "Mika"
-    status: open
+    status: done
+    resolution: "2026-10-30: story 7.17. Entry-only scans answer Not in library; closeEntry closes own entries through closeEntriesForBook, AD-18 updated; NotFoundForm disables Add to library while the wish saves."
     ref: "_bmad-output/implementation-artifacts/epic-7-retro-2026-10-29.md"
   - id: "epic-7-retro-item-74-foreign-keys-wishlists-and-wishlist-entr"
     epic: 7
@@ -925,7 +928,8 @@ action_items:
       Epic 6 items 65 and 67, and writes Epic 6 item 72 into CLAUDE.md Conventions;
       8.1/8.2 ACs gain: a scan never resets silently (P2, P3, decision 2)"
     owner: "Mika"
-    status: open
+    status: done
+    resolution: "2026-10-30: stories 7.16 and 7.17 took the items; epics.md 8.1/8.2 carry the no-silent-reset ACs."
     ref: "_bmad-output/implementation-artifacts/epic-7-retro-2026-10-29.md"
   - id: "epic-7-retro-item-79-housekeeping-set-epic-5-epic-6-and-epic"
     epic: 7

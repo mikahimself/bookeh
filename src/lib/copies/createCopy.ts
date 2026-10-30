@@ -49,7 +49,10 @@ async function deleteCopy(ctx: Context, id: number): Promise<void> {
     where: { id: { equals: id } },
   })
   if (totalDocs === 0) return
-  const loans = await gateway.count(ctx, { collection: 'loans', where: { copy: { equals: id } } })
+  const loans = await gateway.count(ctx, {
+    collection: 'loans',
+    where: { and: [{ copy: { equals: id } }, { owner: { equals: ctx.user.id } }] },
+  })
   if (loans.totalDocs > 0) throw new DomainError('UNDO_FAILED')
   await gateway.deleteByID(ctx, { collection: 'copies', id, depth: 0 })
 }
