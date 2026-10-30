@@ -1,0 +1,67 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>bookeh partial lookup line</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400&display=swap">
+<style>
+/* Mock-up page for Story 7.20 [K26]. Governed by DESIGN.md (Detail panel composition, Buttons, Link) and EXPERIENCE.md (Answer).
+   Page chrome is neutral; each frame carries bookeh's tokens. */
+:root{--page:#ECEEF0;--pfg:#1F2933;--pmu:#5F6B78;--pln:#C9CFD5}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--page:#0E1115;--pfg:#E3E8EE;--pmu:#94A0AD;--pln:#2C343D;color-scheme:dark}}
+:root[data-theme="dark"]{--page:#0E1115;--pfg:#E3E8EE;--pmu:#94A0AD;--pln:#2C343D;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--pfg);font:14px/1.45 'Open Sans',"Segoe UI","Helvetica Neue",sans-serif}
+main{max-width:1120px;margin:0 auto;padding:28px 16px 80px}
+h1{font-weight:300;font-size:38px;line-height:1.1;letter-spacing:-.015em;margin:0 0 8px}
+h2{font-weight:300;font-size:26px;line-height:1.15;margin:52px 0 6px}
+.lede,.why{max-width:72ch;color:var(--pmu);margin:0 0 6px}
+.why strong{font-weight:400;color:var(--pfg)}
+.set{display:flex;flex-wrap:wrap;gap:28px;align-items:flex-start;margin-top:18px}
+.cap{font-size:13px;color:var(--pmu);margin:8px 2px 0;max-width:320px}
+.L{--bg:#FFFFFF;--ink:#1F2933;--mu:#5F6B78;--co:#F0604F}
+.D{--bg:#14181D;--ink:#E3E8EE;--mu:#94A0AD;--co:#FF8E7F}
+.fr{background:var(--bg);color:var(--ink);position:relative;overflow:hidden;width:320px;max-width:100%;height:560px;border:2px solid #222;border-radius:30px;flex:none;padding:22px 20px}
+.hd{font-size:26px;font-weight:300;text-transform:lowercase;margin:0 0 12px}
+.bk{display:flex;gap:14px;align-items:flex-start;margin:0 0 18px}
+.bk i{flex:none;display:block;width:72px;height:108px;background:#2A4FD6}
+.bk b{font-weight:400;font-size:20px;line-height:1.25;display:block}
+.bk span{font-size:13px;color:var(--mu);display:block}
+.m{font-size:13px;color:var(--mu);margin:0 0 4px}
+.gap{height:14px}
+.l{font-size:15px;margin:0}
+u{text-decoration-color:var(--co);text-decoration-thickness:2px;text-underline-offset:3px}
+.btns{display:flex;flex-direction:column;gap:8px;margin-top:18px}
+.bt{display:block;border:2px solid var(--ink);padding:8px 16px;font-size:15px;line-height:1.3;text-transform:lowercase;text-align:center}
+.bt.pr{border-color:var(--co)}
+.back{font-size:13px;text-align:center;margin-top:4px}
+.cmp{border-collapse:collapse;margin-top:16px;font-size:13px;max-width:100%}
+.cmp th,.cmp td{text-align:left;padding:6px 14px 6px 0;border-bottom:1px solid var(--pln);vertical-align:top}
+.cmp th{font-weight:400;color:var(--pmu)}
+</style></head><body><main>
+<h1>Finna didn't answer, Google Books did</h1>
+<p class="lede">Story 7.20 [K26]. One source failed and another found the Book. The Not in library Answer has to say which source didn't answer and offer Try again, so Mika can wait for Finna before a permanent shared Book is built from Google's values alone. Pick the line's place and wording.</p>
+<table class="cmp"><tr><th></th><th>Place</th><th>Wording</th><th>Weight</th></tr>
+<tr><td>A · In the notes</td><td>Under "From Google Books", Try again as a Link on the same line</td><td>"Finna didn't answer. Try again"</td><td>Lightest: Add to library stays the plain path</td></tr>
+<tr><td>B · Own line above the foot</td><td>Where Look it up again and the edition Link sit, Try again on its own Link line with the reason muted under it</td><td>"Try again" / "Finna didn't answer."</td><td>Same shape as Re-fetch's Link and hint</td></tr>
+<tr><td>C · Says what a save means</td><td>As A, with a second muted sentence</td><td>"Finna didn't answer. Saving now uses Google Books alone. Try Finna again"</td><td>Most explicit, one line longer</td></tr></table>
+<p class="why">In all three Try again re-runs the lookup in place with the progress line, and <strong>Add to library</strong> stays the one primary and saves what the Answer shows. Each option shows a light English and a dark Finnish frame.</p>
+<h2>A · In the notes</h2><p class="why">The line joins the notes the Answer already has. Quiet, and it reads as part of where the record comes from.</p><div class="set"><div><div class="fr L"><p class="hd">Not in library</p>
+<div class="bk"><i></i><div><b>Sinuhe egyptiläinen</b><span>Mika Waltari</span><span>WSOY · 2003</span></div></div>
+<p class="m">From Google Books</p><p class="m">Finna didn't answer. <u>Try again</u></p>
+<div class="btns"><span class="bt">Add to wishlist</span><span class="bt pr">Add to library</span><div class="back"><u>Back</u></div></div></div><p class="cap">English, light.</p></div><div><div class="fr D"><p class="hd">Ei kirjastossa</p>
+<div class="bk"><i></i><div><b>Sinuhe egyptiläinen</b><span>Mika Waltari</span><span>WSOY · 2003</span></div></div>
+<p class="m">Lähde: Google Books</p><p class="m">Finna ei vastannut. <u>Yritä uudelleen</u></p>
+<div class="btns"><span class="bt">Lisää toivelistalle</span><span class="bt pr">Lisää kirjastoon</span><div class="back"><u>Takaisin</u></div></div></div><p class="cap">Finnish, dark.</p></div></div>
+<h2>B · Own line above the foot</h2><p class="why">Try again gets its own tap target on a line, as Re-fetch does, so it is easier to hit one-handed. The reason sits under it as a hint.</p><div class="set"><div><div class="fr L"><p class="hd">Not in library</p>
+<div class="bk"><i></i><div><b>Sinuhe egyptiläinen</b><span>Mika Waltari</span><span>WSOY · 2003</span></div></div>
+<p class="m">From Google Books</p><div class="gap"></div><p class="l"><u>Try again</u></p><p class="m">Finna didn't answer.</p>
+<div class="btns"><span class="bt">Add to wishlist</span><span class="bt pr">Add to library</span><div class="back"><u>Back</u></div></div></div><p class="cap">English, light.</p></div><div><div class="fr D"><p class="hd">Ei kirjastossa</p>
+<div class="bk"><i></i><div><b>Sinuhe egyptiläinen</b><span>Mika Waltari</span><span>WSOY · 2003</span></div></div>
+<p class="m">Lähde: Google Books</p><div class="gap"></div><p class="l"><u>Yritä uudelleen</u></p><p class="m">Finna ei vastannut.</p>
+<div class="btns"><span class="bt">Lisää toivelistalle</span><span class="bt pr">Lisää kirjastoon</span><div class="back"><u>Takaisin</u></div></div></div><p class="cap">Finnish, dark.</p></div></div>
+<h2>C · Says what a save means (picked, Mika, 2026-10-30)</h2><p class="why">As A, and it states the consequence. Clearest about the permanent shared Book; the longest line.</p><div class="set"><div><div class="fr L"><p class="hd">Not in library</p>
+<div class="bk"><i></i><div><b>Sinuhe egyptiläinen</b><span>Mika Waltari</span><span>WSOY · 2003</span></div></div>
+<p class="m">From Google Books</p><p class="m">Finna didn't answer. Saving now uses Google Books alone. <u>Try Finna again</u></p>
+<div class="btns"><span class="bt">Add to wishlist</span><span class="bt pr">Add to library</span><div class="back"><u>Back</u></div></div></div><p class="cap">English, light.</p></div><div><div class="fr D"><p class="hd">Ei kirjastossa</p>
+<div class="bk"><i></i><div><b>Sinuhe egyptiläinen</b><span>Mika Waltari</span><span>WSOY · 2003</span></div></div>
+<p class="m">Lähde: Google Books</p><p class="m">Finna ei vastannut. Tallennus käyttää vain Google Booksia. <u>Yritä Finnaa uudelleen</u></p>
+<div class="btns"><span class="bt">Lisää toivelistalle</span><span class="bt pr">Lisää kirjastoon</span><div class="back"><u>Takaisin</u></div></div></div><p class="cap">Finnish, dark.</p></div></div>
+</main></body></html>
