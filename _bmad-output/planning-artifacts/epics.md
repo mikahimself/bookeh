@@ -438,7 +438,7 @@ People, Lend and Returned with Undo, the Loans section by person or by date with
 
 ### Epic 7: Keep wishlists
 Named lists with counts, Add to wishlist from the Answer and Book detail with Undo, the entry sheet with For, Bought / Ordered / Remove, rename and delete lists, and a save closing matching open entries.
-**Slices:** H1–H3, H5–H17.
+**Slices:** H1–H3, H5–H17, K22–K33 (clean-up before Epic 8).
 **FRs covered:** FR-21 (Add to wishlist), FR-22 (wishlist), FR-26 (entries), FR-28 (bought, ordered), FR-38, FR-39.
 
 ### Epic 8: Shop check — "do I already have this?"
@@ -2879,7 +2879,7 @@ So that "Antti" and "antti k" can become one (FR-34, UX-DR50).
 
 ## Epic 7: Keep wishlists
 
-Named lists with counts, Add to wishlist from the Answer and Book detail with Undo, the entry sheet with For, Bought / Ordered / Remove, rename and delete lists, and a save closing matching open entries.
+Named lists with counts, Add to wishlist from the Answer and Book detail with Undo, the entry sheet with For, Bought / Ordered / Remove, rename and delete lists, a save closing matching open entries, and twelve clean-up stories that take every open retrospective item and the deferred-items triage (`deferred-triage-2026-10-30.md`) before Epic 8.
 
 ### Story 7.1: [H1] `wishlists` collection
 
@@ -3100,6 +3100,351 @@ So that I see my wishes next to my copies (FR-26, UX-DR43).
 **And** a Book held only through entries opens in Book detail too, with no copies group
 **And** removing the last copy of a Book that still has open entries keeps Book detail open on it (`RemoveCopy`'s `last` counts entries too; handed on by Story 7.3)
 
+### Story 7.16: [K22] Conventions builds read
+
+As Mika,
+I want the rules the retrospectives taught written where builds read them, before the rest of the clean-up runs,
+So that the stories after this one follow them (Epic 4 retrospective item 47; Epic 6 retrospective item 72; Epic 7 retrospective item 77; `deferred-triage-2026-10-30.md` A15, C15, D22).
+
+**Acceptance Criteria:**
+
+**Given** CLAUDE.md Conventions
+**When** the story is done
+**Then** they say a deferral that touches a rule the spine states (an AD) is fixed in the story or written into the next story's acceptance criteria at plan time, never left in a context's open items (item 72)
+**And** they say a story with `followup_review_recommended: true` gets a walkthrough on the real surface before the next story mounts it (item 47)
+**And** they say Payload skips a field's `validate` when its `admin.condition` is false, so clearing that depends on another field belongs in a `beforeValidate` hook
+**And** the Finna line points at the adapter's `FINNA_FIELDS` and `tests/fixtures/REPORT.md`, and warns that `isbn:` matches the whole work
+
+**Given** `_bmad/custom/bmad-build.toml` and `bmad-build-auto.toml`
+**When** the story is done
+**Then** both say a story that adds or changes a screen runs one uncommitted Playwright walk of its acceptance criteria against the e2e server before done, and records what it saw in the Auto Run Result (item 77); the spine's Tests row doesn't change, since nothing is committed
+
+**Given** the story-size figure
+**When** the story is done
+**Then** the spine's Story size row and `epics.md`'s Story size line say about 500 hand-written changed lines, as CLAUDE.md does
+
+### Story 7.17: [K23] Wishlist and loan clean-up
+
+As Mika,
+I want the seams between wishlists, scanning and loans closed in one pass,
+So that a wished Book always gets an Answer, Bought ticks off every wish of mine for it, and a lent copy can't end up in a state the screens disagree on (Epic 7 retrospective, 2026-10-29, items 73 and 78, decisions 1 and 2; Epic 6 retrospective, 2026-10-26, items 65 and 67, decisions 1, 2 and 4).
+
+**Acceptance Criteria:**
+
+**Given** a scan of a Book I hold only through open entries, my own or for a Person
+**When** the lookup returns
+**Then** the Not in library Answer shows, with Add to library and Add to wishlist, instead of a bare Scan
+**And** Add to library from it saves the copy, closes my own open entries (Story 7.7) and leaves entries for a Person open
+**And** the entry-only case in `answer.unit.spec.ts`, which pins `{ kind: 'scan' }`, asserts the Answer instead; the On wishlist heading stays with Story 8.2
+
+**Given** two of my own open entries for one Book, on different lists, with no recipient
+**When** I press Bought or Ordered on one
+**Then** `closeEntry` closes both through `closeEntriesForBook()`, as a save does, and creates one copy (FR-28, decision 1)
+**And** its restore removes the copy and reopens every entry it closed; an integration case undoes it across the two lists
+**And** an entry for a Person still closes alone, with no copy, and leaves my own entries open
+**And** AD-18's `closeEntry()` sentence says so in the same commit
+
+**Given** the Not found form
+**When** the wishlist press is pending
+**Then** Add to library is disabled, so Enter or a tap can't create a second private Book beside the wish; one unit case
+
+**Given** a copy with an open loan
+**When** Edit book sets it to Ordered
+**Then** `setStatus` refuses with `VALIDATION` on `status` and nothing is saved (decision 1); a returned loan doesn't refuse; one integration case each
+**And** the error shows under the Status switch, in English and Finnish, and says to return the copy first; the copy's existing field error renders under Location, which Ordered hides
+**And** the spine's `copies.status` rule says an ordered copy is never lent, in the same commit, so EXPERIENCE.md's Lent marker row holds as written
+
+**Given** Lend's Undo
+**When** the loan has been returned since
+**Then** the restore refuses with `UNDO_FAILED` and keeps the loan, as the save's restore refuses a copy with a loan (decision 2); AD-20 names the refusal in the same commit; one integration case
+
+**Given** the loan counts in `receiveCopy.ts` and `createCopy.ts`
+**When** they run
+**Then** they filter on `owner` as well, as every other loan read does (FR-48)
+
+**Given** the Lend picker
+**When** it opens
+**Then** its default date and `max` are today in `Europe/Helsinki` at that moment, so a Book detail left open past midnight offers the new day (decision 4); `BookDetail` no longer passes `today`; one unit case with the clock moved
+**And** `lib/loans/dates` joins the client allowlist in `bookeh/client-lib-imports` and the spine's Design Paradigm in the same commit
+
+**Given** AD-20's stated refusals
+**When** the integration lane runs
+**Then** Received's Undo succeeds on a copy with only a returned loan, and the save's Undo refuses with `UNDO_FAILED` after a returned loan by the explicit check, not the foreign key (item 67)
+
+### Story 7.18: [K24] Foreign keys that refuse or cascade
+
+As Mika,
+I want every foreign key to state what a delete does,
+So that a back-office delete works or says why it can't, and deleting a user leaves nothing of theirs behind (Epic 6 retrospective item 66, decision 3; Epic 7 retrospective item 74; closes the 3.15, 3.18–3.21, 6.1, 6.4, 7.1, 7.2 and 7.4 deferrals).
+
+**Acceptance Criteria:**
+
+**Given** the 23 foreign keys Payload generates as `ON DELETE set null`
+**When** this story's migration has run
+**Then** these cascade: `owner_id` on `copies`, `locations`, `loans`, `people`, `user_books`, `wishlists` and `wishlist_entries`; `created_by_id` on `books`, `authors`, `series` and `media`, which only private rows carry (AD-4); and `wishlist_entries.wishlist_id` (AD-18: deleting a wishlist deletes its entries)
+**And** these restrict: `loans.copy_id`, `loans.person_id`, `wishlist_entries.for_person_id`, and `book_id` on `copies`, `user_books` and `wishlist_entries`
+**And** these stay `set null`, as optional links a delete clears by rule: `copies.location_id`, `users.default_location_id`, `books.series_id`, `books.cover_id` and `user_books.series_id`
+**And** the `_rels` keys stay `cascade`: a `restrict` there fails a user delete or not depending on trigger order (checked on Postgres when this story was written), so the guard for them is the hook below
+
+**Given** that Payload hard-codes `set null` on a relationship column
+**When** the actions are declared
+**Then** one `afterSchemaInit` hook sets them on the Drizzle tables' foreign keys (`getTableConfig(table).foreignKeys`; checked on Payload 3.90.2 when this story was written), so dev push, the generated migration and CI's drift check agree
+**And** the migration is generated, not hand-written (AD-13), and is verified on a restored copy of the latest production dump
+**And** a required relationship left on `set null` fails at schema init, so Epic 9's collections can't copy the pattern
+
+**Given** a back-office delete of a copy with a loan, or of a Person with a loan or a wishlist entry, open or closed
+**When** the admin confirms it
+**Then** a `beforeDelete` hook refuses with a readable message instead of a raw database error, counting through `asRequestUser(req)` (AD-3)
+**And** a Book with copies, `user-books` rows or entries gets the same refusal for the rows the admin may read; other users' rows stay unread (FR-48), so those are refused by the foreign key alone, with a raw error and nothing lost
+**And** an author or series that Books use gets the same refusal, because today a back-office delete silently strips it from every Book
+
+**Given** a user with People, loans, copies, a private Book, wishlists and entries
+**When** the admin deletes the user
+**Then** all of it goes and another user's copy of a shared Book stays; one integration case on the migration-built database
+**And** a private cover's file is left to `sweepOrphanMedia()` at the next start
+
+**Given** the services that delete in order
+**When** the constraints land
+**Then** `removeCopies`, `deletePerson`, `mergePerson`, `deleteWishlist`, the save's Undo and the private-Book merge behave as before
+**And** Story 7.4's race closes: a recipient's entry committed during a Person delete fails the delete instead of becoming the owner's own wish
+
+**Given** the spine
+**When** the story is done
+**Then** AD-19 states the rule (owners and creators cascade, references refuse, optional links clear) and names the hook, in the same commit
+
+### Story 7.19: [K25] Own email and password closed over REST
+
+As Mika,
+I want a signed-in user unable to change their own email or password through the REST API,
+So that a stolen session can't take over an account, and a second user can join without this hole (Epic 1 retrospective item 16, decision 2; held open for the tailnet by item 11).
+
+**Acceptance Criteria:**
+
+**Given** a signed-in non-admin
+**When** they send `PATCH /api/users/<own id>`, or a bulk `PATCH /api/users`, with `email` or `password`
+**Then** both stay as stored and the old password still signs in; other fields in the request follow the rules they have today
+**And** the admin can still change any user's email and password
+**And** `email` is closed by field-level `update` access and `password` by a `beforeOperation` hook on update: `password` is not a Payload field, so the retro's field-level access can't reach it
+**And** `updateProfile()` and the first-user seed are unchanged
+
+**Given** the access rule
+**When** the integration lane runs
+**Then** a two-user access test proves it, and the spine's Accounts row says so in the same commit
+
+### Story 7.20: [K26] Scan and collection leftovers
+
+As Mika,
+I want the everyday defects the deferred-items triage found fixed,
+So that a poor shared Book, a failed page or a stale count doesn't survive into Epic 8 (`deferred-triage-2026-10-30.md` B31, C21, C32, D14, D15).
+
+**Acceptance Criteria:**
+
+**Given** a lookup where one source failed and another found the Book
+**When** the Not in library Answer shows
+**Then** `found` carries the failed sources and the Answer says which source didn't answer, with Try again, so I can wait for Finna before a permanent shared Book is built from Google's values alone
+**And** a held partial outcome keeps its failed list, so a save after the Answer uses what the Answer showed (AD-11); one integration case
+**And** the line's place and wording are picked from a rendered mock-up and recorded in EXPERIENCE.md before the build, as for Story 7.14
+
+**Given** an unexpected failure while a frontend page renders
+**When** it throws
+**Then** the app's own error page shows in the frontend layout, with the design tokens, both themes and both languages: a heading, Try again and a Link to Collection
+**And** no detail of the error reaches the screen, and the error is logged
+
+**Given** a toast Undo of a bar action with Book detail closed
+**When** the rows reload
+**Then** the server render refreshes as `afterAction`'s does, so the Filter panel's counts follow (AD-7), with no second refresh when `ReadAndRating` is mounted; AD-7 says so in the same commit; one unit case
+
+**Given** an ordered copy in the covers layout
+**When** a screen reader reads the tile
+**Then** it says Ordered in both languages, as the row does; the airmail band stays decorative
+
+**Given** the free fields on Edit book
+**When** a value is saved
+**Then** `publisher` and `language` have limits in `fields/limits.ts`, wide enough for every fixture, checked by `editBook` with `TOO_LONG` and clipped on source values by `clipCandidate`
+**And** `year`, `pages` and `seriesIndex` refuse negatives; no migration is needed
+
+### Story 7.21: [K27] Checks that guard the spine
+
+As Mika,
+I want the spine rules nothing checks today to fail a test when they break,
+So that a dead lint rule or a lost migration shows up in CI, not in production (Epic 3 retrospective item 27, finding A3; `deferred-triage-2026-10-30.md` A16, B4, B12, B19, B28, C23).
+
+**Acceptance Criteria:**
+
+**Given** a migration file with no entry in `src/migrations/index.ts`, or an entry with no file
+**When** the unit lane runs
+**Then** it fails, so production can't start without a migration (AD-13)
+
+**Given** the lint rules that enforce the layer table, AD-2 and AD-3
+**When** the unit lane runs
+**Then** sample sources run through the real ESLint config show the gateway ban, the `.payload` ban, the frontend import ban, `react/jsx-no-literals` and each direction of the zones reporting, so a dead rule fails a test (the same harness style as `clientLibImports.unit.spec.ts`)
+**And** the zones gain the edges the code keeps: services to `src/fields`, `fields/isbn` to `lib/errors`, the frontend to `src/fields` and `lib/metadata` types, `src/i18n` to `lib/payload`; the spine's import table names them in the same commit
+
+**Given** a save's Undo after the copy was removed with `removeCopies`
+**When** Undo runs
+**Then** it succeeds and skips the rows that are gone (AD-20); one integration case
+
+**Given** a promote or merge that replaces a cover and then fails
+**When** the transaction rolls back
+**Then** the old cover's file is still on disk, which pins `deleteMediaRow()`'s contract; one integration case
+
+### Story 7.22: [K28] Repo tidy
+
+As Mika,
+I want the repository's leftover setup and dead code cleared,
+So that the README, the Node version and the restore steps can be trusted when they're needed (`deferred-triage-2026-10-30.md` A1, A2, A3, A7, A9, A22, B21, C4, D21).
+
+**Acceptance Criteria:**
+
+**Given** the Node version
+**When** the story is done
+**Then** `.nvmrc` names 22.23.3, `engines.node` follows it and CI reads `node-version-file`, so the pin no longer rests on a comment
+**And** the compose `payload` service runs `npm ci`, so the container can't rewrite `package-lock.json`
+
+**Given** `.npmrc`'s `legacy-peer-deps=true`
+**When** `npm ci` passes without it
+**Then** it's dropped; otherwise it stays and CI fails on a mismatched `@payloadcms/*` version
+
+**Given** the documents
+**When** the story is done
+**Then** the README describes bookeh, without Payload's blank-template text (MongoDB, Cloud deploy), and warns that a running `next dev` can push a schema change and that accepting its data-loss prompt truncates dev tables
+**And** `deploy/README.md` has a step-by-step production restore: where the `.env` secrets live, emptying `data/`, `pg_restore` through compose, and the media copy with uid 1001 ownership
+
+**Given** code nothing uses
+**When** the story is done
+**Then** `flashToast()`, `flash.ts`, `flashCookie.ts`, their unit spec and `ToastProvider`'s `bookeh_flash` read are gone
+**And** `next.config.ts` drops `images.localPatterns`, since `Cover` uses a plain `img`
+
+### Story 7.23: [K29] Shared service code
+
+As Mika,
+I want the code Epics 6 and 7 copied between services folded into one place,
+So that Epics 8 and 9 build on one version of it (Epic 6 retrospective item 70; Epic 7 retrospective item 76).
+
+**Acceptance Criteria:**
+
+**Given** `resolveLocation`, `resolvePerson` and `resolveWishlist`
+**When** the story is done
+**Then** all three are thin calls to one owned-name resolver in a module every service may import, with behaviour unchanged, so `lib/tags` gets it in Epic 9; AD-18's owning services stay as they are
+
+**Given** the open-entry and open-loan conditions
+**When** the story is done
+**Then** each is written once and used at every read, 7 and 5 sites today, in a module `lib/books` may import too, since it imports no other service
+
+**Given** `Named`, declared in five services
+**When** the story is done
+**Then** it has one home beside `Ref`, and the spine's Shared shapes name it there in the same commit
+
+### Story 7.24: [K30] Shared frontend code
+
+As Mika,
+I want the screens' copied and misplaced code folded in,
+So that Epic 8 reworks the Answer without pulling Book detail along (Epic 6 retrospective item 70; Epic 7 retrospective item 76).
+
+**Acceptance Criteria:**
+
+**Given** Add to wishlist in Book detail
+**When** the story is done
+**Then** `saveEntryAction` lives in `actions/wishlists.ts` (spine: an action used from several pages), and `AddToWishlist`, `viewerWishlists` and `useSavePress` in a shared folder; Book detail imports nothing from `scan/`
+
+**Given** the Lend picker
+**When** the story is done
+**Then** `LendPicker` composes `ui/Picker`, which supplies the held form, the wait for close, the Dialog or Sheet and the row class; Picker grows only what Lend needs, and EXPERIENCE.md's Lend row still holds
+
+**Given** the lent check
+**When** the story is done
+**Then** one `isLent(copy)` replaces the conditions in rows, tiles, Book detail and the Answer
+
+**Given** `ManagedList`
+**When** the story is done
+**Then** its name field uses `limits.name`
+
+### Story 7.25: [K31] Shared test helpers
+
+As Mika,
+I want the copied test builders in one place and the largest spec split,
+So that a new test starts from a helper and a change to a surface touches one spec (Epic 6 retrospective item 70; Epic 7 retrospective item 76).
+
+**Acceptance Criteria:**
+
+**Given** the integration specs
+**When** the story is done
+**Then** `tests/helpers` has one builder for users, shared Books, copies, People and loans, replacing the copies of `freshUser`, `sharedBook`, `unique`, `ownerId`, `copyAs`, `personAs`, `loanAs` and `failure` across the specs
+**And** `serverTree` has one home, used by the three unit specs that copy it
+
+**Given** `collectionPage.unit.spec.ts`, 1608 lines
+**When** the story is done
+**Then** it's split by surface, and `loansPage.unit.spec.ts:548`, which restates a mocked call sequence, is removed
+
+**Given** the split
+**When** the lanes run
+**Then** the test count matches the count before the story, less that one case, as recorded in the Auto Run Result; no production code changes, and the moved lines don't count towards the size guide
+
+### Story 7.26: [K32] Spec reconciliation
+
+As Mika,
+I want the spine, the PRD and the UX documents to say what the code does,
+So that Epic 8 starts from documents it can trust (Epic 3 retrospective items 27 and 28; Epic 6 retrospective item 68; Epic 7 retrospective item 75; `deferred-triage-2026-10-30.md` A18, C3, C46, D20).
+
+**Acceptance Criteria:**
+
+**Given** the spine
+**When** the story is done
+**Then** AD-9 says a source returns its records, or `undefined` on failure, and that candidates come from the first source with records; AD-17 gives `ownedRelation(slug, { name, required?, hasMany? })`; AD-16 says the seed takes a bare `Payload` and that a service's `owner` is overwritten by the hook; the Tests row says `*.unit.spec.ts` holds component tests as well as pure functions (item 27)
+**And** AD-18 names `mergePerson` as the writer of `loans.person` and `wishlist-entries.forPerson` on a merge; Shared shapes gain `ClosedEntry` and `setEntryRecipient`'s `number | null` return; the Navigation and history row gains Book detail's "back, then replace" close, `useCloseDetail(to)`; the import table notes `loans/dates` to `i18n/locale` (items 68, 75)
+**And** the one-way table gains `catalogue` to `tags`, which AD-5 needs for `editBook()` before Story 9.2
+**And** AD-16 records that Payload's adapter swallows a failed COMMIT, so `withTransaction` can report success after a connection lost at that instant (accepted for Phase 1)
+
+**Given** the PRD
+**When** the story is done
+**Then** FR-47 says a private Book's cover is shared in place on promote and merge (Epic 4 retrospective decision 1, AD-5)
+
+**Given** the UX documents
+**When** the story is done
+**Then** EXPERIENCE.md's On wishlists row says "{list} · for {person}", or "{list}" alone for my own entries, and its Lend row says "Find a person…" appears past six People; DESIGN.md's Cover tile row carries the "Lent · {person}" line (items 68, 75)
+
+**Given** the tracking documents
+**When** the story is done
+**Then** `deferred-work.md` takes the verdicts of `deferred-triage-2026-10-30.md`: closed and moot entries go, and each open one names its story or its acceptance
+**And** that file is the mark item 28 asked for, so the spec files stay as they are
+**And** `epic-6-context.md` and `epic-7-context.md` are recompiled, so no story reads as remaining and the foreign-key open item is gone
+
+### Story 7.27: [K33] Owed checks on the phone and the LXC
+
+As Mika,
+I want every check only a real device can settle run once on the finished clean-up and written down in one place,
+So that nothing is still owed when Epic 8 starts (Epic 4 retrospective item 47; Epic 5 retrospective items 57 and 59; Epic 6 retrospective items 69 and 71; Epic 7 retrospective item 79; `deferred-triage-2026-10-30.md` A25, A31, A35, C2, D3).
+
+**Acceptance Criteria:**
+
+**Given** this story
+**When** it runs
+**Then** Mika runs it, on the installed PWA on an iPhone against production with Stories 7.16 to 7.26 deployed; an unattended build stops at this story
+**And** the results go in one file beside the retrospectives, so a later retro can read them
+
+**Given** covers on the phone
+**When** the session runs
+**Then** it records whether Book detail's Edit offers the camera, whether a camera photo goes through the touch corner crop, and whether a HEIC photo uploads as the cover (items 47, 57; closes `spec-5-18`'s deferred check)
+**And** it records the covers column counts at 375 and 390px, and that a covers view of a few hundred coverless copies scrolls smoothly
+
+**Given** sheets and fields on the phone
+**When** the session runs
+**Then** it records the iOS keyboard over New location in the Move sheet, the sheet restore after history Back from Scan (5.12), Done's focus on entering select mode, Lend and Returned reachable in Book detail's half-open sheet (6.7), and the Wishlists sheet and picker (item 79)
+**And** it records that the camera comes back after Scan has been in the background for a minute, and that a toast and a full-screen task clear the notch in landscape
+
+**Given** the wider checks
+**When** the session runs
+**Then** it records keep-my-place with more than one page after Back from Scan and Edit book, in a desktop browser
+**And** the acceptance checklist in `deploy/README.md` is run on the LXC and its result recorded
+
+**Given** a check that fails
+**When** the session ends
+**Then** a small fix lands in this story, and anything larger becomes a story before Epic 8
+
+**Given** the sprint tracking
+**When** every check is recorded
+**Then** `epic-5`, `epic-6` and `epic-7` read `done` in `sprint-status.yaml` (items 59, 71, 79), and the stale `bookeh-postgres-last-backup` container is gone (Mika runs `docker rm`; the agent's attempt was refused in Story 5.39)
+
 ## Epic 8: Shop check — "do I already have this?"
 
 The full Answer: In library, Ordered, On wishlist or Not in library as the heading, every other fact as a line; Lookup by title or author with "In your library" and "Elsewhere"; lookup of a Book without an ISBN; and the shop-check end-to-end test.
@@ -3116,6 +3461,7 @@ So that every Answer states the facts in the same order (FR-20, AD-9).
 **When** it runs
 **Then** the heading is the first that applies: In library (at least one owned copy), Ordered (only ordered copies), On wishlist (only open entries), Not in library
 **And** every other fact is a line: each copy with its location and lent marker, "Ordered" for an ordered copy, "On {list}" for each open entry
+**And** a Book held only through open entries, my own or for a Person, gets the On wishlist heading (Epic 7 retrospective decision 2)
 **And** unit tests cover every combination of owned, ordered, lent and wished
 
 ### Story 8.2: [I2] In library, Ordered and On wishlist Answers
@@ -3132,6 +3478,11 @@ So that I never buy a duplicate (FR-16, FR-20, NFR-1, UX-DR46).
 **And** each ordered copy's line on the Answer carries its own Received Link, which makes that copy owned at the default location with "Saved to {location} · Undo"
 **And** Add to library from On wishlist closes my own open entries for the Book (Story 7.7)
 **And** on Mika's phone over 4G, scan to Answer takes 2 s or less for a Book I hold and 5 s or less from a source; the measurements are written in the story's notes
+
+**Given** any lookup that finishes
+**When** `answerFor` returns
+**Then** a scan never resets silently: it ends on an Answer, or on Scan with a stated error (`INVALID_ISBN`, `RATE_LIMITED`)
+**And** the On wishlist Answer replaces Story 7.17's Not in library stopgap for a Book held only through entries (Epic 7 retrospective decision 2)
 
 ### Story 8.3: [I4] Finna search
 
