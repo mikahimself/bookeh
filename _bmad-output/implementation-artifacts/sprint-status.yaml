@@ -29,7 +29,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 10-06-2026 17:50
-last_updated: 10-30-2026 17:30
+last_updated: 10-30-2026 18:10
 project: bookeh
 project_key: NOKEY
 tracking_system: file-system
@@ -228,9 +228,9 @@ development_status:
   7-14-h10-add-to-wishlist: done
   7-15-h17-on-wishlists-in-book-detail: done
   7-16-k22-conventions-builds-read: done
-  7-17-k23-wishlist-and-loan-clean-up: review
-  7-18-k24-foreign-keys-that-refuse-or-cascade: review
-  7-19-k25-own-email-and-password-closed-over-rest: backlog
+  7-17-k23-wishlist-and-loan-clean-up: done
+  7-18-k24-foreign-keys-that-refuse-or-cascade: done
+  7-19-k25-own-email-and-password-closed-over-rest: done
   7-20-k26-scan-and-collection-leftovers: backlog
   7-21-k27-checks-that-guard-the-spine: backlog
   7-22-k28-repo-tidy: backlog
@@ -399,7 +399,10 @@ action_items:
       change their own email or password via PATCH /api/users/<own id> (field-level
       update access), proven by a two-user access test'
     owner: 'Mika'
-    status: open
+    status: done
+    resolution: '2026-10-30: story 7.19. email has admin-only field update access;
+      a beforeOperation hook drops password from any non-admin update; users.int.spec.ts
+      proves it over REST (by id and bulk). The spine Accounts row records it.'
     ref: '_bmad-output/implementation-artifacts/epic-1-retro-2026-10-10.md'
   - id: 'epic-1-retro-item-17-tests-at-a-functional-minimum'
     epic: 1

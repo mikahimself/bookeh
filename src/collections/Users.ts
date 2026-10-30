@@ -1,6 +1,8 @@
 import type {
   Access,
+  CollectionBeforeOperationHook,
   CollectionConfig,
+  EmailField,
   FieldAccess,
   RelationshipFieldSingleValidation,
   SingleRelationshipField,
@@ -52,6 +54,36 @@ const defaultLocation: SingleRelationshipField = {
   access: { create: self, read: self, update: self },
 }
 
+/**
+ * Epic 1 retro item 16: only the admin changes an email, so a stolen session
+ * cannot take over the account. Merged into Payload's own auth `email` field;
+ * a user's own update drops it silently, as it drops `roles`.
+ */
+const email: EmailField = {
+  name: 'email',
+  type: 'email',
+  access: { update: adminOnlyField },
+}
+
+/**
+ * The same rule for `password`, which is not a Payload field, so field access
+ * cannot reach it: an update by anyone but the admin drops it before the
+ * operation hashes it. Covers `PATCH /api/users/<id>` and the bulk `PATCH
+ * /api/users`. `resetPassword` writes through the adapter, not this operation,
+ * and system writes (`overrideAccess`) keep it.
+ */
+const passwordForAdminOnly: CollectionBeforeOperationHook = ({
+  args,
+  operation,
+  overrideAccess,
+  req,
+}) => {
+  if (operation !== 'update' || overrideAccess || isAdmin(req.user)) return args
+  if (args.data === null || typeof args.data !== 'object' || !('password' in args.data)) return args
+  const { password: _dropped, ...data } = args.data
+  return { ...args, data }
+}
+
 export const Users: CollectionConfig = {
   slug: 'users',
   admin: {
@@ -75,7 +107,9 @@ export const Users: CollectionConfig = {
     delete: adminOnly,
     unlock: adminOnly,
   },
+  hooks: { beforeOperation: [passwordForAdminOnly] },
   fields: [
+    email,
     {
       name: 'roles',
       type: 'select',

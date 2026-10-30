@@ -1,4 +1,6 @@
+import { REST_PATCH } from '@payloadcms/next/routes'
 import {
+  AuthenticationError,
   createLocalReq,
   Forbidden,
   getPayload,
@@ -9,6 +11,7 @@ import {
 import { describe, expect, it } from 'vitest'
 
 import config from '@/payload.config'
+import type { User } from '@/payload-types'
 
 import { as, createUser } from '../helpers/harness'
 
@@ -25,6 +28,23 @@ const newUser = (tag: string): RequiredDataFromCollectionSlug<'users'> => ({
   profileVisibility: 'hidden',
   collectionVisibility: 'closed',
 })
+
+const signIn = async (email: string, password = 'test-password') =>
+  (await payload()).login({ collection: 'users', data: { email, password } })
+
+/** `PATCH /api/<path>` through the REST handler, signed in as `who`. */
+const restPatch = async (who: User, path: string, body: Record<string, unknown>) => {
+  const { token } = await signIn(who.email)
+  const url = new URL(`http://localhost/api/${path}`)
+  return REST_PATCH(config)(
+    new Request(url, {
+      method: 'PATCH',
+      headers: { Authorization: `JWT ${token}`, 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    }),
+    { params: Promise.resolve({ slug: url.pathname.split('/').slice(2) }) },
+  )
+}
 
 describe('users collection', () => {
   it('lets a user read and update themself', async () => {
@@ -92,6 +112,38 @@ describe('users collection', () => {
     expect(updated.roles).toEqual(['user'])
     const after = await p.findByID({ collection: 'users', id: a.id })
     expect(after.roles).toEqual(['user'])
+  })
+
+  it("keeps a user's own email and password on a REST update, by id or in bulk", async () => {
+    const p = await payload()
+    const a = await createUser()
+    const takeover = (tag: string) => ({
+      email: `${tag}-${a.id}@test.invalid`,
+      password: 'stolen-password',
+      displayName: tag,
+    })
+
+    const byId = await restPatch(a, `users/${a.id}`, takeover('by-id'))
+    expect(byId.status).toBe(200)
+    const bulk = await restPatch(a, `users?where[id][equals]=${a.id}`, takeover('bulk'))
+    expect(bulk.status).toBe(200)
+
+    const after = await p.findByID({ collection: 'users', id: a.id })
+    expect(after.email).toBe(a.email)
+    expect(after.displayName).toBe('bulk')
+    await expect(signIn(a.email)).resolves.toMatchObject({ user: { id: a.id } })
+    await expect(signIn(a.email, 'stolen-password')).rejects.toThrow(AuthenticationError)
+  })
+
+  it("lets the admin change any user's email and password over REST", async () => {
+    const adm = await admin()
+    const b = await createUser()
+    const email = `changed-${b.id}@test.invalid`
+
+    const response = await restPatch(adm, `users/${b.id}`, { email, password: 'new-password' })
+    expect(response.status).toBe(200)
+
+    await expect(signIn(email, 'new-password')).resolves.toMatchObject({ user: { id: b.id } })
   })
 
   it('lets an admin read, update roles, create and delete users', async () => {
