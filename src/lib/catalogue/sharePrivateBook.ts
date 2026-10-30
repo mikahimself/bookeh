@@ -269,7 +269,7 @@ async function merge(tx: Context, ownId: number, sharedId: number): Promise<void
   await moveCopiesToBook(tx, ownId, sharedId)
   await moveEntriesToBook(tx, ownId, sharedId)
   await mergeUserBook(tx, ownId, sharedId, overrides)
-  // Postgres would null a remaining reference on delete; the throw rolls the save back.
+  // A remaining reference would refuse the delete (AD-19); this names it first and rolls the save back.
   if (!(await isUnreferenced(tx, 'books', ownId))) {
     throw new Error(`Private Book ${ownId} is still referenced after its merge`)
   }

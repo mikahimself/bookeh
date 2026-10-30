@@ -262,7 +262,7 @@ Arrows are the only allowed import directions, and ESLint `no-restricted-imports
 
 ### AD-19 — Invariants the database can express are database constraints
 
-- **Binds:** `books`, `user-books`, `loans`, name-keyed collections; back office
+- **Binds:** `books`, `user-books`, `loans`, name-keyed collections, every relationship foreign key; back office
 - **Prevents:** back-office edits or concurrent saves breaking a rule that only a service checks
 - **Rule:** These are unique constraints, declared in the collection config or through the Postgres adapter's `afterSchemaInit`, and present from the first migration that creates the table:
   - `books(isbn13)` where `visibility = shared`; `books(createdBy, isbn13)` where `visibility = private`
@@ -271,6 +271,8 @@ Arrows are the only allowed import directions, and ESLint `no-restricted-imports
   - `nameKey` among shared rows, and `(createdBy, nameKey)` or `(owner, nameKey)` among private rows; `(owner, kind, nameKey)` for `tags`
 
   A service check for the same rule exists only to raise a `DomainError` first.
+
+  Every relationship foreign key states what a delete does (Story 7.18): owners and creators cascade (`owner_id` on every owned collection, `created_by_id`, which only private catalogue rows carry, and `wishlist_entries.wishlist_id`), references refuse (`ON DELETE restrict`: `loans.copy_id`, `loans.person_id`, `wishlist_entries.for_person_id`, and `book_id` on `copies`, `user_books` and `wishlist_entries`), optional links clear (`set null`: `copies.location_id`, `users.default_location_id`, `books.series_id`, `books.cover_id`, `user_books.series_id`). Payload generates every one as `set null`, so `foreignKeyActions` (`src/collections/foreignKeys.ts`), the last `afterSchemaInit` hook, sets them on the Drizzle tables and fails schema init for a `set null` key it does not list or that sits on a NOT NULL column. `_rels` keys stay `cascade`: a `restrict` there fails a user delete depending on trigger order. In the back office, `refuseWhileReferenced` (`src/collections/deleteGuards.ts`) is the `beforeDelete` of copies, People, Books, authors and series: it counts the referencing rows through `asRequestUser(req)` (AD-3) and refuses with a readable 409; rows the deleting user cannot read are left to the foreign key, and the hook is the only guard for an author or series on a Book (`_rels`).
 
 ### AD-20 — Undo is one mechanism: server-held receipts in `lib/undo`
 

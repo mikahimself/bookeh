@@ -61,6 +61,19 @@ const { docs: books } = await payload.find({
 })
 if (books.length > 0) {
   const ofBooks: Where = { book: { in: books.map((book) => book.id) } }
+  // Spine, AD-19: loans and entries refuse the deletes below (`ON DELETE restrict`).
+  const { docs: copies } = await payload.find({
+    collection: 'copies',
+    where: ofBooks,
+    pagination: false,
+    ...system,
+  })
+  await payload.delete({
+    collection: 'loans',
+    where: { copy: { in: copies.map((copy) => copy.id) } },
+    ...system,
+  })
+  await payload.delete({ collection: 'wishlist-entries', where: ofBooks, ...system })
   await payload.delete({ collection: 'copies', where: ofBooks, ...system })
   await payload.delete({ collection: 'user-books', where: ofBooks, ...system })
   for (const book of books) {

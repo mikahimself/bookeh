@@ -29,7 +29,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 10-06-2026 17:50
-last_updated: 10-30-2026 16:40
+last_updated: 10-30-2026 17:30
 project: bookeh
 project_key: NOKEY
 tracking_system: file-system
@@ -229,7 +229,7 @@ development_status:
   7-15-h17-on-wishlists-in-book-detail: done
   7-16-k22-conventions-builds-read: done
   7-17-k23-wishlist-and-loan-clean-up: review
-  7-18-k24-foreign-keys-that-refuse-or-cascade: backlog
+  7-18-k24-foreign-keys-that-refuse-or-cascade: review
   7-19-k25-own-email-and-password-closed-over-rest: backlog
   7-20-k26-scan-and-collection-leftovers: backlog
   7-21-k27-checks-that-guard-the-spine: backlog
@@ -822,7 +822,8 @@ action_items:
       (7.1) and wishlist-entries owner_id, wishlist_id, book_id and for_person_id
       (7.2), generated as ON DELETE set null with wishlist_id and book_id NOT NULL"
     owner: "Mika"
-    status: open
+    status: done
+    resolution: "2026-10-30: story 7.18. foreignKeyActions sets every relationship key (owners and creators cascade, references restrict, optional links set null); beforeDelete refusals on copies, People, Books, authors and series; AD-19 records it. Production-dump check owed in Story 7.27."
     ref: "_bmad-output/implementation-artifacts/epic-6-retro-2026-10-26.md"
   - id: "epic-6-retro-item-67-ad-20-test-gaps-received-undo-succeeds-w"
     epic: 6
@@ -890,7 +891,8 @@ action_items:
     action: "Foreign keys: wishlists and wishlist-entries columns join the Epic 6
       item 66 restrict/cascade migration; closes the 7.1, 7.2 and 7.4 deferrals (X5)"
     owner: "Mika"
-    status: open
+    status: done
+    resolution: "2026-10-30: story 7.18. wishlists and wishlist-entries keys are in the same migration."
     ref: "_bmad-output/implementation-artifacts/epic-7-retro-2026-10-29.md"
   - id: "epic-7-retro-item-75-spec-reconciliation-ad-18-names-mergeper"
     epic: 7

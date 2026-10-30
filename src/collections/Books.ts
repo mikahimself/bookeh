@@ -6,6 +6,18 @@ import { isbnField } from '@/fields/isbn'
 import { rawMetadataField } from '@/fields/rawMetadata'
 import { visibilityFields } from '@/fields/visibility'
 
+import { refuseWhileReferenced } from '@/access/deleteGuards'
+
+/** Spine, AD-19: a back-office delete names what still refers to the row. */
+const inUse = refuseWhileReferenced(
+  'Copies, reading states or wishlist entries still refer to this Book, so it can’t be deleted.',
+  [
+    { collection: 'copies', where: (id) => ({ book: { equals: id } }) },
+    { collection: 'user-books', where: (id) => ({ book: { equals: id } }) },
+    { collection: 'wishlist-entries', where: (id) => ({ book: { equals: id } }) },
+  ],
+)
+
 /**
  * Spine, AD-4/AD-5/AD-6: one edition. Shared Books come from a source, private
  * ones from manual entry, readable only by their creator and the admin. Users
@@ -23,6 +35,7 @@ export const Books: CollectionConfig = {
     defaultColumns: ['title', 'isbn13', 'visibility', 'createdBy'],
     listSearchableFields: ['title', 'isbn13'],
   },
+  hooks: { beforeDelete: [inUse] },
   fields: [
     isbnField(),
     ...bookFields(),

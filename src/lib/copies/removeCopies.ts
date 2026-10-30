@@ -22,7 +22,7 @@ export type RemoveResult = { removed: number; skipped: number[] }
  * transaction; the read filters on `owner` too (FR-48). An ordered copy keeps
  * its loans. `copies` does not import `loans` (spine, Module boundaries). A
  * loan of a removed copy committed concurrently after the loans read makes the
- * copy delete fail on `loans.copy_id` (NOT NULL with `ON DELETE set null`),
+ * copy delete fail on `loans.copy_id` (`ON DELETE restrict`, AD-19),
  * and the whole call rolls back as `INTERNAL`.
  */
 export async function removeCopies(

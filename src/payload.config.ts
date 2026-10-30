@@ -9,6 +9,7 @@ import { Books } from './collections/Books'
 import { isbnIndexes, nameKeyIndexes } from './collections/catalogueIndexes'
 import { Copies } from './collections/Copies'
 import { Genres } from './collections/Genres'
+import { foreignKeyActions } from './collections/foreignKeys'
 import { Loans, openLoanIndex } from './collections/Loans'
 import { Locations } from './collections/Locations'
 import { People } from './collections/People'
@@ -81,6 +82,8 @@ export default buildConfig({
       nameKeyIndexes('series'),
       isbnIndexes,
       openLoanIndex,
+      // Last: it sets the delete actions on the tables the hooks above extend.
+      foreignKeyActions,
     ],
   }),
   sharp,

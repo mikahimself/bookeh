@@ -3436,6 +3436,7 @@ So that nothing is still owed when Epic 8 starts (Epic 4 retrospective item 47; 
 **When** the session runs
 **Then** it records keep-my-place with more than one page after Back from Scan and Edit book, in a desktop browser
 **And** the acceptance checklist in `deploy/README.md` is run on the LXC and its result recorded
+**And** Story 7.18's `foreign_keys` migration is run on a restored copy of the latest production dump before it is deployed, and the result recorded (handed on by Story 7.18: only Mika reaches production)
 
 **Given** a check that fails
 **When** the session ends

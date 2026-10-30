@@ -5,6 +5,8 @@ import { ownerField } from '@/fields/owner'
 import { ownedRelation, readableRelation } from '@/fields/relation'
 import type { Copy } from '@/payload-types'
 
+import { refuseWhileReferenced } from '@/access/deleteGuards'
+
 /**
  * AD-8: an ordered copy has no location. A collection hook rather than a
  * `validate` on `location`, so the error lands on `location` whichever field
@@ -24,6 +26,12 @@ const noLocationWhenOrdered: CollectionBeforeValidateHook<Copy> = ({ collection,
   return data
 }
 
+/** Spine, AD-19: a back-office delete names what still refers to the row. */
+const lent = refuseWhileReferenced(
+  'This copy has loans, so it can’t be deleted here. Remove it in bookeh, which removes its loans too.',
+  [{ collection: 'loans', where: (id) => ({ copy: { equals: id } }) }],
+)
+
 /**
  * Spine, AD-1/AD-8/AD-17: one physical item of a Book, owned by one user. The
  * Book is a catalogue row read through `catalogueAccess`, so `readableRelation`
@@ -40,7 +48,7 @@ export const Copies: CollectionConfig = {
     group: 'My data',
     defaultColumns: ['book', 'status', 'location', 'updatedAt'],
   },
-  hooks: { beforeValidate: [noLocationWhenOrdered] },
+  hooks: { beforeValidate: [noLocationWhenOrdered], beforeDelete: [lent] },
   fields: [
     ownerField(),
     readableRelation('books', { name: 'book', required: true }),

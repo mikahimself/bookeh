@@ -5,6 +5,17 @@ import { limits } from '@/fields/limits'
 import { nameKeyField } from '@/fields/nameKey'
 import { ownerField } from '@/fields/owner'
 
+import { refuseWhileReferenced } from '@/access/deleteGuards'
+
+/** Spine, AD-19: a back-office delete names what still refers to the row. */
+const inUse = refuseWhileReferenced(
+  'This person has loans or wishlist entries, so they can’t be deleted. Merge them into another person in bookeh’s Settings instead.',
+  [
+    { collection: 'loans', where: (id) => ({ person: { equals: id } }) },
+    { collection: 'wishlist-entries', where: (id) => ({ forPerson: { equals: id } }) },
+  ],
+)
+
 /**
  * Spine, AD-1/AD-19: a name on the user's own list of borrowers and
  * recipients (FR-34), never a user account. Private: the owner alone reads and
@@ -25,6 +36,7 @@ export const People: CollectionConfig = {
     defaultColumns: ['name', 'updatedAt'],
   },
   indexes: [{ fields: ['owner', 'nameKey'], unique: true }],
+  hooks: { beforeDelete: [inUse] },
   fields: [
     ownerField(),
     { name: 'name', type: 'text', required: true, maxLength: limits.name },

@@ -275,9 +275,8 @@ async function entriesOn(tx: Context, id: number): Promise<number[]> {
  * (AD-16). An id that is not a row id, or not the viewer's list (the admin's
  * included), fails with `NOT_FOUND` before any write. The entries are deleted
  * through the gateway, then the list. No Undo: the screen confirms first. An
- * entry on the list committed concurrently after the entry read makes the
- * list delete fail on `wishlist_entries.wishlist_id` (NOT NULL with `ON DELETE
- * set null`), and the whole call rolls back as `INTERNAL`.
+ * entry on the list committed concurrently after the entry read goes with the
+ * list (`wishlist_entries.wishlist_id`, `ON DELETE cascade`, AD-19).
  */
 export async function deleteWishlist(ctx: Context, id: number): Promise<void> {
   if (!isRowId(id)) throw new DomainError('NOT_FOUND')

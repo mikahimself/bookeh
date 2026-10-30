@@ -190,11 +190,9 @@ async function entriesOf(tx: Context, id: number): Promise<number[]> {
  * before any write. Every loan of the source, open or returned, then every
  * wishlist entry for it, open or closed, moves to the target through the
  * gateway (only `forPerson` changes), then the source is deleted. No Undo. A
- * loan to the Person committed concurrently after the check makes the delete
- * fail on `loans.person_id` (NOT NULL with `ON DELETE set null`), and the
- * whole call rolls back as `INTERNAL`; an entry for it committed concurrently
- * is cleared by `wishlist_entries.for_person_id` (`ON DELETE set null`) and
- * silently becomes the owner's own wish.
+ * loan or an entry for the Person committed concurrently after the moves makes
+ * the delete fail on `loans.person_id` or `wishlist_entries.for_person_id`
+ * (`ON DELETE restrict`, AD-19), and the whole call rolls back as `INTERNAL`.
  */
 export async function mergePerson(ctx: Context, sourceId: number, targetId: number): Promise<void> {
   if (!isRowId(sourceId) || !isRowId(targetId)) throw new DomainError('NOT_FOUND')
@@ -229,11 +227,10 @@ export async function mergePerson(ctx: Context, sourceId: number, targetId: numb
  * or not the viewer's Person (the admin's included), fails with `NOT_FOUND`; a
  * Person with any loan, open or returned, or any wishlist entry for them,
  * open or closed, fails with `PERSON_IN_USE`; both before any write. No Undo.
- * A loan to the Person committed concurrently after the check makes the delete
- * fail on `loans.person_id` (NOT NULL with `ON DELETE set null`), and the
- * whole call rolls back as `INTERNAL`; an entry for them committed
- * concurrently is cleared by `wishlist_entries.for_person_id` (`ON DELETE set
- * null`) and silently becomes the owner's own wish.
+ * A loan or an entry for the Person committed concurrently after the check
+ * makes the delete fail on `loans.person_id` or
+ * `wishlist_entries.for_person_id` (`ON DELETE restrict`, AD-19), and the
+ * whole call rolls back as `INTERNAL`.
  */
 export async function deletePerson(ctx: Context, id: number): Promise<void> {
   if (!isRowId(id)) throw new DomainError('NOT_FOUND')
