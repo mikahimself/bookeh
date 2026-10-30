@@ -104,3 +104,6 @@
 - source_spec: none
   summary: Let a user mark a Book as "Currently reading" — a third reading state beside unread and read (UserBooks read flag, FR-29), with its shelf filter and marker.
   evidence: Split from the phone-polish sidequest (2026-10-27); it changes the data model, PRD FR-29 and the spine, so it is its own story after the polish story.
+- source_spec: `_bmad-output/implementation-artifacts/spec-7-16-k22-conventions-builds-read.md`
+  summary: Say what `bmad-build-auto` does when the previous story carries `followup_review_recommended: true` (halt for the walkthrough, or go on and record it as owed), since the CLAUDE.md walkthrough rule needs a person on the real surface.
+  evidence: Blind review of 7.16; neither `_bmad/custom/bmad-build-auto.toml` nor CLAUDE.md states the unattended behaviour, and the fix edits the auto rules, which is the owner's call.

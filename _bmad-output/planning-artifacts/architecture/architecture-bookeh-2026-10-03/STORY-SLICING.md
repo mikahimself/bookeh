@@ -16,7 +16,7 @@ Slice numbers are stable. A slice that was dropped keeps its number, listed unde
 ## Slicing rules
 
 1. **One concern per story.** A story is one collection, one service or one screen. If the title needs "and", split it.
-2. **About 300 hand-written changed lines.** `payload-types.ts`, migrations, the lockfile and the import map don't count.
+2. **About 500 hand-written changed lines.** `payload-types.ts`, migrations, the lockfile and the import map don't count.
 3. **A collection story contains only the collection.** That means the collection file, its access rules, hooks and constraints, the migration, and the two-user access test. No service and no screen.
 4. **Schema stories merge one at a time.** After rebasing, the story regenerates its migration (AD-13).
 5. **Services land before the screens that use them.** A screen story wires up behaviour that is already tested.

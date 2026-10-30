@@ -43,7 +43,7 @@ Admin is an acceptable temporary way to enter books only until the scan-and-save
 
 Order: **existing shared Book first, then pluggable sources: Finna, then Google Books, then others.** Finna before Google, never the reverse. Lookup is read-only; a Book is created on save (PRD FR-11).
 
-- Finna: `https://api.finna.fi/v1/search?lookfor=isbn:"<isbn13>"&type=AllFields` — verify against api.finna.fi/swagger before implementing. Pick the best record (prefer ones with cover + subjects). Records are MARC-flavoured; inspect raw output before designing the parser.
+- Finna: `https://api.finna.fi/api/v1/search?lookfor=isbn:"<isbn13>"&type=AllFields&limit=100` plus one `field[]` per entry in `FINNA_FIELDS` (`src/lib/metadata/sources/finna.ts`, the authority). `tests/fixtures/REPORT.md` records what each fixture returned; it is generated, so re-run `npm run fixtures` after changing `FINNA_FIELDS`. Read both before changing the adapter. `isbn:` matches the whole work, so Finna also returns other editions: keep only the records whose own `isbns` normalise to the ISBN asked for (binding text after a space ignored), then pick the best (prefer ones with cover + subjects). Records are MARC-flavoured; inspect raw output before changing the parser.
 - Google Books: `https://www.googleapis.com/books/v1/volumes?q=isbn:<isbn13>`.
 - Normalise all input ISBNs to ISBN-13 (accept ISBN-10, hyphens, spaces).
 - Lookup returns one unified shape, `SourceResult`, defined in the spine (Structural Seed → Shared shapes).
@@ -70,6 +70,9 @@ Follow the PRD's **Build Order** (replaces the old M1–M5). Each story should b
 - Stories stay compact in the diff, not the spec. The spec is as rich as the story needs: Code Map, decisions and acceptance criteria may push it past the `oversized` warning (2500 tokens of plan-time spec, set in `_bmad/custom/bmad-build.toml` and `bmad-build-auto.toml`), and that warning alone is never a reason to split or to halt. At the token gate, keep the full spec. Split a story only when the hand-written diff would not scan in one review, roughly more than 500 changed lines excluding generated files such as migration snapshots. In review triage, a finding that only says the story was built despite `oversized` is rejected.
 - A story that changes a spine contract updates ARCHITECTURE-SPINE.md in the same commit. The update is one of the story's acceptance criteria, never a deferral.
 - A deferred item handed to a later story is one of that story's acceptance criteria; otherwise it stays with the story that deferred it.
+- A deferral that touches a rule the spine states (an AD) is fixed in the story or written into the next story's acceptance criteria at plan time, never left in an epic context's open items.
+- A story with `followup_review_recommended: true` gets a walkthrough on the real surface before the next story mounts it.
+- Payload skips a field's `validate` when its `admin.condition` is false, so clearing a field that depends on another field (a copy's location when it is ordered, say) belongs in a `beforeValidate` hook (verified by storing bad values in `7d34440`; `Copies.ts` and `Loans.ts` follow it).
 - A story built beside others (parallel worktrees) names the files it shares with them in its Residual risks.
 - Commit after each story. Conventional commit messages.
 - v1 runs on the tailnet only. Frontend users sign in (PRD F1); the admin role does not read users' private data (PRD FR-48). Token links instead of email for invites and resets (PRD FR-2, FR-5, FR-52).

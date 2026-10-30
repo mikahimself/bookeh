@@ -5,4 +5,5 @@
 
 persistent_facts = [
   "The `oversized` spec warning threshold in this project is 2500 tokens of plan-time spec (the Spec Change Log, Review Triage Log and Auto Run Result excluded). Read it in place of every 1600-token threshold in this skill's steps and spec template. The warning is never a reason to split a story or to halt (CLAUDE.md, Conventions); split only when the hand-written diff would pass about 500 changed lines.",
+  "A story that adds or changes a screen runs one uncommitted Playwright walk of its acceptance criteria against the e2e server (the `webServer` in `playwright.config.ts`: `bookeh_test`, `BOOKEH_SOURCES=fixture`), written as `tests/e2e/*.walk.spec.ts`, which git ignores, before it is done, and records what it saw under `## Auto Run Result` in the spec, adding that section if the spec has none. The walk is a check, not a test: nothing from it is committed, and the spine's Tests row (Playwright covers only scan-to-save and shop check) still holds.",
 ]
