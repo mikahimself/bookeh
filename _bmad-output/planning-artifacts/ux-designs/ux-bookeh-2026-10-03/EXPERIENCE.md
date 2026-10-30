@@ -343,6 +343,7 @@ Two columns on wide screens: profile, language, theme, visibility, default locat
 | Signed out or session ended | Any | Sign in, then back to the address the user wanted. |
 | Wrong email or password | Sign in | "Wrong email or password." The response does not say which. |
 | Action with no connection | Any | The failing action reports "No connection." in an error toast. Nothing is queued. |
+| Unexpected failure | Any page that throws | "Couldn't show this page.", Try again (primary) and a Collection Link. No error detail on the screen. A server error is in the server log, a client one in the browser console. |
 
 ## Interaction Primitives
 

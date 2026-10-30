@@ -81,6 +81,7 @@ describe('lookupSources', () => {
     const first = merged([a1], [b1])
     expect(outcome).toEqual({
       kind: 'found',
+      failed: [],
       candidates: [first.result, merged([a2], [b1]).result],
       raw: first.raw,
     })
@@ -129,6 +130,7 @@ describe('lookupSources', () => {
 
     expect(await lookupSources(ISBN)).toEqual({
       kind: 'found',
+      failed: ['B'],
       candidates: [merged([a1]).result],
       raw: merged([a1]).raw,
     })

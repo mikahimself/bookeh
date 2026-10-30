@@ -48,6 +48,7 @@ const suffix = () => randomUUID().slice(0, 8)
 
 const found = (candidate: Partial<SourceResult> & { isbn13: string }): SourcesOutcome => ({
   kind: 'found',
+  failed: [],
   candidates: [
     {
       title: 'T2',

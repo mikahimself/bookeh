@@ -50,6 +50,7 @@ const candidate = (
 
 const found = (...candidates: SourceResult[]): Extract<SourcesOutcome, { kind: 'found' }> => ({
   kind: 'found',
+  failed: [],
   candidates,
   raw: raw(candidates[0]!.title),
 })

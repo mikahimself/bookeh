@@ -92,6 +92,8 @@ const LIMITS: Partial<Record<EditKey, number>> = {
   title: limits.title,
   subtitle: limits.subtitle,
   description: limits.description,
+  publisher: limits.publisher,
+  language: limits.language,
   series: limits.name,
 }
 
@@ -120,7 +122,8 @@ const isIsbnClash = (err: unknown): boolean =>
  *
  * Before any read, an unknown key (`themes` included: themes are never
  * edited), a cleared `title` and an author name blank after normalising fail
- * with `VALIDATION` naming each key; a `title`, `subtitle`, `description`,
+ * with `VALIDATION` naming each key, as does a negative `seriesIndex`, `year`
+ * or `pages`; a `title`, `subtitle`, `publisher`, `language`, `description`,
  * author or `series` over its `limits` after normalising names its key with
  * `TOO_LONG`, never clipped, as `normaliseManual()` does; and an `isbn13`
  * that is not an ISBN (blank and `null` included) names it with
@@ -198,6 +201,7 @@ export async function editBook(
       const stored = normalise(key, value)
       const max = LIMITS[key]
       if (key === 'title' && stored === null) rejected.set(key, 'VALIDATION')
+      else if (typeof stored === 'number' && stored < 0) rejected.set(key, 'VALIDATION')
       else if (typeof stored === 'string' && max !== undefined && stored.length > max) {
         rejected.set(key, 'TOO_LONG')
       } else Object.assign(changes, { [key]: stored })

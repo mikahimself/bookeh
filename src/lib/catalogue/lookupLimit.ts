@@ -5,7 +5,7 @@ import { processState } from '@/lib/processState'
 // Spine, AD-9, AD-12 and FR-11: one per-user limit on lookups, held in process.
 // Every lookup and preview fetch in the user's name calls `limitLookups()`:
 // `lookupBook`, `saveCopy` (only when no outcome is held for the ISBN),
-// `refetchBook`, `lookupAgain` (only when it asks the sources: a merge into
+// `refetchBook`, `retryLookup`, `lookupAgain` (only when it asks the sources: a merge into
 // a shared Book or a held outcome counts nothing) and `fetchCoverPreview`
 // (once per record, the user and ISBN, for its first image it does not hold,
 // and again for a cover whose fetch failed). `searchBooks` (I10) must call
@@ -32,7 +32,7 @@ const windows = () => processState('catalogue.lookupLimit', () => new Map<number
  * current window. A refused call does not move the window's reset. Called
  * before a source is asked: by `lookupBook` before it reads anything, by
  * `saveCopy` on a held-outcome miss before `lookupSources()`, by
- * `refetchBook` before its fresh `lookupSources()`, by `lookupAgain`
+ * `refetchBook` and `retryLookup` before their fresh `lookupSources()`, by `lookupAgain`
  * immediately before its fresh `lookupSources()` (never on the merge or
  * held-candidate paths), and by `fetchCoverPreview` before the first fetch
  * of a record (user and ISBN) of an image it does not hold, and again before

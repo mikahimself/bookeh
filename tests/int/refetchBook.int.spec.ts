@@ -29,6 +29,7 @@ const COVER_URL = 'https://api.finna.fi/Cover/Show?source=Solr&id=x&index=0&size
 
 const found = (isbn13: string, extra: Partial<SourceResult>): SourcesOutcome => ({
   kind: 'found',
+  failed: [],
   candidates: [
     {
       isbn13,

@@ -21,7 +21,8 @@ const TITLE: Record<DevicePrefs['size'], string> = {
  * and the authors in muted label, each on one truncated line. A placeholder
  * cover carries the title alone, so the authors are said once. An ordered
  * copy's cover wears the airmail band across its top-left corner
- * (`airmail-band`); no word. A lent owned copy has the lent marker before its
+ * (`airmail-band`), decorative, and the tile says `ordered` to a screen reader
+ * alone. A lent owned copy has the lent marker before its
  * title and "Lent · {person}" (`lent`) after the authors. Hook-free, like `BookRow`, and like it a link to
  * `href`; `open` puts the selection bar along the bottom edge of the cover.
  * In select mode (`select`) the tile is one `<label>` with the checkbox
@@ -30,6 +31,7 @@ const TITLE: Record<DevicePrefs['size'], string> = {
 export function CoverTile({
   row: { copy, book },
   size,
+  ordered,
   lent,
   href,
   replace,
@@ -38,6 +40,7 @@ export function CoverTile({
 }: {
   row: ShelfRow
   size: DevicePrefs['size']
+  ordered: string
   lent: (person: string) => string
   href: string
   replace: boolean
@@ -72,6 +75,7 @@ export function CoverTile({
       )}
       {authors && <p className="truncate text-label text-text-muted">{authors}</p>}
       {lentTo !== null && <p className="truncate text-label text-text">{lent(lentTo)}</p>}
+      {copy.status === 'ordered' && <span className="sr-only">{ordered}</span>}
     </>
   )
 

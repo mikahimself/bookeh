@@ -111,8 +111,8 @@ async function ask(source: Source, isbn13: string): Promise<SourceResult[] | und
  * Asks every source for a normalised ISBN-13 (AD-9). `found` holds one candidate per
  * record of the first source with records, each gap-filled from the other sources in
  * source order; `none` only when every source answered with no records; otherwise
- * `unavailable`, naming the failed sources. A `found` or `none` reached with no source
- * failing is cached (`FOUND_TTL_MS`, `NONE_TTL_MS`); a `found` merged while a source
+ * `unavailable`, naming the failed sources; `found` names them too (`[]` when every source
+ * answered). A `found` or `none` reached with no source failing is cached (`FOUND_TTL_MS`, `NONE_TTL_MS`); a `found` merged while a source
  * failed is cached for `PARTIAL_TTL_MS`, so the save after the Answer uses the outcome
  * the Answer showed (AD-11); `unavailable` never is. `fresh` skips the cache
  * read and still writes the cache: re-fetch asks the sources again (AD-5).
@@ -150,6 +150,7 @@ export async function lookupSources(
     kind: 'found',
     candidates: merged.map(({ result }) => result),
     raw: merged[0].raw,
+    failed,
   }
   remember(isbn13, outcome, failed.length === 0 ? FOUND_TTL_MS : PARTIAL_TTL_MS)
   return outcome

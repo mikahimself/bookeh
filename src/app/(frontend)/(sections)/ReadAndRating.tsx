@@ -12,7 +12,7 @@ import { useSavedSwitch } from '../components/useSavedSwitch'
 import { useToast } from '../components/toast/ToastProvider'
 
 import { setRatingAction, setReadAction } from './actions'
-import { useAfterAction } from './ShelfRows'
+import { useAfterAction, useClaimUndoRefresh } from './ShelfRows'
 
 type Props = { bookId: number; initial: Pick<UserBookState, 'read' | 'rating'> }
 
@@ -28,13 +28,16 @@ type Props = { bookId: number; initial: Pick<UserBookState, 'read' | 'rating'> }
  * restored flag: a refresh can bring back the very value the group was
  * rendered with, so a prop-change key would not remount it. The refresh
  * follows any toast Undo, so it refreshes Book detail after one from another
- * group too; `ReceiveCopy` relies on it.
+ * group too; `ReceiveCopy` relies on it. While mounted it claims that refresh
+ * from the rows (`useClaimUndoRefresh`), so on `/` it runs once; on `/loans`
+ * `RefreshOnUndo` refreshes as well.
  */
 export function ReadAndRating(props: Props) {
   const router = useRouter()
   const { onUndone } = useToast()
   const [, startTransition] = useTransition()
   const [generation, setGeneration] = useState(0)
+  useClaimUndoRefresh()
 
   useEffect(
     () =>

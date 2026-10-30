@@ -8,6 +8,8 @@ export const limits = {
   title: 500,
   subtitle: 500,
   description: 10_000,
+  publisher: 200,
+  language: 50,
   /** An author's, a series', a Person's or a wishlist's name. */
   name: 200,
 } as const

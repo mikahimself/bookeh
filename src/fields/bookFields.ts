@@ -50,11 +50,11 @@ const overridable = (override: boolean): Field[] => [
   { name: 'subtitle', type: 'text', maxLength: limits.subtitle },
   relation(override, 'authors', { name: 'authors', hasMany: true }),
   relation(override, 'series', { name: 'series' }),
-  { name: 'seriesIndex', type: 'number' },
-  { name: 'publisher', type: 'text' },
-  { name: 'year', type: 'number' },
-  { name: 'language', type: 'text' },
-  { name: 'pages', type: 'number' },
+  { name: 'seriesIndex', type: 'number', min: 0 },
+  { name: 'publisher', type: 'text', maxLength: limits.publisher },
+  { name: 'year', type: 'number', min: 0 },
+  { name: 'language', type: 'text', maxLength: limits.language },
+  { name: 'pages', type: 'number', min: 0 },
   { name: 'description', type: 'textarea', maxLength: limits.description },
 ]
 

@@ -37,6 +37,10 @@ vi.mock('next/navigation', async (importOriginal) => ({
 }))
 vi.mock('@/app/(frontend)/actions/undo', () => ({ undoAction }))
 vi.mock('@/app/(frontend)/actions/prefs', () => ({ setDevicePrefsAction: vi.fn() }))
+vi.mock('@/app/(frontend)/(sections)/actions', () => ({
+  setReadAction: vi.fn(),
+  setRatingAction: vi.fn(),
+}))
 
 /** Every observer made, with the elements it watches. */
 const observers: { callback: IntersectionObserverCallback; elements: Element[] }[] = []
@@ -69,6 +73,7 @@ const { ShelfActionsProvider, ShelfRowsProvider, useAfterAction } =
 const { CollectionList } = await import('@/app/(frontend)/(sections)/CollectionList')
 const { CollectionDisplayProvider } = await import('@/app/(frontend)/(sections)/CollectionDisplay')
 const { SelectionProvider } = await import('@/app/(frontend)/(sections)/Selection')
+const { ReadAndRating } = await import('@/app/(frontend)/(sections)/ReadAndRating')
 
 const book = (bookId: number): EffectiveBook => ({
   bookId,
@@ -225,6 +230,59 @@ describe('CollectionList', () => {
     expect(fetchStub).toHaveBeenCalledOnce()
     expect(fetchStub.mock.calls[0]![0]).toBe('/data/shelf?offset=0&limit=60')
     expect(titles()).toHaveLength(59)
+  })
+
+  it('refreshes once after an Undo: after the rows, or by a mounted ReadAndRating alone', async () => {
+    const undo = async () => {
+      undoAction.mockResolvedValue({ ok: true, data: null })
+      act(() => {
+        probe.toast.show({ kind: 'success', message: 'Saved', undo: { token: 'tok', seconds: 60 } })
+      })
+      fireEvent.click(screen.getByRole('button', { name: 'Undo' }))
+    }
+
+    mount({ rows: rows(1, 2), total: 2, labels: {} })
+    let answer: (body: unknown) => void = () => {}
+    fetchStub.mockReturnValueOnce(
+      new Promise((resolve) => {
+        answer = (body) => resolve({ status: 200, json: async () => body })
+      }),
+    )
+    await undo()
+    await waitFor(() => expect(fetchStub).toHaveBeenCalledOnce())
+    expect(router.refresh).not.toHaveBeenCalled()
+
+    answer({ ok: true, data: { rows: rows(2, 2), total: 1, labels: {} } })
+    await waitFor(() => expect(router.refresh).toHaveBeenCalledOnce())
+    cleanup()
+    router.refresh.mockClear()
+    fetchStub.mockClear()
+
+    render(
+      createElement(
+        ToastProvider,
+        null,
+        createElement(
+          ShelfActionsProvider,
+          null,
+          createElement(ReadAndRating, { bookId: 1, initial: { read: false, rating: null } }),
+          createElement(
+            ShelfRowsProvider,
+            {
+              query,
+              initial: { rows: rows(1, 2), total: 2, labels: {} },
+            } as ComponentProps<typeof ShelfRowsProvider>,
+            createElement(Probe),
+          ),
+        ),
+      ),
+    )
+    answerWith({ ok: true, data: { rows: rows(2, 2), total: 1, labels: {} } })
+    await undo()
+
+    await waitFor(() => expect(fetchStub).toHaveBeenCalledOnce())
+    await act(async () => {})
+    expect(router.refresh).toHaveBeenCalledOnce()
   })
 
   it('shows "Not in library" and reloads after an action fails NOT_FOUND', async () => {

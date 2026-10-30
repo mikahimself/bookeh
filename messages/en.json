@@ -135,7 +135,9 @@
     "unavailable": "Couldn't look it up",
     "noAnswer": "{sources} didn't answer. {isbn} may still be known.",
     "tryAgain": "Try again",
-    "addByHand": "Add by hand"
+    "addByHand": "Add by hand",
+    "partial": "{sources} didn't answer. Saving now uses {found} alone.",
+    "tryPartial": "Try {sources} again"
   },
   "editBook": {
     "heading": "Edit book",
@@ -182,6 +184,15 @@
   "sources": {
     "finna": "Finna",
     "google": "Google Books"
+  },
+  "sourcesPartitive": {
+    "finna": "Finna",
+    "google": "Google Books"
+  },
+  "errorPage": {
+    "heading": "Couldn't show this page.",
+    "tryAgain": "Try again",
+    "collection": "Collection"
   },
   "task": {
     "close": "Close"

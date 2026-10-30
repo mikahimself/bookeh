@@ -158,6 +158,7 @@ describe('lookupBook', () => {
     it('maps found candidates to drafts and keeps a valid pick', async () => {
       vi.mocked(lookupSources).mockResolvedValue({
         kind: 'found',
+        failed: [],
         candidates: [
           candidate(isbn, 'First', { coverUrl: 'https://covers.example/first.jpg' }),
           candidate(isbn, 'Second', { source: 'google', raw: { google: {} } }),
@@ -169,6 +170,7 @@ describe('lookupBook', () => {
       const { raw: _second, ...second } = candidate(isbn, 'Second', { source: 'google' })
       expect(result).toEqual({
         kind: 'source',
+        failed: [],
         pick: 1,
         candidates: [
           { ...first, hasCover: true },
@@ -188,6 +190,7 @@ describe('lookupBook', () => {
     it.each([5, -1, 0.5, undefined])('falls back to the best candidate for pick %s', async (pick) => {
       vi.mocked(lookupSources).mockResolvedValue({
         kind: 'found',
+        failed: [],
         candidates: [candidate(isbn, 'First'), candidate(isbn, 'Second')],
         raw: { v: 1, fetchedAt: '2026-10-19T00:00:00.000Z', sources: {}, subjects: {}, coverUrl: null },
       })
@@ -208,6 +211,7 @@ describe('lookupBook', () => {
     const found = (...candidates: SourceResult[]) =>
       vi.mocked(lookupSources).mockResolvedValue({
         kind: 'found',
+        failed: [],
         candidates,
         raw: { v: 1, fetchedAt: '2026-10-19T00:00:00.000Z', sources: {}, subjects: {}, coverUrl: null },
       })

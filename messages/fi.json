@@ -135,7 +135,9 @@
     "unavailable": "Haku ei onnistunut",
     "noAnswer": "{count, plural, one {{sources} ei vastannut.} other {{sources} eivät vastanneet.}} {isbn} voi silti löytyä.",
     "tryAgain": "Yritä uudelleen",
-    "addByHand": "Lisää käsin"
+    "addByHand": "Lisää käsin",
+    "partial": "{count, plural, one {{sources} ei vastannut.} other {{sources} eivät vastanneet.}} Tallennus käyttää nyt vain {found}.",
+    "tryPartial": "Yritä {sources} uudelleen"
   },
   "editBook": {
     "heading": "Muokkaa kirjaa",
@@ -182,6 +184,15 @@
   "sources": {
     "finna": "Finna",
     "google": "Google Books"
+  },
+  "sourcesPartitive": {
+    "finna": "Finnaa",
+    "google": "Google Booksia"
+  },
+  "errorPage": {
+    "heading": "Sivua ei voitu näyttää.",
+    "tryAgain": "Yritä uudelleen",
+    "collection": "Kokoelma"
   },
   "task": {
     "close": "Sulje"

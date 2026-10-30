@@ -85,6 +85,7 @@ describe('notInLibrary', () => {
         authors: [{ name: 'Väinö Linna', id: null }],
         series: { name: 'Sotaromaanit', id: 4 },
       },
+      failed: [],
     }
     expect(notInLibrary(result)).toEqual({
       isbn13: '9789510396358',
@@ -120,6 +121,7 @@ describe('notInLibrary', () => {
           cover: '/data/cover/9789510396358?pick=1',
         },
       ],
+      failed: [],
     })
   })
 
@@ -129,6 +131,7 @@ describe('notInLibrary', () => {
       candidates: [draft({ hasCover: false, year: 2014, pages: 1, source: 'fixture' })],
       pick: 0,
       matches: { authors: [{ name: 'Väinö Linna', id: 3 }], series: { name: 'Uusi', id: null } },
+      failed: ['finna'],
     })
     expect(answer).toMatchObject({
       cover: null,
@@ -142,6 +145,7 @@ describe('notInLibrary', () => {
       pick: undefined,
       candidate: { source: 'fixture', recordId: 'helka.1' },
       editions: [],
+      failed: ['finna'],
     })
   })
 
@@ -167,6 +171,7 @@ describe('notInLibrary', () => {
       pick: undefined,
       candidate: undefined,
       editions: [],
+      failed: [],
     })
   })
 
@@ -206,6 +211,7 @@ describe('inLibrary', () => {
       newSeries: null,
       pick: undefined,
       editions: [],
+      failed: [],
       bookId: 7,
       lookAgain: false,
       copies: [
@@ -241,6 +247,7 @@ describe('inLibrary', () => {
         candidates: [draft()],
         pick: 0,
         matches: { authors: [], series: null },
+        failed: [],
       }),
     ).toBeNull()
     expect(inLibrary({ kind: 'none' })).toBeNull()
@@ -298,6 +305,7 @@ describe('answerLines', () => {
     pick: 0,
     candidate: undefined,
     editions: [],
+    failed: [],
     ...over,
   })
 

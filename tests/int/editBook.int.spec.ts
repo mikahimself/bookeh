@@ -283,6 +283,8 @@ describe('editBook', () => {
     ['description', { description: 'x'.repeat(10_001) }],
     ['authors', { authors: [ghost, 'x'.repeat(201)] }],
     ['series', { series: 'x'.repeat(201) }],
+    ['publisher', { publisher: 'x'.repeat(201) }],
+    ['language', { language: 'x'.repeat(51) }],
   ] satisfies [string, BookEdits][])(
     'rejects an over-long %s with TOO_LONG and writes nothing',
     async (key, edits) => {
@@ -295,6 +297,15 @@ describe('editBook', () => {
       expect(await named('authors', [ghost])).toEqual([])
     },
   )
+
+  it.each([
+    ['year', { year: -1 }],
+    ['pages', { pages: -1 }],
+    ['seriesIndex', { seriesIndex: -1 }],
+  ] satisfies [string, BookEdits][])('refuses a negative %s', async (key, edits) => {
+    const x = await sharedX()
+    await rejectsNaming(editBook(asB, { bookId: x.id, edits }), [key])
+  })
 
   it('collapses whitespace runs in a single-line field, not in the description', async () => {
     const x = await sharedX()

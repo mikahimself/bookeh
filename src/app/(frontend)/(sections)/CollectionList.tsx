@@ -122,7 +122,14 @@ export function CollectionList({ query, book }: { query: ShelfQuery; book: numbe
       ) : layout === 'covers' ? (
         <ul className={`grid ${GRID[size]}`}>
           {shelf.rows.map((row) => (
-            <CoverTile key={row.copy.copyId} row={row} size={size} lent={lent} {...opens(row)} />
+            <CoverTile
+              key={row.copy.copyId}
+              row={row}
+              size={size}
+              ordered={t('ordered')}
+              lent={lent}
+              {...opens(row)}
+            />
           ))}
         </ul>
       ) : (

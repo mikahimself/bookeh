@@ -59,6 +59,7 @@ const candidate = (isbn13: string, coverUrl?: string): SourceResult => ({
 
 const found = (...candidates: SourceResult[]): SourcesOutcome => ({
   kind: 'found',
+  failed: [],
   candidates,
   raw: {
     v: 1,

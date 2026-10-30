@@ -24,7 +24,10 @@ vi.mock('next/navigation', async (importOriginal) => ({
   useRouter: () => router,
 }))
 vi.mock('@/app/(frontend)/(sections)/actions', () => ({ setReadAction, setRatingAction }))
-vi.mock('@/app/(frontend)/(sections)/ShelfRows', () => ({ useAfterAction: () => afterAction }))
+vi.mock('@/app/(frontend)/(sections)/ShelfRows', () => ({
+  useAfterAction: () => afterAction,
+  useClaimUndoRefresh: () => {},
+}))
 vi.mock('@/app/(frontend)/components/toast/ToastProvider', () => ({
   useToast: () => ({
     show,

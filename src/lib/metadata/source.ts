@@ -24,7 +24,7 @@ export type SourceResult = {
 }
 
 export type SourcesOutcome =
-  | { kind: 'found'; candidates: SourceResult[]; raw: RawMetadata } // candidates best first
+  | { kind: 'found'; candidates: SourceResult[]; raw: RawMetadata; failed: SourceId[] } // candidates best first; failed: [] when every source answered
   | { kind: 'none' }
   | { kind: 'unavailable'; failed: SourceId[] } // failed names the sources that failed or timed out
 

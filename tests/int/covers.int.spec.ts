@@ -51,6 +51,7 @@ const found = (isbn13: string, coverUrl?: string): Extract<SourcesOutcome, { kin
   }
   return {
     kind: 'found',
+    failed: [],
     candidates: [best],
     raw: {
       v: 1,

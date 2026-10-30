@@ -10,18 +10,21 @@ import { answerLines, type AnswerBook, type AnswerLine } from './answer'
  * An Answer's body (EXPERIENCE.md, Answer; DESIGN.md, Detail panel
  * composition): the cover beside the title, the author and edition lines
  * under it, then `lines` (the viewer's copies, a lent one with the lent marker), then where the record comes
- * from and what a save would create, then `editions` (the line under the
+ * from and what a save would create, closed by `sourceNote` (a source that
+ * didn't answer), then `editions` (the line under the
  * Book: the edition picker's Link, or Look it up again), and at the foot `children`, the Answer's buttons. A line with
  * nothing to show is left out.
  */
 export async function AnswerLayout({
   book,
   lines = [],
+  sourceNote,
   editions,
   children,
 }: {
   book: AnswerBook
   lines?: AnswerLine[]
+  sourceNote?: ReactNode
   editions?: ReactNode
   children: ReactNode
 }) {
@@ -65,13 +68,14 @@ export async function AnswerLayout({
           ))}
         </ul>
       )}
-      {notes.length > 0 && (
+      {(notes.length > 0 || sourceNote) && (
         <div className="flex flex-col gap-1">
           {notes.map((line, index) => (
             <p key={index} className="text-meta text-text-muted">
               {line}
             </p>
           ))}
+          {sourceNote}
         </div>
       )}
       {editions}

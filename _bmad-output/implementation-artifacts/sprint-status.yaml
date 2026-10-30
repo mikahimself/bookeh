@@ -231,7 +231,7 @@ development_status:
   7-17-k23-wishlist-and-loan-clean-up: done
   7-18-k24-foreign-keys-that-refuse-or-cascade: done
   7-19-k25-own-email-and-password-closed-over-rest: done
-  7-20-k26-scan-and-collection-leftovers: backlog
+  7-20-k26-scan-and-collection-leftovers: done
   7-21-k27-checks-that-guard-the-spine: backlog
   7-22-k28-repo-tidy: backlog
   7-23-k29-shared-service-code: backlog

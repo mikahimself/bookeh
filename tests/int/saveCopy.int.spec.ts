@@ -61,6 +61,7 @@ const found = (
   names: { author: string; series: string },
 ): Extract<SourcesOutcome, { kind: 'found' }> => ({
   kind: 'found',
+  failed: [],
   candidates: [
     {
       isbn13,

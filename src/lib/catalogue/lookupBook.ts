@@ -36,9 +36,9 @@ export type Match = { name: string; id: number | null }
 
 /**
  * What an ISBN is (AD-9, FR-11): a Book the viewer can already read, with
- * what they hold of it; the sources' candidates with the picked index and the
- * picked one's author and series matches; no source knows it; or the sources
- * could not be asked. `rawMetadata` and `raw` never appear in any kind. The
+ * what they hold of it; the sources' candidates with the picked index, the
+ * picked one's author and series matches and the sources that failed; no
+ * source knows it; or the sources could not be asked. `rawMetadata` and `raw` never appear in any kind. The
  * spine's `genres` in `matches` arrives with `mapSubjectsToGenres` (Epic 9).
  */
 export type LookupResult =
@@ -48,6 +48,7 @@ export type LookupResult =
       candidates: Draft[]
       pick: number
       matches: { authors: Match[]; series: Match | null }
+      failed: SourceId[]
     }
   | { kind: 'none' }
   | { kind: 'unavailable'; failed: SourceId[] }
@@ -128,7 +129,24 @@ export async function lookupBook(ctx: Context, target: LookupTarget): Promise<Lo
         candidates: candidates.map(toDraft),
         pick,
         matches: { authors, series },
+        failed: outcome.failed,
       }
     }
   }
+}
+
+/**
+ * Try {sources} again on the Answer (AD-9): asks the sources past the held
+ * outcome, which a `found` or `none` replaces. `unavailable` is never cached,
+ * so when no source has records and one failed, the held partial stays until
+ * its `PARTIAL_TTL_MS` runs out. A source whose breaker is open counts as
+ * failed without being asked. Returns the sources that failed, `[]` for
+ * `none`. The caller then renders the Answer again, and `lookupBook` reads
+ * what is held.
+ */
+export async function retryLookup(ctx: Context, isbn: string): Promise<SourceId[]> {
+  const isbn13 = normaliseIsbn(isbn)
+  limitLookups(ctx)
+  const outcome = await lookupSources(isbn13, { fresh: true })
+  return outcome.kind === 'none' ? [] : outcome.failed
 }

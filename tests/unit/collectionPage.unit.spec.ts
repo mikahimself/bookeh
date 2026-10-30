@@ -365,6 +365,7 @@ describe('CollectionPage', () => {
     const [lent, ordered] = screen.getAllByRole('listitem')
     within(lent).getByText('Lent · Antti')
     expect(within(ordered).queryByText(/Lent/)).toBeNull()
+    within(ordered).getByText('Ordered')
   })
 
   it('starts the list over for a new query, and keeps the rows held when only book changes', async () => {

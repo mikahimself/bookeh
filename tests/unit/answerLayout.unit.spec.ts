@@ -29,6 +29,7 @@ const book: AnswerBook = {
   pick: undefined,
   candidate: undefined,
   editions: [],
+  failed: [],
 }
 
 describe('AnswerLayout', () => {

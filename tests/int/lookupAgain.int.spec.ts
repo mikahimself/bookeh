@@ -41,6 +41,7 @@ const record = (isbn13: string, extra: Partial<SourceResult> = {}): SourceResult
 
 const found = (...candidates: SourceResult[]): SourcesOutcome => ({
   kind: 'found',
+  failed: [],
   candidates,
   raw: { v: 1, fetchedAt: '2026-10-23T00:00:00.000Z', sources: {}, subjects: {}, coverUrl: null },
 })

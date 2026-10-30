@@ -30,6 +30,8 @@ export type AnswerEdition = {
  * the shown candidate's identity, so the save uses that record or none
  * (AD-11; `undefined` for a Book that exists). `editions` lists
  * every candidate in order when there are two or more, else it is empty.
+ * `failed` names the sources that didn't answer the lookup that found the
+ * candidate (`[]` for a Book that exists).
  * Nothing here comes from a user record.
  */
 export type AnswerBook = {
@@ -47,6 +49,7 @@ export type AnswerBook = {
   pick: number | undefined
   candidate: CandidateId | undefined
   editions: AnswerEdition[]
+  failed: SourceId[]
 }
 
 /**
@@ -103,6 +106,7 @@ const existingBook = (book: ExistingResult['book'], isbn13: string): AnswerBook 
   pick: undefined,
   candidate: undefined,
   editions: [],
+  failed: [],
 })
 
 /**
@@ -144,6 +148,7 @@ export function notInLibrary(result: LookupResult): AnswerBook | null {
         pick: several ? pick : undefined,
         candidate: { source: draft.source, recordId: draft.recordId },
         editions: several ? answerEditions(isbn13, candidates) : [],
+        failed: result.failed,
       }
     }
     default:

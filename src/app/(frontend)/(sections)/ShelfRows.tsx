@@ -52,6 +52,10 @@ type ShelfActionsValue = {
   afterAction: (result: ActionResult<unknown>) => number | null
   /** The mounted rows' reload, resolving once the rows answered; returns the unregister. */
   register: (reload: () => Promise<void>) => () => void
+  /** A toast Undo: refreshes once `reloaded` settles, unless a claim holds the refresh. */
+  afterUndo: (reloaded: Promise<void>) => void
+  /** Takes over the refresh after a toast Undo; returns the release. */
+  claimUndoRefresh: () => () => void
 }
 
 const ShelfActionsContext = createContext<ShelfActionsValue | null>(null)
@@ -67,6 +71,12 @@ export function useAfterAction(): ShelfActionsValue['afterAction'] {
   return useShelfActions().afterAction
 }
 
+/** `ReadAndRating`: while mounted it refreshes for a toast Undo, so `afterUndo` does not. */
+export function useClaimUndoRefresh(): void {
+  const { claimUndoRefresh } = useShelfActions()
+  useEffect(() => claimUndoRefresh(), [claimUndoRefresh])
+}
+
 /**
  * Spine, AD-7: `afterAction` above the list, unkeyed, so the action bar and
  * Book detail reach it and it outlives a query change. `ok` reloads the
@@ -75,8 +85,11 @@ export function useAfterAction(): ShelfActionsValue['afterAction'] {
  * once, with no rows mounted after Load failed) the server render is
  * refreshed in a transition, so the Filter panel's values, Book detail and
  * the cached first page follow the write; the list never shows a page older
- * than its rows. A toast Undo is not an action: it reloads through `onUndone`
- * and `ReadAndRating` refreshes for it (on `/loans`, `RefreshOnUndo` too).
+ * than its rows. A toast Undo is not an action: the rows reload through
+ * `onUndone` and `afterUndo` refreshes after them, unless a mounted
+ * `ReadAndRating` claimed that refresh: its remount shares the transition, so
+ * on `/` it runs once. `/loans` and one wishlist mount no rows and refresh
+ * through `RefreshOnUndo`, on `/loans` beside a mounted `ReadAndRating`.
  */
 export function ShelfActionsProvider({ children }: { children: ReactNode }) {
   const t = useTranslations('answer')
@@ -85,6 +98,7 @@ export function ShelfActionsProvider({ children }: { children: ReactNode }) {
   const router = useRouter()
   const [, startTransition] = useTransition()
   const reload = useRef<(() => Promise<void>) | null>(null)
+  const undoClaims = useRef(0)
 
   const register = useCallback((next: () => Promise<void>) => {
     reload.current = next
@@ -103,7 +117,26 @@ export function ShelfActionsProvider({ children }: { children: ReactNode }) {
     [reportFailure, router, show, t],
   )
 
-  const value = useMemo(() => ({ afterAction, register }), [afterAction, register])
+  const afterUndo = useCallback(
+    (reloaded: Promise<void>) => {
+      // Read as the Undo lands: the claimant refreshes at this moment, even if it unmounts next.
+      if (undoClaims.current > 0) return
+      void reloaded.then(() => startTransition(() => router.refresh()))
+    },
+    [router],
+  )
+
+  const claimUndoRefresh = useCallback(() => {
+    undoClaims.current += 1
+    return () => {
+      undoClaims.current -= 1
+    }
+  }, [])
+
+  const value = useMemo(
+    () => ({ afterAction, register, afterUndo, claimUndoRefresh }),
+    [afterAction, register, afterUndo, claimUndoRefresh],
+  )
   return <ShelfActionsContext.Provider value={value}>{children}</ShelfActionsContext.Provider>
 }
 
@@ -147,7 +180,7 @@ export function ShelfRowsProvider({ query, initial, children }: Props) {
 
 function ShelfRowsState({ query, initial, restore, children }: Props & { restore: boolean }) {
   const { onUndone } = useToast()
-  const { register } = useShelfActions()
+  const { register, afterUndo } = useShelfActions()
   const reportFailure = useReportFailure()
   // Fixed for the state's life: the provider remounts it for another query.
   const [rowsQuery] = useState(query)
@@ -264,7 +297,7 @@ function ShelfRowsState({ query, initial, restore, children }: Props & { restore
   }, [run])
 
   useEffect(() => register(reload), [register, reload])
-  useEffect(() => onUndone(() => void reload()), [onUndone, reload])
+  useEffect(() => onUndone(() => afterUndo(reload())), [onUndone, reload, afterUndo])
 
   const value = useMemo(() => ({ shelf, loading, loadMore }), [shelf, loading, loadMore])
   return <ShelfRowsContext.Provider value={value}>{children}</ShelfRowsContext.Provider>

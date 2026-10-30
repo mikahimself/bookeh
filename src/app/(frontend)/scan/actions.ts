@@ -1,5 +1,6 @@
 'use server'
 
+import { retryLookup } from '@/lib/catalogue/lookupBook'
 import { type CandidateId, isCandidateId } from '@/lib/catalogue/pick'
 import {
   type EntrySaveResult,
@@ -9,6 +10,7 @@ import {
   type SaveTarget,
 } from '@/lib/catalogue/saveCopy'
 import { DomainError, logger, runAction, type ActionResult, type ErrorCode } from '@/lib/errors'
+import type { SourceId } from '@/lib/metadata/source'
 import { requireUserOrThrow } from '@/lib/payload/context'
 import { isRowId, type Ref } from '@/lib/payload/ref'
 import type { Undoable } from '@/lib/undo/undo'
@@ -47,6 +49,26 @@ export async function saveCopyAction(input: unknown): Promise<ActionResult<Undoa
   return result.code === 'NOT_FOUND' || result.code === 'RATE_LIMITED'
     ? result
     : { ok: false, code: 'SAVE_FAILED' }
+}
+
+/**
+ * Try {sources} again on the Not in library Answer: asks the sources past the
+ * held outcome (`retryLookup()`), and the client renders the Answer again;
+ * `data` names the sources that still failed.
+ * Anything but an `{ isbn13 }` string is `VALIDATION`. A failure comes back as
+ * it is, `RATE_LIMITED` included, for its toast; the Answer stays. Logged as
+ * in `saveCopyAction`.
+ */
+export async function retryLookupAction(input: unknown): Promise<ActionResult<SourceId[]>> {
+  const result = await runAction(async () => {
+    const ctx = await requireUserOrThrow()
+    if (!isIsbnInput(input)) throw new DomainError('VALIDATION')
+    return retryLookup(ctx, input.isbn13)
+  })
+  if (!result.ok && result.code !== 'UNAUTHENTICATED' && result.code !== 'INTERNAL') {
+    logger().warn({ code: result.code }, 'retryLookupAction failed')
+  }
+  return result
 }
 
 type IsbnInput = { isbn13: string; pick?: number; candidate?: CandidateId }
