@@ -726,4 +726,17 @@ describe('saveCopy of a held private Book', () => {
     expect(await copiesOf(user)).toHaveLength(1)
     expect(await fs.readdir(mediaDir(payload))).not.toContain(renamed[0])
   })
+
+  // `deleteMediaRow()`: the delete rolls back, so the row needs its file.
+  it('keeps the replaced cover and its file when the copy fails after the swap', async () => {
+    const { user, ctx, isbn, own } = await promoteSetup()
+    const uploaded = await upload(ctx, own.id)
+    const broken = await contextFor({ ...user, defaultLocation: 2_000_000_000 })
+
+    expect(await rejectedPaths(saveCopy(broken, isbnInput(isbn)))).toEqual(['location'])
+
+    expect(await exists('media', uploaded.id)).toBe(true)
+    expect((await bookById(own.id)).cover).toBe(uploaded.id)
+    expect(await fs.readdir(mediaDir(payload))).toContain(uploaded.filename)
+  })
 })

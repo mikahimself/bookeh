@@ -27,6 +27,7 @@ import {
   REQUEST_MEMORY_SIZE,
   REQUEST_WINDOW_MS,
 } from '@/lib/catalogue/saveRequests'
+import { removeCopies } from '@/lib/copies/removeCopies'
 import { DomainError, logger } from '@/lib/errors'
 import { lendCopy, returnLoan } from '@/lib/loans/loans'
 import { heldOutcome, lookupSources } from '@/lib/metadata/lookup'
@@ -814,6 +815,44 @@ describe('saveCopy', () => {
       expect((await copiesOf(user)).map((copy) => copy.id)).toEqual([result.copyId])
       const loan = await payload.findByID({ collection: 'loans', id: data.loanId, depth: 0 })
       expect(loan.returnedOn).toEqual(expect.any(String))
+    })
+
+    // AD-20: a restore skips rows that are gone.
+    it('succeeds after removeCopies, deleting the rows nothing references', async () => {
+      const { user, ctx } = await freshUser()
+      const isbn = randomIsbn()
+      const names = { author: unique('Eino Leino'), series: unique('Helkavirsiä') }
+      vi.mocked(lookupSources).mockResolvedValue(found(isbn, names))
+
+      const result = await saveCopy(ctx, inputFor(isbn))
+      const media = await coverOf(result.bookId)
+      await removeCopies(ctx, [result.copyId])
+
+      await undo(ctx, result.undoToken)
+
+      expect(await copiesOf(user)).toEqual([])
+      expect(await booksWithIsbn(isbn)).toEqual([])
+      expect(await countByName('authors', names.author)).toBe(0)
+      expect(await countByName('series', names.series)).toBe(0)
+      expect(await mediaCount(media.id)).toBe(0)
+    })
+
+    // AD-20: the Book can be gone too; the rows it left unreferenced still go.
+    it('succeeds after removeCopies and the Book deleted, deleting its author and series', async () => {
+      const { ctx } = await freshUser()
+      const isbn = randomIsbn()
+      const names = { author: unique('Larin Paraske'), series: unique('Kalevala') }
+      vi.mocked(lookupSources).mockResolvedValue(found(isbn, names))
+
+      const result = await saveCopy(ctx, inputFor(isbn))
+      await coverOf(result.bookId)
+      await removeCopies(ctx, [result.copyId])
+      await payload.delete({ collection: 'books', id: result.bookId, overrideAccess: true })
+
+      await undo(ctx, result.undoToken)
+
+      expect(await countByName('authors', names.author)).toBe(0)
+      expect(await countByName('series', names.series)).toBe(0)
     })
 
     it('keeps a Book that existed before the save, even unreferenced', async () => {

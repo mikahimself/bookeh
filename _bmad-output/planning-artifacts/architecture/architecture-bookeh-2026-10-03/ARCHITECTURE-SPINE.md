@@ -53,14 +53,16 @@ flowchart TD
   META --> EXT["Finna, Google Books"]
 ```
 
-Arrows are the only allowed import directions, and ESLint `no-restricted-imports` enforces them.
+The diagram shows the main directions; the list below is the full table of allowed imports. ESLint enforces it: `import/no-restricted-paths` zones hold the directories to the allowlists below, type imports included, and `@typescript-eslint/no-restricted-imports` holds the gateway and metadata bans, where types are allowed.
 
-- `src/lib` never imports from `src/app`. `src/collections` imports only from `src/access` and `src/fields`.
+- `src/lib` imports only from `src/lib`, `src/fields`, `access/roles`, `i18n/locale`, `payload-types` and `payload.config`, the last only in `lib/payload` (AD-2). It never imports from `src/app`. `src/collections` imports only from `src/access`, `src/fields` and `payload-types`.
+- `src/fields` imports only from `src/access` and `lib/errors`. `src/i18n` imports only from `lib/payload`.
+- `src/app/(frontend)` imports only from `src/lib`, `src/fields`, `src/i18n`, `access/roles` (AD-2) and `payload-types`.
 - `lib/metadata` has no database access.
-- Between services, imports are one-way: `catalogue` may import `copies`, `wishlists`, `books` and `metadata`; `wishlists` and `loans` may import `copies` and `people`; `shelf` may import `books`; `tags` may import `books` and `shelf`; `copies` may import `account` (deleting or merging a location clears or moves the profile default, AD-18); `people`, `books` and `metadata` import no other service.
+- Between services, imports are one-way: `catalogue` may import `copies`, `wishlists`, `books` and `metadata`; `wishlists` and `loans` may import `copies` and `people`; `shelf` may import `books`; `tags` may import `books` and `shelf`; `copies` may import `account` (deleting or merging a location clears or moves the profile default, AD-18); `people`, `books`, `metadata` and `backup` import no other service.
 - `account` imports no other service.
 - `lib/undo` imports only `lib/payload` and `lib/errors`. Any service may import it. `lib/errors.ts` and `lib/processState.ts` import nothing from the project, and any module under `src/lib` may import them.
-- `src/app/(frontend)` imports from `lib/payload` only `requireUser`, `requireUserOrThrow`, `isRowId` (`lib/payload/ref.ts`, pure) and types. It never calls the gateway.
+- `src/app/(frontend)` imports from `lib/payload` only `requireUser`, `requireUserOrThrow`, `isRowId` (`lib/payload/ref.ts`, pure) and types. It never calls the gateway. From `lib/metadata` it imports only types and `sources/fixture`, a module that exists for the fixture cover route; lint does not hold it to that file.
 - Client components import from `src/lib` only types, `lib/shelf/query.ts`, `lib/catalogue/corners.ts` (`checkCorners`, `squareToQuad`, `Point`, `Corners`, `QuadMap`) `lib/books/languageName.ts` (`languageName`) and `lib/loans/dates.ts` (`helsinkiToday`, `isCalendarDate`; the Lend picker reads today at each open), which are pure.
 
 ## Invariants & Rules

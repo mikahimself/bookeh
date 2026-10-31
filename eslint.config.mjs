@@ -14,7 +14,7 @@ const appDir = path.join(srcDir, 'app')
  * Import directions from the architecture spine (Design Paradigm).
  * Zones for `import/no-restricted-paths`: `target` is the importing directory,
  * `from` the forbidden one, `except` the allowed paths relative to `from`.
- * The directories exist only from Story 1.7 on; the rules stay silent until then.
+ * The rule has no type-import option: a zone counts `import type` too.
  */
 
 // Allowed imports from `src/lib` per service, besides the service itself,
@@ -31,6 +31,7 @@ const serviceImports = {
   account: ['payload', 'undo'],
   undo: ['payload'],
   metadata: [],
+  backup: [],
   payload: [],
 }
 
@@ -51,8 +52,43 @@ const serviceZones = Object.entries(serviceImports).map(([service, allowed]) => 
 const importZones = [
   {
     target: 'src/lib',
-    from: 'src/app',
-    message: 'Spine, Design Paradigm: src/lib never imports from src/app.',
+    from: 'src',
+    except: [
+      './lib',
+      './fields',
+      './access/roles.ts',
+      './i18n/locale.ts',
+      './payload-types.ts',
+      './payload.config.ts',
+    ],
+    message:
+      'Spine, Design Paradigm: src/lib imports only from src/lib, src/fields, access/roles, i18n/locale, payload-types and, in lib/payload, payload.config.',
+  },
+  {
+    target: 'src/fields',
+    from: 'src',
+    except: ['./fields', './access', './lib/errors.ts'],
+    message: 'Spine, Design Paradigm: src/fields imports only from src/access and lib/errors.',
+  },
+  {
+    target: 'src/i18n',
+    from: 'src',
+    except: ['./i18n', './lib/payload'],
+    message: 'Spine, Design Paradigm: src/i18n imports only from lib/payload.',
+  },
+  {
+    target: 'src/app/(frontend)',
+    from: 'src',
+    except: [
+      './app/(frontend)',
+      './lib',
+      './fields',
+      './i18n',
+      './access/roles.ts',
+      './payload-types.ts',
+    ],
+    message:
+      'Spine, Design Paradigm: src/app/(frontend) imports only from src/lib, src/fields, src/i18n, access/roles and payload-types.',
   },
   {
     target: 'src/collections',
@@ -65,6 +101,14 @@ const importZones = [
     from: 'src',
     message:
       'Spine, Design Paradigm: lib/errors.ts and lib/processState.ts import nothing from the project.',
+  },
+  {
+    // Spine, AD-2: `gatewayExempt` lifts the ban from some services; this zone does not.
+    target: Object.keys(serviceImports)
+      .filter((service) => service !== 'payload')
+      .map((service) => `src/lib/${service}`),
+    from: 'src/payload.config.ts',
+    message: 'Spine, AD-2: only lib/payload imports payload.config.',
   },
   ...serviceZones,
 ]
@@ -450,6 +494,13 @@ const eslintConfig = defineConfig([
               '^(drizzle-orm|pg)(/|$)',
               '^@payloadcms/',
             ].map((regex) => ({ regex, allowTypeImports: true, message: frontendThroughServices })),
+            {
+              // The fixture cover route serves `fixtureCover` in fixture mode only.
+              regex: '/lib/metadata(?!/sources/fixture$)(/|$)',
+              allowTypeImports: true,
+              message:
+                'Spine, Design Paradigm: src/app/(frontend) imports from lib/metadata only types; lookups go through lib/catalogue.',
+            },
           ],
         },
       ],
