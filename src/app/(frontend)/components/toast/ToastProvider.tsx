@@ -1,11 +1,10 @@
 'use client'
 
 import { useTranslations } from 'next-intl'
-import { usePathname, useRouter } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import {
   createContext,
   useContext,
-  useEffect,
   useMemo,
   useState,
   useSyncExternalStore,
@@ -16,7 +15,6 @@ import {
 import { undoAction } from '../../actions/undo'
 import { ActionLink, TextLink } from '../Link'
 import { reportFailure, settleAction } from '../request'
-import { takeFlash } from './flashCookie'
 import { createToastStore, toastMessage, type ToastStore } from './store'
 import { ToastView } from './ToastView'
 
@@ -35,16 +33,13 @@ export function useToast(): ToastContextValue {
 
 /**
  * Owns the one toast (spine, Toasts). Mounted once in the root layout, above
- * the pages, so a toast survives client navigation. Reads and clears the
- * `bookeh_flash` cookie (set by `flashToast()`) on mount and on every
- * pathname change.
+ * the pages, so a toast survives client navigation.
  */
 export function ToastProvider({ children }: { children: ReactNode }) {
   const t = useTranslations()
   const [store] = useState(() => createToastStore())
   const [undoneListeners] = useState(() => new Set<() => void>())
   const state = useSyncExternalStore(store.subscribe, store.getState, () => null)
-  const pathname = usePathname()
   const router = useRouter()
   const [undoPending, startUndo] = useTransition()
   const value = useMemo(
@@ -96,16 +91,6 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   // in flight (the copy may be going); tapping it dismisses.
   const edit =
     state?.input.kind === 'success' && !state.leaving && !undoPending ? state.input.edit : undefined
-
-  useEffect(() => {
-    const input = takeFlash({
-      read: () => document.cookie,
-      write: (cookie) => {
-        document.cookie = cookie
-      },
-    })
-    if (input) store.show(input)
-  }, [pathname, store])
 
   return (
     <ToastContext.Provider value={value}>

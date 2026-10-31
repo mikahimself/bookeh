@@ -16,13 +16,6 @@ const nextConfig: NextConfig = {
     // Cover upload (AD-14): a 5 MiB image plus the multipart overhead.
     serverActions: { bodySizeLimit: '6mb' },
   },
-  images: {
-    localPatterns: [
-      {
-        pathname: '/api/media/file/**',
-      },
-    ],
-  },
   webpack: (webpackConfig) => {
     webpackConfig.resolve.extensionAlias = {
       '.cjs': ['.cts', '.cjs'],

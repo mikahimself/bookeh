@@ -2,8 +2,8 @@
 # next.config.ts. Runtime configuration comes only from the environment
 # variables named in .env.example; nothing secret is baked in here.
 #
-# Keep the Node version in lock-step with .github/workflows/ci.yml
-# (setup-node 22.23.3) and docker-compose.yml.
+# An image tag cannot read .nvmrc, the Node source: keep it equal by hand,
+# here and in docker-compose.yml.
 
 FROM node:22.23.3-alpine AS base
 

@@ -358,7 +358,8 @@ journalctl -u bookeh-backup             # every run's output
 systemctl list-timers bookeh-backup.timer
 ```
 
-To restore from `bookeh.dump`, read "Collation and restore" below first.
+To restore production, read "Collation and restore" below first, then follow
+"Restore production — [lxc] and [host]".
 
 ## Collation and restore (read before any restore)
 
@@ -381,6 +382,94 @@ tag may ship a new ICU, which requires `REINDEX` and
 
 Note: `docker/postgres/initdb/` from the repo is **not** mounted here on
 purpose — `bookeh_test` is a dev/CI artifact.
+
+## Restore production — [lxc] and [host]
+
+This replaces the production database and media with a backup. Each command
+carries its machine tag: ownership is set from the **[host]**, because the
+LXC's root cannot chown over NFS. Pick a dated directory under
+`/mnt/nas/bookeh/backups`, never a `.failed` one; `<run>` below is its name.
+The paths are the defaults; use the values from `.env` if they differ.
+
+If the LXC or the NAS was rebuilt, run the first-install steps it lost
+first: the marker file, directories, deploy files, `.env` and GHCR login must
+exist, and on a new LXC step 1 below has nothing to stop until the
+units are installed. To undo a bad release, set `BOOKEH_IMAGE_TAG` to the good
+version too: a restore does not change the image, and an older image may not
+run a newer dump.
+
+Before you start, while Postgres still runs, prove the backup reads, and if
+the current data is worth keeping take a fresh backup first (**[lxc]**):
+
+```sh
+systemctl start bookeh-backup.service   # optional: the current state
+RUN=/mnt/nas/bookeh/backups/<run>
+cd /opt/bookeh
+docker compose -f compose.prod.yml exec -T postgres pg_restore --list > /dev/null < "$RUN/bookeh.dump"
+```
+
+1. **[lxc]** Stop the stack and the nightly backup, including a run in
+   progress:
+
+   ```sh
+   systemctl stop bookeh-backup.timer bookeh-backup.service bookeh
+   ```
+
+2. **[lxc]** Recover the secrets. `.env` is in neither the backup nor the
+   repo, and no location for it is recorded anywhere here: it is wherever the
+   operator keeps it. If `/opt/bookeh/.env` survived, keep it. Otherwise put
+   the operator's copy there, or rebuild it from `.env.example` (step 5 of the
+   first install), then:
+
+   ```sh
+   chmod 600 /opt/bookeh/.env
+   ```
+
+   If a secret is lost, a new `POSTGRES_PASSWORD` works, since the cluster is
+   rebuilt empty; a new `PAYLOAD_SECRET` only signs everyone out.
+
+3. **[host]** Empty `data/` and `media/`, keeping both directories and the
+   marker file in `postgres/`, then copy the media in and set its owner. This
+   deletes the current database and media. Use uid 101001 in an unprivileged
+   container, 1001 in a privileged one (step 3 of the first install):
+
+   ```sh
+   RUN=/mnt/nas/bookeh/backups/<run>
+   test -f "$RUN/bookeh.dump" && test -d "$RUN/media" &&
+     find /mnt/nas/bookeh/postgres/data /mnt/nas/bookeh/media -mindepth 1 -delete &&
+     cp -a "$RUN/media/." /mnt/nas/bookeh/media/ &&
+     chown -R 101001 /mnt/nas/bookeh/media     # 1001 in a privileged container
+   ```
+
+4. **[lxc]** Start Postgres alone, so initdb builds an empty ICU cluster, and
+   restore into it:
+
+   ```sh
+   cd /opt/bookeh
+   RUN=/mnt/nas/bookeh/backups/<run>
+   docker compose -f compose.prod.yml up -d --wait postgres
+   docker compose -f compose.prod.yml exec -T postgres \
+     pg_restore -U bookeh -d bookeh --exit-on-error \
+     < "$RUN/bookeh.dump"
+   ```
+
+   If `pg_restore` stops on an error, the database is partial: never start the
+   app on it or rerun into it. Stop Postgres with
+   `docker compose -f compose.prod.yml down` and go back to step 3.
+
+5. **[lxc]** Check the collation. Expected `i|fi-FI`:
+
+   ```sh
+   docker compose -f compose.prod.yml exec -T postgres psql -U bookeh -d bookeh -tAc \
+     "select datlocprovider, daticulocale from pg_database where datname = 'bookeh'"
+   ```
+
+6. **[lxc]** Start the stack and the timer. The app applies any newer
+   migrations at start. Then sign in and open a Book with a cover.
+
+   ```sh
+   systemctl start bookeh bookeh-backup.timer
+   ```
 
 ## Restore rehearsal — [lxc]
 

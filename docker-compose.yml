@@ -1,7 +1,7 @@
 services:
   payload:
-    # Pinned to the same Node as the Dockerfile and CI's setup-node; keep the
-    # three in lock-step (epic 1 retro item 13).
+    # An image tag cannot read .nvmrc, the Node source: keep it equal by hand,
+    # here and in the Dockerfile.
     image: node:22.23.3-alpine
     ports:
       - '3000:3000'
@@ -9,7 +9,7 @@ services:
       - .:/home/node/app
       - node_modules:/home/node/app/node_modules
     working_dir: /home/node/app/
-    command: sh -c "npm install && npm run dev"
+    command: sh -c "npm ci && npm run dev"
     depends_on:
       postgres:
         condition: service_healthy

@@ -44,14 +44,15 @@ jobs:
 
       - uses: actions/setup-node@v7
         with:
-          # Follows the Dockerfile's node:22.23.3-alpine.
-          node-version: 22.23.3
+          node-version-file: .nvmrc
           cache: npm
 
       # Services start before checkout, so the Compose init script cannot be
       # mounted; create bookeh_test the same way (inherits template1's locale).
       - run: docker exec ${{ job.services.postgres.id }} createdb -U bookeh bookeh_test
 
+      # .npmrc's legacy-peer-deps hides a Payload peer mismatch from npm.
+      - run: node scripts/check-payload-versions.mjs
       - run: npm ci
       - run: npm run lint
       - run: npm run typecheck
