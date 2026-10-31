@@ -5,6 +5,8 @@ import type { CandidateId } from '@/lib/catalogue/pick'
 import { DomainError } from '@/lib/errors'
 import type { SourceId } from '@/lib/metadata/source'
 
+import { isLent } from '../isLent'
+
 /**
  * One source candidate in the edition picker (EXPERIENCE.md, Answer, Several
  * editions; D-7), each part `null` when the candidate has none. `cover` is
@@ -173,10 +175,10 @@ export function inLibrary(result: LookupResult): InLibrary | null {
     ...existingBook(book, book.isbn13),
     bookId: book.bookId,
     lookAgain: book.visibility === 'private',
-    copies: mine.copies.map(({ location, status, loan }) => ({
-      location: location?.name ?? null,
-      status,
-      lentTo: status === 'owned' && loan !== null ? loan.person.name : null,
+    copies: mine.copies.map((copy) => ({
+      location: copy.location?.name ?? null,
+      status: copy.status,
+      lentTo: isLent(copy) ? copy.loan.person.name : null,
     })),
   }
 }

@@ -10,11 +10,12 @@ import { returnedLoans } from '@/lib/loans/loans'
 import type { Context } from '@/lib/payload/context'
 import { lendingPeople } from '@/lib/people/people'
 
+import { AddToWishlist } from '../components/AddToWishlist'
 import { buttonClass } from '../components/Button'
 import { markerSlotClass } from '../components/ui/classes'
+import { viewerWishlists } from '../components/viewerWishlists'
 import { heldBook } from '../heldBook'
-import { AddToWishlist } from '../scan/AddToWishlist'
-import { viewerWishlists } from '../scan/viewerWishlists'
+import { isLent } from '../isLent'
 
 import { BookDetailFrame } from './BookDetailPanel'
 import { BookHeader, joined } from './BookHeader'
@@ -86,7 +87,7 @@ export async function BookDetail({
     entries: [],
   }
   const state = await getUserBookState(ctx, bookId)
-  const lendable = copies.some(({ status, loan }) => status === 'owned' && loan === null)
+  const lendable = copies.some((copy) => copy.status === 'owned' && !isLent(copy))
   const people = lendable
     ? await lendingPeople(ctx).catch((err: unknown) => {
         logger().error({ err }, 'The People failed to load')
@@ -118,61 +119,65 @@ export async function BookDetail({
           <section tabIndex={-1} className="flex flex-col gap-2">
             <h3 className="text-heading-group text-text-muted ui-case">{t('detail.yourCopies')}</h3>
             <ul className="flex flex-col gap-4">
-              {copies.map(({ copyId, location, status, note, loan }) => (
-                <li key={copyId}>
+              {copies.map((copy) => (
+                <li key={copy.copyId}>
                   {/* Names the line's Links and Note after the copy. */}
                   <div
                     role="group"
-                    aria-labelledby={`copy-${copyId}`}
+                    aria-labelledby={`copy-${copy.copyId}`}
                     className="flex flex-col gap-2"
                   >
                     <div className="flex items-center justify-between gap-4">
-                      <p id={`copy-${copyId}`} className="text-body text-text">
-                        {location && (
+                      <p id={`copy-${copy.copyId}`} className="text-body text-text">
+                        {copy.location && (
                           <>
-                            <FilterChip field="location" id={location.id}>
-                              {location.name}
+                            <FilterChip field="location" id={copy.location.id}>
+                              {copy.location.name}
                             </FilterChip>
                             {DOT}
                           </>
                         )}
-                        {t('answer.copy', { status })}
+                        {t('answer.copy', { status: copy.status })}
                       </p>
-                      {status === 'owned' && loan !== null && <ReturnLoan loanId={loan.loanId} />}
-                      {status === 'owned' && loan === null && (
+                      {isLent(copy) && <ReturnLoan loanId={copy.loan.loanId} />}
+                      {copy.status === 'owned' && !isLent(copy) && (
                         <div className="flex shrink-0 gap-4">
                           <LendCopy
-                            copyId={copyId}
-                            context={location ? `${book.title}${DOT}${location.name}` : book.title}
+                            copyId={copy.copyId}
+                            context={
+                              copy.location
+                                ? `${book.title}${DOT}${copy.location.name}`
+                                : book.title
+                            }
                             people={people}
                           />
                           {locations.length > 0 && (
                             <MoveCopy
-                              copyId={copyId}
-                              location={location?.id ?? null}
+                              copyId={copy.copyId}
+                              location={copy.location?.id ?? null}
                               locations={locations}
                             />
                           )}
                           <RemoveCopy
-                            copyId={copyId}
+                            copyId={copy.copyId}
                             last={copies.length === 1 && entries.length === 0}
                             {...(copies.length === 1 &&
                               entries.length > 0 && { focusAfter: onWishlistsId })}
                           />
                         </div>
                       )}
-                      {status === 'ordered' && <ReceiveCopy copyId={copyId} />}
+                      {copy.status === 'ordered' && <ReceiveCopy copyId={copy.copyId} />}
                     </div>
-                    {status === 'owned' && loan !== null && (
+                    {isLent(copy) && (
                       <p className="flex items-center gap-2 text-body text-text">
                         <span aria-hidden="true" className={`${markerSlotClass} bg-accent`} />
                         {t('loans.lentTo', {
-                          person: loan.person.name,
-                          date: day(loan.since),
+                          person: copy.loan.person.name,
+                          date: day(copy.loan.since),
                         })}
                       </p>
                     )}
-                    <CopyNote copyId={copyId} note={note ?? ''} />
+                    <CopyNote copyId={copy.copyId} note={copy.note ?? ''} />
                   </div>
                 </li>
               ))}

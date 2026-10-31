@@ -38,7 +38,7 @@ vi.mock('@/app/(frontend)/components/toast/ToastProvider', () => ({
 }))
 vi.mock('@/app/(frontend)/scan/actions', () => ({ retryLookupAction }))
 vi.mock('@/app/(frontend)/scan/AddToLibrary', () => ({ AddToLibrary: () => null }))
-vi.mock('@/app/(frontend)/scan/AddToWishlist', () => ({ AddToWishlist: () => null }))
+vi.mock('@/app/(frontend)/components/AddToWishlist', () => ({ AddToWishlist: () => null }))
 vi.mock('@/app/(frontend)/scan/AnswerBack', () => ({ AnswerBack: () => null }))
 
 const { AnswerLayout } = await import('@/app/(frontend)/scan/AnswerLayout')

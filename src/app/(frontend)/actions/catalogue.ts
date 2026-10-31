@@ -8,8 +8,8 @@ import { DomainError, runAction, type ActionResult } from '@/lib/errors'
 import { requireUserOrThrow } from '@/lib/payload/context'
 import { isRowId } from '@/lib/payload/ref'
 
+import type { EditionRow } from '../components/EditionLabel'
 import { answerEditions, editionLines } from '../scan/answer'
-import type { EditionRow } from '../scan/EditionPicker'
 
 /**
  * What Look it up again answers the client: `lookupAgain()`'s result, with

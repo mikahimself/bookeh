@@ -13,11 +13,9 @@ import { Button } from '../components/Button'
 import { settleAction } from '../components/request'
 import { TextField } from '../components/TextField'
 import { useToast } from '../components/toast/ToastProvider'
-import { markerSlotClass } from '../components/ui/classes'
+import { markerSlotClass, pickerRowClass } from '../components/ui/classes'
 import { Combobox } from '../components/ui/Combobox'
-import { Dialog } from '../components/ui/Dialog'
-import { useWide } from '../components/ui/overlay'
-import { Sheet } from '../components/ui/Sheet'
+import { PickerFrame } from '../components/ui/Picker'
 
 import { useAfterAction } from './ShelfRows'
 
@@ -72,8 +70,6 @@ export function LendPicker({
   const { show } = useToast()
   const afterAction = useAfterAction()
   const formId = useId()
-  const wide = useWide()
-  const [heldWide, setHeldWide] = useState(wide)
   const [marked, setMarked] = useState<number | null>(null)
   const [finding, setFinding] = useState(false)
   const [found, setFound] = useState<number | null>(null)
@@ -87,7 +83,6 @@ export function LendPicker({
   if (open !== wasOpen) {
     setWasOpen(open)
     if (open) {
-      setHeldWide(wide)
       setMarked(null)
       setFinding(false)
       setFound(null)
@@ -178,8 +173,6 @@ export function LendPicker({
   }
 
   const rows = people.slice(0, ROWS)
-  const rowClass =
-    'flex w-full items-center gap-2 bg-transparent py-2 text-left text-control text-text max-wide:min-h-tap'
 
   const form = (
     <form
@@ -198,7 +191,7 @@ export function LendPicker({
                 type="button"
                 aria-pressed={marked === id}
                 onClick={() => mark(id)}
-                className={rowClass}
+                className={pickerRowClass}
               >
                 <span
                   aria-hidden="true"
@@ -210,7 +203,7 @@ export function LendPicker({
           ))}
           {people.length > ROWS && !finding && (
             <li>
-              <button type="button" onClick={() => setFinding(true)} className={rowClass}>
+              <button type="button" onClick={() => setFinding(true)} className={pickerRowClass}>
                 <span aria-hidden="true" className={markerSlotClass} />
                 <span className="underline decoration-accent decoration-2 underline-offset-3">
                   {t('loans.findPerson')}
@@ -267,20 +260,15 @@ export function LendPicker({
         }}
         error={errors.lentOn}
       />
-      {!heldWide && (
-        <Button type="submit" variant="primary" disabled={blocked}>
-          {t('loans.lend')}
-        </Button>
-      )}
     </form>
   )
-  const muted = <p className="text-meta text-text-muted">{context}</p>
 
-  return heldWide ? (
-    <Dialog
+  return (
+    <PickerFrame
       open={open}
       onOpenChange={onOpenChange}
       title={t('loans.lendTitle')}
+      description={<p className="text-meta text-text-muted">{context}</p>}
       onClosed={onClosed}
       confirm={
         <Button type="submit" form={formId} variant="primary" disabled={blocked}>
@@ -288,20 +276,7 @@ export function LendPicker({
         </Button>
       }
     >
-      <div className="flex flex-col gap-4">
-        {muted}
-        {form}
-      </div>
-    </Dialog>
-  ) : (
-    <Sheet open={open} onOpenChange={onOpenChange} label={t('loans.lendTitle')} onClosed={onClosed}>
-      <div className="flex flex-col gap-4">
-        <div className="flex flex-col gap-1">
-          <h2 className="text-heading-group ui-case">{t('loans.lendTitle')}</h2>
-          {muted}
-        </div>
-        {form}
-      </div>
-    </Sheet>
+      {form}
+    </PickerFrame>
   )
 }

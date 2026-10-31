@@ -9,11 +9,11 @@ import type { ActionResult } from '@/lib/errors'
 import { parseShelfQuery, shelfHref } from '@/lib/shelf/query'
 
 import { lookUpAgainAction, type LookUpAgainOutcome } from '../actions/catalogue'
+import { EditionLabel } from '../components/EditionLabel'
 import { ActionLink } from '../components/Link'
 import { settleAction } from '../components/request'
 import { useToast } from '../components/toast/ToastProvider'
 import { Picker } from '../components/ui/Picker'
-import { EditionLabel } from '../scan/EditionPicker'
 
 import { useAfterAction } from './ShelfRows'
 

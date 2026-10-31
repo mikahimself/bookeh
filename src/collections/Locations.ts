@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload'
 
 import { ownerAccess } from '@/access/owner'
+import { limits } from '@/fields/limits'
 import { nameKeyField } from '@/fields/nameKey'
 import { ownerField } from '@/fields/owner'
 
@@ -25,7 +26,7 @@ export const Locations: CollectionConfig = {
   indexes: [{ fields: ['owner', 'nameKey'], unique: true }],
   fields: [
     ownerField(),
-    { name: 'name', type: 'text', required: true, maxLength: 200 },
+    { name: 'name', type: 'text', required: true, maxLength: limits.name },
     nameKeyField(),
   ],
 }

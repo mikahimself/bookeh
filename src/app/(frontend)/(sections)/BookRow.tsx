@@ -5,6 +5,7 @@ import type { ShelfRow } from '@/lib/shelf/query'
 import { Checkbox } from '../components/Checkbox'
 import { Cover } from '../components/Cover'
 import { markerSlotClass } from '../components/ui/classes'
+import { isLent } from '../isLent'
 import type { DevicePrefs } from '../prefs'
 
 type Size = DevicePrefs['size']
@@ -63,7 +64,7 @@ export function BookRow({
       ? [authors, joined([book.year, book.publisher])]
       : [joined([authors, book.year, book.publisher])]
   const meta = lines.filter((line) => line !== '')
-  const lentTo = copy.status === 'owned' && copy.loan !== null ? copy.loan.person.name : null
+  const lentTo = isLent(copy) ? copy.loan.person.name : null
   const ending = copy.status === 'ordered' ? ordered : copy.location?.name
 
   const content = (

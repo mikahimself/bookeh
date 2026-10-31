@@ -1,8 +1,9 @@
 /**
- * The length limits of the Book, author, series, Person and wishlist text
- * fields, in UTF-16 units as Payload's `maxLength` counts them. The schema
- * declares them; `lib/catalogue` clips source values to them before a shared
- * Book is written, and the owning services check typed names against them.
+ * The length limits of the Book, author, series, Person, location and
+ * wishlist text fields, in UTF-16 units as Payload's `maxLength` counts them.
+ * The schema declares them; `lib/catalogue` clips source values to them
+ * before a shared Book is written, and the owning services check typed names
+ * against them.
  */
 export const limits = {
   title: 500,
@@ -10,7 +11,7 @@ export const limits = {
   description: 10_000,
   publisher: 200,
   language: 50,
-  /** An author's, a series', a Person's or a wishlist's name. */
+  /** An author's, a series', a Person's, a location's or a wishlist's name. */
   name: 200,
 } as const
 

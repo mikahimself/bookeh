@@ -4,33 +4,10 @@ import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { useState, useTransition } from 'react'
 
-import { Cover } from '../components/Cover'
+import { EditionLabel, type EditionRow } from '../components/EditionLabel'
 import { ActionLink } from '../components/Link'
 import { ProgressLine } from '../components/ProgressLine'
 import { Picker } from '../components/ui/Picker'
-
-/**
- * A candidate's row: its preview cover, if any, its title for the cover
- * placeholder, and its line from `editionLines()`, computed on the server.
- */
-export type EditionRow = {
-  cover: string | null
-  title: string
-  language: string | null
-  line: string
-}
-
-/** An edition Picker row's label: the cover at Rows m beside the edition line. */
-export function EditionLabel({ cover, title, language, line }: EditionRow) {
-  return (
-    <span className="flex items-center gap-3">
-      <span className="w-cover-row shrink-0">
-        <Cover src={cover} title={title} language={language} />
-      </span>
-      <span>{line}</span>
-    </span>
-  )
-}
 
 /**
  * EXPERIENCE.md, Answer, Several editions (D-7): "{n} editions found" under

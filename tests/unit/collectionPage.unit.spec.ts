@@ -1276,11 +1276,11 @@ describe('CollectionPage', () => {
           ok: true,
           data: { loanId: 31, person: { id: 41, name }, undoToken: 'tok', undoSeconds: 1800 },
         })
-        const openPicker = async () => {
+        const openPicker = async (frame = detail) => {
           holds(linna, [copy(21, { location: { id: 3, name: 'Tampere' } })])
           reloads()
           await renderPage({ book: '5' })
-          const sheet = await detail('Tuntematon sotilas')
+          const sheet = await frame('Tuntematon sotilas')
           fireEvent.click(within(sheet).getByRole('button', { name: 'Lend' }))
           return screen.findByRole('dialog', { name: 'Lend' })
         }
@@ -1311,6 +1311,44 @@ describe('CollectionPage', () => {
             kind: 'success',
             message: 'Lent to Antti',
             undo: { token: 'tok', seconds: 1800 },
+          })
+        })
+
+        describe('on a wide screen', () => {
+          beforeEach(() => {
+            matchesScreen = (query) => query.includes('900px')
+          })
+
+          afterEach(() => {
+            matchesScreen = () => false
+          })
+
+          it('has Lend in the Dialog foot, disabled until a person is marked', async () => {
+            lendingPeople.mockResolvedValue([{ id: 40, name: 'Antti' }])
+            lendCopyAction.mockResolvedValue(lent('Antti'))
+            // Book detail is the panel from 900px.
+            const picker = await openPicker((name) => screen.findByRole('complementary', { name }))
+
+            const lend = within(picker).getByRole('button', { name: 'Lend' })
+            const cancel = within(picker).getByRole('button', { name: 'Cancel' })
+            expect(lend.parentElement).toBe(cancel.parentElement)
+            expect(lend).toHaveProperty('disabled', true)
+
+            fireEvent.click(within(picker).getByRole('button', { name: 'Antti' }))
+            expect(lend).toHaveProperty('disabled', false)
+            fireEvent.click(lend)
+
+            await waitFor(() => expect(router.refresh).toHaveBeenCalledOnce())
+            expect(lendCopyAction).toHaveBeenCalledExactlyOnceWith({
+              copyId: 21,
+              person: 40,
+              lentOn: helsinkiToday(),
+            })
+            expect(showToast).toHaveBeenCalledExactlyOnceWith({
+              kind: 'success',
+              message: 'Lent to Antti',
+              undo: { token: 'tok', seconds: 1800 },
+            })
           })
         })
 

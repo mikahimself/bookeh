@@ -6,15 +6,16 @@ import { useRef, useState, type FormEvent, type KeyboardEvent } from 'react'
 import type { ErrorCode } from '@/lib/errors'
 import type { WishlistLine } from '@/lib/wishlists/wishlists'
 
+import { AddToWishlist } from '../components/AddToWishlist'
 import { Button } from '../components/Button'
+import type { EntryTarget } from '../components/entryTarget'
 import { ProgressLine } from '../components/ProgressLine'
 import { TextField } from '../components/TextField'
+import type { OnRefused } from '../components/useSavePress'
 
 import { saveManualAction } from './actions'
-import { AddToWishlist } from './AddToWishlist'
 import { AnswerBack } from './AnswerBack'
-import type { EntryTarget } from './entryTarget'
-import { type OnRefused, useAddToLibrary } from './useAddToLibrary'
+import { useAddToLibrary } from './useAddToLibrary'
 
 /**
  * The Not found Answer's form: Title (focused; Enter moves to Author) and

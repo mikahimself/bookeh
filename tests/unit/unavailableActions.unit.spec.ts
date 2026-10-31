@@ -15,6 +15,8 @@ vi.mock('next/navigation', async (importOriginal) => ({
 vi.mock('@/app/(frontend)/components/navigation', () => ({ useTaskBack: () => vi.fn() }))
 vi.mock('@/app/(frontend)/scan/actions', () => ({
   saveManualAction: vi.fn(),
+}))
+vi.mock('@/app/(frontend)/actions/wishlists', () => ({
   saveEntryAction: vi.fn(),
 }))
 vi.mock('@/app/(frontend)/components/toast/ToastProvider', () => ({

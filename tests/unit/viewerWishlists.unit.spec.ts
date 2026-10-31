@@ -8,7 +8,7 @@ const error = vi.fn()
 vi.mock('@/lib/wishlists/wishlists', () => ({ listWishlists }))
 vi.mock('@/lib/errors', () => ({ logger: () => ({ error }) }))
 
-const { viewerWishlists } = await import('@/app/(frontend)/scan/viewerWishlists')
+const { viewerWishlists } = await import('@/app/(frontend)/components/viewerWishlists')
 
 describe('viewerWishlists', () => {
   it('logs a failed read and reads as no lists', async () => {

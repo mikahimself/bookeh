@@ -43,34 +43,34 @@ Mika keeps several named, private wishlists of Books he doesn't own yet, adds to
 - Adding a Book to the library closes the user's own open entries for it; entries for a Person stay open.
 - Bought and Ordered close the entry. An own entry closes every own open entry for that Book, on any list, and makes one copy; an entry for a Person closes alone with no copy.
 - A Person with any entry or loan, open or closed, cannot be deleted.
-- Clean-up stories that fold copied code keep behaviour unchanged.
+- Clean-up stories that fold copied code keep behaviour unchanged; a fold of test code changes no production code.
 - Any screen change: English and Finnish strings in the terse voice, the accessibility floor, design tokens only.
 
 ## Technical Decisions
 
 - **Entries:** never a copy or a copy status. Closing keeps the row and sets `closedAt`; Remove deletes it. Entries are addressed by their own id, since a Book can be on a list twice. `lib/wishlists` is the only writer of `wishlist-entries`.
-- **Layers:** ESLint zones enforce the import directions. Between services: `catalogue` may import `copies`, `wishlists`, `books`, `metadata`; `wishlists` and `loans` may import `copies`, `people`; `shelf` may import `books`; `tags` may import `books`, `shelf`; `copies` may import `account`; `people`, `books`, `metadata` and `account` import no other service, so anything `lib/books` shares must sit in a module free of service imports. Also allowed: services to `src/fields`, `fields/isbn` to `lib/errors`, the frontend to `src/fields` and `lib/metadata` types, `src/i18n` to `lib/payload`. A new edge is named in the spine's import table in the same commit, and the lint rules are themselves tested through the real ESLint config. Client components import from `src/lib` only types and the listed pure modules (`bookeh/client-lib-imports`); the frontend never calls the gateway.
-- **Names:** each private name-keyed collection has one owning service; screens never match names. Pickers send a `Ref` (`number | { create: string }`), resolved inside the action's transaction by the owner; a row created that way survives Undo.
+- **Layers:** ESLint zones enforce the import directions, and the rules are tested through the real ESLint config. `catalogue` may import `copies`, `wishlists`, `books`, `metadata`; `wishlists` and `loans` may import `copies`, `people`; `shelf` may import `books`; `tags` may import `books`, `shelf`; `copies` may import `account`; `people`, `books`, `metadata` and `account` import no other service. A new edge is named in the spine's import table in the same commit. The frontend never calls the gateway. Client components import from `src/lib` only types and the listed pure modules (`bookeh/client-lib-imports`).
+- **Shared service code:** `lib/payload` holds what every service may use: `resolveOwnedName()`, the open-entry and open-loan conditions, and `Named` beside `Ref`. It owns no rows; a service calls the resolver only for its own collection. Tags carry a `kind`, so Epic 9 needs more than a union edit there.
+- **Names:** each private name-keyed collection has one owning service; screens never match names. Pickers send a `Ref`, resolved inside the action's transaction by the owner; a row created that way survives Undo.
+- **Actions and overlays:** an action used by one page sits in `actions.ts` beside it; one used from several pages in `actions/<domain>.ts`. Overlays come from the `components/ui` wrappers, which also handle Back for overlays without an address.
 - **Undo:** service functions return `Undone<T>`, open no transaction and record nothing; the action wraps one call in `withUndo`. A restore skips rows that are gone. The save's restore refuses with `UNDO_FAILED` once the copy has any loan, by an explicit check, not the foreign key; Received's on an open loan only; Lend's once the loan is returned.
-- **Foreign keys:** owners and creators cascade, references restrict, optional links `set null`, set by `foreignKeyActions` in `afterSchemaInit`; `refuseWhileReferenced` gives the back office a readable 409. A new relationship must be listed there, or schema init fails.
-- **Migrations:** schema stories commit a generated migration and merge one at a time. Production applies migrations at start and never pushes, so `src/migrations/index.ts` must list every file.
-- **Copies and accounts:** an ordered copy has no location and is never lent. Only the admin changes a user's `email` or `password`.
-- **Lookup:** Finna before Google Books. `found` can carry failed sources, and the save uses the outcome the Answer showed. No source call inside a transaction.
-- **Shelf refresh:** rows are never patched locally; they reload through `/data/shelf` and the server render refreshes, so Filter panel values follow.
+- **Foreign keys:** owners and creators cascade, references restrict, optional links `set null`, set by `foreignKeyActions` in `afterSchemaInit`. A new relationship must be listed there, or schema init fails.
+- **Migrations:** schema stories commit a generated migration. Production applies migrations at start and never pushes.
+- **Copies:** an ordered copy has no location and is never lent.
 - **Tests:** a test exists only when the criteria name the behaviour or it guards a spine rule; services go through integration tests against `bookeh_test`; `*.unit.spec.ts` for pure functions and component tests; nothing reaches the network. A story that adds or changes a screen runs one uncommitted Playwright walk before done and records it in the Auto Run Result.
 - **Story shape:** one conventional commit, about 500 hand-written changed lines. A story that changes a spine contract updates ARCHITECTURE-SPINE.md in the same commit.
 
 ## UX & Interaction Patterns
 
 - Terse states: "Couldn't load. Try again." with a retry Link on a failed list.
-- A row reads "Ordered" for an ordered copy; the airmail band stays decorative.
+- Pickers are a bottom sheet on the phone and a dialog on wide screens: one choice, then they close. Lend alone doesn't close on a choice, and its documented behaviour must survive any rework.
 - Modals hold and return focus. Book detail closes by history back, falling back to `/`.
 - Wording and placement a story has to pick come from a rendered mock-up and are recorded in EXPERIENCE.md before the build.
 
 ## Cross-Story Dependencies
 
-- Stories 7.1–7.21 are done. Clean-up runs in order from 7.22 to 7.27.
-- 7.23–7.25 fold copied code so Epics 8 and 9 build on one version; 7.24 lets Epic 8 rework the Answer without pulling Book detail along, and Epic 9's `lib/tags` takes the shared resolver from 7.23.
+- Stories 7.1–7.23 are done. Clean-up runs in order from 7.24 to 7.27.
+- 7.24 frees Book detail from `scan/`, so Epic 8 can rework the Answer without pulling Book detail along. 7.25 changes tests only, and its test count must match the count before the story, less the one named case.
 - 7.26 reconciles the documents with the code, so it runs after the code stories, and recompiles this file.
 - 7.27 is Mika's on-device session, and an unattended build stops there. It runs on production with 7.16–7.26 deployed, includes Story 7.18's `foreign_keys` migration on a restored production dump, and then sets epics 5, 6 and 7 to `done`.
-- Epic 8 adds the On wishlist Answer, which replaces the Not in library stopgap for a Book held only through entries.
+- Epic 8 adds the On wishlist Answer, which replaces the Not in library stopgap for a Book held only through entries. Epic 9's `lib/tags` takes the shared resolver from 7.23.

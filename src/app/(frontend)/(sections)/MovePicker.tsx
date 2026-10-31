@@ -3,6 +3,7 @@
 import { useTranslations } from 'next-intl'
 import type { TransitionStartFunction } from 'react'
 
+import { limits } from '@/fields/limits'
 import type { LocationOption } from '@/lib/copies/locations'
 import type { Ref } from '@/lib/payload/ref'
 
@@ -85,7 +86,7 @@ export function MovePicker({
       create={{
         label: t('newLocation'),
         submit: t('move'),
-        maxLength: 200,
+        maxLength: limits.name,
         onCreate: (name) => move({ create: name }),
       }}
     />

@@ -10,6 +10,7 @@ import { buttonClass } from '../components/Button'
 import { TextLink } from '../components/Link'
 import { ProgressLine } from '../components/ProgressLine'
 
+import { isLent } from '../isLent'
 import type { DevicePrefs } from '../prefs'
 
 import { BookRow } from './BookRow'
@@ -85,7 +86,7 @@ export function CollectionList({ query, book }: { query: ShelfQuery; book: numbe
     select: selecting
       ? {
           ticked: ticked.has(row.copy.copyId),
-          onToggle: () => toggle(row.copy.copyId, row.copy.loan !== null),
+          onToggle: () => toggle(row.copy.copyId, isLent(row.copy)),
         }
       : undefined,
   })

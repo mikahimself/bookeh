@@ -1,4 +1,4 @@
-import type { CandidateId } from '@/lib/catalogue/pick'
+import type { IsbnInput, ManualInput } from '../saveInput'
 
 /**
  * What Add to wishlist saves (`saveEntryAction`): the ISBN's Book with the
@@ -6,7 +6,4 @@ import type { CandidateId } from '@/lib/catalogue/pick'
  * a Book the user holds. Not in a `'use server'` file: those export only
  * async functions.
  */
-export type EntryTarget =
-  | { isbn13: string; pick?: number; candidate?: CandidateId }
-  | { manual: { title: string; author: string; isbn13?: string } }
-  | { bookId: number }
+export type EntryTarget = IsbnInput | { manual: ManualInput } | { bookId: number }

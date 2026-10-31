@@ -235,7 +235,7 @@ development_status:
   7-21-k27-checks-that-guard-the-spine: done
   7-22-k28-repo-tidy: done
   7-23-k29-shared-service-code: done
-  7-24-k30-shared-frontend-code: backlog
+  7-24-k30-shared-frontend-code: done
   7-25-k31-shared-test-helpers: backlog
   7-26-k32-spec-reconciliation: backlog
   7-27-k33-owed-checks-on-the-phone-and-the-lxc: backlog

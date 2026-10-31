@@ -1,11 +1,11 @@
 'use client'
 
-import { useId, useRef, useState, type ReactNode } from 'react'
+import { useId, useRef, useState, type ReactNode, type RefObject } from 'react'
 
 import { Button } from '../Button'
 import { useSuspendSwipe } from '../swipe'
 import { TextField } from '../TextField'
-import { markerSlotClass } from './classes'
+import { markerSlotClass, pickerRowClass } from './classes'
 import { Dialog } from './Dialog'
 import { useWide } from './overlay'
 import { Sheet } from './Sheet'
@@ -37,19 +37,100 @@ export type PickerProps<V extends string | number> = {
   }
 }
 
+export type PickerFrameProps = Pick<PickerProps<string>, 'open' | 'onOpenChange' | 'title'> & {
+  description?: ReactNode
+  /** Runs once per close, after the overlay's history entry is gone. */
+  onClosed?: () => void
+  /** The element focused on open, in place of the overlay's default. */
+  initialFocus?: RefObject<HTMLElement | null>
+  /**
+   * The confirming Button, last in both forms: the Dialog's foot, the sheet's
+   * foot at full width. It sits outside `children`, so a submitting one needs
+   * `form="<id>"`.
+   */
+  confirm?: ReactNode
+  children: ReactNode
+}
+
+/**
+ * The overlay a Picker sits in: the Bottom sheet on the phone, the Dialog on
+ * wide screens. The form is taken at each open and kept until the close, so
+ * a resize never swaps the overlay while it is open. `description` goes under
+ * the title in the sheet and first in the dialog's body. What waits for the
+ * close is the caller's, through `onClosed`.
+ */
+export function PickerFrame({
+  open,
+  onOpenChange,
+  title,
+  description,
+  onClosed,
+  initialFocus,
+  confirm,
+  children,
+}: PickerFrameProps) {
+  const wide = useWide()
+  const titleId = useId()
+  const [heldWide, setHeldWide] = useState(wide)
+  const [wasOpen, setWasOpen] = useState(open)
+  if (open !== wasOpen) {
+    setWasOpen(open)
+    if (open) setHeldWide(wide)
+  }
+  // The Sheet and Dialog suspend it too; held here as well, like every wrapper.
+  useSuspendSwipe(open)
+
+  return heldWide ? (
+    <Dialog
+      open={open}
+      onOpenChange={onOpenChange}
+      title={title}
+      onClosed={onClosed}
+      initialFocus={initialFocus}
+      confirm={confirm}
+    >
+      {description != null ? (
+        <div className="flex flex-col gap-4">
+          {description}
+          {children}
+        </div>
+      ) : (
+        children
+      )}
+    </Dialog>
+  ) : (
+    <Sheet
+      open={open}
+      onOpenChange={onOpenChange}
+      labelledBy={titleId}
+      onClosed={onClosed}
+      initialFocus={initialFocus}
+    >
+      <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-1">
+          <h2 id={titleId} className="text-heading-group ui-case">
+            {title}
+          </h2>
+          {description}
+        </div>
+        {children}
+        {confirm}
+      </div>
+    </Sheet>
+  )
+}
+
 type Choice<V> = { value: V } | { create: string }
 
 /**
  * DESIGN.md, Picker: the Bottom sheet on the phone, the Dialog on wide
  * screens, holding one choice from a short list; the chosen row has the 8px
  * marker. One tap chooses and closes; the chosen row, Back, X or Cancel
- * close without a choice. The form is taken at each open and kept until the
- * close, so a resize never swaps the overlay while it is open. With `create`,
- * a field and a secondary Button under the rows: a value blank after
+ * close without a choice. `PickerFrame` holds the overlay. With `create`, a
+ * field and a secondary Button under the rows: a value blank after
  * trimming does nothing (the Button is disabled), any other closes and is
  * the choice. The field starts empty at each open, and with no rows it has
- * the focus on open. `description` goes under the title in the sheet and
- * first in the dialog's body.
+ * the focus on open.
  */
 export function Picker<V extends string | number>({
   open,
@@ -61,9 +142,6 @@ export function Picker<V extends string | number>({
   onChoose,
   create,
 }: PickerProps<V>) {
-  const wide = useWide()
-  const titleId = useId()
-  const [heldWide, setHeldWide] = useState(wide)
   /** The choice waiting for the close to finish; `null` when the close is no choice. */
   const pending = useRef<Choice<V> | null>(null)
   const [name, setName] = useState('')
@@ -73,13 +151,8 @@ export function Picker<V extends string | number>({
   const [wasOpen, setWasOpen] = useState(open)
   if (open !== wasOpen) {
     setWasOpen(open)
-    if (open) {
-      setHeldWide(wide)
-      setName('')
-    }
+    if (open) setName('')
   }
-  // The Sheet and Dialog suspend it too; held here as well, like every wrapper.
-  useSuspendSwipe(open)
 
   const onClosed = () => {
     const choice = pending.current
@@ -110,7 +183,7 @@ export function Picker<V extends string | number>({
               type="button"
               aria-pressed={chosen}
               onClick={() => choose(option.value)}
-              className="flex w-full items-center gap-2 bg-transparent py-2 text-left text-control text-text max-wide:min-h-tap"
+              className={pickerRowClass}
             >
               <span
                 aria-hidden="true"
@@ -154,40 +227,16 @@ export function Picker<V extends string | number>({
     rows
   )
 
-  return heldWide ? (
-    <Dialog
+  return (
+    <PickerFrame
       open={open}
       onOpenChange={onOpenChange}
       title={title}
+      description={description}
       onClosed={onClosed}
       initialFocus={initialFocus}
     >
-      {description != null ? (
-        <div className="flex flex-col gap-4">
-          {description}
-          {body}
-        </div>
-      ) : (
-        body
-      )}
-    </Dialog>
-  ) : (
-    <Sheet
-      open={open}
-      onOpenChange={onOpenChange}
-      labelledBy={titleId}
-      onClosed={onClosed}
-      initialFocus={initialFocus}
-    >
-      <div className="flex flex-col gap-4">
-        <div className="flex flex-col gap-1">
-          <h2 id={titleId} className="text-heading-group ui-case">
-            {title}
-          </h2>
-          {description}
-        </div>
-        {body}
-      </div>
-    </Sheet>
+      {body}
+    </PickerFrame>
   )
 }

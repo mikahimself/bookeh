@@ -8,3 +8,7 @@ export const optionClass =
 
 /** The 8px marker's slot: empty unless chosen, so the labels line up (Combobox, Picker). */
 export const markerSlotClass = 'size-2 shrink-0'
+
+/** A Picker row: full width, marker slot first, the phone's tap height (Picker, Lend). */
+export const pickerRowClass =
+  'flex w-full items-center gap-2 bg-transparent py-2 text-left text-control text-text max-wide:min-h-tap'

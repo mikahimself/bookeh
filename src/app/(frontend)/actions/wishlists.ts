@@ -1,6 +1,7 @@
 'use server'
 
-import { DomainError, runAction, type ActionResult } from '@/lib/errors'
+import { type EntrySaveResult, saveEntry, type SaveTarget } from '@/lib/catalogue/saveCopy'
+import { DomainError, logger, runAction, type ActionResult } from '@/lib/errors'
 import { requireUserOrThrow } from '@/lib/payload/context'
 import { isRowId, type Ref } from '@/lib/payload/ref'
 import { withUndo, type Undoable } from '@/lib/undo/undo'
@@ -13,14 +14,17 @@ import {
 import { createWishlist, deleteWishlist, renameWishlist } from '@/lib/wishlists/wishlists'
 
 import { parseRef } from '../ref'
+import { isIsbnInput, isManualFields, isbnTarget, manualFields } from '../saveInput'
 
-// The Wishlists section, one wishlist and its opened entry (FR-38, FR-39).
+// The Wishlists section, one wishlist and its opened entry (FR-38, FR-39),
+// and Add to wishlist from the Answer and Book detail (`saveEntryAction`).
 // Client input is checked here, never repaired: a name must be a string, an
 // id a row id (`isRowId()`) and a recipient `null` or a `Ref` (`parseRef()`),
 // else `VALIDATION` with no write. Normalising, the blank and length checks,
 // resolving a Person and ownership are `lib/wishlists`'s. The client
 // refreshes or navigates on success. Bought and Ordered are undoable (AD-20)
-// and toast; everything else, Remove included, has no Undo and no toast.
+// and toast, as is `saveEntryAction`, which has its own checks; everything
+// else, Remove included, has no Undo and no toast.
 
 const name = (value: unknown): string => {
   if (typeof value !== 'string') throw new DomainError('VALIDATION')
@@ -124,4 +128,69 @@ export async function removeEntryAction(entry: unknown): Promise<ActionResult<nu
     await removeEntry(ctx, id(entry))
     return null
   })
+}
+
+/**
+ * Add to wishlist on the Not in library and Not found Answers and in Book
+ * detail (FR-21, FR-22, UX-DR46): the Book on the user's wishlist `wishlist`
+ * as an open entry for the user (`saveEntry()`). The input comes from the
+ * client, so anything but `{ requestId, wishlist, target }` with a string
+ * `requestId`, a `Ref` `wishlist` (`parseRef()`) and a `target` that is the
+ * ISBN's (`{ isbn13 }` with `pick` and `candidate` checked as in
+ * `saveCopyAction`), the Not found form's (`{ manual: { title, author } }`
+ * strings with an optional `isbn13` string) or a held Book's (`{ bookId }`, a
+ * row id) is `VALIDATION` before `saveEntry()` sees it, and comes back as
+ * `VALIDATION`, unlike the copy saves' bad input. The typed text goes
+ * as `saveManualAction` sends it. A `{ create }` name is matched to the
+ * user's list of that name, or makes one, inside the save's transaction
+ * (`resolveWishlist`). `NOT_FOUND` and `RATE_LIMITED` come back as they are,
+ * as in `saveCopyAction`; a `VALIDATION` naming `title` or `authors` comes
+ * back with only those fields, as in `saveManualAction`. Every other failure
+ * but a signed-out session reads as `SAVE_FAILED` (a list gone meanwhile
+ * included) and is logged as in `saveCopyAction`.
+ */
+export async function saveEntryAction(
+  input: unknown,
+): Promise<ActionResult<Undoable<EntrySaveResult>>> {
+  const parsed = parseEntryInput(input)
+  const result = await runAction(async () => {
+    const ctx = await requireUserOrThrow()
+    if (!parsed) throw new DomainError('VALIDATION')
+    const { requestId, target, wishlist } = parsed
+    return saveEntry(ctx, { requestId, target, save: { kind: 'entry', wishlist } })
+  })
+  // Bad input stays `VALIDATION`: nothing reached the save, so "try again" would not help.
+  if (result.ok || result.code === 'UNAUTHENTICATED' || !parsed) return result
+  const marked = manualFields(result)
+  if (marked) return marked
+  if (result.code !== 'INTERNAL') logger().warn({ code: result.code }, 'saveEntryAction failed')
+  return result.code === 'NOT_FOUND' || result.code === 'RATE_LIMITED'
+    ? result
+    : { ok: false, code: 'SAVE_FAILED' }
+}
+
+function parseEntryInput(
+  input: unknown,
+): { requestId: string; target: SaveTarget; wishlist: Ref } | undefined {
+  if (typeof input !== 'object' || input === null) return undefined
+  const { requestId, wishlist: sent, target } = input as Record<string, unknown>
+  const wishlist = parseRef(sent)
+  if (typeof requestId !== 'string' || wishlist === undefined) return undefined
+  const parsed = parseEntryTarget(target)
+  return parsed && { requestId, target: parsed, wishlist }
+}
+
+/** One of `EntryTarget`'s kinds (`components/entryTarget`), by its one key, as the save takes it. */
+function parseEntryTarget(target: unknown): SaveTarget | undefined {
+  if (typeof target !== 'object' || target === null) return undefined
+  const kinds = (['isbn13', 'manual', 'bookId'] as const).filter((key) => key in target)
+  if (kinds.length !== 1) return undefined
+  const value = target as Partial<Record<'isbn13' | 'manual' | 'bookId', unknown>>
+  if (kinds[0] === 'bookId') return isRowId(value.bookId) ? { bookId: value.bookId } : undefined
+  if (kinds[0] === 'manual') {
+    if (!isManualFields(value.manual)) return undefined
+    const { isbn13, title, author } = value.manual
+    return { manual: { isbn: isbn13, title, authors: [author] } }
+  }
+  return isIsbnInput(target) ? isbnTarget(target) : undefined
 }

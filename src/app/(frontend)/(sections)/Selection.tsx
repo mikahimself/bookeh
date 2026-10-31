@@ -25,7 +25,7 @@ type SelectionValue = {
   /** The ticked copies' ids (AD-18), in view or not. */
   ticked: ReadonlySet<number>
   /**
-   * The ticked copies that were lent (`CopyLine.loan !== null`) when ticked,
+   * The ticked copies that were lent (`isLent()`) when ticked,
    * so ticked copies out of view still count for Remove's dialog. Always a
    * subset of `ticked`.
    */

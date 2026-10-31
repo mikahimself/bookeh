@@ -5,6 +5,7 @@ import type { ShelfRow } from '@/lib/shelf/query'
 import { Checkbox } from '../components/Checkbox'
 import { Cover } from '../components/Cover'
 import { markerSlotClass } from '../components/ui/classes'
+import { isLent } from '../isLent'
 import type { DevicePrefs } from '../prefs'
 
 import type { RowSelect } from './BookRow'
@@ -48,7 +49,7 @@ export function CoverTile({
   select?: RowSelect
 }) {
   const authors = book.authors.map((author) => author.name).join(', ')
-  const lentTo = copy.status === 'owned' && copy.loan !== null ? copy.loan.person.name : null
+  const lentTo = isLent(copy) ? copy.loan.person.name : null
 
   const coverClass = [
     copy.status === 'ordered' ? 'airmail-band' : '',

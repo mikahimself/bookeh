@@ -9,9 +9,9 @@ const ctx = { user: { id: 1 } }
 const saveEntry = vi.fn()
 
 vi.mock('@/lib/payload/context', () => ({ requireUserOrThrow: async () => ctx }))
-vi.mock('@/lib/catalogue/saveCopy', () => ({ saveCopy: vi.fn(), saveEntry }))
+vi.mock('@/lib/catalogue/saveCopy', () => ({ saveEntry }))
 
-const { saveEntryAction } = await import('@/app/(frontend)/scan/actions')
+const { saveEntryAction } = await import('@/app/(frontend)/actions/wishlists')
 
 const ISBN = '9789510397077'
 const valid = { requestId: 'r1', wishlist: 4, target: { isbn13: ISBN } }

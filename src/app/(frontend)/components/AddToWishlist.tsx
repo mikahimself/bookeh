@@ -10,15 +10,15 @@ import type { Ref } from '@/lib/payload/ref'
 import type { Undoable } from '@/lib/undo/undo'
 import type { WishlistLine } from '@/lib/wishlists/wishlists'
 
-import { useTaskBack } from '../components/navigation'
-import { Button } from '../components/Button'
-import { ProgressLine } from '../components/ProgressLine'
-import { useToast } from '../components/toast/ToastProvider'
-import { Picker } from '../components/ui/Picker'
+import { saveEntryAction } from '../actions/wishlists'
 
-import { saveEntryAction } from './actions'
+import { Button } from './Button'
 import type { EntryTarget } from './entryTarget'
-import { type OnRefused, useSavePress } from './useAddToLibrary'
+import { useTaskBack } from './navigation'
+import { ProgressLine } from './ProgressLine'
+import { useToast } from './toast/ToastProvider'
+import { Picker } from './ui/Picker'
+import { type OnRefused, useSavePress } from './useSavePress'
 
 /** Between a row's name and its count, for assistive technology only. */
 const SEPARATOR = ', '

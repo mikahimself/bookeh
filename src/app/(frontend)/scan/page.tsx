@@ -7,6 +7,7 @@ import { requireUser } from '@/lib/payload/context'
 import { FullScreenTask } from '../components/FullScreenTask'
 import { DismissToast } from '../components/toast/DismissToast'
 import { RaiseToast } from '../components/toast/RaiseToast'
+import { viewerWishlists } from '../components/viewerWishlists'
 
 import { InLibraryAnswer } from './InLibraryAnswer'
 import { NotFoundAnswer } from './NotFoundAnswer'
@@ -14,7 +15,6 @@ import { NotInLibraryAnswer } from './NotInLibraryAnswer'
 import { answerFor, scanParams, type ScanOutcome } from './answer'
 import { ScanScreen } from './ScanScreen'
 import { UnavailableAnswer } from './UnavailableAnswer'
-import { viewerWishlists } from './viewerWishlists'
 
 /**
  * Scan and its Answer, a full-screen task. The wrapper sits in the page, not

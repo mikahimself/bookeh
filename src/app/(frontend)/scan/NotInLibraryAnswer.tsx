@@ -2,8 +2,9 @@ import { getFormatter, getTranslations } from 'next-intl/server'
 
 import type { WishlistLine } from '@/lib/wishlists/wishlists'
 
+import { AddToWishlist } from '../components/AddToWishlist'
+
 import { AddToLibrary } from './AddToLibrary'
-import { AddToWishlist } from './AddToWishlist'
 import { editionLines, type AnswerBook } from './answer'
 import { AnswerBack } from './AnswerBack'
 import { AnswerLayout } from './AnswerLayout'

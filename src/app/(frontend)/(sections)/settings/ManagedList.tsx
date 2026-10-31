@@ -4,7 +4,9 @@ import { useTranslations } from 'next-intl'
 import { useRouter } from 'next/navigation'
 import { useRef, useState, useTransition, type KeyboardEvent, type ReactNode } from 'react'
 
+import { limits } from '@/fields/limits'
 import type { ActionResult, ErrorCode } from '@/lib/errors'
+import type { Named } from '@/lib/payload/ref'
 
 import { Button } from '../../components/Button'
 import { ActionLink } from '../../components/Link'
@@ -15,7 +17,7 @@ import { Dialog } from '../../components/ui/Dialog'
 import { Picker } from '../../components/ui/Picker'
 
 /** A managed name as Settings lists it: its name and its use (a location's copies, a Person's loans and wishes). */
-export type ManagedItem = { id: number; name: string; count: number }
+export type ManagedItem = Named & { count: number }
 
 /** The group's server actions; each answers `null` and the list refreshes on success. */
 export type ManagedListActions = {
@@ -155,7 +157,7 @@ export function NameField({
       label={t('settings.name')}
       name="name"
       autoComplete="off"
-      maxLength={200}
+      maxLength={limits.name}
       enterKeyHint="done"
       autoFocus
       value={value}
