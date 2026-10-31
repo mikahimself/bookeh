@@ -3,14 +3,13 @@ import type { LocationOption } from '@/lib/copies/locations'
 import { DomainError } from '@/lib/errors'
 import type { Context } from '@/lib/payload/context'
 import * as gateway from '@/lib/payload/gateway'
-import { idOf, isRowId, type Ref } from '@/lib/payload/ref'
+import { openEntry } from '@/lib/payload/openRows'
+import { idOf, isRowId, type Named, type Ref } from '@/lib/payload/ref'
 import { withTransaction } from '@/lib/payload/transaction'
 import { resolvePerson } from '@/lib/people/people'
 import type { Undone } from '@/lib/undo/undo'
 
 import { resolveWishlist } from './wishlists'
-
-type Named = { id: number; name: string }
 
 export type NewEntry = { wishlist: Ref; bookId: number }
 
@@ -80,7 +79,7 @@ export async function closeEntriesForBook(ctx: Context, bookId: number): Promise
           { owner: { equals: tx.user.id } },
           { book: { equals: bookId } },
           { forPerson: { exists: false } },
-          { closedAt: { exists: false } },
+          openEntry,
         ],
       },
       select: { book: true },
@@ -143,11 +142,7 @@ export async function closeEntry(
     const { docs } = await gateway.find(tx, {
       collection: 'wishlist-entries',
       where: {
-        and: [
-          { id: { equals: entryId } },
-          { owner: { equals: tx.user.id } },
-          { closedAt: { exists: false } },
-        ],
+        and: [{ id: { equals: entryId } }, { owner: { equals: tx.user.id } }, openEntry],
       },
       select: { forPerson: true, book: true },
       limit: 1,
@@ -211,11 +206,7 @@ async function assertOpenEntry(tx: Context, entryId: number): Promise<void> {
   const { totalDocs } = await gateway.count(tx, {
     collection: 'wishlist-entries',
     where: {
-      and: [
-        { id: { equals: entryId } },
-        { owner: { equals: tx.user.id } },
-        { closedAt: { exists: false } },
-      ],
+      and: [{ id: { equals: entryId } }, { owner: { equals: tx.user.id } }, openEntry],
     },
   })
   if (totalDocs === 0) throw new DomainError('NOT_FOUND')

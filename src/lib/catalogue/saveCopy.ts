@@ -1,12 +1,11 @@
 import { normaliseIsbn } from '@/fields/isbn'
-import type { Named } from '@/lib/books/effectiveBook'
 import { requireOwnBook } from '@/lib/books/requireOwnBook'
 import { createCopy } from '@/lib/copies/createCopy'
 import { DomainError } from '@/lib/errors'
 import { heldOutcome, lookupSources } from '@/lib/metadata/lookup'
 import type { Context } from '@/lib/payload/context'
 import * as gateway from '@/lib/payload/gateway'
-import type { Ref } from '@/lib/payload/ref'
+import type { Named, Ref } from '@/lib/payload/ref'
 import { type Undoable, type Undone, withUndo } from '@/lib/undo/undo'
 import { closeEntriesForBook, createEntry } from '@/lib/wishlists/entries'
 

@@ -1,7 +1,7 @@
-import type { Named } from '@/lib/books/effectiveBook'
 import { genreName } from '@/lib/books/genreName'
 import type { Context } from '@/lib/payload/context'
 import * as gateway from '@/lib/payload/gateway'
+import type { Named } from '@/lib/payload/ref'
 
 /**
  * The system genres, the options of Edit book's genre field: read through

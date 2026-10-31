@@ -3,8 +3,8 @@
 import { useTranslations } from 'next-intl'
 import { useEffect, useEffectEvent, useRef, useState, useTransition } from 'react'
 
-import type { Named } from '@/lib/books/effectiveBook'
 import type { LocationOption } from '@/lib/copies/locations'
+import type { Named } from '@/lib/payload/ref'
 
 import { returnLoanAction } from '../actions/loans'
 

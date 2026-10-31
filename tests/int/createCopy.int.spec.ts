@@ -1,6 +1,7 @@
 import { getPayload, NotFound, type Payload, type Where } from 'payload'
 import { beforeAll, describe, expect, it } from 'vitest'
 
+import { limits } from '@/fields/limits'
 import { createCopy } from '@/lib/copies/createCopy'
 import { DomainError } from '@/lib/errors'
 import type { Context } from '@/lib/payload/context'
@@ -215,6 +216,21 @@ describe('createCopy', () => {
     }).catch((e: unknown) => e)
     expect(err).toBeInstanceOf(DomainError)
     expect(err).toMatchObject({ code: 'VALIDATION', fields: { location: 'VALIDATION' } })
+    expect(await copiesOf(user, shared)).toBe(0)
+    expect(await locationsOf(user)).toBe(0)
+  })
+
+  it('leaves an over-long location name to the write to refuse', async () => {
+    const user = await createUser({ displayName: 'Create Copy Long' })
+    expect(
+      await rejectedPaths(
+        createCopy(await contextFor(user), {
+          bookId: shared.id,
+          status: 'owned',
+          location: { create: 'x'.repeat(limits.name + 1) },
+        }),
+      ),
+    ).toEqual(['name'])
     expect(await copiesOf(user, shared)).toBe(0)
     expect(await locationsOf(user)).toBe(0)
   })

@@ -4,9 +4,9 @@ import { useTranslations } from 'next-intl'
 import { useRouter } from 'next/navigation'
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore, useTransition } from 'react'
 
-import type { Named } from '@/lib/books/effectiveBook'
 import type { LocationOption } from '@/lib/copies/locations'
 import type { ErrorCode } from '@/lib/errors'
+import type { Named } from '@/lib/payload/ref'
 
 import { Button } from '../../../components/Button'
 import { FullScreenTask } from '../../../components/FullScreenTask'

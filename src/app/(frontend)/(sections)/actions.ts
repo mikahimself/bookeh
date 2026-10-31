@@ -1,7 +1,6 @@
 'use server'
 
 import { setRating } from '@/lib/books/setRating'
-import type { Named } from '@/lib/books/effectiveBook'
 import { setRead } from '@/lib/books/setRead'
 import { refetchBook, type RefetchResult } from '@/lib/catalogue/refetchBook'
 import { listLocations, type LocationOption } from '@/lib/copies/locations'
@@ -11,7 +10,7 @@ import { removeCopies, type RemoveResult } from '@/lib/copies/removeCopies'
 import { setNote } from '@/lib/copies/updateCopy'
 import { DomainError, runAction, type ActionResult } from '@/lib/errors'
 import { requireUserOrThrow } from '@/lib/payload/context'
-import { isRowId } from '@/lib/payload/ref'
+import { isRowId, type Named } from '@/lib/payload/ref'
 import { withUndo, type Undoable } from '@/lib/undo/undo'
 
 import { parseRef } from '../ref'

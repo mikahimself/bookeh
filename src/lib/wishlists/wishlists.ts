@@ -1,62 +1,15 @@
-import { limits } from '@/fields/limits'
 import { toNameKey } from '@/fields/nameKey'
-import { normaliseName } from '@/fields/sortName'
 import { DomainError } from '@/lib/errors'
 import type { Context } from '@/lib/payload/context'
 import * as gateway from '@/lib/payload/gateway'
-import { idOf, isRowId, type Ref } from '@/lib/payload/ref'
+import { openEntry } from '@/lib/payload/openRows'
+import { normalisedName, ownedRowKeyed, ownsRows, resolveOwnedName } from '@/lib/payload/ownedName'
+import { idOf, isRowId, type Named, type Ref } from '@/lib/payload/ref'
 import { withTransaction } from '@/lib/payload/transaction'
-
-/**
- * A typed name, normalised (NFC, trimmed, whitespace collapsed). Blank after
- * normalising fails with `VALIDATION` on `field`; longer than `limits.name`
- * fails with `VALIDATION` and `field` marked `TOO_LONG`, never clipped
- * (spine, Text input).
- */
-function normalisedName(name: string, field: 'wishlist' | 'name'): string {
-  const normalised = normaliseName(name)
-  if (normalised === '') throw new DomainError('VALIDATION', { fields: { [field]: 'VALIDATION' } })
-  if (normalised.length > limits.name) {
-    throw new DomainError('VALIDATION', { fields: { [field]: 'TOO_LONG' } })
-  }
-  return normalised
-}
-
-/** The context user's wishlist keyed `key`, other than `exceptId`, or undefined. */
-async function takenBy(tx: Context, key: string, exceptId?: number): Promise<number | undefined> {
-  const { docs } = await gateway.find(tx, {
-    collection: 'wishlists',
-    where: {
-      and: [
-        { nameKey: { equals: key } },
-        { owner: { equals: tx.user.id } },
-        ...(exceptId === undefined ? [] : [{ id: { not_equals: exceptId } }]),
-      ],
-    },
-    limit: 1,
-    pagination: false,
-    depth: 0,
-  })
-  return docs[0]?.id
-}
-
-/**
- * Whether `id` is one of the context user's wishlists. `count`, not
- * `findByID`: a `NotFound` would end the transaction. Filters on `owner`
- * explicitly as well as through `ownerAccess`, so the admin is held to their
- * own lists too (FR-48).
- */
-async function ownsWishlist(tx: Context, id: number): Promise<boolean> {
-  const { totalDocs } = await gateway.count(tx, {
-    collection: 'wishlists',
-    where: { and: [{ id: { equals: id } }, { owner: { equals: tx.user.id } }] },
-  })
-  return totalDocs === 1
-}
 
 /** Fails with `NOT_FOUND` unless `id` is one of the context user's wishlists. */
 async function assertOwnWishlist(tx: Context, id: number): Promise<void> {
-  if (!(await ownsWishlist(tx, id))) throw new DomainError('NOT_FOUND')
+  if (!(await ownsRows(tx, 'wishlists', [id]))) throw new DomainError('NOT_FOUND')
 }
 
 /**
@@ -72,28 +25,11 @@ async function assertOwnWishlist(tx: Context, id: number): Promise<void> {
  * the unique index's `ValidationError`, unchanged.
  */
 export async function resolveWishlist(ctx: Context, ref: Ref): Promise<number> {
-  if (typeof ref === 'number') {
-    if (!isRowId(ref) || !(await ownsWishlist(ctx, ref))) {
-      throw new DomainError('VALIDATION', { fields: { wishlist: 'VALIDATION' } })
-    }
-    return ref
-  }
-
-  const name = normalisedName(ref.create, 'wishlist')
-  const found = await takenBy(ctx, toNameKey(name))
-  if (found !== undefined) return found
-
-  // `owner` and `nameKey` are what Payload's create type requires; the hooks set both.
-  const created = await gateway.create(ctx, {
-    collection: 'wishlists',
-    data: { owner: ctx.user.id, name, nameKey: '' },
-    depth: 0,
-  })
-  return created.id
+  return resolveOwnedName(ctx, ref, { collection: 'wishlists', field: 'wishlist' })
 }
 
 /** A wishlist as the Wishlists section lists it: its name and its open entries. */
-export type WishlistLine = { id: number; name: string; count: number }
+export type WishlistLine = Named & { count: number }
 
 /**
  * Spine, AD-18, FR-39: the context user's wishlists, sorted by name in the
@@ -115,7 +51,7 @@ export async function listWishlists(ctx: Context): Promise<WishlistLine[]> {
 
   const { docs: entries } = await gateway.find(ctx, {
     collection: 'wishlist-entries',
-    where: { and: [{ owner: { equals: ctx.user.id } }, { closedAt: { exists: false } }] },
+    where: { and: [{ owner: { equals: ctx.user.id } }, openEntry] },
     select: { wishlist: true },
     depth: 0,
     pagination: false,
@@ -127,8 +63,6 @@ export async function listWishlists(ctx: Context): Promise<WishlistLine[]> {
   }
   return lists.map(({ id, name }) => ({ id, name, count: counts.get(id) ?? 0 }))
 }
-
-type Named = { id: number; name: string }
 
 /** An open entry as one list shows it: its Book, and its recipient, or `null` when it is the viewer's own wish. */
 export type ListEntry = { entryId: number; bookId: number; forPerson: Named | null }
@@ -163,11 +97,7 @@ export async function getWishlist(ctx: Context, id: number): Promise<WishlistVie
   const { docs: entries } = await gateway.find(ctx, {
     collection: 'wishlist-entries',
     where: {
-      and: [
-        { wishlist: { equals: id } },
-        { owner: { equals: ctx.user.id } },
-        { closedAt: { exists: false } },
-      ],
+      and: [{ wishlist: { equals: id } }, { owner: { equals: ctx.user.id } }, openEntry],
     },
     select: { book: true, forPerson: true },
     sort: ['-createdAt', '-id'],
@@ -215,7 +145,7 @@ export async function createWishlist(ctx: Context, name: string): Promise<number
   const normalised = normalisedName(name, 'name')
 
   return withTransaction(ctx, async (tx) => {
-    const taken = await takenBy(tx, toNameKey(normalised))
+    const taken = await ownedRowKeyed(tx, 'wishlists', toNameKey(normalised))
     if (taken !== undefined) throw new DomainError('NAME_TAKEN', { conflictId: taken })
 
     // `owner` and `nameKey` are what Payload's create type requires; the hooks set both.
@@ -245,7 +175,7 @@ export async function renameWishlist(ctx: Context, id: number, name: string): Pr
 
   await withTransaction(ctx, async (tx) => {
     await assertOwnWishlist(tx, id)
-    const taken = await takenBy(tx, toNameKey(normalised), id)
+    const taken = await ownedRowKeyed(tx, 'wishlists', toNameKey(normalised), id)
     if (taken !== undefined) throw new DomainError('NAME_TAKEN', { conflictId: taken })
 
     await gateway.updateByID(tx, {

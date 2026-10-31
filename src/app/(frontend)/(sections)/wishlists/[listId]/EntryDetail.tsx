@@ -1,6 +1,7 @@
 import { getTranslations } from 'next-intl/server'
 
-import type { EffectiveBook, Named } from '@/lib/books/effectiveBook'
+import type { EffectiveBook } from '@/lib/books/effectiveBook'
+import type { Named } from '@/lib/payload/ref'
 import type { ListEntry } from '@/lib/wishlists/wishlists'
 
 import { BookDetailFrame } from '../../BookDetailPanel'

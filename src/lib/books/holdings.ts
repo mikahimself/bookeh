@@ -1,8 +1,7 @@
 import type { Context } from '@/lib/payload/context'
 import * as gateway from '@/lib/payload/gateway'
-import { idOf } from '@/lib/payload/ref'
-
-import type { Named } from './effectiveBook'
+import { openEntry, openLoan } from '@/lib/payload/openRows'
+import { idOf, type Named } from '@/lib/payload/ref'
 
 // Spine, Structural Seed (Shared shapes, `src/lib/books`).
 
@@ -94,7 +93,7 @@ export async function getHoldings(
 
   const { docs: entries } = await gateway.find(ctx, {
     collection: 'wishlist-entries',
-    where: { book: { in: [...bookIds] }, closedAt: { exists: false } },
+    where: { book: { in: [...bookIds] }, ...openEntry },
     select: { book: true, wishlist: true, forPerson: true },
     sort: ['createdAt', 'id'],
     depth: 0,
@@ -153,7 +152,7 @@ async function openLoansOf(
   const loanByCopy = new Map<number, NonNullable<CopyLine['loan']>>()
   const { docs: loans } = await gateway.find(ctx, {
     collection: 'loans',
-    where: { copy: { in: copyIds }, returnedOn: { exists: false } },
+    where: { copy: { in: copyIds }, ...openLoan },
     select: { copy: true, person: true, lentOn: true },
     depth: 0,
     pagination: false,

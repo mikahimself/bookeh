@@ -1,12 +1,13 @@
 import { getFormatter, getLocale, getTranslations } from 'next-intl/server'
 import type { ReactNode } from 'react'
 
-import { getEffectiveBooks, type EffectiveBook, type Named } from '@/lib/books/effectiveBook'
+import { getEffectiveBooks, type EffectiveBook } from '@/lib/books/effectiveBook'
 import { listLocations, type LocationOption } from '@/lib/copies/locations'
 import { logger } from '@/lib/errors'
 import { openLoans, returnedLoans, type OpenLoan, type ReturnedLoan } from '@/lib/loans/loans'
 import type { Context } from '@/lib/payload/context'
 import { requireUser } from '@/lib/payload/context'
+import type { Named } from '@/lib/payload/ref'
 import { parseShelfQuery } from '@/lib/shelf/query'
 
 import { devicePrefs } from '../../prefs'

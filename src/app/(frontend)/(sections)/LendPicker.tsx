@@ -4,10 +4,9 @@ import { useTranslations } from 'next-intl'
 import { useEffect, useId, useRef, useState, type TransitionStartFunction } from 'react'
 
 import { limits } from '@/fields/limits'
-import type { Named } from '@/lib/books/effectiveBook'
 import type { ActionResult } from '@/lib/errors'
 import { helsinkiToday } from '@/lib/loans/dates'
-import type { Ref } from '@/lib/payload/ref'
+import type { Named, Ref } from '@/lib/payload/ref'
 
 import { lendCopyAction } from '../actions/loans'
 import { Button } from '../components/Button'

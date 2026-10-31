@@ -1,6 +1,7 @@
 import { DomainError } from '@/lib/errors'
 import type { Context } from '@/lib/payload/context'
 import * as gateway from '@/lib/payload/gateway'
+import { openLoan } from '@/lib/payload/openRows'
 import { isRowId } from '@/lib/payload/ref'
 import { withTransaction } from '@/lib/payload/transaction'
 import type { Undone } from '@/lib/undo/undo'
@@ -83,11 +84,7 @@ async function restoreOrdered(ctx: Context, copyId: number): Promise<void> {
   const open = await gateway.count(ctx, {
     collection: 'loans',
     where: {
-      and: [
-        { copy: { equals: copyId } },
-        { owner: { equals: ctx.user.id } },
-        { returnedOn: { exists: false } },
-      ],
+      and: [{ copy: { equals: copyId } }, { owner: { equals: ctx.user.id } }, openLoan],
     },
   })
   if (open.totalDocs > 0) throw new DomainError('UNDO_FAILED')

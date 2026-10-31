@@ -1,6 +1,7 @@
 import { DomainError } from '@/lib/errors'
 import type { Context } from '@/lib/payload/context'
 import * as gateway from '@/lib/payload/gateway'
+import { openLoan } from '@/lib/payload/openRows'
 import { isRowId } from '@/lib/payload/ref'
 import { withTransaction } from '@/lib/payload/transaction'
 
@@ -24,11 +25,7 @@ export async function setStatus(ctx: Context, copyId: number, change: CopyStatus
       const open = await gateway.count(tx, {
         collection: 'loans',
         where: {
-          and: [
-            { copy: { equals: copyId } },
-            { owner: { equals: tx.user.id } },
-            { returnedOn: { exists: false } },
-          ],
+          and: [{ copy: { equals: copyId } }, { owner: { equals: tx.user.id } }, openLoan],
         },
       })
       if (open.totalDocs > 0) {

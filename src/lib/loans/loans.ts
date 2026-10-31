@@ -1,15 +1,13 @@
 import { DomainError } from '@/lib/errors'
 import type { Context } from '@/lib/payload/context'
 import * as gateway from '@/lib/payload/gateway'
-import { idOf, isRowId, type Ref } from '@/lib/payload/ref'
+import { openLoan } from '@/lib/payload/openRows'
+import { idOf, isRowId, type Named, type Ref } from '@/lib/payload/ref'
 import { withTransaction } from '@/lib/payload/transaction'
 import { resolvePerson } from '@/lib/people/people'
 import type { Undone } from '@/lib/undo/undo'
 
 import { helsinkiToday, isCalendarDate } from './dates'
-
-/** Spine, Shared shapes. Declared here, as in `lib/people`. */
-type Named = { id: number; name: string }
 
 /** Spine, Shared shapes: the loan `lendCopy()` opened and its borrower. */
 export type Lent = { loanId: number; person: Named }
@@ -76,11 +74,7 @@ export async function lendCopy(
     const open = await gateway.count(tx, {
       collection: 'loans',
       where: {
-        and: [
-          { copy: { equals: copyId } },
-          { owner: { equals: tx.user.id } },
-          { returnedOn: { exists: false } },
-        ],
+        and: [{ copy: { equals: copyId } }, { owner: { equals: tx.user.id } }, openLoan],
       },
     })
     if (open.totalDocs > 0) {
@@ -220,7 +214,7 @@ export type OpenLoan = {
 export async function openLoans(ctx: Context): Promise<OpenLoan[]> {
   const { docs } = await gateway.find(ctx, {
     collection: 'loans',
-    where: { and: [{ owner: { equals: ctx.user.id } }, { returnedOn: { exists: false } }] },
+    where: { and: [{ owner: { equals: ctx.user.id } }, openLoan] },
     select: { copy: true, person: true, lentOn: true },
     sort: ['lentOn', 'id'],
     depth: 0,

@@ -4,8 +4,7 @@ import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { useMemo, useState, useTransition } from 'react'
 
-import type { Named } from '@/lib/books/effectiveBook'
-import type { Ref } from '@/lib/payload/ref'
+import type { Named, Ref } from '@/lib/payload/ref'
 
 import { setEntryRecipientAction } from '../../../actions/wishlists'
 import { settleAction, useReportFailure } from '../../../components/request'

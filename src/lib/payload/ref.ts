@@ -3,6 +3,9 @@
 /** Spine, Shared shapes: an existing row, or a name to create. */
 export type Ref = number | { create: string }
 
+/** Spine, Shared shapes: a related record as the surface shows it. */
+export type Named = { id: number; name: string }
+
 /** The largest Payload row id: ids are Postgres `integer` (int4). */
 export const MAX_ROW_ID = 2147483647
 

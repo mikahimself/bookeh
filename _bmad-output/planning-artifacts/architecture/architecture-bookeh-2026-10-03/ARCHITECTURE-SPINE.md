@@ -247,7 +247,7 @@ The diagram shows the main directions; the list below is the full table of allow
 
 ### AD-18 — One writer per kind of row, one home per rule
 
-- **Binds:** `lib/copies`, `lib/people`, `lib/books`, `lib/wishlists`, `lib/loans`, `lib/account`, `lib/catalogue`; FR-4, FR-17, FR-28, FR-31, FR-33, FR-34, FR-35
+- **Binds:** `lib/copies`, `lib/people`, `lib/books`, `lib/wishlists`, `lib/loans`, `lib/account`, `lib/catalogue`, `lib/payload/ownedName.ts`; FR-4, FR-17, FR-28, FR-31, FR-33, FR-34, FR-35
 - **Prevents:** three modules creating copies with different default-location and wishlist behaviour; a screen writing a row through the gateway; the same rule enforced twice with different errors; deletes failing on foreign keys; a screen looping single actions for a selection and stopping half way; a picker that takes an id on one screen and a name on another
 - **Rule:**
   - `lib/copies` is the only writer of `copies`. `createCopy()` is its only insert; move, receive, set status, set note and remove are its other functions, and `editBook()` calls them. A `location` of `undefined` on an owned copy means the profile's default location; `null` means none; no hook sets a default. Setting a copy to ordered clears its location; Received makes it owned at the default location.
@@ -255,7 +255,7 @@ The diagram shows the main directions; the list below is the full table of allow
   - `upsertUserBook()` in `lib/books` is the only writer of `user-books` (AD-6). `setRead()` in `lib/books` and `changeTags()` in `lib/tags` take either copy ids or a Book id, so they also work for a Book the user has only on a wishlist. `setRead()` takes a value or `toggle`, which the server resolves: unread when every Book is read, otherwise read.
   - `findOrCreateByName()` in `lib/catalogue` is the only matcher for authors and series (AD-5).
   - Each private name-keyed collection has one owning service that matches by `nameKey`, creates, renames and deletes its rows, and merges them where the interface offers a merge: locations in `lib/copies`, People in `lib/people`, tags of every kind in `lib/tags` (which reads system genre names and, through `lib/shelf`, system theme names for `SYSTEM_NAME`), wishlists in `lib/wishlists`. The profile, `profileVisibility` and `collectionVisibility` included, is read and updated only through `lib/account`. System genres are managed only through `lib/catalogue`, admin only. Screens never match names.
-  - An input that picks one of these rows or creates it inline is a `Ref`: an id, or a name to create. The owning service resolves it inside the action's transaction. Undo leaves a row created this way.
+  - An input that picks one of these rows or creates it inline is a `Ref`: an id, or a name to create. The owning service resolves it inside the action's transaction, for locations, People and wishlists through `resolveOwnedName()` in `lib/payload`: shared code that a service calls only for its own collection, and that makes `lib/payload` no owner. Undo leaves a row created this way.
   - Renaming onto a `nameKey` that exists fails with `NAME_TAKEN` and the existing row's id as `conflictId`. So does adding a row by name from a Settings list ("Add location", "Add person"); only a `Ref` matches an existing name instead.
   - A merge is one function in the owning service, in one transaction: every reference to the source row moves to the target, then the source row is deleted.
   - Deletes that affect other rows are one function in the owning service, in one transaction: deleting a copy deletes its loans; a Person with a loan or a wishlist entry, open or closed, cannot be deleted (`PERSON_IN_USE`); deleting a location clears it from copies and from the profile default; deleting a wishlist deletes its entries. A merge or delete updates referencing rows of other collections through the gateway.
@@ -411,9 +411,9 @@ type RawMetadata = {
 
 // src/lib/payload
 type Ref = number | { create: string } // an existing row, or a name to create
+type Named = { id: number; name: string }
 
 // src/lib/books
-type Named = { id: number; name: string }
 type EffectiveBook = {
   bookId: number
   isbn13: string | null
@@ -596,7 +596,7 @@ src/
   access/              # role helpers, where-returning access, asRequestUser
   fields/              # ownerField, bookFields, nameKeyField, sortNameField, isbnField, ownedRelation, readableRelation
   lib/
-    payload/           # requireUser, requireUserOrThrow, context, withTransaction, gateway, Drizzle helper, Ref
+    payload/           # requireUser, requireUserOrThrow, context, withTransaction, gateway, Drizzle helper, Ref, Named, ownedName (resolveOwnedName and its helpers), openEntry, openLoan
     errors.ts          # DomainError, ActionResult, ErrorCode, runAction, runRoute
     processState.ts    # in-process state on globalThis
     undo/              # receipt store, withUndo, undo

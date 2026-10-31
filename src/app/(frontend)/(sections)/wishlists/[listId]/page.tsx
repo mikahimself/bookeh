@@ -1,11 +1,11 @@
 import { getTranslations } from 'next-intl/server'
 import { redirect } from 'next/navigation'
 
-import { getEffectiveBooks, type EffectiveBook, type Named } from '@/lib/books/effectiveBook'
+import { getEffectiveBooks, type EffectiveBook } from '@/lib/books/effectiveBook'
 import { logger } from '@/lib/errors'
 import type { Context } from '@/lib/payload/context'
 import { requireUser } from '@/lib/payload/context'
-import { isRowId } from '@/lib/payload/ref'
+import { isRowId, type Named } from '@/lib/payload/ref'
 import { personUse } from '@/lib/people/people'
 import { getWishlist, type ListEntry, type WishlistView } from '@/lib/wishlists/wishlists'
 

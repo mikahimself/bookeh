@@ -1,14 +1,10 @@
-import { limits } from '@/fields/limits'
 import { toNameKey } from '@/fields/nameKey'
-import { normaliseName } from '@/fields/sortName'
 import { DomainError } from '@/lib/errors'
 import type { Context } from '@/lib/payload/context'
 import * as gateway from '@/lib/payload/gateway'
-import { idOf, isRowId, type Ref } from '@/lib/payload/ref'
+import { normalisedName, ownedRowKeyed, ownsRows, resolveOwnedName } from '@/lib/payload/ownedName'
+import { idOf, isRowId, type Named, type Ref } from '@/lib/payload/ref'
 import { withTransaction } from '@/lib/payload/transaction'
-
-/** Spine, Shared shapes. Declared here: `lib/people` imports no other service. */
-type Named = { id: number; name: string }
 
 /**
  * Spine, Shared shapes: a Person with their number of loans, open and
@@ -16,56 +12,9 @@ type Named = { id: number; name: string }
  */
 export type PersonUse = Named & { loans: number; entries: number }
 
-/**
- * A typed name, normalised (NFC, trimmed, whitespace collapsed). Blank after
- * normalising fails with `VALIDATION` on `field`; longer than `limits.name`
- * fails with `VALIDATION` and `field` marked `TOO_LONG`, never clipped
- * (spine, Text input).
- */
-function normalisedName(name: string, field: 'person' | 'name'): string {
-  const normalised = normaliseName(name)
-  if (normalised === '') throw new DomainError('VALIDATION', { fields: { [field]: 'VALIDATION' } })
-  if (normalised.length > limits.name) {
-    throw new DomainError('VALIDATION', { fields: { [field]: 'TOO_LONG' } })
-  }
-  return normalised
-}
-
-/** The context user's Person keyed `key`, other than `exceptId`, or undefined. */
-async function takenBy(tx: Context, key: string, exceptId?: number): Promise<number | undefined> {
-  const { docs } = await gateway.find(tx, {
-    collection: 'people',
-    where: {
-      and: [
-        { nameKey: { equals: key } },
-        { owner: { equals: tx.user.id } },
-        ...(exceptId === undefined ? [] : [{ id: { not_equals: exceptId } }]),
-      ],
-    },
-    limit: 1,
-    pagination: false,
-    depth: 0,
-  })
-  return docs[0]?.id
-}
-
-/**
- * Whether every id (distinct) is one of the context user's People. `count`,
- * not `findByID`: a `NotFound` would end the transaction. Filters on `owner`
- * explicitly as well as through `ownerAccess`, so the admin is held to their
- * own People too (FR-48).
- */
-async function ownsPeople(tx: Context, ids: number[]): Promise<boolean> {
-  const { totalDocs } = await gateway.count(tx, {
-    collection: 'people',
-    where: { and: [{ id: { in: ids } }, { owner: { equals: tx.user.id } }] },
-  })
-  return totalDocs === ids.length
-}
-
 /** Fails with `NOT_FOUND` unless every id (distinct) is one of the context user's People. */
 async function assertOwnPeople(tx: Context, ids: number[]): Promise<void> {
-  if (!(await ownsPeople(tx, ids))) throw new DomainError('NOT_FOUND')
+  if (!(await ownsRows(tx, 'people', ids))) throw new DomainError('NOT_FOUND')
 }
 
 /**
@@ -81,24 +30,7 @@ async function assertOwnPeople(tx: Context, ids: number[]): Promise<void> {
  * index's `ValidationError`, unchanged.
  */
 export async function resolvePerson(ctx: Context, ref: Ref): Promise<number> {
-  if (typeof ref === 'number') {
-    if (!isRowId(ref) || !(await ownsPeople(ctx, [ref]))) {
-      throw new DomainError('VALIDATION', { fields: { person: 'VALIDATION' } })
-    }
-    return ref
-  }
-
-  const name = normalisedName(ref.create, 'person')
-  const found = await takenBy(ctx, toNameKey(name))
-  if (found !== undefined) return found
-
-  // `owner` and `nameKey` are what Payload's create type requires; the hooks set both.
-  const created = await gateway.create(ctx, {
-    collection: 'people',
-    data: { owner: ctx.user.id, name, nameKey: '' },
-    depth: 0,
-  })
-  return created.id
+  return resolveOwnedName(ctx, ref, { collection: 'people', field: 'person' })
 }
 
 /**
@@ -115,7 +47,7 @@ export async function createPerson(ctx: Context, name: string): Promise<number> 
   const normalised = normalisedName(name, 'name')
 
   return withTransaction(ctx, async (tx) => {
-    const taken = await takenBy(tx, toNameKey(normalised))
+    const taken = await ownedRowKeyed(tx, 'people', toNameKey(normalised))
     if (taken !== undefined) throw new DomainError('NAME_TAKEN', { conflictId: taken })
 
     // `owner` and `nameKey` are what Payload's create type requires; the hooks set both.
@@ -146,7 +78,7 @@ export async function renamePerson(ctx: Context, id: number, name: string): Prom
 
   await withTransaction(ctx, async (tx) => {
     await assertOwnPeople(tx, [id])
-    const taken = await takenBy(tx, toNameKey(normalised), id)
+    const taken = await ownedRowKeyed(tx, 'people', toNameKey(normalised), id)
     if (taken !== undefined) throw new DomainError('NAME_TAKEN', { conflictId: taken })
 
     await gateway.updateByID(tx, {

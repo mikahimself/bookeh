@@ -1,16 +1,13 @@
 import { OVERRIDABLE_BOOK_FIELDS, type OverridableBookField } from '@/fields/bookFields'
 import type { Context } from '@/lib/payload/context'
 import * as gateway from '@/lib/payload/gateway'
-import { idOf } from '@/lib/payload/ref'
+import { idOf, type Named } from '@/lib/payload/ref'
 import type { Book, UserBook } from '@/payload-types'
 
 import { coverUrl } from './coverUrl'
 import { genreName } from './genreName'
 
 // Spine, Structural Seed (Shared shapes, `src/lib/books`).
-
-/** A related record as the surface shows it. */
-export type Named = { id: number; name: string }
 
 /**
  * Spine, AD-6: a Book as the viewer sees it, their `user-books` overrides laid

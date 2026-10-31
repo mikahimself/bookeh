@@ -3,9 +3,9 @@
 import { useTranslations } from 'next-intl'
 import { useId, useState } from 'react'
 
-import type { Named } from '@/lib/books/effectiveBook'
 import type { BookEdits } from '@/lib/catalogue/editBook'
 import type { ErrorCode } from '@/lib/errors'
+import type { Named } from '@/lib/payload/ref'
 
 import { ActionLink } from '../../../components/Link'
 import { TextAreaField, TextField } from '../../../components/TextField'

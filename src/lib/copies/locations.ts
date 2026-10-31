@@ -4,7 +4,8 @@ import { getProfile, updateProfile } from '@/lib/account/profile'
 import { DomainError } from '@/lib/errors'
 import type { Context } from '@/lib/payload/context'
 import * as gateway from '@/lib/payload/gateway'
-import { idOf, isRowId, type Ref } from '@/lib/payload/ref'
+import { ownsRows, resolveOwnedName } from '@/lib/payload/ownedName'
+import { idOf, isRowId, type Named, type Ref } from '@/lib/payload/ref'
 import { withTransaction } from '@/lib/payload/transaction'
 
 /**
@@ -20,29 +21,11 @@ import { withTransaction } from '@/lib/payload/transaction'
  * `ValidationError`, unchanged.
  */
 export async function resolveLocation(ctx: Context, ref: Ref): Promise<number> {
-  if (typeof ref === 'number') return ref
-
-  const name = normaliseName(ref.create)
-  if (name === '') throw new DomainError('VALIDATION', { fields: { location: 'VALIDATION' } })
-
-  // Owner access scopes the read to the context user, the admin included.
-  const { docs } = await gateway.find(ctx, {
+  return resolveOwnedName(ctx, ref, {
     collection: 'locations',
-    where: { nameKey: { equals: toNameKey(name) } },
-    limit: 1,
-    pagination: false,
-    depth: 0,
+    field: 'location',
+    checks: 'atWrite',
   })
-  const found = docs[0]
-  if (found) return found.id
-
-  // `owner` and `nameKey` are what Payload's create type requires; the hooks set both.
-  const created = await gateway.create(ctx, {
-    collection: 'locations',
-    data: { owner: ctx.user.id, name, nameKey: '' },
-    depth: 0,
-  })
-  return created.id
 }
 
 /** A copy's status and, when owned, where it is. An ordered copy has no location (AD-8). */
@@ -63,7 +46,7 @@ export async function locationFor(ctx: Context, change: CopyStatus): Promise<num
 }
 
 /** A location as a picker lists it. */
-export type LocationOption = { id: number; name: string }
+export type LocationOption = Named
 
 /**
  * Spine, AD-18: the context user's own locations, sorted by name in the
@@ -117,18 +100,9 @@ export async function createLocation(ctx: Context, name: string): Promise<number
   })
 }
 
-/**
- * Fails with `NOT_FOUND` unless every id (distinct) is one of the context
- * user's locations. `count`, not `findByID`: a `NotFound` would end the
- * transaction. Filters on `owner` explicitly as well as through `ownerAccess`,
- * so the admin is held to their own locations too (FR-48).
- */
+/** Fails with `NOT_FOUND` unless every id (distinct) is one of the context user's locations. */
 async function assertOwnLocations(tx: Context, ids: number[]): Promise<void> {
-  const { totalDocs } = await gateway.count(tx, {
-    collection: 'locations',
-    where: { and: [{ id: { in: ids } }, { owner: { equals: tx.user.id } }] },
-  })
-  if (totalDocs !== ids.length) throw new DomainError('NOT_FOUND')
+  if (!(await ownsRows(tx, 'locations', ids))) throw new DomainError('NOT_FOUND')
 }
 
 /**

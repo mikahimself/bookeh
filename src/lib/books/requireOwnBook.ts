@@ -1,6 +1,7 @@
 import { DomainError } from '@/lib/errors'
 import type { Context } from '@/lib/payload/context'
 import * as gateway from '@/lib/payload/gateway'
+import { openEntry } from '@/lib/payload/openRows'
 import { isRowId } from '@/lib/payload/ref'
 
 /**
@@ -25,7 +26,7 @@ export async function requireOwnBook(ctx: Context, bookId: number): Promise<void
   if (copies.totalDocs > 0) return
   const entries = await gateway.count(ctx, {
     collection: 'wishlist-entries',
-    where: { book: { equals: bookId }, closedAt: { exists: false } },
+    where: { book: { equals: bookId }, ...openEntry },
   })
   if (entries.totalDocs === 0) throw new DomainError('NOT_FOUND')
 }

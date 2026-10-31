@@ -13,9 +13,9 @@
  * for a single-valued parameter the first value counts. No page number.
  */
 
-import type { EffectiveBook, Named } from '@/lib/books/effectiveBook'
+import type { EffectiveBook } from '@/lib/books/effectiveBook'
 import type { CopyLine } from '@/lib/books/holdings'
-import { isRowId } from '@/lib/payload/ref'
+import { isRowId, type Named } from '@/lib/payload/ref'
 
 /** Spine, Shared shapes: what the collection lists and in what order. */
 export type ShelfQuery = {

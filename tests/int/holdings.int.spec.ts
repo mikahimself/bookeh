@@ -3,11 +3,11 @@ import { randomUUID } from 'node:crypto'
 import { getPayload, type Payload } from 'payload'
 import { beforeAll, describe, expect, it } from 'vitest'
 
-import type { Named } from '@/lib/books/effectiveBook'
 import { getHoldings } from '@/lib/books/holdings'
 import { lendCopy, returnLoan } from '@/lib/loans/loans'
 import type { Context } from '@/lib/payload/context'
 import * as gateway from '@/lib/payload/gateway'
+import type { Named } from '@/lib/payload/ref'
 import config from '@/payload.config'
 import type { Book, Copy, User, WishlistEntry } from '@/payload-types'
 
