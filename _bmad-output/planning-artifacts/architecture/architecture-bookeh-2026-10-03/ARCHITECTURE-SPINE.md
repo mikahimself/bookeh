@@ -461,6 +461,9 @@ type LookupResult =
   | { kind: 'none' }
   | { kind: 'unavailable'; failed: SourceId[] } // the Answer names these sources
 type LookupTarget = { isbn: string; pick?: number } | { bookId: number } // isbn as entered
+type AnswerHeading = 'inLibrary' | 'ordered' | 'onWishlist' | 'notInLibrary' // first that applies; a lent copy counts as owned, so it reads inLibrary; ordered means copies exist with none owned
+type AnswerFactLine = { kind: 'copy'; copy: CopyLine } | { kind: 'entry'; entry: EntryLine }
+type AnswerFacts = { heading: AnswerHeading; lines: AnswerFactLine[] } // answerFacts(holdings): pure; every copy then every entry, in Holdings order; no wording
 type BookEdits = Partial<{
   isbn13: string // private Books only
   title: string
@@ -603,7 +606,7 @@ src/
     processState.ts    # in-process state on globalThis
     undo/              # receipt store, withUndo, undo
     metadata/          # source contract, sources/, merge, lookupSources, cache
-    catalogue/         # lookupBook, retryLookup, searchBooks, saveCopy, saveEntry, editBook, findOrCreateByName, isUnreferenced, covers (download, upload and warp), re-fetch, lookupAgain, genre admin
+    catalogue/         # lookupBook, retryLookup, searchBooks, saveCopy, saveEntry, editBook, findOrCreateByName, isUnreferenced, covers (download, upload and warp), re-fetch, lookupAgain, answerFacts, genre admin
     books/             # EffectiveBook, getEffectiveBooks, getHoldings, getUserBookState, requireOwnBook, upsertUserBook, setRead, setRating, coverUrl
     shelf/             # Drizzle query module, read-only: getShelfRows, values and suggestions; query.ts (pure): parseShelfQuery, shelfHref, shelfRowsPath
     tags/              # tags of every kind: changeTags, rename, merge, delete, tagUse; SYSTEM_NAME checks
