@@ -1,0 +1,66 @@
+{
+  "kind": "books#volumes",
+  "totalItems": 1,
+  "items": [
+    {
+      "kind": "books#volume",
+      "id": "PRjWzgEACAAJ",
+      "etag": "PpXEn1sUZu8",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/PRjWzgEACAAJ",
+      "volumeInfo": {
+        "title": "Pikkuporvarit",
+        "authors": [
+          "Anna Kontula"
+        ],
+        "publishedDate": "2021",
+        "industryIdentifiers": [
+          {
+            "type": "ISBN_10",
+            "identifier": "9523516574"
+          },
+          {
+            "type": "ISBN_13",
+            "identifier": "9789523516571"
+          }
+        ],
+        "readingModes": {
+          "text": false,
+          "image": false
+        },
+        "printType": "BOOK",
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": false,
+        "contentVersion": "preview-1.0.0",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "language": "fi",
+        "previewLink": "http://books.google.fi/books?id=PRjWzgEACAAJ&dq=isbn:9789523516571&hl=&cd=1&source=gbs_api",
+        "infoLink": "http://books.google.fi/books?id=PRjWzgEACAAJ&dq=isbn:9789523516571&hl=&source=gbs_api",
+        "canonicalVolumeLink": "https://books.google.com/books/about/Pikkuporvarit.html?hl=&id=PRjWzgEACAAJ"
+      },
+      "saleInfo": {
+        "country": "FI",
+        "saleability": "NOT_FOR_SALE",
+        "isEbook": false
+      },
+      "accessInfo": {
+        "country": "FI",
+        "viewability": "NO_PAGES",
+        "embeddable": false,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": false
+        },
+        "pdf": {
+          "isAvailable": false
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=PRjWzgEACAAJ&hl=&source=gbs_api",
+        "accessViewStatus": "NONE",
+        "quoteSharingAllowed": false
+      }
+    }
+  ]
+}

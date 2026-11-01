@@ -1,0 +1,66 @@
+{
+  "kind": "books#volumes",
+  "totalItems": 1,
+  "items": [
+    {
+      "kind": "books#volume",
+      "id": "7PvyQgAACAAJ",
+      "etag": "I1RZB07idSI",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/7PvyQgAACAAJ",
+      "volumeInfo": {
+        "title": "Supernaiivi",
+        "authors": [
+          "Erlend Loe",
+          "Outi Menna"
+        ],
+        "publishedDate": "2002",
+        "industryIdentifiers": [
+          {
+            "type": "ISBN_10",
+            "identifier": "951578963X"
+          },
+          {
+            "type": "ISBN_13",
+            "identifier": "9789515789631"
+          }
+        ],
+        "readingModes": {
+          "text": false,
+          "image": false
+        },
+        "pageCount": 222,
+        "printType": "BOOK",
+        "averageRating": 4,
+        "ratingsCount": 1,
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": false,
+        "contentVersion": "preview-1.0.0",
+        "language": "fi",
+        "previewLink": "http://books.google.fi/books?id=7PvyQgAACAAJ&dq=isbn:9789515789631&hl=&cd=1&source=gbs_api",
+        "infoLink": "http://books.google.fi/books?id=7PvyQgAACAAJ&dq=isbn:9789515789631&hl=&source=gbs_api",
+        "canonicalVolumeLink": "https://books.google.com/books/about/Supernaiivi.html?hl=&id=7PvyQgAACAAJ"
+      },
+      "saleInfo": {
+        "country": "FI",
+        "saleability": "NOT_FOR_SALE",
+        "isEbook": false
+      },
+      "accessInfo": {
+        "country": "FI",
+        "viewability": "NO_PAGES",
+        "embeddable": false,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": false
+        },
+        "pdf": {
+          "isAvailable": false
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=7PvyQgAACAAJ&hl=&source=gbs_api",
+        "accessViewStatus": "NONE",
+        "quoteSharingAllowed": false
+      }
+    }
+  ]
+}

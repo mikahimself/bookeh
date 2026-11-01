@@ -1,0 +1,67 @@
+{
+  "kind": "books#volumes",
+  "totalItems": 1,
+  "items": [
+    {
+      "kind": "books#volume",
+      "id": "IYh9tAEACAAJ",
+      "etag": "sgKOUUtqLUg",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/IYh9tAEACAAJ",
+      "volumeInfo": {
+        "title": "Röyhkeys",
+        "authors": [
+          "Ossi Nyman"
+        ],
+        "publishedDate": "2017",
+        "industryIdentifiers": [
+          {
+            "type": "ISBN_10",
+            "identifier": "9518517592"
+          },
+          {
+            "type": "ISBN_13",
+            "identifier": "9789518517590"
+          }
+        ],
+        "readingModes": {
+          "text": false,
+          "image": false
+        },
+        "pageCount": 188,
+        "printType": "BOOK",
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": false,
+        "contentVersion": "preview-1.0.0",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "language": "fi",
+        "previewLink": "http://books.google.fi/books?id=IYh9tAEACAAJ&dq=isbn:9789518517590&hl=&cd=1&source=gbs_api",
+        "infoLink": "http://books.google.fi/books?id=IYh9tAEACAAJ&dq=isbn:9789518517590&hl=&source=gbs_api",
+        "canonicalVolumeLink": "https://books.google.com/books/about/R%C3%B6yhkeys.html?hl=&id=IYh9tAEACAAJ"
+      },
+      "saleInfo": {
+        "country": "FI",
+        "saleability": "NOT_FOR_SALE",
+        "isEbook": false
+      },
+      "accessInfo": {
+        "country": "FI",
+        "viewability": "NO_PAGES",
+        "embeddable": false,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": false
+        },
+        "pdf": {
+          "isAvailable": false
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=IYh9tAEACAAJ&hl=&source=gbs_api",
+        "accessViewStatus": "NONE",
+        "quoteSharingAllowed": false
+      }
+    }
+  ]
+}

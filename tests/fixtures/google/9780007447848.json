@@ -1,0 +1,142 @@
+{
+  "kind": "books#volumes",
+  "totalItems": 2,
+  "items": [
+    {
+      "kind": "books#volume",
+      "id": "DWvlNEkUDPUC",
+      "etag": "unDCrLt3zkE",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/DWvlNEkUDPUC",
+      "volumeInfo": {
+        "title": "A Storm of Swords",
+        "subtitle": "Steel and Snow",
+        "authors": [
+          "George R. R. Martin"
+        ],
+        "publisher": "HarperCollins UK",
+        "publishedDate": "2011",
+        "description": "HBO's hit series A GAME OF THRONES is based on George R R Martin's internationally bestselling series A SONG OF ICE AND FIRE, the greatest fantasy epic of the modern age. A STORM OF SWORDS: STEEL AND SNOW is the FIRST part of the third volume in the series. 'Martin has captured the imagination of millions' Guardian Winter approaches Westeros like an angry beast. The Seven Kingdoms are divided by revolt and blood feud. In the northern wastes, a horde of hungry, savage people steeped in the dark magic of the wilderness is poised to invade the Kingdom of the North where Robb Stark wears his new-forged crown. And Robb's defences are ranged against the South, the land of the cunning and cruel Lannisters, who have his younger sisters in their power. Throughout Westeros, the war for the Iron Throne rages more fiercely than ever, but if the Wall is breached, no king will live to claim it.",
+        "industryIdentifiers": [
+          {
+            "type": "ISBN_13",
+            "identifier": "9780007447848"
+          },
+          {
+            "type": "ISBN_10",
+            "identifier": "0007447841"
+          }
+        ],
+        "readingModes": {
+          "text": false,
+          "image": false
+        },
+        "pageCount": 642,
+        "printType": "BOOK",
+        "categories": [
+          "Fiction"
+        ],
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": false,
+        "contentVersion": "0.3.2.0.preview.0",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "imageLinks": {
+          "smallThumbnail": "http://books.google.com/books/content?id=DWvlNEkUDPUC&printsec=frontcover&img=1&zoom=5&source=gbs_api",
+          "thumbnail": "http://books.google.com/books/content?id=DWvlNEkUDPUC&printsec=frontcover&img=1&zoom=1&source=gbs_api"
+        },
+        "language": "en",
+        "previewLink": "http://books.google.fi/books?id=DWvlNEkUDPUC&dq=isbn:9780007447848&hl=&cd=1&source=gbs_api",
+        "infoLink": "http://books.google.fi/books?id=DWvlNEkUDPUC&dq=isbn:9780007447848&hl=&source=gbs_api",
+        "canonicalVolumeLink": "https://books.google.com/books/about/A_Storm_of_Swords.html?hl=&id=DWvlNEkUDPUC"
+      },
+      "saleInfo": {
+        "country": "FI",
+        "saleability": "NOT_FOR_SALE",
+        "isEbook": false
+      },
+      "accessInfo": {
+        "country": "FI",
+        "viewability": "NO_PAGES",
+        "embeddable": false,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": false
+        },
+        "pdf": {
+          "isAvailable": true
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=DWvlNEkUDPUC&hl=&source=gbs_api",
+        "accessViewStatus": "NONE",
+        "quoteSharingAllowed": false
+      },
+      "searchInfo": {
+        "textSnippet": "A STORM OF SWORDS: STEEL AND SNOW is the FIRST part of the third volume in the series. &#39;Martin has captured the imagination of millions&#39; Guardian Winter approaches Westeros like an angry beast."
+      }
+    },
+    {
+      "kind": "books#volume",
+      "id": "olE-0gEACAAJ",
+      "etag": "Djt7pUOzkWg",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/olE-0gEACAAJ",
+      "volumeInfo": {
+        "title": "A Storm of Swords. 1",
+        "subtitle": "Steel and Snow",
+        "authors": [
+          "Garry Martin"
+        ],
+        "publishedDate": "2011",
+        "industryIdentifiers": [
+          {
+            "type": "ISBN_10",
+            "identifier": "0007447841"
+          },
+          {
+            "type": "ISBN_13",
+            "identifier": "9780007447848"
+          }
+        ],
+        "readingModes": {
+          "text": false,
+          "image": false
+        },
+        "pageCount": 0,
+        "printType": "BOOK",
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": false,
+        "contentVersion": "preview-1.0.0",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "language": "en",
+        "previewLink": "http://books.google.fi/books?id=olE-0gEACAAJ&dq=isbn:9780007447848&hl=&cd=2&source=gbs_api",
+        "infoLink": "http://books.google.fi/books?id=olE-0gEACAAJ&dq=isbn:9780007447848&hl=&source=gbs_api",
+        "canonicalVolumeLink": "https://books.google.com/books/about/A_Storm_of_Swords_1.html?hl=&id=olE-0gEACAAJ"
+      },
+      "saleInfo": {
+        "country": "FI",
+        "saleability": "NOT_FOR_SALE",
+        "isEbook": false
+      },
+      "accessInfo": {
+        "country": "FI",
+        "viewability": "NO_PAGES",
+        "embeddable": false,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": false
+        },
+        "pdf": {
+          "isAvailable": false
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=olE-0gEACAAJ&hl=&source=gbs_api",
+        "accessViewStatus": "NONE",
+        "quoteSharingAllowed": false
+      }
+    }
+  ]
+}

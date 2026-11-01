@@ -1,0 +1,67 @@
+{
+  "kind": "books#volumes",
+  "totalItems": 1,
+  "items": [
+    {
+      "kind": "books#volume",
+      "id": "xT19tgEACAAJ",
+      "etag": "XwjBWfU78vM",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/xT19tgEACAAJ",
+      "volumeInfo": {
+        "title": "Taivaanpallo",
+        "authors": [
+          "Olli Jalonen"
+        ],
+        "publishedDate": "2018",
+        "industryIdentifiers": [
+          {
+            "type": "ISBN_10",
+            "identifier": "9511319175"
+          },
+          {
+            "type": "ISBN_13",
+            "identifier": "9789511319177"
+          }
+        ],
+        "readingModes": {
+          "text": false,
+          "image": false
+        },
+        "pageCount": 461,
+        "printType": "BOOK",
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": false,
+        "contentVersion": "preview-1.0.0",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "language": "fi",
+        "previewLink": "http://books.google.fi/books?id=xT19tgEACAAJ&dq=isbn:9789511319177&hl=&cd=1&source=gbs_api",
+        "infoLink": "http://books.google.fi/books?id=xT19tgEACAAJ&dq=isbn:9789511319177&hl=&source=gbs_api",
+        "canonicalVolumeLink": "https://books.google.com/books/about/Taivaanpallo.html?hl=&id=xT19tgEACAAJ"
+      },
+      "saleInfo": {
+        "country": "FI",
+        "saleability": "NOT_FOR_SALE",
+        "isEbook": false
+      },
+      "accessInfo": {
+        "country": "FI",
+        "viewability": "NO_PAGES",
+        "embeddable": false,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": false
+        },
+        "pdf": {
+          "isAvailable": false
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=xT19tgEACAAJ&hl=&source=gbs_api",
+        "accessViewStatus": "NONE",
+        "quoteSharingAllowed": false
+      }
+    }
+  ]
+}

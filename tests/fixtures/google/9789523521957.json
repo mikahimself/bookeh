@@ -1,0 +1,67 @@
+{
+  "kind": "books#volumes",
+  "totalItems": 1,
+  "items": [
+    {
+      "kind": "books#volume",
+      "id": "D-Py0AEACAAJ",
+      "etag": "1ahapX48FII",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/D-Py0AEACAAJ",
+      "volumeInfo": {
+        "title": "Mikä internetiä vaivaa?",
+        "authors": [
+          "Veikka Lahtinen"
+        ],
+        "publishedDate": "2024",
+        "industryIdentifiers": [
+          {
+            "type": "ISBN_10",
+            "identifier": "9523521950"
+          },
+          {
+            "type": "ISBN_13",
+            "identifier": "9789523521957"
+          }
+        ],
+        "readingModes": {
+          "text": false,
+          "image": false
+        },
+        "pageCount": 0,
+        "printType": "BOOK",
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": false,
+        "contentVersion": "preview-1.0.0",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "language": "fi",
+        "previewLink": "http://books.google.fi/books?id=D-Py0AEACAAJ&dq=isbn:9789523521957&hl=&cd=1&source=gbs_api",
+        "infoLink": "http://books.google.fi/books?id=D-Py0AEACAAJ&dq=isbn:9789523521957&hl=&source=gbs_api",
+        "canonicalVolumeLink": "https://books.google.com/books/about/Mik%C3%A4_interneti%C3%A4_vaivaa.html?hl=&id=D-Py0AEACAAJ"
+      },
+      "saleInfo": {
+        "country": "FI",
+        "saleability": "NOT_FOR_SALE",
+        "isEbook": false
+      },
+      "accessInfo": {
+        "country": "FI",
+        "viewability": "NO_PAGES",
+        "embeddable": false,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": false
+        },
+        "pdf": {
+          "isAvailable": false
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=D-Py0AEACAAJ&hl=&source=gbs_api",
+        "accessViewStatus": "NONE",
+        "quoteSharingAllowed": false
+      }
+    }
+  ]
+}

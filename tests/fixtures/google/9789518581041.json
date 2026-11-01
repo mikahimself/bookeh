@@ -1,0 +1,71 @@
+{
+  "kind": "books#volumes",
+  "totalItems": 1,
+  "items": [
+    {
+      "kind": "books#volume",
+      "id": "MF11zQEACAAJ",
+      "etag": "t12MQje5z4M",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/MF11zQEACAAJ",
+      "volumeInfo": {
+        "title": "Löytöretki suomeen",
+        "authors": [
+          "Kersti Juva"
+        ],
+        "publishedDate": "2019",
+        "description": "Suomea on väitetty maailman vaikeimmaksi kieleksi. Minkälainen rakas kielemme oikeastaan on? Tämän kirjan luettuasi oma kieli avautuu aivan uudessa valossa. Suomalaiset ovat jäyhää ja hiljaista kansaa, mutta kun puhe kääntyy suomen kieleen, tulee hämäläiseenkin eloa. Suomen kieli on suomalaisille rakas, ja suhtaudumme siihen intohimoisesti. Kääntäjälegenda Kersti Juva kutsuu jokaisen kielestä kiinnostuneen löytöretkelle suomen saloihin. Runsaiden esimerkkien saattelemana Juva käy läpi kielemme erityispiirteet ja yllättävät yksityiskohdat englantiin peilaten. Teos kokoaa hänen elämäntyönsä yksiin kansiin. FM Kersti Juva on maamme huomattavimpia suomentajia, joka tunnetaan erityisesti Tolkien-käännöksistään. Hän on suomentanut myös englanninkielisiä klassikoita, nykyproosaa sekä näytelmiä. Juva on saanut valtionpalkinnon kahdesti.",
+        "industryIdentifiers": [
+          {
+            "type": "ISBN_10",
+            "identifier": "9518581045"
+          },
+          {
+            "type": "ISBN_13",
+            "identifier": "9789518581041"
+          }
+        ],
+        "readingModes": {
+          "text": false,
+          "image": false
+        },
+        "pageCount": 413,
+        "printType": "BOOK",
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": false,
+        "contentVersion": "preview-1.0.0",
+        "panelizationSummary": {
+          "containsEpubBubbles": false,
+          "containsImageBubbles": false
+        },
+        "language": "en",
+        "previewLink": "http://books.google.fi/books?id=MF11zQEACAAJ&dq=isbn:9789518581041&hl=&cd=1&source=gbs_api",
+        "infoLink": "http://books.google.fi/books?id=MF11zQEACAAJ&dq=isbn:9789518581041&hl=&source=gbs_api",
+        "canonicalVolumeLink": "https://books.google.com/books/about/L%C3%B6yt%C3%B6retki_suomeen.html?hl=&id=MF11zQEACAAJ"
+      },
+      "saleInfo": {
+        "country": "FI",
+        "saleability": "NOT_FOR_SALE",
+        "isEbook": false
+      },
+      "accessInfo": {
+        "country": "FI",
+        "viewability": "NO_PAGES",
+        "embeddable": false,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": false
+        },
+        "pdf": {
+          "isAvailable": false
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=MF11zQEACAAJ&hl=&source=gbs_api",
+        "accessViewStatus": "NONE",
+        "quoteSharingAllowed": false
+      },
+      "searchInfo": {
+        "textSnippet": "FM Kersti Juva on maamme huomattavimpia suomentajia, joka tunnetaan erityisesti Tolkien-käännöksistään. Hän on suomentanut myös englanninkielisiä klassikoita, nykyproosaa sekä näytelmiä. Juva on saanut valtionpalkinnon kahdesti."
+      }
+    }
+  ]
+}

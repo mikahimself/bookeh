@@ -1,0 +1,76 @@
+{
+  "kind": "books#volumes",
+  "totalItems": 1,
+  "items": [
+    {
+      "kind": "books#volume",
+      "id": "E5TOygAACAAJ",
+      "etag": "DTeFvTvLrew",
+      "selfLink": "https://www.googleapis.com/books/v1/volumes/E5TOygAACAAJ",
+      "volumeInfo": {
+        "title": "A Dance with Dragons",
+        "subtitle": "Dreams and dust. Part one",
+        "authors": [
+          "George R. R. Martin"
+        ],
+        "publisher": "Voyager",
+        "publishedDate": "2012",
+        "description": "In the aftermath of a colossal battle, new threats are emerging from every direction. Tyrion Lannister, having killed his father, and wrongfully accused of killing his nephew, King Joffrey, has escaped from King's Landing with a price on his head.",
+        "industryIdentifiers": [
+          {
+            "type": "ISBN_10",
+            "identifier": "0007466064"
+          },
+          {
+            "type": "ISBN_13",
+            "identifier": "9780007466061"
+          }
+        ],
+        "readingModes": {
+          "text": false,
+          "image": false
+        },
+        "pageCount": 690,
+        "printType": "BOOK",
+        "categories": [
+          "Fantasy fiction"
+        ],
+        "maturityRating": "NOT_MATURE",
+        "allowAnonLogging": false,
+        "contentVersion": "preview-1.0.0",
+        "imageLinks": {
+          "smallThumbnail": "http://books.google.com/books/content?id=E5TOygAACAAJ&printsec=frontcover&img=1&zoom=5&source=gbs_api",
+          "thumbnail": "http://books.google.com/books/content?id=E5TOygAACAAJ&printsec=frontcover&img=1&zoom=1&source=gbs_api"
+        },
+        "language": "en",
+        "previewLink": "http://books.google.fi/books?id=E5TOygAACAAJ&dq=isbn:9780007466061&hl=&cd=1&source=gbs_api",
+        "infoLink": "http://books.google.fi/books?id=E5TOygAACAAJ&dq=isbn:9780007466061&hl=&source=gbs_api",
+        "canonicalVolumeLink": "https://books.google.com/books/about/A_Dance_with_Dragons.html?hl=&id=E5TOygAACAAJ"
+      },
+      "saleInfo": {
+        "country": "FI",
+        "saleability": "NOT_FOR_SALE",
+        "isEbook": false
+      },
+      "accessInfo": {
+        "country": "FI",
+        "viewability": "NO_PAGES",
+        "embeddable": false,
+        "publicDomain": false,
+        "textToSpeechPermission": "ALLOWED",
+        "epub": {
+          "isAvailable": false
+        },
+        "pdf": {
+          "isAvailable": false
+        },
+        "webReaderLink": "http://play.google.com/books/reader?id=E5TOygAACAAJ&hl=&source=gbs_api",
+        "accessViewStatus": "NONE",
+        "quoteSharingAllowed": false
+      },
+      "searchInfo": {
+        "textSnippet": "New threats emerge to endanger the future of the Seven Kingdoms, as Daenerys Targaryen, ruling in the East, fights off a multitude of enemies, while Jon Snow, Lord Commander of the Night&#39;s Watch, faces his foes both in the Watch and beyond ..."
+      }
+    }
+  ]
+}
