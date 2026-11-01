@@ -153,7 +153,7 @@ development_status:
   4-14-d31-cover-on-edit-book: done
   epic-4-retrospective: done
 
-  epic-5: in-progress
+  epic-5: done
   5-1-e16-shelf-query-parameters: done
   5-2-e1-shelf-query-my-copies-sorted: done
   5-3-e2-shelf-query-text-search: done
@@ -195,7 +195,7 @@ development_status:
   5-39-k20-epic-4-leftovers: done
   epic-5-retrospective: done
 
-  epic-6: in-progress
+  epic-6: done
   6-1-j1-people-collection: done
   6-2-j2-loans-collection: done
   6-3-j7-people-service: done
@@ -211,7 +211,7 @@ development_status:
   6-13-j8-people-in-settings: done
   epic-6-retrospective: done
 
-  epic-7: in-progress
+  epic-7: done
   7-1-h1-wishlists-collection: done
   7-2-h2-wishlist-entries-collection: done
   7-3-h14-entries-in-holdings-and-book-access: done
@@ -238,7 +238,7 @@ development_status:
   7-24-k30-shared-frontend-code: done
   7-25-k31-shared-test-helpers: done
   7-26-k32-spec-reconciliation: done
-  7-27-k33-owed-checks-on-the-phone-and-the-lxc: backlog
+  7-27-k33-owed-checks-on-the-phone-and-the-lxc: done
   epic-7-retrospective: done
 
   epic-8: backlog
@@ -744,7 +744,7 @@ action_items:
       over New location in the Move sheet; sheet restore after history Back from Scan
       (5.12); Done autoFocus on entering select mode (S2, P5)"
     owner: "Mika"
-    status: open
+    status: done
     ref: "_bmad-output/implementation-artifacts/epic-5-retro-2026-10-23.md"
   - id: "epic-5-retro-item-58-spec-reconciliation-spec-5-7-and-spine-l"
     epic: 5
@@ -856,7 +856,7 @@ action_items:
     action: "Phone session: add 6.7 half-open sheet with Lend and Returned reachable
       to the checks owed by Epic 5 item 57 and Epic 4 item 47 (S1, P4)"
     owner: "Mika"
-    status: open
+    status: done
     ref: "_bmad-output/implementation-artifacts/epic-6-retro-2026-10-26.md"
   - id: "epic-6-retro-item-70-deferred-refactor-when-a-story-next-touc"
     epic: 6
@@ -871,7 +871,7 @@ action_items:
     action: "Housekeeping: set epic-5 and epic-6 to done in sprint-status.yaml; docker
       rm bookeh-postgres-last-backup (P7)"
     owner: "Mika"
-    status: open
+    status: done
     ref: "_bmad-output/implementation-artifacts/epic-6-retro-2026-10-26.md"
   - id: "epic-6-retro-item-72-process-a-deferral-that-touches-a-rule-t"
     epic: 6
@@ -947,5 +947,5 @@ action_items:
       5 item 57 and Epic 6 item 69, adding the Wishlists sheet and picker at phone
       width"
     owner: "Mika"
-    status: open
+    status: done
     ref: "_bmad-output/implementation-artifacts/epic-7-retro-2026-10-29.md"
