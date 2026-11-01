@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { createElement, type ComponentProps } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -26,6 +26,7 @@ const getHoldings = vi.fn<(ctx: unknown, ids: number[]) => Promise<Map<number, H
 const listLocations = vi.fn<(ctx: unknown) => Promise<LocationOption[]>>()
 const logError = vi.fn()
 const showToast = vi.fn()
+const onUndone = vi.fn((_listener: () => void) => () => {})
 const devicePrefs = vi.fn<() => Promise<DevicePrefs>>()
 const setDevicePrefsAction = vi.fn()
 const interfaceLocale = vi.fn(() => 'en')
@@ -99,7 +100,7 @@ vi.mock('@/app/(frontend)/components/toast/ToastProvider', () => ({
     show: showToast,
     dismiss: vi.fn(),
     withdraw: vi.fn(),
-    onUndone: () => () => {},
+    onUndone,
   }),
 }))
 vi.mock('next/link', () => ({
@@ -247,6 +248,15 @@ describe('LoansPage', () => {
     ])
     fireEvent.click(screen.getAllByRole('link')[0]!)
     expect(router.push).toHaveBeenCalledWith('/loans?book=7', { scroll: false })
+  })
+
+  it('refreshes after a toast Undo', async () => {
+    lent([loan(2, 7, 'Leena', '2026-07-02')], [puhdistus])
+    await renderPage()
+    const listener = onUndone.mock.calls.at(-1)?.[0]
+    expect(listener).toBeDefined()
+    act(() => listener?.())
+    await waitFor(() => expect(router.refresh).toHaveBeenCalledOnce())
   })
 
   it('leaves out a loan whose Book the viewer can no longer read', async () => {

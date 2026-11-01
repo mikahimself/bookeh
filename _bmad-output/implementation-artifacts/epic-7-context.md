@@ -49,7 +49,7 @@ Mika keeps several named, private wishlists of Books he doesn't own yet, adds to
 ## Technical Decisions
 
 - **Entries:** never a copy or a copy status. Closing keeps the row and sets `closedAt`; Remove deletes it. Entries are addressed by their own id, since a Book can be on a list twice. `lib/wishlists` is the only writer of `wishlist-entries`.
-- **Layers:** ESLint zones enforce the import directions, and the rules are tested through the real ESLint config. `catalogue` may import `copies`, `wishlists`, `books`, `metadata`; `wishlists` and `loans` may import `copies`, `people`; `shelf` may import `books`; `tags` may import `books`, `shelf`; `copies` may import `account`; `people`, `books`, `metadata` and `account` import no other service. A new edge is named in the spine's import table in the same commit. The frontend never calls the gateway. Client components import from `src/lib` only types and the listed pure modules (`bookeh/client-lib-imports`).
+- **Layers:** ESLint zones enforce the import directions, and the rules are tested through the real ESLint config. `catalogue` may import `copies`, `wishlists`, `books`, `metadata`, `tags`; `wishlists` and `loans` may import `copies`, `people`; `shelf` may import `books`; `tags` may import `books`, `shelf`; `copies` may import `account`; `people`, `books`, `metadata` and `account` import no other service. A new edge is named in the spine's import table in the same commit. The frontend never calls the gateway. Client components import from `src/lib` only types and the listed pure modules (`bookeh/client-lib-imports`).
 - **Shared service code:** `lib/payload` holds what every service may use: `resolveOwnedName()`, the open-entry and open-loan conditions, and `Named` beside `Ref`. It owns no rows; a service calls the resolver only for its own collection. Tags carry a `kind`, so Epic 9 needs more than a union edit there.
 - **Names:** each private name-keyed collection has one owning service; screens never match names. Pickers send a `Ref`, resolved inside the action's transaction by the owner; a row created that way survives Undo.
 - **Actions and overlays:** an action used by one page sits in `actions.ts` beside it; one used from several pages in `actions/<domain>.ts`. Overlays come from the `components/ui` wrappers, which also handle Back for overlays without an address.
@@ -69,8 +69,7 @@ Mika keeps several named, private wishlists of Books he doesn't own yet, adds to
 
 ## Cross-Story Dependencies
 
-- Stories 7.1–7.23 are done. Clean-up runs in order from 7.24 to 7.27.
-- 7.24 frees Book detail from `scan/`, so Epic 8 can rework the Answer without pulling Book detail along. 7.25 changes tests only, and its test count must match the count before the story, less the one named case.
-- 7.26 reconciles the documents with the code, so it runs after the code stories, and recompiles this file.
-- 7.27 is Mika's on-device session, and an unattended build stops there. It runs on production with 7.16–7.26 deployed, includes Story 7.18's `foreign_keys` migration on a restored production dump, and then sets epics 5, 6 and 7 to `done`.
+- Stories 7.1–7.26 are built; the clean-up ran in order from 7.16 to 7.26.
+- 7.24 freed Book detail from `scan/`, so Epic 8 can rework the Answer without pulling Book detail along. 7.25 changed tests only. 7.26 reconciled the spine, PRD and UX documents with the code and recompiled this file.
+- 7.27 is Mika's on-device session, outside the unattended build. It runs on production with 7.16–7.26 deployed, includes Story 7.18's `foreign_keys` migration on a restored production dump, and then sets epics 5, 6 and 7 to `done`.
 - Epic 8 adds the On wishlist Answer, which replaces the Not in library stopgap for a Book held only through entries. Epic 9's `lib/tags` takes the shared resolver from 7.23.
