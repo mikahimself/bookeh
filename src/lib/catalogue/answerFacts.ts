@@ -21,11 +21,11 @@ export type AnswerFacts = { heading: AnswerHeading; lines: AnswerFactLine[] }
  * holdings-derived headings only: Not found and Couldn't look it up come from
  * `LookupResult`, and FR-20's "In {friend}'s library" is Phase 2/3, so a
  * heading that does not follow from what the viewer holds belongs there, not
- * in this union. Story 8.2 retires the two call sites this supersedes:
- * `ScanOutcome` in `src/app/(frontend)/scan/answer.ts`, whose `inLibrary`
- * still means any copy, ordered ones included, and `copyLines()` beside it —
- * note that `AnswerFactLine.copy` is the whole `CopyLine`, not the
- * `AnswerCopy` projection `copyLines()` takes. Heading precedence, first
+ * in this union. Story 8.2 retired the two stopgaps this supersedes, the
+ * `inLibrary()` that meant any copy and the `copyLines()` beside it in
+ * `src/app/(frontend)/scan/answer.ts`; `held()` and `factLines()` there read
+ * this function's output instead, and `AnswerFactLine.copy` reaches them as
+ * the whole `CopyLine`, not a projection of it. Heading precedence, first
  * that applies: `inLibrary` when at least one copy is `owned` (a lent copy is
  * an owned copy), else `ordered` when a copy is ordered and none is owned,
  * else `onWishlist` when there is at least one entry, else

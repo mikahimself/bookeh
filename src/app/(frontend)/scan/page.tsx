@@ -9,7 +9,7 @@ import { DismissToast } from '../components/toast/DismissToast'
 import { RaiseToast } from '../components/toast/RaiseToast'
 import { viewerWishlists } from '../components/viewerWishlists'
 
-import { InLibraryAnswer } from './InLibraryAnswer'
+import { HeldAnswer } from './HeldAnswer'
 import { NotFoundAnswer } from './NotFoundAnswer'
 import { NotInLibraryAnswer } from './NotInLibraryAnswer'
 import { answerFor, scanParams, type ScanOutcome } from './answer'
@@ -25,10 +25,11 @@ import { UnavailableAnswer } from './UnavailableAnswer'
  *
  * `?isbn=` is the Answer's address: the lookup runs here, on the server, with
  * the text as typed. An invalid ISBN or the rate limit keeps Scan with the
- * text in the field; so does the Answer still to come (on wishlist). An ISBN
+ * text in the field; nothing else does (NFR-1). An ISBN
  * no source knows opens Not found with it; one no source had while a source
  * failed opens Couldn't look it up, whose Try again renders this address
- * again.
+ * again. A held Answer titles the task from its own heading -- In library,
+ * Ordered or On wishlist -- since the heading is the answer.
  *
  * `?title=` with no `isbn` (or a blank one) is the Not found Answer with no
  * ISBN and the text in its Title field (`scanParams()`).
@@ -73,9 +74,11 @@ export default async function ScanPage({
           )}
         </FullScreenTask>
       ) : (
-        <FullScreenTask title={t(`answer.${outcome.kind}`)}>
-          {outcome.kind === 'inLibrary' ? (
-            <InLibraryAnswer answer={outcome.answer} />
+        <FullScreenTask
+          title={t(`answer.${outcome.kind === 'held' ? outcome.answer.heading : outcome.kind}`)}
+        >
+          {outcome.kind === 'held' ? (
+            <HeldAnswer answer={outcome.answer} />
           ) : outcome.kind === 'notInLibrary' ? (
             <NotInLibraryAnswer answer={outcome.answer} lists={lists} />
           ) : outcome.kind === 'unavailable' ? (

@@ -6,10 +6,11 @@ import { useEffect, useTransition } from 'react'
 import { useToast } from '../components/toast/ToastProvider'
 
 /**
- * A section whose rows change with no Book detail open (Loans, one wishlist):
- * refreshes the server render after any successful toast Undo, so an undone
- * Returned, Lend, Bought or Ordered puts its row back (`ReadAndRating`
- * refreshes only while Book detail is mounted). Renders nothing.
+ * A surface whose server render changes with no Book detail open (Loans, one
+ * wishlist, a held Answer): refreshes it after any successful toast Undo, so
+ * an undone Returned, Lend, Bought, Ordered or Received puts the row, or the
+ * Answer's heading, back (`ReadAndRating` refreshes only while Book detail is
+ * mounted). Renders nothing.
  */
 export function RefreshOnUndo() {
   const router = useRouter()

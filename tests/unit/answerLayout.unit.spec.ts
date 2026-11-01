@@ -1,10 +1,15 @@
 // @vitest-environment jsdom
 import { cleanup, render, screen } from '@testing-library/react'
+import { createElement } from 'react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { AnswerLayout } from '@/app/(frontend)/scan/AnswerLayout'
 import type { AnswerBook } from '@/app/(frontend)/scan/answer'
 
+vi.mock('@/app/(frontend)/scan/AnswerReceive', () => ({
+  AnswerReceive: ({ copyId }: { copyId: number }) =>
+    createElement('button', { type: 'button' }, `Received ${copyId}`),
+}))
 vi.mock('next-intl/server', async () => {
   const { createTranslator } = await vi.importActual<typeof import('next-intl')>('next-intl')
   const { default: messages } = await import('../../messages/en.json')
@@ -40,8 +45,8 @@ describe('AnswerLayout', () => {
       await AnswerLayout({
         book,
         lines: [
-          { text: 'Mökki', lent: 'Lent · Antti' },
-          { text: '', lent: 'Lent · Leena' },
+          { text: 'Mökki', lent: 'Lent · Antti', receive: null },
+          { text: '', lent: 'Lent · Leena', receive: null },
         ],
         children: null,
       }),
@@ -51,5 +56,22 @@ describe('AnswerLayout', () => {
       'Mökki · Lent · Antti',
       'Lent · Leena',
     ])
+  })
+
+  it("puts a line's Received Link on that line alone", async () => {
+    render(
+      await AnswerLayout({
+        book,
+        lines: [
+          { text: 'Tampere · owned', lent: null, receive: null },
+          { text: 'Ordered', lent: null, receive: 3 },
+        ],
+        children: null,
+      }),
+    )
+
+    const items = screen.getAllByRole('listitem')
+    expect(items[0]!.querySelector('button')).toBeNull()
+    expect(items[1]!.querySelector('button')?.textContent).toBe('Received 3')
   })
 })

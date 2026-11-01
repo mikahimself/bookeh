@@ -1,5 +1,6 @@
 import { normaliseIsbn } from '@/fields/isbn'
 import { coverUrl } from '@/lib/books/coverUrl'
+import { answerFacts, type AnswerFactLine, type AnswerHeading } from '@/lib/catalogue/answerFacts'
 import type { Draft, LookupResult } from '@/lib/catalogue/lookupBook'
 import type { CandidateId } from '@/lib/catalogue/pick'
 import { DomainError } from '@/lib/errors'
@@ -55,23 +56,19 @@ export type AnswerBook = {
 }
 
 /**
- * One of the viewer's copies on the In library Answer: its location's name,
- * if any, its status, and `lentTo`, the borrower's name when it is an owned
- * copy with an open loan, else `null`.
+ * What a held Answer shows (FR-16, FR-20): the Book, the heading
+ * `answerFacts()` gave the viewer's holdings, and every remaining fact as a
+ * line, in `Holdings` order. `bookId` is the Book Open book shows in the
+ * collection. `lookAgain`: the In library Answer on the viewer's own private
+ * Book (the lookup never answers with another user's), so Look it up again
+ * shows (EXPERIENCE.md, Answer screens: that Link is In library's alone).
  */
-export type AnswerCopy = {
-  location: string | null
-  status: 'owned' | 'ordered'
-  lentTo: string | null
+export type HeldAnswer = AnswerBook & {
+  bookId: number
+  heading: Exclude<AnswerHeading, 'notInLibrary'>
+  lookAgain: boolean
+  facts: AnswerFactLine[]
 }
-
-/**
- * What the In library Answer shows: the Book and the viewer's copies, oldest
- * first. `bookId` is the Book Open book shows in the collection. `lookAgain`:
- * the Book is the viewer's own private Book (the lookup never answers with
- * another user's), so Look it up again shows.
- */
-export type InLibrary = AnswerBook & { bookId: number; copies: AnswerCopy[]; lookAgain: boolean }
 
 type ExistingResult = Extract<LookupResult, { kind: 'existing' }>
 
@@ -114,28 +111,27 @@ const existingBook = (book: ExistingResult['book'], isbn13: string): AnswerBook 
 /**
  * The Not in library Answer for a lookup, or `null` when another Answer
  * applies: the picked source candidate, or a Book the viewer can read and
- * holds no copy of. A Book held only through open entries, the viewer's own
- * or for a Person, answers here until Story 8.2's On wishlist heading. Epic
- * 8's `answerFacts` takes over heading precedence. A Book with no ISBN has
- * none: the lookup found it by its ISBN.
+ * holds nothing of. `isbn13` is the ISBN asked for, so a Book whose own
+ * `isbn13` is unset still answers (`held()` takes the same). Heading
+ * precedence is `answerFacts()`': anything the viewer holds of the Book,
+ * a copy or an open entry, belongs to `held()`.
  */
-export function notInLibrary(result: LookupResult): AnswerBook | null {
+export function notInLibrary(result: LookupResult, isbn13: string): AnswerBook | null {
   switch (result.kind) {
     case 'existing': {
       const { book, mine } = result
-      if (book.isbn13 === null || mine.copies.length > 0) return null
-      return existingBook(book, book.isbn13)
+      if (answerFacts(mine).heading !== 'notInLibrary') return null
+      return existingBook(book, isbn13)
     }
     case 'source': {
       const { candidates, pick } = result
       const draft = candidates[pick]
       if (!draft) return null
       const { series } = result.matches
-      // Every candidate carries the ISBN asked for (the `Source` contract).
-      const { isbn13 } = draft
       // With one candidate there is nothing to pick: the save sends none.
       const several = candidates.length > 1
       return {
+        // Every candidate carries the ISBN asked for (the `Source` contract).
         isbn13,
         title: draft.title,
         language: draft.language ?? null,
@@ -159,27 +155,24 @@ export function notInLibrary(result: LookupResult): AnswerBook | null {
 }
 
 /**
- * The In library Answer (FR-16, FR-20, FR-30): a Book the viewer holds at
- * least one copy of, with each copy's location and status in Holdings order.
- * `null` for anything else; a Book held only by wishlist entries is Not in
- * library's (`notInLibrary`). A Book with no ISBN has none, as there.
- * Any copy counts, ordered included, so an ordered-only holding shows In
- * library with an "Ordered" line until the Ordered heading arrives (Story
- * 8.2, as Story 4.9's AC says).
+ * The held Answer (FR-16, FR-20, FR-30): a Book the viewer holds a copy or an
+ * open wishlist entry of, with `answerFacts()`'s heading -- In library,
+ * Ordered or On wishlist -- and its lines. `null` for anything else: a
+ * `source` result, and an `existing` one the viewer holds nothing of, which is
+ * `notInLibrary()`'s. `isbn13` is the ISBN asked for, which Add to library and
+ * Add another copy save.
  */
-export function inLibrary(result: LookupResult): InLibrary | null {
+export function held(result: LookupResult, isbn13: string): HeldAnswer | null {
   if (result.kind !== 'existing') return null
   const { book, mine } = result
-  if (book.isbn13 === null || mine.copies.length === 0) return null
+  const { heading, lines } = answerFacts(mine)
+  if (heading === 'notInLibrary') return null
   return {
-    ...existingBook(book, book.isbn13),
+    ...existingBook(book, isbn13),
     bookId: book.bookId,
-    lookAgain: book.visibility === 'private',
-    copies: mine.copies.map((copy) => ({
-      location: copy.location?.name ?? null,
-      status: copy.status,
-      lentTo: isLent(copy) ? copy.loan.person.name : null,
-    })),
+    heading,
+    lookAgain: heading === 'inLibrary' && book.visibility === 'private',
+    facts: lines,
   }
 }
 
@@ -251,32 +244,54 @@ export function editionLines(editions: AnswerEdition[], text: EditionText): stri
   )
 }
 
-/** The catalogue strings the In library Answer's copy lines are built from. */
-export type CopyText = {
-  copy: (status: AnswerCopy['status']) => string
-  copyAt: (location: string, status: AnswerCopy['status']) => string
+/** The catalogue strings a held Answer's fact lines are built from. */
+export type FactText = {
+  copy: (status: 'owned' | 'ordered') => string
+  copyAt: (location: string, status: 'owned' | 'ordered') => string
   lent: (person: string) => string
+  onList: (list: string) => string
+  onListFor: (list: string, person: string) => string
 }
 
 /**
- * One copy line: `text`, then the lent marker and `lent` when `lent` is not
+ * One fact line: `text`, then the lent marker and `lent` when `lent` is not
  * `null`. A lent copy's `text` is its location's name, `''` with none.
+ * `receive` is the copy id an ordered copy's Received Link acts on, `null` on
+ * every other line.
  */
-export type AnswerLine = { text: string; lent: string | null }
+export type AnswerLine = { text: string; lent: string | null; receive: number | null }
 
 /**
- * A line per copy, in order: its location and status, or the status alone
- * with no location; a lent copy's is its location, if any, and "Lent · {person}".
+ * A line per fact, in `answerFacts()` order: a copy's location and status, or
+ * the status alone with no location; a lent copy's is its location, if any,
+ * and "Lent · {person}"; an ordered copy's carries its own `receive`. An
+ * entry's names its list, and its recipient too when it has one.
  */
-export function copyLines(copies: AnswerCopy[], text: CopyText): AnswerLine[] {
-  return copies.map(({ location, status, lentTo }) =>
-    lentTo !== null
-      ? { text: location ?? '', lent: text.lent(lentTo) }
-      : {
-          text: location === null ? text.copy(status) : text.copyAt(location, status),
-          lent: null,
-        },
-  )
+export function factLines(facts: readonly AnswerFactLine[], text: FactText): AnswerLine[] {
+  return facts.map((fact) => {
+    if (fact.kind === 'entry') {
+      const { wishlist, forPerson } = fact.entry
+      return {
+        text:
+          forPerson === null
+            ? text.onList(wishlist.name)
+            : text.onListFor(wishlist.name, forPerson.name),
+        lent: null,
+        receive: null,
+      }
+    }
+    const { copy } = fact
+    const location = copy.location?.name ?? null
+    // An ordered copy is never lent (`isLent`), so the two never meet.
+    if (isLent(copy)) {
+      return { text: location ?? '', lent: text.lent(copy.loan.person.name), receive: null }
+    }
+    return {
+      text: location === null ? text.copy(copy.status) : text.copyAt(location, copy.status),
+      lent: null,
+      receive: copy.status === 'ordered' ? copy.copyId : null,
+    }
+  })
 }
 
 /**
@@ -304,20 +319,26 @@ const first = (value: string | string[] | undefined): string | undefined =>
   Array.isArray(value) ? value[0] : value
 
 export type ScanOutcome =
-  | { kind: 'inLibrary'; answer: InLibrary }
+  | { kind: 'held'; answer: HeldAnswer }
   | { kind: 'notInLibrary'; answer: AnswerBook }
   | { kind: 'notFound'; isbn13: string | null; title: string }
   | { kind: 'unavailable'; isbn13: string; failed: SourceId[] }
   | { kind: 'scan'; error?: 'INVALID_ISBN' | 'RATE_LIMITED' }
 
 /**
- * What `/scan?isbn=` renders for `isbn`, the text as typed: the In library
- * Answer, the Not in library Answer, the Not found Answer when no source
- * knows the ISBN (with it in 13 digits: the lookup has accepted the text),
- * Couldn't look it up when a source failed and none had it (with the ISBN
- * likewise, and the failed sources in the lookup's order: AD-9), or Scan,
- * with the field error or rate-limit toast the lookup refused with. Any other
- * error propagates to Next's error handling.
+ * What `/scan?isbn=` renders for `isbn`, the text as typed: the held Answer
+ * (In library, Ordered or On wishlist), the Not in library Answer, the Not
+ * found Answer when no source knows the ISBN (with it in 13 digits: the lookup
+ * has accepted the text), Couldn't look it up when a source failed and none
+ * had it (with the ISBN likewise, and the failed sources in the lookup's
+ * order: AD-9), or Scan, with the field error or rate-limit toast the lookup
+ * refused with. Any other error propagates to Next's error handling.
+ *
+ * NFR-1, "a scan never resets silently": every finished lookup ends on an
+ * Answer. The Answers take the normalised ISBN asked for rather than the
+ * found Book's, so no `existing` result falls through; a `source` result whose
+ * picked candidate has gone since (a `pick` the outcome no longer holds) ends
+ * on Not found with that ISBN. A bare `{ kind: 'scan' }` is returned nowhere.
  */
 export async function answerFor(
   isbn: string,
@@ -335,12 +356,14 @@ export async function answerFor(
     }
     throw err
   }
-  if (result.kind === 'none') return { kind: 'notFound', isbn13: normaliseIsbn(isbn), title: '' }
+  // The lookup accepted the text, so this cannot refuse it.
+  const isbn13 = normaliseIsbn(isbn)
+  if (result.kind === 'none') return { kind: 'notFound', isbn13, title: '' }
   if (result.kind === 'unavailable') {
-    return { kind: 'unavailable', isbn13: normaliseIsbn(isbn), failed: result.failed }
+    return { kind: 'unavailable', isbn13, failed: result.failed }
   }
-  const held = inLibrary(result)
-  if (held) return { kind: 'inLibrary', answer: held }
-  const answer = notInLibrary(result)
-  return answer ? { kind: 'notInLibrary', answer } : { kind: 'scan' }
+  const holding = held(result, isbn13)
+  if (holding) return { kind: 'held', answer: holding }
+  const answer = notInLibrary(result, isbn13)
+  return answer ? { kind: 'notInLibrary', answer } : { kind: 'notFound', isbn13, title: '' }
 }

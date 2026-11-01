@@ -5,11 +5,15 @@ import { Cover } from '../components/Cover'
 import { markerSlotClass } from '../components/ui/classes'
 
 import { answerLines, type AnswerBook, type AnswerLine } from './answer'
+import { AnswerReceive } from './AnswerReceive'
 
 /**
  * An Answer's body (EXPERIENCE.md, Answer; DESIGN.md, Detail panel
  * composition): the cover beside the title, the author and edition lines
- * under it, then `lines` (the viewer's copies, a lent one with the lent marker), then where the record comes
+ * under it, then `lines` (what the viewer holds: a lent copy with the lent
+ * marker, an ordered copy with its own Received Link beside its text, the
+ * list focusable in code alone so that Link can move focus there before its
+ * refresh unmounts it), then where the record comes
  * from and what a save would create, closed by `sourceNote` (a source that
  * didn't answer), then `editions` (the line under the
  * Book: the edition picker's Link, or Look it up again), and at the foot `children`, the Answer's buttons. A line with
@@ -54,16 +58,19 @@ export async function AnswerLayout({
         </div>
       </div>
       {lines.length > 0 && (
-        <ul className="flex flex-col gap-1">
+        <ul tabIndex={-1} className="flex flex-col gap-1">
           {lines.map((line, index) => (
-            <li key={index} className="text-body text-text">
-              {line.text && line.lent ? `${line.text} · ` : line.text}
-              {line.lent && (
-                <span className="inline-flex items-center gap-2">
-                  <span aria-hidden="true" className={`${markerSlotClass} bg-accent`} />
-                  {line.lent}
-                </span>
-              )}
+            <li key={index} className="flex flex-wrap items-center gap-x-3 text-body text-text">
+              <span>
+                {line.text && line.lent ? `${line.text} · ` : line.text}
+                {line.lent && (
+                  <span className="inline-flex items-center gap-2">
+                    <span aria-hidden="true" className={`${markerSlotClass} bg-accent`} />
+                    {line.lent}
+                  </span>
+                )}
+              </span>
+              {line.receive !== null && <AnswerReceive copyId={line.receive} />}
             </li>
           ))}
         </ul>
