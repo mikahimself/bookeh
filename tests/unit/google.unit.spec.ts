@@ -3,7 +3,7 @@ import { readFileSync, readdirSync } from 'node:fs'
 import { afterEach, beforeEach, describe, expect, it, vi, type MockInstance } from 'vitest'
 
 import { logger } from '@/lib/errors'
-import type { SourceResult } from '@/lib/metadata/source'
+import type { SearchHit, SourceResult } from '@/lib/metadata/source'
 import { google } from '@/lib/metadata/sources/google'
 
 const FIXTURES = new URL('../fixtures/google/', import.meta.url)
@@ -326,5 +326,212 @@ describe('google.lookupByIsbn over every recorded response', () => {
       }
     }
     expect(warn).not.toHaveBeenCalled()
+  })
+})
+
+describe('google.search', () => {
+  it('maps a full volume to a hit', async () => {
+    serve(searchBody([volume('3Wf_ffkFQmgC')]))
+
+    const hits = await google.search!('a game of thrones')
+
+    expect(hits).toStrictEqual<SearchHit[]>([
+      {
+        isbn13: '9780007448036',
+        title: 'A Game of Thrones',
+        authors: [{ name: 'George R. R. Martin' }],
+        publisher: 'Harper Voyager',
+        year: 2011,
+        source: 'google',
+        hasCover: true,
+      },
+    ])
+    expect(hits[0]).not.toHaveProperty('binding')
+    expect(warn).not.toHaveBeenCalled()
+  })
+
+  it('reports no cover for a sparse volume', async () => {
+    serve(searchBody([volume('D-Py0AEACAAJ')]))
+
+    const [hit] = await google.search!('mikä internetiä vaivaa')
+
+    expect(hit).toStrictEqual<SearchHit>({
+      isbn13: '9789523521957',
+      title: 'Mikä internetiä vaivaa?',
+      authors: [{ name: 'Veikka Lahtinen' }],
+      publisher: 'kosmos',
+      year: 2024,
+      source: 'google',
+      hasCover: false,
+    })
+  })
+
+  it('flips an inverted author name and keeps it as the sort name', async () => {
+    const inverted = volume('3Wf_ffkFQmgC')
+    inverted.volumeInfo.authors = ['Martin, George R. R.']
+    serve(searchBody([inverted]))
+
+    const [hit] = await google.search!('martin')
+
+    expect(hit.authors).toStrictEqual([
+      { name: 'George R. R. Martin', sortName: 'Martin, George R. R.' },
+    ])
+  })
+
+  it('converts an ISBN-10 when that is the only identifier', async () => {
+    const only10 = volume('DWvlNEkUDPUC')
+    only10.volumeInfo.industryIdentifiers = only10.volumeInfo.industryIdentifiers!.filter(
+      ({ type }) => type !== 'ISBN_13',
+    )
+    serve(searchBody([only10]))
+
+    const [hit] = await google.search!('a storm of swords')
+
+    expect(hit.isbn13).toBe('9780007447848')
+  })
+
+  it.each([
+    ['no identifiers', undefined],
+    ['an ISSN only', [{ type: 'ISSN', identifier: '03178471' }]],
+  ])('drops a volume with %s, without logging', async (_, identifiers) => {
+    const edited = volume('3Wf_ffkFQmgC')
+    edited.volumeInfo.industryIdentifiers = identifiers
+    serve(searchBody([edited]))
+
+    expect(await google.search!('a game of thrones')).toEqual([])
+    expect(warn).not.toHaveBeenCalled()
+  })
+
+  it('drops a volume without a title, without logging', async () => {
+    const untitled = volume('3Wf_ffkFQmgC')
+    delete (untitled.volumeInfo as Record<string, unknown>).title
+    serve(searchBody([untitled]))
+
+    expect(await google.search!('a game of thrones')).toEqual([])
+    expect(warn).not.toHaveBeenCalled()
+  })
+
+  it('leaves out a field the volume does not have', async () => {
+    const sparse = volume('3Wf_ffkFQmgC')
+    delete (sparse.volumeInfo as Record<string, unknown>).publisher
+    delete (sparse.volumeInfo as Record<string, unknown>).publishedDate
+    serve(searchBody([sparse]))
+
+    const [hit] = await google.search!('a game of thrones')
+
+    expect(hit).not.toHaveProperty('publisher')
+    expect(hit).not.toHaveProperty('year')
+  })
+
+  it('prefers the ISBN-13 entry over an ISBN-10 one for a different ISBN', async () => {
+    const edited = volume('3Wf_ffkFQmgC')
+    const otherIsbn10 = volume('DWvlNEkUDPUC').volumeInfo.industryIdentifiers!.find(
+      ({ type }) => type === 'ISBN_10',
+    )!.identifier
+    // The ISBN-10 comes first, so a single pass would convert it instead.
+    edited.volumeInfo.industryIdentifiers = [
+      { type: 'ISBN_10', identifier: otherIsbn10 },
+      { type: 'ISBN_13', identifier: '9780007448036' },
+    ]
+    serve(searchBody([edited]))
+
+    const [hit] = await google.search!('a game of thrones')
+
+    expect(hit.isbn13).toBe('9780007448036')
+  })
+
+  it('keeps one hit per ISBN-13', async () => {
+    const twice = [volume('3Wf_ffkFQmgC'), { ...volume('3Wf_ffkFQmgC'), id: 'other-record' }]
+    serve(searchBody(twice))
+
+    expect(await google.search!('a game of thrones')).toHaveLength(1)
+  })
+
+  it('raises hasCover from a duplicate of the same ISBN-13', async () => {
+    const stub = { ...volume('3Wf_ffkFQmgC'), id: 'catalogue-stub' }
+    stub.volumeInfo = { ...stub.volumeInfo }
+    delete stub.volumeInfo.imageLinks
+    serve(searchBody([stub, volume('3Wf_ffkFQmgC')]))
+
+    const hits = await google.search!('a game of thrones')
+
+    expect(hits).toHaveLength(1)
+    expect(hits[0].hasCover).toBe(true)
+  })
+
+  it('returns one hit per edition, in the order Google sent them', async () => {
+    serve(searchBody([volume('DWvlNEkUDPUC'), volume('GzENB4wePpEC')]))
+
+    const hits = await google.search!('a storm of swords')
+
+    expect(hits.map(({ isbn13 }) => isbn13)).toStrictEqual(['9780007447848', '9780007447855'])
+  })
+
+  it('does not re-sort a volume with a cover first', async () => {
+    serve(searchBody([volume('D-Py0AEACAAJ'), volume('MF11zQEACAAJ'), volume('3Wf_ffkFQmgC')]))
+
+    const hits = await google.search!('kirja')
+
+    expect(hits.map(({ hasCover }) => hasCover)).toStrictEqual([false, false, true])
+  })
+
+  it('answers nothing when Google found nothing, without logging', async () => {
+    serve({ kind: 'books#volumes', totalItems: 0 })
+
+    expect(await google.search!('nothing at all')).toEqual([])
+    expect(warn).not.toHaveBeenCalled()
+  })
+
+  it('makes no request for a blank query', async () => {
+    const mock = serve(searchBody([volume('3Wf_ffkFQmgC')]))
+
+    expect(await google.search!('   ')).toEqual([])
+    expect(mock).not.toHaveBeenCalled()
+    expect(warn).not.toHaveBeenCalled()
+  })
+
+  it('sends the API key only when it is set', async () => {
+    const mock = serve(searchBody([]))
+
+    vi.stubEnv('GOOGLE_BOOKS_API_KEY', 'test-key')
+    await google.search!('a game of thrones')
+    vi.stubEnv('GOOGLE_BOOKS_API_KEY', undefined)
+    await google.search!('a game of thrones')
+
+    const [keyed, keyless] = requested(mock)
+    expect(keyed.searchParams.get('key')).toBe('test-key')
+    expect(keyless.searchParams.has('key')).toBe(false)
+    for (const url of [keyed, keyless]) {
+      expect(url.origin + url.pathname).toBe('https://www.googleapis.com/books/v1/volumes')
+      expect(url.searchParams.get('q')).toBe('a game of thrones')
+      expect(url.searchParams.get('printType')).toBe('books')
+      expect(url.searchParams.get('maxResults')).toBe('20')
+    }
+  })
+})
+
+describe('google.search without a usable answer', () => {
+  it.each<[string, () => Promise<Response>]>([
+    ['HTTP 429', async () => new Response('slow down', { status: 429 })],
+    ['HTTP 403', async () => new Response('forbidden', { status: 403 })],
+    ['HTTP 503', async () => new Response('unavailable', { status: 503 })],
+    ['fetch rejects', () => Promise.reject(new TypeError('fetch failed'))],
+    [
+      'the request times out',
+      () => Promise.reject(Object.assign(new Error('timed out'), { name: 'TimeoutError' })),
+    ],
+    ['body is not JSON', async () => new Response('not json')],
+    ['body is not an object', async () => Response.json([{ id: 'x' }])],
+    ['items is not an array', async () => Response.json({ totalItems: 1, items: {} })],
+  ])('answers nothing when %s, logging the query once without the key', async (_, impl) => {
+    vi.stubEnv('GOOGLE_BOOKS_API_KEY', 'secret-key-123')
+    fetchMock(impl)
+
+    await expect(google.search!('a game of thrones')).resolves.toEqual([])
+    expect(warn).toHaveBeenCalledOnce()
+    const call = logged(warn.mock.calls)
+    expect(call).toContain('a game of thrones')
+    expect(call).not.toContain('secret-key-123')
+    expect(call).not.toContain('googleapis.com')
   })
 })

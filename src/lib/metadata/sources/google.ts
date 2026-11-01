@@ -1,7 +1,7 @@
 // Google Books, the second source (FR-11, AD-9): core fields, categories as subjects, covers.
 import { toIsbn13 } from '@/fields/isbn'
 
-import type { Source, SourceResult } from '../source'
+import type { SearchHit, Source, SourceResult } from '../source'
 import {
   clean,
   compact,
@@ -10,18 +10,34 @@ import {
   isoLanguage,
   list,
   lookupFailed,
+  sourceFailed,
   strings,
   type Json,
 } from './shared'
 
 const LABEL = 'Google Books'
 
-/** The key is optional (keyless requests share Google's daily quota) and read at call time. */
-function googleUrl(isbn13: string): string {
-  const params = new URLSearchParams({ q: `isbn:${isbn13}` })
+/** Google's default page is 10, its cap 40; 20 is one screen of Lookup results per source. */
+const MAX_RESULTS = 20
+
+/**
+ * The volumes endpoint with these params. The key is optional (keyless requests share
+ * Google's daily quota) and read at call time, so both callers pick up a late env change.
+ */
+function volumesUrl(params: Record<string, string>): string {
+  const query = new URLSearchParams(params)
   const key = process.env.GOOGLE_BOOKS_API_KEY?.trim()
-  if (key) params.set('key', key)
-  return `https://www.googleapis.com/books/v1/volumes?${params}`
+  if (key) query.set('key', key)
+  return `https://www.googleapis.com/books/v1/volumes?${query}`
+}
+
+function googleUrl(isbn13: string): string {
+  return volumesUrl({ q: `isbn:${isbn13}` })
+}
+
+/** Free-text search (FR-20); books only. */
+function searchUrl(query: string): string {
+  return volumesUrl({ q: query, printType: 'books', maxResults: String(MAX_RESULTS) })
 }
 
 // --- Matching ----------------------------------------------------------------------------
@@ -31,6 +47,19 @@ function hasIsbn(info: Json, isbn13: string): boolean {
   return list(info.industryIdentifiers)
     .filter(isObject)
     .some(({ identifier }) => typeof identifier === 'string' && toIsbn13(identifier) === isbn13)
+}
+
+/** A search hit's own ISBN-13: the first identifier that normalises, ISBN-13 entries first. */
+function searchIsbn13(info: Json): string | undefined {
+  const entries = list(info.industryIdentifiers).filter(isObject)
+  for (const type of ['ISBN_13', 'ISBN_10']) {
+    for (const { type: entryType, identifier } of entries) {
+      if (entryType !== type || typeof identifier !== 'string') continue
+      const isbn13 = toIsbn13(identifier)
+      if (isbn13) return isbn13
+    }
+  }
+  return undefined
 }
 
 // --- Fields ------------------------------------------------------------------------------
@@ -142,6 +171,29 @@ function toResult(volume: Json, isbn13: string, body: unknown): SourceResult | u
   })
 }
 
+/**
+ * A hit for a volume that has a title and a usable ISBN, built field by field like Finna's
+ * `toHit`. `binding` is always absent: Google's `printType` is BOOK/MAGAZINE, not a binding.
+ * `hasCover` is true where `coverUrl()` yields a URL.
+ */
+function toHit(volume: Json): SearchHit | undefined {
+  const info = isObject(volume.volumeInfo) ? volume.volumeInfo : {}
+  const title = clean(info.title)
+  const isbn13 = searchIsbn13(info)
+  if (!title || !isbn13) return undefined
+  const publisher = clean(info.publisher)
+  const published = year(info)
+  return {
+    isbn13,
+    title,
+    authors: authors(info),
+    ...(publisher !== undefined && { publisher }),
+    ...(published !== undefined && { year: published }),
+    source: 'google',
+    hasCover: coverUrl(info) !== undefined,
+  }
+}
+
 // --- Request -----------------------------------------------------------------------------
 
 /** The response body when it is a usable answer; undefined after logging why not. */
@@ -169,5 +221,32 @@ export const google: Source = {
     return results.sort(
       (a, b) => Number(b.coverUrl !== undefined) - Number(a.coverUrl !== undefined),
     )
+  },
+  async search(query) {
+    const text = clean(query)
+    if (!text) return []
+    const failed = (reason: string): SearchHit[] => {
+      sourceFailed(LABEL, 'search', { query: text }, reason)
+      return []
+    }
+    const body = await getJson(LABEL, 'search', searchUrl(text), { query: text })
+    // `getJson` has logged the failure; a search answers with a list either way.
+    if (body === undefined) return []
+    if (!isObject(body)) return failed('response is not an object')
+    // Google leaves `items` out when nothing matched.
+    if (body.items !== undefined && !Array.isArray(body.items))
+      return failed('items is not an array')
+    // One hit per ISBN-13 in Google's relevance order, the first volume winning, with
+    // `hasCover` raised by a later duplicate that has one — Finna's rule in `finnaSearchHits`.
+    // No cover-first re-sort: unlike `lookupByIsbn`, these records are different books.
+    const hits = new Map<string, SearchHit>()
+    for (const volume of list(body.items).filter(isObject)) {
+      const hit = toHit(volume)
+      if (!hit) continue
+      const seen = hits.get(hit.isbn13)
+      if (seen) seen.hasCover ||= hit.hasCover
+      else hits.set(hit.isbn13, hit)
+    }
+    return [...hits.values()]
   },
 }
