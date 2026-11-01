@@ -10,7 +10,9 @@ import {
   buildReport,
   capture,
   GOOGLE_HEALTH_ISBN,
+  querySlug,
   readIsbnList,
+  readQueryList,
   type FetchFn,
 } from '../../scripts/capture-fixtures'
 
@@ -38,6 +40,22 @@ describe('ISBN list', () => {
   it('refuses a wrong check digit, naming the line', () => {
     expect(() => readIsbnList('9789520408053\n978-952-04-0805-4\n')).toThrow(
       /line 2: "978-952-04-0805-4"/,
+    )
+  })
+})
+
+describe('query list', () => {
+  it('skips comments and blank lines, and slugs each query for its file name', () => {
+    const queries = readQueryList('# notes\n\ntuntematon  sotilas\nHarari, Yuval Noah # author\n')
+
+    expect(queries).toEqual(['tuntematon sotilas', 'Harari, Yuval Noah'])
+    expect(queries.map(querySlug)).toEqual(['tuntematon-sotilas', 'harari-yuval-noah'])
+  })
+
+  it('refuses a query twice over and one with no usable file name, naming the line', () => {
+    expect(() => readQueryList('sapiens\nsapiens\n')).toThrow(/line 2: "sapiens" twice/)
+    expect(() => readQueryList('sapiens\n???\n')).toThrow(
+      /line 2: "\?\?\?" has no usable file name/,
     )
   })
 })
@@ -116,18 +134,46 @@ describe('capture', () => {
     expect(await readdir(join(dir, 'google'))).toEqual(['9789520408053.json'])
   })
 
-  it('makes no request when every fixture exists', async () => {
+  it('makes no request when every fixture exists, searches included', async () => {
     const dir = await tempDir()
     for (const source of ['finna', 'google']) {
       await mkdir(join(dir, source))
       await writeFile(join(dir, source, '9789520408053.json'), '{}\n')
     }
+    await mkdir(join(dir, 'finna', 'search'))
+    await writeFile(join(dir, 'finna', 'search', 'tuntematon-sotilas.json'), '{}\n')
     const fetchFn = vi.fn<FetchFn>()
 
-    const { notCaptured } = await capture(['9789520408053'], dir, fetchFn, noSleep, KEY)
+    const { notCaptured } = await capture(['9789520408053'], dir, fetchFn, noSleep, KEY, [
+      'tuntematon sotilas',
+    ])
 
     expect(fetchFn).not.toHaveBeenCalled()
     expect(notCaptured).toEqual([])
+  })
+
+  it('records a missing search query under its slug and writes nothing for a failure', async () => {
+    const dir = await tempDir()
+    // Google is down for this run, and Finna answers everything but the second query.
+    const fetchFn = vi.fn<FetchFn>(async (url) => {
+      if (url.startsWith('https://www.googleapis.com/')) return new Response('', { status: 503 })
+      if (new URL(url).searchParams.get('lookfor') === 'ei löydy') {
+        return new Response('oops', { status: 404 })
+      }
+      return Response.json({ resultCount: 0, status: 'OK' })
+    })
+
+    const { notCaptured, written } = await capture(['9789520408053'], dir, fetchFn, noSleep, KEY, [
+      'tuntematon sotilas',
+      'ei löydy',
+    ])
+
+    expect(written).toBe(2)
+    expect(await readdir(join(dir, 'finna', 'search'))).toEqual(['tuntematon-sotilas.json'])
+    expect(notCaptured).toEqual([
+      expect.objectContaining({ source: 'google', isbn13: '9789520408053' }),
+      expect.objectContaining({ source: 'finna', query: 'ei löydy' }),
+    ])
   })
 })
 

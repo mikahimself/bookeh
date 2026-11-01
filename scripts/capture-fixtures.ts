@@ -1,5 +1,6 @@
-// Records live Finna and Google Books responses for the ISBNs in tests/fixtures/isbns.txt and
-// writes tests/fixtures/REPORT.md (Story 3.2). Existing fixtures are never fetched again.
+// Records live Finna and Google Books responses for the ISBNs in tests/fixtures/isbns.txt, the
+// Finna search responses for the queries in tests/fixtures/queries.txt (Story 8.3), and writes
+// tests/fixtures/REPORT.md (Story 3.2). Existing fixtures are never fetched again.
 // Needs GOOGLE_BOOKS_API_KEY in .env. Run: npm run fixtures
 import { existsSync } from 'node:fs'
 import { mkdir, readFile, rm, writeFile } from 'node:fs/promises'
@@ -7,7 +8,14 @@ import { join } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 
 import { toIsbn13 } from '@/fields/isbn'
-import { FINNA_FIELDS, finnaMatches, finnaUrl } from '@/lib/metadata/sources/finna'
+import {
+  FINNA_FIELDS,
+  FINNA_SEARCH_FIELDS,
+  finnaMatches,
+  finnaSearchHits,
+  finnaSearchUrl,
+  finnaUrl,
+} from '@/lib/metadata/sources/finna'
 
 export const SOURCES = ['finna', 'google'] as const
 export type Source = (typeof SOURCES)[number]
@@ -24,6 +32,8 @@ export interface ListedIsbn {
 export interface NotCaptured {
   source: Source
   isbn13: string
+  /** Set instead of `isbn13` for a search fixture. */
+  query?: string
   reason: string
 }
 
@@ -44,6 +54,37 @@ export function readIsbnList(text: string): ListedIsbn[] {
     result.push({ listed, isbn13 })
   })
   return result
+}
+
+// --- Queries -----------------------------------------------------------------------------
+
+/** Parses queries.txt: one search query per line, blank lines and `#` comments skipped. */
+export function readQueryList(text: string): string[] {
+  const queries: string[] = []
+  text.split(/\r?\n/).forEach((raw, index) => {
+    const query = raw.replace(/#.*$/, '').trim().replace(/\s+/g, ' ')
+    if (!query) return
+    if (!querySlug(query)) {
+      throw new Error(`queries.txt line ${index + 1}: "${query}" has no usable file name`)
+    }
+    if (queries.includes(query)) throw new Error(`queries.txt line ${index + 1}: "${query}" twice`)
+    queries.push(query)
+  })
+  return queries
+}
+
+/** The query's fixture file name, without extension: `Harari, Yuval` gives `harari-yuval`. */
+export function querySlug(query: string): string {
+  return query
+    .normalize('NFD')
+    .replace(/\p{Diacritic}/gu, '')
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+}
+
+export function searchFixturePath(dir: string, query: string): string {
+  return join(dir, 'finna', 'search', `${querySlug(query)}.json`)
 }
 
 // --- Requests ----------------------------------------------------------------------------
@@ -137,6 +178,7 @@ export async function capture(
   fetchFn: FetchFn,
   sleepFn: SleepFn,
   googleKey = '',
+  queries: readonly string[] = [],
 ): Promise<{ requests: number; written: number; notCaptured: NotCaptured[] }> {
   const notCaptured: NotCaptured[] = []
   const writtenGoogle: string[] = []
@@ -178,6 +220,22 @@ export async function capture(
     }
     // About one request per second per source.
     if (fetched) await sleepFn(REQUEST_GAP_MS)
+  }
+
+  // Finna search: one fixture per query, under the same rules.
+  if (queries.length > 0) await mkdir(join(dir, 'finna', 'search'), { recursive: true })
+  for (const query of queries) {
+    const path = searchFixturePath(dir, query)
+    if (existsSync(path)) continue
+    const result = await fetchJson(finnaSearchUrl(query), fetchFn, sleepFn)
+    requests++
+    if (!result.ok) {
+      notCaptured.push({ source: 'finna', isbn13: '', query, reason: result.reason })
+    } else {
+      await writeFile(path, `${JSON.stringify(result.body, null, 2)}\n`)
+      written++
+    }
+    await sleepFn(REQUEST_GAP_MS)
   }
 
   // Google can degrade after the first check; a spurious 0 must not become a fixture.
@@ -310,13 +368,37 @@ function sourceCells(row: SourceRow): [string, string] {
   return [`${row.total} / ${row.matching}`, yes(row.cover)]
 }
 
+interface QueryRow {
+  query: string
+  slug: string
+  captured: boolean
+  records: number
+  hits: number
+}
+
+async function buildQueryRow(dir: string, query: string): Promise<QueryRow> {
+  const path = searchFixturePath(dir, query)
+  const body: unknown = existsSync(path)
+    ? (JSON.parse(await readFile(path, 'utf8')) as unknown)
+    : undefined
+  return {
+    query,
+    slug: querySlug(query),
+    captured: body !== undefined,
+    records: list(isObject(body) ? body.records : undefined).length,
+    hits: body === undefined ? 0 : finnaSearchHits(body, query).length,
+  }
+}
+
 export async function buildReport(
   isbns: ListedIsbn[],
   dir: string,
   capturedOn: string,
   reasons: NotCaptured[] = [],
+  queries: readonly string[] = [],
 ): Promise<{ markdown: string; missing: NotCaptured[] }> {
   const rows = await Promise.all(isbns.map((entry) => buildRow(dir, entry)))
+  const queryRows = await Promise.all(queries.map((query) => buildQueryRow(dir, query)))
   const total = rows.length
   const inFinna = rows.filter((r) => r.finna.matching > 0)
   const inGoogle = rows.filter((r) => r.google.matching > 0)
@@ -326,15 +408,25 @@ export async function buildReport(
   const withGenres = rows.filter((r) => r.genres.length > 0)
   const englishMissing = rows.filter((r) => /^978[01]/.test(r.isbn13) && r.google.matching === 0)
 
-  const missing: NotCaptured[] = rows.flatMap((row) =>
-    SOURCES.filter((source) => !row[source].captured).map((source) => ({
-      source,
-      isbn13: row.isbn13,
-      reason:
-        reasons.find((r) => r.source === source && r.isbn13 === row.isbn13)?.reason ??
-        'no fixture on disk',
-    })),
-  )
+  const missing: NotCaptured[] = [
+    ...rows.flatMap((row) =>
+      SOURCES.filter((source) => !row[source].captured).map((source) => ({
+        source,
+        isbn13: row.isbn13,
+        reason:
+          reasons.find((r) => r.source === source && r.isbn13 === row.isbn13)?.reason ??
+          'no fixture on disk',
+      })),
+    ),
+    ...queryRows
+      .filter((row) => !row.captured)
+      .map((row) => ({
+        source: 'finna' as Source,
+        isbn13: '',
+        query: row.query,
+        reason: reasons.find((r) => r.query === row.query)?.reason ?? 'no fixture on disk',
+      })),
+  ]
 
   const half = withCategories.length * 2 >= total
   const googleMissing = rows.filter((r) => !r.google.captured).length
@@ -382,8 +474,11 @@ export async function buildReport(
     '',
     `- Finna: \`GET https://api.finna.fi/api/v1/search?lookfor=isbn:"<isbn13>"&type=AllFields&limit=100\` plus one \`field[]\` per field below`,
     '- Google Books: `GET https://www.googleapis.com/books/v1/volumes?q=isbn:<isbn13>&key=<key>`',
+    `- Finna search: \`GET https://api.finna.fi/api/v1/search?lookfor=<query>&type=AllFields&limit=20\` plus one \`field[]\` per search field below`,
     '',
     `Finna fields: ${FINNA_FIELDS.map((f) => `\`${f}\``).join(', ')}`,
+    '',
+    `Finna search fields: ${FINNA_SEARCH_FIELDS.map((f) => `\`${f}\``).join(', ')}`,
     '',
     'A match is a record whose own ISBNs normalise to the ISBN asked for: Finna `isbns` (binding text after a space ignored), Google `industryIdentifiers`. Covers and categories count matches only.',
     '',
@@ -428,9 +523,32 @@ export async function buildReport(
     '',
     ...terms(tally(rows, (r) => r.categories)),
     '',
+    '## Search queries',
+    '',
+    'Recorded under `finna/search/<slug>.json`. Hits are the distinct ISBN-13s the response yields.',
+    '',
+    '| Query | Fixture | Records | Hits |',
+    '|---|---|---|---|',
+    ...(queryRows.length
+      ? queryRows.map((row) =>
+          [
+            row.query,
+            row.captured ? `${row.slug}.json` : 'not captured',
+            row.captured ? String(row.records) : '–',
+            row.captured ? String(row.hits) : '–',
+          ]
+            .map(cell)
+            .join(' | ')
+            .replace(/^/, '| ')
+            .replace(/$/, ' |'),
+        )
+      : ['| none | – | – | – |']),
+    '',
     '## Not captured',
     '',
-    ...(missing.length ? missing.map((m) => `- ${m.source} ${m.isbn13}: ${m.reason}`) : ['- none']),
+    ...(missing.length
+      ? missing.map((m) => `- ${m.source} ${m.query ?? m.isbn13}: ${m.reason}`)
+      : ['- none']),
     '',
     '## D-2 checkpoint',
     '',
@@ -455,8 +573,10 @@ async function main(): Promise<number> {
   const dir = fileURLToPath(new URL('../tests/fixtures/', import.meta.url))
   const reportPath = join(dir, 'REPORT.md')
   let isbns: ListedIsbn[]
+  let queries: string[]
   try {
     isbns = readIsbnList(await readFile(join(dir, 'isbns.txt'), 'utf8'))
+    queries = readQueryList(await readFile(join(dir, 'queries.txt'), 'utf8'))
   } catch (error) {
     process.stderr.write(`${error instanceof Error ? error.message : String(error)}\n`)
     return 1
@@ -475,6 +595,7 @@ async function main(): Promise<number> {
     loggingFetch,
     sleep,
     key,
+    queries,
   )
 
   // A run that wrote nothing keeps the date of the capture it reports on.
@@ -482,11 +603,11 @@ async function main(): Promise<number> {
   const today = new Date().toISOString().slice(0, 10)
   const capturedOn = written === 0 ? (/^Captured: (.+)$/m.exec(previous)?.[1] ?? today) : today
 
-  const { markdown, missing } = await buildReport(isbns, dir, capturedOn, notCaptured)
+  const { markdown, missing } = await buildReport(isbns, dir, capturedOn, notCaptured, queries)
   await writeFile(reportPath, markdown)
   process.stdout.write(`${requests} fixtures requested; report written to ${reportPath}\n`)
   for (const m of missing)
-    process.stderr.write(`not captured: ${m.source} ${m.isbn13} (${m.reason})\n`)
+    process.stderr.write(`not captured: ${m.source} ${m.query ?? m.isbn13} (${m.reason})\n`)
   return missing.length > 0 ? 1 : 0
 }
 

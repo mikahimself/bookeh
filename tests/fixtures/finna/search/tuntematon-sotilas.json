@@ -1,0 +1,511 @@
+{
+  "resultCount": 7545,
+  "records": [
+    {
+      "id": "museovirasto.5720e687-bd79-453b-bf51-fed1939136dc",
+      "title": "tuntematon sotilas",
+      "shortTitle": "tuntematon sotilas",
+      "nonPresenterAuthors": [
+        {
+          "name": "Räikkönen, Erkki",
+          "role": "kuvaaja"
+        }
+      ],
+      "isbns": [],
+      "publishers": [],
+      "images": [
+        "/Cover/Show?source=Solr&id=museovirasto.5720e687-bd79-453b-bf51-fed1939136dc&index=0&size=large"
+      ]
+    },
+    {
+      "id": "sa-kuva.sa-kuva/114828",
+      "title": "Tuntematon sotilas",
+      "shortTitle": "Tuntematon sotilas",
+      "nonPresenterAuthors": [
+        {
+          "name": "Tuntematon",
+          "role": "kuvaaja"
+        }
+      ],
+      "isbns": [],
+      "publishers": [],
+      "year": "1939",
+      "images": [
+        "/Cover/Show?source=Solr&id=sa-kuva.sa-kuva%2F114828&index=0&size=large"
+      ]
+    },
+    {
+      "id": "sa-kuva.sa-kuva/40691",
+      "title": "Tuntematon sotilas",
+      "shortTitle": "Tuntematon sotilas",
+      "nonPresenterAuthors": [],
+      "isbns": [],
+      "publishers": [],
+      "year": "1941",
+      "images": [
+        "/Cover/Show?source=Solr&id=sa-kuva.sa-kuva%2F40691&index=0&size=large"
+      ]
+    },
+    {
+      "id": "sa-kuva.sa-kuva/40692",
+      "title": "Tuntematon sotilas",
+      "shortTitle": "Tuntematon sotilas",
+      "nonPresenterAuthors": [],
+      "isbns": [],
+      "publishers": [],
+      "year": "1941",
+      "images": [
+        "/Cover/Show?source=Solr&id=sa-kuva.sa-kuva%2F40692&index=0&size=large"
+      ]
+    },
+    {
+      "id": "ekk.991175364006250",
+      "title": "Tuntematon sotilas",
+      "shortTitle": "Tuntematon sotilas",
+      "nonPresenterAuthors": [
+        {
+          "name": "Linna, Väinö",
+          "type": "Personal Name"
+        }
+      ],
+      "isbns": [],
+      "publishers": [
+        "Helsinki : WSOY"
+      ],
+      "year": "1954",
+      "images": []
+    },
+    {
+      "id": "anders.a0a93c82-2af7-4280-b1c6-2c40c9566757",
+      "title": "Tuntematon sotilas",
+      "shortTitle": "Tuntematon sotilas",
+      "nonPresenterAuthors": [
+        {
+          "name": "Linna, Väinö",
+          "date": "1920-1992",
+          "role": "kirjoittaja",
+          "id": "000067929",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Honkanen, Veikko",
+          "date": "1942-",
+          "role": "tekijä",
+          "id": "000044461",
+          "type": "Personal Name"
+        }
+      ],
+      "isbns": [
+        "978-951-0-43251-8"
+      ],
+      "publishers": [
+        "WSOY"
+      ],
+      "year": "2017",
+      "images": []
+    },
+    {
+      "id": "kangasniemi.c087fe7d-c15d-46de-92e5-8dbab338a08b",
+      "title": "Tuntematon sotilas (MP3-CD)",
+      "shortTitle": "Tuntematon sotilas (MP3-CD)",
+      "nonPresenterAuthors": [
+        {
+          "name": "Linna, Väinö",
+          "id": "(FI-ASTERI-N)000067929",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Honkanen, Veikko",
+          "date": "(2)-",
+          "type": "Personal Name"
+        }
+      ],
+      "isbns": [
+        "978-951-0-43251-8"
+      ],
+      "publishers": [
+        "WSOY"
+      ],
+      "year": "2017",
+      "images": [
+        "/Cover/Show?source=Solr&id=kangasniemi.c087fe7d-c15d-46de-92e5-8dbab338a08b&index=0&size=large",
+        "/Cover/Show?source=Solr&id=kangasniemi.c087fe7d-c15d-46de-92e5-8dbab338a08b&index=1&size=large"
+      ]
+    },
+    {
+      "id": "jykdok.844498",
+      "title": "Tuntematon sotilas",
+      "shortTitle": "Tuntematon sotilas",
+      "nonPresenterAuthors": [
+        {
+          "name": "Linna, Väinö",
+          "role": "kirjoittaja",
+          "id": "(FI-ASTERI-N)000067929",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Werner Söderström osakeyhtiö",
+          "role": "kustantaja, julkaisija",
+          "id": "(FI-ASTERI-N)000006477",
+          "type": "Corporate Name"
+        }
+      ],
+      "isbns": [
+        "951-0-24444-9 kovakantinen",
+        "951-0-25001-5 1/2-n",
+        "951-0-25094-5 kokonaisuus kovakantinen",
+        "951-0-25258-1 kokonaisuus 1/2-n"
+      ],
+      "publishers": [
+        "WSOY"
+      ],
+      "year": "2000",
+      "images": []
+    },
+    {
+      "id": "helka.996597143506253",
+      "title": "Tuntematon sotilas",
+      "shortTitle": "Tuntematon sotilas",
+      "nonPresenterAuthors": [
+        {
+          "name": "Linna, Väinö",
+          "date": "1920-1992",
+          "role": "kirjoittaja",
+          "id": "(FI-ASTERI-N)000067929",
+          "type": "Personal Name"
+        }
+      ],
+      "isbns": [],
+      "publishers": [
+        "WSOY"
+      ],
+      "year": "1955",
+      "images": []
+    },
+    {
+      "id": "anders.60c921c0-cbf3-4ecb-a695-f3f45875acaa",
+      "title": "Tuntematon sotilas",
+      "shortTitle": "Tuntematon sotilas",
+      "nonPresenterAuthors": [
+        {
+          "name": "Linna, Väinö",
+          "date": "1920-1992",
+          "role": "kirjoittaja",
+          "id": "000067929",
+          "type": "Personal Name"
+        }
+      ],
+      "isbns": [
+        "951-0-02405-8"
+      ],
+      "publishers": [
+        "WSOY"
+      ],
+      "year": "1972",
+      "images": []
+    },
+    {
+      "id": "anders.f2c99c92-8ac0-419b-84a9-82c1cd88ec1f",
+      "title": "TUNTEMATON SOTILAS",
+      "shortTitle": "TUNTEMATON SOTILAS",
+      "nonPresenterAuthors": [
+        {
+          "name": "Linna, Väinö",
+          "date": "1920-1992",
+          "role": "kirjoittaja",
+          "id": "000067929",
+          "type": "Personal Name"
+        }
+      ],
+      "isbns": [],
+      "publishers": [
+        "WSOY"
+      ],
+      "year": "1962",
+      "images": []
+    },
+    {
+      "id": "arto.018891571",
+      "title": "Tuntematon sotilas",
+      "shortTitle": "Tuntematon sotilas",
+      "nonPresenterAuthors": [
+        {
+          "name": "Bagh, Peter von",
+          "date": "1943-2014",
+          "role": "kirjoittaja",
+          "id": "(FI-ASTERI-N)000066608",
+          "type": "Personal Name"
+        }
+      ],
+      "isbns": [
+        "951-861-206-4"
+      ],
+      "publishers": [],
+      "year": "1989",
+      "images": []
+    },
+    {
+      "id": "heili.3c81d29d-e141-43ee-b2f0-a7d81759d795",
+      "title": "Tuntematon sotilas",
+      "shortTitle": "Tuntematon sotilas",
+      "nonPresenterAuthors": [
+        {
+          "name": "Hämäläinen, Kalervo",
+          "date": "1917-2015",
+          "id": "000045016",
+          "type": "Personal Name"
+        }
+      ],
+      "isbns": [],
+      "publishers": [
+        "Suomen Sotaveteraaniliitto"
+      ],
+      "year": "1990",
+      "images": []
+    },
+    {
+      "id": "fikka.4431934",
+      "title": "Tuntematon sotilas",
+      "shortTitle": "Tuntematon sotilas",
+      "nonPresenterAuthors": [
+        {
+          "name": "Koski, Erkki",
+          "date": "1926-1997",
+          "role": "säveltäjä",
+          "id": "(FI-ASTERI-N)000203762",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Saukki",
+          "date": "1928-2014",
+          "role": "sanoittaja",
+          "id": "(FI-ASTERI-N)000063892",
+          "type": "Personal Name"
+        }
+      ],
+      "isbns": [],
+      "publishers": [
+        "Scandia-Musiikki Oy"
+      ],
+      "year": "1955",
+      "images": []
+    },
+    {
+      "id": "anders.315113b4-7013-476f-af14-54b99182731e",
+      "title": "Tuntematon sotilas",
+      "shortTitle": "Tuntematon sotilas",
+      "nonPresenterAuthors": [
+        {
+          "name": "Mollberg, Rauni",
+          "date": "1929-2007",
+          "role": "ohjaaja",
+          "id": "000066083",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Linna, Väinö",
+          "date": "1920-1992",
+          "role": "käsikirjoittaja",
+          "id": "000067929",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Aaltonen, Veikko",
+          "role": "käsikirjoittaja",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Vuorinen, Esa",
+          "role": "kuvaaja",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Soinio, Olli",
+          "role": "leikkaaja",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Suominen, Ensio",
+          "role": "lavastaja",
+          "type": "Personal Name"
+        }
+      ],
+      "isbns": [],
+      "publishers": [
+        "Finnkino [jakaja]"
+      ],
+      "year": "2005",
+      "images": []
+    },
+    {
+      "id": "blanka.0e352140-92c2-415f-ac0c-3558e9587f1f",
+      "title": "Tuntematon sotilas",
+      "shortTitle": "Tuntematon sotilas",
+      "nonPresenterAuthors": [
+        {
+          "name": "Louhimies, Aku",
+          "role": "ohjaaja, käsikirjoittaja, tuottaja",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Linna, Väinö",
+          "date": "1920-1992",
+          "role": "kirjoittaja",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Rantala, Jari Olavi",
+          "date": "1967-",
+          "role": "käsikirjoittaja",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Tenhunen, Mikko",
+          "role": "tuottaja",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Haavisto, Miia",
+          "role": "tuottaja",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Orasmaa, Mika",
+          "role": "kuvaaja",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Enersen, Lasse",
+          "date": "1978-",
+          "role": "säveltäjä",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Elokuvaosakeyhtiö Suomi 2017",
+          "type": "Corporate Name"
+        }
+      ],
+      "isbns": [],
+      "publishers": [
+        "SF Film Finland"
+      ],
+      "year": "2018",
+      "images": []
+    },
+    {
+      "id": "blanka.19fea4dd-271e-4140-bf0d-0de8443530eb",
+      "title": "Tuntematon sotilas",
+      "shortTitle": "Tuntematon sotilas",
+      "nonPresenterAuthors": [
+        {
+          "name": "Linna, Väinö",
+          "date": "1920-1992",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Laine, Edvin",
+          "role": "ohj",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Klemelä, Kosti",
+          "role": "näytt",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Savolainen, Heikki",
+          "role": "näytt",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Sinisalo, Veikko",
+          "role": "näytt",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Tolvanen, Reino",
+          "role": "näytt.)",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Lindman, Åke",
+          "date": "1929-",
+          "role": "näytt",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Siimes, Pentti",
+          "role": "näytt.)",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Riuttu, Leo",
+          "role": "näytt",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Halttunen, Kaarlo",
+          "role": "näytt",
+          "type": "Personal Name"
+        }
+      ],
+      "isbns": [],
+      "publishers": [
+        "Finnkino, jakaja"
+      ],
+      "year": "2001",
+      "images": []
+    },
+    {
+      "id": "luc.99218413806246",
+      "title": "Tuntematon sotilas",
+      "shortTitle": "Tuntematon sotilas",
+      "nonPresenterAuthors": [
+        {
+          "name": "Laine, Edvin",
+          "date": "1905-1989",
+          "role": "elokuvaohjaaja",
+          "id": "(FI-ASTERI-N)000066472",
+          "type": "Personal Name"
+        }
+      ],
+      "isbns": [],
+      "publishers": [
+        "Finnkino"
+      ],
+      "year": "2000",
+      "images": []
+    },
+    {
+      "id": "tmk.178578076429800",
+      "title": "Tuntematon sotilas",
+      "shortTitle": "Tuntematon sotilas",
+      "nonPresenterAuthors": [],
+      "isbns": [],
+      "publishers": [],
+      "year": "1954",
+      "images": []
+    },
+    {
+      "id": "helka.993408423506253",
+      "title": "Tuntematon sotilas",
+      "shortTitle": "Tuntematon sotilas",
+      "nonPresenterAuthors": [
+        {
+          "name": "Linna, Väinö",
+          "date": "1920-1992",
+          "role": "kirjoittaja",
+          "id": "(FI-ASTERI-N)000067929",
+          "type": "Personal Name"
+        }
+      ],
+      "isbns": [],
+      "publishers": [
+        "WSOY"
+      ],
+      "year": "1956",
+      "images": []
+    }
+  ],
+  "status": "OK"
+}

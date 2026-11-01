@@ -51,6 +51,22 @@ export function compact(result: SourceResult): SourceResult {
 
 // --- Request -----------------------------------------------------------------------------
 
+/**
+ * Logs one failed request against a source; always undefined, so a caller can
+ * `return sourceFailed(…)`. `subject` is the log context that names what was asked for
+ * (`{ isbn13 }` for a lookup, `{ query }` for a search); the URL is never logged.
+ */
+export function sourceFailed(
+  label: string,
+  action: string,
+  subject: Json,
+  reason: string,
+  details?: Json,
+): undefined {
+  logger().warn({ ...subject, ...details }, `${label} ${action} failed: ${reason}`)
+  return undefined
+}
+
 /** Logs one failed lookup; always undefined, so a caller can `return lookupFailed(…)`. */
 export function lookupFailed(
   label: string,
@@ -58,17 +74,19 @@ export function lookupFailed(
   reason: string,
   details?: Json,
 ): undefined {
-  logger().warn({ isbn13, ...details }, `${label} lookup failed: ${reason}`)
-  return undefined
+  return sourceFailed(label, 'lookup', { isbn13 }, reason, details)
 }
 
 const timedOut = (err: unknown): boolean => err instanceof Error && err.name === 'TimeoutError'
 
 /**
  * The parsed JSON body of a 2xx answer; undefined after one logged failure for a network
- * error, a timeout, a non-2xx status or a body that is not JSON. The URL is never logged.
+ * error, a timeout, a non-2xx status or a body that is not JSON. `subject` is the log
+ * context — `{ isbn13 }` for a lookup, `{ query }` for a search. The URL is never logged.
  */
-export async function getJson(label: string, url: string, isbn13: string): Promise<unknown> {
+export async function getJson(label: string, url: string, subject: Json): Promise<unknown> {
+  const failed = (reason: string, details?: Json): undefined =>
+    sourceFailed(label, 'request', subject, reason, details)
   let response: Response
   try {
     response = await fetch(url, {
@@ -76,16 +94,16 @@ export async function getJson(label: string, url: string, isbn13: string): Promi
       signal: AbortSignal.timeout(TIMEOUT_MS),
     })
   } catch (err) {
-    return lookupFailed(label, isbn13, timedOut(err) ? 'timeout' : 'network error', { err })
+    return failed(timedOut(err) ? 'timeout' : 'network error', { err })
   }
   if (!response.ok) {
     await response.body?.cancel().catch(() => {})
-    return lookupFailed(label, isbn13, `HTTP ${response.status}`)
+    return failed(`HTTP ${response.status}`)
   }
   try {
     return (await response.json()) as unknown
   } catch (err) {
     // The timeout signal also covers reading the body.
-    return lookupFailed(label, isbn13, timedOut(err) ? 'timeout' : 'response is not JSON', { err })
+    return failed(timedOut(err) ? 'timeout' : 'response is not JSON', { err })
   }
 }

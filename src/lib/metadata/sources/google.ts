@@ -146,7 +146,7 @@ function toResult(volume: Json, isbn13: string, body: unknown): SourceResult | u
 
 /** The response body when it is a usable answer; undefined after logging why not. */
 async function fetchBody(isbn13: string): Promise<Json | undefined> {
-  const body = await getJson(LABEL, googleUrl(isbn13), isbn13)
+  const body = await getJson(LABEL, googleUrl(isbn13), { isbn13 })
   if (body === undefined) return undefined
   if (!isObject(body)) return lookupFailed(LABEL, isbn13, 'response is not an object')
   // Google leaves `items` out when nothing matched.

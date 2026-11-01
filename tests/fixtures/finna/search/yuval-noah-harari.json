@@ -1,0 +1,536 @@
+{
+  "resultCount": 187,
+  "records": [
+    {
+      "id": "tiekko.1124166",
+      "title": "Nexus (pokkari) Tietoverkkojen lyhyt historia",
+      "shortTitle": "Nexus (pokkari) Tietoverkkojen lyhyt historia",
+      "nonPresenterAuthors": [
+        {
+          "name": "Harari, Yuval Noah",
+          "role": "kirjoittaja",
+          "type": "Personal Name"
+        }
+      ],
+      "isbns": [
+        "9789528703693"
+      ],
+      "publishers": [
+        "Bazar"
+      ],
+      "year": "2026",
+      "images": []
+    },
+    {
+      "id": "satakirjastot.291614",
+      "title": "Sapiens : Daisy-äänikirja vain lukemisesteisille",
+      "shortTitle": "Sapiens",
+      "nonPresenterAuthors": [
+        {
+          "name": "Harari, Yuval Noah",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Rauvala, Tapio",
+          "role": "lukija",
+          "type": "Personal Name"
+        }
+      ],
+      "isbns": [],
+      "publishers": [
+        "Celia"
+      ],
+      "year": "2016",
+      "images": []
+    },
+    {
+      "id": "anders.ebc58ed6-94f0-4757-bd43-077a08fbce31",
+      "title": "Sapiens / en kort historik över mänskligheten",
+      "shortTitle": "Sapiens",
+      "nonPresenterAuthors": [
+        {
+          "name": "Harari, Yuval Noah",
+          "date": "1976-",
+          "role": "författare",
+          "id": "000226158",
+          "type": "Personal Name"
+        }
+      ],
+      "isbns": [
+        "978-91-27-14039-4"
+      ],
+      "publishers": [
+        "Natur & Kultur"
+      ],
+      "year": "2015",
+      "images": []
+    },
+    {
+      "id": "fikka.2118161",
+      "title": "Renaissance military memoirs : war, history, and identity, 1450-1600",
+      "shortTitle": "Renaissance military memoirs",
+      "nonPresenterAuthors": [
+        {
+          "name": "Harari, Yuval Noah",
+          "type": "Personal Name"
+        }
+      ],
+      "isbns": [
+        "1843830647 hardback"
+      ],
+      "publishers": [
+        "Boydell Press"
+      ],
+      "year": "2004",
+      "images": []
+    },
+    {
+      "id": "helle.1533447",
+      "title": "21 tankar om det 21:a århundradet",
+      "shortTitle": "21 tankar om det 21:a århundradet",
+      "nonPresenterAuthors": [
+        {
+          "name": "Harari, Yuval Noah",
+          "role": "författare",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Retzlaff, Joachim",
+          "role": "översättare",
+          "type": "Personal Name"
+        }
+      ],
+      "isbns": [
+        "9789127164178 mjuka pärmar"
+      ],
+      "publishers": [
+        "Natur & Kultur"
+      ],
+      "year": "2019",
+      "images": [
+        "/Cover/Show?source=Solr&id=helle.1533447&index=0&size=large"
+      ]
+    },
+    {
+      "id": "3amk.211700",
+      "title": "Sapiens : ihmisen lyhyt historia",
+      "shortTitle": "Sapiens",
+      "nonPresenterAuthors": [
+        {
+          "name": "Harari, Yuval Noah",
+          "role": "kirjoittaja",
+          "id": "(FI-ASTERI-N)000226158",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Iso-Markku, Jaana",
+          "date": "1956-",
+          "role": "kääntäjä",
+          "id": "(FI-ASTERI-N)000045388",
+          "type": "Personal Name"
+        }
+      ],
+      "isbns": [
+        "978-952-279-470-3 pehmeäkantinen"
+      ],
+      "publishers": [
+        "Bazar"
+      ],
+      "year": "2017",
+      "images": []
+    },
+    {
+      "id": "helle.1509592",
+      "title": "Sapiens : en kort historik över mänskligheten",
+      "shortTitle": "Sapiens",
+      "nonPresenterAuthors": [
+        {
+          "name": "Harari, Yuval Noah",
+          "role": "författare",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Retzlaff, Joachim",
+          "role": "översättare",
+          "type": "Personal Name"
+        }
+      ],
+      "isbns": [
+        "978-91-27-16145-0 mjuka pärmar"
+      ],
+      "publishers": [
+        "Natur & Kultur"
+      ],
+      "year": "2018",
+      "images": []
+    },
+    {
+      "id": "anders.773afc45-bbc0-437b-97f4-3b8c839b25c4",
+      "title": "21 tankar om det 21:a århundradet",
+      "shortTitle": "21 tankar om det 21:a århundradet",
+      "nonPresenterAuthors": [
+        {
+          "name": "Harari, Yuval Noah",
+          "date": "1976-",
+          "role": "författare",
+          "id": "000226158",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Retzlaff, Joachim",
+          "date": "1952-",
+          "role": "översättare",
+          "type": "Personal Name"
+        }
+      ],
+      "isbns": [
+        "978-91-27-15676-0"
+      ],
+      "publishers": [
+        "Natur & Kultur"
+      ],
+      "year": "2018",
+      "images": []
+    },
+    {
+      "id": "3amk.271199",
+      "title": "21 oppituntia maailman tilasta",
+      "shortTitle": "21 oppituntia maailman tilasta",
+      "nonPresenterAuthors": [
+        {
+          "name": "Harari, Yuval Noah",
+          "role": "kirjoittaja",
+          "id": "(FI-ASTERI-N)000226158",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Iso-Markku, Jaana",
+          "date": "1956-",
+          "role": "kääntäjä",
+          "id": "(FI-ASTERI-N)000045388",
+          "type": "Personal Name"
+        }
+      ],
+      "isbns": [
+        "978-952-279-609-7 kovakantinen"
+      ],
+      "publishers": [
+        "Bazar"
+      ],
+      "year": "2018",
+      "images": []
+    },
+    {
+      "id": "3amk.90327",
+      "title": "Homo Deus : huomisen lyhyt historia",
+      "shortTitle": "Homo Deus",
+      "nonPresenterAuthors": [
+        {
+          "name": "Harari, Yuval Noah",
+          "role": "kirjoittaja",
+          "id": "(FI-ASTERI-N)000226158",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Iso-Markku, Jaana",
+          "date": "1956-",
+          "role": "kääntäjä",
+          "id": "(FI-ASTERI-N)000045388",
+          "type": "Personal Name"
+        }
+      ],
+      "isbns": [
+        "978-952-279-435-2 kovakantinen"
+      ],
+      "publishers": [
+        "Bazar"
+      ],
+      "year": "2017",
+      "images": []
+    },
+    {
+      "id": "3amk.299662",
+      "title": "Universumi vailla merkitystä? : Yuval Noah Hararin teosten analyysiä ja kritiikkiä",
+      "shortTitle": "Universumi vailla merkitystä?",
+      "nonPresenterAuthors": [
+        {
+          "name": "Juntunen, Sammeli",
+          "role": "kirjoittaja",
+          "id": "(FI-ASTERI-N)000089019",
+          "type": "Personal Name"
+        }
+      ],
+      "isbns": [
+        "978-952-379-377-4 pehmeäkantinen"
+      ],
+      "publishers": [
+        "Basam Books"
+      ],
+      "year": "2022",
+      "images": []
+    },
+    {
+      "id": "kristinestad.be72018a-4e91-48c5-b135-1024e47e9b28",
+      "title": "Sapiens / en kort historik över mänskligheten",
+      "shortTitle": "Sapiens",
+      "nonPresenterAuthors": [
+        {
+          "name": "Harari, Yuval Noah",
+          "role": "författare",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Retzlaff, Joachim",
+          "date": "1952-",
+          "role": "översättare",
+          "id": "https://libris.kb.se/sq468lwb3lw8k83#it",
+          "type": "Personal Name"
+        }
+      ],
+      "isbns": [
+        "978-91-27-15078-2"
+      ],
+      "publishers": [
+        "Natur & Kultur"
+      ],
+      "year": "2017",
+      "images": []
+    },
+    {
+      "id": "3amk.282057",
+      "title": "21 lessons for the 21st century",
+      "shortTitle": "21 lessons for the 21st century",
+      "nonPresenterAuthors": [
+        {
+          "name": "Harari, Yuval Noah",
+          "role": "kirjoittaja",
+          "type": "Personal Name"
+        }
+      ],
+      "isbns": [
+        "978-1-78470-828-3 pehmeäkantinen"
+      ],
+      "publishers": [
+        "Vintage"
+      ],
+      "year": "2019",
+      "images": []
+    },
+    {
+      "id": "ekk.994159314006250",
+      "title": "Sapiens : ihmisen lyhyt historia",
+      "shortTitle": "Sapiens",
+      "nonPresenterAuthors": [
+        {
+          "name": "Harari, Yuval Noah",
+          "role": "kirjoittaja",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Iso-Markku, Jaana",
+          "date": "1956-",
+          "role": "kääntäjä",
+          "type": "Personal Name"
+        }
+      ],
+      "isbns": [
+        "978-952-279-470-3 pehmeäkantinen"
+      ],
+      "publishers": [
+        "Bazar"
+      ],
+      "year": "2017",
+      "images": []
+    },
+    {
+      "id": "anders.637334e7-942c-48f0-8391-8452b6034f0a",
+      "title": "Pysäyttämätön ihminen / Osa 3 Kuinka vihollisista tuli ystäviä",
+      "shortTitle": "Pysäyttämätön ihminen",
+      "nonPresenterAuthors": [
+        {
+          "name": "Harari, Yuval Noah",
+          "date": "1976-",
+          "role": "kirjoittaja",
+          "id": "000226158",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Zaplana, Ricard",
+          "role": "kuvittaja",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Raudaskoski, Seppo",
+          "role": "kääntäjä",
+          "id": "000123984",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Werner Söderström osakeyhtiö",
+          "id": "000006477",
+          "type": "Corporate Name"
+        }
+      ],
+      "isbns": [
+        "978-951-0-51330-9"
+      ],
+      "publishers": [
+        "Werner Söderström osakeyhtiö"
+      ],
+      "year": "2025",
+      "images": []
+    },
+    {
+      "id": "anders.cd68745d-038a-42b8-8c0c-b8aff5eb6928",
+      "title": "Homo deus / en kort historik över morgondagen",
+      "shortTitle": "Homo deus",
+      "nonPresenterAuthors": [
+        {
+          "name": "Harari, Yuval Noah",
+          "date": "1976-",
+          "role": "författare",
+          "id": "000226158",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Retzlaff, Joachim",
+          "date": "1952-",
+          "role": "översättare",
+          "type": "Personal Name"
+        }
+      ],
+      "isbns": [
+        "978-91-27-15079-9"
+      ],
+      "publishers": [
+        "Natur & Kultur"
+      ],
+      "year": "2017",
+      "images": []
+    },
+    {
+      "id": "eepos.3230083",
+      "title": "Nexus : tietoverkkojen lyhyt historia",
+      "shortTitle": "Nexus",
+      "nonPresenterAuthors": [
+        {
+          "name": "Harari, Yuval Noah",
+          "role": "kirjoittaja",
+          "id": "(FI-ASTERI-N)000226158",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Kilpeläinen, Tapani",
+          "role": "kääntäjä",
+          "id": "(FI-ASTERI-N)000123260",
+          "type": "Personal Name"
+        }
+      ],
+      "isbns": [
+        "978-952-403-999-4 pehmeäkantinen"
+      ],
+      "publishers": [
+        "Bazar"
+      ],
+      "year": "2025",
+      "images": [
+        "/Cover/Show?source=Solr&id=eepos.3230083&index=0&size=large"
+      ]
+    },
+    {
+      "id": "3amk.211701",
+      "title": "Homo Deus : huomisen lyhyt historia",
+      "shortTitle": "Homo Deus",
+      "nonPresenterAuthors": [
+        {
+          "name": "Harari, Yuval Noah",
+          "role": "kirjoittaja",
+          "id": "(FI-ASTERI-N)000226158",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Iso-Markku, Jaana",
+          "date": "1956-",
+          "role": "kääntäjä",
+          "id": "(FI-ASTERI-N)000045388",
+          "type": "Personal Name"
+        }
+      ],
+      "isbns": [
+        "978-952-279-625-7 pehmeäkantinen"
+      ],
+      "publishers": [
+        "Bazar"
+      ],
+      "year": "2018",
+      "images": []
+    },
+    {
+      "id": "anders.c13dc427-eb51-423e-a48e-b7facbd137b9",
+      "title": "Pysäyttämätön ihminen / Miksi maailma ei ole reilu Osa 2",
+      "shortTitle": "Pysäyttämätön ihminen",
+      "nonPresenterAuthors": [
+        {
+          "name": "Harari, Yuval Noah",
+          "date": "1976-",
+          "role": "kirjoittaja",
+          "id": "000226158",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Zaplana, Ricard",
+          "role": "kuvittaja",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Raudaskoski, Seppo",
+          "role": "kääntäjä",
+          "id": "000123984",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Werner Söderström osakeyhtiö",
+          "id": "000006477",
+          "type": "Corporate Name"
+        }
+      ],
+      "isbns": [
+        "978-951-0-49956-6"
+      ],
+      "publishers": [
+        "Werner Söderström osakeyhtiö"
+      ],
+      "year": "2024",
+      "images": []
+    },
+    {
+      "id": "3amk.309247",
+      "title": "Nexus : tietoverkkojen lyhyt historia",
+      "shortTitle": "Nexus",
+      "nonPresenterAuthors": [
+        {
+          "name": "Harari, Yuval Noah",
+          "role": "kirjoittaja",
+          "id": "(FI-ASTERI-N)000226158",
+          "type": "Personal Name"
+        },
+        {
+          "name": "Kilpeläinen, Tapani",
+          "date": "1974-",
+          "role": "kääntäjä",
+          "id": "(FI-ASTERI-N)000123260",
+          "type": "Personal Name"
+        }
+      ],
+      "isbns": [
+        "978-952-403-516-3 kovakantinen"
+      ],
+      "publishers": [
+        "Bazar"
+      ],
+      "year": "2024",
+      "images": []
+    }
+  ],
+  "status": "OK"
+}

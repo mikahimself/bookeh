@@ -1,7 +1,7 @@
 // Finna, the first source (FR-11, AD-9): core fields, series, themes (FR-17a) and author sort names.
 import { toIsbn13 } from '@/fields/isbn'
 
-import type { Source, SourceResult } from '../source'
+import type { SearchHit, Source, SourceResult } from '../source'
 import {
   clean,
   compact,
@@ -10,6 +10,7 @@ import {
   isoLanguage,
   list,
   lookupFailed,
+  sourceFailed,
   strings,
   type Json,
 } from './shared'
@@ -65,6 +66,34 @@ export function finnaUrl(isbn13: string): string {
   return `${ORIGIN}/api/v1/search?${params}`
 }
 
+/**
+ * The fields a `SearchHit` needs, and no more: `FINNA_FIELDS` asks for `fullRecord` and
+ * `imagesExtended`, which turn a 20-record search answer into hundreds of kilobytes.
+ */
+export const FINNA_SEARCH_FIELDS = [
+  'id',
+  'title',
+  'shortTitle',
+  'nonPresenterAuthors',
+  'isbns',
+  'publishers',
+  'year',
+  'images',
+] as const
+
+/** Twenty records is a readable list after de-duplication and a committable fixture. */
+const SEARCH_LIMIT = 20
+
+export function finnaSearchUrl(query: string): string {
+  const params = new URLSearchParams({
+    lookfor: query,
+    type: 'AllFields',
+    limit: String(SEARCH_LIMIT),
+  })
+  for (const field of FINNA_SEARCH_FIELDS) params.append('field[]', field)
+  return `${ORIGIN}/api/v1/search?${params}`
+}
+
 // --- Guards ------------------------------------------------------------------------------
 
 /** `clean`, then trailing ISBD punctuation (`/ : ; = ,`) dropped: `Bazar :` gives `Bazar`. */
@@ -80,6 +109,19 @@ function matchingIsbnEntry(record: Json, isbn13: string): string | undefined {
     const token = entry.trim().split(/\s+/)[0] ?? ''
     return toIsbn13(token) === isbn13
   })
+}
+
+/**
+ * Every distinct ISBN-13 the record's `isbns` names, in Finna's order: one entry per binding
+ * (`978-952-04-0805-3 kovakantinen`), so one record can name several editions.
+ */
+function recordIsbns(record: Json): string[] {
+  const found: string[] = []
+  for (const entry of strings(record.isbns)) {
+    const isbn13 = toIsbn13(entry.trim().split(/\s+/)[0] ?? '')
+    if (isbn13 && !found.includes(isbn13)) found.push(isbn13)
+  }
+  return found
 }
 
 /** The records whose `isbns` normalise to the ISBN asked for. Finna also returns other editions. */
@@ -288,11 +330,72 @@ export function finnaResults(body: unknown, isbn13: string): SourceResult[] | un
   return scored.map(({ result }) => result)
 }
 
+// --- Search ------------------------------------------------------------------------------
+
+/** The seven `SearchHit` fields of a parsed record, plus whether a cover exists for the ISBN. */
+function toHit(result: SourceResult, hasCover: boolean): SearchHit {
+  return {
+    isbn13: result.isbn13,
+    title: result.title,
+    authors: result.authors,
+    ...(result.publisher !== undefined && { publisher: result.publisher }),
+    ...(result.year !== undefined && { year: result.year }),
+    ...(result.binding !== undefined && { binding: result.binding }),
+    source: result.source,
+    hasCover,
+  }
+}
+
+/**
+ * The hits of a Finna search response body, one per distinct ISBN-13 in Finna's own order,
+ * first occurrence winning: Finna answers with one record per library holding, so one edition
+ * comes back many times. Each record's `isbns` is expanded, so a record naming two bindings
+ * gives two hits, each with its own binding text. `hasCover` is true when any record carrying
+ * that ISBN-13 has an image. `[]`, after one logged warning, when the body is not a usable
+ * answer (FR-20, AD-9).
+ */
+export function finnaSearchHits(body: unknown, query: string): SearchHit[] {
+  const failed = (reason: string, details?: Json): SearchHit[] => {
+    sourceFailed(LABEL, 'search', { query }, reason, details)
+    return []
+  }
+  if (!isObject(body) || body.status !== 'OK') {
+    const answer: Json = isObject(body) ? body : {}
+    return failed('status is not OK', {
+      status: answer.status,
+      statusMessage: answer.statusMessage,
+    })
+  }
+  // Finna leaves `records` out when nothing matched.
+  const noMatch = body.records === undefined && body.resultCount === 0
+  if (!noMatch && !Array.isArray(body.records)) return failed('records is not an array')
+
+  const hits = new Map<string, SearchHit>()
+  for (const record of list(body.records).filter(isObject)) {
+    for (const isbn13 of recordIsbns(record)) {
+      // `toResult` states every field rule; the narrow field set leaves its other fields empty.
+      const result = toResult(record, isbn13, {})
+      if (!result) continue
+      const cover = result.coverUrl !== undefined
+      const seen = hits.get(isbn13)
+      if (seen) seen.hasCover ||= cover
+      else hits.set(isbn13, toHit(result, cover))
+    }
+  }
+  return [...hits.values()]
+}
+
 export const finna: Source = {
   id: 'finna',
   async lookupByIsbn(isbn13) {
-    const body = await getJson(LABEL, finnaUrl(isbn13), isbn13)
+    const body = await getJson(LABEL, finnaUrl(isbn13), { isbn13 })
     if (body === undefined) return undefined
     return finnaResults(body, isbn13)
+  },
+  async search(query) {
+    const body = await getJson(LABEL, finnaSearchUrl(query), { query })
+    // `getJson` has logged the failure; a search answers with a list either way.
+    if (body === undefined) return []
+    return finnaSearchHits(body, query)
   },
 }

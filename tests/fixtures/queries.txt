@@ -1,0 +1,6 @@
+# Search queries, as supplied 2026-11-01 (Story 8.3). Input to `npm run fixtures`.
+# One query per line; blank lines and `#` comments skipped. A Finnish title, an author,
+# and one query Finna has no match for.
+tuntematon sotilas
+yuval noah harari
+qwzxvb kirjaton teos 12345
