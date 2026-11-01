@@ -1,4 +1,4 @@
-import { readFileSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 
 import { afterEach, beforeEach, describe, expect, it, vi, type MockInstance } from 'vitest'
 
@@ -6,14 +6,9 @@ import { logger } from '@/lib/errors'
 import type { SearchHit } from '@/lib/metadata/source'
 import { finna } from '@/lib/metadata/sources/finna'
 
-const FIXTURES = new URL('../fixtures/finna/search/', import.meta.url)
+import { querySlug } from '../../scripts/capture-fixtures'
 
-/** The queries in tests/fixtures/queries.txt and the fixtures `npm run fixtures` recorded. */
-const SLUGS: Record<string, string> = {
-  'tuntematon sotilas': 'tuntematon-sotilas',
-  'yuval noah harari': 'yuval-noah-harari',
-  'qwzxvb kirjaton teos 12345': 'qwzxvb-kirjaton-teos-12345',
-}
+const FIXTURES = new URL('../fixtures/finna/search/', import.meta.url)
 
 type Record_ = {
   id?: string
@@ -24,8 +19,11 @@ type Record_ = {
 }
 type Body = { status?: string; resultCount?: number; records?: Record_[] }
 
+/** The response `npm run fixtures` recorded for this query, keyed as the script keys it. */
 function fixture(query: string): Body {
-  return JSON.parse(readFileSync(new URL(`${SLUGS[query]}.json`, FIXTURES), 'utf8')) as Body
+  const file = new URL(`${querySlug(query)}.json`, FIXTURES)
+  if (!existsSync(file)) throw new Error(`no recorded Finna search for "${query}"`)
+  return JSON.parse(readFileSync(file, 'utf8')) as Body
 }
 
 /** The record with this id; the fixtures are committed, so it is there. */
@@ -33,13 +31,18 @@ function record(body: Body, id: string): Record_ {
   return body.records!.find((entry) => entry.id === id)!
 }
 
-/** Serves the recorded response for the query in the request's `lookfor`, optionally edited. */
-function serveFixtures(edit: (body: Body) => void = () => {}): void {
+/**
+ * Serves the recorded response for the query in the request's `lookfor`, optionally edited.
+ * A query with no fixture fails the test instead of reaching `getJson`, which would swallow
+ * the error as a network failure and leave a plausible `[]` behind.
+ */
+function serveFixtures(query: string, edit: (body: Body) => void = () => {}): void {
+  const body = fixture(query)
+  edit(body)
   vi.stubGlobal(
     'fetch',
     vi.fn(async (url: string) => {
-      const body = fixture(new URL(url).searchParams.get('lookfor') ?? '')
-      edit(body)
+      expect(new URL(url).searchParams.get('lookfor')).toBe(query)
       return Response.json(body)
     }),
   )
@@ -64,28 +67,23 @@ afterEach(() => {
 })
 
 describe('finna.search', () => {
-  beforeEach(() => serveFixtures())
+  it('trims the query, and answers nothing for an empty one without asking Finna', async () => {
+    const fetchMock = vi.fn()
+    vi.stubGlobal('fetch', fetchMock)
 
-  it('asks for the query over the narrow search field set', async () => {
-    await search('tuntematon sotilas')
+    await expect(search('')).resolves.toStrictEqual([])
+    await expect(search('   ')).resolves.toStrictEqual([])
+    expect(fetchMock).not.toHaveBeenCalled()
+    expect(warn).not.toHaveBeenCalled()
 
-    const url = new URL(vi.mocked(fetch).mock.calls[0]![0] as string)
-    expect(url.origin + url.pathname).toBe('https://api.finna.fi/api/v1/search')
-    expect(url.searchParams.get('lookfor')).toBe('tuntematon sotilas')
-    expect(url.searchParams.get('limit')).toBe('20')
-    expect(url.searchParams.getAll('field[]')).toStrictEqual([
-      'id',
-      'title',
-      'shortTitle',
-      'nonPresenterAuthors',
-      'isbns',
-      'publishers',
-      'year',
-      'images',
-    ])
+    // The stub fails the test unless the trimmed query is what reached Finna.
+    serveFixtures('tuntematon sotilas')
+    expect(await search('  tuntematon sotilas  ')).not.toStrictEqual([])
+    expect(warn).not.toHaveBeenCalled()
   })
 
   it('answers one hit per ISBN-13 in Finna order, with the hit fields and no others', async () => {
+    serveFixtures('yuval noah harari')
     const hits = await search('yuval noah harari')
 
     expect(hits.slice(0, 4)).toStrictEqual([
@@ -133,6 +131,7 @@ describe('finna.search', () => {
   })
 
   it('drops the records whose isbns yield no ISBN-13, and expands those that name several', async () => {
+    serveFixtures('tuntematon sotilas')
     const hits = await search('tuntematon sotilas')
 
     // The image-only archive records at the head of the answer name no ISBN and are out;
@@ -159,6 +158,7 @@ describe('finna.search', () => {
   })
 
   it('keeps the first record of a duplicated ISBN but takes a cover from any of them', async () => {
+    serveFixtures('tuntematon sotilas')
     const hits = await search('tuntematon sotilas')
 
     // `anders.a0a93c82…` has no image, the later `kangasniemi.c087…` for the same ISBN has two.
@@ -181,7 +181,7 @@ describe('finna.search', () => {
 
 describe('finna.search over an edited answer', () => {
   it('drops a record without a title or without an id', async () => {
-    serveFixtures((body) => {
+    serveFixtures('tuntematon sotilas', (body) => {
       delete record(body, 'anders.a0a93c82-2af7-4280-b1c6-2c40c9566757').shortTitle
       delete record(body, 'anders.a0a93c82-2af7-4280-b1c6-2c40c9566757').title
       delete record(body, 'kangasniemi.c087fe7d-c15d-46de-92e5-8dbab338a08b').shortTitle
@@ -197,7 +197,7 @@ describe('finna.search over an edited answer', () => {
   })
 
   it('reports no cover when no record carrying the ISBN has an image', async () => {
-    serveFixtures((body) => {
+    serveFixtures('tuntematon sotilas', (body) => {
       record(body, 'kangasniemi.c087fe7d-c15d-46de-92e5-8dbab338a08b').images = []
     })
 
@@ -208,7 +208,7 @@ describe('finna.search over an edited answer', () => {
   })
 
   it('answers nothing for a query Finna has no match for, without logging', async () => {
-    serveFixtures()
+    serveFixtures('qwzxvb kirjaton teos 12345')
 
     await expect(search('qwzxvb kirjaton teos 12345')).resolves.toStrictEqual([])
     expect(warn).not.toHaveBeenCalled()

@@ -61,13 +61,22 @@ export function readIsbnList(text: string): ListedIsbn[] {
 /** Parses queries.txt: one search query per line, blank lines and `#` comments skipped. */
 export function readQueryList(text: string): string[] {
   const queries: string[] = []
+  // The fixture is keyed on the slug, so two queries must not share one.
+  const slugs = new Map<string, string>()
   text.split(/\r?\n/).forEach((raw, index) => {
     const query = raw.replace(/#.*$/, '').trim().replace(/\s+/g, ' ')
     if (!query) return
-    if (!querySlug(query)) {
+    const slug = querySlug(query)
+    if (!slug) {
       throw new Error(`queries.txt line ${index + 1}: "${query}" has no usable file name`)
     }
-    if (queries.includes(query)) throw new Error(`queries.txt line ${index + 1}: "${query}" twice`)
+    const taken = slugs.get(slug)
+    if (taken !== undefined) {
+      throw new Error(
+        `queries.txt line ${index + 1}: "${query}" has the same fixture as "${taken}" (${slug}.json)`,
+      )
+    }
+    slugs.set(slug, query)
     queries.push(query)
   })
   return queries

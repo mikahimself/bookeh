@@ -52,8 +52,10 @@ describe('query list', () => {
     expect(queries.map(querySlug)).toEqual(['tuntematon-sotilas', 'harari-yuval-noah'])
   })
 
-  it('refuses a query twice over and one with no usable file name, naming the line', () => {
-    expect(() => readQueryList('sapiens\nsapiens\n')).toThrow(/line 2: "sapiens" twice/)
+  it('refuses two queries that share a fixture, and one with no file name, naming the line', () => {
+    expect(() => readQueryList('tuntematon sotilas\nTuntematon Sotilas!\n')).toThrow(
+      /line 2: "Tuntematon Sotilas!" has the same fixture as "tuntematon sotilas" \(tuntematon-sotilas\.json\)/,
+    )
     expect(() => readQueryList('sapiens\n???\n')).toThrow(
       /line 2: "\?\?\?" has no usable file name/,
     )
@@ -216,5 +218,39 @@ describe('buildReport', () => {
     await rm(join(dir, 'google', '9789515782755.json'))
     const undecided = await buildReport(isbns, dir, '2026-10-11')
     expect(undecided.markdown).toContain('Not decided')
+  })
+
+  it('names the search request, its fields and a row per recorded query', async () => {
+    const dir = await tempDir()
+    await mkdir(join(dir, 'finna', 'search'), { recursive: true })
+    // Three records, one of them without an ISBN: two hits.
+    await writeFile(
+      join(dir, 'finna', 'search', 'tuntematon-sotilas.json'),
+      JSON.stringify({
+        resultCount: 7545,
+        status: 'OK',
+        records: [
+          { id: 'a', shortTitle: 'Tuntematon sotilas', isbns: ['951-0-02405-8'] },
+          { id: 'b', shortTitle: 'Tuntematon sotilas', isbns: ['978-951-0-43251-8 kovakantinen'] },
+          { id: 'c', shortTitle: 'Tuntematon sotilas', isbns: [] },
+        ],
+      }),
+    )
+
+    const { markdown, missing } = await buildReport(
+      [],
+      dir,
+      '2026-11-01',
+      [],
+      ['tuntematon sotilas', 'ei löydy'],
+    )
+
+    expect(markdown).toContain('- Finna search: `GET https://api.finna.fi/api/v1/search?lookfor=')
+    expect(markdown).toContain('Finna search fields: `id`, `title`')
+    expect(markdown).toContain('| tuntematon sotilas | tuntematon-sotilas.json | 3 | 2 |')
+    expect(markdown).toContain('| ei löydy | not captured | – | – |')
+    expect(missing).toEqual([
+      expect.objectContaining({ source: 'finna', query: 'ei löydy', reason: 'no fixture on disk' }),
+    ])
   })
 })

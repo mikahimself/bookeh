@@ -103,12 +103,17 @@ function cleanIsbd(value: unknown): string | undefined {
 
 // --- Matching ----------------------------------------------------------------------------
 
+/**
+ * The ISBN-13 an `isbns` entry names: the text before the first space, normalised.
+ * `978-952-04-0805-3 kovakantinen` gives `9789520408053`. The one Finna matching rule.
+ */
+function entryIsbn(entry: string): string | null {
+  return toIsbn13(entry.trim().split(/\s+/)[0] ?? '')
+}
+
 /** The `isbns` entry naming the ISBN asked for: `978-952-04-0805-3 kovakantinen`. */
 function matchingIsbnEntry(record: Json, isbn13: string): string | undefined {
-  return strings(record.isbns).find((entry) => {
-    const token = entry.trim().split(/\s+/)[0] ?? ''
-    return toIsbn13(token) === isbn13
-  })
+  return strings(record.isbns).find((entry) => entryIsbn(entry) === isbn13)
 }
 
 /**
@@ -118,7 +123,7 @@ function matchingIsbnEntry(record: Json, isbn13: string): string | undefined {
 function recordIsbns(record: Json): string[] {
   const found: string[] = []
   for (const entry of strings(record.isbns)) {
-    const isbn13 = toIsbn13(entry.trim().split(/\s+/)[0] ?? '')
+    const isbn13 = entryIsbn(entry)
     if (isbn13 && !found.includes(isbn13)) found.push(isbn13)
   }
   return found
@@ -332,7 +337,7 @@ export function finnaResults(body: unknown, isbn13: string): SourceResult[] | un
 
 // --- Search ------------------------------------------------------------------------------
 
-/** The seven `SearchHit` fields of a parsed record, plus whether a cover exists for the ISBN. */
+/** The seven `SearchHit` fields of a parsed record, plus whether that record reported an image. */
 function toHit(result: SourceResult, hasCover: boolean): SearchHit {
   return {
     isbn13: result.isbn13,
@@ -350,8 +355,10 @@ function toHit(result: SourceResult, hasCover: boolean): SearchHit {
  * The hits of a Finna search response body, one per distinct ISBN-13 in Finna's own order,
  * first occurrence winning: Finna answers with one record per library holding, so one edition
  * comes back many times. Each record's `isbns` is expanded, so a record naming two bindings
- * gives two hits, each with its own binding text. `hasCover` is true when any record carrying
- * that ISBN-13 has an image. `[]`, after one logged warning, when the body is not a usable
+ * gives two hits, each with its own binding text. `hasCover` is true when any kept record
+ * naming that ISBN-13 reported an image: it is per record, not per edition, so a record naming
+ * four bindings and holding one image marks all four, and a record dropped for a missing title
+ * or id contributes no cover. `[]`, after one logged warning, when the body is not a usable
  * answer (FR-20, AD-9).
  */
 export function finnaSearchHits(body: unknown, query: string): SearchHit[] {
@@ -388,14 +395,17 @@ export function finnaSearchHits(body: unknown, query: string): SearchHit[] {
 export const finna: Source = {
   id: 'finna',
   async lookupByIsbn(isbn13) {
-    const body = await getJson(LABEL, finnaUrl(isbn13), { isbn13 })
+    const body = await getJson(LABEL, 'lookup', finnaUrl(isbn13), { isbn13 })
     if (body === undefined) return undefined
     return finnaResults(body, isbn13)
   },
   async search(query) {
-    const body = await getJson(LABEL, finnaSearchUrl(query), { query })
+    // `lookfor=` is a search for everything: Finna answers 20 arbitrary records.
+    const asked = query.trim()
+    if (!asked) return []
+    const body = await getJson(LABEL, 'search', finnaSearchUrl(asked), { query: asked })
     // `getJson` has logged the failure; a search answers with a list either way.
     if (body === undefined) return []
-    return finnaSearchHits(body, query)
+    return finnaSearchHits(body, asked)
   },
 }

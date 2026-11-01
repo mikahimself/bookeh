@@ -148,7 +148,7 @@ Recorded under `finna/search/<slug>.json`. Hits are the distinct ISBN-13s the re
 
 ## Not captured
 
-- google 9789515782755: timeout (4 attempts)
+- google 9789515782755: Google health check failed: HTTP 503 (4 attempts)
 
 ## D-2 checkpoint
 
