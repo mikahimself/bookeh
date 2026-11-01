@@ -27,8 +27,8 @@ export type AnswerFacts = { heading: AnswerHeading; lines: AnswerFactLine[] }
  * note that `AnswerFactLine.copy` is the whole `CopyLine`, not the
  * `AnswerCopy` projection `copyLines()` takes. Heading precedence, first
  * that applies: `inLibrary` when at least one copy is `owned` (a lent copy is
- * an owned copy), else `ordered` when there is at least one copy (all of them
- * ordered), else `onWishlist` when there is at least one entry, else
+ * an owned copy), else `ordered` when a copy is ordered and none is owned,
+ * else `onWishlist` when there is at least one entry, else
  * `notInLibrary`. The heading consumes no line: every copy gets a line, then
  * every entry, each in `Holdings` order (oldest first, ties by id — AD-9's
  * `getHoldings()` sorts them, and this function reads its output rather than
