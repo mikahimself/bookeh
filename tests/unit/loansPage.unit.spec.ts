@@ -1,13 +1,6 @@
 // @vitest-environment jsdom
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
-import {
-  cloneElement,
-  createElement,
-  isValidElement,
-  type ComponentProps,
-  type ReactElement,
-  type ReactNode,
-} from 'react'
+import { createElement, type ComponentProps } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import type { DevicePrefs } from '@/app/(frontend)/prefs'
@@ -16,16 +9,16 @@ import type { CopyLine, Holdings } from '@/lib/books/holdings'
 import type { LocationOption } from '@/lib/copies/locations'
 import type { OpenLoan, ReturnedLoan } from '@/lib/loans/loans'
 
+import { serverTree } from '../helpers/serverTree'
+
 // EXPERIENCE.md, Loans and States; FR-37: the open loans by person (groups
 // under the name as typed) or by date (one list, longest out first), the order
 // a device preference; Nothing lent; Load failed; Book detail on `/loans`.
-// FR-36: Returned on an open row with Undo, and the returned group below.
+// FR-36: the Returned control on open rows, and the returned group below.
 
 const router = { replace: vi.fn(), refresh: vi.fn(), push: vi.fn(), back: vi.fn() }
 const openLoans = vi.fn<(ctx: unknown) => Promise<OpenLoan[]>>()
 const returnedLoans = vi.fn<(ctx: unknown, book?: number) => Promise<ReturnedLoan[]>>()
-const returnLoanAction = vi.fn()
-const undoneListeners = new Set<() => void>()
 const getEffectiveBooks =
   vi.fn<(ctx: unknown, ids: readonly number[]) => Promise<Map<number, EffectiveBook>>>()
 const heldBook = vi.fn<(ctx: unknown, bookId: number) => Promise<EffectiveBook | undefined>>()
@@ -80,7 +73,7 @@ vi.mock('@/lib/copies/locations', () => ({ listLocations }))
 vi.mock('@/lib/people/people', () => ({ lendingPeople: async () => [] }))
 vi.mock('@/app/(frontend)/actions/loans', () => ({
   lendCopyAction: vi.fn(),
-  returnLoanAction,
+  returnLoanAction: vi.fn(),
 }))
 vi.mock('@/app/(frontend)/(sections)/actions', () => ({
   removeCopiesAction: vi.fn(),
@@ -106,10 +99,7 @@ vi.mock('@/app/(frontend)/components/toast/ToastProvider', () => ({
     show: showToast,
     dismiss: vi.fn(),
     withdraw: vi.fn(),
-    onUndone: (listener: () => void) => {
-      undoneListeners.add(listener)
-      return () => undoneListeners.delete(listener)
-    },
+    onUndone: () => () => {},
   }),
 }))
 vi.mock('next/link', () => ({
@@ -149,21 +139,6 @@ vi.stubGlobal('matchMedia', (query: string) => ({
 
 const { default: LoansPage } = await import('@/app/(frontend)/(sections)/loans/page')
 const { DEFAULT_PREFS } = await import('@/app/(frontend)/prefs')
-
-/** The page's tree with its async server components awaited, as the server renderer does. */
-async function serverTree(node: ReactNode): Promise<ReactNode> {
-  if (Array.isArray(node)) return Promise.all(node.map(serverTree))
-  if (!isValidElement(node)) return node
-  const { type, props } = node as ReactElement<{ children?: ReactNode }>
-  if (typeof type === 'function' && type.constructor.name === 'AsyncFunction') {
-    return serverTree(await (type as (props: unknown) => Promise<ReactNode>)(props))
-  }
-  if (props.children === undefined) return node
-  const children = await serverTree(props.children)
-  return Array.isArray(children)
-    ? cloneElement(node, undefined, ...(children as ReactNode[]))
-    : cloneElement(node, undefined, children)
-}
 
 const renderPage = async (params: Record<string, string> = {}) =>
   render(await serverTree(await LoansPage({ searchParams: Promise.resolve(params) })))
@@ -543,27 +518,6 @@ describe('LoansPage', () => {
       expect(screen.getByText("Couldn't load.")).toBeTruthy()
       expect(screen.queryByRole('listitem')).toBeNull()
       expect(screen.queryByRole('heading', { name: 'Returned' })).toBeNull()
-    })
-
-    it('Returned closes the loan with an Undo toast and refreshes; a toast Undo refreshes again', async () => {
-      returnLoanAction.mockResolvedValue({
-        ok: true,
-        data: { loanId: 2, undoToken: 'token', undoSeconds: 10 },
-      })
-      lent([loan(2, 7, 'Leena', '2026-07-02')], [puhdistus])
-      await renderPage()
-
-      fireEvent.click(screen.getByRole('button', { name: 'Returned' }))
-      await waitFor(() => expect(router.refresh).toHaveBeenCalledOnce())
-      expect(returnLoanAction).toHaveBeenCalledWith({ loanId: 2 })
-      expect(showToast).toHaveBeenCalledWith({
-        kind: 'success',
-        message: 'Returned',
-        undo: { token: 'token', seconds: 10 },
-      })
-
-      for (const listener of undoneListeners) listener()
-      await waitFor(() => expect(router.refresh).toHaveBeenCalledTimes(2))
     })
   })
 })

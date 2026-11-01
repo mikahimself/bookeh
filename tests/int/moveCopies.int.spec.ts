@@ -8,6 +8,7 @@ import { undo, withUndo } from '@/lib/undo/undo'
 import config from '@/payload.config'
 import type { Book, Copy, User, UserLocation } from '@/payload-types'
 
+import { failure } from '../helpers/builders'
 import { contextFor, createUser } from '../helpers/harness'
 import { randomIsbn } from '../helpers/isbn'
 
@@ -48,8 +49,6 @@ describe('moveCopies', () => {
   const locationsOf = async (user: User) =>
     (await payload.count({ collection: 'locations', where: { owner: { equals: user.id } } }))
       .totalDocs
-
-  const failure = (promise: Promise<unknown>) => promise.catch((e: unknown) => e)
 
   beforeAll(async () => {
     payload = await getPayload({ config })

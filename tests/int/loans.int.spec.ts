@@ -1,5 +1,3 @@
-import { randomUUID } from 'node:crypto'
-
 import { Forbidden, getPayload, NotFound, type Payload, ValidationError } from 'payload'
 import { beforeAll, describe, expect, it } from 'vitest'
 
@@ -7,6 +5,7 @@ import * as gateway from '@/lib/payload/gateway'
 import config from '@/payload.config'
 import type { Book, Loan, User } from '@/payload-types'
 
+import { copyAs, loanAs, ownerId, personAs } from '../helpers/builders'
 import { contextFor, createUser } from '../helpers/harness'
 import { randomIsbn } from '../helpers/isbn'
 import { rejectedPaths } from '../helpers/validation'
@@ -16,9 +15,6 @@ import { rejectedPaths } from '../helpers/validation'
 // be the user's own rows (foreign ids), calendar dates at 12:00 UTC and one
 // open loan per copy in the database.
 
-const ownerId = (doc: { owner: number | User }): number =>
-  typeof doc.owner === 'number' ? doc.owner : doc.owner.id
-
 describe('loans', () => {
   let payload: Payload
   let a: User
@@ -26,35 +22,9 @@ describe('loans', () => {
   let admin: User
   let shared: Book
 
-  const copyAs = async (user: User) =>
-    gateway.create(await contextFor(user), {
-      collection: 'copies',
-      data: { owner: user.id, book: shared.id, status: 'owned' },
-      depth: 0,
-    })
-
-  /** A uniquely named Person; `owner` and `nameKey` only satisfy the create type. */
-  const personAs = async (user: User) =>
-    gateway.create(await contextFor(user), {
-      collection: 'people',
-      data: { owner: user.id, name: `Liisa ${randomUUID()}`, nameKey: 'ignored' },
-      depth: 0,
-    })
-
-  /** A loan created by `user` through the gateway; `owner` only satisfies the create type. */
-  const loanAs = async (
-    user: User,
-    data: Pick<Loan, 'copy' | 'person'> & Partial<Loan>,
-  ): Promise<Loan> =>
-    gateway.create(await contextFor(user), {
-      collection: 'loans',
-      data: { owner: user.id, lentOn: '2026-10-20', ...data },
-      depth: 0,
-    })
-
   /** A fresh copy and Person of A's, lent on 2026-10-20. */
   const openLoan = async (data: Partial<Loan> = {}) => {
-    const [copy, person] = await Promise.all([copyAs(a), personAs(a)])
+    const [copy, person] = await Promise.all([copyAs(a, { book: shared.id }), personAs(a)])
     return loanAs(a, { copy: copy.id, person: person.id, ...data })
   }
 
@@ -100,9 +70,9 @@ describe('loans', () => {
 
   it("rejects another user's copy or Person", async () => {
     const [ownCopy, ownPerson, foreignCopy, foreignPerson] = await Promise.all([
-      copyAs(a),
+      copyAs(a, { book: shared.id }),
       personAs(a),
-      copyAs(b),
+      copyAs(b, { book: shared.id }),
       personAs(b),
     ])
     expect(await rejectedPaths(loanAs(a, { copy: foreignCopy.id, person: ownPerson.id }))).toEqual([

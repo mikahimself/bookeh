@@ -8,13 +8,12 @@ import * as gateway from '@/lib/payload/gateway'
 import config from '@/payload.config'
 import type { User } from '@/payload-types'
 
+import { unique } from '../helpers/builders'
 import { contextFor, createUser } from '../helpers/harness'
 
 // `genres`, AD-4/AD-5/AD-19: shared system genres read by everyone signed in
 // and written by the admin only; `nameKey` unique across the table. The index
 // is global and rows are never cleaned up, so names carry a per-run suffix.
-
-const unique = (name: string) => `${name} ${randomUUID().slice(0, 8)}`
 
 describe('genres', () => {
   let payload: Payload

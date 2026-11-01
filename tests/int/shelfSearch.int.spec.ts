@@ -10,8 +10,8 @@ import { shelfIds } from '@/lib/shelf/shelfIds'
 import config from '@/payload.config'
 import type { Book, User } from '@/payload-types'
 
+import { sharedBook } from '../helpers/builders'
 import { contextFor, createUser } from '../helpers/harness'
-import { randomIsbn } from '../helpers/isbn'
 
 // `shelfIds()` with `q` (FR-24, NFR-7): title, author, series, ISBN-13 and
 // per-copy notes, case-insensitive without accent folding, `%` `_` `\`
@@ -26,15 +26,6 @@ describe('shelfIds text search', () => {
   let payload: Payload
 
   const reqFor = async (user: User) => (await contextFor(user)).req
-
-  const sharedBook = async (by: User, data: Partial<Book> = {}) =>
-    payload.create({
-      collection: 'books',
-      data: { title: 'Kirja', isbn13: randomIsbn(), visibility: 'shared', ...data },
-      overrideAccess: true,
-      depth: 0,
-      req: await reqFor(by),
-    })
 
   const sharedRecord = async (by: User, collection: 'authors' | 'series', name: string) =>
     (
@@ -71,17 +62,17 @@ describe('shelfIds text search', () => {
     const asA = await contextFor(a)
     const kivi = await sharedRecord(a, 'authors', 'Aleksis Kivi')
     const muumit = await sharedRecord(a, 'series', 'Muumit')
-    const byTitle = await copyOf(a, await sharedBook(a, { title: 'Seitsemän veljestä' }))
-    const byAuthor = await copyOf(a, await sharedBook(a, { authors: [kivi] }))
+    const byTitle = await copyOf(a, await sharedBook({ by: a, title: 'Seitsemän veljestä' }))
+    const byAuthor = await copyOf(a, await sharedBook({ by: a, authors: [kivi] }))
     // A viewer row overriding another field leaves the Book's authors in force.
     const leino = await sharedRecord(a, 'authors', 'Eino Leino')
-    const yearOnly = await sharedBook(a, { authors: [leino] })
+    const yearOnly = await sharedBook({ by: a, authors: [leino] })
     const byAuthorWithRow = await copyOf(a, yearOnly)
     await upsertUserBook(asA, yearOnly.id, { overrides: { year: 1900 } })
-    const bySeries = await copyOf(a, await sharedBook(a, { series: muumit }))
-    const isbnBook = await sharedBook(a)
+    const bySeries = await copyOf(a, await sharedBook({ by: a, series: muumit }))
+    const isbnBook = await sharedBook({ by: a })
     const byIsbn = await copyOf(a, isbnBook)
-    const noted = await sharedBook(a)
+    const noted = await sharedBook({ by: a })
     const inAttic = await copyOf(a, noted, 'Vintti, laatikko 3')
     await copyOf(a, noted)
 
@@ -97,7 +88,7 @@ describe('shelfIds text search', () => {
   it('folds case but never accents', async () => {
     const a = await createUser({ displayName: 'Search Accents' })
     const asA = await contextFor(a)
-    const arra = await copyOf(a, await sharedBook(a, { title: 'Ärrä' }))
+    const arra = await copyOf(a, await sharedBook({ by: a, title: 'Ärrä' }))
 
     expect(await search(asA, 'arra')).toEqual({ ids: [], total: 0 })
     expect(await search(asA, 'ÄRRÄ')).toEqual({ ids: [arra], total: 1 })
@@ -106,11 +97,11 @@ describe('shelfIds text search', () => {
   it('matches %, _ and \\ literally', async () => {
     const a = await createUser({ displayName: 'Search Literals' })
     const asA = await contextFor(a)
-    const percent = await copyOf(a, await sharedBook(a, { title: '100% totta' }))
-    await copyOf(a, await sharedBook(a, { title: '100 totta' }))
-    const underscore = await copyOf(a, await sharedBook(a, { title: 'a_b' }))
-    await copyOf(a, await sharedBook(a, { title: 'axb' }))
-    const backslash = await copyOf(a, await sharedBook(a, { title: 'C:\\kansio' }))
+    const percent = await copyOf(a, await sharedBook({ by: a, title: '100% totta' }))
+    await copyOf(a, await sharedBook({ by: a, title: '100 totta' }))
+    const underscore = await copyOf(a, await sharedBook({ by: a, title: 'a_b' }))
+    await copyOf(a, await sharedBook({ by: a, title: 'axb' }))
+    const backslash = await copyOf(a, await sharedBook({ by: a, title: 'C:\\kansio' }))
 
     expect(await search(asA, '%')).toEqual({ ids: [percent], total: 1 })
     expect(await search(asA, '_')).toEqual({ ids: [underscore], total: 1 })
@@ -124,7 +115,7 @@ describe('shelfIds text search', () => {
     const own = await sharedRecord(a, 'authors', 'Uusi Kirjailija')
     const oldSeries = await sharedRecord(a, 'series', 'Kesäsarja')
     const newSeries = await sharedRecord(a, 'series', 'Talvisarja')
-    const book = await sharedBook(a, { title: 'Vanha', authors: [shared], series: oldSeries })
+    const book = await sharedBook({ by: a, title: 'Vanha', authors: [shared], series: oldSeries })
     const copy = await copyOf(a, book)
     await upsertUserBook(asA, book.id, {
       overrides: { title: 'Uusi', authors: [own], series: newSeries },

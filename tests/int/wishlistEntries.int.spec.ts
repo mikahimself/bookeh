@@ -7,6 +7,7 @@ import * as gateway from '@/lib/payload/gateway'
 import config from '@/payload.config'
 import type { Book, User, WishlistEntry } from '@/payload-types'
 
+import { ownerId, personAs } from '../helpers/builders'
 import { contextFor, createUser } from '../helpers/harness'
 import { randomIsbn } from '../helpers/isbn'
 import { rejectedPaths } from '../helpers/validation'
@@ -15,9 +16,6 @@ import { rejectedPaths } from '../helpers/validation'
 // owner-scoped access that binds the admin too, `wishlist` and `forPerson`
 // that must be the user's own rows and a `book` the user may read (foreign
 // ids), open by default, the same Book allowed twice.
-
-const ownerId = (doc: { owner: number | User }): number =>
-  typeof doc.owner === 'number' ? doc.owner : doc.owner.id
 
 describe('wishlist-entries', () => {
   let payload: Payload
@@ -41,14 +39,6 @@ describe('wishlist-entries', () => {
     gateway.create(await contextFor(user), {
       collection: 'wishlists',
       data: { owner: user.id, name: `Wishes ${randomUUID()}`, nameKey: 'ignored' },
-      depth: 0,
-    })
-
-  /** A uniquely named Person; `owner` and `nameKey` only satisfy the create type. */
-  const personAs = async (user: User) =>
-    gateway.create(await contextFor(user), {
-      collection: 'people',
-      data: { owner: user.id, name: `Liisa ${randomUUID()}`, nameKey: 'ignored' },
       depth: 0,
     })
 

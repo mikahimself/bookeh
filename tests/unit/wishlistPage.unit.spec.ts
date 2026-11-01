@@ -1,18 +1,13 @@
 // @vitest-environment jsdom
 import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
-import {
-  cloneElement,
-  createElement,
-  isValidElement,
-  type ComponentProps,
-  type ReactElement,
-  type ReactNode,
-} from 'react'
+import { createElement, type ComponentProps } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import type { EffectiveBook } from '@/lib/books/effectiveBook'
 import type { PersonUse } from '@/lib/people/people'
 import type { WishlistView } from '@/lib/wishlists/wishlists'
+
+import { serverTree } from '../helpers/serverTree'
 
 // EXPERIENCE.md, Wishlists and States; FR-38, FR-39, FR-48: one list under a
 // Back link, its name as typed as the `h1`; a row per open entry with "For
@@ -115,21 +110,6 @@ const { default: WishlistPage } =
   await import('@/app/(frontend)/(sections)/wishlists/[listId]/page')
 
 installNavigationTracking()
-
-/** The page's tree with its async server components awaited, as the server renderer does. */
-async function serverTree(node: ReactNode): Promise<ReactNode> {
-  if (Array.isArray(node)) return Promise.all(node.map(serverTree))
-  if (!isValidElement(node)) return node
-  const { type, props } = node as ReactElement<{ children?: ReactNode }>
-  if (typeof type === 'function' && type.constructor.name === 'AsyncFunction') {
-    return serverTree(await (type as (props: unknown) => Promise<ReactNode>)(props))
-  }
-  if (props.children === undefined) return node
-  const children = await serverTree(props.children)
-  return Array.isArray(children)
-    ? cloneElement(node, undefined, ...(children as ReactNode[]))
-    : cloneElement(node, undefined, children)
-}
 
 const renderPage = async (listId = '7', search: Record<string, string> = {}) =>
   render(

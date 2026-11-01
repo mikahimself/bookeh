@@ -8,6 +8,7 @@ import { undo, withUndo } from '@/lib/undo/undo'
 import config from '@/payload.config'
 import type { Book, Copy, User } from '@/payload-types'
 
+import { failure } from '../helpers/builders'
 import { contextFor, createUser } from '../helpers/harness'
 import { randomIsbn } from '../helpers/isbn'
 
@@ -55,8 +56,6 @@ describe('receiveCopy', () => {
     })
     return { user: updated, location }
   }
-
-  const failure = (promise: Promise<unknown>) => promise.catch((e: unknown) => e)
 
   beforeAll(async () => {
     payload = await getPayload({ config })

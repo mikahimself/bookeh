@@ -30,7 +30,8 @@ import { createWishlist } from '@/lib/wishlists/wishlists'
 import config from '@/payload.config'
 import type { Book, User } from '@/payload-types'
 
-import { contextFor, createUser } from '../helpers/harness'
+import { freshUser, sharedBook } from '../helpers/builders'
+import { contextFor } from '../helpers/harness'
 import { randomIsbn } from '../helpers/isbn'
 import { rejectedPaths } from '../helpers/validation'
 
@@ -133,14 +134,6 @@ describe('saveCopy of a held private Book', () => {
     return media
   }
 
-  const freshUser = async (admin = false) => {
-    const user = await createUser({
-      displayName: 'Share Private User',
-      ...(admin && { roles: ['admin'] }),
-    })
-    return { user, ctx: await contextFor(user) }
-  }
-
   /** A private Book of the context's user from a manual save, with one copy. */
   const privateBook = async (ctx: Context, isbn: string, title: string, author: string) => {
     const { bookId } = await saveCopy(ctx, {
@@ -152,18 +145,18 @@ describe('saveCopy of a held private Book', () => {
   }
 
   /** A shared Book as `ensureSharedBook()` leaves it, with one shared author. */
-  const sharedBook = async (isbn13: string, title: string, author: string): Promise<Book> => {
-    const system = { overrideAccess: true, depth: 0 } as const
+  const sharedBookWithAuthor = async (
+    isbn13: string,
+    title: string,
+    author: string,
+  ): Promise<Book> => {
     const shared = await payload.create({
       collection: 'authors',
       data: { name: author, nameKey: '', visibility: 'shared' },
-      ...system,
+      overrideAccess: true,
+      depth: 0,
     })
-    return payload.create({
-      collection: 'books',
-      data: { isbn13, title, authors: [shared.id], source: 'finna', visibility: 'shared' },
-      ...system,
-    })
+    return sharedBook({ isbn13, title, authors: [shared.id], source: 'finna' })
   }
 
   beforeAll(async () => {
@@ -202,7 +195,7 @@ describe('saveCopy of a held private Book', () => {
 
   /** A's private Book with ISBN X and a held `found` outcome for X. */
   const promoteSetup = async (admin = false) => {
-    const { user, ctx } = await freshUser(admin)
+    const { user, ctx } = await freshUser(admin ? { roles: ['admin'] } : {})
     const isbn = randomIsbn()
     const key = suffix()
     const own = await privateBook(ctx, isbn, 'T1', `aleksis kivi ${key}`)
@@ -454,12 +447,12 @@ describe('saveCopy of a held private Book', () => {
     ['a user, a held found', false, true],
     ['the admin', true, false],
   ])('merges the private Book into the shared one for %s', async (_, admin, held) => {
-    const { user, ctx } = await freshUser(admin)
+    const { user, ctx } = await freshUser(admin ? { roles: ['admin'] } : {})
     const isbn = randomIsbn()
     const author = `Juhani Aho ${suffix()}`
     const own = await privateBook(ctx, isbn, 'T1', author)
     await upsertUserBook(ctx, own.id, { read: true })
-    const shared = await sharedBook(isbn, 'T2', author.toUpperCase())
+    const shared = await sharedBookWithAuthor(isbn, 'T2', author.toUpperCase())
     if (held) vi.mocked(heldOutcome).mockReturnValue(found({ isbn13: isbn, coverUrl: COVER_URL }))
 
     const result = await saveCopy(ctx, isbnInput(isbn))
@@ -484,7 +477,7 @@ describe('saveCopy of a held private Book', () => {
     const isbn = randomIsbn()
     const own = await privateBook(ctx, isbn, 'T1', `Eino Leino ${suffix()}`)
     await upsertUserBook(ctx, own.id, { read: true, rating: 4 })
-    const shared = await sharedBook(isbn, 'T2', `Eino Leino ${suffix()}`)
+    const shared = await sharedBookWithAuthor(isbn, 'T2', `Eino Leino ${suffix()}`)
     await upsertUserBook(ctx, shared.id, { rating: 2, overrides: { title: 'Mine' } })
     const [before] = (await rowsOf(user)).filter((row) => row.book === shared.id)
 
@@ -527,7 +520,7 @@ describe('saveCopy of a held private Book', () => {
       data: { owner: user.id, wishlist: list, book: ownId, forPerson: person.id },
       depth: 0,
     })
-    const shared = await sharedBook(isbn, 'T2', author)
+    const shared = await sharedBookWithAuthor(isbn, 'T2', author)
 
     const result = await saveCopy(ctx, isbnInput(isbn))
 
@@ -554,7 +547,7 @@ describe('saveCopy of a held private Book', () => {
     const author = `Juhani Aho ${suffix()}`
     const own = await privateBook(ctx, isbn, 'T1', author)
     await upsertUserBook(ctx, own.id, { read: true })
-    await sharedBook(isbn, 'T2', author)
+    await sharedBookWithAuthor(isbn, 'T2', author)
     const b = await freshUser()
     // No app path can do this (AD-4): written past validation and access.
     const copyOfB = await payload.db.create({
@@ -609,7 +602,7 @@ describe('saveCopy of a held private Book', () => {
     const cover = await mediaRow(ctx, 'private')
     await setBookCover(ctx, own.id, cover.id)
     // The same loose key: no `authors` override keeps the private author.
-    const shared = await sharedBook(isbn, 'T2', `${author}.`)
+    const shared = await sharedBookWithAuthor(isbn, 'T2', `${author}.`)
     const sharedCover = await mediaRow(ctx, 'shared')
     await setBookCover(ctx, shared.id, sharedCover.id)
 
@@ -627,7 +620,7 @@ describe('saveCopy of a held private Book', () => {
     const own = await privateBook(ctx, isbn, 'T1', author)
     const cover = await mediaRow(ctx, 'private')
     await setBookCover(ctx, own.id, cover.id)
-    const shared = await sharedBook(isbn, 'T2', author)
+    const shared = await sharedBookWithAuthor(isbn, 'T2', author)
 
     await saveCopy(ctx, isbnInput(isbn))
 
@@ -649,7 +642,7 @@ describe('saveCopy of a held private Book', () => {
     const own = await privateBook(ctx, isbn, 'T1', author)
     await upsertUserBook(ctx, own.id, { rating: 4 })
     const [ownRow] = await rowsOf(user)
-    const shared = await sharedBook(isbn, 'T2', author)
+    const shared = await sharedBookWithAuthor(isbn, 'T2', author)
     await upsertUserBook(ctx, shared.id, { overrides: { title: 'Mine' } })
 
     await saveCopy(ctx, isbnInput(isbn))
@@ -674,7 +667,7 @@ describe('saveCopy of a held private Book', () => {
     const b = await freshUser()
     const ofB = await privateBook(b.ctx, isbn, 'T1', `Aleksis Kivi ${suffix()}`)
     const [copyOfB] = await copiesOf(b.user)
-    if (kind === 'merge') await sharedBook(isbn, 'T2', `Aleksis Kivi ${suffix()}`)
+    if (kind === 'merge') await sharedBookWithAuthor(isbn, 'T2', `Aleksis Kivi ${suffix()}`)
 
     await saveCopy(ctx, isbnInput(isbn))
     if (kind === 'promote') await trackCover(own.id)
@@ -689,7 +682,7 @@ describe('saveCopy of a held private Book', () => {
     async (kind) => {
       const { user, ctx, isbn, own, names } = await promoteSetup()
       await upsertUserBook(ctx, own.id, { read: true })
-      const shared = kind === 'merge' ? await sharedBook(isbn, 'T2', names.author) : own
+      const shared = kind === 'merge' ? await sharedBookWithAuthor(isbn, 'T2', names.author) : own
       const [oldCopy] = await copiesOf(user)
 
       const result = await saveCopy(ctx, isbnInput(isbn))

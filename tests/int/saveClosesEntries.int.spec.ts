@@ -16,8 +16,7 @@ import { createWishlist } from '@/lib/wishlists/wishlists'
 import config from '@/payload.config'
 import type { User } from '@/payload-types'
 
-import { contextFor, createUser } from '../helpers/harness'
-import { randomIsbn } from '../helpers/isbn'
+import { freshUser, sharedBook, unique } from '../helpers/builders'
 
 // `saveCopy()`, FR-28/AD-18: Add to library closes the user's own open
 // entries for the saved Book in the save's transaction, and its Undo reopens
@@ -31,8 +30,6 @@ vi.mock('@/lib/copies/createCopy', async (importOriginal) => {
   return { ...actual, createCopy: vi.fn(actual.createCopy) }
 })
 
-const unique = (name: string) => `${name} ${randomUUID().slice(0, 8)}`
-
 const copyInput = (target: CopySaveInput['target']): CopySaveInput => ({
   requestId: randomUUID(),
   target,
@@ -41,19 +38,6 @@ const copyInput = (target: CopySaveInput['target']): CopySaveInput => ({
 
 describe('saveCopy closes matching wishes', () => {
   let payload: Payload
-
-  const freshUser = async () => {
-    const user = await createUser({ displayName: 'Closes Entries User' })
-    return { user, ctx: await contextFor(user) }
-  }
-
-  const sharedBook = async () =>
-    payload.create({
-      collection: 'books',
-      data: { title: 'Tuntematon sotilas', isbn13: randomIsbn(), visibility: 'shared' },
-      overrideAccess: true,
-      depth: 0,
-    })
 
   const ownEntry = async (ctx: Context, wishlist: number, bookId: number) =>
     (await createEntry(ctx, { wishlist, bookId })).data.entryId

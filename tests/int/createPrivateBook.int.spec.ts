@@ -22,6 +22,7 @@ import { undo } from '@/lib/undo/undo'
 import config from '@/payload.config'
 import type { Author, Book, User, UserLocation } from '@/payload-types'
 
+import { freshUser, unique } from '../helpers/builders'
 import { as, contextFor, createUser } from '../helpers/harness'
 import { hyphenatedIsbn10, randomIsbn } from '../helpers/isbn'
 import { rejectedPaths } from '../helpers/validation'
@@ -32,8 +33,6 @@ import { rejectedPaths } from '../helpers/validation'
 // `lookupSources` and must never be asked by a save; `fetch` likewise.
 
 vi.mock('@/lib/metadata/lookup', () => ({ lookupSources: vi.fn(), heldOutcome: vi.fn() }))
-
-const unique = (name: string) => `${name} ${randomUUID().slice(0, 8)}`
 
 const manualInput = (manual: ManualEntry): CopySaveInput => ({
   requestId: randomUUID(),
@@ -103,11 +102,6 @@ describe('saveCopy with a manual target', () => {
       depth: 0,
       req: (await contextFor(user)).req,
     })
-
-  const freshUser = async (data: Partial<User> = {}) => {
-    const user = await createUser({ displayName: 'Manual Entry User', ...data })
-    return { user, ctx: await contextFor(user) }
-  }
 
   /** A fresh user whose profile default is a new location, and its context. */
   const userWithDefault = async () => {

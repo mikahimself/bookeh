@@ -15,8 +15,9 @@ import {
   resolvePerson,
 } from '@/lib/people/people'
 import config from '@/payload.config'
-import type { Book, Loan, Person, User, WishlistEntry } from '@/payload-types'
+import type { Book, Loan, User, WishlistEntry } from '@/payload-types'
 
+import { copyAs, failure, loanAs, personAs } from '../helpers/builders'
 import { contextFor, createUser } from '../helpers/harness'
 import { randomIsbn } from '../helpers/isbn'
 
@@ -31,37 +32,15 @@ describe('people service', () => {
   let payload: Payload
   let shared: Book
 
-  const personAs = async (user: User, name: string): Promise<Person> =>
-    gateway.create(await contextFor(user), {
-      collection: 'people',
-      data: { owner: user.id, name, nameKey: '' },
-      depth: 0,
-    })
-
-  /** A loan of a fresh copy of `user`'s; `owner` only satisfies the create type. */
-  const loanAs = async (
+  /** A loan of a new copy of `shared`, as `user`. */
+  const lendNewCopy = async (
     user: User,
     person: number,
     returnedOn?: string,
     lentOn = '2026-10-20',
   ): Promise<Loan> => {
-    const ctx = await contextFor(user)
-    const copy = await gateway.create(ctx, {
-      collection: 'copies',
-      data: { owner: user.id, book: shared.id, status: 'owned' },
-      depth: 0,
-    })
-    return gateway.create(ctx, {
-      collection: 'loans',
-      data: {
-        owner: user.id,
-        copy: copy.id,
-        person,
-        lentOn,
-        ...(returnedOn && { returnedOn }),
-      },
-      depth: 0,
-    })
+    const copy = await copyAs(user, { book: shared.id })
+    return loanAs(user, { copy: copy.id, person, lentOn, ...(returnedOn && { returnedOn }) })
   }
 
   /** A uniquely named list; `owner` and `nameKey` only satisfy the create type. */
@@ -119,8 +98,6 @@ describe('people service', () => {
       })
     ).docs.map(({ name }) => name)
 
-  const failure = (promise: Promise<unknown>) => promise.catch((e: unknown) => e)
-
   beforeAll(async () => {
     payload = await getPayload({ config })
     const creator = await createUser({ displayName: 'People Service Book' })
@@ -136,7 +113,7 @@ describe('people service', () => {
   it('resolves my own id, matches my name by nameKey and creates a new one', async () => {
     const a = await createUser({ displayName: 'Resolve Person' })
     const asA = await contextFor(a)
-    const antti = await personAs(a, 'Antti')
+    const antti = await personAs(a, { name: 'Antti' })
 
     expect(await resolvePerson(asA, antti.id)).toBe(antti.id)
     expect(await resolvePerson(asA, { create: '  ANTTI ' })).toBe(antti.id)
@@ -150,8 +127,8 @@ describe('people service', () => {
     const a = await createUser({ displayName: 'Resolve Person Viewer' })
     const admin = await createUser({ displayName: 'Resolve Person Admin', roles: ['admin'] })
     const b = await createUser({ displayName: 'Resolve Person Other' })
-    const theirs = await personAs(b, 'Antti')
-    const gone = await personAs(a, 'Gone')
+    const theirs = await personAs(b, { name: 'Antti' })
+    const gone = await personAs(a, { name: 'Gone' })
     await payload.delete({ collection: 'people', id: gone.id })
 
     const invalid = { code: 'VALIDATION', fields: { person: 'VALIDATION' } }
@@ -176,8 +153,8 @@ describe('people service', () => {
     const a = await createUser({ displayName: 'Own Names Viewer' })
     const admin = await createUser({ displayName: 'Own Names Admin', roles: ['admin'] })
     const b = await createUser({ displayName: 'Own Names Other' })
-    const antti = await personAs(b, 'Antti')
-    const liisa = await personAs(b, 'Liisa')
+    const antti = await personAs(b, { name: 'Antti' })
+    const liisa = await personAs(b, { name: 'Liisa' })
 
     for (const viewer of [a, admin]) {
       const ctx = await contextFor(viewer)
@@ -214,8 +191,8 @@ describe('people service', () => {
   it('renames a person, normalised, and allows a case-only rename of itself', async () => {
     const a = await createUser({ displayName: 'Rename Person' })
     const asA = await contextFor(a)
-    const antti = await personAs(a, 'Antti')
-    const liisa = await personAs(a, 'liisa')
+    const antti = await personAs(a, { name: 'Antti' })
+    const liisa = await personAs(a, { name: 'liisa' })
 
     await renamePerson(asA, antti.id, '  Antti   K ')
     await renamePerson(asA, liisa.id, 'Liisa')
@@ -236,8 +213,8 @@ describe('people service', () => {
 
   it("fails a rename onto a taken name with NAME_TAKEN and the other's id", async () => {
     const a = await createUser({ displayName: 'Rename Person Taken' })
-    const antti = await personAs(a, 'Antti')
-    const liisa = await personAs(a, 'Liisa')
+    const antti = await personAs(a, { name: 'Antti' })
+    const liisa = await personAs(a, { name: 'Liisa' })
 
     expect(await failure(renamePerson(await contextFor(a), antti.id, 'LIISA'))).toMatchObject({
       code: 'NAME_TAKEN',
@@ -250,12 +227,12 @@ describe('people service', () => {
     const a = await createUser({ displayName: 'People Viewer' })
     const admin = await createUser({ displayName: 'People Admin', roles: ['admin'] })
     const b = await createUser({ displayName: 'People Other' })
-    const theirs = await personAs(b, 'Antti')
-    const theirLoan = await loanAs(b, theirs.id)
-    const gone = await personAs(a, 'Gone')
+    const theirs = await personAs(b, { name: 'Antti' })
+    const theirLoan = await lendNewCopy(b, theirs.id)
+    const gone = await personAs(a, { name: 'Gone' })
     await payload.delete({ collection: 'people', id: gone.id })
-    const mine = await personAs(a, 'Liisa')
-    const mineAsAdmin = await personAs(admin, 'Liisa')
+    const mine = await personAs(a, { name: 'Liisa' })
+    const mineAsAdmin = await personAs(admin, { name: 'Liisa' })
 
     const notFound = { code: 'NOT_FOUND' }
     for (const [viewer, own] of [
@@ -279,13 +256,13 @@ describe('people service', () => {
 
   it('moves every loan and entry of the source to the target, then deletes the source', async () => {
     const a = await createUser({ displayName: 'Merge Person' })
-    const source = await personAs(a, 'Antti')
-    const target = await personAs(a, 'Antti K')
-    const other = await personAs(a, 'Liisa')
-    const open = await loanAs(a, source.id)
-    const returned = await loanAs(a, source.id, '2026-10-22')
-    const targets = await loanAs(a, target.id)
-    const others = await loanAs(a, other.id)
+    const source = await personAs(a, { name: 'Antti' })
+    const target = await personAs(a, { name: 'Antti K' })
+    const other = await personAs(a, { name: 'Liisa' })
+    const open = await lendNewCopy(a, source.id)
+    const returned = await lendNewCopy(a, source.id, '2026-10-22')
+    const targets = await lendNewCopy(a, target.id)
+    const others = await lendNewCopy(a, other.id)
     const closedAt = '2026-10-23T10:00:00.000Z'
     const openEntry = await entryAs(a, source.id)
     const closedEntry = await entryAs(a, source.id, closedAt)
@@ -307,8 +284,8 @@ describe('people service', () => {
 
   it('refuses to merge a Person into itself with VALIDATION', async () => {
     const a = await createUser({ displayName: 'Merge Person Itself' })
-    const p = await personAs(a, 'Antti')
-    const loan = await loanAs(a, p.id)
+    const p = await personAs(a, { name: 'Antti' })
+    const loan = await lendNewCopy(a, p.id)
 
     expect(await failure(mergePerson(await contextFor(a), p.id, p.id))).toMatchObject({
       code: 'VALIDATION',
@@ -319,9 +296,9 @@ describe('people service', () => {
 
   it("rolls a merge back with the caller's transaction", async () => {
     const a = await createUser({ displayName: 'Merge Person Rollback' })
-    const source = await personAs(a, 'Antti')
-    const target = await personAs(a, 'Liisa')
-    const loan = await loanAs(a, source.id)
+    const source = await personAs(a, { name: 'Antti' })
+    const target = await personAs(a, { name: 'Liisa' })
+    const loan = await lendNewCopy(a, source.id)
     const entry = await entryAs(a, source.id)
 
     const e = new Error('after')
@@ -340,13 +317,13 @@ describe('people service', () => {
   it('deletes an unused Person and refuses one with any loan or entry with PERSON_IN_USE', async () => {
     const a = await createUser({ displayName: 'Delete Person' })
     const asA = await contextFor(a)
-    const unused = await personAs(a, 'Antti')
-    const returned = await personAs(a, 'Liisa')
-    const open = await personAs(a, 'Kalle')
-    const wished = await personAs(a, 'Aino')
-    const wishedOnce = await personAs(a, 'Bea')
-    await loanAs(a, returned.id, '2026-10-22')
-    await loanAs(a, open.id)
+    const unused = await personAs(a, { name: 'Antti' })
+    const returned = await personAs(a, { name: 'Liisa' })
+    const open = await personAs(a, { name: 'Kalle' })
+    const wished = await personAs(a, { name: 'Aino' })
+    const wishedOnce = await personAs(a, { name: 'Bea' })
+    await lendNewCopy(a, returned.id, '2026-10-22')
+    await lendNewCopy(a, open.id)
     const openEntry = await entryAs(a, wished.id)
     const closedEntry = await entryAs(a, wishedOnce.id, '2026-10-23T10:00:00.000Z')
     // An own wish (no recipient) names no one.
@@ -367,16 +344,16 @@ describe('people service', () => {
     const a = await createUser({ displayName: 'Person Use' })
     const b = await createUser({ displayName: 'Person Use Other' })
     const admin = await createUser({ displayName: 'Person Use Admin', roles: ['admin'] })
-    const kalle = await personAs(admin, 'Kalle')
-    const liisa = await personAs(a, 'Liisa')
-    const antti = await personAs(a, 'Antti')
-    await loanAs(a, antti.id)
-    await loanAs(a, antti.id, '2026-10-22')
+    const kalle = await personAs(admin, { name: 'Kalle' })
+    const liisa = await personAs(a, { name: 'Liisa' })
+    const antti = await personAs(a, { name: 'Antti' })
+    await lendNewCopy(a, antti.id)
+    await lendNewCopy(a, antti.id, '2026-10-22')
     await entryAs(a, antti.id)
     await entryAs(a, antti.id, '2026-10-23T10:00:00.000Z')
     await entryAs(a, null)
-    const theirs = await personAs(b, 'Aino')
-    await loanAs(b, theirs.id)
+    const theirs = await personAs(b, { name: 'Aino' })
+    await lendNewCopy(b, theirs.id)
     await entryAs(b, theirs.id)
 
     expect(await personUse(await contextFor(a))).toEqual([
@@ -392,15 +369,15 @@ describe('people service', () => {
     const a = await createUser({ displayName: 'Lending People' })
     const b = await createUser({ displayName: 'Lending People Other' })
     const admin = await createUser({ displayName: 'Lending People Admin', roles: ['admin'] })
-    const bea = await personAs(a, 'Bea')
-    const leena = await personAs(a, 'Leena')
-    const antti = await personAs(a, 'Antti')
-    await loanAs(a, leena.id, '2026-10-05', '2026-10-01')
-    await loanAs(a, antti.id, undefined, '2026-10-20')
+    const bea = await personAs(a, { name: 'Bea' })
+    const leena = await personAs(a, { name: 'Leena' })
+    const antti = await personAs(a, { name: 'Antti' })
+    await lendNewCopy(a, leena.id, '2026-10-05', '2026-10-01')
+    await lendNewCopy(a, antti.id, undefined, '2026-10-20')
     // Older, and read after the newer one: the newest `lentOn` decides, not the last read.
-    await loanAs(a, antti.id, '2026-09-05', '2026-09-01')
-    const aino = await personAs(b, 'Aino')
-    await loanAs(b, aino.id)
+    await lendNewCopy(a, antti.id, '2026-09-05', '2026-09-01')
+    const aino = await personAs(b, { name: 'Aino' })
+    await lendNewCopy(b, aino.id)
 
     expect(await lendingPeople(await contextFor(a))).toEqual([
       { id: antti.id, name: 'Antti' },

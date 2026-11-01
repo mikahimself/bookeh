@@ -29,7 +29,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 10-06-2026 17:50
-last_updated: 10-30-2026 18:10
+last_updated: 11-01-2026 12:00
 project: bookeh
 project_key: NOKEY
 tracking_system: file-system
@@ -236,7 +236,7 @@ development_status:
   7-22-k28-repo-tidy: done
   7-23-k29-shared-service-code: done
   7-24-k30-shared-frontend-code: done
-  7-25-k31-shared-test-helpers: backlog
+  7-25-k31-shared-test-helpers: done
   7-26-k32-spec-reconciliation: backlog
   7-27-k33-owed-checks-on-the-phone-and-the-lxc: backlog
   epic-7-retrospective: done
@@ -253,6 +253,10 @@ development_status:
   8-9-i7-add-by-hand-from-lookup: backlog
   8-10-i8-end-to-end-shop-check: backlog
   8-11-k21-page-not-found: backlog
+  8-12-i13-open-library-source: backlog
+  8-13-i14-hardcover-source: backlog
+  8-14-i15-enrichment-sources: backlog
+  8-15-i16-kirjasampo-enrichment: backlog
   epic-8-retrospective: optional
 
   epic-9: backlog

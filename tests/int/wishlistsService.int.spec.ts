@@ -17,6 +17,7 @@ import {
 import config from '@/payload.config'
 import type { Book, User, Wishlist, WishlistEntry } from '@/payload-types'
 
+import { failure } from '../helpers/builders'
 import { contextFor, createUser } from '../helpers/harness'
 import { randomIsbn } from '../helpers/isbn'
 
@@ -65,8 +66,6 @@ describe('wishlists service', () => {
 
   const exists = async (collection: 'wishlists' | 'wishlist-entries', id: number) =>
     (await payload.count({ collection, where: { id: { equals: id } } })).totalDocs === 1
-
-  const failure = (promise: Promise<unknown>) => promise.catch((e: unknown) => e)
 
   beforeAll(async () => {
     payload = await getPayload({ config })

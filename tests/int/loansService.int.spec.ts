@@ -8,8 +8,9 @@ import { lendCopy, openLoans, returnedLoans, returnLoan } from '@/lib/loans/loan
 import * as gateway from '@/lib/payload/gateway'
 import { undo, withUndo } from '@/lib/undo/undo'
 import config from '@/payload.config'
-import type { Book, Copy, Person, User } from '@/payload-types'
+import type { Book, Person, User } from '@/payload-types'
 
+import { copyAs, failure, personAs } from '../helpers/builders'
 import { contextFor, createUser } from '../helpers/harness'
 import { randomIsbn } from '../helpers/isbn'
 
@@ -29,24 +30,6 @@ const dayAfter = (date: string) =>
 describe('loans service', () => {
   let payload: Payload
   let shared: Book
-
-  const copyAs = async (
-    user: User,
-    status: Copy['status'] = 'owned',
-    location: number | null = null,
-  ): Promise<Copy> =>
-    gateway.create(await contextFor(user), {
-      collection: 'copies',
-      data: { owner: user.id, book: shared.id, status, location },
-      depth: 0,
-    })
-
-  const personAs = async (user: User, name = `Liisa ${randomUUID()}`): Promise<Person> =>
-    gateway.create(await contextFor(user), {
-      collection: 'people',
-      data: { owner: user.id, name, nameKey: '' },
-      depth: 0,
-    })
 
   const storedCopy = async (id: number) => {
     const { status, location } = await payload.findByID({ collection: 'copies', id, depth: 0 })
@@ -98,7 +81,7 @@ describe('loans service', () => {
       data: { owner: user.id, name: 'Olohuone', nameKey: '' },
       depth: 0,
     })
-    const copy = await copyAs(user, 'owned', location.id)
+    const copy = await copyAs(user, { book: shared.id, location: location.id })
     const person = await personAs(user)
     return { user, ctx, location, copy, person }
   }
@@ -109,8 +92,6 @@ describe('loans service', () => {
     const { data } = await lendCopy(l.ctx, l.copy.id, l.person.id, '2026-10-01')
     return { ...l, loanId: data.loanId }
   }
-
-  const failure = (promise: Promise<unknown>) => promise.catch((e: unknown) => e)
 
   beforeAll(async () => {
     payload = await getPayload({ config })
@@ -179,7 +160,7 @@ describe('loans service', () => {
 
   it('refuses an ordered or already lent copy on copy, writing nothing', async () => {
     const { user, ctx, copy, person } = await lender('Lend Refused Copy')
-    const ordered = await copyAs(user, 'ordered')
+    const ordered = await copyAs(user, { book: shared.id, status: 'ordered' })
     const invalid = { code: 'VALIDATION', fields: { copy: 'VALIDATION' } }
 
     expect(await failure(lendCopy(ctx, ordered.id, person.id))).toMatchObject(invalid)
@@ -206,8 +187,8 @@ describe('loans service', () => {
     const a = await createUser({ displayName: 'Lend Viewer' })
     const admin = await createUser({ displayName: 'Lend Admin', roles: ['admin'] })
     const b = await createUser({ displayName: 'Lend Other' })
-    const theirs = await copyAs(b)
-    const gone = await copyAs(a)
+    const theirs = await copyAs(b, { book: shared.id })
+    const gone = await copyAs(a, { book: shared.id })
     await payload.delete({ collection: 'copies', id: gone.id })
 
     for (const viewer of [a, admin]) {
@@ -322,10 +303,10 @@ describe('loans service', () => {
 
   it("lists only the viewer's open loans, longest out first, ties by id", async () => {
     const { user, ctx, copy, person } = await lender('Open Loans Viewer')
-    const second = await copyAs(user)
-    const third = await copyAs(user)
-    const returned = await copyAs(user)
-    const antti = await personAs(user, `Antti ${randomUUID()}`)
+    const second = await copyAs(user, { book: shared.id })
+    const third = await copyAs(user, { book: shared.id })
+    const returned = await copyAs(user, { book: shared.id })
+    const antti = await personAs(user, { name: `Antti ${randomUUID()}` })
     const first = await lendCopy(ctx, second.id, antti.id, '2026-09-01')
     const next = await lendCopy(ctx, third.id, antti.id, '2026-09-12')
     // Moved onto `next`'s day after it: the lower id is no longer the first row stored.
@@ -341,7 +322,7 @@ describe('loans service', () => {
 
     const admin = await createUser({ displayName: 'Open Loans Admin', roles: ['admin'] })
     const adminCtx = await contextFor(admin)
-    const adminCopy = await copyAs(admin)
+    const adminCopy = await copyAs(admin, { book: shared.id })
     const adminLoan = await lendCopy(adminCtx, adminCopy.id, { create: 'Kalle' }, '2026-01-01')
 
     const named = (p: Person) => ({ id: p.id, name: p.name })
@@ -372,8 +353,12 @@ describe('loans service', () => {
   })
   it("lists only the viewer's returned loans, newest return first, ties by lentOn then id", async () => {
     const { user, ctx, copy, person } = await lender('Returned Loans Viewer')
-    const [second, third, fourth] = [await copyAs(user), await copyAs(user), await copyAs(user)]
-    const antti = await personAs(user, `Antti ${randomUUID()}`)
+    const [second, third, fourth] = [
+      await copyAs(user, { book: shared.id }),
+      await copyAs(user, { book: shared.id }),
+      await copyAs(user, { book: shared.id }),
+    ]
+    const antti = await personAs(user, { name: `Antti ${randomUUID()}` })
     const lentReturned = async (
       copyId: number,
       who: number,
@@ -397,7 +382,7 @@ describe('loans service', () => {
     const adminCtx = await contextFor(admin)
     const adminLoan = await lendCopy(
       adminCtx,
-      (await copyAs(admin)).id,
+      (await copyAs(admin, { book: shared.id })).id,
       { create: 'Kalle' },
       '2026-01-01',
     )
@@ -431,7 +416,7 @@ describe('loans service', () => {
 
   it("narrows returnedLoans to the viewer's copies of one Book, newest return first", async () => {
     const { user, ctx, copy, person } = await lender('Lent Before Viewer')
-    const second = await copyAs(user)
+    const second = await copyAs(user, { book: shared.id })
     const otherBook = await payload.create({
       collection: 'books',
       data: { title: 'Sinuhe egyptiläinen', isbn13: randomIsbn(), visibility: 'shared' },
@@ -466,7 +451,7 @@ describe('loans service', () => {
     const adminCtx = await contextFor(admin)
     await lentReturned(
       adminCtx,
-      (await copyAs(admin)).id,
+      (await copyAs(admin, { book: shared.id })).id,
       { create: 'Kalle' },
       '2026-01-01',
       '2026-05-01',

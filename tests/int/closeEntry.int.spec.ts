@@ -1,5 +1,3 @@
-import { randomUUID } from 'node:crypto'
-
 import { getPayload, type Payload } from 'payload'
 import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest'
 
@@ -14,8 +12,8 @@ import { createWishlist } from '@/lib/wishlists/wishlists'
 import config from '@/payload.config'
 import type { User } from '@/payload-types'
 
+import { sharedBook, unique } from '../helpers/builders'
 import { contextFor, createUser } from '../helpers/harness'
-import { randomIsbn } from '../helpers/isbn'
 
 // `closeEntry()`, FR-28/AD-18/AD-20: Bought and Ordered close one entry and
 // make a copy only for the user's own wish; Undo deletes the copy and reopens
@@ -26,8 +24,6 @@ vi.mock('@/lib/copies/createCopy', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@/lib/copies/createCopy')>()
   return { ...actual, createCopy: vi.fn(actual.createCopy) }
 })
-
-const unique = (name: string) => `${name} ${randomUUID().slice(0, 8)}`
 
 describe('closeEntry', () => {
   let payload: Payload
@@ -50,14 +46,6 @@ describe('closeEntry', () => {
     })
     return { user, ctx: await contextFor(user), location }
   }
-
-  const sharedBook = async () =>
-    payload.create({
-      collection: 'books',
-      data: { title: 'Seitsemän veljestä', isbn13: randomIsbn(), visibility: 'shared' },
-      overrideAccess: true,
-      depth: 0,
-    })
 
   const ownEntry = async (ctx: Context, bookId: number) => {
     const wishlist = await createWishlist(ctx, unique('Toiveet'))

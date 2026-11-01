@@ -1,5 +1,3 @@
-import { randomUUID } from 'node:crypto'
-
 import { getPayload, type Payload } from 'payload'
 import { beforeAll, describe, expect, it } from 'vitest'
 
@@ -11,30 +9,15 @@ import { createWishlist } from '@/lib/wishlists/wishlists'
 import config from '@/payload.config'
 import type { User } from '@/payload-types'
 
+import { freshUser, sharedBook, unique } from '../helpers/builders'
 import { contextFor, createUser } from '../helpers/harness'
-import { randomIsbn } from '../helpers/isbn'
 
 // `setEntryRecipient()` and `removeEntry()`, FR-38/AD-18: the opened entry's
 // "For" and Remove, on the user's own open entries only. Rows are checked per
 // user: other files write in parallel.
 
-const unique = (name: string) => `${name} ${randomUUID().slice(0, 8)}`
-
 describe('entry recipient and removal', () => {
   let payload: Payload
-
-  const user = async () => {
-    const created = await createUser({ displayName: 'Entry Recipient User' })
-    return { user: created, ctx: await contextFor(created) }
-  }
-
-  const sharedBook = async () =>
-    payload.create({
-      collection: 'books',
-      data: { title: 'Seitsemän veljestä', isbn13: randomIsbn(), visibility: 'shared' },
-      overrideAccess: true,
-      depth: 0,
-    })
 
   const ownEntry = async (ctx: Context, bookId: number) => {
     const wishlist = await createWishlist(ctx, unique('Toiveet'))
@@ -80,7 +63,7 @@ describe('entry recipient and removal', () => {
 
   describe('setEntryRecipient', () => {
     it('sets, changes and clears the recipient by id', async () => {
-      const a = await user()
+      const a = await freshUser()
       const x = await sharedBook()
       const entry = await ownEntry(a.ctx, x.id)
       const other = await ownEntry(a.ctx, x.id)
@@ -98,7 +81,7 @@ describe('entry recipient and removal', () => {
     })
 
     it('creates a Person for a new inline name', async () => {
-      const a = await user()
+      const a = await freshUser()
       const entry = await ownEntry(a.ctx, (await sharedBook()).id)
 
       const id = await setEntryRecipient(a.ctx, entry, { create: 'Liisa' })
@@ -108,7 +91,7 @@ describe('entry recipient and removal', () => {
     })
 
     it('reuses the Person an inline name matches by nameKey', async () => {
-      const a = await user()
+      const a = await freshUser()
       const entry = await ownEntry(a.ctx, (await sharedBook()).id)
       const liisa = await createPerson(a.ctx, 'Liisa')
 
@@ -119,8 +102,8 @@ describe('entry recipient and removal', () => {
     })
 
     it('fails with VALIDATION on person for a foreign Person or a blank name, changing nothing', async () => {
-      const a = await user()
-      const b = await user()
+      const a = await freshUser()
+      const b = await freshUser()
       const entry = await ownEntry(a.ctx, (await sharedBook()).id)
       const p = await createPerson(a.ctx, 'Liisa')
       await setEntryRecipient(a.ctx, entry, p)
@@ -138,8 +121,8 @@ describe('entry recipient and removal', () => {
     })
 
     it('fails with NOT_FOUND for a closed, a foreign or a non-row id, creating no Person', async () => {
-      const a = await user()
-      const b = await user()
+      const a = await freshUser()
+      const b = await freshUser()
       const x = await sharedBook()
       const closed = await ownEntry(a.ctx, x.id)
       await closeByHand(a.ctx, closed)
@@ -168,7 +151,7 @@ describe('entry recipient and removal', () => {
 
   describe('removeEntry', () => {
     it('deletes only that entry', async () => {
-      const a = await user()
+      const a = await freshUser()
       const x = await sharedBook()
       const entry = await ownEntry(a.ctx, x.id)
       const other = await ownEntry(a.ctx, x.id)
@@ -179,8 +162,8 @@ describe('entry recipient and removal', () => {
     })
 
     it('fails with NOT_FOUND for a closed, a foreign or a non-row id, deleting nothing', async () => {
-      const a = await user()
-      const b = await user()
+      const a = await freshUser()
+      const b = await freshUser()
       const x = await sharedBook()
       const closed = await ownEntry(a.ctx, x.id)
       await closeByHand(a.ctx, closed)

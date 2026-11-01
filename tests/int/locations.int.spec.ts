@@ -5,6 +5,7 @@ import * as gateway from '@/lib/payload/gateway'
 import config from '@/payload.config'
 import type { Book, Copy, User, UserLocation } from '@/payload-types'
 
+import { copyAs, ownerId } from '../helpers/builders'
 import { as, contextFor, createUser } from '../helpers/harness'
 import { randomIsbn } from '../helpers/isbn'
 import { rejectedPaths } from '../helpers/validation'
@@ -14,9 +15,6 @@ import { rejectedPaths } from '../helpers/validation'
 // `users.defaultLocation` take the owner's locations only, an ordered copy has
 // none (AD-8), and the admin never reads or writes another user's default
 // (FR-48) without locking that user's row.
-
-const ownerId = (doc: { owner: number | User }): number =>
-  typeof doc.owner === 'number' ? doc.owner : doc.owner.id
 
 describe('locations', () => {
   let payload: Payload
@@ -33,13 +31,6 @@ describe('locations', () => {
     gateway.create(await contextFor(user), {
       collection: 'locations',
       data: { owner: user.id, name: 'Hylly', nameKey: 'ignored', ...data },
-      depth: 0,
-    })
-
-  const copyAs = async (user: User, data: Partial<Copy> = {}) =>
-    gateway.create(await contextFor(user), {
-      collection: 'copies',
-      data: { owner: user.id, book: shared.id, status: 'owned', ...data },
       depth: 0,
     })
 
@@ -124,10 +115,12 @@ describe('locations', () => {
 
   it("puts a copy at one of the owner's locations only", async () => {
     const own = await locationAs(a, { name: 'Olohuone' })
-    expect((await copyAs(a, { location: own.id })).location).toBe(own.id)
+    expect((await copyAs(a, { book: shared.id, location: own.id })).location).toBe(own.id)
 
     const foreign = await locationAs(b, { name: 'Olohuone' })
-    expect(await rejectedPaths(copyAs(a, { location: foreign.id }))).toEqual(['location'])
+    expect(await rejectedPaths(copyAs(a, { book: shared.id, location: foreign.id }))).toEqual([
+      'location',
+    ])
     const { totalDocs } = await payload.count({
       collection: 'copies',
       where: { location: { equals: foreign.id } },
@@ -137,11 +130,11 @@ describe('locations', () => {
 
   it('keeps an ordered copy without a location', async () => {
     const own = await locationAs(a, { name: 'Varasto' })
-    expect(await rejectedPaths(copyAs(a, { status: 'ordered', location: own.id }))).toEqual([
-      'location',
-    ])
+    expect(
+      await rejectedPaths(copyAs(a, { book: shared.id, status: 'ordered', location: own.id })),
+    ).toEqual(['location'])
 
-    const copy = await copyAs(a, { location: own.id })
+    const copy = await copyAs(a, { book: shared.id, location: own.id })
     const asA = await contextFor(a)
     const update = (data: Partial<Copy>) =>
       gateway.updateByID(asA, { collection: 'copies', id: copy.id, data, depth: 0 })

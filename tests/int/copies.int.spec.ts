@@ -11,6 +11,7 @@ import * as gateway from '@/lib/payload/gateway'
 import config from '@/payload.config'
 import type { Book, Copy, User } from '@/payload-types'
 
+import { copyAs, ownerId } from '../helpers/builders'
 import { contextFor, createUser } from '../helpers/harness'
 import { randomIsbn } from '../helpers/isbn'
 import { rejectedPaths } from '../helpers/validation'
@@ -19,9 +20,6 @@ import { rejectedPaths } from '../helpers/validation'
 // binds the admin too, a `book` that must be readable by the request user and
 // the two-value `status`. This file tests the collection directly, writing
 // through the gateway as a user; services create copies through `createCopy()`.
-
-const ownerId = (copy: Copy): number =>
-  typeof copy.owner === 'number' ? copy.owner : copy.owner.id
 
 describe('copies', () => {
   let payload: Payload
@@ -40,14 +38,6 @@ describe('copies', () => {
       req: (await contextFor(user)).req,
     })
 
-  /** A copy created by `user` through the gateway; `owner` only satisfies the create type. */
-  const copyAs = async (user: User, data: Partial<Copy> = {}) =>
-    gateway.create(await contextFor(user), {
-      collection: 'copies',
-      data: { owner: user.id, book: shared.id, status: 'owned', ...data },
-      depth: 0,
-    })
-
   const systemRead = (id: number) => payload.findByID({ collection: 'copies', id, depth: 0 })
 
   beforeAll(async () => {
@@ -59,7 +49,7 @@ describe('copies', () => {
   })
 
   it('saves a copy for the request user, whatever owner the input names', async () => {
-    const copy = await copyAs(a, { owner: b.id, notes: 'Signed' })
+    const copy = await copyAs(a, { book: shared.id, owner: b.id, notes: 'Signed' })
     expect(ownerId(copy)).toBe(a.id)
     expect(copy.book).toBe(shared.id)
     expect(copy.status).toBe('owned')
@@ -75,7 +65,7 @@ describe('copies', () => {
   })
 
   it("accepts a shared Book and the user's own private Book, rejects another user's", async () => {
-    expect(ownerId(await copyAs(b))).toBe(b.id)
+    expect(ownerId(await copyAs(b, { book: shared.id }))).toBe(b.id)
     const privateBook = await systemBook(a, 'private')
     await expect(copyAs(a, { book: privateBook.id })).resolves.toBeDefined()
     expect(await rejectedPaths(copyAs(b, { book: privateBook.id }))).toEqual(['book'])
@@ -87,7 +77,7 @@ describe('copies', () => {
   })
 
   it('hides a copy from another user and from the admin alike', async () => {
-    const copy = await copyAs(a)
+    const copy = await copyAs(a, { book: shared.id })
     for (const user of [b, admin]) {
       const ctx = await contextFor(user)
       const seen = await gateway.find(ctx, {
@@ -102,7 +92,7 @@ describe('copies', () => {
   })
 
   it("refuses another user's writes and leaves the row as it was", async () => {
-    const copy = await copyAs(a, { notes: 'Mine' })
+    const copy = await copyAs(a, { book: shared.id, notes: 'Mine' })
     const asB = await contextFor(b)
     // Unlike reads, Payload's by-ID writes answer Forbidden, not NotFound,
     // when a `where` access policy hides the row.
@@ -118,7 +108,7 @@ describe('copies', () => {
   })
 
   it('lets the owner edit and delete', async () => {
-    const copy = await copyAs(a)
+    const copy = await copyAs(a, { book: shared.id })
     const asA = await contextFor(a)
     const updated = await gateway.updateByID(asA, {
       collection: 'copies',
@@ -131,7 +121,7 @@ describe('copies', () => {
   })
 
   it('lets a signed-out request read nothing', async () => {
-    const copy = await copyAs(a)
+    const copy = await copyAs(a, { book: shared.id })
     await expect(
       payload.find({
         collection: 'copies',
@@ -157,6 +147,6 @@ describe('copies', () => {
 
   it('rejects a status outside ordered | owned', async () => {
     const status = 'loaned' as Copy['status']
-    expect(await rejectedPaths(copyAs(a, { status }))).toEqual(['status'])
+    expect(await rejectedPaths(copyAs(a, { book: shared.id, status }))).toEqual(['status'])
   })
 })

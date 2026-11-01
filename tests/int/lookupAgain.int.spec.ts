@@ -15,7 +15,7 @@ import { createWishlist } from '@/lib/wishlists/wishlists'
 import config from '@/payload.config'
 import type { Book, User } from '@/payload-types'
 
-import { contextFor, createUser } from '../helpers/harness'
+import { freshUser, sharedBook } from '../helpers/builders'
 import { randomIsbn } from '../helpers/isbn'
 
 // Story 5.35, FR-12/AD-5/D-8: Look it up again asks the sources fresh for the
@@ -63,14 +63,6 @@ describe('lookupAgain', () => {
       })
     ).docs
 
-  const freshUser = async (admin = false) => {
-    const user = await createUser({
-      displayName: 'Look Again User',
-      ...(admin && { roles: ['admin', 'user'] }),
-    })
-    return { user, ctx: await contextFor(user) }
-  }
-
   /** A private Book of the context's user from a manual save, with one copy. */
   const privateBook = async (ctx: Context, isbn: string | undefined, title = 'T1') => {
     const { bookId } = await saveCopy(ctx, {
@@ -81,17 +73,12 @@ describe('lookupAgain', () => {
     return bookById(bookId)
   }
 
-  const sharedBook = (isbn13: string): Promise<Book> =>
-    payload.create({
-      collection: 'books',
-      data: { isbn13, title: 'T2', source: 'google', visibility: 'shared' },
-      overrideAccess: true,
-      depth: 0,
-    })
+  const t2Book = (isbn13: string): Promise<Book> =>
+    sharedBook({ isbn13, title: 'T2', source: 'google' })
 
   /** The viewer's private Book with ISBN X and another user's private Book with X. */
   const setup = async (admin = false) => {
-    const a = await freshUser(admin)
+    const a = await freshUser(admin ? { roles: ['admin', 'user'] } : {})
     const isbn = randomIsbn()
     const own = await privateBook(a.ctx, isbn)
     const b = await freshUser()
@@ -146,7 +133,7 @@ describe('lookupAgain', () => {
 
   it('merges into the shared Book with the ISBN without asking the sources or counting a lookup', async () => {
     const { user, ctx, isbn, own, untouched } = await setup()
-    const shared = await sharedBook(isbn)
+    const shared = await t2Book(isbn)
     // AD-9: the limit is spent, yet the merge asks no source and so still runs.
     for (let i = 0; i < LOOKUP_LIMIT; i++) limitLookups(ctx)
 
@@ -165,7 +152,7 @@ describe('lookupAgain', () => {
     const { user, ctx, isbn, own, untouched } = await setup()
     const list = await createWishlist(ctx, `Toiveet ${suffix()}`)
     const { entryId } = (await createEntry(ctx, { wishlist: list, bookId: own.id })).data
-    const shared = await sharedBook(isbn)
+    const shared = await t2Book(isbn)
 
     const result = await lookupAgain(ctx, { bookId: own.id })
 
@@ -271,7 +258,7 @@ describe('lookupAgain', () => {
 
   it('is NOT_FOUND before any source call for a shared Book, no ISBN or a Book not held', async () => {
     const { ctx } = await freshUser()
-    const shared = await sharedBook(randomIsbn())
+    const shared = await t2Book(randomIsbn())
     await payload.create({
       collection: 'copies',
       data: { owner: ctx.user.id, book: shared.id, status: 'owned' },

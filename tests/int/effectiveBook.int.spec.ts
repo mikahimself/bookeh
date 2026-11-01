@@ -1,5 +1,3 @@
-import { randomUUID } from 'node:crypto'
-
 import { getPayload, type Payload } from 'payload'
 import sharp from 'sharp'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
@@ -11,6 +9,7 @@ import * as gateway from '@/lib/payload/gateway'
 import config from '@/payload.config'
 import type { Author, Book, Genre, Media, Series, User } from '@/payload-types'
 
+import { unique } from '../helpers/builders'
 import { contextFor, createUser } from '../helpers/harness'
 import { randomIsbn } from '../helpers/isbn'
 
@@ -18,8 +17,6 @@ import { randomIsbn } from '../helpers/isbn'
 // over one shared Book, seen by three users; unreadable ids are absent; the
 // cover URL is the one Payload computes. Shared name keys are unique and rows
 // stay, so every name carries a per-run suffix.
-
-const unique = (name: string) => `${name} ${randomUUID().slice(0, 8)}`
 
 describe('getEffectiveBooks', () => {
   let payload: Payload

@@ -18,7 +18,7 @@ import { createWishlist, deleteWishlist } from '@/lib/wishlists/wishlists'
 import config from '@/payload.config'
 import type { User } from '@/payload-types'
 
-import { contextFor, createUser } from '../helpers/harness'
+import { freshUser, sharedBook, unique } from '../helpers/builders'
 import { randomIsbn } from '../helpers/isbn'
 
 // `saveEntry()`, AD-11/AD-18/FR-21: Add to wishlist ensures the Book as
@@ -28,8 +28,6 @@ import { randomIsbn } from '../helpers/isbn'
 // write in parallel.
 
 vi.mock('@/lib/metadata/lookup', () => ({ lookupSources: vi.fn(), heldOutcome: vi.fn() }))
-
-const unique = (name: string) => `${name} ${randomUUID().slice(0, 8)}`
 
 const COVER_URL = 'https://api.finna.fi/Cover/Show?source=Solr&id=x&index=0&size=large'
 
@@ -74,11 +72,6 @@ describe('saveEntry', () => {
   const mediaIds: number[] = []
   const filenames: string[] = []
 
-  const freshUser = async () => {
-    const user = await createUser({ displayName: 'Save Entry User' })
-    return { user, ctx: await contextFor(user) }
-  }
-
   const find = async <C extends 'copies' | 'wishlist-entries' | 'wishlists'>(
     collection: C,
     user: User,
@@ -113,14 +106,6 @@ describe('saveEntry', () => {
         overrideAccess: true,
       })
     ).totalDocs
-
-  const sharedBook = async (isbn13: string) =>
-    payload.create({
-      collection: 'books',
-      data: { title: 'Seitsemän veljestä', isbn13, visibility: 'shared' },
-      overrideAccess: true,
-      depth: 0,
-    })
 
   /** The Book's cover row, recorded for cleanup. */
   const coverOf = async (bookId: number) => {
@@ -179,7 +164,7 @@ describe('saveEntry', () => {
     const miss = await saveEntry(ctx, entryInput({ isbn13: isbn }, listId))
     await coverOf(miss.bookId)
     const held = randomIsbn()
-    const existing = await sharedBook(held)
+    const existing = await sharedBook({ isbn13: held })
     const hit = await saveEntry(ctx, entryInput({ isbn13: held }, listId))
 
     expect(miss).toEqual({
@@ -205,9 +190,9 @@ describe('saveEntry', () => {
   it('saves by id a Book held by a copy or only by an entry, never one not held', async () => {
     const { user, ctx } = await freshUser()
     const listId = await createWishlist(ctx, unique('Toiveet'))
-    const byCopy = await sharedBook(randomIsbn())
-    const byEntry = await sharedBook(randomIsbn())
-    const notHeld = await sharedBook(randomIsbn())
+    const byCopy = await sharedBook()
+    const byEntry = await sharedBook()
+    const notHeld = await sharedBook()
     await saveCopy(ctx, {
       requestId: randomUUID(),
       target: { isbn13: byCopy.isbn13! },
@@ -255,7 +240,7 @@ describe('saveEntry', () => {
   it('creates a list named by the Ref and reuses it for the same name in another case', async () => {
     const { user, ctx } = await freshUser()
     const isbn = randomIsbn()
-    await sharedBook(isbn)
+    await sharedBook({ isbn13: isbn })
 
     const first = await saveEntry(ctx, entryInput({ isbn13: isbn }, { create: 'Joulu' }))
     const second = await saveEntry(ctx, entryInput({ isbn13: isbn }, { create: 'joulu' }))
@@ -296,7 +281,7 @@ describe('saveEntry', () => {
     const { user, ctx } = await freshUser()
     const listId = await createWishlist(ctx, unique('Kahdesti'))
     const isbn = randomIsbn()
-    await sharedBook(isbn)
+    await sharedBook({ isbn13: isbn })
     const input = entryInput({ isbn13: isbn }, listId)
 
     const first = await saveEntry(ctx, input)
@@ -368,7 +353,7 @@ describe('saveEntry', () => {
     it('keeps a list the save created by name', async () => {
       const { user, ctx } = await freshUser()
       const isbn = randomIsbn()
-      const book = await sharedBook(isbn)
+      const book = await sharedBook({ isbn13: isbn })
 
       const result = await saveEntry(ctx, entryInput({ isbn13: isbn }, { create: unique('Uusi') }))
       await undo(ctx, result.undoToken)

@@ -5,14 +5,12 @@ import * as gateway from '@/lib/payload/gateway'
 import config from '@/payload.config'
 import type { User, Wishlist } from '@/payload-types'
 
+import { ownerId } from '../helpers/builders'
 import { contextFor, createUser } from '../helpers/harness'
 import { rejectedPaths } from '../helpers/validation'
 
 // `wishlists`, AD-1/AD-2/AD-19, FR-38: owner from the request, owner-scoped
 // access that binds the admin too, one name per owner by key in the database.
-
-const ownerId = (doc: { owner: number | User }): number =>
-  typeof doc.owner === 'number' ? doc.owner : doc.owner.id
 
 describe('wishlists', () => {
   let payload: Payload

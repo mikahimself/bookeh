@@ -1,5 +1,3 @@
-import { randomUUID } from 'node:crypto'
-
 import { getPayload, ValidationError, type Payload } from 'payload'
 import { beforeAll, describe, expect, it } from 'vitest'
 
@@ -14,6 +12,7 @@ import { withTransaction } from '@/lib/payload/transaction'
 import config from '@/payload.config'
 import type { User } from '@/payload-types'
 
+import { unique } from '../helpers/builders'
 import { contextFor, createUser } from '../helpers/harness'
 import { randomIsbn } from '../helpers/isbn'
 
@@ -21,8 +20,6 @@ import { randomIsbn } from '../helpers/isbn'
 // the candidate the save chose (`chooseCandidate()`) with shared authors and
 // series, or returned as it is. It asks no source: the save resolved the
 // outcome before (AD-11), so the tests hand it one.
-
-const unique = (name: string) => `${name} ${randomUUID().slice(0, 8)}`
 
 const raw = (title: string): RawMetadata => ({
   v: 1,

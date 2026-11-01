@@ -442,9 +442,9 @@ Named lists with counts, Add to wishlist from the Answer and Book detail with Un
 **FRs covered:** FR-21 (Add to wishlist), FR-22 (wishlist), FR-26 (entries), FR-28 (bought, ordered), FR-38, FR-39.
 
 ### Epic 8: Shop check — "do I already have this?"
-The full Answer: In library, Ordered, On wishlist or Not in library as the heading, every other fact as a line; Lookup by title or author with "In your library" and "Elsewhere"; lookup of a Book without an ISBN; the shop-check end-to-end test.
-**Slices:** I1, I2, I4–I8, I10–I12, K21 (page not found, added at the Epic 7 retro).
-**FRs covered:** FR-20, FR-21, FR-22 (complete).
+The full Answer: In library, Ordered, On wishlist or Not in library as the heading, every other fact as a line; Lookup by title or author with "In your library" and "Elsewhere"; lookup of a Book without an ISBN; the shop-check end-to-end test; Open Library and Hardcover as further sources, and Kirjasampo as enrichment for Finnish fiction.
+**Slices:** I1, I2, I4–I8, I10–I16, K21 (page not found, added at the Epic 7 retro).
+**FRs covered:** FR-20, FR-21, FR-22 (complete); FR-11, FR-17a (extended by I13–I16).
 **NFRs covered:** NFR-1.
 
 ### Epic 9: Tag, genre and theme my books
@@ -3403,6 +3403,11 @@ So that Epic 8 starts from documents it can trust (Epic 3 retrospective items 27
 **When** the story is done
 **Then** EXPERIENCE.md's On wishlists row says "{list} · for {person}", or "{list}" alone for my own entries, and its Lend row says "Find a person…" appears past six People; DESIGN.md's Cover tile row carries the "Lent · {person}" line (items 68, 75)
 
+**Given** `/loans`, which lost its only `RefreshOnUndo` check with the case Story 7.25 removed
+**When** the story is done
+**Then** one case in `loansPage.unit.spec.ts`, modelled on `wishlistPage.unit.spec.ts` 'refreshes after a toast Undo', asserts that a toast Undo on the page refreshes it (AD-7)
+**And** the comment in `vitest.unit.setup.ts` names the specs that now hold the overlay tests, not `collectionPage.unit.spec.ts`
+
 **Given** the tracking documents
 **When** the story is done
 **Then** `deferred-work.md` takes the verdicts of `deferred-triage-2026-10-30.md`: closed and moot entries go, and each open one names its story or its acceptance
@@ -3448,7 +3453,7 @@ So that nothing is still owed when Epic 8 starts (Epic 4 retrospective item 47; 
 
 ## Epic 8: Shop check — "do I already have this?"
 
-The full Answer: In library, Ordered, On wishlist or Not in library as the heading, every other fact as a line; Lookup by title or author with "In your library" and "Elsewhere"; lookup of a Book without an ISBN; and the shop-check end-to-end test.
+The full Answer: In library, Ordered, On wishlist or Not in library as the heading, every other fact as a line; Lookup by title or author with "In your library" and "Elsewhere"; lookup of a Book without an ISBN; the shop-check end-to-end test; and Open Library, Hardcover and Kirjasampo behind the existing source contract.
 
 ### Story 8.1: [I1] Answer heading and fact lines
 
@@ -3618,6 +3623,139 @@ So that a mistyped or stale link doesn't drop me on Next.js's unstyled default 4
 **Given** the spine's Routes table
 **When** the page lands
 **Then** a row names the not-found page and when it applies, in the same commit
+
+### Story 8.12: [I13] Open Library source
+
+As Mika,
+I want Open Library asked after Finna and Google Books,
+So that a book neither of them knows, or a field they leave empty, can still be filled (FR-11, FR-20, AD-9).
+
+**Acceptance Criteria:**
+
+**Given** `sources/openLibrary.ts` and the order `[finna, google, openLibrary]` in `sources/index.ts`
+**When** `lookupByIsbn` runs against recorded fixtures
+**Then** it reads `GET /api/books?bibkeys=ISBN:<isbn13>&jscmd=data&format=json`, one call, which already holds author names; an empty object is `[]`, and an HTTP or network failure is `undefined`
+**And** `year` is parsed from the free-form `publish_date`, a date without a year leaves it out, and `recordId` is the edition key
+**And** every request sends `User-Agent: bookeh (<contact>)` as Open Library asks; the contact comes from the environment, is documented in `.env.example`, and is not written in the repo
+**And** `themes` stays `[]` (FR-17a), and the source's subjects are kept as its `subjects`, which `mapSubjectsToGenres` does not read
+**And** an author name is passed on as given; a name in the wrong order ("Jalonen Olli") is corrected on the edit screen, not guessed at in the adapter
+
+**Given** the adapter's `search(query)`
+**When** it runs against recorded fixtures
+**Then** it reads `search.json` with a `fields` list and returns `SearchHit`s like Finna's, one per ISBN-13 (Story 8.3), never an ISBN of another edition of the work presented as this one's, and it never throws
+
+**Given** Open Library's cover URLs answer with a 302 to changing `archive.org` hosts, and AD-14 downloads with `redirect: 'error'`
+**When** the adapter builds a result
+**Then** it sets no `coverUrl`, `COVER_HOSTS` is unchanged, and AD-14 stays as it is
+
+**Given** the new source
+**When** the story lands
+**Then** `npm run fixtures` captures it, including one Finnish ISBN and one ISBN it doesn't hold; tests run only against fixtures
+**And** `sources` and `sourcesPartitive` name it in English and Finnish, so the partial line reads correctly
+**And** the spine's source list, the array order in AD-9 and the context diagram name it, in the same commit
+**And** Finna still wins over Google Books and Open Library for every field they both have
+
+### Story 8.13: [I14] Hardcover source
+
+As Mika,
+I want Hardcover asked after Open Library,
+So that recent English-language books get descriptions and covers the other sources lack (FR-11, FR-20, AD-9).
+
+**Acceptance Criteria:**
+
+**Given** `sources/hardcover.ts` and the order `[finna, google, openLibrary, hardcover]`
+**When** `HARDCOVER_API_TOKEN` is set
+**Then** `lookupByIsbn` posts one GraphQL query for `editions` where `isbn_13` equals the ISBN, on the server only, with a token limited to catalogue reads
+**And** the token is never sent to the browser, never logged, and documented in `.env.example` and `deploy/README.md`, including that it expires and where to renew it
+
+**When** `HARDCOVER_API_TOKEN` is not set
+**Then** the source is left out of `sources`, so development, CI and a fresh deploy work without it and the partial line never names it
+
+**Given** a token that has expired or lacks access (401 or 403)
+**When** a lookup runs
+**Then** the adapter returns `undefined` like any failure, and the log line says the token needs renewing, without the token's value
+
+**Given** the query is written from the published schema
+**When** the story starts
+**Then** the first step captures real responses with Mika's token, for an English ISBN, a Finnish ISBN and an ISBN it doesn't hold; a field the responses don't hold is left out, and the query depth stays within what the API accepts
+**And** the capture records in the story's notes which fields Hardcover adds over Finna, Google Books and Open Library on those ISBNs; if it adds none, the story stops and Mika decides
+
+**Given** the adapter's `search(query)`
+**When** it runs against recorded fixtures
+**Then** it returns `SearchHit`s like Finna's, one per ISBN-13, and it never throws
+
+**Given** a Hardcover cover URL
+**When** it is served directly over https, without a redirect
+**Then** its host joins `COVER_HOSTS` and AD-14 names it; otherwise the adapter sets no `coverUrl`, as Story 8.12 does
+
+**Given** the new source
+**When** the story lands
+**Then** `sources` and `sourcesPartitive` name it in both languages, and the spine names it in the same commit
+**And** `themes` stays `[]` (FR-17a), and tests run only against fixtures
+
+### Story 8.14: [I15] Enrichment sources
+
+As the developer,
+I want a source that adds to a found book without being able to find one,
+So that a source holding work-level data can never name a Book or block a save (FR-17a, AD-9).
+
+**Acceptance Criteria:**
+
+**Given** `enrichment?: true` on `Source`
+**When** `lookupSources` runs
+**Then** an enrichment source is asked in parallel under the same timeout and breaker as the others
+**And** it is never the first source of a candidate, so `source`, `recordId`, `title`, `authors` and every other edition field never come from it while any source has them, and a candidate is built only from another source's record
+**And** a record from it alone does not make `found`: when no other source has records the outcome is what it would have been without it (`none` or `unavailable`)
+**And** its failure or timeout is logged and is left out of `failed`, so it never adds to the partial line, never makes an outcome `unavailable`, and never shortens a cache lifetime
+
+**Given** a merge with an enrichment record
+**When** `mergeResults` runs
+**Then** `themes` is the union: the other sources' themes first, in order, then the enrichment terms not already there, ignoring case, each as given
+**And** `description` gap-fills like any field, after every other source
+**And** the enrichment response is kept in `raw.sources` under its id (FR-18), and `subjects` does not gain an entry that feeds genre mapping
+
+**Given** Re-fetch and Look it up again
+**When** they run on a Book that already has themes
+**Then** FR-19 holds: they fill empty fields only, so a Book saved earlier gains enrichment terms only if its themes are empty, and there is no backfill job
+
+**Given** the documents
+**When** the story lands
+**Then** the PRD's FR-17a says themes come from Finna and from enrichment sources, and FR-11 defines an enrichment source; the spine's AD-9, `Source` and the `themes` comment in `SourceResult` say the same, in the same commit
+**And** tests use fake sources and cover: enrichment alone is not `found`, enrichment down does not change the outcome, themes union without a duplicate differing only in case, and Finna still first
+
+### Story 8.15: [I16] Kirjasampo enrichment
+
+As Mika,
+I want Kirjasampo's themes on Finnish fiction,
+So that a novel carries the terms readers use for what it is about, alongside the library's subject headings (FR-17a, AD-9).
+
+**Acceptance Criteria:**
+
+**Given** the first step of the story
+**When** it starts
+**Then** the licence of the Kirjasampo data and the terms of the `ldf.fi` SPARQL endpoint are confirmed and written in the story's notes; if they don't allow this use, the story stops and Mika decides
+
+**Given** `sources/kirjasampo.ts`, marked `enrichment: true`, last in `sources/index.ts`
+**When** `lookupByIsbn` runs for an ISBN under 978-951 or 978-952
+**Then** one SELECT to `https://ldf.fi/kirjasampo/sparql` matches every hyphenation of the ISBN-13 and of its ISBN-10 (a 10-digit check digit may be `X`), each as `@fi`, `@sv` and plain, against `schema:isbn` and `kaunokki:ISBN`, because the data stores ISBNs hyphenated and language-tagged and a stripped-string filter is too slow for the lookup budget
+**And** any other ISBN returns `[]` without a request
+**And** when an ISBN matches more than one work the source returns `[]` and logs it, rather than guessing
+
+**Given** the match is a work, which holds the ISBNs and titles of all its editions and translations
+**When** the adapter builds a result
+**Then** it uses only the work's `teema` terms, Finnish labels only, as `themes`, and its `kuvaus` in Finnish as `description` when it has one
+**And** `title` is the work's Finnish label for the contract's sake and never reaches a candidate (Story 8.14); `authors` and `subjects` are `[]`, and publisher, year, pages, series, language and cover are left out
+**And** `recordId` is the work's URI
+
+**Given** a Finnish ISBN that Finna holds
+**When** the Answer and the save run end to end against fixtures
+**Then** the saved Book keeps Finna's title, authors and publisher and has Finna's themes plus Kirjasampo's new terms, and `books.source` is `finna`
+
+**Given** the new source
+**When** the story lands
+**Then** `npm run fixtures` captures it: a 978 Finnish ISBN, an ISBN stored in its ISBN-10 form, a check digit `X`, and an ISBN it doesn't hold; tests run only against fixtures
+**And** the spine names it, in the same commit, with AD-9's note that it is the only enrichment source
+**And** with Stories 8.12 and 8.13 in, NFR-1 is measured again as Story 8.2 measured it, since a lookup waits for its slowest source: scan to Answer stays within 5 s from a source, and the figures are written in the story's notes
 
 ## Epic 9: Tag, genre and theme my books
 

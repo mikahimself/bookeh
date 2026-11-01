@@ -18,14 +18,14 @@ covers updates, restores and troubleshooting afterwards.
 - **One app container, always** (AD-12). Payload's `onInit` seed and
   in-process assumptions are not safe to scale out. Do not add replicas.
 
-Four machines appear below. Every command is tagged with where it runs:
+Four machines appear below. Every command is tagged with where it« runs:
 
-| Tag | Machine |
-|---|---|
-| **[dev]** | Your development machine, with this repository checked out |
-| **[NAS]** | The Synology, configured through DSM in a browser |
-| **[host]** | The Proxmox host, as root |
-| **[lxc]** | Inside the bookeh LXC, as root |
+| Tag        | Machine                                                    |
+| ---------- | ---------------------------------------------------------- |
+| **[dev]**  | Your development machine, with this repository checked out |
+| **[NAS]**  | The Synology, configured through DSM in a browser          |
+| **[host]** | The Proxmox host, as root                                  |
+| **[lxc]**  | Inside the bookeh LXC, as root                             |
 
 ## Prerequisites
 
@@ -107,7 +107,7 @@ In DSM:
      the clean fix. (Alternative: keep squash on and pre-own the directory,
      step 3.)
    - Check **Allow users to access mounted subfolders** — without it,
-     mounting the `bookeh` *subfolder* (rather than the share root) is
+     mounting the `bookeh` _subfolder_ (rather than the share root) is
      denied even though the rule is otherwise correct.
 
 ### 2. Mount the NAS into the LXC — [host]
@@ -253,8 +253,8 @@ sed -n 's/^GHCR_TOKEN=//p' .env | docker login ghcr.io \
   -u "$(sed -n 's/^GHCR_USER=//p' .env)" --password-stdin
 ```
 
-**GHCR token expiry:** `__________` *(fill in when minting the token; mint
-a new one before this date).*
+**GHCR token expiry:** `__________` _(fill in when minting the token; mint
+a new one before this date)._
 
 ### 7. Install and start the systemd units — [lxc]
 
@@ -326,9 +326,7 @@ add them to `/opt/bookeh/.env` by hand — this story added the three
 run writes a dated directory under `BOOKEH_BACKUP_DIR`
 (`/mnt/nas/bookeh/backups`) holding `bookeh.dump` — a custom-format
 `pg_dump`, verified with `pg_restore --list` before the run counts as a
-success — and `media/`, a full copy of the media directory (modes and
-timestamps kept, owned by root: over NFS the LXC's root cannot chown to
-the app user, so a restore sets the owner to uid 1001 itself). Configuration
+success — and `media/`, a full copy of the media directory. Configuration
 lives in `/opt/bookeh/.env` (`BOOKEH_BACKUP_DIR`, `BOOKEH_STATUS_DIR`,
 `BOOKEH_BACKUP_RETENTION_DAYS`).
 
@@ -358,8 +356,7 @@ journalctl -u bookeh-backup             # every run's output
 systemctl list-timers bookeh-backup.timer
 ```
 
-To restore production, read "Collation and restore" below first, then follow
-"Restore production — [lxc] and [host]".
+To restore from `bookeh.dump`, read "Collation and restore" below first.
 
 ## Collation and restore (read before any restore)
 
@@ -382,94 +379,6 @@ tag may ship a new ICU, which requires `REINDEX` and
 
 Note: `docker/postgres/initdb/` from the repo is **not** mounted here on
 purpose — `bookeh_test` is a dev/CI artifact.
-
-## Restore production — [lxc] and [host]
-
-This replaces the production database and media with a backup. Each command
-carries its machine tag: ownership is set from the **[host]**, because the
-LXC's root cannot chown over NFS. Pick a dated directory under
-`/mnt/nas/bookeh/backups`, never a `.failed` one; `<run>` below is its name.
-The paths are the defaults; use the values from `.env` if they differ.
-
-If the LXC or the NAS was rebuilt, run the first-install steps it lost
-first: the marker file, directories, deploy files, `.env` and GHCR login must
-exist, and on a new LXC step 1 below has nothing to stop until the
-units are installed. To undo a bad release, set `BOOKEH_IMAGE_TAG` to the good
-version too: a restore does not change the image, and an older image may not
-run a newer dump.
-
-Before you start, while Postgres still runs, prove the backup reads, and if
-the current data is worth keeping take a fresh backup first (**[lxc]**):
-
-```sh
-systemctl start bookeh-backup.service   # optional: the current state
-RUN=/mnt/nas/bookeh/backups/<run>
-cd /opt/bookeh
-docker compose -f compose.prod.yml exec -T postgres pg_restore --list > /dev/null < "$RUN/bookeh.dump"
-```
-
-1. **[lxc]** Stop the stack and the nightly backup, including a run in
-   progress:
-
-   ```sh
-   systemctl stop bookeh-backup.timer bookeh-backup.service bookeh
-   ```
-
-2. **[lxc]** Recover the secrets. `.env` is in neither the backup nor the
-   repo, and no location for it is recorded anywhere here: it is wherever the
-   operator keeps it. If `/opt/bookeh/.env` survived, keep it. Otherwise put
-   the operator's copy there, or rebuild it from `.env.example` (step 5 of the
-   first install), then:
-
-   ```sh
-   chmod 600 /opt/bookeh/.env
-   ```
-
-   If a secret is lost, a new `POSTGRES_PASSWORD` works, since the cluster is
-   rebuilt empty; a new `PAYLOAD_SECRET` only signs everyone out.
-
-3. **[host]** Empty `data/` and `media/`, keeping both directories and the
-   marker file in `postgres/`, then copy the media in and set its owner. This
-   deletes the current database and media. Use uid 101001 in an unprivileged
-   container, 1001 in a privileged one (step 3 of the first install):
-
-   ```sh
-   RUN=/mnt/nas/bookeh/backups/<run>
-   test -f "$RUN/bookeh.dump" && test -d "$RUN/media" &&
-     find /mnt/nas/bookeh/postgres/data /mnt/nas/bookeh/media -mindepth 1 -delete &&
-     cp -a "$RUN/media/." /mnt/nas/bookeh/media/ &&
-     chown -R 101001 /mnt/nas/bookeh/media     # 1001 in a privileged container
-   ```
-
-4. **[lxc]** Start Postgres alone, so initdb builds an empty ICU cluster, and
-   restore into it:
-
-   ```sh
-   cd /opt/bookeh
-   RUN=/mnt/nas/bookeh/backups/<run>
-   docker compose -f compose.prod.yml up -d --wait postgres
-   docker compose -f compose.prod.yml exec -T postgres \
-     pg_restore -U bookeh -d bookeh --exit-on-error \
-     < "$RUN/bookeh.dump"
-   ```
-
-   If `pg_restore` stops on an error, the database is partial: never start the
-   app on it or rerun into it. Stop Postgres with
-   `docker compose -f compose.prod.yml down` and go back to step 3.
-
-5. **[lxc]** Check the collation. Expected `i|fi-FI`:
-
-   ```sh
-   docker compose -f compose.prod.yml exec -T postgres psql -U bookeh -d bookeh -tAc \
-     "select datlocprovider, daticulocale from pg_database where datname = 'bookeh'"
-   ```
-
-6. **[lxc]** Start the stack and the timer. The app applies any newer
-   migrations at start. Then sign in and open a Book with a cover.
-
-   ```sh
-   systemctl start bookeh bookeh-backup.timer
-   ```
 
 ## Restore rehearsal — [lxc]
 
@@ -510,25 +419,26 @@ or the restore procedure.
    be changed with `BOOKEH_RESTORE_PORT` and `BOOKEH_RESTORE_IMAGE`
    (default: the image of the running app container). The media copy
    needs free space in `/tmp` for the whole media directory.
+
 5. On `OK`, fill in a row of the record below in `deploy/README.md` on
    the **[dev]** machine, from the script's output, and commit it (the LXC
    has no checkout).
 
 **What each check proves** (a failure exits non-zero and names the check):
 
-| Check | Proves |
-|---|---|
-| `collation icu/fi-FI` | The restore target was created ICU `fi-FI`, as any real restore must be ("Collation and restore"); a libc target fails the run. |
-| `counts match` | `users`, `users_roles`, `books`, `books_rels`, `books_texts`, `authors`, `series`, `genres`, `media`, `copies`, `user_books`, `user_books_rels` and `locations` hold as many rows as production: users and roles, the catalogue with its author, series and genre links, and each user's copies and locations are all in the dump. A difference names the tables and asks for a fresh backup. |
-| `signed in` | The restored users and their password hashes work with a new `PAYLOAD_SECRET`, through the production image. |
-| `covers checked: N` | Every book cover's file is in the media copy and served by the app: the media backup is complete. A missing one is named. |
-| `time taken` | How long the restore took, without the sign-in prompt. The scratch database is on tmpfs and the media copy on local `/tmp`, so this is a lower bound for a real restore onto the NAS. |
+| Check                 | Proves                                                                                                                                                                                                                                                                                                                                                                                        |
+| --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `collation icu/fi-FI` | The restore target was created ICU `fi-FI`, as any real restore must be ("Collation and restore"); a libc target fails the run.                                                                                                                                                                                                                                                               |
+| `counts match`        | `users`, `users_roles`, `books`, `books_rels`, `books_texts`, `authors`, `series`, `genres`, `media`, `copies`, `user_books`, `user_books_rels` and `locations` hold as many rows as production: users and roles, the catalogue with its author, series and genre links, and each user's copies and locations are all in the dump. A difference names the tables and asks for a fresh backup. |
+| `signed in`           | The restored users and their password hashes work with a new `PAYLOAD_SECRET`, through the production image.                                                                                                                                                                                                                                                                                  |
+| `covers checked: N`   | Every book cover's file is in the media copy and served by the app: the media backup is complete. A missing one is named.                                                                                                                                                                                                                                                                     |
+| `time taken`          | How long the restore took, without the sign-in prompt. The scratch database is on tmpfs and the media copy on local `/tmp`, so this is a lower bound for a real restore onto the NAS.                                                                                                                                                                                                         |
 
 **Record:**
 
 | Date | Backup | Counts | Covers checked | Time taken | No test data before cataloguing |
-|---|---|---|---|---|---|
-| 2026-10-22 | `20261022-052417` | users=1 users_roles=2 books=19 books_rels=17 books_texts=159 authors=14 series=5 genres=0 media=1 copies=19 user_books=0 user_books_rels=0 locations=0 | 1 | 40 s (lower bound) | Yes (operator, 2026-10-22) |
+| ---- | ------ | ------ | -------------- | ---------- | ------------------------------- |
+|      |        |        |                |            |                                 |
 
 The last column confirms that production held no test books, authors,
 series or covers before real cataloguing began (cataloguing gate). Check it
@@ -574,7 +484,7 @@ restore").
   domain doesn't match. Force `vers=3` in the host fstab (step 2) and
   remount.
 - **Postgres loops with `chmod: /var/lib/postgresql/data: Operation not
-  permitted` / `find: ... Permission denied`:** the data directory's owner
+permitted` / `find: ... Permission denied`:** the data directory's owner
   on the NAS doesn't match the uid the container runs as — in an
   unprivileged LXC that owner must be 100070 (step 3). The service runs as
   `user: postgres` precisely so no operation needs container-root, which
@@ -615,7 +525,7 @@ restore").
 - [ ] `systemctl list-timers bookeh-backup.timer` shows the timer with a
       next-run time.
 - [ ] Status mount: `docker compose -f compose.prod.yml exec app cat
-      /app/backup-status/last-backup.json` prints the status JSON from
+  /app/backup-status/last-backup.json` prints the status JSON from
       inside the app container.
 - [ ] Restore rehearsal at the cataloguing gate: `./restore-rehearsal.sh`
       prints `OK`, `docker ps -a` and `docker network ls` show no

@@ -1,5 +1,3 @@
-import { randomUUID } from 'node:crypto'
-
 import { getPayload, type Payload } from 'payload'
 import { beforeAll, describe, expect, it } from 'vitest'
 
@@ -10,8 +8,8 @@ import { shelfIds } from '@/lib/shelf/shelfIds'
 import config from '@/payload.config'
 import type { Book, User } from '@/payload-types'
 
+import { sharedBook, unique } from '../helpers/builders'
 import { contextFor, createUser } from '../helpers/harness'
-import { randomIsbn } from '../helpers/isbn'
 
 // `getShelfRows()`, AD-7: one hydrated read whose pages concatenate to the
 // full read in `shelfIds`' order, and `labels` that name only filter ids the
@@ -20,21 +18,10 @@ import { randomIsbn } from '../helpers/isbn'
 // Each test has its own users. Shared name keys are unique and rows stay, so
 // names carry a per-run suffix.
 
-const unique = (name: string) => `${name} ${randomUUID().slice(0, 8)}`
-
 describe('getShelfRows', () => {
   let payload: Payload
 
   const reqFor = async (user: User) => (await contextFor(user)).req
-
-  const sharedBook = async (by: User, data: Partial<Book> = {}) =>
-    payload.create({
-      collection: 'books',
-      data: { title: 'Kirja', isbn13: randomIsbn(), visibility: 'shared', ...data },
-      overrideAccess: true,
-      depth: 0,
-      req: await reqFor(by),
-    })
 
   const record = async (
     by: User,
@@ -73,10 +60,11 @@ describe('getShelfRows', () => {
   it('pages concatenate to the full read in shelfIds order, overrides applied', async () => {
     const a = await createUser({ displayName: 'Rows Paging' })
     const asA = await contextFor(a)
-    const x = await sharedBook(a, { title: 'Xylofoni' })
+    const x = await sharedBook({ by: a, title: 'Xylofoni' })
     await copyOf(a, x)
     await copyOf(a, x)
-    for (const title of ['Yksi', 'Kaksi', 'Kolme']) await copyOf(a, await sharedBook(a, { title }))
+    for (const title of ['Yksi', 'Kaksi', 'Kolme'])
+      await copyOf(a, await sharedBook({ by: a, title }))
     await upsertUserBook(asA, x.id, { overrides: { title: 'Oma nimi' } })
     const query = { filters: {}, sort: 'added', dir: 'asc' } as const
 
@@ -117,7 +105,7 @@ describe('getShelfRows', () => {
     const bLikeS = await record(b, 'authors', sName, 'private')
     const bLikeSeries = await record(b, 'series', series.name, 'private')
 
-    const x = await sharedBook(b, { authors: [t.id], series: series.id })
+    const x = await sharedBook({ by: b, authors: [t.id], series: series.id })
     await copyOf(a, x)
     await upsertUserBook(asA, x.id, { overrides: { authors: [likeS.id] } })
 

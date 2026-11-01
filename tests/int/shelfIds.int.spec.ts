@@ -11,8 +11,8 @@ import { shelfIds } from '@/lib/shelf/shelfIds'
 import config from '@/payload.config'
 import type { Book, User } from '@/payload-types'
 
+import { sharedBook } from '../helpers/builders'
 import { contextFor, createUser } from '../helpers/harness'
-import { randomIsbn } from '../helpers/isbn'
 
 // `shelfIds()`, AD-7: the viewer's copies only (two-user access test), in
 // Finnish title order with overrides applied, no year (or a cleared one) last
@@ -24,16 +24,6 @@ const ALL = { offset: 0, limit: 50 }
 
 describe('shelfIds', () => {
   let payload: Payload
-
-  /** A shared Book, as `lib/catalogue` writes it. */
-  const sharedBook = async (by: User, data: Partial<Book> = {}) =>
-    payload.create({
-      collection: 'books',
-      data: { title: 'Kirja', isbn13: randomIsbn(), visibility: 'shared', ...data },
-      overrideAccess: true,
-      depth: 0,
-      req: (await contextFor(by)).req,
-    })
 
   /** A copy owned by `user`; `owner` only satisfies the create type. */
   const copyOf = async (user: User, book: Book) =>
@@ -72,9 +62,9 @@ describe('shelfIds', () => {
   it("lists only the viewer's copies and counts only them", async () => {
     const a = await createUser({ displayName: 'Shelf A' })
     const b = await createUser({ displayName: 'Shelf B' })
-    const x = await sharedBook(a)
-    const y = await sharedBook(b)
-    const p = await sharedBook(a, { title: 'Oma', visibility: 'private' })
+    const x = await sharedBook({ by: a })
+    const y = await sharedBook({ by: b })
+    const p = await sharedBook({ by: a, title: 'Oma', visibility: 'private' })
     const firstOfX = await copyOf(a, x)
     const secondOfX = await copyOf(a, x)
     const ownP = await copyOf(a, p)
@@ -107,14 +97,14 @@ describe('shelfIds', () => {
   it('sorts titles in Finnish order, an overridden title by its override', async () => {
     const a = await createUser({ displayName: 'Shelf Titles' })
     const asA = await contextFor(a)
-    const orkki = await copyOf(a, await sharedBook(a, { title: 'Örkki' }))
-    const aapinen = await sharedBook(a, { title: 'Aapinen' })
+    const orkki = await copyOf(a, await sharedBook({ by: a, title: 'Örkki' }))
+    const aapinen = await sharedBook({ by: a, title: 'Aapinen' })
     const oopinen = await copyOf(a, aapinen)
     await upsertUserBook(asA, aapinen.id, { overrides: { title: 'Ööpinen' } })
-    const zorro = await copyOf(a, await sharedBook(a, { title: 'Zorro' }))
+    const zorro = await copyOf(a, await sharedBook({ by: a, title: 'Zorro' }))
     // Byte order (C collation) puts Ä before Å; Finnish puts Å first.
-    const arra = await copyOf(a, await sharedBook(a, { title: 'Ärrä' }))
-    const ake = await copyOf(a, await sharedBook(a, { title: 'Åke' }))
+    const arra = await copyOf(a, await sharedBook({ by: a, title: 'Ärrä' }))
+    const ake = await copyOf(a, await sharedBook({ by: a, title: 'Åke' }))
 
     expect(await copyIds(asA, 'title', 'asc')).toEqual([zorro, ake, arra, orkki, oopinen])
   })
@@ -122,10 +112,10 @@ describe('shelfIds', () => {
   it('puts Books with no year last in both directions', async () => {
     const a = await createUser({ displayName: 'Shelf Years' })
     const asA = await contextFor(a)
-    const none = await copyOf(a, await sharedBook(a))
-    const y2005 = await copyOf(a, await sharedBook(a, { year: 2005 }))
-    const y1990 = await copyOf(a, await sharedBook(a, { year: 1990 }))
-    const book1980 = await sharedBook(a, { year: 1980 })
+    const none = await copyOf(a, await sharedBook({ by: a }))
+    const y2005 = await copyOf(a, await sharedBook({ by: a, year: 2005 }))
+    const y1990 = await copyOf(a, await sharedBook({ by: a, year: 1990 }))
+    const book1980 = await sharedBook({ by: a, year: 1980 })
     const cleared = await copyOf(a, book1980)
     await upsertUserBook(asA, book1980.id, { overrides: { year: null } })
 
@@ -140,7 +130,7 @@ describe('shelfIds', () => {
     const kivi = await author(a, 'Kivi, Aleksis')
     const topelius = await author(a, 'Topelius, Zacharias')
     const by = async (title: string, authors: number[]) =>
-      copyOf(a, await sharedBook(a, { title, authors }))
+      copyOf(a, await sharedBook({ by: a, title, authors }))
 
     const muumi = await by('Muumi', [jansson])
     const seitseman = await by('Seitsemän veljestä', [kivi])
@@ -158,7 +148,7 @@ describe('shelfIds', () => {
     )
     const hiddenThenKivi = await by('Pientä', [hidden, kivi])
     const onlyHidden = await by('Salainen', [hidden])
-    const overriddenBook = await sharedBook(a, { title: 'Kirja', authors: [jansson] })
+    const overriddenBook = await sharedBook({ by: a, title: 'Kirja', authors: [jansson] })
     const overridden = await copyOf(a, overriddenBook)
     await upsertUserBook(asA, overriddenBook.id, { overrides: { authors: [kivi] } })
 

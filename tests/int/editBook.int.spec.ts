@@ -15,6 +15,7 @@ import * as gateway from '@/lib/payload/gateway'
 import config from '@/payload.config'
 import type { Author, Book, Genre, User } from '@/payload-types'
 
+import { unique } from '../helpers/builders'
 import { contextFor, createUser } from '../helpers/harness'
 import { hyphenatedIsbn10, randomIsbn } from '../helpers/isbn'
 
@@ -37,8 +38,6 @@ describe('editBook', () => {
   let asC: Context
   let genre: Genre
   let s: Author
-
-  const unique = (name: string) => `${name} ${randomUUID().slice(0, 8)}`
 
   /** Rows of `collection` with one of `names`, read with system privileges. */
   const named = async (collection: 'authors' | 'series', names: string[]) =>

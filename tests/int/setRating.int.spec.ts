@@ -6,6 +6,7 @@ import { getUserBookState } from '@/lib/books/userBookState'
 import config from '@/payload.config'
 import type { Book, User } from '@/payload-types'
 
+import { failure } from '../helpers/builders'
 import { contextFor, createUser } from '../helpers/harness'
 import { randomIsbn } from '../helpers/isbn'
 
@@ -42,8 +43,6 @@ describe('setRating', () => {
         depth: 0,
       })
     ).docs
-
-  const failure = (promise: Promise<unknown>) => promise.catch((e: unknown) => e)
 
   beforeAll(async () => {
     payload = await getPayload({ config })

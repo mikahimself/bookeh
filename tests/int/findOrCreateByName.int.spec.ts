@@ -1,5 +1,3 @@
-import { randomUUID } from 'node:crypto'
-
 import { getPayload, type Payload } from 'payload'
 import { beforeAll, describe, expect, it } from 'vitest'
 
@@ -11,6 +9,7 @@ import { withTransaction } from '@/lib/payload/transaction'
 import config from '@/payload.config'
 import type { User } from '@/payload-types'
 
+import { unique } from '../helpers/builders'
 import { contextFor, createUser } from '../helpers/harness'
 
 // `findOrCreateByName()`, AD-5/AD-18: the one matcher of `authors` and
@@ -18,8 +17,6 @@ import { contextFor, createUser } from '../helpers/harness'
 // with the caller as `createdBy` on private rows, and refreshes a still-derived
 // author `sortName` from the source. Shared names carry a per-run suffix (the
 // shared index is global); private names are safe on fresh users.
-
-const unique = (name: string) => `${name} ${randomUUID().slice(0, 8)}`
 
 describe('findOrCreateByName', () => {
   let payload: Payload

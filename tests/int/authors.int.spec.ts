@@ -15,6 +15,7 @@ import * as gateway from '@/lib/payload/gateway'
 import config from '@/payload.config'
 import type { Author, User } from '@/payload-types'
 
+import { unique } from '../helpers/builders'
 import { contextFor, createUser } from '../helpers/harness'
 
 // `authors`, AD-4/AD-5/AD-19: shared rows for everyone signed in, private rows
@@ -22,8 +23,6 @@ import { contextFor, createUser } from '../helpers/harness'
 // unique among shared rows and per creator among private ones. The shared
 // index is global and rows are never cleaned up, so shared names carry a
 // per-run suffix; private names are safe because each run creates fresh users.
-
-const unique = (name: string) => `${name} ${randomUUID().slice(0, 8)}`
 
 type Visibility = Author['visibility']
 

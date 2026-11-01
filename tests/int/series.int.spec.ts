@@ -1,5 +1,3 @@
-import { randomUUID } from 'node:crypto'
-
 import { Forbidden, getPayload, NotFound, type Payload, ValidationError } from 'payload'
 import { beforeAll, describe, expect, it } from 'vitest'
 
@@ -7,14 +5,13 @@ import * as gateway from '@/lib/payload/gateway'
 import config from '@/payload.config'
 import type { Series, User } from '@/payload-types'
 
+import { unique } from '../helpers/builders'
 import { contextFor, createUser } from '../helpers/harness'
 
 // `series`, AD-4/AD-5/AD-19: the same rules as `authors`, whose spec proves
 // the shared helpers' branches. Here only that `series` is wired to them:
 // read scoping, refused user writes and the per-scope `nameKey` indexes.
 // Shared names carry a per-run suffix (the shared index is global).
-
-const unique = (name: string) => `${name} ${randomUUID().slice(0, 8)}`
 
 describe('series', () => {
   let payload: Payload

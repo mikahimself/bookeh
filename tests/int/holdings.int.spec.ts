@@ -1,5 +1,3 @@
-import { randomUUID } from 'node:crypto'
-
 import { getPayload, type Payload } from 'payload'
 import { beforeAll, describe, expect, it } from 'vitest'
 
@@ -11,6 +9,7 @@ import type { Named } from '@/lib/payload/ref'
 import config from '@/payload.config'
 import type { Book, Copy, User, WishlistEntry } from '@/payload-types'
 
+import { copyAs, unique } from '../helpers/builders'
 import { contextFor, createUser } from '../helpers/harness'
 import { randomIsbn } from '../helpers/isbn'
 
@@ -20,8 +19,6 @@ import { randomIsbn } from '../helpers/isbn'
 // owner, so each carries a per-run suffix. A copy's open loan rides on its
 // line (J10); returned loans do not. Open wishlist entries are holdings too
 // (H14), with or without copies; closed ones are not.
-
-const unique = (name: string) => `${name} ${randomUUID().slice(0, 8)}`
 
 describe('getHoldings', () => {
   let payload: Payload
@@ -58,14 +55,6 @@ describe('getHoldings', () => {
     return { id, name }
   }
 
-  /** A copy created by `user` through the gateway; `owner` only satisfies the create type. */
-  const copyAs = async (user: User, data: Partial<Copy> = {}) =>
-    gateway.create(await contextFor(user), {
-      collection: 'copies',
-      data: { owner: user.id, book: x.id, status: 'owned', ...data },
-      depth: 0,
-    })
-
   beforeAll(async () => {
     payload = await getPayload({ config })
     a = await createUser({ displayName: 'Holdings User A' })
@@ -81,10 +70,10 @@ describe('getHoldings', () => {
 
     shelf = await locationOfA()
 
-    ownedByA = await copyAs(a, { location: shelf.id, notes: 'Signed' })
+    ownedByA = await copyAs(a, { book: x.id, location: shelf.id, notes: 'Signed' })
     // `notes: ''` as a form submits an empty field; read as no note.
-    orderedByA = await copyAs(a, { status: 'ordered', notes: '' })
-    ownedByB = await copyAs(b)
+    orderedByA = await copyAs(a, { book: x.id, status: 'ordered', notes: '' })
+    ownedByB = await copyAs(b, { book: x.id })
     await copyAs(a, { book: p.id })
   })
 

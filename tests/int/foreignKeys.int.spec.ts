@@ -13,26 +13,16 @@ import { createWishlist } from '@/lib/wishlists/wishlists'
 import config from '@/payload.config'
 import type { User } from '@/payload-types'
 
+import { freshUser, sharedBook, unique } from '../helpers/builders'
 import { as, contextFor, createUser } from '../helpers/harness'
-import { randomIsbn } from '../helpers/isbn'
 
 // Spine, AD-19, on the migration-built database: a user delete cascades to
 // everything they own or created, references refuse, and a back-office delete
 // of a referenced row is refused with a readable message.
 
-const unique = (name: string) => `${name} ${randomUUID().slice(0, 8)}`
-
 describe('foreign keys', () => {
   let payload: Payload
   let admin: User
-
-  const sharedBook = () =>
-    payload.create({
-      collection: 'books',
-      data: { title: unique('Seitsemän veljestä'), isbn13: randomIsbn(), visibility: 'shared' },
-      overrideAccess: true,
-      depth: 0,
-    })
 
   const count = async (collection: CollectionSlug, field: string, value: number) =>
     (
@@ -43,19 +33,14 @@ describe('foreign keys', () => {
       })
     ).totalDocs
 
-  const userWith = async () => {
-    const user = await createUser({ displayName: 'FK User' })
-    return { user, ctx: await contextFor(user) }
-  }
-
   beforeAll(async () => {
     payload = await getPayload({ config })
     admin = await createUser({ roles: ['admin', 'user'] })
   })
 
   it("deletes a user's rows with the user and keeps another user's copy of a shared Book", async () => {
-    const { user, ctx } = await userWith()
-    const other = await userWith()
+    const { user, ctx } = await freshUser()
+    const other = await freshUser()
     const shared = await sharedBook()
 
     const sharedCopy = (await createCopy(ctx, { bookId: shared.id, status: 'owned' })).data
@@ -107,7 +92,7 @@ describe('foreign keys', () => {
   })
 
   it('refuses back-office deletes of referenced rows with a readable message', async () => {
-    const { ctx } = await userWith()
+    const { ctx } = await freshUser()
     const book = await sharedBook()
     const copy = (await createCopy(ctx, { bookId: book.id, status: 'owned' })).data
     const { data: loan } = await lendCopy(ctx, copy, { create: unique('Liisa') })
@@ -147,7 +132,7 @@ describe('foreign keys', () => {
 
   // Story 7.4's race: an entry the delete could not see refuses it instead of losing its recipient.
   it('refuses a delete the hook does not count by the foreign key, losing nothing', async () => {
-    const { user, ctx } = await userWith()
+    const { user, ctx } = await freshUser()
     const book = await sharedBook()
     const list = await createWishlist(ctx, unique('Lahjat'))
     const entry = (await createEntry(ctx, { wishlist: list, bookId: book.id })).data.entryId

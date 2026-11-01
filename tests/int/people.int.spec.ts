@@ -3,33 +3,20 @@ import { beforeAll, describe, expect, it } from 'vitest'
 
 import * as gateway from '@/lib/payload/gateway'
 import config from '@/payload.config'
-import type { Person, User } from '@/payload-types'
+import type { User } from '@/payload-types'
 
+import { ownerId, personAs } from '../helpers/builders'
 import { contextFor, createUser } from '../helpers/harness'
 import { rejectedPaths } from '../helpers/validation'
 
 // `people`, AD-1/AD-2/AD-19, FR-34: owner from the request, owner-scoped
 // access that binds the admin too, one name per owner by key in the database.
 
-const ownerId = (doc: { owner: number | User }): number =>
-  typeof doc.owner === 'number' ? doc.owner : doc.owner.id
-
 describe('people', () => {
   let payload: Payload
   let a: User
   let b: User
   let admin: User
-
-  /**
-   * A Person created by `user` through the gateway; `owner` and `nameKey`
-   * only satisfy the create type, the hooks set both.
-   */
-  const personAs = async (user: User, data: Partial<Person> = {}) =>
-    gateway.create(await contextFor(user), {
-      collection: 'people',
-      data: { owner: user.id, name: 'Liisa', nameKey: 'ignored', ...data },
-      depth: 0,
-    })
 
   beforeAll(async () => {
     payload = await getPayload({ config })

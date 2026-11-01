@@ -36,6 +36,7 @@ import { undo } from '@/lib/undo/undo'
 import config from '@/payload.config'
 import type { Book, User, UserLocation } from '@/payload-types'
 
+import { freshUser, unique } from '../helpers/builders'
 import { contextFor, createUser } from '../helpers/harness'
 import { randomIsbn } from '../helpers/isbn'
 import { rejectedPaths } from '../helpers/validation'
@@ -52,8 +53,6 @@ const FINNA_FIXTURE = readFileSync(
   new URL('../fixtures/finna/9780007466061.json', import.meta.url),
   'utf8',
 )
-
-const unique = (name: string) => `${name} ${randomUUID().slice(0, 8)}`
 
 const COVER_URL = 'https://api.finna.fi/Cover/Show?source=Solr&id=x&index=0&size=large'
 
@@ -158,11 +157,6 @@ describe('saveCopy', () => {
       overrideAccess: true,
     })
     return { user: updated, location, ctx: await contextFor(updated) }
-  }
-
-  const freshUser = async (data: Partial<User> = {}) => {
-    const user = await createUser({ displayName: 'Save Copy User', ...data })
-    return { user, ctx: await contextFor(user) }
   }
 
   beforeAll(async () => {

@@ -1,5 +1,3 @@
-import { randomUUID } from 'node:crypto'
-
 import { getPayload, type Payload } from 'payload'
 import { beforeAll, describe, expect, it } from 'vitest'
 
@@ -10,8 +8,8 @@ import { suggest } from '@/lib/shelf/suggest'
 import config from '@/payload.config'
 import type { Book, User } from '@/payload-types'
 
+import { sharedBook, unique } from '../helpers/builders'
 import { contextFor, createUser } from '../helpers/harness'
-import { randomIsbn } from '../helpers/isbn'
 
 // `filterValues()` and `suggest()`, AD-7: values in use on the viewer's
 // copies only (two-user access test), counted in copies and in name order,
@@ -21,21 +19,10 @@ import { randomIsbn } from '../helpers/isbn'
 // Each test has its own users. Shared name keys are unique and rows stay, so
 // names carry a per-run suffix.
 
-const unique = (name: string) => `${name} ${randomUUID().slice(0, 8)}`
-
 describe('shelf filter values and suggestions', () => {
   let payload: Payload
 
   const reqFor = async (user: User) => (await contextFor(user)).req
-
-  const sharedBook = async (by: User, data: Partial<Book> = {}) =>
-    payload.create({
-      collection: 'books',
-      data: { title: 'Kirja', isbn13: randomIsbn(), visibility: 'shared', ...data },
-      overrideAccess: true,
-      depth: 0,
-      req: await reqFor(by),
-    })
 
   const record = async (
     by: User,
@@ -92,15 +79,15 @@ describe('shelf filter values and suggestions', () => {
     const arkku = await locationOf(a, unique('Arkku'))
     const vintti = await locationOf(b, unique('Vintti'))
 
-    const x = await sharedBook(a, { genres: [fiction.id, biography.id], language: 'fi' })
-    const y = await sharedBook(a, { language: 'en' })
-    const w = await sharedBook(a, { genres: [biography.id] })
+    const x = await sharedBook({ by: a, genres: [fiction.id, biography.id], language: 'fi' })
+    const y = await sharedBook({ by: a, language: 'en' })
+    const w = await sharedBook({ by: a, genres: [biography.id] })
     await copyOf(a, x, { location: hylly.id })
     await copyOf(a, x, { location: hylly.id })
     await copyOf(a, y, { status: 'ordered' })
     await copyOf(a, w, { location: arkku.id })
 
-    const z = await sharedBook(b, { genres: [other.id], language: 'de' })
+    const z = await sharedBook({ by: b, genres: [other.id], language: 'de' })
     await copyOf(b, z, { location: vintti.id })
     await copyOf(b, x, { status: 'ordered' })
     await upsertUserBook(await contextFor(b), y.id, { overrides: { language: 'it' } })
@@ -151,11 +138,11 @@ describe('shelf filter values and suggestions', () => {
     const linna = await record(a, 'authors', unique('Väinö Linna'), 'private')
     const othersOnly = await record(b, 'authors', unique('Kivi Muu'), 'shared')
 
-    await copyOf(a, await sharedBook(a, { authors: [kivi.id] }))
-    await copyOf(a, await sharedBook(a, { authors: [ownKivi.id] }))
-    const x = await sharedBook(a, { authors: [replaced.id] })
+    await copyOf(a, await sharedBook({ by: a, authors: [kivi.id] }))
+    await copyOf(a, await sharedBook({ by: a, authors: [ownKivi.id] }))
+    const x = await sharedBook({ by: a, authors: [replaced.id] })
     await copyOf(a, x)
-    await copyOf(b, await sharedBook(b, { authors: [othersOnly.id] }))
+    await copyOf(b, await sharedBook({ by: b, authors: [othersOnly.id] }))
 
     expect(await suggest(asA, 'author', 'kivi')).toEqual([{ id: kivi.id, name: kiviName }])
     expect(await suggest(asA, 'author', 'waltari')).toEqual([
@@ -176,10 +163,10 @@ describe('shelf filter values and suggestions', () => {
     const peppi = await record(a, 'series', unique('Peppi'), 'private')
     const othersSeries = await record(b, 'series', unique('Muumit'), 'private')
 
-    const x = await sharedBook(a, { publisher: '100% Kustannus', series: muumit.id })
+    const x = await sharedBook({ by: a, publisher: '100% Kustannus', series: muumit.id })
     await copyOf(a, x)
-    await copyOf(a, await sharedBook(a, { publisher: 'WSOY' }))
-    await copyOf(b, await sharedBook(b, { publisher: '50% Oy', series: othersSeries.id }))
+    await copyOf(a, await sharedBook({ by: a, publisher: 'WSOY' }))
+    await copyOf(b, await sharedBook({ by: b, publisher: '50% Oy', series: othersSeries.id }))
 
     expect(await suggest(asA, 'publisher', '%')).toEqual([{ id: null, name: '100% Kustannus' }])
     expect(await suggest(asA, 'publisher', 's')).toEqual([

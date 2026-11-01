@@ -19,6 +19,7 @@ import { ownedRelation, readableRelation } from '@/fields/relation'
 import { withTransaction } from '@/lib/payload/transaction'
 import appConfig from '@/payload.config'
 
+import { ownerId } from '../helpers/builders'
 import { rejectedPaths } from '../helpers/validation'
 
 // Throwaway collections on a second, keyed Payload instance in its own
@@ -67,8 +68,6 @@ const config = buildConfig({
 })
 
 type Row = { id: number; owner: number | { id: number } }
-
-const ownerId = (row: Row): number => (typeof row.owner === 'number' ? row.owner : row.owner.id)
 
 let payload: Payload
 let a: TypedUser

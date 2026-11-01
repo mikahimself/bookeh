@@ -1,5 +1,3 @@
-import { randomUUID } from 'node:crypto'
-
 import { getPayload, type Payload } from 'payload'
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -17,6 +15,7 @@ import type { Named } from '@/lib/payload/ref'
 import config from '@/payload.config'
 import type { Book, Copy, User } from '@/payload-types'
 
+import { unique } from '../helpers/builders'
 import { contextFor, createUser } from '../helpers/harness'
 import { hyphenatedIsbn10, randomIsbn } from '../helpers/isbn'
 
@@ -26,8 +25,6 @@ import { hyphenatedIsbn10, randomIsbn } from '../helpers/isbn'
 // are faked at the service's dependency, so no cache or adapter is involved.
 
 vi.mock('@/lib/metadata/lookup', () => ({ lookupSources: vi.fn() }))
-
-const unique = (name: string) => `${name} ${randomUUID().slice(0, 8)}`
 
 // Shared names are global across runs, so the default author is run-unique
 // and matches no row unless a test seeds it.
