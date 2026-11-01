@@ -14,12 +14,18 @@ type Viewer = Context['user']
  * substring (`\`, `%`, `_` escaped), matched with plain `ILIKE`: case-folded
  * under the database's Finnish collation, never accent-folded. It matches the
  * effective title, an effective author's name, the effective series' name,
- * ISBN-13 or the copy's own notes; authors and series pass the AD-4 read rule.
+ * ISBN-13 or, when `notes` names a notes column, that column; authors and
+ * series pass the AD-4 read rule. `notes` is optional because the branch over
+ * wishlist entries has no notes column to match.
  * The matching authors are an uncorrelated `array(…)`, so `ILIKE` runs over
  * `authors` once per query; as an `in (select …)` the planner pulls it into a
  * per-row join that scans every author for every copy.
  */
-export function textSearch(viewer: Viewer, q: string | undefined): SQL | undefined {
+export function textSearch(
+  viewer: Viewer,
+  q: string | undefined,
+  options: { notes?: SQL } = {},
+): SQL | undefined {
   const text = q?.trim()
   if (!text) return undefined
   const pattern = containsPattern(text)
@@ -33,5 +39,5 @@ export function textSearch(viewer: Viewer, q: string | undefined): SQL | undefin
     or exists (select 1 from series s
       where s.id = ${effective('series')} and ${readableBy(viewer, 's')} and ${like(sql`s.name`)})
     or ${like(sql`b.isbn13`)}
-    or ${like(sql`copies.notes`)})`
+    ${options.notes ? sql`or ${like(options.notes)}` : sql``})`
 }

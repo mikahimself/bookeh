@@ -153,7 +153,7 @@ The diagram shows the main directions; the list below is the full table of allow
   - The values a filter offers and the suggestions for author, series and publisher are shelf queries on `visibleCopies`. `filterValues()` returns the locations, statuses, read and unread (the viewer's `user-books` row, a missing row unread), genres and languages in use on the viewer's copies, each with its copy count, never narrowed by the current query; tags arrive in Epic 9. Suggestions are distinct on `nameKey` and prefer the shared record's id.
   - Text sort relies on the database's `fi-FI` ICU collation. Author sort uses the `sortName` of the Book's first effective author the viewer may read (AD-4), then the effective title, both in the sort's direction; a Book with no readable author sorts last both ways. Text search is `ILIKE` with no accent folding.
   - No code lists or searches `books`, `authors` or `series` on their own. They are reached through a copy or wishlist entry the viewer can see, or by exact match on ISBN-13 or `nameKey`. Book detail, Edit book and every `{ bookId }` a client sends start with `requireOwnBook(ctx, bookId)` in `lib/books`, which fails with `NOT_FOUND` unless the viewer has a copy or an open wishlist entry of that Book.
-  - Lookup's own-library results are a shelf text search over the viewer's copies and open wishlist entries, the entries through a `visibleEntries(viewer)` fragment that mirrors `visibleCopies`. Every other list that is not copies (loans, a wishlist) hydrates Books through `getEffectiveBooks()` and does not sort or filter on Book fields.
+  - Lookup's own-library results are a shelf text search over the viewer's copies and open wishlist entries, the entries through a `visibleEntries(viewer)` fragment that mirrors `visibleCopies`. `searchMine(ctx, text)` in `lib/shelf` is that reader: one row per Book, in the `author` ascending order, at most `MINE_SEARCH_LIMIT` Books, hydrated through `getEffectiveBooks()` and `getHoldings()` into `MyBook[]`. Every other list that is not copies (loans, a wishlist) hydrates Books through `getEffectiveBooks()` and does not sort or filter on Book fields.
 
 ### AD-8 — Status, wishlist, loan and reading state each have one home
 
@@ -511,6 +511,7 @@ type ShelfRange = { offset: number; limit: number }
 type ShelfRow = { copy: CopyLine; book: EffectiveBook }
 type ShelfRows = { rows: ShelfRow[]; total: number; labels: Record<string, string> } // labels keyed `field:id` for location, genre, author, series: a location named for its owner only, a genre in the viewer's language,
   // an author or series only when readable and sharing its `nameKey` with a readable effective author or series on a visible copy
+type MyBook = { book: EffectiveBook; mine: Holdings } // searchMine(ctx, text): the viewer's Books matching the text, their copies and open entries; at most MINE_SEARCH_LIMIT (20)
 type Counted<T> = T & { count: number }
 type FilterValues = { // filterValues(ctx, locale): values in use on the viewer's copies, each counted in copies
   location: Counted<Named>[]; status: Counted<{ value: 'owned' | 'ordered' }>[]

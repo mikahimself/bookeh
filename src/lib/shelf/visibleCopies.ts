@@ -22,3 +22,12 @@ export const readableBy = (viewer: Viewer, alias: string): SQL => {
   const t = sql.identifier(alias)
   return sql`(${t}.visibility = 'shared' or ${t}.created_by_id = ${viewer.id})`
 }
+
+/**
+ * Spine, AD-7: the counterpart of `visibleCopies` for wishlist entries, on
+ * the unaliased `wishlist_entries` table — the one condition deciding whose
+ * entries a viewer sees. Openness is a separate rule (`closed_at is null`,
+ * `openEntry` for the gateway reads): a closed entry is still the viewer's,
+ * it is simply not a holding.
+ */
+export const visibleEntries = (viewer: Viewer): SQL => sql`wishlist_entries.owner_id = ${viewer.id}`

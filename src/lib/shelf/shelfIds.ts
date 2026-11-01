@@ -29,7 +29,7 @@ export async function shelfIds(
   const viewer = ctx.user
   const conditions = [
     visibleCopies(viewer),
-    textSearch(viewer, query.q),
+    textSearch(viewer, query.q, { notes: sql`copies.notes` }),
     scalarFilters(query.filters),
     relationFilters(viewer, query.filters),
   ].filter((condition) => condition !== undefined)
