@@ -55,6 +55,10 @@ function search(query: string): Promise<SearchHit[]> {
 
 const isbns = (hits: SearchHit[]): string[] => hits.map((hit) => hit.isbn13)
 
+/** The absolute cover URL of a fixture record's first image, as the adapter builds it. */
+const coverOf = (body: Body, id: string): string =>
+  `https://api.finna.fi${(record(body, id).images as string[])[0]}`
+
 let warn: MockInstance
 
 beforeEach(() => {
@@ -94,7 +98,6 @@ describe('finna.search', () => {
         publisher: 'Bazar',
         year: 2026,
         source: 'finna',
-        hasCover: false,
       },
       {
         isbn13: '9789127140394',
@@ -103,7 +106,6 @@ describe('finna.search', () => {
         publisher: 'Natur & Kultur',
         year: 2015,
         source: 'finna',
-        hasCover: false,
       },
       {
         isbn13: '9781843830641',
@@ -113,7 +115,6 @@ describe('finna.search', () => {
         year: 2004,
         binding: 'hardback',
         source: 'finna',
-        hasCover: false,
       },
       {
         isbn13: '9789127164178',
@@ -123,7 +124,7 @@ describe('finna.search', () => {
         year: 2019,
         binding: 'mjuka pärmar',
         source: 'finna',
-        hasCover: true,
+        coverUrl: coverOf(fixture('yuval noah harari'), 'helle.1533447'),
       },
     ])
     expect(new Set(isbns(hits)).size).toBe(hits.length)
@@ -166,7 +167,10 @@ describe('finna.search', () => {
       isbn13: '9789510432518',
       title: 'Tuntematon sotilas',
       year: 2017,
-      hasCover: true,
+      coverUrl: coverOf(
+        fixture('tuntematon sotilas'),
+        'kangasniemi.c087fe7d-c15d-46de-92e5-8dbab338a08b',
+      ),
     })
     expect(hits.filter((hit) => hit.isbn13 === '9789510432518')).toHaveLength(1)
     // Both records of that ISBN name the same authors, but only the first states their roles.
@@ -174,8 +178,7 @@ describe('finna.search', () => {
       { name: 'Väinö Linna', sortName: 'Linna, Väinö' },
       { name: 'Veikko Honkanen', sortName: 'Honkanen, Veikko' },
     ])
-    expect(hits.every((hit) => typeof hit.hasCover === 'boolean')).toBe(true)
-    expect(hits.filter((hit) => hit.hasCover)).toHaveLength(1)
+    expect(hits.filter((hit) => hit.coverUrl !== undefined)).toHaveLength(1)
   })
 })
 
@@ -203,8 +206,9 @@ describe('finna.search over an edited answer', () => {
 
     const hits = await search('tuntematon sotilas')
 
-    expect(hits[0]).toMatchObject({ isbn13: '9789510432518', hasCover: false })
-    expect(hits.some((hit) => hit.hasCover)).toBe(false)
+    expect(hits[0]).toMatchObject({ isbn13: '9789510432518' })
+    expect(hits[0]).not.toHaveProperty('coverUrl')
+    expect(hits.some((hit) => hit.coverUrl !== undefined)).toBe(false)
   })
 
   it('answers nothing for a query Finna has no match for, without logging', async () => {

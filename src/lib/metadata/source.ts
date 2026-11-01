@@ -31,7 +31,7 @@ export type SourcesOutcome =
 export type SearchHit = Pick<
   SourceResult,
   'isbn13' | 'title' | 'authors' | 'publisher' | 'year' | 'binding' | 'source'
-> & { hasCover: boolean }
+> & { coverUrl?: string }
 
 export type RawMetadata = {
   v: 1
@@ -50,6 +50,10 @@ export type RawMetadata = {
  *   (logged), so an outage is never read as "no such book".
  * - Neither method ever throws or rejects: a failure is logged. The `undefined`
  *   failure signal is `lookupByIsbn`'s only; `search` still resolves a list.
+ * - `search` resolves one hit per distinct ISBN-13 it found, each carrying the
+ *   source's own cover URL as `coverUrl` when it has one. That URL stays on the
+ *   server (AD-14): `searchBooks` records it for the cover route and hands the
+ *   client `hasCover` instead.
  * - Each result's `isbn13` is the ISBN asked for, never another ISBN found in
  *   the record. `source` is the adapter's own `id`; `recordId` is the
  *   source's own id for the record (a record without one is skipped); `raw`

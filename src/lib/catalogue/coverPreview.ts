@@ -7,7 +7,8 @@ import { pickIndex } from './pick'
 
 // Spine, AD-9, AD-10, AD-12 and AD-14: the pre-save cover preview. `lookupBook`
 // (and `lookupAgain`)
-// records every candidate's cover URL per user and ISBN-13; the
+// records every candidate's cover URL per user and ISBN-13, and `searchBooks`
+// the one URL of each search hit that has one; the
 // `/data/cover/[isbn13]` handler serves the one at the requested index. The
 // first request for an image fetches it through `fetchCover()`, the same
 // checked call the save's cover download makes, and holds the bytes on the
@@ -49,7 +50,9 @@ const keyOf = (ctx: Context, isbn13: string) => `${ctx.user.id}:${isbn13}`
  * Records `urls`, every candidate's cover URL in candidate order, as
  * `ctx.user`'s cover previews for `isbn13`, or forgets them when none is
  * defined. The previous record's held covers whose URL is still listed are
- * kept; the rest go. Called by `lookupBook` and `lookupAgain` alone. Bounded
+ * kept; the rest go. Called by `lookupBook`, `lookupAgain` and `searchBooks`
+ * alone — a search records one URL per hit, so its `urls` is one element and
+ * the preview route's `pick` resolves to index 0. Bounded
  * to `PREVIEW_SIZE` entries (one per user and ISBN), each living
  * `PREVIEW_TTL_MS`.
  */

@@ -337,8 +337,8 @@ export function finnaResults(body: unknown, isbn13: string): SourceResult[] | un
 
 // --- Search ------------------------------------------------------------------------------
 
-/** The seven `SearchHit` fields of a parsed record, plus whether that record reported an image. */
-function toHit(result: SourceResult, hasCover: boolean): SearchHit {
+/** The seven `SearchHit` fields of a parsed record, plus the record's own cover URL. */
+function toHit(result: SourceResult): SearchHit {
   return {
     isbn13: result.isbn13,
     title: result.title,
@@ -347,7 +347,7 @@ function toHit(result: SourceResult, hasCover: boolean): SearchHit {
     ...(result.year !== undefined && { year: result.year }),
     ...(result.binding !== undefined && { binding: result.binding }),
     source: result.source,
-    hasCover,
+    ...(result.coverUrl !== undefined && { coverUrl: result.coverUrl }),
   }
 }
 
@@ -355,11 +355,11 @@ function toHit(result: SourceResult, hasCover: boolean): SearchHit {
  * The hits of a Finna search response body, one per distinct ISBN-13 in Finna's own order,
  * first occurrence winning: Finna answers with one record per library holding, so one edition
  * comes back many times. Each record's `isbns` is expanded, so a record naming two bindings
- * gives two hits, each with its own binding text. `hasCover` is true when any kept record
- * naming that ISBN-13 reported an image: it is per record, not per edition, so a record naming
- * four bindings and holding one image marks all four, and a record dropped for a missing title
- * or id contributes no cover. `[]`, after one logged warning, when the body is not a usable
- * answer (FR-20, AD-9).
+ * gives two hits, each with its own binding text. `coverUrl` is the first image URL any kept
+ * record naming that ISBN-13 reported: it is per record, not per edition, so a record naming
+ * four bindings and holding one image gives all four that URL, and a record dropped for a
+ * missing title or id contributes no cover. `[]`, after one logged warning, when the body is
+ * not a usable answer (FR-20, AD-9).
  */
 export function finnaSearchHits(body: unknown, query: string): SearchHit[] {
   const failed = (reason: string, details?: Json): SearchHit[] => {
@@ -383,10 +383,10 @@ export function finnaSearchHits(body: unknown, query: string): SearchHit[] {
       // `toResult` states every field rule; the narrow field set leaves its other fields empty.
       const result = toResult(record, isbn13, {})
       if (!result) continue
-      const cover = result.coverUrl !== undefined
       const seen = hits.get(isbn13)
-      if (seen) seen.hasCover ||= cover
-      else hits.set(isbn13, toHit(result, cover))
+      if (!seen) hits.set(isbn13, toHit(result))
+      // `??=` only when there is a URL: assigning `undefined` would add the key.
+      else if (result.coverUrl !== undefined) seen.coverUrl ??= result.coverUrl
     }
   }
   return [...hits.values()]

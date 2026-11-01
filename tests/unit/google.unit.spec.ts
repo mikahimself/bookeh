@@ -24,6 +24,11 @@ function volume(id: string): Volume {
   return JSON.parse(readFileSync(new URL(`${id}.json`, VOLUMES), 'utf8')) as Volume
 }
 
+/** The cover URL the adapter builds from a volume's thumbnail. */
+function coverOf(item: Volume): string {
+  return `${item.volumeInfo.imageLinks!.thumbnail.replace(/^http:/, 'https:')}&fife=w2000`
+}
+
 function searchBody(items: unknown[]) {
   return { kind: 'books#volumes', totalItems: items.length, items }
 }
@@ -89,7 +94,7 @@ describe('google.lookupByIsbn', () => {
           'Fiction / Media Tie-In',
         ],
         themes: [],
-        coverUrl: `${full.volumeInfo.imageLinks!.thumbnail.replace(/^http:/, 'https:')}&fife=w2000`,
+        coverUrl: coverOf(full),
         source: 'google',
         recordId: '3Wf_ffkFQmgC',
         raw: { google: body },
@@ -330,8 +335,9 @@ describe('google.lookupByIsbn over every recorded response', () => {
 })
 
 describe('google.search', () => {
-  it('maps a full volume to a hit', async () => {
-    serve(searchBody([volume('3Wf_ffkFQmgC')]))
+  it('maps a full volume to a hit, with its cover URL', async () => {
+    const full = volume('3Wf_ffkFQmgC')
+    serve(searchBody([full]))
 
     const hits = await google.search!('a game of thrones')
 
@@ -343,14 +349,14 @@ describe('google.search', () => {
         publisher: 'Harper Voyager',
         year: 2011,
         source: 'google',
-        hasCover: true,
+        coverUrl: coverOf(full),
       },
     ])
     expect(hits[0]).not.toHaveProperty('binding')
     expect(warn).not.toHaveBeenCalled()
   })
 
-  it('reports no cover for a sparse volume', async () => {
+  it('leaves the cover URL out for a sparse volume', async () => {
     serve(searchBody([volume('D-Py0AEACAAJ')]))
 
     const [hit] = await google.search!('mikä internetiä vaivaa')
@@ -362,8 +368,8 @@ describe('google.search', () => {
       publisher: 'kosmos',
       year: 2024,
       source: 'google',
-      hasCover: false,
     })
+    expect(hit).not.toHaveProperty('coverUrl')
   })
 
   it('flips an inverted author name and keeps it as the sort name', async () => {
@@ -447,16 +453,17 @@ describe('google.search', () => {
     expect(await google.search!('a game of thrones')).toHaveLength(1)
   })
 
-  it('raises hasCover from a duplicate of the same ISBN-13', async () => {
+  it('fills a missing cover URL from a duplicate of the same ISBN-13', async () => {
+    const full = volume('3Wf_ffkFQmgC')
     const stub = { ...volume('3Wf_ffkFQmgC'), id: 'catalogue-stub' }
     stub.volumeInfo = { ...stub.volumeInfo }
     delete stub.volumeInfo.imageLinks
-    serve(searchBody([stub, volume('3Wf_ffkFQmgC')]))
+    serve(searchBody([stub, full]))
 
     const hits = await google.search!('a game of thrones')
 
     expect(hits).toHaveLength(1)
-    expect(hits[0].hasCover).toBe(true)
+    expect(hits[0].coverUrl).toBe(coverOf(full))
   })
 
   it('returns one hit per edition, in the order Google sent them', async () => {
@@ -472,7 +479,7 @@ describe('google.search', () => {
 
     const hits = await google.search!('kirja')
 
-    expect(hits.map(({ hasCover }) => hasCover)).toStrictEqual([false, false, true])
+    expect(hits.map(({ coverUrl }) => coverUrl !== undefined)).toStrictEqual([false, false, true])
   })
 
   it('answers nothing when Google found nothing, without logging', async () => {

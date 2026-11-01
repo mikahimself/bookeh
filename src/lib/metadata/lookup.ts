@@ -4,7 +4,7 @@ import { logger } from '@/lib/errors'
 import { processState } from '@/lib/processState'
 
 import { mergeResults } from './merge'
-import type { Source, SourceId, SourceResult, SourcesOutcome } from './source'
+import type { SearchHit, Source, SourceId, SourceResult, SourcesOutcome } from './source'
 import { sources } from './sources'
 
 /** One source's budget inside NFR-1's 5 s scan-to-result; the adapters' own fetch timeout is a backstop. */
@@ -154,4 +154,53 @@ export async function lookupSources(
   }
   remember(isbn13, outcome, failed.length === 0 ? FOUND_TTL_MS : PARTIAL_TTL_MS)
   return outcome
+}
+
+/** One source's search hits under `SOURCE_TIMEOUT_MS`; `[]` when it timed out or rejected. */
+async function askSearch(source: Source, query: string): Promise<SearchHit[]> {
+  if (!source.search) return []
+  let timer: ReturnType<typeof setTimeout> | undefined
+  const timeout = new Promise<undefined>((resolve) => {
+    timer = setTimeout(() => {
+      logger().warn(
+        { source: source.id, query },
+        `Source ${source.id} search timed out after ${SOURCE_TIMEOUT_MS} ms`,
+      )
+      resolve(undefined)
+    }, SOURCE_TIMEOUT_MS)
+  })
+  try {
+    return (await Promise.race([source.search(query), timeout])) ?? []
+  } catch (err) {
+    // A contract breach: a source's `search` never rejects. Handled like a timeout.
+    logger().warn({ source: source.id, query, err }, `Source ${source.id} search rejected`)
+    return []
+  } finally {
+    clearTimeout(timer)
+  }
+}
+
+/**
+ * Asks every source in `sources/index.ts` that implements `search` for `query` (AD-9), in
+ * parallel, each under `SOURCE_TIMEOUT_MS`; a timeout or a rejection is one logged warning
+ * naming the source and the query, and that source contributes nothing. The hits merge in
+ * source order, keeping the first hit per ISBN-13 and filling its missing `coverUrl` from a
+ * later source's hit for the same ISBN; a hit without an `isbn13` is dropped. Unlike
+ * `lookupSources` this uses neither the cache nor the breaker: `search` answers with a list
+ * either way, so there is no failure signal to count, and free-text queries repeat too
+ * rarely for a cache to pay. Writes nothing. Never throws. Called by `searchBooks` alone,
+ * which owns the per-user rate limit and the cover-preview record a search needs; the list
+ * is bounded by what each source's own request asks for, with no cap applied here.
+ */
+export async function searchSources(query: string): Promise<SearchHit[]> {
+  const lists = await Promise.all(sources.map((source) => askSearch(source, query)))
+  const hits = new Map<string, SearchHit>()
+  for (const hit of lists.flat()) {
+    if (!hit.isbn13) continue
+    const seen = hits.get(hit.isbn13)
+    if (seen) {
+      if (hit.coverUrl !== undefined) seen.coverUrl ??= hit.coverUrl
+    } else hits.set(hit.isbn13, { ...hit })
+  }
+  return [...hits.values()]
 }

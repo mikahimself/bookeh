@@ -174,7 +174,7 @@ function toResult(volume: Json, isbn13: string, body: unknown): SourceResult | u
 /**
  * A hit for a volume that has a title and a usable ISBN, built field by field like Finna's
  * `toHit`. `binding` is always absent: Google's `printType` is BOOK/MAGAZINE, not a binding.
- * `hasCover` is true where `coverUrl()` yields a URL.
+ * `coverUrl` is whatever `coverUrl()` yields, left out when it yields nothing.
  */
 function toHit(volume: Json): SearchHit | undefined {
   const info = isObject(volume.volumeInfo) ? volume.volumeInfo : {}
@@ -183,6 +183,7 @@ function toHit(volume: Json): SearchHit | undefined {
   if (!title || !isbn13) return undefined
   const publisher = clean(info.publisher)
   const published = year(info)
+  const cover = coverUrl(info)
   return {
     isbn13,
     title,
@@ -190,7 +191,7 @@ function toHit(volume: Json): SearchHit | undefined {
     ...(publisher !== undefined && { publisher }),
     ...(published !== undefined && { year: published }),
     source: 'google',
-    hasCover: coverUrl(info) !== undefined,
+    ...(cover !== undefined && { coverUrl: cover }),
   }
 }
 
@@ -236,16 +237,17 @@ export const google: Source = {
     // Google leaves `items` out when nothing matched.
     if (body.items !== undefined && !Array.isArray(body.items))
       return failed('items is not an array')
-    // One hit per ISBN-13 in Google's relevance order, the first volume winning, with
-    // `hasCover` raised by a later duplicate that has one — Finna's rule in `finnaSearchHits`.
+    // One hit per ISBN-13 in Google's relevance order, the first volume winning, with a
+    // missing `coverUrl` filled from a later duplicate — Finna's rule in `finnaSearchHits`.
     // No cover-first re-sort: unlike `lookupByIsbn`, these records are different books.
     const hits = new Map<string, SearchHit>()
     for (const volume of list(body.items).filter(isObject)) {
       const hit = toHit(volume)
       if (!hit) continue
       const seen = hits.get(hit.isbn13)
-      if (seen) seen.hasCover ||= hit.hasCover
-      else hits.set(hit.isbn13, hit)
+      if (!seen) hits.set(hit.isbn13, hit)
+      // `??=` only when there is a URL: assigning `undefined` would add the key.
+      else if (hit.coverUrl !== undefined) seen.coverUrl ??= hit.coverUrl
     }
     return [...hits.values()]
   },

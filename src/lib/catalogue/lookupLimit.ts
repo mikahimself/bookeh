@@ -8,9 +8,9 @@ import { processState } from '@/lib/processState'
 // `refetchBook`, `retryLookup`, `lookupAgain` (only when it asks the sources: a merge into
 // a shared Book or a held outcome counts nothing) and `fetchCoverPreview`
 // (once per record, the user and ISBN, for its first image it does not hold,
-// and again for a cover whose fetch failed). `searchBooks` (I10) must call
-// it too when it arrives, so a runaway client cannot ask Finna and Google
-// Books in the user's name unchecked. Not counted: the cover download that
+// and again for a cover whose fetch failed). `searchBooks` calls it once per
+// call, however many sources answer, so a runaway client cannot ask Finna and
+// Google Books in the user's name unchecked. Not counted: the cover download that
 // follows (`storeCover()`,
 // from `saveCopy`, `prepareShare` and `refetchBook`), one image per Book the
 // call creates, shares or fills.
@@ -34,10 +34,11 @@ const windows = () => processState('catalogue.lookupLimit', () => new Map<number
  * `saveCopy` on a held-outcome miss before `lookupSources()`, by
  * `refetchBook` and `retryLookup` before their fresh `lookupSources()`, by `lookupAgain`
  * immediately before its fresh `lookupSources()` (never on the merge or
- * held-candidate paths), and by `fetchCoverPreview` before the first fetch
- * of a record (user and ISBN) of an image it does not hold, and again before
- * fetching a cover whose fetch failed. `searchBooks` (I10) must call it the
- * same way when it arrives.
+ * held-candidate paths), by `searchBooks` once per call, after
+ * the blank-text guard and before any source is asked, and by
+ * `fetchCoverPreview` before the first fetch of a record (user and ISBN) of an
+ * image it does not hold, and again before fetching a cover whose fetch
+ * failed.
  */
 export function limitLookups(ctx: Context): void {
   const now = Date.now()
