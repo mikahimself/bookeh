@@ -4,10 +4,9 @@ import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { useTransition } from 'react'
 
-import type { CandidateId } from '@/lib/catalogue/pick'
-
 import { Button } from '../components/Button'
 import { ProgressLine } from '../components/ProgressLine'
+import type { CopyTarget } from '../saveInput'
 
 import { saveCopyAction } from './actions'
 import { useAddToLibrary } from './useAddToLibrary'
@@ -22,23 +21,21 @@ import { useAddToLibrary } from './useAddToLibrary'
  * its manual fields, or the sources' current one) is the message.
  * The press semantics (latch, `requestId`, unmount) are `useAddToLibrary()`'s.
  *
- * `pick` is the source candidate shown and `candidate` its identity, sent so
- * the server builds the Book from that record or, when its outcome no longer
- * has it, answers `NOT_FOUND` and the Answer is rendered again (D-7, AD-11);
- * both left out for a Book that exists.
+ * `target` is what the save is for: `{ isbn13 }` with `pick`, the source
+ * candidate shown, and `candidate`, its identity, sent so the server builds
+ * the Book from that record or, when its outcome no longer has it, answers
+ * `NOT_FOUND` and the Answer is rendered again (D-7, AD-11); both left out
+ * for a Book that exists. A held Book with no ISBN sends `{ bookId }`
+ * instead, which `requireOwnBook()` gates in the save (I12, AD-7).
  *
  * `another` makes it Add another copy on the In library Answer: the same
  * save, toast and return, as a secondary button.
  */
 export function AddToLibrary({
-  isbn13,
-  pick,
-  candidate,
+  target,
   another = false,
 }: {
-  isbn13: string
-  pick?: number
-  candidate?: CandidateId
+  target: CopyTarget
   another?: boolean
 }) {
   const t = useTranslations()
@@ -48,13 +45,7 @@ export function AddToLibrary({
 
   const press = () =>
     add(
-      (requestId) =>
-        saveCopyAction({
-          requestId,
-          isbn13,
-          ...(pick !== undefined && { pick }),
-          ...(candidate !== undefined && { candidate }),
-        }),
+      (requestId) => saveCopyAction({ requestId, target }),
       (failure) => {
         if (failure.code !== 'NOT_FOUND') return false
         startTransition(() => {

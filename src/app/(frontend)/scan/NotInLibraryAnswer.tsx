@@ -5,7 +5,7 @@ import type { WishlistLine } from '@/lib/wishlists/wishlists'
 import { AddToWishlist } from '../components/AddToWishlist'
 
 import { AddToLibrary } from './AddToLibrary'
-import { editionLines, type AnswerBook } from './answer'
+import { editionLines, type SourceAnswer } from './answer'
 import { AnswerBack } from './AnswerBack'
 import { AnswerLayout } from './AnswerLayout'
 import { EditionPicker } from './EditionPicker'
@@ -18,13 +18,15 @@ import { PartialLookupLine } from './PartialLookupLine'
  * candidate shown; Add to wishlist offers `lists`, the viewer's wishlists.
  * When a source failed and another found the Book, the notes end with
  * `PartialLookupLine`. Finnish objects decline, hence `sourcesPartitive`; a
- * source with no label shows its id, in either catalogue.
+ * source with no label shows its id, in either catalogue. The Answer always
+ * carries an ISBN (`SourceAnswer`): the picker, the cover preview and both
+ * saves address it.
  */
 export async function NotInLibraryAnswer({
   answer,
   lists,
 }: {
-  answer: AnswerBook
+  answer: SourceAnswer
   lists: readonly WishlistLine[]
 }) {
   const t = await getTranslations()
@@ -41,6 +43,12 @@ export async function NotInLibraryAnswer({
     return partitives.has(key) ? partitives(key) : id
   }
   const list = (names: string[]) => format.list(names, { type: 'conjunction' })
+  // Both saves are for the candidate shown, addressed by the ISBN asked for.
+  const target = {
+    isbn13: answer.isbn13,
+    ...(pick !== undefined && { pick }),
+    ...(answer.candidate !== undefined && { candidate: answer.candidate }),
+  }
   const text = {
     pages: (pages: number) => t('answer.pages', { pages }),
     unnamed: (n: number) => t('answer.unnamedEdition', { n }),
@@ -77,16 +85,8 @@ export async function NotInLibraryAnswer({
         ) : undefined
       }
     >
-      <AddToWishlist
-        lists={lists}
-        title={answer.title}
-        target={{
-          isbn13: answer.isbn13,
-          ...(pick !== undefined && { pick }),
-          ...(answer.candidate !== undefined && { candidate: answer.candidate }),
-        }}
-      />
-      <AddToLibrary isbn13={answer.isbn13} pick={pick} candidate={answer.candidate} />
+      <AddToWishlist lists={lists} title={answer.title} target={target} />
+      <AddToLibrary target={target} />
       <AnswerBack label={t('answer.back')} />
     </AnswerLayout>
   )

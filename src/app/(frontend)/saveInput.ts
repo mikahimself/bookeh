@@ -1,6 +1,7 @@
 import { type CandidateId, isCandidateId } from '@/lib/catalogue/pick'
 import type { SaveTarget } from '@/lib/catalogue/saveCopy'
 import type { ActionResult, ErrorCode } from '@/lib/errors'
+import { isRowId } from '@/lib/payload/ref'
 
 // Input checks the copy saves (`scan/actions.ts`) and the entry save
 // (`actions/wishlists.ts`) share. Not in a `'use server'` file: those export
@@ -28,6 +29,44 @@ export function isbnTarget({ isbn13, pick, candidate }: IsbnInput): SaveTarget {
       candidate: { source: candidate.source, recordId: candidate.recordId },
     }),
   }
+}
+
+/**
+ * What a copy save is for (`saveCopyAction`): the ISBN's Book with the
+ * candidate shown, or a Book the user holds -- the Answer for a Book with no
+ * ISBN (I12). The entry save adds `{ manual }` (`components/entryTarget`).
+ */
+export type CopyTarget = IsbnInput | { bookId: number }
+
+const TARGET_KINDS = ['isbn13', 'manual', 'bookId'] as const
+
+/** One kind of save target, named by its one key. */
+export type TargetKind = (typeof TARGET_KINDS)[number]
+
+/**
+ * The target a client sent, by its one key, as the save takes it: exactly one
+ * of `TARGET_KINDS` present, and that kind among `allowed` -- `bookId` and
+ * `isbn13` for the copy save, those and `manual` for the entry save. A
+ * `bookId` must be a row id, so a guessed or malformed one is `undefined`
+ * (the action's `VALIDATION`) before the save sees it.
+ */
+export function parseTarget(
+  target: unknown,
+  allowed: readonly TargetKind[],
+): SaveTarget | undefined {
+  if (typeof target !== 'object' || target === null) return undefined
+  const kinds = TARGET_KINDS.filter((key) => key in target)
+  if (kinds.length !== 1) return undefined
+  const [kind] = kinds as [TargetKind]
+  if (!allowed.includes(kind)) return undefined
+  const value = target as Partial<Record<TargetKind, unknown>>
+  if (kind === 'bookId') return isRowId(value.bookId) ? { bookId: value.bookId } : undefined
+  if (kind === 'manual') {
+    if (!isManualFields(value.manual)) return undefined
+    const { isbn13, title, author } = value.manual
+    return { manual: { isbn: isbn13, title, authors: [author] } }
+  }
+  return isIsbnInput(target) ? isbnTarget(target) : undefined
 }
 
 export type ManualInput = { title: string; author: string; isbn13?: string }

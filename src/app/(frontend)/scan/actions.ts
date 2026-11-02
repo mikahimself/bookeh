@@ -1,7 +1,7 @@
 'use server'
 
 import { retryLookup } from '@/lib/catalogue/lookupBook'
-import { saveCopy, type SaveResult } from '@/lib/catalogue/saveCopy'
+import { saveCopy, type SaveResult, type SaveTarget } from '@/lib/catalogue/saveCopy'
 import { DomainError, logger, runAction, type ActionResult } from '@/lib/errors'
 import type { SourceId } from '@/lib/metadata/source'
 import { requireUserOrThrow } from '@/lib/payload/context'
@@ -10,20 +10,22 @@ import type { Undoable } from '@/lib/undo/undo'
 import {
   isIsbnInput,
   isManualFields,
-  isbnTarget,
   manualFields,
-  type IsbnInput,
+  parseTarget,
   type ManualInput,
 } from '../saveInput'
 
 /**
  * Add to library on the Not in library Answer (FR-21) and Add another copy on
- * the In library Answer (FR-20): an owned copy of the ISBN's Book at the
- * default location. The input comes from the client, so anything but
- * `{ requestId, isbn13 }` strings, with an optional `pick` that is a
- * non-negative integer (the edition picked, D-7) and an optional `candidate`
- * of non-empty `source` and `recordId` strings (its identity, AD-11), is
- * `VALIDATION` before `saveCopy()` sees it. `NOT_FOUND` comes back as it is
+ * the In library Answer (FR-20): an owned copy at the default location, of
+ * the ISBN's Book or of a Book the user already holds. The input comes from
+ * the client, so anything but a `requestId` string and a `target` of exactly
+ * one kind -- `{ isbn13 }`, with an optional `pick` that is a non-negative
+ * integer (the edition picked, D-7) and an optional `candidate` of non-empty
+ * `source` and `recordId` strings (its identity, AD-11), or `{ bookId }` with
+ * a row id (the Answer for a Book with no ISBN, I12; `requireOwnBook()` gates
+ * it in the save) -- is `VALIDATION` before `saveCopy()` sees it, by the same
+ * `parseTarget()` the entry save uses. `NOT_FOUND` comes back as it is
  * (R5): no source knows the ISBN any more, the candidate shown has gone, or
  * the held Book is gone, and the client refreshes the Answer, which then
  * shows what the server holds now. When no source knows the ISBN, trying
@@ -39,9 +41,9 @@ import {
 export async function saveCopyAction(input: unknown): Promise<ActionResult<Undoable<SaveResult>>> {
   const result = await runAction(async () => {
     const ctx = await requireUserOrThrow()
-    if (!isSaveInput(input)) throw new DomainError('VALIDATION')
-    const { requestId } = input
-    return saveCopy(ctx, { requestId, target: isbnTarget(input), save: { kind: 'copy' } })
+    const parsed = parseSaveInput(input)
+    if (!parsed) throw new DomainError('VALIDATION')
+    return saveCopy(ctx, { ...parsed, save: { kind: 'copy' } })
   })
   if (result.ok || result.code === 'UNAUTHENTICATED') return result
   if (result.code !== 'INTERNAL') logger().warn({ code: result.code }, 'saveCopyAction failed')
@@ -70,9 +72,13 @@ export async function retryLookupAction(input: unknown): Promise<ActionResult<So
   return result
 }
 
-function isSaveInput(input: unknown): input is { requestId: string } & IsbnInput {
-  if (typeof input !== 'object' || input === null) return false
-  return typeof (input as Record<string, unknown>).requestId === 'string' && isIsbnInput(input)
+/** `{ requestId, target }` as the copy save takes it, `undefined` for anything else. */
+function parseSaveInput(input: unknown): { requestId: string; target: SaveTarget } | undefined {
+  if (typeof input !== 'object' || input === null) return undefined
+  const { requestId, target } = input as Record<string, unknown>
+  if (typeof requestId !== 'string') return undefined
+  const parsed = parseTarget(target, ['isbn13', 'bookId'])
+  return parsed && { requestId, target: parsed }
 }
 
 /**

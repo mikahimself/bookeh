@@ -1,6 +1,8 @@
 import { normaliseIsbn } from '@/fields/isbn'
 import { getEffectiveBooks, type EffectiveBook } from '@/lib/books/effectiveBook'
 import { getHoldings, type Holdings } from '@/lib/books/holdings'
+import { requireOwnBook } from '@/lib/books/requireOwnBook'
+import { DomainError } from '@/lib/errors'
 import { lookupSources } from '@/lib/metadata/lookup'
 import type { SourceId, SourceResult } from '@/lib/metadata/source'
 import type { Context } from '@/lib/payload/context'
@@ -22,10 +24,11 @@ import { pickIndex } from './pick'
 export type Draft = Omit<SourceResult, 'raw' | 'coverUrl'> & { hasCover: boolean }
 
 /**
- * The ISBN as entered (ISBN-10 or -13, hyphens and spaces allowed) and the
- * chosen candidate. The spine's `{ bookId }` target arrives with I12.
+ * What to answer for: the ISBN as entered (ISBN-10 or -13, hyphens and spaces
+ * allowed) with the chosen candidate, or a Book the viewer holds, by id --
+ * the Answer for a Book with no ISBN (I12, AD-11).
  */
-export type LookupTarget = { isbn: string; pick?: number }
+export type LookupTarget = { isbn: string; pick?: number } | { bookId: number }
 
 /**
  * A name of the picked candidate and the shared row a save would link it to;
@@ -73,6 +76,23 @@ const sharedMatch = async (
 ): Promise<Match> => ({ name, id: (await findByName(ctx, collection, 'shared', name))?.id ?? null })
 
 /**
+ * The `existing` answer for a Book the viewer holds, by id (AD-7): the gate,
+ * then the two reads the ISBN path makes. `NOT_FOUND` when the Book is no
+ * longer readable (a shared Book the admin made private), so every answer
+ * carries a Book.
+ */
+const ownBook = async (ctx: Context, bookId: number): Promise<LookupResult> => {
+  await requireOwnBook(ctx, bookId)
+  // One after the other: calls on one context never run concurrently (AD-16).
+  const books = await getEffectiveBooks(ctx, [bookId])
+  const book = books.get(bookId)
+  if (!book) throw new DomainError('NOT_FOUND')
+  const holdings = await getHoldings(ctx, [bookId])
+  // `getHoldings` keys every requested id.
+  return { kind: 'existing', book, mine: holdings.get(bookId)! }
+}
+
+/**
  * Spine, AD-9 and FR-11: the Answer's one data call. Normalises the ISBN
  * (`INVALID_ISBN` before any read), then answers in order: a shared Book with
  * that ISBN, the viewer's own private Book, then `lookupSources`. Lookup is
@@ -85,8 +105,16 @@ const sharedMatch = async (
  * in-process cache so the next save can auto-share (AD-5). A shared Book never
  * calls the sources.
  * Rate-limited per user after normalising (`limitLookups`, AD-9): a refused call reads nothing.
+ *
+ * A `{ bookId }` target (AD-7, AD-11, I12) is the Answer for a Book reached by
+ * id, which is how a Book with no ISBN gets one. `requireOwnBook()` gates it
+ * (`NOT_FOUND` for an id that is not a row id, or a Book the viewer holds
+ * nothing of -- the admin's read access is no holding), then the same two
+ * reads answer `existing`. No source is asked, so nothing counts against the
+ * lookup limit (AD-9).
  */
 export async function lookupBook(ctx: Context, target: LookupTarget): Promise<LookupResult> {
+  if ('bookId' in target) return ownBook(ctx, target.bookId)
   const isbn13 = normaliseIsbn(target.isbn)
   limitLookups(ctx)
 

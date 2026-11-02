@@ -14,7 +14,7 @@ import {
 import { createWishlist, deleteWishlist, renameWishlist } from '@/lib/wishlists/wishlists'
 
 import { parseRef } from '../ref'
-import { isIsbnInput, isManualFields, isbnTarget, manualFields } from '../saveInput'
+import { manualFields, parseTarget } from '../saveInput'
 
 // The Wishlists section, one wishlist and its opened entry (FR-38, FR-39),
 // and Add to wishlist from the Answer and Book detail (`saveEntryAction`).
@@ -176,21 +176,7 @@ function parseEntryInput(
   const { requestId, wishlist: sent, target } = input as Record<string, unknown>
   const wishlist = parseRef(sent)
   if (typeof requestId !== 'string' || wishlist === undefined) return undefined
-  const parsed = parseEntryTarget(target)
+  // Every `EntryTarget` kind (`components/entryTarget`), checked in one place.
+  const parsed = parseTarget(target, ['isbn13', 'manual', 'bookId'])
   return parsed && { requestId, target: parsed, wishlist }
-}
-
-/** One of `EntryTarget`'s kinds (`components/entryTarget`), by its one key, as the save takes it. */
-function parseEntryTarget(target: unknown): SaveTarget | undefined {
-  if (typeof target !== 'object' || target === null) return undefined
-  const kinds = (['isbn13', 'manual', 'bookId'] as const).filter((key) => key in target)
-  if (kinds.length !== 1) return undefined
-  const value = target as Partial<Record<'isbn13' | 'manual' | 'bookId', unknown>>
-  if (kinds[0] === 'bookId') return isRowId(value.bookId) ? { bookId: value.bookId } : undefined
-  if (kinds[0] === 'manual') {
-    if (!isManualFields(value.manual)) return undefined
-    const { isbn13, title, author } = value.manual
-    return { manual: { isbn: isbn13, title, authors: [author] } }
-  }
-  return isIsbnInput(target) ? isbnTarget(target) : undefined
 }

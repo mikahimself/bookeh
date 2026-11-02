@@ -15,9 +15,12 @@ vi.mock('next-intl/server', async () => {
   }
 })
 // The Answer's buttons and Links are client components: named, not exercised, here.
+const targets: unknown[] = []
 vi.mock('@/app/(frontend)/scan/AddToLibrary', () => ({
-  AddToLibrary: ({ another = false }: { another?: boolean }) =>
-    button(another ? 'Add another copy' : 'Add to library'),
+  AddToLibrary: ({ target, another = false }: { target: unknown; another?: boolean }) => {
+    targets.push(target)
+    return button(another ? 'Add another copy' : 'Add to library')
+  },
 }))
 vi.mock('@/app/(frontend)/scan/AnswerBack', () => ({
   AnswerBack: ({ label, variant }: { label: string; variant?: string }) =>
@@ -89,7 +92,10 @@ const renderAnswer = async (held: Held) => {
 const buttons = () => screen.getAllByRole('button').map((item) => item.textContent)
 
 describe('the held Answer', () => {
-  afterEach(cleanup)
+  afterEach(() => {
+    cleanup()
+    targets.length = 0
+  })
 
   // EXPERIENCE.md, Answer screens: the buttons each heading calls for, the one primary.
   it('offers Open book, Add another copy and Back on In library', async () => {
@@ -128,6 +134,36 @@ describe('the held Answer', () => {
 
     await renderAnswer(answer({ facts }))
     expect(screen.queryByRole('button', { name: 'Look it up again' })).toBeNull()
+  })
+
+  // I12: a Book with no ISBN is saved by id, the one target `saveCopy` can take.
+  it('saves a Book with no ISBN by id, and offers no Look it up again', async () => {
+    await renderAnswer(answer({ isbn13: null, facts: [{ kind: 'copy', copy: copy() }] }))
+
+    expect(buttons()).toEqual(['Open book', 'Add another copy', 'Back (primary)'])
+    expect(targets).toEqual([{ bookId: 7 }])
+    expect(screen.queryByRole('button', { name: 'Look it up again' })).toBeNull()
+  })
+
+  it('saves a Book with no ISBN by id from On wishlist too', async () => {
+    await renderAnswer(
+      answer({
+        isbn13: null,
+        heading: 'onWishlist',
+        facts: [{ kind: 'entry', entry: entry() }],
+      }),
+    )
+
+    expect(buttons()).toEqual(['Add to library', 'Back'])
+    expect(targets).toEqual([{ bookId: 7 }])
+  })
+
+  it('saves a Book with an ISBN by that ISBN', async () => {
+    await renderAnswer(
+      answer({ heading: 'onWishlist', facts: [{ kind: 'entry', entry: entry() }] }),
+    )
+
+    expect(targets).toEqual([{ isbn13: '9789510396353' }])
   })
 
   it("names an entry's list, and its recipient when it has one", async () => {

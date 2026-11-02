@@ -3,7 +3,7 @@ import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { createElement } from 'react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import type { AnswerBook } from '@/app/(frontend)/scan/answer'
+import type { SourceAnswer } from '@/app/(frontend)/scan/answer'
 
 const router = { refresh: vi.fn(), replace: vi.fn() }
 const show = vi.fn()
@@ -45,7 +45,7 @@ const { AnswerLayout } = await import('@/app/(frontend)/scan/AnswerLayout')
 const { NotInLibraryAnswer } = await import('@/app/(frontend)/scan/NotInLibraryAnswer')
 const { PartialLookupLine } = await import('@/app/(frontend)/scan/PartialLookupLine')
 
-const book: AnswerBook = {
+const book: SourceAnswer = {
   isbn13: '9789510396358',
   title: 'Tuntematon sotilas',
   language: 'fi',
@@ -64,7 +64,7 @@ const book: AnswerBook = {
 }
 
 /** The server component's tree, its async `AnswerLayout` resolved as `render` cannot. */
-const renderAnswer = async (answer: AnswerBook) => {
+const renderAnswer = async (answer: SourceAnswer) => {
   const { props } = await NotInLibraryAnswer({ answer, lists: [] })
   return render(await AnswerLayout(props as Parameters<typeof AnswerLayout>[0]))
 }

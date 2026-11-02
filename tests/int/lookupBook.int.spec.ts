@@ -30,7 +30,11 @@ vi.mock('@/lib/metadata/lookup', () => ({ lookupSources: vi.fn() }))
 // and matches no row unless a test seeds it.
 const defaultAuthor = unique('Väinö Linna')
 
-const candidate = (isbn13: string, title: string, extra: Partial<SourceResult> = {}): SourceResult => ({
+const candidate = (
+  isbn13: string,
+  title: string,
+  extra: Partial<SourceResult> = {},
+): SourceResult => ({
   isbn13,
   title,
   authors: [{ name: defaultAuthor }],
@@ -45,6 +49,7 @@ const candidate = (isbn13: string, title: string, extra: Partial<SourceResult> =
 describe('lookupBook', () => {
   let payload: Payload
   let a: User
+  let b: User
   let asA: Context
   let asB: Context
   let asAdmin: Context
@@ -71,7 +76,7 @@ describe('lookupBook', () => {
   beforeAll(async () => {
     payload = await getPayload({ config })
     a = await createUser({ displayName: 'Lookup User A' })
-    const b = await createUser({ displayName: 'Lookup User B' })
+    b = await createUser({ displayName: 'Lookup User B' })
     const admin = await createUser({ displayName: 'Lookup Admin', roles: ['admin'] })
     asA = await contextFor(a)
     asB = await contextFor(b)
@@ -160,7 +165,13 @@ describe('lookupBook', () => {
           candidate(isbn, 'First', { coverUrl: 'https://covers.example/first.jpg' }),
           candidate(isbn, 'Second', { source: 'google', raw: { google: {} } }),
         ],
-        raw: { v: 1, fetchedAt: '2026-10-19T00:00:00.000Z', sources: {}, subjects: {}, coverUrl: null },
+        raw: {
+          v: 1,
+          fetchedAt: '2026-10-19T00:00:00.000Z',
+          sources: {},
+          subjects: {},
+          coverUrl: null,
+        },
       })
       const result = await lookupBook(asA, { isbn, pick: 1 })
       const { raw: _first, ...first } = candidate(isbn, 'First')
@@ -184,15 +195,24 @@ describe('lookupBook', () => {
       expect(await booksWithIsbn(isbn)).toBe(0)
     })
 
-    it.each([5, -1, 0.5, undefined])('falls back to the best candidate for pick %s', async (pick) => {
-      vi.mocked(lookupSources).mockResolvedValue({
-        kind: 'found',
-        failed: [],
-        candidates: [candidate(isbn, 'First'), candidate(isbn, 'Second')],
-        raw: { v: 1, fetchedAt: '2026-10-19T00:00:00.000Z', sources: {}, subjects: {}, coverUrl: null },
-      })
-      expect(await lookupBook(asA, { isbn, pick })).toMatchObject({ kind: 'source', pick: 0 })
-    })
+    it.each([5, -1, 0.5, undefined])(
+      'falls back to the best candidate for pick %s',
+      async (pick) => {
+        vi.mocked(lookupSources).mockResolvedValue({
+          kind: 'found',
+          failed: [],
+          candidates: [candidate(isbn, 'First'), candidate(isbn, 'Second')],
+          raw: {
+            v: 1,
+            fetchedAt: '2026-10-19T00:00:00.000Z',
+            sources: {},
+            subjects: {},
+            coverUrl: null,
+          },
+        })
+        expect(await lookupBook(asA, { isbn, pick })).toMatchObject({ kind: 'source', pick: 0 })
+      },
+    )
 
     it('passes none and unavailable through', async () => {
       vi.mocked(lookupSources).mockResolvedValue({ kind: 'none' })
@@ -210,7 +230,13 @@ describe('lookupBook', () => {
         kind: 'found',
         failed: [],
         candidates,
-        raw: { v: 1, fetchedAt: '2026-10-19T00:00:00.000Z', sources: {}, subjects: {}, coverUrl: null },
+        raw: {
+          v: 1,
+          fetchedAt: '2026-10-19T00:00:00.000Z',
+          sources: {},
+          subjects: {},
+          coverUrl: null,
+        },
       })
 
     const rowsWithName = async (collection: 'authors' | 'series', name: string) =>
@@ -234,7 +260,12 @@ describe('lookupBook', () => {
       const sharedAuthor = await findOrCreateByName(asB, 'authors', 'shared', { name: author })
       const sharedSeries = await findOrCreateByName(asB, 'series', 'shared', { name: seriesName })
       const given = ` ${author.replace('Tove Jansson', 'tove  JANSSON')} `
-      found(candidate(isbn, 'Muumipeikko', { authors: [{ name: given }], series: seriesName.toUpperCase() }))
+      found(
+        candidate(isbn, 'Muumipeikko', {
+          authors: [{ name: given }],
+          series: seriesName.toUpperCase(),
+        }),
+      )
 
       expect(await matchesOf({ isbn })).toEqual({
         // Shown normalised, as a save stores it.
@@ -273,7 +304,10 @@ describe('lookupBook', () => {
       await findOrCreateByName(asB, 'authors', 'private', { name: author })
       found(candidate(isbn, 'Yksityinen', { authors: [{ name: author }] }))
 
-      expect(await matchesOf({ isbn })).toEqual({ authors: [{ name: author, id: null }], series: null })
+      expect(await matchesOf({ isbn })).toEqual({
+        authors: [{ name: author, id: null }],
+        series: null,
+      })
       expect(await rowsWithName('authors', author)).toBe(2)
     })
 
@@ -285,6 +319,120 @@ describe('lookupBook', () => {
         authors: [{ name: other, id: null }],
         series: null,
       })
+    })
+  })
+
+  // AD-7/AD-11, I12: the Answer for a Book reached by id, which is how a Book
+  // with no ISBN gets one. The gate is holding; no source is ever asked.
+  describe('by Book id', () => {
+    /** A list of A's; `owner` and `nameKey` only satisfy the create type. */
+    const wishlistOfA = async (): Promise<Named> => {
+      const { id, name } = await gateway.create(asA, {
+        collection: 'wishlists',
+        data: { owner: a.id, name: unique('Toiveet'), nameKey: 'ignored' },
+        depth: 0,
+      })
+      return { id, name }
+    }
+
+    it("answers the viewer's own Book, with their copy and no source asked", async () => {
+      const result = await lookupBook(asA, { bookId: x.id })
+      expect(result).toMatchObject({
+        kind: 'existing',
+        book: { bookId: x.id, title: 'Tuntematon sotilas' },
+        mine: {
+          copies: [{ copyId: copyOfX.id, status: 'owned', location: shelf }],
+          entries: [],
+        },
+      })
+      expect(lookupSources).not.toHaveBeenCalled()
+    })
+
+    it('answers a Book held through an open entry alone', async () => {
+      const book = await systemBook(a, 'private')
+      const list = await wishlistOfA()
+      const entry = await gateway.create(asA, {
+        collection: 'wishlist-entries',
+        data: { owner: a.id, wishlist: list.id, book: book.id },
+        depth: 0,
+      })
+      expect(await lookupBook(asA, { bookId: book.id })).toMatchObject({
+        kind: 'existing',
+        book: { bookId: book.id },
+        mine: { copies: [], entries: [{ entryId: entry.id, wishlist: list }] },
+      })
+      expect(lookupSources).not.toHaveBeenCalled()
+    })
+
+    it('answers a Book whose only copy is ordered', async () => {
+      const book = await systemBook(a, 'private')
+      const copy = await gateway.create(asA, {
+        collection: 'copies',
+        data: { owner: a.id, book: book.id, status: 'ordered' },
+        depth: 0,
+      })
+      expect(await lookupBook(asA, { bookId: book.id })).toMatchObject({
+        kind: 'existing',
+        mine: { copies: [{ copyId: copy.id, status: 'ordered' }], entries: [] },
+      })
+    })
+
+    it('is NOT_FOUND for a Book the viewer holds nothing of, the admin included', async () => {
+      const book = await systemBook(b, 'shared')
+      await gateway.create(asB, {
+        collection: 'copies',
+        data: { owner: b.id, book: book.id, status: 'owned' },
+        depth: 0,
+      })
+      for (const ctx of [asA, asAdmin]) {
+        await expect(lookupBook(ctx, { bookId: book.id })).rejects.toMatchObject(
+          new DomainError('NOT_FOUND'),
+        )
+      }
+      expect(lookupSources).not.toHaveBeenCalled()
+    })
+
+    it('is NOT_FOUND when the viewer’s only entry on the Book is closed', async () => {
+      const book = await systemBook(a, 'private')
+      const list = await wishlistOfA()
+      await gateway.create(asA, {
+        collection: 'wishlist-entries',
+        data: {
+          owner: a.id,
+          wishlist: list.id,
+          book: book.id,
+          closedAt: '2026-10-01T00:00:00.000Z',
+        },
+        depth: 0,
+      })
+      await expect(lookupBook(asA, { bookId: book.id })).rejects.toMatchObject(
+        new DomainError('NOT_FOUND'),
+      )
+    })
+
+    it.each([0, -1, 1.5])('is NOT_FOUND for %s, which is not a row id', async (bookId) => {
+      await expect(lookupBook(asA, { bookId })).rejects.toMatchObject(new DomainError('NOT_FOUND'))
+    })
+
+    // The limit protects the sources (AD-9); this path asks none.
+    it('counts no lookup, so it answers at the limit', async () => {
+      const e = await createUser({ displayName: 'Lookup User E' })
+      const asE = await contextFor(e)
+      const book = await systemBook(e, 'private')
+      await gateway.create(asE, {
+        collection: 'copies',
+        data: { owner: e.id, book: book.id, status: 'owned' },
+        depth: 0,
+      })
+      vi.mocked(lookupSources).mockResolvedValue({ kind: 'none' })
+      const isbn = randomIsbn()
+      for (let i = 0; i < LOOKUP_LIMIT; i++) {
+        expect(await lookupBook(asE, { isbn })).toEqual({ kind: 'none' })
+      }
+      await expect(lookupBook(asE, { isbn })).rejects.toMatchObject(new DomainError('RATE_LIMITED'))
+
+      expect(await lookupBook(asE, { bookId: book.id })).toMatchObject({ kind: 'existing' })
+      expect(lookupSources).toHaveBeenCalledTimes(LOOKUP_LIMIT)
     })
   })
 

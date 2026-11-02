@@ -12,7 +12,7 @@ import { viewerWishlists } from '../components/viewerWishlists'
 import { HeldAnswer } from './HeldAnswer'
 import { NotFoundAnswer } from './NotFoundAnswer'
 import { NotInLibraryAnswer } from './NotInLibraryAnswer'
-import { answerFor, scanParams, type ScanOutcome } from './answer'
+import { answerFor, answerForBook, scanParams, type ScanOutcome } from './answer'
 import { ScanScreen } from './ScanScreen'
 import { UnavailableAnswer } from './UnavailableAnswer'
 
@@ -31,7 +31,13 @@ import { UnavailableAnswer } from './UnavailableAnswer'
  * again. A held Answer titles the task from its own heading -- In library,
  * Ordered or On wishlist -- since the heading is the answer.
  *
- * `?title=` with no `isbn` (or a blank one) is the Not found Answer with no
+ * `?book=<bookId>` is the held Answer for a Book the viewer holds, read with
+ * no ISBN, so a Book that has none gets an Answer too (I12). A Book the
+ * viewer does not hold renders Scan with the "Not in library" notice, as the
+ * collection does for the same param, so nothing resets silently (NFR-1).
+ * An `?isbn=` wins over it.
+ *
+ * `?title=` with no `isbn` or `book` is the Not found Answer with no
  * ISBN and the text in its Title field (`scanParams()`).
  *
  * `&pick=` is the edition picked (D-7); `lookupBook` falls back to the best
@@ -48,13 +54,15 @@ export default async function ScanPage({
 }) {
   const ctx = await requireUser()
   const t = await getTranslations()
-  const { isbn: text, title, pick } = scanParams(await searchParams)
+  const { isbn: text, book, title, pick } = scanParams(await searchParams)
   const outcome: ScanOutcome =
     text !== undefined
       ? await answerFor(text, (isbn) => lookupBook(ctx, { isbn, pick }))
-      : title !== undefined
-        ? { kind: 'notFound', isbn13: null, title }
-        : { kind: 'scan' }
+      : book !== undefined
+        ? await answerForBook(() => lookupBook(ctx, { bookId: book }))
+        : title !== undefined
+          ? { kind: 'notFound', isbn13: null, title }
+          : { kind: 'scan' }
   const lists =
     outcome.kind === 'notInLibrary' || outcome.kind === 'notFound' || outcome.kind === 'unavailable'
       ? await viewerWishlists(ctx)
@@ -62,7 +70,16 @@ export default async function ScanPage({
 
   return (
     <ViewTransition enter="task-enter" exit="task-exit" default="none">
-      {outcome.kind === 'scan' ? (
+      {outcome.kind === 'notHeld' ? (
+        <FullScreenTask title={t('scan.heading')}>
+          <ScanScreen />
+          {/* Fresh per render, so the same address raises it again. */}
+          <RaiseToast
+            key={crypto.randomUUID()}
+            input={{ kind: 'success', message: t('answer.notInLibrary') }}
+          />
+        </FullScreenTask>
+      ) : outcome.kind === 'scan' ? (
         <FullScreenTask title={t('scan.heading')}>
           <ScanScreen
             isbn={text}

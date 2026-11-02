@@ -1,6 +1,7 @@
 import { getTranslations } from 'next-intl/server'
 
 import { RefreshOnUndo } from '../(sections)/RefreshOnUndo'
+import type { CopyTarget } from '../saveInput'
 
 import { AddToLibrary } from './AddToLibrary'
 import { factLines, type HeldAnswer as Held } from './answer'
@@ -33,6 +34,9 @@ import { OpenBook } from './OpenBook'
  */
 export async function HeldAnswer({ answer }: { answer: Held }) {
   const t = await getTranslations()
+  // A Book with no ISBN is saved by id, which `requireOwnBook()` gates (I12).
+  const target: CopyTarget =
+    answer.isbn13 === null ? { bookId: answer.bookId } : { isbn13: answer.isbn13 }
   const lines = factLines(answer.facts, {
     copy: (status) => t('answer.copy', { status }),
     copyAt: (location, status) => t('answer.copyAt', { location, status }),
@@ -50,10 +54,10 @@ export async function HeldAnswer({ answer }: { answer: Held }) {
       {answer.heading === 'inLibrary' && (
         <>
           <OpenBook bookId={answer.bookId} label={t('answer.openBook')} />
-          <AddToLibrary isbn13={answer.isbn13} another />
+          <AddToLibrary target={target} another />
         </>
       )}
-      {answer.heading === 'onWishlist' && <AddToLibrary isbn13={answer.isbn13} />}
+      {answer.heading === 'onWishlist' && <AddToLibrary target={target} />}
       <RefreshOnUndo />
       <AnswerBack
         label={t('answer.back')}

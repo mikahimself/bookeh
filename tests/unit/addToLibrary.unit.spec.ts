@@ -54,7 +54,7 @@ describe('AddToLibrary', () => {
     ['Saved with no location', null, 'toast.saved'],
   ])('shows the held %s toast and goes back to Scan', async (_, savedTo, message) => {
     saveCopyAction.mockResolvedValue(saved(savedTo))
-    render(createElement(AddToLibrary, { isbn13: ISBN }))
+    render(createElement(AddToLibrary, { target: { isbn13: ISBN } }))
     fireEvent.click(button())
 
     await waitFor(() => expect(back).toHaveBeenCalledTimes(1))
@@ -65,28 +65,29 @@ describe('AddToLibrary', () => {
       undo: { token: 'token', seconds: 1800 },
       edit: '/books/1/edit?copy=2',
     })
-    expect(saveCopyAction).toHaveBeenCalledWith({ requestId: expect.any(String), isbn13: ISBN })
+    expect(saveCopyAction).toHaveBeenCalledWith({
+      requestId: expect.any(String),
+      target: { isbn13: ISBN },
+    })
   })
 
   it('sends the picked edition', async () => {
     saveCopyAction.mockResolvedValue(saved(null))
     const candidate = { source: 'finna', recordId: 'helka.2' }
-    render(createElement(AddToLibrary, { isbn13: ISBN, pick: 1, candidate }))
+    render(createElement(AddToLibrary, { target: { isbn13: ISBN, pick: 1, candidate } }))
     fireEvent.click(button())
 
     await waitFor(() => expect(back).toHaveBeenCalledTimes(1))
     expect(saveCopyAction).toHaveBeenCalledWith({
       requestId: expect.any(String),
-      isbn13: ISBN,
-      pick: 1,
-      candidate,
+      target: { isbn13: ISBN, pick: 1, candidate },
     })
   })
 
   it('makes one call for a double tap', async () => {
     const call = deferred()
     saveCopyAction.mockReturnValue(call.promise)
-    render(createElement(AddToLibrary, { isbn13: ISBN }))
+    render(createElement(AddToLibrary, { target: { isbn13: ISBN } }))
     // One act: the second click lands before `pending` disables the button.
     act(() => {
       button().click()
@@ -104,7 +105,7 @@ describe('AddToLibrary', () => {
       createElement(
         Activity,
         { mode } as ActivityProps,
-        createElement(AddToLibrary, { isbn13: ISBN }),
+        createElement(AddToLibrary, { target: { isbn13: ISBN } }),
       )
     const view = render(tree('visible'))
     fireEvent.click(button())
@@ -135,7 +136,7 @@ describe('AddToLibrary', () => {
 
   it('re-renders the address on NOT_FOUND, with no toast and no return', async () => {
     saveCopyAction.mockResolvedValue({ ok: false, code: 'NOT_FOUND' })
-    render(createElement(AddToLibrary, { isbn13: ISBN }))
+    render(createElement(AddToLibrary, { target: { isbn13: ISBN } }))
     fireEvent.click(button())
 
     await waitFor(() => expect(refresh).toHaveBeenCalledTimes(1))
@@ -146,7 +147,7 @@ describe('AddToLibrary', () => {
   it('goes to sign in, back to this address, when the session is gone', async () => {
     window.history.replaceState(null, '', `/scan?isbn=${ISBN}`)
     saveCopyAction.mockResolvedValue({ ok: false, code: 'UNAUTHENTICATED' })
-    render(createElement(AddToLibrary, { isbn13: ISBN }))
+    render(createElement(AddToLibrary, { target: { isbn13: ISBN } }))
     fireEvent.click(button())
 
     await waitFor(() =>
@@ -160,7 +161,7 @@ describe('AddToLibrary', () => {
 
   it('shows No connection when the call rejects', async () => {
     saveCopyAction.mockRejectedValue(new TypeError('Failed to fetch'))
-    render(createElement(AddToLibrary, { isbn13: ISBN }))
+    render(createElement(AddToLibrary, { target: { isbn13: ISBN } }))
     fireEvent.click(button())
 
     await waitFor(() => expect(show).toHaveBeenCalledWith({ kind: 'error', code: 'NO_CONNECTION' }))
@@ -170,7 +171,7 @@ describe('AddToLibrary', () => {
   it('shows the toast but does not navigate once the Answer is gone', async () => {
     const call = deferred()
     saveCopyAction.mockReturnValue(call.promise)
-    const view = render(createElement(AddToLibrary, { isbn13: ISBN }))
+    const view = render(createElement(AddToLibrary, { target: { isbn13: ISBN } }))
     fireEvent.click(button())
     view.unmount()
 

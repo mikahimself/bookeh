@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import {
   answerFor,
+  answerForBook,
   answerLines,
   editionLine,
   editionLines,
@@ -298,6 +299,20 @@ describe('held', () => {
     ).toMatchObject({ isbn13: ISBN })
   })
 
+  // I12: asked for by Book id, there is no ISBN, so Look it up again cannot run.
+  it('carries no ISBN, and no Look it up again, when asked for by Book id', () => {
+    expect(
+      held(
+        {
+          kind: 'existing',
+          book: { ...book, isbn13: null, visibility: 'private' },
+          mine: { copies: [copy()], entries: [] },
+        },
+        null,
+      ),
+    ).toMatchObject({ isbn13: null, heading: 'inLibrary', lookAgain: false })
+  })
+
   it('is not the answer when the viewer holds nothing, or for the other kinds', () => {
     expect(held({ kind: 'existing', book, mine: nothing }, ISBN)).toBeNull()
     expect(
@@ -445,6 +460,13 @@ describe('scanParams', () => {
     ['an ISBN with a pick', { isbn: ISBN, pick: '1' }, { isbn: ISBN, pick: 1 }],
     ['a pick that is not digits', { isbn: ISBN, pick: '-1' }, { isbn: ISBN }],
     ['a pick without an ISBN', { title: 'x', pick: '1' }, { title: 'x' }],
+    ['a Book id', { book: '7' }, { book: 7 }],
+    ['an ISBN with a Book id', { isbn: ISBN, book: '7' }, { isbn: ISBN }],
+    ['a Book id with a title', { book: '7', title: 'x' }, { book: 7 }],
+    ['a Book id that is not digits', { book: 'abc', title: 'x' }, { title: 'x' }],
+    ['a Book id that is not digits, alone', { book: 'abc' }, {}],
+    ['a Book id that is not a row id', { book: '0', title: 'x' }, { title: 'x' }],
+    ['a Book id past the row-id range', { book: '99999999999', title: 'x' }, { title: 'x' }],
   ])('reads %s', (_, params, expected) => {
     expect(scanParams(params)).toEqual(expected)
   })
@@ -620,5 +642,66 @@ describe('answerFor', () => {
         throw new Error('db down')
       }),
     ).rejects.toThrow('db down')
+  })
+})
+
+// I12: `/scan?book=` ends on the held Answer or back on Scan with the notice.
+describe('answerForBook', () => {
+  it('answers held with no ISBN for a Book that has none', async () => {
+    await expect(
+      answerForBook(async () => ({
+        kind: 'existing',
+        book: { ...book, isbn13: null },
+        mine: { copies: [copy()], entries: [] },
+      })),
+    ).resolves.toMatchObject({
+      kind: 'held',
+      answer: { bookId: 7, isbn13: null, heading: 'inLibrary' },
+    })
+  })
+
+  // A Book with an ISBN must behave as its `?isbn=` Answer does: the saves
+  // target the ISBN, and Look it up again is offered on the viewer's own
+  // private Book.
+  it("carries the Book's own ISBN when it has one", async () => {
+    await expect(
+      answerForBook(async () => ({
+        kind: 'existing',
+        book: { ...book, visibility: 'private' },
+        mine: { copies: [copy()], entries: [] },
+      })),
+    ).resolves.toMatchObject({
+      kind: 'held',
+      answer: { isbn13: book.isbn13, heading: 'inLibrary', lookAgain: true },
+    })
+    await expect(
+      answerForBook(async () => ({
+        kind: 'existing',
+        book,
+        mine: { copies: [], entries: [entry] },
+      })),
+    ).resolves.toMatchObject({ kind: 'held', answer: { heading: 'onWishlist' } })
+  })
+
+  it('ends on Scan with the notice when the viewer holds nothing of it', async () => {
+    await expect(
+      answerForBook(async () => ({ kind: 'existing', book, mine: nothing })),
+    ).resolves.toEqual({ kind: 'notHeld' })
+  })
+
+  it('ends on Scan with the notice for a Book that is not the viewer’s', async () => {
+    await expect(
+      answerForBook(async () => {
+        throw new DomainError('NOT_FOUND')
+      }),
+    ).resolves.toEqual({ kind: 'notHeld' })
+  })
+
+  it('lets any other error through', async () => {
+    await expect(
+      answerForBook(async () => {
+        throw new DomainError('SAVE_FAILED')
+      }),
+    ).rejects.toMatchObject(new DomainError('SAVE_FAILED'))
   })
 })

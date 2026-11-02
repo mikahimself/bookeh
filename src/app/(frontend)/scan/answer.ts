@@ -5,6 +5,7 @@ import type { Draft, LookupResult } from '@/lib/catalogue/lookupBook'
 import type { CandidateId } from '@/lib/catalogue/pick'
 import { DomainError } from '@/lib/errors'
 import type { SourceId } from '@/lib/metadata/source'
+import { isRowId } from '@/lib/payload/ref'
 
 import { isLent } from '../isLent'
 
@@ -27,9 +28,11 @@ export type AnswerEdition = {
 /**
  * The Book an Answer shows (EXPERIENCE.md, Answer). `source` is the source
  * id, `null` for a shared Book; `newAuthors` and `newSeries` are the rows a
- * save would create; `isbn13` is what Add to library and Add another copy
- * save, with `pick`, the source candidate shown when there are several
- * (`undefined` for one candidate or a Book that exists), and `candidate`,
+ * save would create; `isbn13` is the ISBN the Answer was asked for, `null`
+ * for a held Book that has none (I12), in which case the saves target the
+ * Book by id instead, with `pick`, the source candidate shown when there are
+ * several (`undefined` for one candidate or a Book that exists), and
+ * `candidate`,
  * the shown candidate's identity, so the save uses that record or none
  * (AD-11; `undefined` for a Book that exists). `editions` lists
  * every candidate in order when there are two or more, else it is empty.
@@ -38,7 +41,7 @@ export type AnswerEdition = {
  * Nothing here comes from a user record.
  */
 export type AnswerBook = {
-  isbn13: string
+  isbn13: string | null
   title: string
   language: string | null
   authors: string[]
@@ -56,12 +59,20 @@ export type AnswerBook = {
 }
 
 /**
+ * An Answer that carries an ISBN: every Answer a lookup by ISBN produces,
+ * `notInLibrary()`'s included. The edition picker, the pre-save cover preview
+ * and Add to wishlist all address the ISBN, so they take this.
+ */
+export type SourceAnswer = AnswerBook & { isbn13: string }
+
+/**
  * What a held Answer shows (FR-16, FR-20): the Book, the heading
  * `answerFacts()` gave the viewer's holdings, and every remaining fact as a
  * line, in `Holdings` order. `bookId` is the Book Open book shows in the
  * collection. `lookAgain`: the In library Answer on the viewer's own private
- * Book (the lookup never answers with another user's), so Look it up again
- * shows (EXPERIENCE.md, Answer screens: that Link is In library's alone).
+ * Book with an ISBN (the lookup never answers with another user's), so Look
+ * it up again shows (EXPERIENCE.md, Answer screens: that Link is In
+ * library's alone).
  */
 export type HeldAnswer = AnswerBook & {
   bookId: number
@@ -90,7 +101,7 @@ export function answerEditions(isbn13: string, drafts: readonly Draft[]): Answer
 }
 
 /** A Book the viewer can read: no source line, and a save creates nothing new. */
-const existingBook = (book: ExistingResult['book'], isbn13: string): AnswerBook => ({
+const existingBook = (book: ExistingResult['book'], isbn13: string | null): AnswerBook => ({
   isbn13,
   title: book.title,
   language: book.language,
@@ -116,12 +127,12 @@ const existingBook = (book: ExistingResult['book'], isbn13: string): AnswerBook 
  * precedence is `answerFacts()`': anything the viewer holds of the Book,
  * a copy or an open entry, belongs to `held()`.
  */
-export function notInLibrary(result: LookupResult, isbn13: string): AnswerBook | null {
+export function notInLibrary(result: LookupResult, isbn13: string): SourceAnswer | null {
   switch (result.kind) {
     case 'existing': {
       const { book, mine } = result
       if (answerFacts(mine).heading !== 'notInLibrary') return null
-      return existingBook(book, isbn13)
+      return { ...existingBook(book, isbn13), isbn13 }
     }
     case 'source': {
       const { candidates, pick } = result
@@ -160,9 +171,12 @@ export function notInLibrary(result: LookupResult, isbn13: string): AnswerBook |
  * Ordered or On wishlist -- and its lines. `null` for anything else: a
  * `source` result, and an `existing` one the viewer holds nothing of, which is
  * `notInLibrary()`'s. `isbn13` is the ISBN asked for, which Add to library and
- * Add another copy save.
+ * Add another copy save; `null` when the Answer was asked for by Book id
+ * (I12), and then the saves target the Book by id. `lookAgain` needs an
+ * ISBN: `lookupAgain()` is `NOT_FOUND` without one, and Book detail shows
+ * the "needs an ISBN" line in place of the Link for such a Book.
  */
-export function held(result: LookupResult, isbn13: string): HeldAnswer | null {
+export function held(result: LookupResult, isbn13: string | null): HeldAnswer | null {
   if (result.kind !== 'existing') return null
   const { book, mine } = result
   const { heading, lines } = answerFacts(mine)
@@ -171,7 +185,7 @@ export function held(result: LookupResult, isbn13: string): HeldAnswer | null {
     ...existingBook(book, isbn13),
     bookId: book.bookId,
     heading,
-    lookAgain: heading === 'inLibrary' && book.visibility === 'private',
+    lookAgain: isbn13 !== null && heading === 'inLibrary' && book.visibility === 'private',
     facts: lines,
   }
 }
@@ -295,14 +309,18 @@ export function factLines(facts: readonly AnswerFactLine[], text: FactText): Ans
 }
 
 /**
- * What `/scan` was asked for: `isbn`, the text as typed when it is not blank
- * (Go on an empty field is no submission), else `title` when the key is
- * present, even empty (Add without ISBN opens `?title=`). With an `isbn`,
- * `title` is ignored. With an `isbn`, `pick` is the edition picked (D-7)
+ * What `/scan` was asked for, in order: `isbn`, the text as typed when it is
+ * not blank (Go on an empty field is no submission); else `book`, a Book id
+ * when the value is a row id (the Answer for a Book with no ISBN, I12); else
+ * `title` when the key is present, even empty (Add without ISBN opens
+ * `?title=`). An earlier param wins, so an address with both `isbn` and
+ * `book` answers the ISBN. A `book` that is not a row id is ignored and the
+ * next param is read. With an `isbn`, `pick` is the edition picked (D-7)
  * when it is digits, else left out. A repeated key counts by its first value.
  */
 export function scanParams(params: Record<string, string | string[] | undefined>): {
   isbn?: string
+  book?: number
   title?: string
   pick?: number
 } {
@@ -310,6 +328,10 @@ export function scanParams(params: Record<string, string | string[] | undefined>
   if (isbn?.trim()) {
     const pick = first(params.pick)
     return pick !== undefined && /^\d+$/.test(pick) ? { isbn, pick: Number(pick) } : { isbn }
+  }
+  const book = first(params.book)
+  if (book !== undefined && /^\d+$/.test(book) && isRowId(Number(book))) {
+    return { book: Number(book) }
   }
   const title = first(params.title)
   return title === undefined ? {} : { title }
@@ -320,9 +342,10 @@ const first = (value: string | string[] | undefined): string | undefined =>
 
 export type ScanOutcome =
   | { kind: 'held'; answer: HeldAnswer }
-  | { kind: 'notInLibrary'; answer: AnswerBook }
+  | { kind: 'notInLibrary'; answer: SourceAnswer }
   | { kind: 'notFound'; isbn13: string | null; title: string }
   | { kind: 'unavailable'; isbn13: string; failed: SourceId[] }
+  | { kind: 'notHeld' }
   | { kind: 'scan'; error?: 'INVALID_ISBN' | 'RATE_LIMITED' }
 
 /**
@@ -366,4 +389,31 @@ export async function answerFor(
   if (holding) return { kind: 'held', answer: holding }
   const answer = notInLibrary(result, isbn13)
   return answer ? { kind: 'notInLibrary', answer } : { kind: 'notFound', isbn13, title: '' }
+}
+
+/**
+ * What `/scan?book=<bookId>` renders (I12): the held Answer -- In library,
+ * Ordered or On wishlist -- for a Book the viewer holds, carrying the Book's
+ * own ISBN, so a Book with one behaves exactly as its `?isbn=` Answer would
+ * and a Book with none still gets an Answer. A Book the viewer holds
+ * nothing of ends on `notHeld`: the page renders Scan with the "Not in
+ * library" notice, as the section does for the same address, so NFR-1's "a
+ * scan never resets silently" holds. That covers the lookup's `NOT_FOUND`
+ * (not the viewer's Book, or not a row id) and an `existing` result the
+ * viewer holds nothing of -- a holding lost between the gate and the read.
+ * Any other error propagates to Next's error handling.
+ */
+export async function answerForBook(lookup: () => Promise<LookupResult>): Promise<ScanOutcome> {
+  let result: LookupResult
+  try {
+    result = await lookup()
+  } catch (err) {
+    if (err instanceof DomainError && err.code === 'NOT_FOUND') return { kind: 'notHeld' }
+    throw err
+  }
+  // The Book's own ISBN, so a Book that has one saves and looks itself up by
+  // it exactly as the `?isbn=` Answer does (AD-5); `null` for one with none.
+  const isbn13 = result.kind === 'existing' ? result.book.isbn13 : null
+  const holding = held(result, isbn13)
+  return holding ? { kind: 'held', answer: holding } : { kind: 'notHeld' }
 }

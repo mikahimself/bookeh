@@ -77,7 +77,7 @@ describe('saveCopyAction', () => {
   })
 
   it('saves one owned copy at the default location, once per requestId', async () => {
-    const input = { requestId: randomUUID(), isbn13 }
+    const input = { requestId: randomUUID(), target: { isbn13 } }
 
     const result = await saveCopyAction(input)
     expect(result).toEqual({
@@ -100,7 +100,7 @@ describe('saveCopyAction', () => {
   })
 
   it('undoes the save with its token once', async () => {
-    const result = await saveCopyAction({ requestId: randomUUID(), isbn13 })
+    const result = await saveCopyAction({ requestId: randomUUID(), target: { isbn13 } })
     if (!result.ok) throw new Error(`save failed: ${result.code}`)
 
     expect(await undoAction(result.data.undoToken)).toEqual({ ok: true, data: null })
@@ -109,9 +109,11 @@ describe('saveCopyAction', () => {
   })
 
   it('adds another owned copy of a Book the user already holds', async () => {
-    expect(await saveCopyAction({ requestId: randomUUID(), isbn13 })).toMatchObject({ ok: true })
+    expect(await saveCopyAction({ requestId: randomUUID(), target: { isbn13 } })).toMatchObject({
+      ok: true,
+    })
 
-    expect(await saveCopyAction({ requestId: randomUUID(), isbn13 })).toMatchObject({
+    expect(await saveCopyAction({ requestId: randomUUID(), target: { isbn13 } })).toMatchObject({
       ok: true,
       data: { savedTo: { id: location.id, name: 'Tampere' } },
     })
@@ -121,10 +123,44 @@ describe('saveCopyAction', () => {
     ])
   })
 
+  // I12: the Answer for a Book with no ISBN saves by id, gated by `requireOwnBook()`.
+  it('adds one more owned copy of a Book the user holds, by id', async () => {
+    const first = await saveCopyAction({ requestId: randomUUID(), target: { isbn13 } })
+    if (!first.ok) throw new Error(`save failed: ${first.code}`)
+
+    expect(
+      await saveCopyAction({ requestId: randomUUID(), target: { bookId: first.data.bookId } }),
+    ).toMatchObject({ ok: true, data: { savedTo: { id: location.id, name: 'Tampere' } } })
+    expect(await copies()).toHaveLength(2)
+  })
+
+  it('answers NOT_FOUND for a bookId the user holds nothing of', async () => {
+    const other = await payload.create({
+      collection: 'books',
+      data: { title: 'Ei hallussa', isbn13: randomIsbn(), visibility: 'shared' },
+      overrideAccess: true,
+      depth: 0,
+    })
+    expect(await saveCopyAction({ requestId: randomUUID(), target: { bookId: other.id } })).toEqual(
+      { ok: false, code: 'NOT_FOUND' },
+    )
+    expect(await copies()).toEqual([])
+  })
+
   it.each([
-    ['a malformed input', { isbn13: 5 }],
+    ['a malformed input', { target: { isbn13: 5 } }],
+    ['a target of no kind', { requestId: randomUUID(), target: {} }],
+    [
+      'a target of two kinds',
+      { requestId: randomUUID(), target: { isbn13: '9789510396353', bookId: 1 } },
+    ],
+    ['a bookId that is not a row id', { requestId: randomUUID(), target: { bookId: 'x' } }],
+    [
+      'a manual target, which only the entry save takes',
+      { requestId: randomUUID(), target: { manual: { title: 'Kotiseutu', author: 'A. K' } } },
+    ],
     ['no input', undefined],
-    ['an ISBN saveCopy refuses', { requestId: randomUUID(), isbn13: 'not an isbn' }],
+    ['an ISBN saveCopy refuses', { requestId: randomUUID(), target: { isbn13: 'not an isbn' } }],
   ])('answers SAVE_FAILED for %s and writes nothing', async (_, input) => {
     expect(await saveCopyAction(input)).toEqual({ ok: false, code: 'SAVE_FAILED' })
     expect(await copies()).toEqual([])
@@ -133,13 +169,13 @@ describe('saveCopyAction', () => {
   it('ignores pick and candidate once a shared Book holds the ISBN', async () => {
     const candidate = { source: 'finna', recordId: 'not.in.any.outcome' }
     expect(
-      await saveCopyAction({ requestId: randomUUID(), isbn13, pick: 1, candidate }),
+      await saveCopyAction({ requestId: randomUUID(), target: { isbn13, pick: 1, candidate } }),
     ).toMatchObject({ ok: true })
     expect(await copies()).toMatchObject([{ status: 'owned', location: location.id }])
   })
 
   it.each(['1', -1, 1.5])('answers SAVE_FAILED for pick %s and writes nothing', async (pick) => {
-    expect(await saveCopyAction({ requestId: randomUUID(), isbn13, pick })).toEqual({
+    expect(await saveCopyAction({ requestId: randomUUID(), target: { isbn13, pick } })).toEqual({
       ok: false,
       code: 'SAVE_FAILED',
     })
@@ -151,7 +187,9 @@ describe('saveCopyAction', () => {
     ['an empty recordId', { source: 'finna', recordId: '' }],
     ['no source', { recordId: 'finna.1' }],
   ])('answers SAVE_FAILED for a candidate that is %s and writes nothing', async (_, candidate) => {
-    expect(await saveCopyAction({ requestId: randomUUID(), isbn13, candidate })).toEqual({
+    expect(
+      await saveCopyAction({ requestId: randomUUID(), target: { isbn13, candidate } }),
+    ).toEqual({
       ok: false,
       code: 'SAVE_FAILED',
     })
@@ -179,7 +217,10 @@ describe('saveCopyAction', () => {
       }),
     )
     try {
-      const result = await saveCopyAction({ requestId: randomUUID(), isbn13: fresh, pick: 1 })
+      const result = await saveCopyAction({
+        requestId: randomUUID(),
+        target: { isbn13: fresh, pick: 1 },
+      })
       if (!result.ok) throw new Error(`save failed: ${result.code}`)
       const book = await payload.findByID({
         collection: 'books',
@@ -217,7 +258,7 @@ describe('saveCopyAction', () => {
       }),
     )
     try {
-      const result = await saveCopyAction({ requestId: randomUUID(), isbn13: fresh })
+      const result = await saveCopyAction({ requestId: randomUUID(), target: { isbn13: fresh } })
       if (!result.ok) throw new Error(`save failed: ${result.code}`)
       const book = await payload.findByID({
         collection: 'books',
@@ -255,8 +296,7 @@ describe('saveCopyAction', () => {
       expect(
         await saveCopyAction({
           requestId: randomUUID(),
-          isbn13: fresh,
-          candidate: { source: 'finna', recordId: 'not.in.outcome' },
+          target: { isbn13: fresh, candidate: { source: 'finna', recordId: 'not.in.outcome' } },
         }),
       ).toEqual({ ok: false, code: 'NOT_FOUND' })
     } finally {
@@ -283,7 +323,7 @@ describe('saveCopyAction', () => {
       }),
     )
     try {
-      expect(await saveCopyAction({ requestId: randomUUID(), isbn13: fresh })).toEqual({
+      expect(await saveCopyAction({ requestId: randomUUID(), target: { isbn13: fresh } })).toEqual({
         ok: false,
         code: 'NOT_FOUND',
       })
@@ -306,7 +346,7 @@ describe('saveCopyAction', () => {
       vi.fn(async () => new Response(null, { status: 503 })),
     )
     try {
-      expect(await saveCopyAction({ requestId: randomUUID(), isbn13: fresh })).toEqual({
+      expect(await saveCopyAction({ requestId: randomUUID(), target: { isbn13: fresh } })).toEqual({
         ok: false,
         code: 'SAVE_FAILED',
       })
@@ -322,7 +362,9 @@ describe('saveCopyAction', () => {
     const sources = vi.fn(async () => new Response(null, { status: 503 }))
     vi.stubGlobal('fetch', sources)
     try {
-      expect(await saveCopyAction({ requestId: randomUUID(), isbn13: randomIsbn() })).toEqual({
+      expect(
+        await saveCopyAction({ requestId: randomUUID(), target: { isbn13: randomIsbn() } }),
+      ).toEqual({
         ok: false,
         code: 'RATE_LIMITED',
       })
@@ -335,7 +377,7 @@ describe('saveCopyAction', () => {
 
   it('answers UNAUTHENTICATED without a session', async () => {
     requestHeaders = new Headers()
-    expect(await saveCopyAction({ requestId: randomUUID(), isbn13 })).toEqual({
+    expect(await saveCopyAction({ requestId: randomUUID(), target: { isbn13 } })).toEqual({
       ok: false,
       code: 'UNAUTHENTICATED',
     })
