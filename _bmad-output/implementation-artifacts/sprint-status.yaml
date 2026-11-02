@@ -29,7 +29,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 10-06-2026 17:50
-last_updated: 11-01-2026 23:40
+last_updated: 11-02-2026 09:50
 project: bookeh
 project_key: NOKEY
 tracking_system: file-system
@@ -248,7 +248,7 @@ development_status:
   8-4-i5-google-books-search: done
   8-5-i10-search-across-sources: done
   8-6-i11-search-my-copies-and-wishes: done
-  8-7-i12-look-up-a-book-without-an-isbn: backlog
+  8-7-i12-look-up-a-book-without-an-isbn: done
   8-8-i6-lookup-by-title-or-author: backlog
   8-9-i7-add-by-hand-from-lookup: backlog
   8-10-i8-end-to-end-shop-check: backlog
