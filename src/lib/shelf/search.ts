@@ -9,8 +9,8 @@ import { readableBy } from './visibleCopies'
 type Viewer = Context['user']
 
 /**
- * Spine, AD-7: `q` as one condition on the shelf's aliases (`copies`, `b`,
- * `ub`), or none for an empty or blank `q`. The trimmed `q` is one literal
+ * Spine, AD-7: `q` as one condition on the aliases `b` and `ub` (and on the
+ * table `notes` names, when given), or none for an empty or blank `q`. The trimmed `q` is one literal
  * substring (`\`, `%`, `_` escaped), matched with plain `ILIKE`: case-folded
  * under the database's Finnish collation, never accent-folded. It matches the
  * effective title, an effective author's name, the effective series' name,

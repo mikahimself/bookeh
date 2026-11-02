@@ -14,7 +14,7 @@
  */
 
 import type { EffectiveBook } from '@/lib/books/effectiveBook'
-import type { CopyLine } from '@/lib/books/holdings'
+import type { CopyLine, Holdings } from '@/lib/books/holdings'
 import { isRowId, type Named } from '@/lib/payload/ref'
 
 /** Spine, Shared shapes: what the collection lists and in what order. */
@@ -72,6 +72,9 @@ export type ShelfRow = { copy: CopyLine; book: EffectiveBook }
 
 /** Spine, Shared shapes: `labels` names the id-valued filter values, keyed `field:id`. */
 export type ShelfRows = { rows: ShelfRow[]; total: number; labels: Record<string, string> }
+
+/** Spine, Shared shapes: a Book the viewer holds, `searchMine()`. */
+export type MyBook = { book: EffectiveBook; mine: Holdings }
 
 /** Spine, Shared shapes: the parsed address; the client list keys on `query` alone. */
 export type ShelfAddress = { query: ShelfQuery; book: number | null }

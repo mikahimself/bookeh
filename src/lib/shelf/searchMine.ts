@@ -1,18 +1,14 @@
 import { type SQL, sql } from '@payloadcms/db-postgres/drizzle'
 
-import { type EffectiveBook, getEffectiveBooks } from '@/lib/books/effectiveBook'
-import { getHoldings, type Holdings } from '@/lib/books/holdings'
+import { getEffectiveBooks } from '@/lib/books/effectiveBook'
+import { getHoldings } from '@/lib/books/holdings'
 import type { Context } from '@/lib/payload/context'
 import { drizzleFor } from '@/lib/payload/drizzle'
 
 import { effective, firstAuthorSortName } from './effective'
+import type { MyBook } from './query'
 import { textSearch } from './search'
 import { readableBy, visibleCopies, visibleEntries } from './visibleCopies'
-
-// Spine, Structural Seed (Shared shapes, `src/lib/shelf`).
-
-/** A Book the viewer holds, as Lookup's own-library group shows it (AD-7). */
-export type MyBook = { book: EffectiveBook; mine: Holdings }
 
 /**
  * The most own Books one Lookup search reports. The same per-source hit cap
@@ -31,13 +27,17 @@ export const MINE_SEARCH_LIMIT = 20
  *
  * Read-only, with system privileges, exactly as `shelfIds` runs. One row per
  * Book: a `union` (not `union all`) of the two branches collapses a Book held
- * both ways, since both read the same `b`/`ub` and so produce identical keys.
+ * both ways in the database, and the hydrated ids are made distinct again in
+ * code, so one Book is one row whatever the sort key does.
  * Order is the shelf's `author` ascending — first readable effective author's
  * `sortName`, no author last, then the effective title, then the Book id — and
  * at most `MINE_SEARCH_LIMIT` Books, both applied in SQL. Blank text asks
- * nothing. Hydration mirrors `getShelfRows`: one `getEffectiveBooks()` and
- * one `getHoldings()` over the ids in SQL order, and a Book that no longer
- * hydrates (made private between the reads) drops its row.
+ * nothing. Unlike `getHoldings`, where a Book's current readability plays no
+ * part, the AD-4 read rule applies here: the join drops a Book the viewer may
+ * not read, so an unreadable one never reaches the hydration. Hydration
+ * mirrors `getShelfRows`: one `getEffectiveBooks()` and one `getHoldings()`
+ * over the distinct ids in SQL order, and a Book deleted between the two
+ * reads drops its row.
  */
 export async function searchMine(ctx: Context, text: string): Promise<MyBook[]> {
   const viewer = ctx.user
@@ -64,7 +64,7 @@ export async function searchMine(ctx: Context, text: string): Promise<MyBook[]> 
     order by m.sort_name asc nulls last, m.title asc, m.book_id asc
     limit ${MINE_SEARCH_LIMIT}`)
 
-  const bookIds = rows.rows.map((row) => Number(row.book_id))
+  const bookIds = [...new Set(rows.rows.map((row) => Number(row.book_id)))]
   const [books, holdings] = await Promise.all([
     getEffectiveBooks(ctx, bookIds),
     getHoldings(ctx, bookIds),
