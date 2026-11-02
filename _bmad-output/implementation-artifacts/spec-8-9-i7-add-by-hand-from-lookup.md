@@ -9,7 +9,37 @@ followup_review_recommended: false
 context:
   - '{project-root}/_bmad-output/implementation-artifacts/epic-8-context.md'
 warnings: []
-deferred: []
+deferred:
+  - summary: >-
+      The Not found Answer the Link opens needs an author as well as the title,
+      so the searched text alone does not complete a save from Lookup's empty
+      state -- the epic's "gets in with what I typed" is only partly true.
+    evidence: |-
+      `NotFoundForm` marks a blank author `VALIDATION` before any save
+      (`src/app/(frontend)/scan/NotFoundForm.tsx:93-95`), and the walk had to
+      type one. Deliberate 3.49/EXPERIENCE.md design (title and author both
+      required), not caused by this story and not changeable inside it: making
+      the author optional is a product decision about manual entry everywhere,
+      not about this Link. What would settle it: the owner's call on whether a
+      hand-entered Book may be saved with a title alone.
+    location: >-
+      src/app/(frontend)/scan/NotFoundForm.tsx:93
+    severity: low
+  - summary: >-
+      Lookup's results and empty state are swapped in with no live region or
+      focus move, so a screen-reader user who presses Find hears nothing and
+      may not discover the "Add by hand" Link.
+    evidence: |-
+      The page re-renders server-side on `?q=`; neither the groups nor the
+      "Nothing found" line sits in a live region, and nothing takes focus
+      (`src/app/(frontend)/scan/find/page.tsx:76-91`). Pre-existing: the same
+      is true of the groups and the "Nothing found" line Story 8.8 shipped, so
+      this story only adds one more item to an announcement that was already
+      missing. What would settle it: whether Lookup's result area should be a
+      polite live region, which is a decision for the screen, not this Link.
+    location: >-
+      src/app/(frontend)/scan/find/page.tsx:76
+    severity: low
 ---
 
 <intent-contract>
@@ -87,6 +117,24 @@ deferred: []
 
 ## Review Triage Log
 
+### 2026-11-02 — Review pass
+
+- verdicts: 13 findings — high 0, medium 0, low 3, false 4, maybe-false 0, plus 6 descriptive or rejected readings
+- findings:
+  - `[low]` `[reject]` (blind hunter) AC 2 and the "Saved from there" matrix row promise a save from the typed text alone, while the form also requires an author — real, but the only fix is to edit this build's spec, which triage rejects; the behaviour itself is recorded in `deferred`.
+  - `[low]` `[defer]` (blind hunter) The author requirement is left in prose only, not in `deferred` or a later story's criteria — taken: it is now the first `deferred` entry, with what would settle it.
+  - `[false]` `[reject]` (blind hunter) The spec's `status` reads `in-review` while `sprint-status.yaml` says `done` — that was this review pass's own in-flight state; finalization writes `status: done` and commits both together, so no contradiction reaches the tree.
+  - `[false]` `[reject]` (blind hunter) Two labels for one destination ("Add without ISBN" on Scan, "Add by hand" on Lookup) — both wordings are EXPERIENCE.md's own for their own screens (Scan's Link, and Lookup's "Nothing found" row, which names the Link "Add by hand"); unifying them would overrule the UX document.
+  - `[false]` `[reject]` (blind hunter) The `answer.addByHand` precedent is a different affordance (Couldn't look it up unfolds the form in place; this navigates) — EXPERIENCE.md specifies both: the Couldn't look it up Link "unfolds the title and author fields ... in place", Lookup's "opens the Not found Answer". The same action on two screens, each as the UX document draws it.
+  - `[low]` `[reject]` (blind hunter) No test for a query holding `&`, `#` or `?` — `encodeURIComponent` is a platform call applied to the whole value, so nothing in the diff can escape one character class and not another; CLAUDE.md rejects a finding that only asks for a test unless it names the criterion or spine rule it guards.
+  - `[low]` `[reject]` (blind hunter) The Finnish catalogue is asserted nowhere — the key is pre-existing (`messages/fi.json:142`, "Lisää käsin") and this story adds none, so there is no new translation to guard; the test-only convention applies as above.
+  - `[low]` `[reject]` (blind hunter) The walk is referenced by path but uncommitted, so nobody can re-run it — that is this project's stated walk convention (a check, not a test; Playwright stays on scan-to-save and the shop check), recorded under Auto Run Result by design.
+  - `[low]` `[defer]` (blind hunter) The empty state changes with no announcement or focus move — pre-existing for the whole result area since Story 8.8; recorded as the second `deferred` entry.
+  - `[low]` `[reject]` (verification gap, Other findings) AC 2 overstates what a save needs — same claim as the first row; rejected for the same reason and deferred once, not twice.
+  - `[false]` `[reject]` (verification gap, Other findings) `sprint-status.yaml` and the spec's status disagree — same in-flight artefact as above.
+  - `[low]` `[reject]` (intent alignment) The committed tests assert the href at `/scan/find`, while two AC clauses live at `/scan` and at the save action — the junction's two halves are each guarded where they are implemented (`tests/unit/answer.unit.spec.ts:450-472` for `?title=`, `tests/unit/notFoundForm.unit.spec.ts` for the prefill and the saves), and bridging them durably would mean a third Playwright spec, which CLAUDE.md's Tests convention reserves for scan-to-save and the shop check. The walk bridged it once and is recorded.
+  - `[low]` `[reject]` (intent alignment) "the typed text" taken as the trimmed text — settled by the intent contract itself ("the **trimmed** text the page searched") and argued in Design Notes; the two differ only for a hand-typed address.
+
 ## Design Notes
 
 **Why the trimmed text, not the field's.** `LookupField` already pushes the trimmed text, so the two normally agree; they differ only for a hand-typed or restored address (`?q=%20%20linna%20%20`). The Title field should show what was actually searched, and the service trims a title anyway, so taking `query` keeps the Answer honest with one fewer variable.
@@ -116,6 +164,18 @@ Status: done
 - `tests/unit/lookupPage.unit.spec.ts` -- the Link and its encoded href on the empty-state case, a new trimmed-`q` case, and its absence with each group alone, with no `q`, with a blank `q`, and under `RATE_LIMITED`.
 - `tests/e2e/addByHand.walk.spec.ts` (uncommitted walk) -- the whole path on the real surface.
 
+**Review findings**
+
+Four layers ran (blind hunter, edge cases, verification gaps, intent alignment); the edge-case layer reported nothing and the verification-gap layer found no gaps. 13 findings in all.
+
+Patched: none — no finding named a defect in the code under review.
+
+Deferred (2, both `low`): the Not found Answer needs an author as well as the title, so the searched text alone does not finish a save from the empty state (deliberate 3.49 design, and making the author optional is a decision about manual entry everywhere); and Lookup's result area, groups included, changes with no live region or focus move, which has been true since Story 8.8.
+
+Rejected (11), with reasons: AC 2 and the matrix row overstating what a save needs (twice — the only fix edits this build's spec, and the behaviour is deferred instead); the spec status reading `in-review` against `sprint-status.yaml`'s `done` (twice — this pass's own in-flight state, settled by this finalization); "Add without ISBN" and "Add by hand" naming one destination, and the same `answer.addByHand` key unfolding the form on Couldn't look it up while navigating here (both wordings and both affordances are EXPERIENCE.md's own, per screen); no test for `&`/`#`/`?` in the query and none through the Finnish catalogue (`encodeURIComponent` applies to the whole value and the key is pre-existing in both catalogues — CLAUDE.md rejects a finding that only asks for a test); the walk being referenced but uncommitted (the project's stated walk convention); the committed tests asserting the href while two AC clauses live at `/scan` and at the save action (each half is guarded where it is implemented, in `answer.unit.spec.ts` and `notFoundForm.unit.spec.ts`, and a durable bridge would be a third Playwright spec the Tests convention does not allow); and "the typed text" taken as the trimmed text (settled by the intent contract and Design Notes).
+
+**Follow-up review recommended: false.** Patched entries by verdict: high 0, medium 0, low 0 — nothing was patched.
+
 **Verification**
 
 - `npm run typecheck` -- clean.
@@ -127,4 +187,4 @@ Status: done
 
 **What the walk saw.** Signed in, went to `/scan/find?q=Käsin lisätty <run>`: "Nothing found" with an "Add by hand" Link whose href was `/scan?title=K%C3%A4sin%20lis%C3%A4tty%20<run>`. Following it opened the Not found Answer (heading "Not found") with that exact text already in the Title field. The form asks for an author, so the walk filled one; Add to library then saved and raised "Saved to E2E shelf". Repeating the same search afterwards showed the book under "In your library", with no "Nothing found" line and no "Add by hand" Link.
 
-**Residual risks.** Only `src/app/(frontend)/scan/find/page.tsx` changed, the same file Story 8.8 last touched -- nothing is shared with a parallel story. The Answer this Link opens requires an author before Add to library succeeds, which the walk had to fill; that is Story 3.49's existing form behaviour, not something this story changed, but it means "the typed text alone" is not quite enough to save from the empty state.
+**Residual risks.** Only `src/app/(frontend)/scan/find/page.tsx` changed, the same file Story 8.8 last touched -- nothing is shared with a parallel story. The Answer this Link opens requires an author before Add to library succeeds, which the walk had to fill; that is Story 3.49's existing form behaviour, not something this story changed, but it means "the typed text alone" is not quite enough to save from the empty state; it is now recorded in `deferred` for the owner. The result area still announces nothing to a screen reader when a search lands, also deferred.
