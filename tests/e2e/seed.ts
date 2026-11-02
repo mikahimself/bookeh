@@ -10,7 +10,14 @@ import config from '@/payload.config'
 import { contextFor } from '../helpers/harness'
 import { assertTestDatabase } from '../helpers/testDatabase'
 
-import { E2E_EMAIL, E2E_ISBN, E2E_LOCATION, E2E_PASSWORD } from './account'
+import {
+  E2E_EMAIL,
+  E2E_ISBN,
+  E2E_LOCATION,
+  E2E_PASSWORD,
+  E2E_SHOP_OWNED,
+  E2E_SHOP_WISHED,
+} from './account'
 
 assertTestDatabase(process.env.DATABASE_URL)
 
@@ -52,10 +59,10 @@ const user = existing
 const ctx = await contextFor(user)
 await updateProfile(ctx, { defaultLocation: await resolveLocation(ctx, { create: E2E_LOCATION }) })
 
-// Earlier runs' Book of the ISBN, so the Answer is again "Not in library" from the source.
+// Earlier runs' Books of the ISBNs, so the Answer is again "Not in library" from the source.
 const { docs: books } = await payload.find({
   collection: 'books',
-  where: { isbn13: { equals: E2E_ISBN } },
+  where: { isbn13: { in: [E2E_ISBN, E2E_SHOP_OWNED, E2E_SHOP_WISHED] } },
   pagination: false,
   ...system,
 })
@@ -83,5 +90,13 @@ if (books.length > 0) {
     }
   }
 }
+
+// The user's wishlists, so the picker starts with no list and "New list" is the field to use.
+await payload.delete({
+  collection: 'wishlist-entries',
+  where: { owner: { equals: user.id } },
+  ...system,
+})
+await payload.delete({ collection: 'wishlists', where: { owner: { equals: user.id } }, ...system })
 
 payload.logger.info(`E2E seed: ${E2E_EMAIL} ready, ${books.length} earlier Book(s) removed`)

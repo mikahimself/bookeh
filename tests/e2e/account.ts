@@ -9,3 +9,8 @@ export const E2E_LOCATION = 'E2E shelf'
 export const E2E_ISBN = '9789524035699'
 /** How the spec types it. */
 export const E2E_ISBN_TYPED = '978-952-403-569-9'
+
+/** Lihan loppu: the shop check's owned book (one matching Finna record). */
+export const E2E_SHOP_OWNED = '9789523520660'
+/** Ei enää Eddy: the shop check's wished-for book. */
+export const E2E_SHOP_WISHED = '9789520408053'
