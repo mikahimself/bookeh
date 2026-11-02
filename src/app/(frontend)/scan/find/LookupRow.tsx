@@ -15,6 +15,9 @@ import type { LookupRowData } from './lookupRows'
 export function LookupRow({ row, lent }: { row: LookupRowData; lent: (person: string) => string }) {
   return (
     <li>
+      {/* No prefetch: rendering an Elsewhere row's `?isbn=` Answer counts a
+          lookup and asks the sources, so a prefetched page of rows would
+          spend the viewer's rate limit before a single tap. */}
       <Link
         href={row.href}
         scroll={false}

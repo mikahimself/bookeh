@@ -1,64 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
-import type { EffectiveBook } from '@/lib/books/effectiveBook'
-import type { CopyLine, Holdings } from '@/lib/books/holdings'
-import type { SearchDraft } from '@/lib/catalogue/searchBooks'
-import type { MyBook } from '@/lib/shelf/query'
-
 import { lookupRows } from '@/app/(frontend)/scan/find/lookupRows'
+
+import { copy, hit, mine } from '../helpers/lookupFixtures'
 
 // EXPERIENCE.md, Lookup: the two groups, their hrefs, their edition lines, the
 // own group's lent marker, and the overlap an own Book takes out of Elsewhere.
-
-const book = (over: Partial<EffectiveBook> = {}): EffectiveBook => ({
-  bookId: 1,
-  isbn13: '9789510123456',
-  visibility: 'shared',
-  source: null,
-  title: 'Tuntematon sotilas',
-  subtitle: null,
-  authors: [{ id: 3, name: 'Väinö Linna' }],
-  series: null,
-  seriesIndex: null,
-  genres: [],
-  themes: [],
-  publisher: 'WSOY',
-  year: 1954,
-  language: 'fi',
-  pages: null,
-  description: null,
-  coverUrl: null,
-  overridden: [],
-  ...over,
-})
-
-const copy = (over: Partial<CopyLine> = {}): CopyLine => ({
-  copyId: 11,
-  status: 'owned',
-  location: { id: 2, name: 'Tampere' },
-  note: null,
-  loan: null,
-  ...over,
-})
-
-const holdings = (copies: CopyLine[] = [copy()]): Holdings => ({ copies, entries: [] })
-
-const mine = (over: Partial<EffectiveBook> = {}, copies?: CopyLine[]): MyBook => ({
-  book: book(over),
-  mine: holdings(copies),
-})
-
-const hit = (over: Partial<SearchDraft> = {}): SearchDraft => ({
-  isbn13: '9789511111118',
-  title: 'Sinuhe egyptiläinen',
-  authors: [{ name: 'Mika Waltari' }],
-  publisher: 'WSOY',
-  year: 1945,
-  binding: 'nidottu',
-  source: 'finna',
-  hasCover: false,
-  ...over,
-})
 
 describe('lookupRows', () => {
   it('groups own Books first and keeps each search its own order', () => {

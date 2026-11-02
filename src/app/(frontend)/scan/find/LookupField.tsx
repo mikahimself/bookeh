@@ -10,7 +10,7 @@ import { TextField } from '../../components/TextField'
 
 /**
  * EXPERIENCE.md, Lookup: one field for a title or an author, searched on Go
- * (not as you type). Go pushes `/scan/find?q=<text>` in a transition, with the
+ * (not as you type). Go pushes `/scan/find?q=<trimmed text>` in a transition, with the
  * progress line while the server searches; the push, not a replace, is what
  * lets Back on a result's Answer land on the results. An empty field submits
  * nothing. Without JS the field still submits as a GET form.
@@ -25,8 +25,10 @@ export function LookupField({ q }: { q: string }) {
 
   const submit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    const text = field.current?.value ?? ''
-    if (!text.trim()) return
+    // Trimmed, so the address, the field and the search the page runs agree:
+    // one search is one address.
+    const text = (field.current?.value ?? '').trim()
+    if (!text) return
     startTransition(() => {
       router.push(`/scan/find?q=${encodeURIComponent(text)}`)
     })

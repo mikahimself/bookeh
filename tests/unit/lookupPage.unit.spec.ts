@@ -3,11 +3,10 @@ import { cleanup, fireEvent, render, screen, within } from '@testing-library/rea
 import { createElement, type ComponentProps, type ReactNode } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import type { EffectiveBook } from '@/lib/books/effectiveBook'
-import type { CopyLine } from '@/lib/books/holdings'
 import type { SearchDraft } from '@/lib/catalogue/searchBooks'
 import type { MyBook } from '@/lib/shelf/query'
 
+import { copy, hit, mine } from '../helpers/lookupFixtures'
 import { serverTree } from '../helpers/serverTree'
 
 // EXPERIENCE.md, Lookup; FR-20, FR-37: the field alone until a search has run,
@@ -92,54 +91,6 @@ const { default: LookupPage } = await import('@/app/(frontend)/scan/find/page')
 const renderPage = async (search: Record<string, string> = {}) =>
   render(await serverTree(await LookupPage({ searchParams: Promise.resolve(search) })))
 
-const book = (over: Partial<EffectiveBook> = {}): EffectiveBook => ({
-  bookId: 1,
-  isbn13: '9789510123456',
-  visibility: 'shared',
-  source: null,
-  title: 'Tuntematon sotilas',
-  subtitle: null,
-  authors: [{ id: 3, name: 'Väinö Linna' }],
-  series: null,
-  seriesIndex: null,
-  genres: [],
-  themes: [],
-  publisher: 'WSOY',
-  year: 1954,
-  language: 'fi',
-  pages: null,
-  description: null,
-  coverUrl: null,
-  overridden: [],
-  ...over,
-})
-
-const copy = (over: Partial<CopyLine> = {}): CopyLine => ({
-  copyId: 11,
-  status: 'owned',
-  location: { id: 2, name: 'Tampere' },
-  note: null,
-  loan: null,
-  ...over,
-})
-
-const mine = (over: Partial<EffectiveBook> = {}, copies: CopyLine[] = [copy()]): MyBook => ({
-  book: book(over),
-  mine: { copies, entries: [] },
-})
-
-const hit = (over: Partial<SearchDraft> = {}): SearchDraft => ({
-  isbn13: '9789511111118',
-  title: 'Sinuhe egyptiläinen',
-  authors: [{ name: 'Mika Waltari' }],
-  publisher: 'WSOY',
-  year: 1945,
-  binding: 'nidottu',
-  source: 'finna',
-  hasCover: true,
-  ...over,
-})
-
 describe('Lookup', () => {
   beforeEach(() => {
     window.history.pushState({ page: 'find' }, '', '/scan/find')
@@ -185,7 +136,7 @@ describe('Lookup', () => {
         copy({ loan: { loanId: 4, person: { id: 5, name: 'Hilla' }, since: '2026-01-02' } }),
       ]),
     ])
-    searchBooks.mockResolvedValue([hit(), hit({ isbn13: '9789510222222', hasCover: false })])
+    searchBooks.mockResolvedValue([hit({ hasCover: true }), hit({ isbn13: '9789510222222' })])
     await renderPage({ q: 'linna' })
 
     expect(searchMine).toHaveBeenCalledWith(expect.anything(), 'linna')
@@ -280,8 +231,9 @@ describe('Lookup', () => {
     fireEvent.click(go)
     expect(router.push).not.toHaveBeenCalled()
 
-    fireEvent.change(field, { target: { value: 'väinö linna' } })
+    fireEvent.change(field, { target: { value: '  väinö linna  ' } })
     fireEvent.click(go)
+    // Trimmed: one search is one address, and it is the text the page searches.
     expect(router.push).toHaveBeenCalledWith('/scan/find?q=v%C3%A4in%C3%B6%20linna')
   })
 })

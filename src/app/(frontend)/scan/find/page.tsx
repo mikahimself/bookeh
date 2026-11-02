@@ -23,7 +23,7 @@ const queryOf = (value: string | string[] | undefined): string =>
  * session, the task base and the held-save toast are the same as Scan's. The
  * camera stays off: only Scan starts it.
  *
- * `?q=` is the search, run here on the server with the text as typed: the
+ * `?q=` is the search, run here on the server with the text trimmed: the
  * viewer's own holdings first (`searchMine`, which counts nothing), then the
  * sources (`searchBooks`, one lookup against the rate limit), one after the
  * other (AD-16). A blank or missing `q` asks nothing and renders the field
