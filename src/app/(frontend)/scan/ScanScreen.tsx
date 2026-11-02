@@ -31,7 +31,8 @@ const SCAN_SUCCESS_MS = 500
  * ignored until it has left the camera's view, so the book still in front of
  * the camera after Back or a save does not reopen its Answer. A typed entry
  * holds nothing. Add without ISBN under the field opens the Not found Answer
- * with no ISBN (`/scan?title=`), a push like a read.
+ * with no ISBN (`/scan?title=`), a push like a read, and Find by title or
+ * author opens Lookup (`/scan/find`) beside it.
  *
  * `isbn` is the text in the address, kept in the field; `error` the message
  * under it. Until the camera is on (permission pending, refused, or none)
@@ -181,9 +182,10 @@ export function ScanScreen({ isbn, error }: { isbn?: string; error?: string }) {
           }
         />
       </form>
-      {/* A block around the Link, so it is only as wide as its text. */}
-      <div>
+      {/* A block around each Link, so it is only as wide as its text. */}
+      <div className="flex flex-col items-start gap-2">
         <TextLink href="/scan?title=">{t('scan.addWithoutIsbn')}</TextLink>
+        <TextLink href="/scan/find">{t('lookup.open')}</TextLink>
       </div>
     </>
   )

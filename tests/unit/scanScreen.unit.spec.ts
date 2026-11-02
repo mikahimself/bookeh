@@ -311,6 +311,15 @@ describe('ScanScreen', () => {
     expect(push).not.toHaveBeenCalled()
   })
 
+  it('links to Lookup and to the Not found Answer under the field', () => {
+    getUserMedia.mockReturnValue(new Promise<MediaStream>(() => undefined))
+    renderScan()
+    expect(screen.getAllByRole('link').map((link) => link.getAttribute('href'))).toEqual([
+      '/scan?title=',
+      '/scan/find',
+    ])
+  })
+
   it('shows the no-camera message and focuses the field when the camera is refused', async () => {
     getUserMedia.mockRejectedValue(new DOMException('denied', 'NotAllowedError'))
     renderScan()

@@ -143,6 +143,15 @@
     "partial": "{count, plural, one {{sources} ei vastannut.} other {{sources} eivät vastanneet.}} Tallennus käyttää nyt vain {found}.",
     "tryPartial": "Yritä {sources} uudelleen"
   },
+  "lookup": {
+    "open": "Hae nimellä tai tekijällä",
+    "heading": "Hae",
+    "field": "Nimi tai tekijä",
+    "submit": "Hae",
+    "mine": "Omassa kirjastossa",
+    "elsewhere": "Muualla",
+    "nothing": "Ei löytynyt mitään"
+  },
   "editBook": {
     "heading": "Muokkaa kirjaa",
     "save": "Tallenna",

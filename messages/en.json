@@ -143,6 +143,15 @@
     "partial": "{sources} didn't answer. Saving now uses {found} alone.",
     "tryPartial": "Try {sources} again"
   },
+  "lookup": {
+    "open": "Find by title or author",
+    "heading": "Find",
+    "field": "Title or author",
+    "submit": "Find",
+    "mine": "In your library",
+    "elsewhere": "Elsewhere",
+    "nothing": "Nothing found"
+  },
   "editBook": {
     "heading": "Edit book",
     "save": "Save",
