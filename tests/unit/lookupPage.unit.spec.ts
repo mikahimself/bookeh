@@ -119,6 +119,7 @@ describe('Lookup', () => {
     expect(screen.queryByRole('listitem')).toBe(null)
     expect(searchMine).not.toHaveBeenCalled()
     expect(searchBooks).not.toHaveBeenCalled()
+    expect(screen.queryByRole('link', { name: 'Add by hand' })).toBe(null)
   })
 
   it('asks nothing for blank text, keeping it in the field', async () => {
@@ -128,6 +129,7 @@ describe('Lookup', () => {
     expect(screen.queryByText('Nothing found')).toBe(null)
     expect(searchMine).not.toHaveBeenCalled()
     expect(searchBooks).not.toHaveBeenCalled()
+    expect(screen.queryByRole('link', { name: 'Add by hand' })).toBe(null)
   })
 
   it('shows the own group above Elsewhere, with each row’s cover, title and lines', async () => {
@@ -170,6 +172,7 @@ describe('Lookup', () => {
       'In your library',
     ])
     expect(screen.queryByText('Nothing found')).toBe(null)
+    expect(screen.queryByRole('link', { name: 'Add by hand' })).toBe(null)
   })
 
   it('shows the Elsewhere group alone when nothing of the viewer’s matched', async () => {
@@ -180,6 +183,7 @@ describe('Lookup', () => {
       'Elsewhere',
     ])
     expect(screen.queryByText('Nothing found')).toBe(null)
+    expect(screen.queryByRole('link', { name: 'Add by hand' })).toBe(null)
   })
 
   it('pushes a result, so Back on its Answer returns to the results', async () => {
@@ -196,6 +200,17 @@ describe('Lookup', () => {
 
     screen.getByText('Nothing found')
     expect(screen.queryAllByRole('heading', { level: 2 })).toEqual([])
+    expect(screen.getByRole('link', { name: 'Add by hand' }).getAttribute('href')).toBe(
+      '/scan?title=ei%20mit%C3%A4%C3%A4n',
+    )
+  })
+
+  it('carries the trimmed text into Add by hand', async () => {
+    await renderPage({ q: '  linna  ' })
+
+    expect(screen.getByRole('link', { name: 'Add by hand' }).getAttribute('href')).toBe(
+      '/scan?title=linna',
+    )
   })
 
   it('keeps the own group and toasts when the source search is refused', async () => {
@@ -215,6 +230,7 @@ describe('Lookup', () => {
     await renderPage({ q: 'linna' })
 
     expect(screen.queryByText('Nothing found')).toBe(null)
+    expect(screen.queryByRole('link', { name: 'Add by hand' })).toBe(null)
     expect(showToast).toHaveBeenCalledWith({ kind: 'error', code: 'RATE_LIMITED' })
   })
 

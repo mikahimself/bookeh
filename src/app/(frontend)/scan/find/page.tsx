@@ -7,6 +7,7 @@ import { requireUser } from '@/lib/payload/context'
 import { searchMine } from '@/lib/shelf/searchMine'
 
 import { FullScreenTask } from '../../components/FullScreenTask'
+import { TextLink } from '../../components/Link'
 import { RaiseToast } from '../../components/toast/RaiseToast'
 
 import { LookupField } from './LookupField'
@@ -33,6 +34,10 @@ const queryOf = (value: string | string[] | undefined): string =>
  * already been read, drops the Elsewhere group and raises the error toast, as
  * Scan does for a refused lookup; any other failure goes to Next's error
  * handling. A result opens its Answer, pushed, so Back returns here.
+ *
+ * The empty state is a way in, not a dead end: "Add by hand" opens the Not
+ * found Answer with the searched text in its Title field, where both saves
+ * make a private Book with no ISBN.
  */
 export default async function LookupPage({
   searchParams,
@@ -81,7 +86,13 @@ export default async function LookupPage({
           group(t('lookup.elsewhere'), groups.elsewhere)}
         {/* Only a search that ran and found nothing: the refused half never answered. */}
         {groups !== null && !limited && groups.mine.length + groups.elsewhere.length === 0 && (
-          <p className="text-control text-text">{t('lookup.nothing')}</p>
+          <div className="flex flex-col items-start gap-2">
+            <p className="text-control text-text">{t('lookup.nothing')}</p>
+            {/* The trimmed text the page searched, not the field's. */}
+            <TextLink href={`/scan?title=${encodeURIComponent(query)}`}>
+              {t('answer.addByHand')}
+            </TextLink>
+          </div>
         )}
         {limited && (
           // Fresh per render, so a repeated search raises it again.
