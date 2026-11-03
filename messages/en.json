@@ -207,6 +207,10 @@
     "tryAgain": "Try again",
     "collection": "Collection"
   },
+  "notFoundPage": {
+    "heading": "Not found",
+    "collection": "Collection"
+  },
   "task": {
     "close": "Close"
   },

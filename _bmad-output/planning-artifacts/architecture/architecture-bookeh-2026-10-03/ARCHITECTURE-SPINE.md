@@ -565,6 +565,7 @@ The addresses are those of `EXPERIENCE.md` → Information Architecture, with th
 | `/data/shelf?<shelf params>&offset=<n>&limit=<n>` | Route handler (AD-10): `ActionResult<ShelfRows>` for that range of the viewer's shelf; shelf params as `shelfRowsPath()` writes them (`book` ignored); `offset` a whole number ≥ 0, `limit` 1–1000 (`SHELF_MAX_ROWS`); a missing or out-of-bounds range is `VALIDATION`, with no query run |
 | `/data/cover/[isbn13]` | Route handler for client-initiated reads (AD-10) |
 | `/data/suggest?field=author\|series\|publisher&q=<text>` | Route handler (AD-10): `ActionResult<Suggestion[]>` from the viewer's collection, at most 10, by name; a blank `q` answers `[]`; a missing or unknown `field` or a `q` over 200 characters is `VALIDATION` |
+| any address no route answers | Not found, with HTTP 404: one heading and a Link to `/`, with the frontend's tokens, font and theme but **none of its providers** — no `ToastProvider`, `NavigationTracker` or `NextIntlClientProvider`, since nothing on the page needs them. Its locale comes from `Accept-Language` alone, never the profile language (AD-15), because it reads no user data and calls no service: the theme cookie and that header are its only inputs. It is `src/app/global-not-found.tsx` (behind `experimental.globalNotFound`) because two root layouts leave no single layout to compose a 404 from, so the file supplies the document, its metadata and its viewport itself. `/admin` keeps Payload's own not-found. |
 
 ### Deployment and environments
 

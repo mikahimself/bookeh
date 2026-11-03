@@ -207,6 +207,10 @@
     "tryAgain": "Yritä uudelleen",
     "collection": "Kokoelma"
   },
+  "notFoundPage": {
+    "heading": "Sivua ei löydy.",
+    "collection": "Kokoelma"
+  },
   "task": {
     "close": "Sulje"
   },

@@ -15,6 +15,9 @@ const nextConfig: NextConfig = {
   experimental: {
     // Cover upload (AD-14): a 5 MiB image plus the multipart overhead.
     serverActions: { bodySizeLimit: '6mb' },
+    // `src/app/global-not-found.tsx`: with two root layouts ((frontend) and
+    // (payload)) there is no single layout a 404 page could compose from.
+    globalNotFound: true,
   },
   webpack: (webpackConfig) => {
     webpackConfig.resolve.extensionAlias = {

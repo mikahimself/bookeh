@@ -77,7 +77,9 @@ const importZones = [
     message: 'Spine, Design Paradigm: src/i18n imports only from lib/payload.',
   },
   {
-    target: 'src/app/(frontend)',
+    // `global-not-found.tsx` must sit in src/app (Next's convention) but is a
+    // frontend screen, so the frontend rules apply to it too.
+    target: ['src/app/(frontend)', 'src/app/global-not-found.tsx'],
     from: 'src',
     except: [
       './app/(frontend)',
@@ -429,7 +431,7 @@ const eslintConfig = defineConfig([
   {
     // Spine, AD-2: no `ctx.req.payload.*` around the gateway. Replaces the
     // roles block's selectors for these files, so it repeats them.
-    files: ['src/lib/**', 'src/i18n/**', 'src/app/(frontend)/**'],
+    files: ['src/lib/**', 'src/i18n/**', 'src/app/(frontend)/**', 'src/app/global-not-found.tsx'],
     ignores: gatewayExempt,
     rules: {
       'no-restricted-syntax': [
@@ -471,7 +473,7 @@ const eslintConfig = defineConfig([
     // Spine, Design Paradigm: src/app/(frontend) imports from lib/payload only
     // requireUser, requireUserOrThrow, isRowId and types. It never calls the gateway,
     // and never touches Payload, its config, its collections or the database.
-    files: ['src/app/(frontend)/**'],
+    files: ['src/app/(frontend)/**', 'src/app/global-not-found.tsx'],
     rules: {
       '@typescript-eslint/no-restricted-imports': [
         'error',
