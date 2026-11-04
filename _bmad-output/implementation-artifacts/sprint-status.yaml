@@ -259,8 +259,8 @@ development_status:
   8-15-i16-kirjasampo-enrichment: done
   epic-8-retrospective: done
 
-  epic-9: backlog
-  9-17-k34-sequential-own-search-hydration: backlog
+  epic-9: in-progress
+  9-17-k34-sequential-own-search-hydration: done
   9-18-k35-independent-search-and-answer-cover-previews: backlog
   9-19-k36-production-kirjasampo-adapter-verification: backlog
   9-1-g1-tags-collection-with-kinds: backlog
@@ -967,7 +967,7 @@ action_items:
     action: "Serialize searchMine effective-book and holdings hydration on its shared
       Payload context (X1; AD-16). Verify own-title search still returns its holdings."
     owner: "Mika"
-    status: open
+    status: done
     ref: "_bmad-output/implementation-artifacts/epic-8-retro-2026-11-04.md"
     story: '9.17'
   - id: "epic-8-retro-item-81-isolate-search-answer-cover-previews"

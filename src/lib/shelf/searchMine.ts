@@ -65,10 +65,9 @@ export async function searchMine(ctx: Context, text: string): Promise<MyBook[]> 
     limit ${MINE_SEARCH_LIMIT}`)
 
   const bookIds = [...new Set(rows.rows.map((row) => Number(row.book_id)))]
-  const [books, holdings] = await Promise.all([
-    getEffectiveBooks(ctx, bookIds),
-    getHoldings(ctx, bookIds),
-  ])
+  // AD-16: readers sharing a Payload context must finish sequentially.
+  const books = await getEffectiveBooks(ctx, bookIds)
+  const holdings = await getHoldings(ctx, bookIds)
 
   return bookIds.flatMap((bookId) => {
     const book = books.get(bookId)
