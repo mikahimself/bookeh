@@ -14,6 +14,7 @@ import { Loans, openLoanIndex } from './collections/Loans'
 import { Locations } from './collections/Locations'
 import { People } from './collections/People'
 import { Series } from './collections/Series'
+import { Tags } from './collections/Tags'
 import { UserBooks } from './collections/UserBooks'
 import { Users } from './collections/Users'
 import { WishlistEntries } from './collections/WishlistEntries'
@@ -57,6 +58,7 @@ export default buildConfig({
     Media,
     People,
     Series,
+    Tags,
     UserBooks,
     Users,
     WishlistEntries,

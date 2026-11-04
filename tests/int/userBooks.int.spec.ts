@@ -154,6 +154,49 @@ describe('user-books', () => {
     }
   })
 
+  it('persists own tags and rejects every foreign target on create and update for users and admins', async () => {
+    const tagFor = async (user: User, name: string) =>
+      gateway.create(await contextFor(user), {
+        collection: 'tags',
+        data: { owner: user.id, name, nameKey: 'ignored', kind: 'tag' },
+        depth: 0,
+      })
+    const foreign = await tagFor(b, 'Foreign')
+    for (const user of [a, admin]) {
+      const own = await tagFor(user, 'Own')
+      const second = await tagFor(user, 'Second')
+      const book = await bookFor(user, 'shared')
+      for (const tags of [[foreign.id], [own.id, foreign.id]]) {
+        expect(await rejectedPaths(createRow(user, book, { tags }))).toEqual(['tags'])
+        expect(
+          (
+            await payload.count({
+              collection: 'user-books',
+              where: { and: [{ owner: { equals: user.id } }, { book: { equals: book.id } }] },
+            })
+          ).totalDocs,
+        ).toBe(0)
+      }
+      const row = await createRow(user, book, { tags: [own.id, second.id] })
+      expect(row.tags).toEqual([own.id, second.id])
+      const update = async (tags: number[]) =>
+        gateway.updateByID(await contextFor(user), {
+          collection: 'user-books',
+          id: row.id,
+          data: { tags },
+          depth: 0,
+        })
+      for (const tags of [[foreign.id], [own.id, foreign.id]]) {
+        expect(await rejectedPaths(update(tags))).toEqual(['tags'])
+        expect(
+          (await payload.findByID({ collection: 'user-books', id: row.id, depth: 0 })).tags,
+        ).toEqual([own.id, second.id])
+      }
+      expect((await update([second.id])).tags).toEqual([second.id])
+      expect((await update([])).tags).toEqual([])
+    }
+  })
+
   it('refuses every operation without a user', async () => {
     const book = await bookFor(a, 'shared')
     const row = await createRow(a, book, { title: 'Mine' })

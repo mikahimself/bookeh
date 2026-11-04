@@ -4,7 +4,7 @@ import { number } from 'payload/shared'
 import { ownerAccess } from '@/access/owner'
 import { overriddenField, overrideFields } from '@/fields/bookFields'
 import { ownerField } from '@/fields/owner'
-import { readableRelation } from '@/fields/relation'
+import { ownedRelation, readableRelation } from '@/fields/relation'
 
 /** Payload's number check (`min`/`max`), then whole stars only: `admin.step` binds the form alone. */
 const wholeNumber: NumberFieldValidation = (value, options) => {
@@ -37,6 +37,7 @@ export const UserBooks: CollectionConfig = {
     readableRelation('books', { name: 'book', required: true }),
     ...overrideFields(),
     overriddenField(),
+    ownedRelation('tags', { name: 'tags', hasMany: true }),
     { name: 'read', type: 'checkbox', defaultValue: false },
     { name: 'rating', type: 'number', min: 1, max: 5, admin: { step: 1 }, validate: wholeNumber },
     { name: 'ratedAt', type: 'date' },

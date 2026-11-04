@@ -76,6 +76,7 @@ export interface Config {
     media: Media;
     people: Person;
     series: Series;
+    tags: Tag;
     'user-books': UserBook;
     users: User;
     'wishlist-entries': WishlistEntry;
@@ -96,6 +97,7 @@ export interface Config {
     media: MediaSelect<false> | MediaSelect<true>;
     people: PeopleSelect<false> | PeopleSelect<true>;
     series: SeriesSelect<false> | SeriesSelect<true>;
+    tags: TagsSelect<false> | TagsSelect<true>;
     'user-books': UserBooksSelect<false> | UserBooksSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
     'wishlist-entries': WishlistEntriesSelect<false> | WishlistEntriesSelect<true>;
@@ -322,6 +324,19 @@ export interface Person {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tags".
+ */
+export interface Tag {
+  id: number;
+  owner: number | User;
+  name: string;
+  nameKey: string;
+  kind: 'tag' | 'genre' | 'theme';
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "user-books".
  */
 export interface UserBook {
@@ -352,6 +367,7 @@ export interface UserBook {
         | 'description'
       )[]
     | null;
+  tags?: (number | Tag)[] | null;
   read?: boolean | null;
   rating?: number | null;
   ratedAt?: string | null;
@@ -443,6 +459,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'series';
         value: number | Series;
+      } | null)
+    | ({
+        relationTo: 'tags';
+        value: number | Tag;
       } | null)
     | ({
         relationTo: 'user-books';
@@ -634,6 +654,18 @@ export interface SeriesSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tags_select".
+ */
+export interface TagsSelect<T extends boolean = true> {
+  owner?: T;
+  name?: T;
+  nameKey?: T;
+  kind?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "user-books_select".
  */
 export interface UserBooksSelect<T extends boolean = true> {
@@ -650,6 +682,7 @@ export interface UserBooksSelect<T extends boolean = true> {
   pages?: T;
   description?: T;
   overridden?: T;
+  tags?: T;
   read?: T;
   rating?: T;
   ratedAt?: T;

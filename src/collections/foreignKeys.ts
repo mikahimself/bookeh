@@ -15,6 +15,7 @@ type OnDelete = 'cascade' | 'restrict' | 'set null'
 export const ON_DELETE: Record<string, Record<string, OnDelete>> = {
   copies: { owner_id: 'cascade', book_id: 'restrict', location_id: 'set null' },
   locations: { owner_id: 'cascade' },
+  tags: { owner_id: 'cascade' },
   loans: { owner_id: 'cascade', copy_id: 'restrict', person_id: 'restrict' },
   people: { owner_id: 'cascade' },
   user_books: { owner_id: 'cascade', book_id: 'restrict', series_id: 'set null' },
