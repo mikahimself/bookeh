@@ -3,13 +3,37 @@ title: '8.12 [I13] Open Library source'
 type: 'feature'
 created: '2026-11-03'
 baseline_revision: '29a561e8f3086fa32b527acd666277d0ec3bff3f'
-status: 'in-review'
+status: 'done'
 review_loop_iteration: 0
-followup_review_recommended: false
+followup_review_recommended: true
 context:
   - '{project-root}/_bmad-output/implementation-artifacts/epic-8-context.md'
 warnings: ['oversized']
-deferred: []
+deferred:
+  - summary: >-
+      The story's criterion names the literal array `[finna, google,
+      openLibrary]`, but membership is gated on `OPEN_LIBRARY_CONTACT`, so a
+      clone or deploy without that variable runs two sources and Open Library's
+      new source names, the three-way merge order and its place in the partial
+      line are unreachable there.
+    evidence: |-
+      `src/lib/metadata/sources/index.ts` builds
+      `[finna, google, ...(openLibraryContact() ? [openLibrary] : [])]`, and
+      `.env.example` ships `OPEN_LIBRARY_CONTACT=` empty. The reading is
+      deliberate and recorded in this spec's Boundaries and in AD-9: Open
+      Library asks every client to identify itself, and the epic's standing
+      rule is that a source whose credential is absent is left out rather than
+      degraded. The competing reading is the criterion's literal one — the
+      source is always third and the variable only supplies the header's text,
+      Open Library permitting unidentified calls at 1 request per second. The
+      test-parity half of the harm is fixed: `vitest.setup.ts` pins a
+      test-only contact, so the int lane always runs three sources. What would
+      settle the rest: the owner's call on whether an environment with no
+      contact should have Open Library at all. Either way it is one line in
+      `sources/index.ts` plus a documentation line.
+    location: >-
+      src/lib/metadata/sources/index.ts:12
+    severity: medium
 ---
 
 <intent-contract>
@@ -112,17 +136,41 @@ deferred: []
 
 ## Review Triage Log
 
-Round 1 (coordinator review), 9 findings, all patched:
+### 2026-11-04 — Review pass
 
-- `[patch]` The int lane read the developer's `.env`, so `sources` had two entries in CI and three on a configured machine -- `vitest.setup.ts` now pins `OPEN_LIBRARY_CONTACT=int-tests@bookeh.invalid` beside the `MEDIA_DIR` and `SEED_*` handling, so the lane always exercises the three-source fan-out.
-- `[patch]` Nothing asserted how Open Library's answer reaches an outcome -- one case in `saveCopyAction.int.spec.ts`, in the file's hostname-stub style, over the real `lookupSources`: `{}` keeps the outcome (`none`), a 500 makes it `unavailable` with `failed: ['openlibrary']`.
-- `[patch]` The capture script's secret check guarded the per-ISBN write only -- extracted as `leaks()` and run on the search write too.
-- `[patch]` `main()` refused to run without a contact, making `capture()`'s `noContact` branch unreachable and blocking Finna/Google capture -- it now warns and proceeds, Open Library reported as not captured.
-- `[patch]` The new module-level `names()` was shadowed by `buildReport`'s own `const names` -- renamed `subjectNames`.
-- `[patch]` `limit=20` caps works, not hits (`yuval noah harari` gives 40 edition ISBNs from 20 works) -- the hits are capped at `MAX_RESULTS` after parsing and the comment corrected.
-- `[patch]` `pages` ignored `pagination`, dropping a field this source exists to gap-fill (`9780007466061` has `pagination: "690p."` and no `number_of_pages`) -- it now falls back to the first number in `pagination`.
-- `[patch]` The comment on `openLibraryContact` claimed call-time reading although `sources` is built once at module load -- corrected.
-- `[patch]` AD-9's "Given Family"/`sortName` rule had an unrecorded exception -- AD-9 now names it: a source that states no form and no order (Open Library) is passed through as given, with the edit screen as the correction path.
+- verdicts: 31 findings — high 0, medium 6, low 22, false 3, maybe-false 0
+- findings:
+  - `[low]` `[patch]` (blind hunter) `npm run fixtures` hard-gated on the contact while the docs say the variable may stay empty, leaving `capture()`'s `noContact` branch unreachable — real: `main()` returned 1 before `capture()` ran. Fixed: it warns and proceeds, Open Library reported as not captured.
+  - `[medium]` `[patch]` (blind hunter) The int specs' Open Library stubs are conditional on the developer's ambient `.env` — verified: `vitest.setup.ts` only imported `dotenv/config`, and CI's `check` job sets just `DATABASE_URL` and `PAYLOAD_SECRET`. Fixed: the lane pins a test-only contact, so the three-source fan-out is what runs everywhere. Grouped with the edge-case and verification-gap findings on the same cause.
+  - `[low]` `[reject]` (blind hunter) `openLibraryHeaders()` fails open, returning `{}` instead of refusing — membership is decided once at module load and no caller uses `openLibrary` outside the array, so the unidentified request needs a contact present at boot and removed mid-process; the fix adds a branch for a state not shown reachable.
+  - `[low]` `[patch]` (blind hunter) Search results uncapped: `limit=20` caps works, not hits — confirmed against the recorded `yuval noah harari` fixture, 40 edition ISBNs from 20 works. Fixed: hits capped at `MAX_RESULTS` and the comment corrected.
+  - `[low]` `[patch]` (blind hunter) `pages` has no `pagination` fallback — confirmed: fixture `9780007466061` carries `pagination: "690p."` and no `number_of_pages`, so the gap-fill this source exists for dropped it. Fixed.
+  - `[low]` `[patch]` (blind hunter) Author names pass through unnormalised against AD-9's "Given Family" rule with no recorded exception — real as a convention gap: the story's own criterion mandates the pass-through, so AD-9 now names the exception in the same commit.
+  - `[medium]` `[patch]` (blind hunter) The fixture secret-leak guard covered the lookup writes only — verified: the search loop called `writeFile` with no check, and this story's secret is an email, likelier to be echoed back than a key. Fixed: one `leaks()` helper on both write paths.
+  - `[low]` `[reject]` (blind hunter) The report's degraded-Google caveat (`englishMissing`) not extended to the third source — generated prose in `REPORT.md` that regenerates on every capture; no user or developer acts on it, and the fix edits report wording only.
+  - `[low]` `[reject]` (blind hunter) Pairwise totals stopped at two sources (no Finna ∧ Open Library figure) — same generated-report prose; `openLibraryAdds` already carries the claim the story rests on, per-book and in the totals.
+  - `[low]` `[patch]` (blind hunter) Two different `names` identifiers in `capture-fixtures.ts`, the new module-level one shadowed inside `buildReport` — real and confusing. Fixed: renamed `subjectNames()`.
+  - `[low]` `[reject]` (blind hunter) The unit spec reads a Finna fixture, contradicting the spec's "tests read only `tests/fixtures/openlibrary/`" — the only fix edits this build's spec; the test itself guards the AD-9 merge order and is worth keeping.
+  - `[low]` `[reject]` (blind hunter) Six identical copy-pasted stub comments across three int specs — a shared stub helper is an abstraction "for later" (CLAUDE.md); the repetition is local to test setup and costs no correctness.
+  - `[low]` `[patch]` (edge-case) Hits exceed one screen when 20 works each yield several edition ISBNs — same cause as the blind hunter's cap finding; grouped and fixed there.
+  - `[false]` `[reject]` (edge-case) One edition doc listing two distinct ISBN-13s makes two hits share one printing's publisher, year and binding — no edition doc in any recorded search fixture carries two distinct ISBN-13s (checked all three), and Finna's adapter deliberately does the same per binding.
+  - `[false]` `[reject]` (edge-case) `publish_date` as a number drops the year — it is a string in every one of the 30 recorded responses (`'2012'`, `'May 05, 2018'`); the numeric case is not shown to exist.
+  - `[low]` `[reject]` (edge-case) A first four-digit run that is not a year ('0000') stores a nonsense year — identical to Finna's `year()` rule (`/\d{4}/`) on the same kind of free text; adding a range guard to one adapter only would diverge from the codebase for a case not shown reachable.
+  - `[false]` `[reject]` (edge-case) Multi-valued `edition.publish_year` shows a reprint year — no edition doc in the recorded fixtures carries more than one year.
+  - `[low]` `[reject]` (edge-case) A short or common contact substring would reject every fixture as leaked — the contact is the owner's own email in his own `.env`; a length floor guards a self-inflicted, immediately visible state.
+  - `[low]` `[patch]` (edge-case) `sources` is a module-level const, so a contact arriving later never adds the source — true; grouped with the comment fix below rather than made dynamic, since the environment is fixed at boot.
+  - `[low]` `[patch]` (edge-case) The "read at call time" comment overstates what setting the variable does — fixed: the comment now says `sources` is built once at module load.
+  - `[medium]` `[patch]` (edge-case) CI has no contact, so the new `openlibrary.org` branches are never taken and CI diverges from a local run — same cause as the blind hunter's; grouped and fixed in `vitest.setup.ts`.
+  - `[low]` `[patch]` (edge-case) `main()` exits before the documented no-contact capture path, so a contributor without the variable cannot capture Finna or Google fixtures — grouped with the first finding and fixed.
+  - `[medium]` `[patch]` (verification-gap) No test in the normal verification path asserts app-level lookup behaviour with Open Library in the array; the `none` → `unavailable` flip the build already hit by accident would ship green — filed pre-verified. Fixed: the lane pins the contact and `saveCopyAction.int.spec.ts` gains one case asserting `{}` leaves the outcome and 500 puts `openlibrary` in `failed`.
+  - `[low]` `[patch]` (verification-gap) The "contact never written to a fixture" loop passes vacuously if no fixture is written — real; fixed directly by asserting the file count (2) before the loop.
+  - `[low]` `[patch]` (verification-gap) The adapter's "read at call time" comment overstates, since the gate is evaluated at module load — grouped with the edge-case comment finding and fixed.
+  - `[medium]` `[defer]` (intent alignment) The criterion names the literal array `[finna, google, openLibrary]`; the build makes membership conditional on `OPEN_LIBRARY_CONTACT`, so a clone without it runs two sources and the new source names and three-way order are unreachable — real, and a deliberate reading recorded in the spec and in AD-9. The test-parity half is fixed (the lane now pins a contact); whether a fresh environment should have Open Library at all is the owner's call, so it is deferred as a question, not a defect.
+  - `[low]` `[reject]` (intent alignment) The AD-9 edit is wider than the criterion asked, adding a general credential-gated-membership rule — the criterion asked for the spine to name the source and its order; the gating rule had to be recorded somewhere, and an unwritten contract would be worse than a written one.
+  - `[low]` `[reject]` (intent alignment) Behaviours the criterion calls fixture-verified are tested against hand-written bodies — a malformed body, a missing key and an HTTP 500 are states no recorded response exhibits; no test reaches the network either way, which is what the criterion protects.
+  - `[medium]` `[patch]` (intent alignment) The fan-out surface is edited only to stop existing tests 404-ing, with no assertion about a third source — same cause as the verification-gap finding; grouped and fixed.
+  - `[low]` `[reject]` (intent alignment) `getJson`'s signature widened for all sources with no test that the other two still send only `Accept` — the parameter defaults to `{}` and both adapters pass nothing; a test asserting an absent header restates config.
+  - `[low]` `[reject]` (intent alignment) The capture-script refactor is wider than "capture the new source" — the per-source search path and the report columns are required by the criterion; the options object replaced six positionals the third source would have forced.
 
 ## Design Notes
 
@@ -141,30 +189,41 @@ editions.isbn,editions.publisher,editions.publish_year,editions.physical_format
 
 Status: done
 
-**Implemented.** Open Library is the third source. `sources/index.ts` is `[finna, google, openLibrary]` when `OPEN_LIBRARY_CONTACT` is set and `[finna, google]` when it is not, so the source is never a dependency and every request that goes out carries `User-Agent: bookeh (<contact>)`. The adapter makes one request per lookup (`api/books?jscmd=data`) and one per search (`search.json`), sets no `coverUrl`, no `description` and no `language`, keeps `themes` empty and Open Library's subject names as `subjects`. `getJson` gained an optional headers argument; Finna and Google pass nothing. No merge, Answer, collection, migration or `COVER_HOSTS` change.
+**Implemented.** Open Library is the third metadata source. `sources/openLibrary.ts` implements the existing `Source` contract: one `GET /api/books?bibkeys=ISBN:<isbn13>&jscmd=data&format=json` per lookup (`{}` or another key gives `[]`; a non-object body, an HTTP error or a network failure gives `undefined`, logged), `year` from the first four-digit run of the free-form `publish_date`, `recordId` the edition key (`/books/OL32370247M`), `pages` from `number_of_pages` or the free-text `pagination`, the source's subject names as its `subjects`, `themes` left `[]` (FR-17a), author names passed through exactly as given with no `sortName`, and no `coverUrl` on either path. `search` reads `search.json` with an explicit `fields` list and builds hits from each work's **edition** docs — never the work-level `isbn` list, which mixes every edition of the work — one per distinct ISBN-13, capped at 20. Every request carries `User-Agent: bookeh (<contact>)`; Open Library joins `sources` only when `OPEN_LIBRARY_CONTACT` is set, so nothing unidentified is ever sent and dev, CI and a fresh deploy work without it.
 
-**Licence and terms of use** (checked 2026-11-03, `openlibrary.org/developers/api` and `/developers/licensing`):
+**Licence and terms** (openlibrary.org/developers/api and the Internet Archive's pages, checked 2026-11-03). The API is free and keyless, intended for "human-centered discovery" and not as "a data backend for third-party services"; bulk metadata is to come from the monthly dumps, not the API. Rate limits are 1 request per second unidentified and 3 identified, identification being a `User-Agent` naming the application and a contact. The Internet Archive "does not assert any new copyright or other proprietary rights over any of the material in the Open Library database", with a rights-issues caveat; the terms of service are archive.org's. A single-user self-hosted catalogue doing per-book lookups is squarely the intended use, so nothing here blocks it and no owner decision was needed.
 
-- **Data.** No licence is named for the API data. The licensing page states that the Internet Archive "does not assert any new copyright or other proprietary rights over any of the material in the Open Library database", with the caveat that "There may be existing rights issues on some contributions and in some jurisdictions". Terms of use are archive.org's site terms. Nothing forbids the use here: per-ISBN and per-query reads of bibliographic facts into a private catalogue, no redistribution.
-- **Rate limit.** 1 request per second for non-identified requests, 3 per second for "Identified requests (with `User-Agent` and `email`)". The page asks clients to "add a HEADER that specifies a `User-Agent` string with (a) the name of your application", example `User-Agent: MyLibraryApp (contact@example.org)` — hence `bookeh (<contact>)` on every request and the contact gate. bookeh makes at most one Open Library request per lookup or search, well inside either tier; `lookupSources` still owns the retry, cache and breaker.
-- **Bulk.** The page says bulk metadata should come from the monthly dumps, not the API. bookeh never bulk-reads; `npm run fixtures` captures one response per ISBN, once, about one per second.
-- **Covers.** `covers.openlibrary.org` answers `HTTP/2 302` (verified for `/b/id/11023404-L.jpg`), and AD-14 downloads with `redirect: 'error'`, so no cover URL is set and the host does not join `COVER_HOSTS`.
-
-**What it adds on the shelf** (`tests/fixtures/REPORT.md`, captured 2026-11-03): Open Library holds 7 of the 30 shelf ISBNs, against Finna's 30 and Google's 18 — the five Martin volumes, `9789511319177` (Taivaanpallo) and `9789523934870`. On two of those it fills a field neither of the other two gives: `subjects` for 9789511319177 (six English subject names) and `subtitle` for 9780007448036. Everything else it carries, Finna already has, so for this shelf it is a gap-filler, not a finder. Its search is worth more than its lookup: `tuntematon sotilas` yields 10 hits against Finna's 7 and `yuval noah harari` 20 against 18, with English editions Finna does not hold.
+**What Open Library adds.** It holds **7 of the 30 shelf ISBNs** (Finna 30, Google 18): the five Martin volumes, `9789511319177` and `9789523934870`. On **2** of those it fills a field neither other source gives — `subjects` for `9789511319177` and `subtitle` for `9780007448036` (`REPORT.md`, Totals). For this shelf it is a gap-filler, not a finder. Its search is the stronger half: 10 hits against Finna's 7 for `tuntematon sotilas`, 20 against 18 for `yuval noah harari`, including English editions Finna does not hold. The epic's "stop if it adds no fields the others have" condition is met, narrowly on the lookup side.
 
 **Files changed**
 
-- `src/lib/metadata/sources/openLibrary.ts` -- new adapter (urls, headers, `openLibraryResults`, `openLibrarySearchHits`, the `Source`).
-- `src/lib/metadata/sources/shared.ts` -- `getJson` takes optional headers, merged over `Accept`.
-- `src/lib/metadata/sources/index.ts` -- the third entry, gated on the contact.
-- `src/lib/metadata/source.ts` -- `SourceId` comment names `openlibrary`.
-- `messages/en.json`, `messages/fi.json` -- `sources.openlibrary`, `sourcesPartitive.openlibrary` (`Open Library` / `Open Librarya`).
-- `.env.example`, `deploy/README.md` -- `OPEN_LIBRARY_CONTACT` documented, empty.
-- `scripts/capture-fixtures.ts` -- Open Library in `SOURCES`, `SEARCH_SOURCES` and per-source search paths, per-request headers, an options object in place of the trailing positional arguments, and Open Library columns, totals, subjects and search rows in `REPORT.md`.
-- `tests/fixtures/openlibrary/` (33 new files), `tests/fixtures/google/9789515782755.json` (captured at last, Google was degraded before), `tests/fixtures/REPORT.md`.
-- `tests/unit/openLibrary.unit.spec.ts` (new), `tests/unit/captureFixtures.unit.spec.ts` (third source threaded through).
-- `ARCHITECTURE-SPINE.md` -- context diagram, AD-9 array order and the credential rule, `SourceId` comment.
-- `sprint-status.yaml` -- 8-12 done.
+- `src/lib/metadata/sources/openLibrary.ts` — the adapter (new).
+- `src/lib/metadata/sources/index.ts` — `[finna, google, openLibrary]`, Open Library entered only with a contact.
+- `src/lib/metadata/sources/shared.ts` — `getJson` takes optional `headers`, merged over `Accept`.
+- `src/lib/metadata/source.ts`, `ARCHITECTURE-SPINE.md` — the `SourceId` comment, the context diagram, AD-9's array order, the credential-gated-membership rule and the author-name exception.
+- `messages/en.json`, `messages/fi.json` — `sources.openlibrary`, `sourcesPartitive.openlibrary` (`Open Librarya`).
+- `.env.example`, `deploy/README.md` — `OPEN_LIBRARY_CONTACT` documented, empty.
+- `scripts/capture-fixtures.ts` — Open Library in `SOURCES`, `SEARCH_SOURCES`, per-source search-fixture paths, per-request headers, one secret-leak helper on both write paths, and its report columns, totals, subject tally and search rows.
+- `tests/fixtures/openlibrary/` — 30 lookup and 3 search responses; `tests/fixtures/google/9789515782755.json` captured at last; `REPORT.md` regenerated.
+- `vitest.setup.ts` — pins a test-only contact so the int lane runs the full fan-out in CI and locally alike.
+- `tests/unit/openLibrary.unit.spec.ts` (new), `tests/unit/captureFixtures.unit.spec.ts`, `tests/int/pickEdition.int.spec.ts`, `tests/int/saveCopy.int.spec.ts`, `tests/int/saveCopyAction.int.spec.ts` — the adapter's behaviour, the capture script's, and the fan-out's.
+- `_bmad-output/implementation-artifacts/sprint-status.yaml` — 8-12 done.
+
+**Review findings.** Four layers ran; 31 findings. **Patched (9 entries):** the int lane depending on the developer's `.env` so CI verified a two-source app while a configured machine verified three (medium, found by three layers independently); no assertion anywhere that Open Library's answer reaches an outcome (medium); the fixture secret-leak guard covering the lookup writes only while the search loop wrote unchecked (medium); `npm run fixtures` refusing to run without a contact and so making its own documented no-contact path unreachable; uncapped search hits (40 from 20 works) and a wrong parity comment; `pages` dropping `pagination`; the AD-9 author-name exception unrecorded; a shadowed `names` identifier; and a "read at call time" comment that overstated what setting the variable does, plus a vacuous assertion in the leak-guard loop. **Deferred (1, medium):** the criterion names the literal array `[finna, google, openLibrary]` while membership is gated on the contact, so a clone without it runs two sources — the owner's call, recorded in `deferred`. **Rejected (13):** three refuted against the recorded fixtures (`publish_date` is a string in all 30; no edition doc carries two distinct ISBN-13s or two `publish_year`s), the rest on convention or on harm that could not be named — generated report prose, a shared test helper "for later", a fix that would only edit this build's spec, a year guard that would diverge from Finna's identical rule, and a test asserting an absent header.
+
+**Follow-up review recommended: true.** Patched entries by verdict: high 0, medium 2, low 7. The named unverified risk: pinning the contact in `vitest.setup.ts` makes every int spec that reaches the sources responsible for stubbing `openlibrary.org`, and the three patched specs are the only ones doing so today — a spec added later that asks the sources without that stub will read a 404 as a source failure and flip `none` to `unavailable`, the same way this build did. Story 8.13 meets the same stubs for `hardcover.app`.
+
+**Verification** (re-run by the parent on the patched tree)
+
+- `npm run typecheck` — clean.
+- `npm run test:unit` — 1278 passed (91 files). `npm run test:int` — 710 passed (81 files), with the pinned contact in effect, so the three-source fan-out is what ran.
+- `npm run lint` — 0 errors (60 pre-existing migration warnings). `eslint` clean on every changed file.
+- `npx prettier --check` — clean on every changed file. `ARCHITECTURE-SPINE.md` and `deploy/README.md` are not Prettier-clean at the baseline commit either (verified against `29a561e`), so their formatting was left alone.
+- `npm run fixtures` — exit 0, no "not captured" line; byte-identical `REPORT.md` after the `pagination` fix.
+- Contact leak: `git grep` finds the address only in two older specs quoting `SEED_EMAIL`; no fixture, log line or committed file of this story carries it.
+- No Playwright walk: no screen was added or changed, so this project's walk rule does not apply.
+
+**Residual risks.** The gating decision above means the production deploy and a fresh clone can run different source arrays; the int lane no longer varies, but a human reading `sources` still has to check the environment. The three int specs' `openlibrary.org` stubs are the only ones that exist, as noted under the follow-up recommendation. The hand-written diff is about 900 lines excluding fixtures, over this project's ~500-line guideline: the capture script took roughly 300 of them because a third source forced the search-fixture layout and the report to become per-source, and splitting the story after the fact would not have made either half reviewable on its own.
 
 ## Verification
 

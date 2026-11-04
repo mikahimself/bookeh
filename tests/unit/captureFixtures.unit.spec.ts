@@ -114,11 +114,14 @@ describe('capture', () => {
     for (const [, init] of openLibraryCalls) {
       expect(init.headers).toMatchObject({ 'User-Agent': `bookeh (${CONTACT})` })
     }
-    // The contact is never written to a fixture.
-    for (const file of await readdir(join(dir, 'openlibrary'), { recursive: true })) {
-      if (file.endsWith('.json')) {
-        expect(await readFile(join(dir, 'openlibrary', file), 'utf8')).not.toContain(CONTACT)
-      }
+    // The contact is never written to a fixture. The count is asserted too, so the loop
+    // cannot pass by finding nothing if capture ever stops writing these fixtures.
+    const written = (await readdir(join(dir, 'openlibrary'), { recursive: true })).filter((file) =>
+      file.endsWith('.json'),
+    )
+    expect(written).toHaveLength(2)
+    for (const file of written) {
+      expect(await readFile(join(dir, 'openlibrary', file), 'utf8')).not.toContain(CONTACT)
     }
 
     const bare = await tempDir()
