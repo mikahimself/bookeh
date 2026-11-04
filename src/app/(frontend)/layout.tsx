@@ -1,24 +1,15 @@
 import type { Metadata, Viewport } from 'next'
 import { NextIntlClientProvider } from 'next-intl'
 import { getLocale, getTranslations } from 'next-intl/server'
-import localFont from 'next/font/local'
 import React from 'react'
+
+import { openSans } from '@/lib/fonts'
 
 import { NavigationTracker } from './components/navigation'
 import { ToastProvider } from './components/toast/ToastProvider'
 import { devicePrefs } from './prefs'
 import { ICONS, themeColorFor } from './pwa'
 import './styles.css'
-
-// Bundle Open Sans so builds do not depend on Google Fonts responses.
-// Publishes `--font-open-sans`; `styles.css` applies it.
-const openSans = localFont({
-  src: '../fonts/OpenSans-Variable.ttf',
-  weight: '300 800',
-  style: 'normal',
-  display: 'swap',
-  variable: '--font-open-sans',
-})
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations('app')

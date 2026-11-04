@@ -1,12 +1,12 @@
 import type { Metadata, Viewport } from 'next'
 import { headers } from 'next/headers'
-import { Open_Sans } from 'next/font/google'
 
 import { resolveLocale, type Locale } from '@/i18n/locale'
 
 import { TextLink } from './(frontend)/components/Link'
 import { devicePrefs } from './(frontend)/prefs'
 import { ICONS, themeColorFor } from './(frontend)/pwa'
+import { openSans } from '@/lib/fonts'
 import './(frontend)/styles.css'
 
 import en from '../../messages/en.json'
@@ -25,13 +25,6 @@ import fi from '../../messages/fi.json'
  * from the catalogues instead.
  */
 const messages: Record<Locale, typeof en> = { en, fi }
-
-// Publishes `--font-open-sans`; `styles.css` applies it.
-const openSans = Open_Sans({
-  subsets: ['latin'],
-  weight: ['300', '400', '600'],
-  variable: '--font-open-sans',
-})
 
 async function locale(): Promise<Locale> {
   return resolveLocale(undefined, (await headers()).get('accept-language'))

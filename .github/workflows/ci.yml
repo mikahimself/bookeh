@@ -99,13 +99,16 @@ jobs:
       # scripts/test-db.ts builds the empty bookeh_test from the committed
       # migrations; the int tests run on it with push off, the lane's default.
       - run: npm run test:int
+        id: integration-tests
       - run: npx playwright install --with-deps chromium
       # Its own `next dev` on bookeh_test (playwright.config.ts): migrate (a
       # no-op here), seed, then the fixture source with push off.
       - run: npm run test:e2e
       # A dev push writes a batch -1 row; there must be none, or push was on.
+      # Earlier failures can skip database setup; check only after the int lane
+      # was attempted, including failed tests, when its database should exist.
       - name: Check push stayed off
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() && steps.integration-tests.outcome != 'skipped' }}
         run: |
           pushes="$(docker exec ${{ job.services.postgres.id }} psql -U bookeh -d bookeh_test -tAc "select count(*) from payload_migrations where batch = -1")"
           if [ "$pushes" != "0" ]; then
