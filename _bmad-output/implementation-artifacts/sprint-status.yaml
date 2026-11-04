@@ -262,7 +262,7 @@ development_status:
   epic-9: in-progress
   9-17-k34-sequential-own-search-hydration: done
   9-18-k35-independent-search-and-answer-cover-previews: done
-  9-19-k36-production-kirjasampo-adapter-verification: backlog
+  9-19-k36-production-kirjasampo-adapter-verification: done
   9-1-g1-tags-collection-with-kinds: backlog
   9-2-g7-change-tags: backlog
   9-3-g8-rename-merge-and-delete-tags: backlog
@@ -987,9 +987,10 @@ action_items:
       fetch stub, asserting generated query and parsed work/themes, plus one request-failure
       case returning undefined (V1; Story 8.15). No live requests in tests."
     owner: "Mika"
-    status: open
+    status: done
     ref: "_bmad-output/implementation-artifacts/epic-8-retro-2026-11-04.md"
     story: '9.19'
+    resolution: '2026-11-04: Story 9.19 verifies production POST/query wiring and recorded Finnish work/themes plus rejected-request undefined behavior; all 9 offline focused tests and scoped ESLint passed.'
   - id: "epic-8-retro-item-83-record-deployed-phone-4g-latency"
     epic: 8
     action: "Record deployed phone-over-4G submit-to-Answer timings: held Book <=2

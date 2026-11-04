@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import { readFile } from 'node:fs/promises'
 
 import {
@@ -21,6 +21,8 @@ const literal = (value: string, language = 'fi') => ({
 const work = { type: 'uri', value: 'http://example.test/work/1' }
 
 describe('Kirjasampo enrichment', () => {
+  afterEach(() => vi.restoreAllMocks())
+
   it('queries all ISBN-13 and equivalent ISBN-10 hyphenations and language forms', () => {
     const variants = isbnVariants(ISBN)
     expect(variants).toHaveLength(4096 + 512)
@@ -79,10 +81,69 @@ describe('Kirjasampo enrichment', () => {
   })
 
   it('does not request an ISBN outside the Finnish prefix', async () => {
-    const fetchMock = vi.spyOn(globalThis, 'fetch')
+    const fetchMock = vi.spyOn(globalThis, 'fetch').mockRejectedValue(new Error('Unexpected request'))
     expect(await kirjasampo.lookupByIsbn('9780141439518')).toEqual([])
     expect(fetchMock).not.toHaveBeenCalled()
-    fetchMock.mockRestore()
+  })
+
+  it('requests and parses recorded Finnish enrichment through the production adapter', async () => {
+    const isbn13 = '9789520408053'
+    const response = await readFile(`tests/fixtures/kirjasampo/${isbn13}.json`, 'utf8')
+    const fetchMock = vi.spyOn(globalThis, 'fetch').mockResolvedValue(
+      new Response(response, { headers: { 'Content-Type': 'application/sparql-results+json' } }),
+    )
+
+    const result = await kirjasampo.lookupByIsbn(isbn13)
+
+    expect(fetchMock).toHaveBeenCalledTimes(1)
+    const [url, request] = fetchMock.mock.calls[0]
+    expect(url).toBe('https://ldf.fi/kirjasampo/sparql')
+    expect(request?.method).toBe('POST')
+    const headers = new Headers(request?.headers)
+    expect(headers.get('Accept')).toBe('application/sparql-results+json')
+    expect(headers.get('Content-Type')).toBe('application/x-www-form-urlencoded')
+    expect(request?.body).toBeInstanceOf(URLSearchParams)
+    const query = new URLSearchParams(request?.body as URLSearchParams).get('query')
+    for (const clause of [
+      'PREFIX schema: <http://schema.org/>',
+      'PREFIX kaunokki: <http://www.yso.fi/onto/kaunokki#>',
+      'PREFIX skos: <http://www.w3.org/2004/02/skos/core#>',
+      'SELECT DISTINCT ?work ?title ?theme ?description',
+      '"9789520408053"',
+      'VALUES ?isbnProperty { schema:isbn kaunokki:ISBN }',
+      '?work ?isbnProperty ?isbn .',
+      'OPTIONAL { ?work skos:prefLabel ?title . FILTER(LANG(?title) = "fi") }',
+      'OPTIONAL { ?work kaunokki:teema/skos:prefLabel ?theme . FILTER(LANG(?theme) = "fi") }',
+      'OPTIONAL { ?work kaunokki:kuvaus ?description . FILTER(LANG(?description) = "fi") }',
+    ]) {
+      expect(query).toContain(clause)
+    }
+    expect(result).toMatchObject([
+      {
+        isbn13,
+        source: 'kirjasampo',
+        recordId: 'http://data.kirjasampo.fi/abstractWork_4149488',
+        title: 'Ei enää Eddy',
+        themes: [
+          'erilaisuus',
+          'köyhyys',
+          'homoseksuaalisuus',
+          'identiteetti',
+          'kiusaaminen',
+          'omaelämäkerrallisuus',
+          'alkoholismi',
+          'ulkopuolisuus',
+          'kasvu',
+        ],
+      },
+    ])
+  })
+
+  it('returns undefined when the production adapter request fails', async () => {
+    const fetchMock = vi.spyOn(globalThis, 'fetch').mockRejectedValue(new Error('Network unavailable'))
+
+    expect(await kirjasampo.lookupByIsbn('9789520408053')).toBeUndefined()
+    expect(fetchMock).toHaveBeenCalledTimes(1)
   })
 
   it('reports malformed endpoint responses as failure', () => {
