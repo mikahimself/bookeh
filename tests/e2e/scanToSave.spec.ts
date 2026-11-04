@@ -45,7 +45,7 @@ test('scan to save, undo, save again', async ({ page, context, baseURL }) => {
 
   await enterIsbn(page)
   await expect(notInLibrary).toBeVisible()
-  await expect(page.getByText('From fixture', { exact: true })).toBeVisible()
+  await expect(page.getByText('From Finna', { exact: true })).toBeVisible()
   const cover = page.locator('img[src^="/data/cover/"]')
   await expect(cover).toBeVisible()
   // A number while pending too, so a miss reads as "0 > 0".

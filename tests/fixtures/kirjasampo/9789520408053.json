@@ -1,0 +1,158 @@
+{
+  "head": {
+    "vars": [
+      "work",
+      "title",
+      "theme",
+      "description"
+    ]
+  },
+  "results": {
+    "bindings": [
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://data.kirjasampo.fi/abstractWork_4149488"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Ei enää Eddy"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "erilaisuus"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://data.kirjasampo.fi/abstractWork_4149488"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Ei enää Eddy"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "köyhyys"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://data.kirjasampo.fi/abstractWork_4149488"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Ei enää Eddy"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "homoseksuaalisuus"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://data.kirjasampo.fi/abstractWork_4149488"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Ei enää Eddy"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "identiteetti"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://data.kirjasampo.fi/abstractWork_4149488"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Ei enää Eddy"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "kiusaaminen"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://data.kirjasampo.fi/abstractWork_4149488"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Ei enää Eddy"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "omaelämäkerrallisuus"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://data.kirjasampo.fi/abstractWork_4149488"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Ei enää Eddy"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "alkoholismi"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://data.kirjasampo.fi/abstractWork_4149488"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Ei enää Eddy"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "ulkopuolisuus"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://data.kirjasampo.fi/abstractWork_4149488"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Ei enää Eddy"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "kasvu"
+        }
+      }
+    ]
+  }
+}

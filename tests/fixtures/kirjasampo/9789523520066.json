@@ -1,0 +1,142 @@
+{
+  "head": {
+    "vars": [
+      "work",
+      "title",
+      "theme",
+      "description"
+    ]
+  },
+  "results": {
+    "bindings": [
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://seco.tkk.fi/saha3/ubd3679b1-137b-40ac-9bce-35b51362858a"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Täysin automatisoitu avaruushomoluksuskommunismi"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "yhteiskuntakritiikki"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://seco.tkk.fi/saha3/ubd3679b1-137b-40ac-9bce-35b51362858a"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Täysin automatisoitu avaruushomoluksuskommunismi"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "sairaus"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://seco.tkk.fi/saha3/ubd3679b1-137b-40ac-9bce-35b51362858a"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Täysin automatisoitu avaruushomoluksuskommunismi"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "työ"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://seco.tkk.fi/saha3/ubd3679b1-137b-40ac-9bce-35b51362858a"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Täysin automatisoitu avaruushomoluksuskommunismi"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "yhteiskunta"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://seco.tkk.fi/saha3/ubd3679b1-137b-40ac-9bce-35b51362858a"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Täysin automatisoitu avaruushomoluksuskommunismi"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "tulevaisuudenodotukset"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://seco.tkk.fi/saha3/ubd3679b1-137b-40ac-9bce-35b51362858a"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Täysin automatisoitu avaruushomoluksuskommunismi"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "politiikka"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://seco.tkk.fi/saha3/ubd3679b1-137b-40ac-9bce-35b51362858a"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Täysin automatisoitu avaruushomoluksuskommunismi"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "filosofia"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://seco.tkk.fi/saha3/ubd3679b1-137b-40ac-9bce-35b51362858a"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Täysin automatisoitu avaruushomoluksuskommunismi"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "yhteiskuntafilosofia"
+        }
+      }
+    ]
+  }
+}

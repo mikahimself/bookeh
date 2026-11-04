@@ -1,0 +1,110 @@
+{
+  "head": {
+    "vars": [
+      "work",
+      "title",
+      "theme",
+      "description"
+    ]
+  },
+  "results": {
+    "bindings": [
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://data.kirjasampo.fi/abstractWork_4479400"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Röyhkeys"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "konsertit"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://data.kirjasampo.fi/abstractWork_4479400"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Röyhkeys"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "irrallisuus"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://data.kirjasampo.fi/abstractWork_4479400"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Röyhkeys"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "odotus"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://data.kirjasampo.fi/abstractWork_4479400"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Röyhkeys"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "osallistuminen"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://data.kirjasampo.fi/abstractWork_4479400"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Röyhkeys"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "työvoimakoulutus"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://data.kirjasampo.fi/abstractWork_4479400"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Röyhkeys"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "kirjoittajakoulutus"
+        }
+      }
+    ]
+  }
+}

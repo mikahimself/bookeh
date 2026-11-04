@@ -8,6 +8,7 @@ import sharp from 'sharp'
 
 import type { Source, SourceResult } from '../source'
 import { finnaResults } from './finna'
+import { isbnVariants, kirjasampoResults } from './kirjasampo'
 import { compact, lookupFailed } from './shared'
 
 /** The environment the selection reads; `process.env` unless a test passes its own. */
@@ -57,7 +58,7 @@ async function readFixture(isbn13: string): Promise<unknown> {
 }
 
 export const fixture: Source = {
-  id: 'fixture',
+  id: 'finna',
   async lookupByIsbn(isbn13) {
     const body = await readFixture(isbn13)
     if (body === null) return []
@@ -66,10 +67,28 @@ export const fixture: Source = {
       compact({
         ...result,
         coverUrl: result.coverUrl ? `${fixtureOrigin()}/data/fixture-cover/${isbn13}` : undefined,
-        source: 'fixture',
-        raw: { fixture: result.raw.finna },
+        source: 'finna',
+        raw: { finna: result.raw.finna },
       }),
     )
+  },
+}
+
+/** Recorded Kirjasampo work data alongside the ordinary Finna fixture in the e2e lane. */
+export const fixtureKirjasampo: Source = {
+  id: 'kirjasampo',
+  enrichment: true,
+  async lookupByIsbn(isbn13) {
+    if (isbnVariants(isbn13).length === 0) return []
+    const file = path.resolve(process.cwd(), 'tests/fixtures/kirjasampo', `${isbn13}.json`)
+    let body: unknown
+    try {
+      body = JSON.parse(await fs.readFile(file, 'utf8')) as unknown
+    } catch (err) {
+      if (err instanceof Error && (err as NodeJS.ErrnoException).code === 'ENOENT') return []
+      return lookupFailed('Kirjasampo fixture', isbn13, 'fixture unreadable', { err })
+    }
+    return kirjasampoResults(body, isbn13)
   },
 }
 

@@ -1,0 +1,174 @@
+{
+  "head": {
+    "vars": [
+      "work",
+      "title",
+      "theme",
+      "description"
+    ]
+  },
+  "results": {
+    "bindings": [
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://data.kirjasampo.fi/abstractWork_4545100"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Taivaanpallo"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "uskonto ja uskonnot"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://data.kirjasampo.fi/abstractWork_4545100"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Taivaanpallo"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "uskonto (uskominen)"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://data.kirjasampo.fi/abstractWork_4545100"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Taivaanpallo"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "valtataistelu"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://data.kirjasampo.fi/abstractWork_4545100"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Taivaanpallo"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "ristiriidat"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://data.kirjasampo.fi/abstractWork_4545100"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Taivaanpallo"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "usko"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://data.kirjasampo.fi/abstractWork_4545100"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Taivaanpallo"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "tiede (ilmiöt)"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://data.kirjasampo.fi/abstractWork_4545100"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Taivaanpallo"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "merimatkat"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://data.kirjasampo.fi/abstractWork_4545100"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Taivaanpallo"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "sisäinen maailma"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://data.kirjasampo.fi/abstractWork_4545100"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Taivaanpallo"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "uuden ajan alku"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://data.kirjasampo.fi/abstractWork_4545100"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Taivaanpallo"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "järki"
+        }
+      }
+    ]
+  }
+}

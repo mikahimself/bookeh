@@ -1,0 +1,206 @@
+{
+  "head": {
+    "vars": [
+      "work",
+      "title",
+      "theme",
+      "description"
+    ]
+  },
+  "results": {
+    "bindings": [
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://www.yso.fi/onto/kaunokki#ateos_9638"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Ole luonani aina"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "ystävyys"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://www.yso.fi/onto/kaunokki#ateos_9638"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Ole luonani aina"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "salaisuudet"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://www.yso.fi/onto/kaunokki#ateos_9638"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Ole luonani aina"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "valheet"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://www.yso.fi/onto/kaunokki#ateos_9638"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Ole luonani aina"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "lapsuus"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://www.yso.fi/onto/kaunokki#ateos_9638"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Ole luonani aina"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "aikuistuminen"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://www.yso.fi/onto/kaunokki#ateos_9638"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Ole luonani aina"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "muistelu"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://www.yso.fi/onto/kaunokki#ateos_9638"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Ole luonani aina"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "muistot"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://www.yso.fi/onto/kaunokki#ateos_9638"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Ole luonani aina"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "ihmisarvo"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://www.yso.fi/onto/kaunokki#ateos_9638"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Ole luonani aina"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "kloonaus"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://www.yso.fi/onto/kaunokki#ateos_9638"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Ole luonani aina"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "kiusaaminen"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://www.yso.fi/onto/kaunokki#ateos_9638"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Ole luonani aina"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "eristys (tekniikka)"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://www.yso.fi/onto/kaunokki#ateos_9638"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Ole luonani aina"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "elimenluovutus"
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,110 @@
+{
+  "head": {
+    "vars": [
+      "work",
+      "title",
+      "theme",
+      "description"
+    ]
+  },
+  "results": {
+    "bindings": [
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://www.btj.fi/at_1591963"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Hytti nro 6 "
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "sovinismi"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://www.btj.fi/at_1591963"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Hytti nro 6 "
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "elämänhallinta"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://www.btj.fi/at_1591963"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Hytti nro 6 "
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "kansanelämä"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://www.btj.fi/at_1591963"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Hytti nro 6 "
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "totalitarismi"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://www.btj.fi/at_1591963"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Hytti nro 6 "
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "junamatkailu"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://www.btj.fi/at_1591963"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Hytti nro 6 "
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "sattuma"
+        }
+      }
+    ]
+  }
+}

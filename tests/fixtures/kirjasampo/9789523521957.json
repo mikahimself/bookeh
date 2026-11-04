@@ -1,0 +1,222 @@
+{
+  "head": {
+    "vars": [
+      "work",
+      "title",
+      "theme",
+      "description"
+    ]
+  },
+  "results": {
+    "bindings": [
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://seco.tkk.fi/saha3/uc21ad54e-7e40-49ac-9acd-ac087a2fd88c"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Mikä internetiä vaivaa?"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "kritiikki"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://seco.tkk.fi/saha3/uc21ad54e-7e40-49ac-9acd-ac087a2fd88c"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Mikä internetiä vaivaa?"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "filosofia"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://seco.tkk.fi/saha3/uc21ad54e-7e40-49ac-9acd-ac087a2fd88c"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Mikä internetiä vaivaa?"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "kapitalismi"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://seco.tkk.fi/saha3/uc21ad54e-7e40-49ac-9acd-ac087a2fd88c"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Mikä internetiä vaivaa?"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Internet"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://seco.tkk.fi/saha3/uc21ad54e-7e40-49ac-9acd-ac087a2fd88c"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Mikä internetiä vaivaa?"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "yhteiskuntafilosofia"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://seco.tkk.fi/saha3/uc21ad54e-7e40-49ac-9acd-ac087a2fd88c"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Mikä internetiä vaivaa?"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "ilmiöt"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://seco.tkk.fi/saha3/uc21ad54e-7e40-49ac-9acd-ac087a2fd88c"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Mikä internetiä vaivaa?"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "sosiaalinen media"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://seco.tkk.fi/saha3/uc21ad54e-7e40-49ac-9acd-ac087a2fd88c"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Mikä internetiä vaivaa?"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "meemit"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://seco.tkk.fi/saha3/uc21ad54e-7e40-49ac-9acd-ac087a2fd88c"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Mikä internetiä vaivaa?"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "työvoima"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://seco.tkk.fi/saha3/uc21ad54e-7e40-49ac-9acd-ac087a2fd88c"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Mikä internetiä vaivaa?"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "digitaaliset pelit"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://seco.tkk.fi/saha3/uc21ad54e-7e40-49ac-9acd-ac087a2fd88c"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Mikä internetiä vaivaa?"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "sosiologia"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://seco.tkk.fi/saha3/uc21ad54e-7e40-49ac-9acd-ac087a2fd88c"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Mikä internetiä vaivaa?"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "poliittinen filosofia"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://seco.tkk.fi/saha3/uc21ad54e-7e40-49ac-9acd-ac087a2fd88c"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Mikä internetiä vaivaa?"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "digitaalinen kulttuuri"
+        }
+      }
+    ]
+  }
+}

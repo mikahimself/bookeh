@@ -14,3 +14,6 @@ export const E2E_ISBN_TYPED = '978-952-403-569-9'
 export const E2E_SHOP_OWNED = '9789523520660'
 /** Ei enää Eddy: the shop check's wished-for book. */
 export const E2E_SHOP_WISHED = '9789520408053'
+
+/** Hytti nro 6: Finna edition plus Kirjasampo work themes. */
+export const E2E_KIRJASAMPO = '9789510397077'

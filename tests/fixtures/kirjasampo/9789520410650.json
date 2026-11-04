@@ -1,0 +1,94 @@
+{
+  "head": {
+    "vars": [
+      "work",
+      "title",
+      "theme",
+      "description"
+    ]
+  },
+  "results": {
+    "bindings": [
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://data.kirjasampo.fi/abstractWork_4436125"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Väkivallan historia"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "raiskaus"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://data.kirjasampo.fi/abstractWork_4436125"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Väkivallan historia"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "homoseksuaalisuus"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://data.kirjasampo.fi/abstractWork_4436125"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Väkivallan historia"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "omaelämäkerrallisuus"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://data.kirjasampo.fi/abstractWork_4436125"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Väkivallan historia"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "traumat"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://data.kirjasampo.fi/abstractWork_4436125"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Väkivallan historia"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "väkivalta"
+        }
+      }
+    ]
+  }
+}

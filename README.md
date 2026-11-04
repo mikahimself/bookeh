@@ -9,11 +9,15 @@ One PWA for web and phone, self-hosted and reachable over a tailnet.
 - Payload CMS 3 on Next.js, in TypeScript, with Postgres 16
 - A custom frontend in `src/app/(frontend)`; Payload admin at `/admin` as the back office
 - Tailwind CSS 4 and Base UI; `@zxing/browser` for scanning
-- Metadata from Finna, then Google Books
+- Metadata from Finna, Google Books, Open Library and Hardcover, with Finnish fiction themes from Kirjasampo
 - Docker Compose on one Proxmox LXC, with Tailscale for access
 
 Requirements, architecture and UX live under `_bmad-output/planning-artifacts/`;
 `CLAUDE.md` links them.
+
+Kirjasampo work metadata is provided by the Finnish Public Libraries and SeCo under
+[CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Its public dataset
+omits copyrighted back-cover synopses.
 
 ## Setup
 

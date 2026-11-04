@@ -1,0 +1,110 @@
+{
+  "head": {
+    "vars": [
+      "work",
+      "title",
+      "theme",
+      "description"
+    ]
+  },
+  "results": {
+    "bindings": [
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://data.kirjasampo.fi/abstractWork_6969300"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Patriarkaatti"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "ihmissuhteet"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://data.kirjasampo.fi/abstractWork_6969300"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Patriarkaatti"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "naisen asema"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://data.kirjasampo.fi/abstractWork_6969300"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Patriarkaatti"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "ristiriidat"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://data.kirjasampo.fi/abstractWork_6969300"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Patriarkaatti"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "yhteiskunta"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://data.kirjasampo.fi/abstractWork_6969300"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Patriarkaatti"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "naisviha"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://data.kirjasampo.fi/abstractWork_6969300"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Patriarkaatti"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "sukupuoli-identiteetti"
+        }
+      }
+    ]
+  }
+}

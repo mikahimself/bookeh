@@ -1,0 +1,142 @@
+{
+  "head": {
+    "vars": [
+      "work",
+      "title",
+      "theme",
+      "description"
+    ]
+  },
+  "results": {
+    "bindings": [
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://www.yso.fi/onto/kaunokki#ateos_10705"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Uhoan voimaa"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "yhteiskuntakritiikki"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://www.yso.fi/onto/kaunokki#ateos_10705"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Uhoan voimaa"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "nuorisokulttuuri"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://www.yso.fi/onto/kaunokki#ateos_10705"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Uhoan voimaa"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "ristiriidat"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://www.yso.fi/onto/kaunokki#ateos_10705"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Uhoan voimaa"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "elämäntapa"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://www.yso.fi/onto/kaunokki#ateos_10705"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Uhoan voimaa"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "omankädenoikeus"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://www.yso.fi/onto/kaunokki#ateos_10705"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Uhoan voimaa"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "seksuaalinen käyttäytyminen"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://www.yso.fi/onto/kaunokki#ateos_10705"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Uhoan voimaa"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "anarkismi"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://www.yso.fi/onto/kaunokki#ateos_10705"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Uhoan voimaa"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "kapinointi"
+        }
+      }
+    ]
+  }
+}

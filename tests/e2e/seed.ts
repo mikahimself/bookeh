@@ -13,6 +13,7 @@ import { assertTestDatabase } from '../helpers/testDatabase'
 import {
   E2E_EMAIL,
   E2E_ISBN,
+  E2E_KIRJASAMPO,
   E2E_LOCATION,
   E2E_PASSWORD,
   E2E_SHOP_OWNED,
@@ -62,7 +63,7 @@ await updateProfile(ctx, { defaultLocation: await resolveLocation(ctx, { create:
 // Earlier runs' Books of the ISBNs, so the Answer is again "Not in library" from the source.
 const { docs: books } = await payload.find({
   collection: 'books',
-  where: { isbn13: { in: [E2E_ISBN, E2E_SHOP_OWNED, E2E_SHOP_WISHED] } },
+  where: { isbn13: { in: [E2E_ISBN, E2E_SHOP_OWNED, E2E_SHOP_WISHED, E2E_KIRJASAMPO] } },
   pagination: false,
   ...system,
 })

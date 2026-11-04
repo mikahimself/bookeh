@@ -1,0 +1,174 @@
+{
+  "head": {
+    "vars": [
+      "work",
+      "title",
+      "theme",
+      "description"
+    ]
+  },
+  "results": {
+    "bindings": [
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://www.yso.fi/onto/kaunokki#ateos_12422"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Supernaiivi"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "matkat"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://www.yso.fi/onto/kaunokki#ateos_12422"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Supernaiivi"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "henkinen kasvu"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://www.yso.fi/onto/kaunokki#ateos_12422"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Supernaiivi"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "elämän tarkoitus"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://www.yso.fi/onto/kaunokki#ateos_12422"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Supernaiivi"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "aikuistuminen"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://www.yso.fi/onto/kaunokki#ateos_12422"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Supernaiivi"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "kriisit"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://www.yso.fi/onto/kaunokki#ateos_12422"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Supernaiivi"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "aikuisuus"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://www.yso.fi/onto/kaunokki#ateos_12422"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Supernaiivi"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "minäkuva"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://www.yso.fi/onto/kaunokki#ateos_12422"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Supernaiivi"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "identiteetti -- etsintä"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://www.yso.fi/onto/kaunokki#ateos_12422"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Supernaiivi"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "elämänodotukset"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://www.yso.fi/onto/kaunokki#ateos_12422"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Supernaiivi"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "naivismi"
+        }
+      }
+    ]
+  }
+}

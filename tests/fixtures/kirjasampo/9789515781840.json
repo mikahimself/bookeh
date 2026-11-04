@@ -1,0 +1,110 @@
+{
+  "head": {
+    "vars": [
+      "work",
+      "title",
+      "theme",
+      "description"
+    ]
+  },
+  "results": {
+    "bindings": [
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://www.yso.fi/onto/kaunokki#ateos_11921"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Käkimassaa"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "nuorisokulttuuri"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://www.yso.fi/onto/kaunokki#ateos_11921"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Käkimassaa"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "elämäntapa"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://www.yso.fi/onto/kaunokki#ateos_11921"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Käkimassaa"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "kolmiodraama (rakkaussuhde)"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://www.yso.fi/onto/kaunokki#ateos_11921"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Käkimassaa"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "kehitysmaat"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://www.yso.fi/onto/kaunokki#ateos_11921"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Käkimassaa"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "maailmankatsomus"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://www.yso.fi/onto/kaunokki#ateos_11921"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Käkimassaa"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "ideologiat"
+        }
+      }
+    ]
+  }
+}

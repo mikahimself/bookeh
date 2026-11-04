@@ -1,0 +1,126 @@
+{
+  "head": {
+    "vars": [
+      "work",
+      "title",
+      "theme",
+      "description"
+    ]
+  },
+  "results": {
+    "bindings": [
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://data.kirjasampo.fi/abstractWork_7249108"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Naisen taistelut ja muodonmuutokset"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "feminismi"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://data.kirjasampo.fi/abstractWork_7249108"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Naisen taistelut ja muodonmuutokset"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "elämänmuutokset"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://data.kirjasampo.fi/abstractWork_7249108"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Naisen taistelut ja muodonmuutokset"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "naisen asema"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://data.kirjasampo.fi/abstractWork_7249108"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Naisen taistelut ja muodonmuutokset"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "vapautuminen"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://data.kirjasampo.fi/abstractWork_7249108"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Naisen taistelut ja muodonmuutokset"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "muistot"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://data.kirjasampo.fi/abstractWork_7249108"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Naisen taistelut ja muodonmuutokset"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "omaelämäkerrallisuus"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://data.kirjasampo.fi/abstractWork_7249108"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Naisen taistelut ja muodonmuutokset"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "kaltoinkohtelu"
+        }
+      }
+    ]
+  }
+}

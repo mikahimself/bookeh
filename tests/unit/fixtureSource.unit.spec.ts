@@ -36,10 +36,10 @@ describe('fixture source', () => {
     expect(result).toMatchObject({
       isbn13: SAPIENS,
       title: 'Sapiens',
-      source: 'fixture',
+      source: 'finna',
       coverUrl: `http://localhost:3100/data/fixture-cover/${SAPIENS}`,
     })
-    expect(Object.keys(result!.raw)).toEqual(['fixture'])
+    expect(Object.keys(result!.raw)).toEqual(['finna'])
   })
 
   it('knows nothing of an ISBN without a fixture', async () => {

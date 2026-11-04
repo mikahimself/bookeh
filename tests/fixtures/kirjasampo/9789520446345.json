@@ -1,0 +1,158 @@
+{
+  "head": {
+    "vars": [
+      "work",
+      "title",
+      "theme",
+      "description"
+    ]
+  },
+  "results": {
+    "bindings": [
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://data.kirjasampo.fi/abstractWork_7324760"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Muutos"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "ihmissuhteet"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://data.kirjasampo.fi/abstractWork_7324760"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Muutos"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "arvot"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://data.kirjasampo.fi/abstractWork_7324760"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Muutos"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "muutto"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://data.kirjasampo.fi/abstractWork_7324760"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Muutos"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "elämänmuutokset"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://data.kirjasampo.fi/abstractWork_7324760"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Muutos"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "aikuistuminen"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://data.kirjasampo.fi/abstractWork_7324760"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Muutos"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "omaelämäkerrallisuus"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://data.kirjasampo.fi/abstractWork_7324760"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Muutos"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "asenteet"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://data.kirjasampo.fi/abstractWork_7324760"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Muutos"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "tavoitteet"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://data.kirjasampo.fi/abstractWork_7324760"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Muutos"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "keskiluokkaisuus"
+        }
+      }
+    ]
+  }
+}

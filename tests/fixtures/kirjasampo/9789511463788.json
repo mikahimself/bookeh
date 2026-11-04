@@ -1,0 +1,62 @@
+{
+  "head": {
+    "vars": [
+      "work",
+      "title",
+      "theme",
+      "description"
+    ]
+  },
+  "results": {
+    "bindings": [
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://data.kirjasampo.fi/abstractWork_7375773"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Erään kissan tutkimuksia"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "suru"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://data.kirjasampo.fi/abstractWork_7375773"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Erään kissan tutkimuksia"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "lapsettomuus"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://data.kirjasampo.fi/abstractWork_7375773"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Erään kissan tutkimuksia"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "keskenmeno"
+        }
+      }
+    ]
+  }
+}

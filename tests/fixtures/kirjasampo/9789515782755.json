@@ -1,0 +1,126 @@
+{
+  "head": {
+    "vars": [
+      "work",
+      "title",
+      "theme",
+      "description"
+    ]
+  },
+  "results": {
+    "bindings": [
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://www.yso.fi/onto/kaunokki#ateos_5270"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Oppi tulee idästä"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "pornografia"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://www.yso.fi/onto/kaunokki#ateos_5270"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Oppi tulee idästä"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "väkivalta"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://www.yso.fi/onto/kaunokki#ateos_5270"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Oppi tulee idästä"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "omankädenoikeus"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://www.yso.fi/onto/kaunokki#ateos_5270"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Oppi tulee idästä"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "seksuaalinen käyttäytyminen"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://www.yso.fi/onto/kaunokki#ateos_5270"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Oppi tulee idästä"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "ideologiat"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://www.yso.fi/onto/kaunokki#ateos_5270"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Oppi tulee idästä"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "luokkataistelu"
+        }
+      },
+      {
+        "work": {
+          "type": "uri",
+          "value": "http://www.yso.fi/onto/kaunokki#ateos_5270"
+        },
+        "title": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "Oppi tulee idästä"
+        },
+        "theme": {
+          "type": "literal",
+          "xml:lang": "fi",
+          "value": "anarkismi"
+        }
+      }
+    ]
+  }
+}
