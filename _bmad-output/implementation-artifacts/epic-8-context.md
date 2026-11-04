@@ -4,7 +4,7 @@
 
 ## Goal
 
-Make "do I already have this?" answerable in a shop, in seconds, with the whole truth. The Answer screen reaches its final form: one heading stating the first fact that applies (In library, Ordered, On wishlist, Not in library) and every remaining fact as its own line, so nothing the user already holds stays hidden. Lookup by title or author arrives for books with no readable barcode and for web-shop checks, showing what the user already has before anything from outside. The epic also closes the lookup contract: a Book without an ISBN opens its own Answer, "Add by hand" catches a search that finds nothing, an end-to-end test guards the whole check, the app gets its own not-found page, and three more metadata sources join behind the existing source contract — Open Library and Hardcover as ordinary sources, Kirjasampo as the first *enrichment* source, which can add to a found book but never name one.
+Make a shop check answer what the user already has before showing outside results. A scan or title/author search should show owned, ordered and wished copies, allow an unknown book to be added by hand, and enrich new Books with metadata from Finna, Google Books, Open Library and Hardcover. Kirjasampo later contributes themes and descriptions without naming a Book on its own.
 
 ## Stories
 
@@ -17,7 +17,7 @@ Make "do I already have this?" answerable in a shop, in seconds, with the whole 
 - Story 8.7: Look up a Book without an ISBN
 - Story 8.8: Lookup by title or author
 - Story 8.9: Add by hand from Lookup
-- Story 8.10: End-to-end: shop check
+- Story 8.10: End-to-end shop check
 - Story 8.11: Page not found
 - Story 8.12: Open Library source
 - Story 8.13: Hardcover source
@@ -26,43 +26,27 @@ Make "do I already have this?" answerable in a shop, in seconds, with the whole 
 
 ## Requirements & Constraints
 
-- **The Answer states every fact.** The heading is the first that applies; all other facts — each copy with its location and lent marker, each ordered copy, each open wishlist entry — appear as lines. A Book held only through open entries (the user's own or made for a Person) reads as On wishlist, replacing the stopgap Epic 7 left behind.
-- **Search covers the user's own holdings first, then the outside sources, and never the rest of the shared catalogue.** Own results come only from the viewer's copies and open entries; a two-user test must prove another user's holdings never leak.
-- **Shop-check speed is measured, not assumed:** on a phone over 4G, scan to Answer within 2 s for a Book already held and 5 s when it comes from a source. Measure when the Answer lands and again once the new sources are in, since a lookup waits for its slowest source; record the figures in the story notes.
-- **A scan never resets silently** — every finished lookup ends on an Answer or back on Scan with a stated error code.
-- **Nothing found is still a path in:** the typed text carries into the Not found Answer, and both Add to library and Add to wishlist save a private Book without an ISBN.
-- **A new source must never become a dependency.** A source whose credential is absent is left out of the source array entirely, so development, CI and a fresh deploy work without it and the partial line never names it; credentials stay server-side, are never logged, and are documented in the example env file and the deploy notes.
-- **Licence and terms come before code** for any new third-party data source: confirm them in the story notes first and stop for the owner's decision if they do not permit the use — likewise if a new source turns out to add no fields the existing ones already have.
+- The Answer chooses its heading in order: In library, Ordered, On wishlist, Not in library. It still lists every applicable copy and open wishlist entry, including location and lent state. A lookup completes on an Answer or returns to Scan with a stated error.
+- Search shows the viewer's holdings before outside sources. Own-library search reads only the viewer's visible copies and open entries, never the shared catalogue or another user's holdings. Search hits distinguish editions with binding, year and publisher.
+- On a phone over 4G, scan to Answer should take at most 2 seconds for a held Book and 5 seconds for a source result. Measure again after adding sources because the slowest source sets lookup latency.
+- A missing source credential leaves that source out of the array and out of partial-result wording. Credentials remain on the server, out of logs and committed files. Confirm a new source's licence and terms before implementing it; if use is not permitted, or the source contributes no missing fields, stop for the owner's decision.
+- Tests use recorded external responses, never live requests. Include a Finnish ISBN and a missing ISBN in each source's capture. The browser never loads a remote source cover directly.
 
 ## Technical Decisions
 
-- **Lookup writes nothing to the database.** The metadata module owns the source contract, the per-source parallel fan-out, merging, the process cache and the circuit breaker. The catalogue module owns the entry points: lookup by ISBN or by Book id, and text search. Its search entry point is the only caller of the search fan-out, and so the only path to a source's `search()`.
-- **One source contract.** A source exposes an id, `lookupByIsbn` returning records best-first (`[]` for "answered, none", `undefined` for failure) and optionally `search`. Nothing throws to the caller; failures are logged. A new source is one adapter file plus one array entry, no schema change. Merging builds one candidate per record of the **first source with records** and gap-fills field by field in array order, so **Finna always wins** over Google Books, Open Library and Hardcover for any shared field; a candidate's `source`/`recordId` come from that first source and are never gap-filled.
-- **Lookup outcomes are three:** found (candidates best-first, raw metadata, the sources that failed), none, unavailable. A merge made while a source failed is cached only briefly so the save after the Answer uses the outcome the Answer showed; unavailable is never cached.
-- **Enrichment is a new flag on the contract.** An enrichment source is asked in parallel under the same timeout and breaker but can never be a candidate's first source: no edition field, id or title comes from it, a record from it alone is not a found outcome, and its failure stays out of the partial-line/unavailable machinery and never shortens a cache lifetime. Its themes union onto the others' (order preserved, case-insensitive de-dup), its description gap-fills last, its raw response is kept under its id, and its subjects deliberately stay out of genre mapping. The re-fetch rule holds: empty fields only, no backfill job.
-- **Search hits are a narrower shape than a lookup result** — ISBN-13, title, authors, publisher, year, binding, source, plus the source's own cover URL, which stays server-side; what reaches the client replaces that URL with a "has a cover" flag. Sources are asked in parallel under the same per-source timeout as a lookup, but with neither the cache nor the breaker, since `search` has no failure signal: a timeout or rejection is logged and that source simply contributes nothing. Merge in source order, one hit per ISBN-13, gap-fill a kept hit's missing cover URL from a later source's hit for the same ISBN, drop records without an ISBN. Blank text asks no source and counts nothing; otherwise a search counts one lookup against the shared rate limit. Binding is display-only, never stored.
-- **Own-library search is a shelf query**, not a catalogue scan: over the viewer's visible copies plus a visible-entries fragment mirroring them, on effective (override-aware) values, one row per Book, author-ascending, capped, hydrated through the effective-Book and holdings readers.
-- **Holdings have one reader** shared by the Answer, Book detail, shelf rows and Lookup results. The heading-and-lines function over it is pure and carries no wording.
-- **A `{ bookId }` lookup target from a client is always gated** by the own-book check (a copy or an open entry of that Book), answers with the viewer's holdings, never calls the sources and counts nothing against the rate limit; it renders at the scan route with a `book` search param. An ISBN target is taken as entered and normalised, with an edition `pick` param.
-- **Rate limiting is shared** across lookup, search, re-fetch, Look it up again, Try again, saves that ask the sources, and cover previews — one per-user in-process limit, surfaced as a wait message.
-- **The browser never loads a cover from a source.** A search records each hit's cover URL server-side so the authenticated cover route can preview it by ISBN; the handler never takes a URL from the client. Cover downloads refuse redirects, so a source whose cover URLs redirect sets no cover URL and its host does not join the allowed hosts.
-- **Fixtures, not the network.** Every source test runs against responses recorded through the fixtures script, including a Finnish ISBN and one the source does not hold. The end-to-end test uses the fixture source, which joins the source array only under its env flag and is refused in production.
-- **Spine updates ship in the same commit:** the source list and array order, the `Source` and result-shape comments, the context diagram, and the Routes row for the not-found page.
+- Metadata lookup and search write nothing. Sources share `id`, `lookupByIsbn` and optional `search`: ISBN lookup returns records best first, `[]` for an answered miss and `undefined` for failure; neither method throws to its caller. Lookup fans out in parallel with per-source timeouts and a breaker. A failure must not become a false “not found.”
+- Merge makes one candidate for each record from the first source with records and fills its empty fields from later sources in priority order. The first source's `source` and `recordId` stay attached to that candidate. The intended order is Finna, Google Books, Open Library, Hardcover; a source with no credential is absent. A Book already shared for an ISBN wins before any source query.
+- Search fans out only to sources with `search`, then merges in source order to one hit per ISBN-13. It can fill a kept hit's missing cover from a later hit; failures contribute no hits. Nonblank search shares the per-user lookup limit. Cover URLs remain server-side, and an authenticated preview route serves allowed HTTPS hosts without following redirects.
+- A Book without an ISBN can open its Answer by Book id only after an own-book gate; that path asks no metadata source. For a source answer with several editions, the Answer chooses a candidate by index and the save uses the server-held candidate, never client-supplied metadata.
+- An enrichment source contributes themes and a missing description only. It cannot supply an edition identity, title or found outcome, and its failure cannot turn lookup unavailable. Source themes union in order with case-insensitive deduplication; re-fetch fills only empty saved fields.
 
 ## UX & Interaction Patterns
 
-- **Answer buttons per heading:** In library offers Open book, Add another copy and Back (Back primary); Ordered offers Back only, with a Received link on each ordered copy's line that makes that copy owned at the default location with a "Saved to {location} · Undo" toast; On wishlist offers Add to library (primary) and Back, and adding closes the user's own open entries for that Book; Not in library keeps Add to wishlist and Add to library.
-- **Lookup screen:** one field for title or author, searched on Go (not as you type), with the progress line while it runs. Results in two groups — "In your library", then "Elsewhere" — each row showing cover, title, author and binding · year · publisher so editions of one title can be told apart; placeholder where a cover cannot be served. A lent copy in the own group shows the lent marker with the borrower. Tapping a result opens its Answer; Back returns to the results. Rate limiting shows "Too many lookups. Wait a moment." Nothing found shows "Nothing found" plus "Add by hand", which opens the Not found Answer with the typed text in the title field.
-- **Scan, Lookup and Answer are one full-screen task:** X leaves it entirely, Back steps back one level, each new Answer replaces the previous history entry. On wide screens the column stays no wider than a phone screen.
-- **Not-found page:** frontend layout, design tokens, both themes, terse voice — one heading and a single link back to the collection. No user data, no service call, identical signed out, both languages, accessibility floor (one `h1`, keyboard-reachable focus-visible link). Screens that already handle a missing or foreign id keep their behaviour, and the Payload admin keeps its own.
-- Author names from a source pass through as given; a name in the wrong order is corrected on the edit screen, never guessed at in an adapter.
+- Scan and Lookup form one full-screen task. Lookup searches on Go and groups results as “In your library” then “Elsewhere”; each row opens its Answer, and Back returns to the results. Empty results offer Add by hand with the typed title carried into the Not found Answer.
+- In library offers Open book and Add another copy; Ordered offers Back and a Received action per ordered copy; On wishlist offers Add to library and Back. Not in library offers Add to library and Add to wishlist.
+- An unknown frontend address uses the app's own accessible, localised not-found page with a link to the collection and no user data.
 
 ## Cross-Story Dependencies
 
-- Story 8.1's heading-and-lines function underpins 8.2's Answer and the Lookup result rows.
-- Story 8.8's Lookup page needs both halves of search — own holdings (8.6) and across-sources (8.5) — which in turn needs the Finna and Google Books search methods (8.3, 8.4). Story 8.9 hangs off 8.8's empty state, reusing the title-prefilled Not found Answer from Epic 3.
-- Story 8.7 (landed) supplies the `{ bookId }` lookup target and `?book=` Answer that Lookup results for a Book without an ISBN depend on (8.8).
-- Story 8.2 depends on Epic 7's entry-closing behaviour and supersedes Epic 7's stopgap Answer for Books held only through entries.
-- Stories 8.12 and 8.13 are new sources against the existing contract; 8.14 extends that contract with the enrichment flag and must land before 8.15, its only consumer. Story 8.15 re-measures the speed target 8.2 first measured, because the slowest source sets it.
-- Story 8.10's end-to-end test exercises 8.2's flows together with Epic 7's wishlist actions, against a fixture source and hand-entered ISBNs, with no network call outside the app.
-- Epic 9 later builds tags, user genres and themes on top of the themes this epic begins filling.
+- Story 8.8 uses own-book search (8.6) and cross-source search (8.5), which in turn uses Finna and Google search (8.3–8.4). Story 8.9 uses 8.8's empty result and the existing manual-book Answer. Story 8.7 supplies the Book-id Answer path for ISBN-free results.
+- Open Library (8.12) precedes Hardcover (8.13) in source order. Enrichment contract changes (8.14) precede Kirjasampo (8.15). Story 8.15 remeasures lookup speed after the new sources are present.
