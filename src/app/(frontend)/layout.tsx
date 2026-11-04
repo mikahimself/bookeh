@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from 'next'
 import { NextIntlClientProvider } from 'next-intl'
 import { getLocale, getTranslations } from 'next-intl/server'
-import { Open_Sans } from 'next/font/google'
+import localFont from 'next/font/local'
 import React from 'react'
 
 import { NavigationTracker } from './components/navigation'
@@ -10,11 +10,13 @@ import { devicePrefs } from './prefs'
 import { ICONS, themeColorFor } from './pwa'
 import './styles.css'
 
+// Bundle Open Sans so builds do not depend on Google Fonts responses.
 // Publishes `--font-open-sans`; `styles.css` applies it.
-const openSans = Open_Sans({
-  subsets: ['latin'],
-  // 600 only for the Cover title, where Trebuchet MS is missing.
-  weight: ['300', '400', '600'],
+const openSans = localFont({
+  src: '../fonts/OpenSans-Variable.ttf',
+  weight: '300 800',
+  style: 'normal',
+  display: 'swap',
   variable: '--font-open-sans',
 })
 
