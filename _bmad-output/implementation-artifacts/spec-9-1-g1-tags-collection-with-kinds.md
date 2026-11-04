@@ -62,6 +62,24 @@ deferred: []
 
 ## Review Triage Log
 
+### 2026-11-04 — Review pass
+- verdicts: 14 findings — high 0, medium 2, low 0, false 12, maybe-false 0
+- findings:
+  - `[medium]` `[patch]` Blind hunter: rollback leaves targetless relationship rows — deleting both tables' rows with nonnull tags_id before dropping columns fixes the demonstrated residual rows; the populated down/up regression now checks cleanup and unrelated-row preservation.
+  - `[false]` `[reject]` Blind hunter: missing kind-change uniqueness test — the same Postgres (owner, kind, nameKey) unique index guards creates and every update, independent of which indexed column changes; existing tests exercise uniqueness failures on both operations. No uncovered implementation failure was shown.
+  - `[false]` `[reject]` Blind hunter: relationship fixtures only use tag kind — ownedRelation validates readable IDs without filtering kind; the required select permits all three kinds and tests successfully create genre and theme labels. No criterion requires a separate test of each equivalent relationship input.
+  - `[false]` `[reject]` Blind hunter: missing nonexistent/deleted-ID cases — readableTargets counts every target and rejects whenever the count differs; Payload's built-in relationship validation runs first. The existing foreign-ID case proves the stricter ownership boundary; no new missing-ID behavior was introduced.
+  - `[false]` `[reject]` Blind hunter: omitted tags and unrelated updates untested — the pre-existing user-books cases in this same passing suite create rows without tags and update other fields; the optional relationship has no default or mutation hook capable of clearing omitted assignments.
+  - `[false]` `[reject]` Blind hunter: missing populated owner-cascade test — AD-19's declared schema hook and the generated migration both use cascade, confirmed against the database. The shared policy unit tests and schema-drift check cover the rule; no broken cascade or new application delete behavior was demonstrated.
+  - `[false]` `[reject]` Blind hunter: missing assigned-label delete test — the relationship-table foreign key cascades on tags deletion while its parent key points to user_books; deleting a tag cannot cascade backwards to the parent or sibling label. Inspected SQL and schema match that direction.
+  - `[false]` `[reject]` Blind hunter: serial uniqueness checks do not prove database enforcement — the migration creates an actual unique Postgres index, also confirmed by direct database inspection and migration schema comparison. Concurrency cannot bypass it; an additional concurrent call sequence would duplicate the same invariant.
+  - `[false]` `[reject]` Blind hunter: absent accent-distinction case — shared toNameKey uses NFC, whitespace collapse and lowercase only, with no accent-folding operation. No implementation change to normalization exists here; existing decomposed-accent coverage exercises the relevant reuse.
+  - `[false]` `[reject]` Blind hunter: in-review spec and done sprint disagree — the review snapshot necessarily precedes terminal finalization. Finalization synchronizes both and records this triage; a request solely to edit this build's spec is rejected by the workflow.
+  - `[medium]` `[patch]` Verification-gap reviewer: migration rollback has no automated regression — added tagsMigration.int.spec.ts using the established transaction/rollback pattern, asserting removed table/columns/enum, removal of populated tag relations, preservation of unrelated relations, and successful reapplication. It ran and passed.
+  - `[false]` `[reject]` Intent auditor: browser classification surfaces are absent under a broader reading — the numbered 9.1 acceptance criteria end at the collection boundary; stories 9.2–9.9 expressly supply services, filters, pickers and Settings. The collection-level reading matches the invoked story.
+  - `[false]` `[reject]` Intent auditor: sole-writer service is unchanged — 9.1 adds the collection/relationship and requires a foreign-ID access test; the existing application service remains unchanged and the tests intentionally exercise Payload's access boundary. Service mutation work belongs to 9.2.
+  - `[false]` `[reject]` Intent auditor: context refresh includes other Epic 9 guidance — step-01 mandates recompiling stale epic context from planning documents. These are distilled existing requirements for later stories, not untested executable changes or additions to 9.1 scope.
+
 ## Verification
 
 **Commands:**
@@ -79,3 +97,34 @@ deferred: []
 - Direct inspection of `bookeh_test` confirmed `tags_owner_id_users_id_fk` and `user_books_rels_tags_fk` cascade, and `owner_kind_nameKey_idx` is unique over `(owner_id, kind, name_key)`. Executed migration down then up within a rolled-back transaction successfully, preserving test data.
 
 **Residual risks:** No known incomplete scope. Development database was not changed. Existing `upsertUserBook` implementation and spine contract are unchanged.
+
+
+## Auto Run Result
+
+Status: done
+
+Implemented private `tags` for tag/genre/theme classification with normalized per-owner/per-kind uniqueness and validated `user-books.tags` ownership for every role, including admin.
+
+Files changed:
+- `src/collections/Tags.ts`: owner-only label model and compound unique index.
+- `src/collections/UserBooks.ts`: has-many owned tags relationship.
+- `src/collections/foreignKeys.ts`: owner cascade policy for tags.
+- `src/payload.config.ts`, `src/payload-types.ts`: collection registration and generated types.
+- `src/migrations/20261104_151042_tags.ts`, its JSON snapshot, and `src/migrations/index.ts`: registered schema migration and clean rollback.
+- `tests/int/tags.int.spec.ts`, `tests/int/userBooks.int.spec.ts`: normalization, uniqueness, privacy and relationship ownership coverage.
+- `tests/int/tagsMigration.int.spec.ts`: populated down/up rollback regression.
+- `epic-9-context.md`, this spec, and `sprint-status.yaml`: refreshed required planning context, run evidence and completed story status.
+
+Review: four layers completed. Two medium patch entries applied; zero deferrals; twelve findings rejected with individual evidence above. Patched counts: high 0, medium 2, low 0. Follow-up review recommended: false; populated rollback, schema comparison and access checks now verify the identified risks, with no specific unverified residual risk to name.
+
+Final verification after review patches:
+- `npm run generate:types`: passed.
+- `npm run test:int -- tests/int/tags.int.spec.ts tests/int/userBooks.int.spec.ts tests/int/tagsMigration.int.spec.ts tests/int/migrationSchema.int.spec.ts`: 4 files, 15 tests passed on migrated bookeh_test with push disabled. Schema matches the Payload configuration.
+- `npm run typecheck`: passed.
+- Scoped ESLint including the migration regression test: passed.
+- `git diff --check`: passed.
+- Earlier schema-policy and migration-registry unit tests: 3 passed.
+
+No product screen changed, so no Playwright walk applies. Development database unchanged; migration/application verification used bookeh_test. No known incomplete scope. No push performed.
+
+Implementation revisions: `06aed5876ed97afaca7fc529bd58b0b4c50c43e8`; review patch revision: `b24438c9de0669b02cf1c3ce61c06e14dad3d937`.
