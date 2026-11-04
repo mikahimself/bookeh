@@ -3,7 +3,7 @@ title: '8.12 [I13] Open Library source'
 type: 'feature'
 created: '2026-11-03'
 baseline_revision: '29a561e8f3086fa32b527acd666277d0ec3bff3f'
-status: 'done'
+status: 'in-review'
 review_loop_iteration: 0
 followup_review_recommended: false
 context:
@@ -111,6 +111,18 @@ deferred: []
 ## Spec Change Log
 
 ## Review Triage Log
+
+Round 1 (coordinator review), 9 findings, all patched:
+
+- `[patch]` The int lane read the developer's `.env`, so `sources` had two entries in CI and three on a configured machine -- `vitest.setup.ts` now pins `OPEN_LIBRARY_CONTACT=int-tests@bookeh.invalid` beside the `MEDIA_DIR` and `SEED_*` handling, so the lane always exercises the three-source fan-out.
+- `[patch]` Nothing asserted how Open Library's answer reaches an outcome -- one case in `saveCopyAction.int.spec.ts`, in the file's hostname-stub style, over the real `lookupSources`: `{}` keeps the outcome (`none`), a 500 makes it `unavailable` with `failed: ['openlibrary']`.
+- `[patch]` The capture script's secret check guarded the per-ISBN write only -- extracted as `leaks()` and run on the search write too.
+- `[patch]` `main()` refused to run without a contact, making `capture()`'s `noContact` branch unreachable and blocking Finna/Google capture -- it now warns and proceeds, Open Library reported as not captured.
+- `[patch]` The new module-level `names()` was shadowed by `buildReport`'s own `const names` -- renamed `subjectNames`.
+- `[patch]` `limit=20` caps works, not hits (`yuval noah harari` gives 40 edition ISBNs from 20 works) -- the hits are capped at `MAX_RESULTS` after parsing and the comment corrected.
+- `[patch]` `pages` ignored `pagination`, dropping a field this source exists to gap-fill (`9780007466061` has `pagination: "690p."` and no `number_of_pages`) -- it now falls back to the first number in `pagination`.
+- `[patch]` The comment on `openLibraryContact` claimed call-time reading although `sources` is built once at module load -- corrected.
+- `[patch]` AD-9's "Given Family"/`sortName` rule had an unrecorded exception -- AD-9 now names it: a source that states no form and no order (Open Library) is passed through as given, with the edit screen as the correction path.
 
 ## Design Notes
 

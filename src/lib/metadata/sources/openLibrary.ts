@@ -23,7 +23,10 @@ type Env = Readonly<Record<string, string | undefined>>
 const LABEL = 'Open Library'
 const ORIGIN = 'https://openlibrary.org'
 
-/** One screen of Lookup results per source, as Google Books uses. */
+/**
+ * One screen of Lookup results per source. `limit` caps the *works* `search.json` returns,
+ * and one work can carry many editions, so the hits are capped again after parsing.
+ */
 const MAX_RESULTS = 20
 
 /** The `search.json` fields asked for: the work, plus the edition docs a hit is built from. */
@@ -41,9 +44,10 @@ export const OPEN_LIBRARY_FIELDS = [
 ] as const
 
 /**
- * The contact Open Library asks every client to identify itself with, read at call time.
- * Unset, the source is left out of `sources/index.ts` entirely (never a dependency), so
- * every request that does go out is identified.
+ * The contact Open Library asks every client to identify itself with. Unset, the source is
+ * left out of `sources/index.ts` entirely (never a dependency), so every request that does
+ * go out is identified. `sources` is built once at module load, so setting the variable in a
+ * running server does not add the source until the process restarts.
  */
 export function openLibraryContact(env: Env = process.env): string | undefined {
   return env.OPEN_LIBRARY_CONTACT?.trim() || undefined
@@ -94,8 +98,15 @@ function year(value: unknown): number | undefined {
   return digits ? Number(digits[0]) : undefined
 }
 
-function pages(value: unknown): number | undefined {
-  return typeof value === 'number' && Number.isInteger(value) && value > 0 ? value : undefined
+/**
+ * `number_of_pages`, or the first number of the free-text `pagination` when that is all the
+ * record has (`"690p."` for 9780007466061) — pages is a field this source exists to gap-fill.
+ */
+function pages(value: unknown, pagination: unknown): number | undefined {
+  if (typeof value === 'number' && Number.isInteger(value) && value > 0) return value
+  const digits = /\d+/.exec(clean(pagination) ?? '')
+  const count = digits ? Number(digits[0]) : 0
+  return count > 0 ? count : undefined
 }
 
 /**
@@ -114,7 +125,7 @@ function toResult(entry: Json, isbn13: string, body: unknown): SourceResult | un
     authors: named(entry.authors).map((name) => ({ name })),
     publisher: named(entry.publishers)[0],
     year: year(entry.publish_date),
-    pages: pages(entry.number_of_pages),
+    pages: pages(entry.number_of_pages, entry.pagination),
     subjects: named(entry.subjects),
     themes: [],
     source: 'openlibrary',
@@ -190,6 +201,7 @@ export function openLibrarySearchHits(body: unknown, query: string): SearchHit[]
     ].map((name) => ({ name }))
     for (const edition of editions(work)) {
       for (const hit of toHits(edition, work, authors)) {
+        if (hits.size >= MAX_RESULTS) return [...hits.values()]
         if (!hits.has(hit.isbn13)) hits.set(hit.isbn13, hit)
       }
     }

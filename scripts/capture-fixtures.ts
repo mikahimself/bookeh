@@ -246,11 +246,13 @@ export async function capture(
   const notCaptured: NotCaptured[] = []
   const openLibrary = openLibraryHeaders({ OPEN_LIBRARY_CONTACT: contact })
   const noContact = contact ? null : 'OPEN_LIBRARY_CONTACT is not set'
-  /** The secrets that must never reach a fixture file. */
+  /** The secrets that must never reach a fixture file, on either write path. */
   const secrets: [string, string][] = [
     [googleKey, 'the API key'],
     [contact, 'the contact'],
   ]
+  const leaks = (text: string): string | undefined =>
+    secrets.find(([secret]) => secret && text.includes(secret))?.[1]
   const writtenGoogle: string[] = []
   let requests = 0
   let written = 0
@@ -281,9 +283,9 @@ export async function capture(
         continue
       }
       const text = `${JSON.stringify(result.body, null, 2)}\n`
-      const leak = secrets.find(([secret]) => secret && text.includes(secret))
+      const leak = leaks(text)
       if (leak) {
-        notCaptured.push({ source, isbn13, reason: `response contains ${leak[1]}` })
+        notCaptured.push({ source, isbn13, reason: `response contains ${leak}` })
         continue
       }
       await writeFile(path, text)
@@ -314,8 +316,14 @@ export async function capture(
       if (!result.ok) {
         notCaptured.push({ source, isbn13: '', query, reason: result.reason })
       } else {
-        await writeFile(path, `${JSON.stringify(result.body, null, 2)}\n`)
-        written++
+        const text = `${JSON.stringify(result.body, null, 2)}\n`
+        const leak = leaks(text)
+        if (leak) {
+          notCaptured.push({ source, isbn13: '', query, reason: `response contains ${leak}` })
+        } else {
+          await writeFile(path, text)
+          written++
+        }
       }
       await sleepFn(REQUEST_GAP_MS)
     }
@@ -377,7 +385,7 @@ export function openLibraryMatches(body: unknown, isbn13: string): Json[] {
 }
 
 /** `[{ name }]` entries with a name, as the adapter reads them. */
-function names(value: unknown): string[] {
+function subjectNames(value: unknown): string[] {
   return list(value)
     .filter(isObject)
     .map((entry) => entry.name)
@@ -502,7 +510,7 @@ async function buildRow(dir: string, entry: ListedIsbn): Promise<Row> {
     categories: unique(google.flatMap((i) => strings(volumeInfo(i).categories))),
     subjects: unique(finna.flatMap(finnaSubjects)),
     genres: unique(finna.flatMap((r) => strings(r.genres))),
-    openLibrarySubjects: unique(openlibrary.flatMap((e) => names(e.subjects))),
+    openLibrarySubjects: unique(openlibrary.flatMap((e) => subjectNames(e.subjects))),
     openLibraryAdds: openLibraryAdds(parsed.openlibrary[0], parsed.finna, google),
   }
 }
@@ -758,12 +766,13 @@ async function main(): Promise<number> {
     )
     return 1
   }
-  const contact = process.env.OPEN_LIBRARY_CONTACT?.trim()
+  // Open Library asks every client to identify itself, so without a contact it is skipped
+  // rather than asked unidentified; Finna and Google are captured either way.
+  const contact = process.env.OPEN_LIBRARY_CONTACT?.trim() ?? ''
   if (!contact) {
     process.stderr.write(
-      'OPEN_LIBRARY_CONTACT is not set in .env. Open Library asks every client to identify itself.\n',
+      'OPEN_LIBRARY_CONTACT is not set in .env; skipping Open Library (it asks every client to identify itself).\n',
     )
-    return 1
   }
 
   const dir = fileURLToPath(new URL('../tests/fixtures/', import.meta.url))

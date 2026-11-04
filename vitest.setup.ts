@@ -21,3 +21,9 @@ delete process.env.SEED_PASSWORD
 // Media files of the int lane go to their own directory, so the sweep in
 // `onInit` never touches the dev `media` directory.
 process.env.MEDIA_DIR = path.resolve('media-test')
+
+// The int lane always runs the full source fan-out, Open Library included, so
+// what it verifies does not depend on the developer's `.env` or on CI's
+// narrower one. The value only has to be non-empty; no request leaves the
+// lane, because every spec that asks the sources stubs `fetch`.
+process.env.OPEN_LIBRARY_CONTACT = 'int-tests@bookeh.invalid'

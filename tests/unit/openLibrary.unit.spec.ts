@@ -132,6 +132,13 @@ describe('Open Library lookup', () => {
     serve(entry({ title: 'Taivaanpallo', key: '/books/OL1M', publish_date: 'May 05, 2018' }))
     expect((await lookup('9789511319177'))[0].year).toBe(2018)
   })
+
+  it('takes pages from `pagination` when the record has no `number_of_pages`', async () => {
+    // 9780007466061 states `pagination: "690p."` only; pages is a field this source gap-fills.
+    serve(fixture('9780007466061'))
+
+    expect((await lookup('9780007466061'))[0].pages).toBe(690)
+  })
 })
 
 describe('Open Library search', () => {
@@ -188,6 +195,13 @@ describe('Open Library search', () => {
         source: 'openlibrary',
       },
     ])
+  })
+
+  it('caps the hits it returns, since `limit` caps works and not editions', async () => {
+    serve(fixture('search/yuval-noah-harari'))
+
+    // 20 works, 40 edition ISBNs between them: one screen of results, not two.
+    expect(await openLibrary.search!('yuval noah harari')).toHaveLength(20)
   })
 
   it('answers with an empty list for no match, a failure, an unusable body and blank text', async () => {

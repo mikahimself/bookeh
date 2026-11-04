@@ -8,6 +8,7 @@ import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import { undoAction } from '@/app/(frontend)/actions/undo'
 import { saveCopyAction, saveManualAction } from '@/app/(frontend)/scan/actions'
 import { LOOKUP_LIMIT, limitLookups } from '@/lib/catalogue/lookupLimit'
+import { lookupSources } from '@/lib/metadata/lookup'
 import config from '@/payload.config'
 import type { User, UserLocation } from '@/payload-types'
 
@@ -349,6 +350,37 @@ describe('saveCopyAction', () => {
       overrideAccess: true,
     })
     expect(totalDocs).toBe(0)
+  })
+
+  // The source fan-out behind the save: `lookupSources` is the real one here, so what Open
+  // Library answers decides the outcome the action then acts on.
+  it('reads Open Library\'s `{}` as "answered, has none" and its 500 as a failure', async () => {
+    const stub = (openLibrary: () => Response) =>
+      vi.stubGlobal(
+        'fetch',
+        vi.fn(async (input: string | URL) => {
+          const url = new URL(String(input))
+          if (url.hostname === 'api.finna.fi')
+            return Response.json({ resultCount: 0, status: 'OK' })
+          if (url.hostname === 'www.googleapis.com') return Response.json({ totalItems: 0 })
+          if (url.hostname === 'openlibrary.org') return openLibrary()
+          return new Response(null, { status: 404 })
+        }),
+      )
+    try {
+      // `{}` is an answer, not a failure: the outcome stays what the other two made it.
+      stub(() => Response.json({}))
+      expect(await lookupSources(randomIsbn())).toEqual({ kind: 'none' })
+
+      // A 500 is a failure, so the ISBN is unavailable rather than unknown.
+      stub(() => new Response(null, { status: 500 }))
+      expect(await lookupSources(randomIsbn())).toEqual({
+        kind: 'unavailable',
+        failed: ['openlibrary'],
+      })
+    } finally {
+      vi.unstubAllGlobals()
+    }
   })
 
   it('answers SAVE_FAILED and writes nothing when the sources cannot be asked', async () => {
