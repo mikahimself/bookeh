@@ -3761,7 +3761,7 @@ So that a novel carries the terms readers use for what it is about, alongside th
 
 Personal tags, user genres and user themes (one `tags` collection with a kind, D-6) on Book detail, Edit book and a selection, with Undo, filters, and management in Settings. System genres seeded and created on save from Google Books categories, re-run over Books saved earlier, shown in the user's language and managed by the admin in Settings, with "New genre" on the Answer. Finna system themes as chips and a filter. Slice G6 (genre override on Edit book) is retired by D-6.
 
-**Order.** Epic 8 retrospective follow-ups 9.17–9.19 run first, in that order; existing story numbers stay stable. Story 9.16 runs before Story 9.11 when Google Books answers again; it is numbered last so existing references keep their numbers. If Google is still down when Story 9.11 starts, 9.11 does not wait for it (Epic 3 retrospective, Mika, 2026-10-21).
+**Order.** Epic 8 retrospective follow-ups 9.17–9.19 run first, in that order; existing story numbers stay stable. Story 9.20 is independent of tagging and can run next. Story 9.16 runs before Story 9.11 when Google Books answers again; it is numbered last so existing references keep their numbers. If Google is still down when Story 9.11 starts, 9.11 does not wait for it (Epic 3 retrospective, Mika, 2026-10-21).
 
 ### Story 9.17: [K34] Sequential own-search hydration
 
@@ -3808,6 +3808,24 @@ So that request, query and parser wiring cannot silently lose enrichment (Story 
 **And** a request or HTTP failure returns `undefined`, preserving the source failure contract
 **And** tests make no live external requests and keep the existing non-Finnish no-request and parser cases
 **And** Epic 8 retrospective item 82 is marked done after the focused tests pass
+
+### Story 9.20: Description on Book detail
+
+As Mika,
+I want to read a book's description in Book detail,
+So that I can see what it is about without opening Edit book.
+
+**Acceptance Criteria:**
+
+**Given** a held Book with a nonblank effective description
+**When** I open Book detail from the collection or loans
+**Then** a read-only Description section shows the full description after classification and before the source actions and foot, in both the phone sheet and wide-screen panel
+**And** it uses the existing effective Book value, including my override; an explicitly cleared override stays empty rather than falling back to the shared description
+**And** a null, empty or whitespace-only description omits the whole section, including its heading
+**And** it renders as escaped plain text, preserving stored line breaks and wrapping long words without horizontal overflow; there is no truncation or expand control
+**And** the heading is “Description” in English and “Kuvaus” in Finnish, using existing group-heading and body styles
+**And** existing held-Book access checks, editing, close behaviour and scrolling remain intact; the Answer and wishlist entry detail are outside this story
+**And** focused unit coverage verifies visible, omitted and literal-text cases; an uncommitted browser walk checks phone and desktop, long text, both locales and editing then returning to detail, with observations recorded in the story
 
 ### Story 9.1: [G1] `tags` collection with kinds
 

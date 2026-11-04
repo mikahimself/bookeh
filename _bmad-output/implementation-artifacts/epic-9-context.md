@@ -11,6 +11,7 @@ Let users classify and find their books through private tags, genres and themes 
 - Story 9.17: Sequential own-search hydration
 - Story 9.18: Independent search and Answer cover previews
 - Story 9.19: Production Kirjasampo adapter verification
+- Story 9.20: Description on Book detail
 - Story 9.1: Tags collection with kinds
 - Story 9.2: Change tags
 - Story 9.3: Rename, merge and delete tags
@@ -55,6 +56,8 @@ Let users classify and find their books through private tags, genres and themes 
 - Render mock-up options and record Mika's choice in `EXPERIENCE.md` before building the tag picker or admin Genres group.
 
 ## Cross-Story Dependencies
+
+- Story 9.20 is independent of tagging and can run next. Display the nonblank effective description after classification and before source actions/the foot, as plain text with preserved line breaks and long-word wrapping. Omit empty values, including cleared overrides. Localize Description/Kuvaus; use the same content at both widths. The Answer and wishlist entry detail are outside its scope.
 
 - Run 9.17, 9.18 and 9.19 first, in order; they close Epic 8 retrospective follow-ups after verification.
 - The private-label model and services underpin pickers, Settings and filters. System genre vocabulary and mapping underpin save classification and the Answer's creation markers.
