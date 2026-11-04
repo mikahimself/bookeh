@@ -37,7 +37,8 @@ const DOT = ' · '
  * locations, FR-32); a lent one's marker with "Lent to {person} since
  * {date}" under its line and Returned only (FR-35, FR-36); an ordered
  * copy's Received, whatever its loans. Genres when the Book
- * has system genres, the admin's Re-fetch on a shared Book (`Refetch`,
+ * has system genres, then a nonblank effective Description in full as plain
+ * text with preserved line breaks, the admin's Re-fetch on a shared Book (`Refetch`,
  * `canEditShared`) or, in its place on a private Book, Look it up again
  * (`DetailLookUpAgain`; without an ISBN a muted line pointing to Edit book),
  * and the foot with Edit and Add to wishlist, both secondary, no primary
@@ -228,6 +229,16 @@ export async function BookDetail({
                 )),
                 DOT,
               )}
+            </p>
+          </section>
+        )}
+        {book.description?.trim() && (
+          <section className="flex min-w-0 flex-col gap-2">
+            <h3 className="text-heading-group text-text-muted ui-case">
+              {t('detail.description')}
+            </h3>
+            <p className="text-body whitespace-pre-wrap text-text wrap-anywhere">
+              {book.description}
             </p>
           </section>
         )}

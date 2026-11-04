@@ -36,6 +36,57 @@ describe('CollectionPage', () => {
   resetCollectionPage()
 
   describe('Book detail', () => {
+    it.each([false, true])(
+      'renders the full effective description as literal text (override: %s)',
+      async (override) => {
+        getShelfRows.mockResolvedValue({ rows: [row(11, linna)], total: 1, labels: {} })
+        const description =
+          '  First line\n\n<b>Literal</b><script>alert("text")</script>\n' +
+          'long'.repeat(100) +
+          '  '
+        holds({ ...linna, description, overridden: override ? ['description'] : [] }, [copy(21)])
+        await renderPage({ book: '5' })
+
+        const sheet = await detail('Tuntematon sotilas')
+        const section = within(sheet)
+          .getByRole('heading', { name: 'Description' })
+          .closest('section')!
+        expect(section.querySelector('p')?.textContent).toBe(description)
+        expect(section.querySelector('b, script')).toBeNull()
+        const genres = within(sheet).getByRole('heading', { name: 'Genres' })
+        const edit = within(sheet).getByRole('link', { name: 'Edit' })
+        expect(
+          genres.compareDocumentPosition(section) & Node.DOCUMENT_POSITION_FOLLOWING,
+        ).toBeTruthy()
+        expect(
+          section.compareDocumentPosition(edit) & Node.DOCUMENT_POSITION_FOLLOWING,
+        ).toBeTruthy()
+      },
+    )
+
+    it.each([
+      { description: null, overridden: [] },
+      { description: '', overridden: [] },
+      { description: ' \n\t ', overridden: [] },
+      { description: null, overridden: ['description'] },
+    ])('omits the entire description group for an empty effective value: %j', async (effective) => {
+      getShelfRows.mockResolvedValue({ rows: [row(11, linna)], total: 1, labels: {} })
+      holds({ ...linna, ...effective }, [copy(21)])
+      await renderPage({ book: '5' })
+
+      const sheet = await detail('Tuntematon sotilas')
+      expect(within(sheet).queryByRole('heading', { name: 'Description' })).toBeNull()
+      // With no description the next group after classification is the foot.
+      const classification = within(sheet)
+        .getByRole('heading', { name: 'Genres' })
+        .closest('section')!
+      expect(
+        classification.nextElementSibling?.contains(
+          within(sheet).getByRole('link', { name: 'Edit' }),
+        ),
+      ).toBe(true)
+    })
+
     it('opens over the list with the header, Your copies and Edit', async () => {
       getShelfRows.mockResolvedValue({ rows: [row(11, linna)], total: 1, labels: {} })
       holds(linna, [
@@ -104,13 +155,21 @@ describe('CollectionPage', () => {
     })
 
     it('shows Re-fetch on a shared Book with an ISBN to the admin only', async () => {
-      const shared = book(5, 'Tuntematon sotilas', { isbn13: '9789510000000' })
+      const shared = book(5, 'Tuntematon sotilas', {
+        isbn13: '9789510000000',
+        description: 'A book description.',
+      })
       getShelfRows.mockResolvedValue({ rows: [row(11, shared)], total: 1, labels: {} })
       holds(shared, [copy(21)])
 
       requireUser.mockResolvedValue({ user: { roles: ['admin', 'user'] } })
       const { unmount } = await renderPage({ book: '5' })
-      within(await detail('Tuntematon sotilas')).getByRole('button', { name: 'Re-fetch' })
+      const sheet = await detail('Tuntematon sotilas')
+      const description = within(sheet).getByRole('heading', { name: 'Description' })
+      const refetch = within(sheet).getByRole('button', { name: 'Re-fetch' })
+      expect(
+        description.compareDocumentPosition(refetch) & Node.DOCUMENT_POSITION_FOLLOWING,
+      ).toBeTruthy()
       unmount()
 
       requireUser.mockResolvedValue({ user: { roles: ['user'] } })

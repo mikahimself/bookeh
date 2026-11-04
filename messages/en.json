@@ -309,6 +309,7 @@
     "tryAgain": "Try again"
   },
   "detail": {
+    "description": "Description",
     "yourCopies": "Your copies",
     "lentBefore": "Lent before",
     "onWishlists": "On wishlists",

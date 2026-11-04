@@ -309,6 +309,7 @@
     "tryAgain": "Yritä uudelleen"
   },
   "detail": {
+    "description": "Kuvaus",
     "yourCopies": "Kappaleesi",
     "lentBefore": "Lainassa aiemmin",
     "onWishlists": "Toivelistoilla",
