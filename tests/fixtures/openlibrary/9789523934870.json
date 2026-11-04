@@ -1,0 +1,32 @@
+{
+  "ISBN:9789523934870": {
+    "url": "http://openlibrary.org/books/OL56953310M/Kadonneen_järjen_metsästys",
+    "key": "/books/OL56953310M",
+    "title": "Kadonneen järjen metsästys",
+    "authors": [
+      {
+        "url": "http://openlibrary.org/authors/OL12117792A/Anna_Kontula",
+        "name": "Anna Kontula"
+      }
+    ],
+    "identifiers": {
+      "isbn_13": [
+        "9789523934870"
+      ],
+      "openlibrary": [
+        "OL56953310M"
+      ]
+    },
+    "publishers": [
+      {
+        "name": "Into"
+      }
+    ],
+    "publish_date": "2024",
+    "cover": {
+      "small": "https://covers.openlibrary.org/b/id/15154077-S.jpg",
+      "medium": "https://covers.openlibrary.org/b/id/15154077-M.jpg",
+      "large": "https://covers.openlibrary.org/b/id/15154077-L.jpg"
+    }
+  }
+}

@@ -1,6 +1,6 @@
 // Spine, Structural Seed → Shared shapes (src/lib/metadata) and AD-9.
 
-export type SourceId = string // 'finna', 'google', ...
+export type SourceId = string // 'finna', 'google', 'openlibrary', ...
 
 export type SourceResult = {
   isbn13: string

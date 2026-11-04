@@ -236,6 +236,13 @@ file), then lock it down:
 chmod 600 /opt/bookeh/.env
 ```
 
+`OPEN_LIBRARY_CONTACT` is the one variable that may stay empty: it is the
+contact address sent to Open Library as `User-Agent: bookeh (<contact>)`,
+which Open Library asks every API client for (identified clients get 3
+requests per second instead of 1). Left empty, the Open Library source is
+left out of the source array entirely — lookup and search ask Finna and
+Google Books only — so a fresh deploy works without it.
+
 `bookeh.service`, `bookeh-backup.service` and `bookeh-backup.timer` are
 installed in step 7, not under `/opt/bookeh`.
 

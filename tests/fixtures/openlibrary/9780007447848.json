@@ -1,0 +1,46 @@
+{
+  "ISBN:9780007447848": {
+    "url": "http://openlibrary.org/books/OL27891405M/A_Storm_of_Swords",
+    "key": "/books/OL27891405M",
+    "title": "A Storm of Swords",
+    "subtitle": "Part one: Steel and snow",
+    "authors": [
+      {
+        "url": "http://openlibrary.org/authors/OL234664A/George_R._R._Martin",
+        "name": "George R. R. Martin"
+      }
+    ],
+    "number_of_pages": 688,
+    "identifiers": {
+      "isbn_13": [
+        "9780007447848"
+      ],
+      "openlibrary": [
+        "OL27891405M"
+      ]
+    },
+    "classifications": {
+      "lc_classifications": [
+        "PS3563.A7239"
+      ]
+    },
+    "publishers": [
+      {
+        "name": "Harper Voyager"
+      }
+    ],
+    "publish_date": "2012",
+    "ebooks": [
+      {
+        "preview_url": "https://archive.org/details/stormofswordspar0000mart_n0u7",
+        "availability": "restricted",
+        "formats": {}
+      }
+    ],
+    "cover": {
+      "small": "https://covers.openlibrary.org/b/id/15266943-S.jpg",
+      "medium": "https://covers.openlibrary.org/b/id/15266943-M.jpg",
+      "large": "https://covers.openlibrary.org/b/id/15266943-L.jpg"
+    }
+  }
+}

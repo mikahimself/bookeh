@@ -1,0 +1,76 @@
+{
+  "ISBN:9780007447855": {
+    "url": "http://openlibrary.org/books/OL32670248M/A_Storm_of_Swords",
+    "key": "/books/OL32670248M",
+    "title": "A Storm of Swords",
+    "subtitle": "Part two: Blood and gold",
+    "authors": [
+      {
+        "url": "http://openlibrary.org/authors/OL234664A/George_R._R._Martin",
+        "name": "George R. R. Martin"
+      }
+    ],
+    "number_of_pages": 656,
+    "identifiers": {
+      "isbn_13": [
+        "9780007447855"
+      ],
+      "openlibrary": [
+        "OL32670248M"
+      ]
+    },
+    "classifications": {
+      "lc_classifications": [
+        "PS3563.A7239"
+      ]
+    },
+    "publishers": [
+      {
+        "name": "Harper Voyager"
+      }
+    ],
+    "publish_date": "2011",
+    "subjects": [
+      {
+        "name": "Imaginary places",
+        "url": "https://openlibrary.org/subjects/imaginary_places"
+      },
+      {
+        "name": "Fiction",
+        "url": "https://openlibrary.org/subjects/fiction"
+      },
+      {
+        "name": "Magic",
+        "url": "https://openlibrary.org/subjects/magic"
+      },
+      {
+        "name": "Imaginary wars and battles",
+        "url": "https://openlibrary.org/subjects/imaginary_wars_and_battles"
+      },
+      {
+        "name": "Fiction, fantasy, epic",
+        "url": "https://openlibrary.org/subjects/fiction,_fantasy,_epic"
+      },
+      {
+        "name": "Seven kingdoms (imaginary place), fiction",
+        "url": "https://openlibrary.org/subjects/seven_kingdoms_(imaginary_place),_fiction"
+      },
+      {
+        "name": "General",
+        "url": "https://openlibrary.org/subjects/general"
+      }
+    ],
+    "ebooks": [
+      {
+        "preview_url": "https://archive.org/details/stormofswordspar0000mart_u7f7",
+        "availability": "restricted",
+        "formats": {}
+      }
+    ],
+    "cover": {
+      "small": "https://covers.openlibrary.org/b/id/15266944-S.jpg",
+      "medium": "https://covers.openlibrary.org/b/id/15266944-M.jpg",
+      "large": "https://covers.openlibrary.org/b/id/15266944-L.jpg"
+    }
+  }
+}

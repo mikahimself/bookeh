@@ -1,0 +1,504 @@
+{
+  "numFound": 19,
+  "start": 0,
+  "numFoundExact": true,
+  "num_found": 19,
+  "documentation_url": "https://openlibrary.org/dev/docs/api/search",
+  "q": "tuntematon sotilas",
+  "offset": null,
+  "docs": [
+    {
+      "author_name": [
+        "Väinö Linna"
+      ],
+      "key": "/works/OL4223922W",
+      "title": "Tuntematon sotilas",
+      "editions": {
+        "numFound": 5,
+        "start": 0,
+        "numFoundExact": true,
+        "docs": [
+          {
+            "key": "/books/OL4510970M",
+            "title": "Tuntematon sotilas",
+            "publisher": [
+              "Yhtyneet kuvalehdet, Suur-Seura"
+            ],
+            "publish_year": [
+              1977
+            ],
+            "isbn": [
+              "9519912061",
+              "9789519912066"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "author_name": [
+        "Väinö Linna"
+      ],
+      "key": "/works/OL8823529W",
+      "title": "Tuntematon sotilas",
+      "editions": {
+        "numFound": 3,
+        "start": 0,
+        "numFoundExact": true,
+        "docs": [
+          {
+            "key": "/books/OL20974205M",
+            "title": "Tuntematon sotilas.",
+            "publisher": [
+              "W. Söderström"
+            ],
+            "publish_year": [
+              1955
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "author_name": [
+        "Väinö Linna"
+      ],
+      "key": "/works/OL17123285W",
+      "title": "Unknown soldiers",
+      "editions": {
+        "numFound": 1,
+        "start": 0,
+        "numFoundExact": true,
+        "docs": [
+          {
+            "key": "/books/OL25693936M",
+            "title": "Unknown soldiers",
+            "publisher": [
+              "Penguin Classics"
+            ],
+            "publish_year": [
+              2015
+            ],
+            "isbn": [
+              "9780141393643",
+              "0141393645"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "author_name": [
+        "Va ino . Linna"
+      ],
+      "key": "/works/OL10585170W",
+      "title": "The unknown soldier",
+      "editions": {
+        "numFound": 1,
+        "start": 0,
+        "numFoundExact": true,
+        "docs": [
+          {
+            "key": "/books/OL13811976M",
+            "title": "The unknown soldier",
+            "publisher": [
+              "Collins"
+            ],
+            "publish_year": [
+              1957
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "author_name": [
+        "Väinö Linna"
+      ],
+      "key": "/works/OL38510905W",
+      "title": "Tuntematon sotilas",
+      "editions": {
+        "numFound": 1,
+        "start": 0,
+        "numFoundExact": true,
+        "docs": [
+          {
+            "key": "/books/OL52405962M",
+            "title": "Tuntematon sotilas",
+            "publisher": [
+              "Söderström"
+            ],
+            "publish_year": [
+              1957
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "author_name": [
+        "Väinö Linna"
+      ],
+      "key": "/works/OL18190254M",
+      "title": "Tundmatu sõdur",
+      "editions": {
+        "numFound": 1,
+        "start": 0,
+        "numFoundExact": true,
+        "docs": [
+          {
+            "key": "/books/OL18190254M",
+            "title": "Tundmatu sõdur",
+            "publisher": [
+              "Orto"
+            ],
+            "publish_year": [
+              1957
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "author_name": [
+        "Edvin Laine"
+      ],
+      "key": "/works/OL5421868W",
+      "title": "Tuntematon sotilas ja Pylvässänky",
+      "editions": {
+        "numFound": 1,
+        "start": 0,
+        "numFoundExact": true,
+        "docs": [
+          {
+            "key": "/books/OL2947748M",
+            "title": "Tuntematon sotilas ja Pylvässänky",
+            "publisher": [
+              "Tammi"
+            ],
+            "publish_year": [
+              1983
+            ],
+            "isbn": [
+              "9513059456",
+              "9789513059453"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "author_name": [
+        "Pekka Lilja"
+      ],
+      "key": "/works/OL4857559W",
+      "title": "Väinö Linnan Tuntematon sotilas konfliktiromaanina",
+      "editions": {
+        "numFound": 1,
+        "start": 0,
+        "numFoundExact": true,
+        "docs": [
+          {
+            "key": "/books/OL2776524M",
+            "title": "Väinö Linnan Tuntematon sotilas konfliktiromaanina",
+            "publisher": [
+              "Jyväskylän yliopisto",
+              "Jakaja, Jyväskylän yliopiston kirjasto"
+            ],
+            "publish_year": [
+              1984
+            ],
+            "isbn": [
+              "9516790682",
+              "9789516790681"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "author_name": [
+        "Väinö Linna"
+      ],
+      "key": "/works/OL8823527W",
+      "title": "The unknown soldier",
+      "editions": {
+        "numFound": 1,
+        "start": 0,
+        "numFoundExact": true,
+        "docs": [
+          {
+            "key": "/books/OL20090356M",
+            "title": "The unknown soldier",
+            "publisher": [
+              "Werner Soderstrom Osakeyhtio Porvoo"
+            ],
+            "publish_year": [
+              1968
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "author_name": [
+        "Väinö Linna"
+      ],
+      "key": "/works/OL11275401W",
+      "title": "The unknown soldier",
+      "editions": {
+        "numFound": 1,
+        "start": 0,
+        "numFoundExact": true,
+        "docs": [
+          {
+            "key": "/books/OL18746848M",
+            "title": "The unknown soldier",
+            "publisher": [
+              "W. Söderström"
+            ],
+            "publish_year": [
+              1975
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "author_name": [
+        "Väinö Linna"
+      ],
+      "key": "/works/OL33297979W",
+      "title": "Palydyme saltak",
+      "editions": {
+        "numFound": 1,
+        "start": 0,
+        "numFoundExact": true,
+        "docs": [
+          {
+            "key": "/books/OL62441435M",
+            "title": "Palydyme saltak",
+            "publisher": [
+              "Sine nomine"
+            ],
+            "publish_year": [
+              2006
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "author_name": [
+        "Väinö Linna"
+      ],
+      "key": "/works/OL33697525W",
+      "title": "Tuntematon sotilas. The Unknown Soldier. A novel",
+      "editions": {
+        "numFound": 1,
+        "start": 0,
+        "numFoundExact": true,
+        "docs": [
+          {
+            "key": "/books/OL45661266M",
+            "title": "Tuntematon sotilas. The Unknown Soldier. A novel",
+            "publish_year": [
+              1957
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "author_name": [
+        "Väinö Linna",
+        "贾叶"
+      ],
+      "key": "/works/OL45473725W",
+      "title": "普通士兵",
+      "editions": {
+        "numFound": 1,
+        "start": 0,
+        "numFoundExact": true,
+        "docs": [
+          {
+            "key": "/books/OL61954716M",
+            "title": "普通士兵",
+            "publisher": [
+              "Zhong yang min zu da xue chu ban she"
+            ],
+            "publish_year": [
+              1997
+            ],
+            "isbn": [
+              "9787810561136",
+              "7810561138"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "author_name": [
+        "Väinö Linna"
+      ],
+      "key": "/works/OL19475251W",
+      "title": "Neizvestnyĭ soldat",
+      "editions": {
+        "numFound": 1,
+        "start": 0,
+        "numFoundExact": true,
+        "docs": [
+          {
+            "key": "/books/OL15445893M",
+            "title": "Neizvestnyĭ soldat",
+            "publisher": [
+              "\"Progress\""
+            ],
+            "publish_year": [
+              1991
+            ],
+            "isbn": [
+              "5010020920",
+              "9785010020927"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "author_name": [
+        "S. A. Wallin"
+      ],
+      "key": "/works/OL18755689W",
+      "title": "Tuntematon sotilas Turkin sodassa",
+      "editions": {
+        "numFound": 1,
+        "start": 0,
+        "numFoundExact": true,
+        "docs": [
+          {
+            "key": "/books/OL24042579M",
+            "title": "Tuntematon sotilas Turkin sodassa",
+            "publisher": [
+              "Suomalaisen Kirjallisuuden Seura"
+            ],
+            "publish_year": [
+              2005
+            ],
+            "isbn": [
+              "9789517467407",
+              "9517467400"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "author_name": [
+        "Jukka Sihvonen"
+      ],
+      "key": "/works/OL33444689W",
+      "title": "Idiootti ja samurai",
+      "editions": {
+        "numFound": 1,
+        "start": 0,
+        "numFoundExact": true,
+        "docs": [
+          {
+            "key": "/books/OL45357242M",
+            "title": "Idiootti ja samurai",
+            "publisher": [
+              "Eetos"
+            ],
+            "publish_year": [
+              2010
+            ],
+            "isbn": [
+              "9789529946167",
+              "9529946163"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "author_name": [
+        "Lea Martin"
+      ],
+      "key": "/works/OL7062693W",
+      "title": "Die deutsche Fassung \"Kreuze in Karelien\" des finnischen Romans \"Tuntematon sotilas\" von Väinö Linna",
+      "editions": {
+        "numFound": 2,
+        "start": 0,
+        "numFoundExact": true,
+        "docs": [
+          {
+            "key": "/books/OL5131873M",
+            "title": "Die deutsche Fassung \"Kreuze in Karelien\" des finnischen Romans \"Tuntematon sotilas\" von Väinö Linna",
+            "publisher": [
+              "Turun Yliopisto"
+            ],
+            "publish_year": [
+              1967
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "key": "/works/OL18683954W",
+      "title": "Koko kansan Tuntematon",
+      "editions": {
+        "numFound": 1,
+        "start": 0,
+        "numFoundExact": true,
+        "docs": [
+          {
+            "key": "/books/OL22991634M",
+            "title": "Koko kansan Tuntematon",
+            "publisher": [
+              "Alfamer"
+            ],
+            "publish_year": [
+              2004
+            ],
+            "isbn": [
+              "9789524720144",
+              "9524720140"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "author_name": [
+        "Jyrki Nummi"
+      ],
+      "key": "/works/OL44516698W",
+      "title": "Jalon Kansan parhaat voimat",
+      "editions": {
+        "numFound": 1,
+        "start": 0,
+        "numFoundExact": true,
+        "docs": [
+          {
+            "key": "/books/OL60792663M",
+            "title": "Jalon Kansan parhaat voimat",
+            "publisher": [
+              "W. Söderström"
+            ],
+            "publish_year": [
+              1993
+            ],
+            "isbn": [
+              "9510190173",
+              "9510190179",
+              "9789510190173"
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}

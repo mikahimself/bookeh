@@ -83,20 +83,22 @@ const timedOut = (err: unknown): boolean => err instanceof Error && err.name ===
  * The parsed JSON body of a 2xx answer; undefined after one logged failure for a network
  * error, a timeout, a non-2xx status or a body that is not JSON. `action` and `subject` are
  * what the failure is logged as: `'lookup'` with `{ isbn13 }`, `'search'` with `{ query }`.
- * The URL is never logged.
+ * The URL is never logged. `headers` is merged over `Accept` for a source that must identify
+ * itself (Open Library's `User-Agent`); the others pass nothing.
  */
 export async function getJson(
   label: string,
   action: string,
   url: string,
   subject: Json,
+  headers: Record<string, string> = {},
 ): Promise<unknown> {
   const failed = (reason: string, details?: Json): undefined =>
     sourceFailed(label, action, subject, reason, details)
   let response: Response
   try {
     response = await fetch(url, {
-      headers: { Accept: 'application/json' },
+      headers: { Accept: 'application/json', ...headers },
       signal: AbortSignal.timeout(TIMEOUT_MS),
     })
   } catch (err) {

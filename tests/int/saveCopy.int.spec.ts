@@ -407,6 +407,9 @@ describe('saveCopy', () => {
         asked.finna++
         return Response.json(body)
       }
+      // Open Library joins the fan-out when OPEN_LIBRARY_CONTACT is set; `{}` is its answer
+      // for an ISBN it does not hold.
+      if (url.hostname === 'openlibrary.org') return Response.json({})
       covers.push(url.href)
       return new Response(new Uint8Array(jpeg), { headers: { 'Content-Type': 'image/jpeg' } })
     })

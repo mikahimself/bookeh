@@ -196,11 +196,13 @@
   },
   "sources": {
     "finna": "Finna",
-    "google": "Google Books"
+    "google": "Google Books",
+    "openlibrary": "Open Library"
   },
   "sourcesPartitive": {
     "finna": "Finnaa",
-    "google": "Google Booksia"
+    "google": "Google Booksia",
+    "openlibrary": "Open Librarya"
   },
   "errorPage": {
     "heading": "Sivua ei voitu näyttää.",

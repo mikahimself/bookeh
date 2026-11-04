@@ -1,24 +1,52 @@
-// Records live Finna and Google Books responses for the ISBNs in tests/fixtures/isbns.txt, the
-// Finna search responses for the queries in tests/fixtures/queries.txt (Story 8.3), and writes
-// tests/fixtures/REPORT.md (Story 3.2). Existing fixtures are never fetched again.
-// Needs GOOGLE_BOOKS_API_KEY in .env. Run: npm run fixtures
+// Records live Finna, Google Books and Open Library responses for the ISBNs in
+// tests/fixtures/isbns.txt, the Finna and Open Library search responses for the queries in
+// tests/fixtures/queries.txt (Stories 8.3, 8.12), and writes tests/fixtures/REPORT.md
+// (Story 3.2). Existing fixtures are never fetched again.
+// Needs GOOGLE_BOOKS_API_KEY and OPEN_LIBRARY_CONTACT in .env. Run: npm run fixtures
 import { existsSync } from 'node:fs'
 import { mkdir, readFile, rm, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import { fileURLToPath, pathToFileURL } from 'node:url'
 
 import { toIsbn13 } from '@/fields/isbn'
+import type { SourceResult } from '@/lib/metadata/source'
 import {
   FINNA_FIELDS,
   FINNA_SEARCH_FIELDS,
   finnaMatches,
+  finnaResults,
   finnaSearchHits,
   finnaSearchUrl,
   finnaUrl,
 } from '@/lib/metadata/sources/finna'
+import {
+  OPEN_LIBRARY_FIELDS,
+  openLibraryHeaders,
+  openLibraryResults,
+  openLibrarySearchHits,
+  openLibrarySearchUrl,
+  openLibraryUrl,
+} from '@/lib/metadata/sources/openLibrary'
 
-export const SOURCES = ['finna', 'google'] as const
+export const SOURCES = ['finna', 'google', 'openlibrary'] as const
 export type Source = (typeof SOURCES)[number]
+
+/** The sources whose `search` has fixtures; Google Books' search is not recorded. */
+export const SEARCH_SOURCES = ['finna', 'openlibrary'] as const
+export type SearchSource = (typeof SEARCH_SOURCES)[number]
+
+/** What one source needs for one request. */
+interface SourceRequest {
+  url: string
+  headers: Record<string, string>
+}
+
+export interface CaptureOptions {
+  googleKey?: string
+  /** `OPEN_LIBRARY_CONTACT`; empty leaves Open Library uncaptured rather than unidentified. */
+  contact?: string
+  queries?: readonly string[]
+}
 
 export type FetchFn = (url: string, init: RequestInit) => Promise<Response>
 export type SleepFn = (ms: number) => Promise<void>
@@ -92,8 +120,8 @@ export function querySlug(query: string): string {
     .replace(/^-+|-+$/g, '')
 }
 
-export function searchFixturePath(dir: string, query: string): string {
-  return join(dir, 'finna', 'search', `${querySlug(query)}.json`)
+export function searchFixturePath(dir: string, source: SearchSource, query: string): string {
+  return join(dir, source, 'search', `${querySlug(query)}.json`)
 }
 
 // --- Requests ----------------------------------------------------------------------------
@@ -103,17 +131,43 @@ export function googleUrl(isbn13: string, key: string): string {
   return `https://www.googleapis.com/books/v1/volumes?${params}`
 }
 
+/** The lookup request for one source: Google carries its key, Open Library its User-Agent. */
+function lookupRequest(
+  source: Source,
+  isbn13: string,
+  googleKey: string,
+  openLibrary: Record<string, string>,
+): SourceRequest {
+  if (source === 'finna') return { url: finnaUrl(isbn13), headers: {} }
+  if (source === 'google') return { url: googleUrl(isbn13, googleKey), headers: {} }
+  return { url: openLibraryUrl(isbn13), headers: openLibrary }
+}
+
+function searchRequest(
+  source: SearchSource,
+  query: string,
+  openLibrary: Record<string, string>,
+): SourceRequest {
+  return source === 'finna'
+    ? { url: finnaSearchUrl(query), headers: {} }
+    : { url: openLibrarySearchUrl(query), headers: openLibrary }
+}
+
 function retryable(status: number): boolean {
   return status === 429 || status >= 500
 }
 
 type Attempt = { ok: true; body: unknown } | { ok: false; reason: string; retry: boolean }
 
-async function attempt(url: string, fetchFn: FetchFn): Promise<Attempt> {
+async function attempt(
+  url: string,
+  fetchFn: FetchFn,
+  headers: Record<string, string> = {},
+): Promise<Attempt> {
   let response: Response
   try {
     response = await fetchFn(url, {
-      headers: { Accept: 'application/json' },
+      headers: { Accept: 'application/json', ...headers },
       signal: AbortSignal.timeout(TIMEOUT_MS),
     })
   } catch (error) {
@@ -139,9 +193,10 @@ async function fetchJson(
   url: string,
   fetchFn: FetchFn,
   sleepFn: SleepFn,
+  headers: Record<string, string> = {},
 ): Promise<{ ok: true; body: unknown } | { ok: false; reason: string }> {
   for (let i = 0; ; i++) {
-    const result = await attempt(url, fetchFn)
+    const result = await attempt(url, fetchFn, headers)
     if (result.ok) return result
     if (!result.retry || i >= BACKOFF_MS.length) {
       const tries = i + 1
@@ -186,10 +241,16 @@ export async function capture(
   dir: string,
   fetchFn: FetchFn,
   sleepFn: SleepFn,
-  googleKey = '',
-  queries: readonly string[] = [],
+  { googleKey = '', contact = '', queries = [] }: CaptureOptions = {},
 ): Promise<{ requests: number; written: number; notCaptured: NotCaptured[] }> {
   const notCaptured: NotCaptured[] = []
+  const openLibrary = openLibraryHeaders({ OPEN_LIBRARY_CONTACT: contact })
+  const noContact = contact ? null : 'OPEN_LIBRARY_CONTACT is not set'
+  /** The secrets that must never reach a fixture file. */
+  const secrets: [string, string][] = [
+    [googleKey, 'the API key'],
+    [contact, 'the contact'],
+  ]
   const writtenGoogle: string[] = []
   let requests = 0
   let written = 0
@@ -206,21 +267,23 @@ export async function capture(
     for (const source of SOURCES) {
       const path = fixturePath(dir, source, isbn13)
       if (existsSync(path)) continue
-      if (source === 'google' && googleDown) {
-        notCaptured.push({ source, isbn13, reason: googleDown })
+      const blocked = source === 'google' ? googleDown : source === 'openlibrary' ? noContact : null
+      if (blocked) {
+        notCaptured.push({ source, isbn13, reason: blocked })
         continue
       }
       fetched = true
-      const url = source === 'finna' ? finnaUrl(isbn13) : googleUrl(isbn13, googleKey)
-      const result = await fetchJson(url, fetchFn, sleepFn)
+      const { url, headers } = lookupRequest(source, isbn13, googleKey, openLibrary)
+      const result = await fetchJson(url, fetchFn, sleepFn, headers)
       requests++
       if (!result.ok) {
         notCaptured.push({ source, isbn13, reason: result.reason })
         continue
       }
       const text = `${JSON.stringify(result.body, null, 2)}\n`
-      if (googleKey && text.includes(googleKey)) {
-        notCaptured.push({ source, isbn13, reason: 'response contains the API key' })
+      const leak = secrets.find(([secret]) => secret && text.includes(secret))
+      if (leak) {
+        notCaptured.push({ source, isbn13, reason: `response contains ${leak[1]}` })
         continue
       }
       await writeFile(path, text)
@@ -231,20 +294,31 @@ export async function capture(
     if (fetched) await sleepFn(REQUEST_GAP_MS)
   }
 
-  // Finna search: one fixture per query, under the same rules.
-  if (queries.length > 0) await mkdir(join(dir, 'finna', 'search'), { recursive: true })
-  for (const query of queries) {
-    const path = searchFixturePath(dir, query)
-    if (existsSync(path)) continue
-    const result = await fetchJson(finnaSearchUrl(query), fetchFn, sleepFn)
-    requests++
-    if (!result.ok) {
-      notCaptured.push({ source: 'finna', isbn13: '', query, reason: result.reason })
-    } else {
-      await writeFile(path, `${JSON.stringify(result.body, null, 2)}\n`)
-      written++
+  // Search: one fixture per query per searching source, under the same rules.
+  if (queries.length > 0) {
+    for (const source of SEARCH_SOURCES) {
+      await mkdir(join(dir, source, 'search'), { recursive: true })
     }
-    await sleepFn(REQUEST_GAP_MS)
+  }
+  for (const query of queries) {
+    for (const source of SEARCH_SOURCES) {
+      const path = searchFixturePath(dir, source, query)
+      if (existsSync(path)) continue
+      if (source === 'openlibrary' && noContact) {
+        notCaptured.push({ source, isbn13: '', query, reason: noContact })
+        continue
+      }
+      const { url, headers } = searchRequest(source, query, openLibrary)
+      const result = await fetchJson(url, fetchFn, sleepFn, headers)
+      requests++
+      if (!result.ok) {
+        notCaptured.push({ source, isbn13: '', query, reason: result.reason })
+      } else {
+        await writeFile(path, `${JSON.stringify(result.body, null, 2)}\n`)
+        written++
+      }
+      await sleepFn(REQUEST_GAP_MS)
+    }
   }
 
   // Google can degrade after the first check; a spurious 0 must not become a fixture.
@@ -295,6 +369,21 @@ function volumeInfo(item: Json): Json {
   return isObject(item.volumeInfo) ? item.volumeInfo : {}
 }
 
+/** The Open Library entry for the ISBN asked for: `[entry]` or `[]` (`{}`, or another key). */
+export function openLibraryMatches(body: unknown, isbn13: string): Json[] {
+  if (!isObject(body)) return []
+  const entry = body[`ISBN:${isbn13}`]
+  return isObject(entry) ? [entry] : []
+}
+
+/** `[{ name }]` entries with a name, as the adapter reads them. */
+function names(value: unknown): string[] {
+  return list(value)
+    .filter(isObject)
+    .map((entry) => entry.name)
+    .filter((name): name is string => typeof name === 'string' && name.trim() !== '')
+}
+
 /** Finna subjects are lists of parts (`["Bellegueule, Eddy", "(fiktiivinen hahmo)"]`). */
 function finnaSubjects(record: Json): string[] {
   return list(record.subjects)
@@ -314,10 +403,14 @@ interface SourceRow {
 interface Row extends ListedIsbn {
   finna: SourceRow
   google: SourceRow
+  openlibrary: SourceRow
   title: string
   categories: string[]
   subjects: string[]
   genres: string[]
+  openLibrarySubjects: string[]
+  /** Fields Open Library has that neither Finna nor Google Books gives for this ISBN. */
+  openLibraryAdds: string[]
 }
 
 async function readFixture(dir: string, source: Source, isbn13: string): Promise<unknown> {
@@ -328,12 +421,56 @@ async function readFixture(dir: string, source: Source, isbn13: string): Promise
 
 const unique = (values: string[]): string[] => [...new Set(values)]
 
+/** The `SourceResult` fields compared between the sources, and how Google states each one. */
+const COMPARED: [keyof SourceResult, (info: Json) => boolean][] = [
+  ['authors', (info) => strings(info.authors).length > 0],
+  ['publisher', (info) => typeof info.publisher === 'string'],
+  ['year', (info) => typeof info.publishedDate === 'string'],
+  ['pages', (info) => typeof info.pageCount === 'number'],
+  ['subtitle', (info) => typeof info.subtitle === 'string'],
+  ['subjects', (info) => strings(info.categories).length > 0],
+]
+
+const filled = (result: SourceResult, field: keyof SourceResult): boolean => {
+  const value = result[field]
+  return Array.isArray(value) ? value.length > 0 : value !== undefined
+}
+
+/**
+ * The fields the Open Library record fills that no Finna or Google match for this ISBN does —
+ * what the third source actually adds. Finna and Open Library are compared through their own
+ * parsers, Google through its raw volume fields.
+ */
+function openLibraryAdds(
+  openlibrary: SourceResult | undefined,
+  finna: SourceResult[],
+  google: Json[],
+): string[] {
+  if (!openlibrary) return []
+  return COMPARED.filter(
+    ([field, inGoogle]) =>
+      filled(openlibrary, field) &&
+      !finna.some((result) => filled(result, field)) &&
+      !google.some((item) => inGoogle(volumeInfo(item))),
+  ).map(([field]) => field)
+}
+
 async function buildRow(dir: string, entry: ListedIsbn): Promise<Row> {
   const finnaBody = await readFixture(dir, 'finna', entry.isbn13)
   const googleBody = await readFixture(dir, 'google', entry.isbn13)
+  const openLibraryBody = await readFixture(dir, 'openlibrary', entry.isbn13)
   const finna = finnaMatches(finnaBody, entry.isbn13)
   const google = googleMatches(googleBody, entry.isbn13)
-  const titles = [...finna.map((r) => r.title), ...google.map((i) => volumeInfo(i).title)]
+  const openlibrary = openLibraryMatches(openLibraryBody, entry.isbn13)
+  const parsed = {
+    finna: finnaResults(finnaBody, entry.isbn13) ?? [],
+    openlibrary: openLibraryResults(openLibraryBody, entry.isbn13) ?? [],
+  }
+  const titles = [
+    ...finna.map((r) => r.title),
+    ...google.map((i) => volumeInfo(i).title),
+    ...openlibrary.map((e) => e.title),
+  ]
   return {
     ...entry,
     finna: {
@@ -354,10 +491,19 @@ async function buildRow(dir: string, entry: ListedIsbn): Promise<Row> {
       matching: google.length,
       cover: google.some((i) => isObject(volumeInfo(i).imageLinks)),
     },
+    openlibrary: {
+      captured: openLibraryBody !== undefined,
+      total: isObject(openLibraryBody) ? Object.keys(openLibraryBody).length : 0,
+      matching: openlibrary.length,
+      // Recorded for the report only: the adapter sets no coverUrl (AD-14, redirects).
+      cover: openlibrary.some((e) => isObject(e.cover)),
+    },
     title: strings(titles)[0] ?? '',
     categories: unique(google.flatMap((i) => strings(volumeInfo(i).categories))),
     subjects: unique(finna.flatMap(finnaSubjects)),
     genres: unique(finna.flatMap((r) => strings(r.genres))),
+    openLibrarySubjects: unique(openlibrary.flatMap((e) => names(e.subjects))),
+    openLibraryAdds: openLibraryAdds(parsed.openlibrary[0], parsed.finna, google),
   }
 }
 
@@ -379,23 +525,32 @@ function sourceCells(row: SourceRow): [string, string] {
 
 interface QueryRow {
   query: string
+  source: SearchSource
   slug: string
   captured: boolean
   records: number
   hits: number
 }
 
-async function buildQueryRow(dir: string, query: string): Promise<QueryRow> {
-  const path = searchFixturePath(dir, query)
+async function buildQueryRow(dir: string, source: SearchSource, query: string): Promise<QueryRow> {
+  const path = searchFixturePath(dir, source, query)
   const body: unknown = existsSync(path)
     ? (JSON.parse(await readFile(path, 'utf8')) as unknown)
     : undefined
+  const records = isObject(body) ? (source === 'finna' ? body.records : body.docs) : undefined
+  const hits =
+    body === undefined
+      ? 0
+      : source === 'finna'
+        ? finnaSearchHits(body, query).length
+        : openLibrarySearchHits(body, query).length
   return {
     query,
+    source,
     slug: querySlug(query),
     captured: body !== undefined,
-    records: list(isObject(body) ? body.records : undefined).length,
-    hits: body === undefined ? 0 : finnaSearchHits(body, query).length,
+    records: list(records).length,
+    hits,
   }
 }
 
@@ -407,12 +562,15 @@ export async function buildReport(
   queries: readonly string[] = [],
 ): Promise<{ markdown: string; missing: NotCaptured[] }> {
   const rows = await Promise.all(isbns.map((entry) => buildRow(dir, entry)))
-  const queryRows = await Promise.all(queries.map((query) => buildQueryRow(dir, query)))
+  const queryRows = await Promise.all(
+    queries.flatMap((query) => SEARCH_SOURCES.map((source) => buildQueryRow(dir, source, query))),
+  )
   const total = rows.length
   const inFinna = rows.filter((r) => r.finna.matching > 0)
   const inGoogle = rows.filter((r) => r.google.matching > 0)
+  const inOpenLibrary = rows.filter((r) => r.openlibrary.matching > 0)
   const inBoth = rows.filter((r) => r.finna.matching > 0 && r.google.matching > 0)
-  const inNeither = rows.filter((r) => r.finna.matching === 0 && r.google.matching === 0)
+  const inNeither = rows.filter((r) => SOURCES.every((source) => r[source].matching === 0))
   const withCategories = rows.filter((r) => r.categories.length > 0)
   const withGenres = rows.filter((r) => r.genres.length > 0)
   const englishMissing = rows.filter((r) => /^978[01]/.test(r.isbn13) && r.google.matching === 0)
@@ -430,10 +588,12 @@ export async function buildReport(
     ...queryRows
       .filter((row) => !row.captured)
       .map((row) => ({
-        source: 'finna' as Source,
+        source: row.source as Source,
         isbn13: '',
         query: row.query,
-        reason: reasons.find((r) => r.query === row.query)?.reason ?? 'no fixture on disk',
+        reason:
+          reasons.find((r) => r.query === row.query && r.source === row.source)?.reason ??
+          'no fixture on disk',
       })),
   ]
 
@@ -475,7 +635,7 @@ export async function buildReport(
   const lines = [
     '# Real-book fixtures',
     '',
-    'Generated by `npm run fixtures` (`scripts/capture-fixtures.ts`) from the files in `finna/` and `google/`. Do not edit by hand.',
+    'Generated by `npm run fixtures` (`scripts/capture-fixtures.ts`) from the files in `finna/`, `google/` and `openlibrary/`. Do not edit by hand.',
     '',
     `Captured: ${capturedOn}`,
     '',
@@ -483,24 +643,32 @@ export async function buildReport(
     '',
     `- Finna: \`GET https://api.finna.fi/api/v1/search?lookfor=isbn:"<isbn13>"&type=AllFields&limit=100\` plus one \`field[]\` per field below`,
     '- Google Books: `GET https://www.googleapis.com/books/v1/volumes?q=isbn:<isbn13>&key=<key>`',
+    '- Open Library: `GET https://openlibrary.org/api/books?bibkeys=ISBN:<isbn13>&jscmd=data&format=json`',
     `- Finna search: \`GET https://api.finna.fi/api/v1/search?lookfor=<query>&type=AllFields&limit=20\` plus one \`field[]\` per search field below`,
+    '- Open Library search: `GET https://openlibrary.org/search.json?q=<query>&fields=<fields below>&limit=20`',
+    '',
+    'Every Open Library request carries `User-Agent: bookeh (<contact>)` from `OPEN_LIBRARY_CONTACT`; the contact itself is never written here.',
     '',
     `Finna fields: ${FINNA_FIELDS.map((f) => `\`${f}\``).join(', ')}`,
     '',
     `Finna search fields: ${FINNA_SEARCH_FIELDS.map((f) => `\`${f}\``).join(', ')}`,
     '',
-    'A match is a record whose own ISBNs normalise to the ISBN asked for: Finna `isbns` (binding text after a space ignored), Google `industryIdentifiers`. Covers and categories count matches only.',
+    `Open Library search fields: ${OPEN_LIBRARY_FIELDS.map((f) => `\`${f}\``).join(', ')}`,
+    '',
+    'A match is a record whose own ISBNs normalise to the ISBN asked for: Finna `isbns` (binding text after a space ignored), Google `industryIdentifiers`, Open Library the `ISBN:<isbn13>` key it answered under. Covers and categories count matches only. Open Library covers are recorded here but never used: those URLs redirect, which AD-14 refuses.',
     '',
     '## Books',
     '',
-    '| As listed | ISBN-13 | Finna records / matching | Finna cover | Google items / matching | Google cover | Google categories | Title |',
-    '|---|---|---|---|---|---|---|---|',
+    '| As listed | ISBN-13 | Finna records / matching | Finna cover | Google items / matching | Google cover | OL keys / matching | OL cover | OL adds | Google categories | Title |',
+    '|---|---|---|---|---|---|---|---|---|---|---|',
     ...rows.map((r) =>
       [
         r.listed,
         r.isbn13,
         ...sourceCells(r.finna),
         ...sourceCells(r.google),
+        ...sourceCells(r.openlibrary),
+        r.openLibraryAdds.join('; ') || '–',
         r.categories.join('; ') || '–',
         r.title || '–',
       ]
@@ -514,9 +682,16 @@ export async function buildReport(
     '',
     `- Found by Finna: ${inFinna.length} of ${total}${uncaptured('finna')}`,
     `- Found by Google: ${inGoogle.length} of ${total}${uncaptured('google')}`,
-    `- Found by both: ${inBoth.length} of ${total}`,
-    `- Found by neither: ${inNeither.length} of ${total} (${names(inNeither)})`,
-    `- Covers: Finna ${rows.filter((r) => r.finna.cover).length}, Google ${rows.filter((r) => r.google.cover).length}`,
+    `- Found by Open Library: ${inOpenLibrary.length} of ${total}${uncaptured('openlibrary')}`,
+    `- Found by Finna and Google both: ${inBoth.length} of ${total}`,
+    `- Found by no source: ${inNeither.length} of ${total} (${names(inNeither)})`,
+    `- Covers: Finna ${rows.filter((r) => r.finna.cover).length}, Google ${rows.filter((r) => r.google.cover).length}, Open Library ${rows.filter((r) => r.openlibrary.cover).length} (unused)`,
+    `- Books where Open Library adds a field the other two leave empty: ${rows.filter((r) => r.openLibraryAdds.length > 0).length} (${tally(
+      rows,
+      (r) => r.openLibraryAdds,
+    )
+      .map(([field, n]) => `${field} ${n}`)
+      .join(', ')})`,
     `- Google results with \`categories\`: ${withCategories.length}`,
     `- Finna results with \`genres\`: ${withGenres.length}`,
     '',
@@ -532,16 +707,21 @@ export async function buildReport(
     '',
     ...terms(tally(rows, (r) => r.categories)),
     '',
+    '## Open Library subjects',
+    '',
+    ...terms(tally(rows, (r) => r.openLibrarySubjects)),
+    '',
     '## Search queries',
     '',
-    'Recorded under `finna/search/<slug>.json`. Hits are the distinct ISBN-13s the response yields.',
+    "Recorded under `<source>/search/<slug>.json`. Records are Finna `records` or Open Library `docs` (works); hits are the distinct ISBN-13s the response yields — for Open Library, from each work's edition docs only.",
     '',
-    '| Query | Fixture | Records | Hits |',
-    '|---|---|---|---|',
+    '| Query | Source | Fixture | Records | Hits |',
+    '|---|---|---|---|---|',
     ...(queryRows.length
       ? queryRows.map((row) =>
           [
             row.query,
+            row.source,
             row.captured ? `${row.slug}.json` : 'not captured',
             row.captured ? String(row.records) : '–',
             row.captured ? String(row.hits) : '–',
@@ -551,7 +731,7 @@ export async function buildReport(
             .replace(/^/, '| ')
             .replace(/$/, ' |'),
         )
-      : ['| none | – | – | – |']),
+      : ['| none | – | – | – | – |']),
     '',
     '## Not captured',
     '',
@@ -575,6 +755,13 @@ async function main(): Promise<number> {
   if (!key) {
     process.stderr.write(
       'GOOGLE_BOOKS_API_KEY is not set in .env. Keyless calls hit the shared quota.\n',
+    )
+    return 1
+  }
+  const contact = process.env.OPEN_LIBRARY_CONTACT?.trim()
+  if (!contact) {
+    process.stderr.write(
+      'OPEN_LIBRARY_CONTACT is not set in .env. Open Library asks every client to identify itself.\n',
     )
     return 1
   }
@@ -603,8 +790,7 @@ async function main(): Promise<number> {
     dir,
     loggingFetch,
     sleep,
-    key,
-    queries,
+    { googleKey: key, contact, queries },
   )
 
   // A run that wrote nothing keeps the date of the capture it reports on.

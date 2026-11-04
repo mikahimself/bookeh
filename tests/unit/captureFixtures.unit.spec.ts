@@ -18,6 +18,10 @@ import {
 
 const noSleep = async () => {}
 const KEY = 'TEST_KEY'
+const CONTACT = 'tester@example.test'
+const OPTS = { googleKey: KEY, contact: CONTACT }
+const isGoogle = (url: string) => url.startsWith('https://www.googleapis.com/')
+const isOpenLibrary = (url: string) => url.startsWith('https://openlibrary.org/')
 const dirs: string[] = []
 
 async function tempDir(): Promise<string> {
@@ -79,29 +83,71 @@ describe('capture', () => {
     const dir = await tempDir()
     const fetchFn = vi.fn<FetchFn>(async () => new Response('{"error":{}}', { status: 503 }))
 
-    const { notCaptured } = await capture(['9789520408053'], dir, fetchFn, noSleep, KEY)
+    const { notCaptured } = await capture(['9789520408053'], dir, fetchFn, noSleep, OPTS)
 
-    // Four for the Google health check, four for Finna; Google is then skipped.
-    expect(fetchFn).toHaveBeenCalledTimes(8)
+    // Four for the Google health check, four for Finna, four for Open Library; Google is
+    // then skipped.
+    expect(fetchFn).toHaveBeenCalledTimes(12)
     expect(notCaptured.map((n) => [n.source, n.isbn13])).toEqual([
       ['finna', '9789520408053'],
       ['google', '9789520408053'],
+      ['openlibrary', '9789520408053'],
     ])
     expect(await readdir(join(dir, 'finna'))).toEqual([])
     expect(await readdir(join(dir, 'google'))).toEqual([])
+    expect(await readdir(join(dir, 'openlibrary'))).toEqual([])
+  })
+
+  it('identifies every Open Library request, and skips the source without a contact', async () => {
+    const dir = await tempDir()
+    const fetchFn = vi.fn<FetchFn>(async (url) =>
+      Response.json(isOpenLibrary(url) ? {} : { resultCount: 0, status: 'OK' }),
+    )
+
+    await capture(['9789520408053'], dir, fetchFn, noSleep, {
+      contact: CONTACT,
+      queries: ['tuntematon sotilas'],
+    })
+
+    const openLibraryCalls = fetchFn.mock.calls.filter(([url]) => isOpenLibrary(url))
+    expect(openLibraryCalls).toHaveLength(2) // one lookup, one search
+    for (const [, init] of openLibraryCalls) {
+      expect(init.headers).toMatchObject({ 'User-Agent': `bookeh (${CONTACT})` })
+    }
+    // The contact is never written to a fixture.
+    for (const file of await readdir(join(dir, 'openlibrary'), { recursive: true })) {
+      if (file.endsWith('.json')) {
+        expect(await readFile(join(dir, 'openlibrary', file), 'utf8')).not.toContain(CONTACT)
+      }
+    }
+
+    const bare = await tempDir()
+    const bareFetch = vi.fn<FetchFn>(async () => Response.json({ resultCount: 0, status: 'OK' }))
+    const { notCaptured } = await capture(['9789520408053'], bare, bareFetch, noSleep, {
+      queries: ['tuntematon sotilas'],
+    })
+
+    expect(bareFetch.mock.calls.some(([url]) => isOpenLibrary(url))).toBe(false)
+    expect(notCaptured.map((n) => [n.source, n.reason])).toEqual([
+      ['google', expect.stringContaining('Google health check failed')],
+      ['openlibrary', 'OPEN_LIBRARY_CONTACT is not set'],
+      ['openlibrary', 'OPEN_LIBRARY_CONTACT is not set'],
+    ])
   })
 
   it('stores no Google response in a run where Google cannot find a book it knows', async () => {
     const dir = await tempDir()
     const fetchFn = vi.fn<FetchFn>(async (url) =>
       Response.json(
-        url.startsWith('https://www.googleapis.com/')
+        isGoogle(url)
           ? { kind: 'books#volumes', totalItems: 0 }
-          : { resultCount: 0, status: 'OK' },
+          : isOpenLibrary(url)
+            ? {}
+            : { resultCount: 0, status: 'OK' },
       ),
     )
 
-    const { notCaptured } = await capture(['9789520408053'], dir, fetchFn, noSleep, KEY)
+    const { notCaptured } = await capture(['9789520408053'], dir, fetchFn, noSleep, OPTS)
 
     expect(fetchFn).toHaveBeenCalledWith(
       expect.stringContaining(GOOGLE_HEALTH_ISBN),
@@ -109,15 +155,17 @@ describe('capture', () => {
     )
     expect(await readdir(join(dir, 'finna'))).toEqual(['9789520408053.json'])
     expect(await readdir(join(dir, 'google'))).toEqual([])
+    expect(await readdir(join(dir, 'openlibrary'))).toEqual(['9789520408053.json'])
     expect(notCaptured).toEqual([
       expect.objectContaining({ source: 'google', isbn13: '9789520408053' }),
     ])
   })
 
-  it('stores both responses when Google finds the books', async () => {
+  it("stores every source's response when Google finds the books", async () => {
     const dir = await tempDir()
     const fetchFn = vi.fn<FetchFn>(async (url) => {
-      if (!url.startsWith('https://www.googleapis.com/')) {
+      if (isOpenLibrary(url)) return Response.json({})
+      if (!isGoogle(url)) {
         return Response.json({ resultCount: 0, status: 'OK' })
       }
       const isbn13 = new URL(url).searchParams.get('q')?.replace('isbn:', '')
@@ -128,27 +176,31 @@ describe('capture', () => {
       })
     })
 
-    const { notCaptured, written } = await capture(['9789520408053'], dir, fetchFn, noSleep, KEY)
+    const { notCaptured, written } = await capture(['9789520408053'], dir, fetchFn, noSleep, OPTS)
 
     expect(notCaptured).toEqual([])
-    expect(written).toBe(2)
-    expect(await readdir(join(dir, 'finna'))).toEqual(['9789520408053.json'])
-    expect(await readdir(join(dir, 'google'))).toEqual(['9789520408053.json'])
+    expect(written).toBe(3)
+    for (const source of ['finna', 'google', 'openlibrary']) {
+      expect(await readdir(join(dir, source))).toEqual(['9789520408053.json'])
+    }
   })
 
   it('makes no request when every fixture exists, searches included', async () => {
     const dir = await tempDir()
-    for (const source of ['finna', 'google']) {
+    for (const source of ['finna', 'google', 'openlibrary']) {
       await mkdir(join(dir, source))
       await writeFile(join(dir, source, '9789520408053.json'), '{}\n')
     }
-    await mkdir(join(dir, 'finna', 'search'))
-    await writeFile(join(dir, 'finna', 'search', 'tuntematon-sotilas.json'), '{}\n')
+    for (const source of ['finna', 'openlibrary']) {
+      await mkdir(join(dir, source, 'search'))
+      await writeFile(join(dir, source, 'search', 'tuntematon-sotilas.json'), '{}\n')
+    }
     const fetchFn = vi.fn<FetchFn>()
 
-    const { notCaptured } = await capture(['9789520408053'], dir, fetchFn, noSleep, KEY, [
-      'tuntematon sotilas',
-    ])
+    const { notCaptured } = await capture(['9789520408053'], dir, fetchFn, noSleep, {
+      ...OPTS,
+      queries: ['tuntematon sotilas'],
+    })
 
     expect(fetchFn).not.toHaveBeenCalled()
     expect(notCaptured).toEqual([])
@@ -158,20 +210,26 @@ describe('capture', () => {
     const dir = await tempDir()
     // Google is down for this run, and Finna answers everything but the second query.
     const fetchFn = vi.fn<FetchFn>(async (url) => {
-      if (url.startsWith('https://www.googleapis.com/')) return new Response('', { status: 503 })
+      if (isGoogle(url)) return new Response('', { status: 503 })
+      if (isOpenLibrary(url)) return Response.json({})
       if (new URL(url).searchParams.get('lookfor') === 'ei löydy') {
         return new Response('oops', { status: 404 })
       }
       return Response.json({ resultCount: 0, status: 'OK' })
     })
 
-    const { notCaptured, written } = await capture(['9789520408053'], dir, fetchFn, noSleep, KEY, [
-      'tuntematon sotilas',
-      'ei löydy',
-    ])
+    const { notCaptured, written } = await capture(['9789520408053'], dir, fetchFn, noSleep, {
+      ...OPTS,
+      queries: ['tuntematon sotilas', 'ei löydy'],
+    })
 
-    expect(written).toBe(2)
+    // Two lookups (Finna, Open Library) and three of the four search fixtures.
+    expect(written).toBe(5)
     expect(await readdir(join(dir, 'finna', 'search'))).toEqual(['tuntematon-sotilas.json'])
+    expect(await readdir(join(dir, 'openlibrary', 'search'))).toEqual([
+      'ei-loydy.json',
+      'tuntematon-sotilas.json',
+    ])
     expect(notCaptured).toEqual([
       expect.objectContaining({ source: 'google', isbn13: '9789520408053' }),
       expect.objectContaining({ source: 'finna', query: 'ei löydy' }),
@@ -220,9 +278,33 @@ describe('buildReport', () => {
     expect(undecided.markdown).toContain('Not decided')
   })
 
-  it('names the search request, its fields and a row per recorded query', async () => {
+  it('names the search request, its fields and a row per recorded query and source', async () => {
     const dir = await tempDir()
     await mkdir(join(dir, 'finna', 'search'), { recursive: true })
+    await mkdir(join(dir, 'openlibrary', 'search'), { recursive: true })
+    // One work, one edition doc carrying both forms of one ISBN: one hit.
+    await writeFile(
+      join(dir, 'openlibrary', 'search', 'tuntematon-sotilas.json'),
+      JSON.stringify({
+        numFound: 1,
+        docs: [
+          {
+            key: '/works/OL4223922W',
+            title: 'Tuntematon sotilas',
+            author_name: ['Väinö Linna'],
+            editions: {
+              docs: [
+                {
+                  key: '/books/OL4510970M',
+                  title: 'Tuntematon sotilas',
+                  isbn: ['9519912061', '9789519912066'],
+                },
+              ],
+            },
+          },
+        ],
+      }),
+    )
     // Three records, one of them without an ISBN: two hits.
     await writeFile(
       join(dir, 'finna', 'search', 'tuntematon-sotilas.json'),
@@ -246,11 +328,22 @@ describe('buildReport', () => {
     )
 
     expect(markdown).toContain('- Finna search: `GET https://api.finna.fi/api/v1/search?lookfor=')
+    expect(markdown).toContain('- Open Library search: `GET https://openlibrary.org/search.json?q=')
     expect(markdown).toContain('Finna search fields: `id`, `title`')
-    expect(markdown).toContain('| tuntematon sotilas | tuntematon-sotilas.json | 3 | 2 |')
-    expect(markdown).toContain('| ei löydy | not captured | – | – |')
+    expect(markdown).toContain('Open Library search fields: `key`, `title`')
+    expect(markdown).toContain('| tuntematon sotilas | finna | tuntematon-sotilas.json | 3 | 2 |')
+    expect(markdown).toContain(
+      '| tuntematon sotilas | openlibrary | tuntematon-sotilas.json | 1 | 1 |',
+    )
+    expect(markdown).toContain('| ei löydy | finna | not captured | – | – |')
+    expect(markdown).toContain('| ei löydy | openlibrary | not captured | – | – |')
     expect(missing).toEqual([
       expect.objectContaining({ source: 'finna', query: 'ei löydy', reason: 'no fixture on disk' }),
+      expect.objectContaining({
+        source: 'openlibrary',
+        query: 'ei löydy',
+        reason: 'no fixture on disk',
+      }),
     ])
   })
 })

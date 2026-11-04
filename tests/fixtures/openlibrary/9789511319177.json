@@ -1,0 +1,73 @@
+{
+  "ISBN:9789511319177": {
+    "url": "http://openlibrary.org/books/OL32370247M/Taivaanpallo",
+    "key": "/books/OL32370247M",
+    "title": "Taivaanpallo",
+    "authors": [
+      {
+        "url": "http://openlibrary.org/authors/OL9200874A/Jalonen_Olli",
+        "name": "Jalonen Olli"
+      }
+    ],
+    "number_of_pages": 461,
+    "identifiers": {
+      "isbn_10": [
+        "9511319175"
+      ],
+      "isbn_13": [
+        "9789511319177"
+      ],
+      "lccn": [
+        "2018395206"
+      ],
+      "oclc": [
+        "1032036489"
+      ],
+      "openlibrary": [
+        "OL32370247M"
+      ]
+    },
+    "classifications": {
+      "lc_classifications": [
+        "PH355.J357 T35 2018"
+      ]
+    },
+    "publishers": [
+      {
+        "name": "Otava"
+      }
+    ],
+    "publish_date": "May 05, 2018",
+    "subjects": [
+      {
+        "name": "Travel",
+        "url": "https://openlibrary.org/subjects/travel"
+      },
+      {
+        "name": "Fiction",
+        "url": "https://openlibrary.org/subjects/fiction"
+      },
+      {
+        "name": "Astronomers",
+        "url": "https://openlibrary.org/subjects/astronomers"
+      },
+      {
+        "name": "Astronomy",
+        "url": "https://openlibrary.org/subjects/astronomy"
+      },
+      {
+        "name": "Finnish literature",
+        "url": "https://openlibrary.org/subjects/finnish_literature"
+      },
+      {
+        "name": "Sailing",
+        "url": "https://openlibrary.org/subjects/sailing"
+      }
+    ],
+    "cover": {
+      "small": "https://covers.openlibrary.org/b/id/11023404-S.jpg",
+      "medium": "https://covers.openlibrary.org/b/id/11023404-M.jpg",
+      "large": "https://covers.openlibrary.org/b/id/11023404-L.jpg"
+    }
+  }
+}

@@ -55,6 +55,9 @@ describe('pick the edition', () => {
           return new Response(body, { headers: { 'Content-Type': 'application/json' } })
         }
         if (url.hostname === 'www.googleapis.com') return Response.json({ totalItems: 0 })
+        // Open Library joins the fan-out when OPEN_LIBRARY_CONTACT is set; `{}` is its
+        // answer for an ISBN it does not hold.
+        if (url.hostname === 'openlibrary.org') return Response.json({})
         return new Response(null, { status: 404 })
       }),
     )

@@ -1,0 +1,51 @@
+{
+  "ISBN:9780007466061": {
+    "url": "http://openlibrary.org/books/OL25336126M/A_Dance_With_Dragons",
+    "key": "/books/OL25336126M",
+    "title": "A Dance With Dragons",
+    "subtitle": "1: Dreams and Dust",
+    "authors": [
+      {
+        "url": "http://openlibrary.org/authors/OL234664A/George_R._R._Martin",
+        "name": "George R. R. Martin"
+      }
+    ],
+    "pagination": "690p.",
+    "identifiers": {
+      "isbn_13": [
+        "9780007466061"
+      ],
+      "openlibrary": [
+        "OL25336126M"
+      ]
+    },
+    "classifications": {
+      "lc_classifications": [
+        "PS3563.A7239"
+      ]
+    },
+    "publishers": [
+      {
+        "name": "Harper Collins Publishers"
+      }
+    ],
+    "publish_places": [
+      {
+        "name": "London, UK"
+      }
+    ],
+    "publish_date": "2012",
+    "ebooks": [
+      {
+        "preview_url": "https://archive.org/details/dancewithdragons0000mart_l7e4",
+        "availability": "noview",
+        "formats": {}
+      }
+    ],
+    "cover": {
+      "small": "https://covers.openlibrary.org/b/id/15266948-S.jpg",
+      "medium": "https://covers.openlibrary.org/b/id/15266948-M.jpg",
+      "large": "https://covers.openlibrary.org/b/id/15266948-L.jpg"
+    }
+  }
+}

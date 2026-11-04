@@ -1,0 +1,1816 @@
+{
+  "ISBN:9780007447831": {
+    "url": "http://openlibrary.org/books/OL58044552M/A_Clash_of_Kings",
+    "key": "/books/OL58044552M",
+    "title": "A Clash of Kings",
+    "authors": [
+      {
+        "url": "http://openlibrary.org/authors/OL234664A/George_R._R._Martin",
+        "name": "George R. R. Martin"
+      }
+    ],
+    "number_of_pages": 928,
+    "pagination": "911",
+    "identifiers": {
+      "isbn_13": [
+        "9780007447831"
+      ],
+      "openlibrary": [
+        "OL58044552M"
+      ]
+    },
+    "publishers": [
+      {
+        "name": "Harper Voyager"
+      },
+      {
+        "name": "HarperCollins Publishers"
+      }
+    ],
+    "publish_places": [
+      {
+        "name": "London, England"
+      }
+    ],
+    "publish_date": "2011",
+    "subjects": [
+      {
+        "name": "Fantasy fiction",
+        "url": "https://openlibrary.org/subjects/fantasy_fiction"
+      },
+      {
+        "name": "Fiction",
+        "url": "https://openlibrary.org/subjects/fiction"
+      },
+      {
+        "name": "Fantasy",
+        "url": "https://openlibrary.org/subjects/fantasy"
+      },
+      {
+        "name": "New York Times bestseller",
+        "url": "https://openlibrary.org/subjects/new_york_times_bestseller"
+      },
+      {
+        "name": "nyt:trade_fiction_paperback=2011-12-31",
+        "url": "https://openlibrary.org/subjects/nyt:trade_fiction_paperback=2011-12-31"
+      },
+      {
+        "name": "Fiction - Fantasy",
+        "url": "https://openlibrary.org/subjects/fiction_-_fantasy"
+      },
+      {
+        "name": "Fantasy - Epic",
+        "url": "https://openlibrary.org/subjects/fantasy_-_epic"
+      },
+      {
+        "name": "Fantasy - Series",
+        "url": "https://openlibrary.org/subjects/fantasy_-_series"
+      },
+      {
+        "name": "Fiction / Fantasy / Epic",
+        "url": "https://openlibrary.org/subjects/fiction_/_fantasy_/_epic"
+      },
+      {
+        "name": "Fiction, fantasy, epic",
+        "url": "https://openlibrary.org/subjects/fiction,_fantasy,_epic"
+      },
+      {
+        "name": "Seven kingdoms (imaginary place), fiction",
+        "url": "https://openlibrary.org/subjects/seven_kingdoms_(imaginary_place),_fiction"
+      },
+      {
+        "name": "Civil war",
+        "url": "https://openlibrary.org/subjects/civil_war"
+      },
+      {
+        "name": "Imaginary places",
+        "url": "https://openlibrary.org/subjects/imaginary_places"
+      },
+      {
+        "name": "Magic",
+        "url": "https://openlibrary.org/subjects/magic"
+      },
+      {
+        "name": "Action & Adventure",
+        "url": "https://openlibrary.org/subjects/action_&_adventure"
+      },
+      {
+        "name": "Dragons",
+        "url": "https://openlibrary.org/subjects/dragons"
+      },
+      {
+        "name": "Science Fiction",
+        "url": "https://openlibrary.org/subjects/science_fiction"
+      },
+      {
+        "name": "Epic",
+        "url": "https://openlibrary.org/subjects/epic"
+      },
+      {
+        "name": "Refugees",
+        "url": "https://openlibrary.org/subjects/refugees"
+      },
+      {
+        "name": "Good and evil",
+        "url": "https://openlibrary.org/subjects/good_and_evil"
+      },
+      {
+        "name": "American Fantasy fiction",
+        "url": "https://openlibrary.org/subjects/american_fantasy_fiction"
+      },
+      {
+        "name": "Kings and rulers",
+        "url": "https://openlibrary.org/subjects/kings_and_rulers"
+      },
+      {
+        "name": "Imaginary wars and battles",
+        "url": "https://openlibrary.org/subjects/imaginary_wars_and_battles"
+      },
+      {
+        "name": "Alchemy",
+        "url": "https://openlibrary.org/subjects/alchemy"
+      },
+      {
+        "name": "Seven Kingdoms (Imaginary place)",
+        "url": "https://openlibrary.org/subjects/seven_kingdoms_(imaginary_place)"
+      },
+      {
+        "name": "Guerras imaginarias",
+        "url": "https://openlibrary.org/subjects/guerras_imaginarias"
+      },
+      {
+        "name": "Betrayal",
+        "url": "https://openlibrary.org/subjects/betrayal"
+      },
+      {
+        "name": "Revenge",
+        "url": "https://openlibrary.org/subjects/revenge"
+      },
+      {
+        "name": "Voyages and travels",
+        "url": "https://openlibrary.org/subjects/voyages_and_travels"
+      },
+      {
+        "name": "Traición",
+        "url": "https://openlibrary.org/subjects/traición"
+      },
+      {
+        "name": "Viajes",
+        "url": "https://openlibrary.org/subjects/viajes"
+      },
+      {
+        "name": "Alquimia",
+        "url": "https://openlibrary.org/subjects/alquimia"
+      },
+      {
+        "name": "Ficción",
+        "url": "https://openlibrary.org/subjects/ficción"
+      },
+      {
+        "name": "Reyes y soberanos",
+        "url": "https://openlibrary.org/subjects/reyes_y_soberanos"
+      },
+      {
+        "name": "American literature",
+        "url": "https://openlibrary.org/subjects/american_literature"
+      },
+      {
+        "name": "Brothers",
+        "url": "https://openlibrary.org/subjects/brothers"
+      },
+      {
+        "name": "Novela",
+        "url": "https://openlibrary.org/subjects/novela"
+      },
+      {
+        "name": "Dystopian",
+        "url": "https://openlibrary.org/subjects/dystopian"
+      },
+      {
+        "name": "Romans, nouvelles",
+        "url": "https://openlibrary.org/subjects/romans,_nouvelles"
+      },
+      {
+        "name": "series:A Song of Ice and Fire",
+        "url": "https://openlibrary.org/subjects/series:a_song_of_ice_and_fire"
+      },
+      {
+        "name": "Rois et souverains",
+        "url": "https://openlibrary.org/subjects/rois_et_souverains"
+      },
+      {
+        "name": "Frères",
+        "url": "https://openlibrary.org/subjects/frères"
+      },
+      {
+        "name": "Guerres et batailles imaginaires",
+        "url": "https://openlibrary.org/subjects/guerres_et_batailles_imaginaires"
+      }
+    ],
+    "subject_places": [
+      {
+        "name": "Westeros",
+        "url": "https://openlibrary.org/subjects/place:westeros"
+      },
+      {
+        "name": "Seven Kingdoms",
+        "url": "https://openlibrary.org/subjects/place:seven_kingdoms"
+      },
+      {
+        "name": "North",
+        "url": "https://openlibrary.org/subjects/place:north"
+      },
+      {
+        "name": "Winterfell",
+        "url": "https://openlibrary.org/subjects/place:winterfell"
+      },
+      {
+        "name": "Winter town",
+        "url": "https://openlibrary.org/subjects/place:winter_town"
+      },
+      {
+        "name": "Last Hearth",
+        "url": "https://openlibrary.org/subjects/place:last_hearth"
+      },
+      {
+        "name": "Widow's Watch",
+        "url": "https://openlibrary.org/subjects/place:widow's_watch"
+      },
+      {
+        "name": "Dreadfort",
+        "url": "https://openlibrary.org/subjects/place:dreadfort"
+      },
+      {
+        "name": "Hornwood",
+        "url": "https://openlibrary.org/subjects/place:hornwood"
+      },
+      {
+        "name": "Torrhen's Square",
+        "url": "https://openlibrary.org/subjects/place:torrhen's_square"
+      },
+      {
+        "name": "White Harbor",
+        "url": "https://openlibrary.org/subjects/place:white_harbor"
+      },
+      {
+        "name": "Wolfswood",
+        "url": "https://openlibrary.org/subjects/place:wolfswood"
+      },
+      {
+        "name": "White Knife",
+        "url": "https://openlibrary.org/subjects/place:white_knife"
+      },
+      {
+        "name": "Bear Island",
+        "url": "https://openlibrary.org/subjects/place:bear_island"
+      },
+      {
+        "name": "Saltspear",
+        "url": "https://openlibrary.org/subjects/place:saltspear"
+      },
+      {
+        "name": "Mole's Town",
+        "url": "https://openlibrary.org/subjects/place:mole's_town"
+      },
+      {
+        "name": "Wall",
+        "url": "https://openlibrary.org/subjects/place:wall"
+      },
+      {
+        "name": "Castle Black",
+        "url": "https://openlibrary.org/subjects/place:castle_black"
+      },
+      {
+        "name": "Shadow Tower",
+        "url": "https://openlibrary.org/subjects/place:shadow_tower"
+      },
+      {
+        "name": "Eastwatch-by-the-Sea",
+        "url": "https://openlibrary.org/subjects/place:eastwatch-by-the-sea"
+      },
+      {
+        "name": "Greyguard",
+        "url": "https://openlibrary.org/subjects/place:greyguard"
+      },
+      {
+        "name": "Stonedoor",
+        "url": "https://openlibrary.org/subjects/place:stonedoor"
+      },
+      {
+        "name": "Beyond the Wall",
+        "url": "https://openlibrary.org/subjects/place:beyond_the_wall"
+      },
+      {
+        "name": "Haunted forest",
+        "url": "https://openlibrary.org/subjects/place:haunted_forest"
+      },
+      {
+        "name": "Craster's Keep",
+        "url": "https://openlibrary.org/subjects/place:craster's_keep"
+      },
+      {
+        "name": "Whitetree",
+        "url": "https://openlibrary.org/subjects/place:whitetree"
+      },
+      {
+        "name": "Fist of the First Men",
+        "url": "https://openlibrary.org/subjects/place:fist_of_the_first_men"
+      },
+      {
+        "name": "Frostfangs",
+        "url": "https://openlibrary.org/subjects/place:frostfangs"
+      },
+      {
+        "name": "Skirling Pass",
+        "url": "https://openlibrary.org/subjects/place:skirling_pass"
+      },
+      {
+        "name": "Milkwater",
+        "url": "https://openlibrary.org/subjects/place:milkwater"
+      },
+      {
+        "name": "Riverlands",
+        "url": "https://openlibrary.org/subjects/place:riverlands"
+      },
+      {
+        "name": "Riverrun",
+        "url": "https://openlibrary.org/subjects/place:riverrun"
+      },
+      {
+        "name": "Twins",
+        "url": "https://openlibrary.org/subjects/place:twins"
+      },
+      {
+        "name": "Harrenhal",
+        "url": "https://openlibrary.org/subjects/place:harrenhal"
+      },
+      {
+        "name": "Raventree Hall",
+        "url": "https://openlibrary.org/subjects/place:raventree_hall"
+      },
+      {
+        "name": "Darry",
+        "url": "https://openlibrary.org/subjects/place:darry"
+      },
+      {
+        "name": "Seagard",
+        "url": "https://openlibrary.org/subjects/place:seagard"
+      },
+      {
+        "name": "Stone Hedge",
+        "url": "https://openlibrary.org/subjects/place:stone_hedge"
+      },
+      {
+        "name": "Gods Eye",
+        "url": "https://openlibrary.org/subjects/place:gods_eye"
+      },
+      {
+        "name": "Blackwater Rush",
+        "url": "https://openlibrary.org/subjects/place:blackwater_rush"
+      },
+      {
+        "name": "Trident",
+        "url": "https://openlibrary.org/subjects/place:trident"
+      },
+      {
+        "name": "Red Fork",
+        "url": "https://openlibrary.org/subjects/place:red_fork"
+      },
+      {
+        "name": "Tumblestone",
+        "url": "https://openlibrary.org/subjects/place:tumblestone"
+      },
+      {
+        "name": "Vale of Arryn",
+        "url": "https://openlibrary.org/subjects/place:vale_of_arryn"
+      },
+      {
+        "name": "Eyrie",
+        "url": "https://openlibrary.org/subjects/place:eyrie"
+      },
+      {
+        "name": "Bloody Gate",
+        "url": "https://openlibrary.org/subjects/place:bloody_gate"
+      },
+      {
+        "name": "Gulltown",
+        "url": "https://openlibrary.org/subjects/place:gulltown"
+      },
+      {
+        "name": "Fingers",
+        "url": "https://openlibrary.org/subjects/place:fingers"
+      },
+      {
+        "name": "Three Sisters",
+        "url": "https://openlibrary.org/subjects/place:three_sisters"
+      },
+      {
+        "name": "Casterly Rock",
+        "url": "https://openlibrary.org/subjects/place:casterly_rock"
+      },
+      {
+        "name": "Castamere",
+        "url": "https://openlibrary.org/subjects/place:castamere"
+      },
+      {
+        "name": "Ashemark",
+        "url": "https://openlibrary.org/subjects/place:ashemark"
+      },
+      {
+        "name": "Crag",
+        "url": "https://openlibrary.org/subjects/place:crag"
+      },
+      {
+        "name": "Golden Tooth",
+        "url": "https://openlibrary.org/subjects/place:golden_tooth"
+      },
+      {
+        "name": "Lannisport",
+        "url": "https://openlibrary.org/subjects/place:lannisport"
+      },
+      {
+        "name": "Oxcross",
+        "url": "https://openlibrary.org/subjects/place:oxcross"
+      },
+      {
+        "name": "Crownlands",
+        "url": "https://openlibrary.org/subjects/place:crownlands"
+      },
+      {
+        "name": "Kingsroad",
+        "url": "https://openlibrary.org/subjects/place:kingsroad"
+      },
+      {
+        "name": "King's Landing",
+        "url": "https://openlibrary.org/subjects/place:king's_landing"
+      },
+      {
+        "name": "Red Keep",
+        "url": "https://openlibrary.org/subjects/place:red_keep"
+      },
+      {
+        "name": "Great Sept of Baelor",
+        "url": "https://openlibrary.org/subjects/place:great_sept_of_baelor"
+      },
+      {
+        "name": "Kingswood",
+        "url": "https://openlibrary.org/subjects/place:kingswood"
+      },
+      {
+        "name": "Dragonstone",
+        "url": "https://openlibrary.org/subjects/place:dragonstone"
+      },
+      {
+        "name": "Rosby",
+        "url": "https://openlibrary.org/subjects/place:rosby"
+      },
+      {
+        "name": "Stokeworth",
+        "url": "https://openlibrary.org/subjects/place:stokeworth"
+      },
+      {
+        "name": "Stormlands",
+        "url": "https://openlibrary.org/subjects/place:stormlands"
+      },
+      {
+        "name": "Storm's End",
+        "url": "https://openlibrary.org/subjects/place:storm's_end"
+      },
+      {
+        "name": "Stonehelm",
+        "url": "https://openlibrary.org/subjects/place:stonehelm"
+      },
+      {
+        "name": "Boneway",
+        "url": "https://openlibrary.org/subjects/place:boneway"
+      },
+      {
+        "name": "Dorne",
+        "url": "https://openlibrary.org/subjects/place:dorne"
+      },
+      {
+        "name": "The Reach",
+        "url": "https://openlibrary.org/subjects/place:the_reach"
+      },
+      {
+        "name": "Highgarden",
+        "url": "https://openlibrary.org/subjects/place:highgarden"
+      },
+      {
+        "name": "Oldtown",
+        "url": "https://openlibrary.org/subjects/place:oldtown"
+      },
+      {
+        "name": "Bitterbridge",
+        "url": "https://openlibrary.org/subjects/place:bitterbridge"
+      },
+      {
+        "name": "Arbor",
+        "url": "https://openlibrary.org/subjects/place:arbor"
+      },
+      {
+        "name": "Mander",
+        "url": "https://openlibrary.org/subjects/place:mander"
+      },
+      {
+        "name": "Iron Islands",
+        "url": "https://openlibrary.org/subjects/place:iron_islands"
+      },
+      {
+        "name": "Pyke",
+        "url": "https://openlibrary.org/subjects/place:pyke"
+      },
+      {
+        "name": "Lordsport",
+        "url": "https://openlibrary.org/subjects/place:lordsport"
+      },
+      {
+        "name": "Old Wyk",
+        "url": "https://openlibrary.org/subjects/place:old_wyk"
+      },
+      {
+        "name": "Great Wyk",
+        "url": "https://openlibrary.org/subjects/place:great_wyk"
+      },
+      {
+        "name": "Narrow sea",
+        "url": "https://openlibrary.org/subjects/place:narrow_sea"
+      },
+      {
+        "name": "Essos",
+        "url": "https://openlibrary.org/subjects/place:essos"
+      },
+      {
+        "name": "Braavos",
+        "url": "https://openlibrary.org/subjects/place:braavos"
+      },
+      {
+        "name": "Lorath",
+        "url": "https://openlibrary.org/subjects/place:lorath"
+      },
+      {
+        "name": "Lys",
+        "url": "https://openlibrary.org/subjects/place:lys"
+      },
+      {
+        "name": "Myr",
+        "url": "https://openlibrary.org/subjects/place:myr"
+      },
+      {
+        "name": "Pentos",
+        "url": "https://openlibrary.org/subjects/place:pentos"
+      },
+      {
+        "name": "Vaes Dothrak",
+        "url": "https://openlibrary.org/subjects/place:vaes_dothrak"
+      },
+      {
+        "name": "Qarth",
+        "url": "https://openlibrary.org/subjects/place:qarth"
+      },
+      {
+        "name": "House of the Undying",
+        "url": "https://openlibrary.org/subjects/place:house_of_the_undying"
+      },
+      {
+        "name": "Vaes Tolorro",
+        "url": "https://openlibrary.org/subjects/place:vaes_tolorro"
+      },
+      {
+        "name": "Meereen",
+        "url": "https://openlibrary.org/subjects/place:meereen"
+      },
+      {
+        "name": "Summer Isles",
+        "url": "https://openlibrary.org/subjects/place:summer_isles"
+      },
+      {
+        "name": "Asshai",
+        "url": "https://openlibrary.org/subjects/place:asshai"
+      }
+    ],
+    "subject_people": [
+      {
+        "name": "Catelyn Stark",
+        "url": "https://openlibrary.org/subjects/person:catelyn_stark"
+      },
+      {
+        "name": "Robb Stark",
+        "url": "https://openlibrary.org/subjects/person:robb_stark"
+      },
+      {
+        "name": "Sansa Stark",
+        "url": "https://openlibrary.org/subjects/person:sansa_stark"
+      },
+      {
+        "name": "Arya Stark",
+        "url": "https://openlibrary.org/subjects/person:arya_stark"
+      },
+      {
+        "name": "Bran Stark",
+        "url": "https://openlibrary.org/subjects/person:bran_stark"
+      },
+      {
+        "name": "Rickon Stark",
+        "url": "https://openlibrary.org/subjects/person:rickon_stark"
+      },
+      {
+        "name": "Luwin",
+        "url": "https://openlibrary.org/subjects/person:luwin"
+      },
+      {
+        "name": "Rodrik Cassel",
+        "url": "https://openlibrary.org/subjects/person:rodrik_cassel"
+      },
+      {
+        "name": "Hallis Mollen",
+        "url": "https://openlibrary.org/subjects/person:hallis_mollen"
+      },
+      {
+        "name": "Mikken",
+        "url": "https://openlibrary.org/subjects/person:mikken"
+      },
+      {
+        "name": "Old Nan",
+        "url": "https://openlibrary.org/subjects/person:old_nan"
+      },
+      {
+        "name": "Hodor",
+        "url": "https://openlibrary.org/subjects/person:hodor"
+      },
+      {
+        "name": "Osha",
+        "url": "https://openlibrary.org/subjects/person:osha"
+      },
+      {
+        "name": "Rickard Karstark",
+        "url": "https://openlibrary.org/subjects/person:rickard_karstark"
+      },
+      {
+        "name": "Harrion Karstark",
+        "url": "https://openlibrary.org/subjects/person:harrion_karstark"
+      },
+      {
+        "name": "Robett Glover",
+        "url": "https://openlibrary.org/subjects/person:robett_glover"
+      },
+      {
+        "name": "Jon Umber (the Greatjon)",
+        "url": "https://openlibrary.org/subjects/person:jon_umber_(the_greatjon)"
+      },
+      {
+        "name": "Wyman Manderly",
+        "url": "https://openlibrary.org/subjects/person:wyman_manderly"
+      },
+      {
+        "name": "Wylis Manderly",
+        "url": "https://openlibrary.org/subjects/person:wylis_manderly"
+      },
+      {
+        "name": "Wendel Manderly",
+        "url": "https://openlibrary.org/subjects/person:wendel_manderly"
+      },
+      {
+        "name": "Donella Hornwood",
+        "url": "https://openlibrary.org/subjects/person:donella_hornwood"
+      },
+      {
+        "name": "Meera Reed",
+        "url": "https://openlibrary.org/subjects/person:meera_reed"
+      },
+      {
+        "name": "Jojen Reed",
+        "url": "https://openlibrary.org/subjects/person:jojen_reed"
+      },
+      {
+        "name": "Roose Bolton",
+        "url": "https://openlibrary.org/subjects/person:roose_bolton"
+      },
+      {
+        "name": "Ramsay Snow",
+        "url": "https://openlibrary.org/subjects/person:ramsay_snow"
+      },
+      {
+        "name": "Walton (Steelshanks)",
+        "url": "https://openlibrary.org/subjects/person:walton_(steelshanks)"
+      },
+      {
+        "name": "Hoster Tully",
+        "url": "https://openlibrary.org/subjects/person:hoster_tully"
+      },
+      {
+        "name": "Edmure Tully",
+        "url": "https://openlibrary.org/subjects/person:edmure_tully"
+      },
+      {
+        "name": "Brynden Tully",
+        "url": "https://openlibrary.org/subjects/person:brynden_tully"
+      },
+      {
+        "name": "Desmond Grell",
+        "url": "https://openlibrary.org/subjects/person:desmond_grell"
+      },
+      {
+        "name": "Robin Ryger",
+        "url": "https://openlibrary.org/subjects/person:robin_ryger"
+      },
+      {
+        "name": "Utherydes Wayn",
+        "url": "https://openlibrary.org/subjects/person:utherydes_wayn"
+      },
+      {
+        "name": "Cleos Frey",
+        "url": "https://openlibrary.org/subjects/person:cleos_frey"
+      },
+      {
+        "name": "Aenys Frey",
+        "url": "https://openlibrary.org/subjects/person:aenys_frey"
+      },
+      {
+        "name": "Jared Frey",
+        "url": "https://openlibrary.org/subjects/person:jared_frey"
+      },
+      {
+        "name": "Hosteen Frey",
+        "url": "https://openlibrary.org/subjects/person:hosteen_frey"
+      },
+      {
+        "name": "Walder Frey (Little Walder)",
+        "url": "https://openlibrary.org/subjects/person:walder_frey_(little_walder)"
+      },
+      {
+        "name": "Walder Frey (Big Walder)",
+        "url": "https://openlibrary.org/subjects/person:walder_frey_(big_walder)"
+      },
+      {
+        "name": "Robar Royce",
+        "url": "https://openlibrary.org/subjects/person:robar_royce"
+      },
+      {
+        "name": "Joffrey Baratheon",
+        "url": "https://openlibrary.org/subjects/person:joffrey_baratheon"
+      },
+      {
+        "name": "Myrcella Baratheon",
+        "url": "https://openlibrary.org/subjects/person:myrcella_baratheon"
+      },
+      {
+        "name": "Tommen Baratheon",
+        "url": "https://openlibrary.org/subjects/person:tommen_baratheon"
+      },
+      {
+        "name": "Stannis Baratheon",
+        "url": "https://openlibrary.org/subjects/person:stannis_baratheon"
+      },
+      {
+        "name": "Selyse Florent",
+        "url": "https://openlibrary.org/subjects/person:selyse_florent"
+      },
+      {
+        "name": "Shireen Baratheon",
+        "url": "https://openlibrary.org/subjects/person:shireen_baratheon"
+      },
+      {
+        "name": "Davos Seaworth",
+        "url": "https://openlibrary.org/subjects/person:davos_seaworth"
+      },
+      {
+        "name": "Devan Seaworth",
+        "url": "https://openlibrary.org/subjects/person:devan_seaworth"
+      },
+      {
+        "name": "Dale Seaworth",
+        "url": "https://openlibrary.org/subjects/person:dale_seaworth"
+      },
+      {
+        "name": "Maric Seaworth",
+        "url": "https://openlibrary.org/subjects/person:maric_seaworth"
+      },
+      {
+        "name": "Matthos Seaworth",
+        "url": "https://openlibrary.org/subjects/person:matthos_seaworth"
+      },
+      {
+        "name": "Allard Seaworth",
+        "url": "https://openlibrary.org/subjects/person:allard_seaworth"
+      },
+      {
+        "name": "Monford Velaryon",
+        "url": "https://openlibrary.org/subjects/person:monford_velaryon"
+      },
+      {
+        "name": "Salladhor Saan",
+        "url": "https://openlibrary.org/subjects/person:salladhor_saan"
+      },
+      {
+        "name": "Melisandre",
+        "url": "https://openlibrary.org/subjects/person:melisandre"
+      },
+      {
+        "name": "Patchface",
+        "url": "https://openlibrary.org/subjects/person:patchface"
+      },
+      {
+        "name": "Bryen Farring",
+        "url": "https://openlibrary.org/subjects/person:bryen_farring"
+      },
+      {
+        "name": "Axell Florent",
+        "url": "https://openlibrary.org/subjects/person:axell_florent"
+      },
+      {
+        "name": "Imry Florent",
+        "url": "https://openlibrary.org/subjects/person:imry_florent"
+      },
+      {
+        "name": "Alester Florent",
+        "url": "https://openlibrary.org/subjects/person:alester_florent"
+      },
+      {
+        "name": "Cressen",
+        "url": "https://openlibrary.org/subjects/person:cressen"
+      },
+      {
+        "name": "Pylos",
+        "url": "https://openlibrary.org/subjects/person:pylos"
+      },
+      {
+        "name": "Renly Baratheon",
+        "url": "https://openlibrary.org/subjects/person:renly_baratheon"
+      },
+      {
+        "name": "Cortnay Penrose",
+        "url": "https://openlibrary.org/subjects/person:cortnay_penrose"
+      },
+      {
+        "name": "Bryce Caron",
+        "url": "https://openlibrary.org/subjects/person:bryce_caron"
+      },
+      {
+        "name": "Emmon Cuy",
+        "url": "https://openlibrary.org/subjects/person:emmon_cuy"
+      },
+      {
+        "name": "Guyard Morrigen",
+        "url": "https://openlibrary.org/subjects/person:guyard_morrigen"
+      },
+      {
+        "name": "Parmen Crane",
+        "url": "https://openlibrary.org/subjects/person:parmen_crane"
+      },
+      {
+        "name": "Brienne Tarth",
+        "url": "https://openlibrary.org/subjects/person:brienne_tarth"
+      },
+      {
+        "name": "Ronnet Connington",
+        "url": "https://openlibrary.org/subjects/person:ronnet_connington"
+      },
+      {
+        "name": "Tywin Lannister",
+        "url": "https://openlibrary.org/subjects/person:tywin_lannister"
+      },
+      {
+        "name": "Cersei Lannister",
+        "url": "https://openlibrary.org/subjects/person:cersei_lannister"
+      },
+      {
+        "name": "Jaime Lannister",
+        "url": "https://openlibrary.org/subjects/person:jaime_lannister"
+      },
+      {
+        "name": "Tyrion Lannister",
+        "url": "https://openlibrary.org/subjects/person:tyrion_lannister"
+      },
+      {
+        "name": "Kevan Lannister",
+        "url": "https://openlibrary.org/subjects/person:kevan_lannister"
+      },
+      {
+        "name": "Lancel Lannister",
+        "url": "https://openlibrary.org/subjects/person:lancel_lannister"
+      },
+      {
+        "name": "Ilyn Payne",
+        "url": "https://openlibrary.org/subjects/person:ilyn_payne"
+      },
+      {
+        "name": "Podrick Payne",
+        "url": "https://openlibrary.org/subjects/person:podrick_payne"
+      },
+      {
+        "name": "Bronn",
+        "url": "https://openlibrary.org/subjects/person:bronn"
+      },
+      {
+        "name": "Lollys Stokeworth",
+        "url": "https://openlibrary.org/subjects/person:lollys_stokeworth"
+      },
+      {
+        "name": "Sandor Clegane",
+        "url": "https://openlibrary.org/subjects/person:sandor_clegane"
+      },
+      {
+        "name": "Gregor Clegane",
+        "url": "https://openlibrary.org/subjects/person:gregor_clegane"
+      },
+      {
+        "name": "Rafford",
+        "url": "https://openlibrary.org/subjects/person:rafford"
+      },
+      {
+        "name": "Tickler",
+        "url": "https://openlibrary.org/subjects/person:tickler"
+      },
+      {
+        "name": "Osfryd Kettleblack",
+        "url": "https://openlibrary.org/subjects/person:osfryd_kettleblack"
+      },
+      {
+        "name": "Osney Kettleblack",
+        "url": "https://openlibrary.org/subjects/person:osney_kettleblack"
+      },
+      {
+        "name": "Amory Lorch",
+        "url": "https://openlibrary.org/subjects/person:amory_lorch"
+      },
+      {
+        "name": "Addam Marbrand",
+        "url": "https://openlibrary.org/subjects/person:addam_marbrand"
+      },
+      {
+        "name": "Harys Swyft",
+        "url": "https://openlibrary.org/subjects/person:harys_swyft"
+      },
+      {
+        "name": "Josmyn Peckledon",
+        "url": "https://openlibrary.org/subjects/person:josmyn_peckledon"
+      },
+      {
+        "name": "Balon Greyjoy",
+        "url": "https://openlibrary.org/subjects/person:balon_greyjoy"
+      },
+      {
+        "name": "Asha Greyjoy",
+        "url": "https://openlibrary.org/subjects/person:asha_greyjoy"
+      },
+      {
+        "name": "Theon Greyjoy",
+        "url": "https://openlibrary.org/subjects/person:theon_greyjoy"
+      },
+      {
+        "name": "Victarion Greyjoy",
+        "url": "https://openlibrary.org/subjects/person:victarion_greyjoy"
+      },
+      {
+        "name": "Aeron Greyjoy",
+        "url": "https://openlibrary.org/subjects/person:aeron_greyjoy"
+      },
+      {
+        "name": "Dagmer",
+        "url": "https://openlibrary.org/subjects/person:dagmer"
+      },
+      {
+        "name": "Wex Pyke",
+        "url": "https://openlibrary.org/subjects/person:wex_pyke"
+      },
+      {
+        "name": "Mace Tyrell",
+        "url": "https://openlibrary.org/subjects/person:mace_tyrell"
+      },
+      {
+        "name": "Garlan Tyrell",
+        "url": "https://openlibrary.org/subjects/person:garlan_tyrell"
+      },
+      {
+        "name": "Loras Tyrell",
+        "url": "https://openlibrary.org/subjects/person:loras_tyrell"
+      },
+      {
+        "name": "Margaery Tyrell",
+        "url": "https://openlibrary.org/subjects/person:margaery_tyrell"
+      },
+      {
+        "name": "Jon Fossoway",
+        "url": "https://openlibrary.org/subjects/person:jon_fossoway"
+      },
+      {
+        "name": "Paxter Redwyne",
+        "url": "https://openlibrary.org/subjects/person:paxter_redwyne"
+      },
+      {
+        "name": "Horas Redwyne",
+        "url": "https://openlibrary.org/subjects/person:horas_redwyne"
+      },
+      {
+        "name": "Hobber Redwyne",
+        "url": "https://openlibrary.org/subjects/person:hobber_redwyne"
+      },
+      {
+        "name": "Mathis Rowan",
+        "url": "https://openlibrary.org/subjects/person:mathis_rowan"
+      },
+      {
+        "name": "Randyll Tarly",
+        "url": "https://openlibrary.org/subjects/person:randyll_tarly"
+      },
+      {
+        "name": "Arys Oakheart",
+        "url": "https://openlibrary.org/subjects/person:arys_oakheart"
+      },
+      {
+        "name": "Boros Blount",
+        "url": "https://openlibrary.org/subjects/person:boros_blount"
+      },
+      {
+        "name": "Mandon Moore",
+        "url": "https://openlibrary.org/subjects/person:mandon_moore"
+      },
+      {
+        "name": "Meryn Trant",
+        "url": "https://openlibrary.org/subjects/person:meryn_trant"
+      },
+      {
+        "name": "Preston Greenfield",
+        "url": "https://openlibrary.org/subjects/person:preston_greenfield"
+      },
+      {
+        "name": "Balon Swann",
+        "url": "https://openlibrary.org/subjects/person:balon_swann"
+      },
+      {
+        "name": "Osmund Kettleblack",
+        "url": "https://openlibrary.org/subjects/person:osmund_kettleblack"
+      },
+      {
+        "name": "Petyr Baelish",
+        "url": "https://openlibrary.org/subjects/person:petyr_baelish"
+      },
+      {
+        "name": "Varys",
+        "url": "https://openlibrary.org/subjects/person:varys"
+      },
+      {
+        "name": "Pycelle",
+        "url": "https://openlibrary.org/subjects/person:pycelle"
+      },
+      {
+        "name": "Gyles Rosby",
+        "url": "https://openlibrary.org/subjects/person:gyles_rosby"
+      },
+      {
+        "name": "Aurane Waters",
+        "url": "https://openlibrary.org/subjects/person:aurane_waters"
+      },
+      {
+        "name": "Aron Santagar",
+        "url": "https://openlibrary.org/subjects/person:aron_santagar"
+      },
+      {
+        "name": "Qyburn",
+        "url": "https://openlibrary.org/subjects/person:qyburn"
+      },
+      {
+        "name": "Hallyne",
+        "url": "https://openlibrary.org/subjects/person:hallyne"
+      },
+      {
+        "name": "Janos Slynt",
+        "url": "https://openlibrary.org/subjects/person:janos_slynt"
+      },
+      {
+        "name": "Jacelyn Bywater",
+        "url": "https://openlibrary.org/subjects/person:jacelyn_bywater"
+      },
+      {
+        "name": "Dontos Hollard",
+        "url": "https://openlibrary.org/subjects/person:dontos_hollard"
+      },
+      {
+        "name": "Lothor Brune",
+        "url": "https://openlibrary.org/subjects/person:lothor_brune"
+      },
+      {
+        "name": "Bonnifer Hasty",
+        "url": "https://openlibrary.org/subjects/person:bonnifer_hasty"
+      },
+      {
+        "name": "Jalabhar Xho",
+        "url": "https://openlibrary.org/subjects/person:jalabhar_xho"
+      },
+      {
+        "name": "Gendry",
+        "url": "https://openlibrary.org/subjects/person:gendry"
+      },
+      {
+        "name": "Chataya",
+        "url": "https://openlibrary.org/subjects/person:chataya"
+      },
+      {
+        "name": "Pia",
+        "url": "https://openlibrary.org/subjects/person:pia"
+      },
+      {
+        "name": "Shae",
+        "url": "https://openlibrary.org/subjects/person:shae"
+      },
+      {
+        "name": "Timett",
+        "url": "https://openlibrary.org/subjects/person:timett"
+      },
+      {
+        "name": "Shagga",
+        "url": "https://openlibrary.org/subjects/person:shagga"
+      },
+      {
+        "name": "Vargo Hoat",
+        "url": "https://openlibrary.org/subjects/person:vargo_hoat"
+      },
+      {
+        "name": "Shagwell",
+        "url": "https://openlibrary.org/subjects/person:shagwell"
+      },
+      {
+        "name": "Rorge",
+        "url": "https://openlibrary.org/subjects/person:rorge"
+      },
+      {
+        "name": "Jeor Mormont",
+        "url": "https://openlibrary.org/subjects/person:jeor_mormont"
+      },
+      {
+        "name": "Jon Snow",
+        "url": "https://openlibrary.org/subjects/person:jon_snow"
+      },
+      {
+        "name": "Donal Noye",
+        "url": "https://openlibrary.org/subjects/person:donal_noye"
+      },
+      {
+        "name": "Alliser Thorne",
+        "url": "https://openlibrary.org/subjects/person:alliser_thorne"
+      },
+      {
+        "name": "Dywen",
+        "url": "https://openlibrary.org/subjects/person:dywen"
+      },
+      {
+        "name": "Yoren",
+        "url": "https://openlibrary.org/subjects/person:yoren"
+      },
+      {
+        "name": "Chett",
+        "url": "https://openlibrary.org/subjects/person:chett"
+      },
+      {
+        "name": "Samwell Tarly",
+        "url": "https://openlibrary.org/subjects/person:samwell_tarly"
+      },
+      {
+        "name": "Eddison Tollett",
+        "url": "https://openlibrary.org/subjects/person:eddison_tollett"
+      },
+      {
+        "name": "Grenn",
+        "url": "https://openlibrary.org/subjects/person:grenn"
+      },
+      {
+        "name": "Satin",
+        "url": "https://openlibrary.org/subjects/person:satin"
+      },
+      {
+        "name": "Ottyn Wythers",
+        "url": "https://openlibrary.org/subjects/person:ottyn_wythers"
+      },
+      {
+        "name": "Thoren Smallwood",
+        "url": "https://openlibrary.org/subjects/person:thoren_smallwood"
+      },
+      {
+        "name": "Qhorin",
+        "url": "https://openlibrary.org/subjects/person:qhorin"
+      },
+      {
+        "name": "Craster",
+        "url": "https://openlibrary.org/subjects/person:craster"
+      },
+      {
+        "name": "Gilly",
+        "url": "https://openlibrary.org/subjects/person:gilly"
+      },
+      {
+        "name": "Lord of Bones",
+        "url": "https://openlibrary.org/subjects/person:lord_of_bones"
+      },
+      {
+        "name": "Orell",
+        "url": "https://openlibrary.org/subjects/person:orell"
+      },
+      {
+        "name": "Ygritte",
+        "url": "https://openlibrary.org/subjects/person:ygritte"
+      },
+      {
+        "name": "Three-eyed crow",
+        "url": "https://openlibrary.org/subjects/person:three-eyed_crow"
+      },
+      {
+        "name": "Daenerys Targaryen",
+        "url": "https://openlibrary.org/subjects/person:daenerys_targaryen"
+      },
+      {
+        "name": "Jorah Mormont",
+        "url": "https://openlibrary.org/subjects/person:jorah_mormont"
+      },
+      {
+        "name": "Rakharo",
+        "url": "https://openlibrary.org/subjects/person:rakharo"
+      },
+      {
+        "name": "Jhogo",
+        "url": "https://openlibrary.org/subjects/person:jhogo"
+      },
+      {
+        "name": "Aggo",
+        "url": "https://openlibrary.org/subjects/person:aggo"
+      },
+      {
+        "name": "Barristan Selmy",
+        "url": "https://openlibrary.org/subjects/person:barristan_selmy"
+      },
+      {
+        "name": "Belwas",
+        "url": "https://openlibrary.org/subjects/person:belwas"
+      },
+      {
+        "name": "Doreah",
+        "url": "https://openlibrary.org/subjects/person:doreah"
+      },
+      {
+        "name": "Irri",
+        "url": "https://openlibrary.org/subjects/person:irri"
+      },
+      {
+        "name": "Jhiqui",
+        "url": "https://openlibrary.org/subjects/person:jhiqui"
+      },
+      {
+        "name": "Xaro Xhoan Daxos",
+        "url": "https://openlibrary.org/subjects/person:xaro_xhoan_daxos"
+      }
+    ],
+    "excerpts": [
+      {
+        "text": "The comet's tail spread across the dawn, a red slash that bled above the crags of Dragonstone like a wound in the pink and purple sky.",
+        "comment": "",
+        "first_sentence": true
+      },
+      {
+        "text": "The comet's tail spread across the dawn, a red slash that bled above the crags of Dragonstone like a wound in the pink and purple sky.",
+        "comment": "Prologue"
+      }
+    ],
+    "notes": "UK",
+    "table_of_contents": [
+      {
+        "level": 1,
+        "label": "Prologue",
+        "title": "",
+        "pagenum": "1"
+      },
+      {
+        "level": 1,
+        "label": "Chapter 1",
+        "title": "Arya (I)",
+        "pagenum": "27"
+      },
+      {
+        "level": 1,
+        "label": "Chapter 2",
+        "title": "Sansa (I)",
+        "pagenum": "34"
+      },
+      {
+        "level": 1,
+        "label": "Chapter 3",
+        "title": "Tyrion (I)",
+        "pagenum": "47"
+      },
+      {
+        "level": 1,
+        "label": "Chapter 4",
+        "title": "Bran (I)",
+        "pagenum": "63"
+      },
+      {
+        "level": 1,
+        "label": "Chapter 5",
+        "title": "Arya (II)",
+        "pagenum": "73"
+      },
+      {
+        "level": 1,
+        "label": "Chapter 6",
+        "title": "Jon (I)",
+        "pagenum": "84"
+      },
+      {
+        "level": 1,
+        "label": "Chapter 7",
+        "title": "Catelyn (I)",
+        "pagenum": "97"
+      },
+      {
+        "level": 1,
+        "label": "Chapter 8",
+        "title": "Tyrion (II)",
+        "pagenum": "111"
+      },
+      {
+        "level": 1,
+        "label": "Chapter 9",
+        "title": "Arya (III)",
+        "pagenum": "124"
+      },
+      {
+        "level": 1,
+        "label": "Chapter 10",
+        "title": "Davos (I)",
+        "pagenum": "132"
+      },
+      {
+        "level": 1,
+        "label": "Chapter 11",
+        "title": "Theon (I)",
+        "pagenum": "149"
+      },
+      {
+        "level": 1,
+        "label": "Chapter 12",
+        "title": "Daenerys (I)",
+        "pagenum": "170"
+      },
+      {
+        "level": 1,
+        "label": "Chapter 13",
+        "title": "Jon (II)",
+        "pagenum": "185"
+      },
+      {
+        "level": 1,
+        "label": "Chapter 14",
+        "title": "Arya (IV)",
+        "pagenum": "192"
+      },
+      {
+        "level": 1,
+        "label": "Chapter 15",
+        "title": "Tyrion (III)",
+        "pagenum": "207"
+      },
+      {
+        "level": 1,
+        "label": "Chapter 16",
+        "title": "Bran (II)",
+        "pagenum": "221"
+      },
+      {
+        "level": 1,
+        "label": "Chapter 17",
+        "title": "Tyrion (IV)",
+        "pagenum": "238"
+      },
+      {
+        "level": 1,
+        "label": "Chapter 18",
+        "title": "Sansa (II)",
+        "pagenum": "254"
+      },
+      {
+        "level": 1,
+        "label": "Chapter 19",
+        "title": "Arya (V)",
+        "pagenum": "263"
+      },
+      {
+        "level": 1,
+        "label": "Chapter 20",
+        "title": "Tyrion (V)",
+        "pagenum": "279"
+      },
+      {
+        "level": 1,
+        "label": "Chapter 21",
+        "title": "Bran (III)",
+        "pagenum": "293"
+      },
+      {
+        "level": 1,
+        "label": "Chapter 22",
+        "title": "Catelyn (II)",
+        "pagenum": "303"
+      },
+      {
+        "level": 1,
+        "label": "Chapter 23",
+        "title": "Jon (III)",
+        "pagenum": "321"
+      },
+      {
+        "level": 1,
+        "label": "Chapter 24",
+        "title": "Theon (II)",
+        "pagenum": "342"
+      },
+      {
+        "level": 1,
+        "label": "Chapter 25",
+        "title": "Tyrion (VI)",
+        "pagenum": "360"
+      },
+      {
+        "level": 1,
+        "label": "Chapter 26",
+        "title": "Arya (VI)",
+        "pagenum": "375"
+      },
+      {
+        "level": 1,
+        "label": "Chapter 27",
+        "title": "Daenerys (II)",
+        "pagenum": "383"
+      },
+      {
+        "level": 1,
+        "label": "Chapter 28",
+        "title": "Bran (IV)",
+        "pagenum": "393"
+      },
+      {
+        "level": 1,
+        "label": "Chapter 29",
+        "title": "Tyrion (VII)",
+        "pagenum": "403"
+      },
+      {
+        "level": 1,
+        "label": "Chapter 30",
+        "title": "Arya (VII)",
+        "pagenum": "413"
+      },
+      {
+        "level": 1,
+        "label": "Chapter 31",
+        "title": "Catelyn (III)",
+        "pagenum": "426"
+      },
+      {
+        "level": 1,
+        "label": "Chapter 32",
+        "title": "Sansa (III)",
+        "pagenum": "440"
+      },
+      {
+        "level": 1,
+        "label": "Chapter 33",
+        "title": "Catelyn (IV)",
+        "pagenum": "449"
+      },
+      {
+        "level": 1,
+        "label": "Chapter 34",
+        "title": "Jon (IV)",
+        "pagenum": "459"
+      },
+      {
+        "level": 1,
+        "label": "Chapter 35",
+        "title": "Bran (V)",
+        "pagenum": "469"
+      },
+      {
+        "level": 1,
+        "label": "Chapter 36",
+        "title": "Tyrion (VIII)",
+        "pagenum": "477"
+      },
+      {
+        "level": 1,
+        "label": "Chapter 37",
+        "title": "Theon (III)",
+        "pagenum": "485"
+      },
+      {
+        "level": 1,
+        "label": "Chapter 38",
+        "title": "Arya (VIII)",
+        "pagenum": "494"
+      },
+      {
+        "level": 1,
+        "label": "Chapter 39",
+        "title": "Catelyn (V)",
+        "pagenum": "503"
+      },
+      {
+        "level": 1,
+        "label": "Chapter 40",
+        "title": "Daenerys (III)",
+        "pagenum": "519"
+      },
+      {
+        "level": 1,
+        "label": "Chapter 41",
+        "title": "Tyrion (IX)",
+        "pagenum": "531"
+      },
+      {
+        "level": 1,
+        "label": "Chapter 42",
+        "title": "Davos (II)",
+        "pagenum": "546"
+      },
+      {
+        "level": 1,
+        "label": "Chapter 43",
+        "title": "Jon (V)",
+        "pagenum": "564"
+      },
+      {
+        "level": 1,
+        "label": "Chapter 44",
+        "title": "Tyrion (X)",
+        "pagenum": "573"
+      },
+      {
+        "level": 1,
+        "label": "Chapter 45",
+        "title": "Catelyn (VI)",
+        "pagenum": "587"
+      },
+      {
+        "level": 1,
+        "label": "Chapter 46",
+        "title": "Bran (VI)",
+        "pagenum": "599"
+      },
+      {
+        "level": 1,
+        "label": "Chapter 47",
+        "title": "Arya (IX)",
+        "pagenum": "609"
+      },
+      {
+        "level": 1,
+        "label": "Chapter 48",
+        "title": "Daenerys (IV)",
+        "pagenum": "628"
+      },
+      {
+        "level": 1,
+        "label": "Chapter 49",
+        "title": "Tyrion (XI)",
+        "pagenum": "640"
+      },
+      {
+        "level": 1,
+        "label": "Chapter 50",
+        "title": "Theon (IV)",
+        "pagenum": "650"
+      },
+      {
+        "level": 1,
+        "label": "Chapter 51",
+        "title": "Jon (VI)",
+        "pagenum": "665"
+      },
+      {
+        "level": 1,
+        "label": "Chapter 52",
+        "title": "Sansa (IV)",
+        "pagenum": "678"
+      },
+      {
+        "level": 1,
+        "label": "Chapter 53",
+        "title": "Jon (VII)",
+        "pagenum": "689"
+      },
+      {
+        "level": 1,
+        "label": "Chapter 54",
+        "title": "Tyrion (XII)",
+        "pagenum": "698"
+      },
+      {
+        "level": 1,
+        "label": "Chapter 55",
+        "title": "Catelyn (VII)",
+        "pagenum": "708"
+      },
+      {
+        "level": 1,
+        "label": "Chapter 56",
+        "title": "Theon (V)",
+        "pagenum": "723"
+      },
+      {
+        "level": 1,
+        "label": "Chapter 57",
+        "title": "Sansa (V)",
+        "pagenum": "733"
+      },
+      {
+        "level": 1,
+        "label": "Chapter 58",
+        "title": "Davos (III)",
+        "pagenum": "740"
+      },
+      {
+        "level": 1,
+        "label": "Chapter 59",
+        "title": "Tyrion (XIII)",
+        "pagenum": "756"
+      },
+      {
+        "level": 1,
+        "label": "Chapter 60",
+        "title": "Sansa (VI)",
+        "pagenum": "763"
+      },
+      {
+        "level": 1,
+        "label": "Chapter 61",
+        "title": "Tyrion (XIV)",
+        "pagenum": "770"
+      },
+      {
+        "level": 1,
+        "label": "Chapter 62",
+        "title": "Sansa (VII)",
+        "pagenum": "778"
+      },
+      {
+        "level": 1,
+        "label": "Chapter 63",
+        "title": "Daenerys (V)",
+        "pagenum": "786"
+      },
+      {
+        "level": 1,
+        "label": "Chapter 64",
+        "title": "Arya (X)",
+        "pagenum": "800"
+      },
+      {
+        "level": 1,
+        "label": "Chapter 65",
+        "title": "Sansa (VIII)",
+        "pagenum": "817"
+      },
+      {
+        "level": 1,
+        "label": "Chapter 66",
+        "title": "Theon (VI)",
+        "pagenum": "827"
+      },
+      {
+        "level": 1,
+        "label": "Chapter 67",
+        "title": "Tyrion (XV)",
+        "pagenum": "840"
+      },
+      {
+        "level": 1,
+        "label": "Chapter 68",
+        "title": "Jon (VIII)",
+        "pagenum": "850"
+      },
+      {
+        "level": 1,
+        "label": "Chapter 69",
+        "title": "Bran (VII)",
+        "pagenum": "862"
+      },
+      {
+        "level": 1,
+        "label": "Appendix",
+        "title": "",
+        "pagenum": "875"
+      },
+      {
+        "level": 2,
+        "label": "The Kings and Their Courts",
+        "title": "",
+        "pagenum": "875"
+      },
+      {
+        "level": 3,
+        "label": "The King on the Iron Throne",
+        "title": "",
+        "pagenum": "877"
+      },
+      {
+        "level": 3,
+        "label": "The King in Highgarden",
+        "title": "",
+        "pagenum": "880"
+      },
+      {
+        "level": 3,
+        "label": "The King in the Narrow Sea",
+        "title": "",
+        "pagenum": "882"
+      },
+      {
+        "level": 3,
+        "label": "The King in the North",
+        "title": "",
+        "pagenum": "884"
+      },
+      {
+        "level": 3,
+        "label": "The Queen Across the Water",
+        "title": "",
+        "pagenum": "889"
+      },
+      {
+        "level": 2,
+        "label": "Other Houses Great and Small",
+        "title": "",
+        "pagenum": "891"
+      },
+      {
+        "level": 3,
+        "label": "House Lannister",
+        "title": "",
+        "pagenum": "893"
+      },
+      {
+        "level": 3,
+        "label": "House Tyrell",
+        "title": "",
+        "pagenum": "895"
+      },
+      {
+        "level": 3,
+        "label": "House Martell",
+        "title": "",
+        "pagenum": "897"
+      },
+      {
+        "level": 3,
+        "label": "House Florent",
+        "title": "",
+        "pagenum": "899"
+      },
+      {
+        "level": 3,
+        "label": "House Greyjoy",
+        "title": "",
+        "pagenum": "901"
+      },
+      {
+        "level": 3,
+        "label": "House Arryn",
+        "title": "",
+        "pagenum": "903"
+      },
+      {
+        "level": 3,
+        "label": "House Frey",
+        "title": "",
+        "pagenum": "905"
+      },
+      {
+        "level": 3,
+        "label": "The Men of the Night's Watch",
+        "title": "",
+        "pagenum": "910"
+      }
+    ],
+    "links": [
+      {
+        "title": "Official Book Page - A Clash of Kings (A Song of Ice and Fire, Book Two) | George R.R. Martin",
+        "url": "https://georgerrmartin.com/grrm_book/a-clash-of-kings-a-song-of-ice-and-fire-book-two/"
+      },
+      {
+        "title": "Wikipedia - A Clash of Kings",
+        "url": "https://en.wikipedia.org/wiki/A_Clash_of_Kings"
+      },
+      {
+        "title": "A Wiki of Ice and Fire - A Clash of Kings",
+        "url": "https://awoiaf.westeros.org/index.php/A_Clash_of_Kings"
+      },
+      {
+        "title": "TV Tropes - A Clash of Kings (Literature)",
+        "url": "https://tvtropes.org/pmwiki/pmwiki.php/Literature/AClashOfKings"
+      }
+    ],
+    "cover": {
+      "small": "https://covers.openlibrary.org/b/id/14849880-S.jpg",
+      "medium": "https://covers.openlibrary.org/b/id/14849880-M.jpg",
+      "large": "https://covers.openlibrary.org/b/id/14849880-L.jpg"
+    }
+  }
+}

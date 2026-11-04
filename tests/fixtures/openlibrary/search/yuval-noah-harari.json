@@ -1,0 +1,573 @@
+{
+  "numFound": 99,
+  "start": 0,
+  "numFoundExact": true,
+  "num_found": 99,
+  "documentation_url": "https://openlibrary.org/dev/docs/api/search",
+  "q": "yuval noah harari",
+  "offset": null,
+  "docs": [
+    {
+      "author_name": [
+        "Yuval Noah Harari"
+      ],
+      "key": "/works/OL17075811W",
+      "title": "Sapiens",
+      "editions": {
+        "numFound": 86,
+        "start": 0,
+        "numFoundExact": true,
+        "docs": [
+          {
+            "key": "/books/OL27700871M",
+            "title": "Sapiens",
+            "publisher": [
+              "Signal"
+            ],
+            "publish_year": [
+              2014
+            ],
+            "isbn": [
+              "9780771038518",
+              "0771038518"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "author_name": [
+        "Yuval Noah Harari"
+      ],
+      "key": "/works/OL17641518W",
+      "title": "ההיסטוריה של המחר",
+      "editions": {
+        "numFound": 39,
+        "start": 0,
+        "numFoundExact": true,
+        "docs": [
+          {
+            "key": "/books/OL26247313M",
+            "title": "Homo Deus: A Brief History of Tomorrow",
+            "publisher": [
+              "Harvill Secker"
+            ],
+            "publish_year": [
+              2015
+            ],
+            "isbn": [
+              "9780771038686",
+              "0771038682"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "author_name": [
+        "Yuval Noah Harari"
+      ],
+      "key": "/works/OL17917961W",
+      "title": "21 Lessons for the 21st Century",
+      "editions": {
+        "numFound": 33,
+        "start": 0,
+        "numFoundExact": true,
+        "docs": [
+          {
+            "key": "/books/OL28709533M",
+            "title": "21 Lessons for the 21st Century",
+            "publisher": [
+              "Penguin Random House"
+            ],
+            "publish_year": [
+              2019
+            ],
+            "isbn": [
+              "9781784708283",
+              "1784708283"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "author_name": [
+        "Yuval Noah Harari"
+      ],
+      "key": "/works/OL37826293W",
+      "title": "Nexus",
+      "editions": {
+        "numFound": 11,
+        "start": 0,
+        "numFoundExact": true,
+        "docs": [
+          {
+            "key": "/books/OL57761157M",
+            "title": "Nexus",
+            "publisher": [
+              "Random House Publishing Group"
+            ],
+            "publish_year": [
+              2024
+            ],
+            "isbn": [
+              "9780593734247",
+              "0593734246"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "author_name": [
+        "Yuval Noah Harari"
+      ],
+      "key": "/works/OL26159701W",
+      "title": "Yuval Noah Harari Seti",
+      "editions": {
+        "numFound": 1,
+        "start": 0,
+        "numFoundExact": true,
+        "docs": [
+          {
+            "key": "/books/OL35307534M",
+            "title": "Yuval Noah Harari Seti",
+            "publisher": [
+              "Kolektif Kitap"
+            ],
+            "publish_year": [
+              2018
+            ],
+            "isbn": [
+              "9786052205181",
+              "6052205180"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "author_name": [
+        "FlashBooks Book Summaries"
+      ],
+      "key": "/works/OL29621052W",
+      "title": "Summary of Sapiens by Yuval Noah Harari",
+      "editions": {
+        "numFound": 1,
+        "start": 0,
+        "numFoundExact": true,
+        "docs": [
+          {
+            "key": "/books/OL40754623M",
+            "title": "Summary of Sapiens by Yuval Noah Harari",
+            "publisher": [
+              "Independently Published"
+            ],
+            "publish_year": [
+              2017
+            ],
+            "isbn": [
+              "9781973303893",
+              "1973303892"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "author_name": [
+        "Yuval Noah Harari"
+      ],
+      "key": "/works/OL43336900W",
+      "title": "Sapiens",
+      "editions": {
+        "numFound": 1,
+        "start": 0,
+        "numFoundExact": true,
+        "docs": [
+          {
+            "key": "/books/OL59027276M",
+            "title": "Sapiens",
+            "publisher": [
+              "Harper Perinnial"
+            ],
+            "publish_year": [
+              2015
+            ],
+            "isbn": [
+              "9780062316103",
+              "0062316109"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "author_name": [
+        "Ricard Zaplana Ruiz",
+        "Yuval Noah Harari"
+      ],
+      "key": "/works/OL28025310W",
+      "title": "Unstoppable Us, Volume 1",
+      "editions": {
+        "numFound": 7,
+        "start": 0,
+        "numFoundExact": true,
+        "docs": [
+          {
+            "key": "/books/OL38403915M",
+            "title": "Unstoppable Us, Volume 1",
+            "publisher": [
+              "Random House Children's Books"
+            ],
+            "publish_year": [
+              2022
+            ],
+            "isbn": [
+              "9780593643464",
+              "0593643461"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "author_name": [
+        "Yuval Noah Harari"
+      ],
+      "key": "/works/OL34306254W",
+      "title": "De animales a dioses",
+      "editions": {
+        "numFound": 1,
+        "start": 0,
+        "numFoundExact": true,
+        "docs": [
+          {
+            "key": "/books/OL46525594M",
+            "title": "De animales a dioses: Breve historia de la humanidad",
+            "publisher": [
+              "Editorial Sudamericana Uruguaya SA"
+            ],
+            "publish_year": [
+              2018
+            ],
+            "isbn": [
+              "9789974881297",
+              "9974881293"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "author_name": [
+        "Noah Fran"
+      ],
+      "key": "/works/OL29618013W",
+      "title": "Summary : Sapiens",
+      "editions": {
+        "numFound": 1,
+        "start": 0,
+        "numFoundExact": true,
+        "docs": [
+          {
+            "key": "/books/OL40750968M",
+            "title": "Summary : Sapiens",
+            "publisher": [
+              "Independently Published"
+            ],
+            "publish_year": [
+              2017
+            ],
+            "isbn": [
+              "9781549711992",
+              "1549711997"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "author_name": [
+        "Yuval Noah Harari"
+      ],
+      "key": "/works/OL9791895W",
+      "title": "Special Operations in the Age of Chivalry, 1100-1550 (Warfare in History) (Warfare in History)",
+      "editions": {
+        "numFound": 6,
+        "start": 0,
+        "numFoundExact": true,
+        "docs": [
+          {
+            "key": "/books/OL11906961M",
+            "title": "Special Operations in the Age of Chivalry, 1100-1550 (Warfare in History) (Warfare in History)",
+            "publisher": [
+              "Boydell Press"
+            ],
+            "publish_year": [
+              2007
+            ],
+            "isbn": [
+              "9781843832928",
+              "1843832925"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "author_name": [
+        "Yuval Noah Harari"
+      ],
+      "key": "/works/OL27812702W",
+      "title": "Unstoppable Us",
+      "editions": {
+        "numFound": 1,
+        "start": 0,
+        "numFoundExact": true,
+        "docs": [
+          {
+            "key": "/books/OL37998896M",
+            "title": "Unstoppable Us",
+            "publisher": [
+              "Penguin Books, Limited"
+            ],
+            "publish_year": [
+              2022
+            ],
+            "isbn": [
+              "9780241596081",
+              "0241596084"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "author_name": [
+        "Yuval Noah Harari"
+      ],
+      "key": "/works/OL20196515W",
+      "title": "Sapiens/Homo Deus box set",
+      "editions": {
+        "numFound": 1,
+        "start": 0,
+        "numFoundExact": true,
+        "docs": [
+          {
+            "key": "/books/OL27383406M",
+            "title": "Sapiens/Homo Deus box set",
+            "publisher": [
+              "Harper"
+            ],
+            "publish_year": [
+              2017
+            ],
+            "isbn": [
+              "9780062834317",
+              "0062834312"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "author_name": [
+        "Yuval Noah Harari"
+      ],
+      "key": "/works/OL26568922W",
+      "title": "Sapiens and Homo Deus : the e-Book Collection",
+      "editions": {
+        "numFound": 1,
+        "start": 0,
+        "numFoundExact": true,
+        "docs": [
+          {
+            "key": "/books/OL35962793M",
+            "title": "Sapiens and Homo Deus : the e-Book Collection",
+            "publisher": [
+              "HarperCollins Publishers"
+            ],
+            "publish_year": [
+              2017
+            ],
+            "isbn": [
+              "9780062693600",
+              "0062693603"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "author_name": [
+        "Yuval Noah Harari",
+        "Ricard Zaplana Ruiz"
+      ],
+      "key": "/works/OL37588500W",
+      "title": "Unstoppable Us Volume 2",
+      "editions": {
+        "numFound": 7,
+        "start": 0,
+        "numFoundExact": true,
+        "docs": [
+          {
+            "key": "/books/OL57785933M",
+            "title": "Unstoppable Us, Volume 2",
+            "publisher": [
+              "Random House Children's Books"
+            ],
+            "publish_year": [
+              2025
+            ],
+            "isbn": [
+              "9780593711842",
+              "059371184X"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "author_name": [
+        "Scorpio Digital Press"
+      ],
+      "key": "/works/OL25429666W",
+      "title": "Summary of 21 Lessons for the 21st Century by Yuval Noah Harari",
+      "editions": {
+        "numFound": 1,
+        "start": 0,
+        "numFoundExact": true,
+        "docs": [
+          {
+            "key": "/books/OL34094160M",
+            "title": "Summary of 21 Lessons for the 21st Century by Yuval Noah Harari",
+            "publisher": [
+              "Independently Published"
+            ],
+            "publish_year": [
+              2019
+            ],
+            "isbn": [
+              "9781077086395",
+              "1077086393"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "author_name": [
+        "Ant Hive Media"
+      ],
+      "key": "/works/OL40692601W",
+      "title": "Yuval Noah Harari's Sapiens Summary",
+      "editions": {
+        "numFound": 1,
+        "start": 0,
+        "numFoundExact": true,
+        "docs": [
+          {
+            "key": "/books/OL55315157M",
+            "title": "Yuval Noah Harari's Sapiens Summary",
+            "publisher": [
+              "CreateSpace Independent Publishing Platform"
+            ],
+            "publish_year": [
+              2016
+            ],
+            "isbn": [
+              "9781530923885",
+              "1530923883"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "author_name": [
+        "Yuval Noah Harari"
+      ],
+      "key": "/works/OL28184954W",
+      "title": "Imparables",
+      "editions": {
+        "numFound": 2,
+        "start": 0,
+        "numFoundExact": true,
+        "docs": [
+          {
+            "key": "/books/OL38585938M",
+            "title": "Imparables",
+            "publisher": [
+              "MONTENA"
+            ],
+            "publish_year": [
+              2022
+            ],
+            "isbn": [
+              "9788418483073",
+              "8418483075"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "author_name": [
+        "Paul Adams / BookHabits"
+      ],
+      "key": "/works/OL29307019W",
+      "title": "Summary of 21 Lessons for the 21st Century by Yuval Noah Harari",
+      "editions": {
+        "numFound": 1,
+        "start": 0,
+        "numFoundExact": true,
+        "docs": [
+          {
+            "key": "/books/OL40287644M",
+            "title": "Summary of 21 Lessons for the 21st Century by Yuval Noah Harari",
+            "publisher": [
+              "Blurb"
+            ],
+            "publish_year": [
+              2020
+            ],
+            "isbn": [
+              "9780464750611",
+              "046475061X"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "author_name": [
+        "Book Addict"
+      ],
+      "key": "/works/OL31994351W",
+      "title": "Summary of Sapiens A Brief History of Humankind",
+      "editions": {
+        "numFound": 1,
+        "start": 0,
+        "numFoundExact": true,
+        "docs": [
+          {
+            "key": "/books/OL43710461M",
+            "title": "Summary of Sapiens A Brief History of Humankind",
+            "publisher": [
+              "Independently published"
+            ],
+            "publish_year": [
+              2018
+            ],
+            "isbn": [
+              "9781792757570",
+              "1792757573"
+            ]
+          }
+        ]
+      }
+    }
+  ]
+}
