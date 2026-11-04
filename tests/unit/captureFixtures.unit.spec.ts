@@ -21,6 +21,8 @@ const KEY = 'TEST_KEY'
 const CONTACT = 'tester@example.test'
 const OPTS = { googleKey: KEY, contact: CONTACT }
 const isGoogle = (url: string) => url.startsWith('https://www.googleapis.com/')
+const isKirjasampo = (url: string) => url.startsWith('https://ldf.fi/kirjasampo/')
+const emptySparql = { results: { bindings: [] } }
 const isOpenLibrary = (url: string) => url.startsWith('https://openlibrary.org/')
 const dirs: string[] = []
 
@@ -128,6 +130,7 @@ describe('capture', () => {
               : lookupBody,
         )
       }
+      if (isKirjasampo(url)) return Response.json(emptySparql)
       if (isOpenLibrary(url)) return Response.json({})
       if (isGoogle(url)) return Response.json({ totalItems: 0 })
       return Response.json({ resultCount: 0, status: 'OK' })
@@ -148,6 +151,7 @@ describe('capture', () => {
     const dir = await tempDir()
     const fetchFn = vi.fn<FetchFn>(async (url) => {
       if (url.includes('hardcover.app')) return Response.json({ data: {} })
+      if (isKirjasampo(url)) return Response.json(emptySparql)
       if (isOpenLibrary(url)) return Response.json({})
       if (isGoogle(url)) return Response.json({ totalItems: 0 })
       return Response.json({ resultCount: 0, status: 'OK', records: [] })
@@ -178,14 +182,15 @@ describe('capture', () => {
 
     const { notCaptured } = await capture(['9789520408053'], dir, fetchFn, noSleep, OPTS)
 
-    // Four for the Google health check, four for Finna, four for Open Library; Google is
-    // then skipped.
-    expect(fetchFn).toHaveBeenCalledTimes(12)
+    // Four attempts each for Google health, Finna, Open Library and Kirjasampo.
+    // The Google lookup is then skipped.
+    expect(fetchFn).toHaveBeenCalledTimes(16)
     expect(notCaptured.map((n) => [n.source, n.isbn13])).toEqual([
       ['finna', '9789520408053'],
       ['google', '9789520408053'],
       ['openlibrary', '9789520408053'],
       ['hardcover', '9789520408053'],
+      ['kirjasampo', '9789520408053'],
     ])
     expect(await readdir(join(dir, 'finna'))).toEqual([])
     expect(await readdir(join(dir, 'google'))).toEqual([])
@@ -195,7 +200,13 @@ describe('capture', () => {
   it('identifies every Open Library request, and skips the source without a contact', async () => {
     const dir = await tempDir()
     const fetchFn = vi.fn<FetchFn>(async (url) =>
-      Response.json(isOpenLibrary(url) ? {} : { resultCount: 0, status: 'OK' }),
+      Response.json(
+        isKirjasampo(url)
+          ? emptySparql
+          : isOpenLibrary(url)
+            ? {}
+            : { resultCount: 0, status: 'OK' },
+      ),
     )
 
     await capture(['9789520408053'], dir, fetchFn, noSleep, {
@@ -219,7 +230,9 @@ describe('capture', () => {
     }
 
     const bare = await tempDir()
-    const bareFetch = vi.fn<FetchFn>(async () => Response.json({ resultCount: 0, status: 'OK' }))
+    const bareFetch = vi.fn<FetchFn>(async (url) =>
+      Response.json(isKirjasampo(url) ? emptySparql : { resultCount: 0, status: 'OK' }),
+    )
     const { notCaptured } = await capture(['9789520408053'], bare, bareFetch, noSleep, {
       queries: ['tuntematon sotilas'],
     })
@@ -238,11 +251,13 @@ describe('capture', () => {
     const dir = await tempDir()
     const fetchFn = vi.fn<FetchFn>(async (url) =>
       Response.json(
-        isGoogle(url)
-          ? { kind: 'books#volumes', totalItems: 0 }
-          : isOpenLibrary(url)
-            ? {}
-            : { resultCount: 0, status: 'OK' },
+        isKirjasampo(url)
+          ? emptySparql
+          : isGoogle(url)
+            ? { kind: 'books#volumes', totalItems: 0 }
+            : isOpenLibrary(url)
+              ? {}
+              : { resultCount: 0, status: 'OK' },
       ),
     )
 
@@ -264,6 +279,7 @@ describe('capture', () => {
   it("stores every source's response when Google finds the books", async () => {
     const dir = await tempDir()
     const fetchFn = vi.fn<FetchFn>(async (url) => {
+      if (isKirjasampo(url)) return Response.json(emptySparql)
       if (isOpenLibrary(url)) return Response.json({})
       if (!isGoogle(url)) {
         return Response.json({ resultCount: 0, status: 'OK' })
@@ -279,15 +295,15 @@ describe('capture', () => {
     const { notCaptured, written } = await capture(['9789520408053'], dir, fetchFn, noSleep, OPTS)
 
     expect(notCaptured).toEqual([expect.objectContaining({ source: 'hardcover' })])
-    expect(written).toBe(3)
-    for (const source of ['finna', 'google', 'openlibrary']) {
+    expect(written).toBe(4)
+    for (const source of ['finna', 'google', 'openlibrary', 'kirjasampo']) {
       expect(await readdir(join(dir, source))).toEqual(['9789520408053.json'])
     }
   })
 
   it('makes no request when every fixture exists, searches included', async () => {
     const dir = await tempDir()
-    for (const source of ['finna', 'google', 'openlibrary', 'hardcover']) {
+    for (const source of ['finna', 'google', 'openlibrary', 'hardcover', 'kirjasampo']) {
       await mkdir(join(dir, source))
       await writeFile(join(dir, source, '9789520408053.json'), '{}\n')
     }
@@ -311,6 +327,7 @@ describe('capture', () => {
     // Google is down for this run, and Finna answers everything but the second query.
     const fetchFn = vi.fn<FetchFn>(async (url) => {
       if (isGoogle(url)) return new Response('', { status: 503 })
+      if (isKirjasampo(url)) return Response.json(emptySparql)
       if (isOpenLibrary(url)) return Response.json({})
       if (new URL(url).searchParams.get('lookfor') === 'ei löydy') {
         return new Response('oops', { status: 404 })
@@ -323,8 +340,8 @@ describe('capture', () => {
       queries: ['tuntematon sotilas', 'ei löydy'],
     })
 
-    // Two lookups (Finna, Open Library) and three of the four search fixtures.
-    expect(written).toBe(5)
+    // Three lookups (Finna, Open Library, Kirjasampo) and three search fixtures.
+    expect(written).toBe(6)
     expect(await readdir(join(dir, 'finna', 'search'))).toEqual(['tuntematon-sotilas.json'])
     expect(await readdir(join(dir, 'openlibrary', 'search'))).toEqual([
       'ei-loydy.json',

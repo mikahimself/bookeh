@@ -234,10 +234,10 @@ describe('Open Library in the source array', () => {
   }
 
   it('comes third with a contact, and is left out entirely without one', async () => {
-    expect(await sourceIds()).toEqual(['finna', 'google', 'openlibrary'])
+    expect(await sourceIds()).toEqual(['finna', 'google', 'openlibrary', 'kirjasampo'])
 
     vi.stubEnv('OPEN_LIBRARY_CONTACT', '')
-    expect(await sourceIds()).toEqual(['finna', 'google'])
+    expect(await sourceIds()).toEqual(['finna', 'google', 'kirjasampo'])
   })
 
   it('gap-fills a merged candidate behind Finna, never overriding it', async () => {

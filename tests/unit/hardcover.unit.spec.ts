@@ -43,12 +43,12 @@ describe('Hardcover catalogue source', () => {
     vi.resetModules()
     expect(
       (await import('@/lib/metadata/sources/index')).sources.map((source) => source.id),
-    ).toEqual(['finna', 'google', 'openlibrary'])
+    ).toEqual(['finna', 'google', 'openlibrary', 'kirjasampo'])
     vi.stubEnv('HARDCOVER_API_TOKEN', 'fixture-only-token')
     vi.resetModules()
     expect(
       (await import('@/lib/metadata/sources/index')).sources.map((source) => source.id),
-    ).toEqual(['finna', 'google', 'openlibrary', 'hardcover'])
+    ).toEqual(['finna', 'google', 'openlibrary', 'hardcover', 'kirjasampo'])
   })
   it('maps recorded English and Finnish editions and the answered miss', () => {
     const english = hardcoverResults(fixture('9780007448036'), '9780007448036')!
