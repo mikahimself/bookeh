@@ -28,7 +28,9 @@ export async function up({ db }: MigrateUpArgs): Promise<void> {
 
 export async function down({ db }: MigrateDownArgs): Promise<void> {
   await db.execute(sql`
-   ALTER TABLE "user_books_rels" DROP CONSTRAINT "user_books_rels_tags_fk";
+   DELETE FROM "user_books_rels" WHERE "tags_id" IS NOT NULL;
+  DELETE FROM "payload_locked_documents_rels" WHERE "tags_id" IS NOT NULL;
+  ALTER TABLE "user_books_rels" DROP CONSTRAINT "user_books_rels_tags_fk";
   
   ALTER TABLE "payload_locked_documents_rels" DROP CONSTRAINT "payload_locked_documents_rels_tags_fk";
   
