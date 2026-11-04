@@ -8,6 +8,7 @@ import {
   FOUND_TTL_MS,
   heldOutcome,
   lookupSources,
+  searchSources,
   NONE_TTL_MS,
   PARTIAL_TTL_MS,
   SOURCE_TIMEOUT_MS,
@@ -69,7 +70,115 @@ afterEach(() => {
   vi.restoreAllMocks()
 })
 
+describe('searchSources', () => {
+  it('skips enrichment sources even when they implement search', async () => {
+    const ordinarySearch = vi.fn(async () => [
+      { isbn13: ISBN, title: 'edition', authors: [], source: 'A' },
+    ])
+    const enrichmentSearch = vi.fn(async () => [
+      { isbn13: ISBN, title: 'work', authors: [], source: 'B' },
+    ])
+    fakes.length = 0
+    fakes.push(
+      { id: 'A', lookupByIsbn: async () => [], search: ordinarySearch },
+      { id: 'B', enrichment: true, lookupByIsbn: async () => [], search: enrichmentSearch },
+    )
+    expect(await searchSources('book')).toMatchObject([{ title: 'edition' }])
+    expect(ordinarySearch).toHaveBeenCalledOnce()
+    expect(enrichmentSearch).not.toHaveBeenCalled()
+  })
+})
+
 describe('lookupSources', () => {
+  it('merges successful enrichment into an ordinary found candidate without edition fields or subjects', async () => {
+    serve(
+      [rec('A', 'edition', { themes: ['Sota'] })],
+      [
+        rec('B', 'work', {
+          title: 'wrong edition',
+          pages: 999,
+          subjects: ['Wrong genre'],
+          themes: ['sota', 'Ystävyys'],
+          description: 'Work summary',
+        }),
+      ],
+    )
+    fakes[1].enrichment = true
+    const outcome = await lookupSources(ISBN)
+    expect(outcome).toMatchObject({
+      kind: 'found',
+      failed: [],
+      candidates: [
+        {
+          source: 'A',
+          title: 'edition',
+          recordId: 'A-edition',
+          themes: ['Sota', 'Ystävyys'],
+          description: 'Work summary',
+        },
+      ],
+    })
+    if (outcome.kind !== 'found') throw new Error('Expected found')
+    expect(outcome.candidates[0].pages).toBeUndefined()
+    expect(outcome.candidates[0].subjects).toEqual([])
+    expect(outcome.raw.sources).toEqual({ A: 'edition', B: 'work' })
+    expect(outcome.raw.subjects).toEqual({ A: [] })
+  })
+
+  it('asks enrichment in parallel without letting it choose a candidate or affect ordinary outcomes', async () => {
+    const [ordinary, enrichment] = serve([], [rec('B', 'work', { themes: ['Sota'] })])
+    fakes[1].enrichment = true
+    expect(await lookupSources(ISBN)).toEqual({ kind: 'none' })
+    expect(ordinary).toHaveBeenCalledOnce()
+    expect(enrichment).toHaveBeenCalledOnce()
+    processState('metadata.cache', () => new Map()).clear()
+    serve(undefined, [rec('B', 'work')])
+    fakes[1].enrichment = true
+    expect(await lookupSources(ISBN)).toEqual({ kind: 'unavailable', failed: ['A'] })
+  })
+
+  it('keeps full found TTL and an empty failed list when enrichment fails', async () => {
+    const [ordinary, enrichment] = serve([rec('A', 'edition')], 'reject')
+    fakes[1].enrichment = true
+    expect(await lookupSources(ISBN)).toMatchObject({
+      kind: 'found',
+      failed: [],
+      candidates: [{ title: 'edition' }],
+    })
+    expect(warn).toHaveBeenCalledOnce()
+    await vi.advanceTimersByTimeAsync(PARTIAL_TTL_MS + 1)
+    await lookupSources(ISBN)
+    expect(ordinary).toHaveBeenCalledOnce()
+    expect(enrichment).toHaveBeenCalledOnce()
+    await vi.advanceTimersByTimeAsync(FOUND_TTL_MS - PARTIAL_TTL_MS)
+    await lookupSources(ISBN)
+    expect(ordinary).toHaveBeenCalledTimes(2)
+  })
+
+  it('times out enrichment without changing a found outcome or its full TTL', async () => {
+    const [ordinary, enrichment] = serve([rec('A', 'edition')], 'hang')
+    fakes[1].enrichment = true
+    const pending = lookupSources(ISBN)
+    await vi.advanceTimersByTimeAsync(SOURCE_TIMEOUT_MS)
+    expect(await pending).toMatchObject({
+      kind: 'found',
+      failed: [],
+      candidates: [{ title: 'edition' }],
+    })
+    expect(warn).toHaveBeenCalledWith(
+      expect.objectContaining({ source: 'B', isbn13: ISBN }),
+      expect.stringContaining('timed out'),
+    )
+    await vi.advanceTimersByTimeAsync(PARTIAL_TTL_MS + 1)
+    await lookupSources(ISBN)
+    expect(ordinary).toHaveBeenCalledOnce()
+    expect(enrichment).toHaveBeenCalledOnce()
+    await vi.advanceTimersByTimeAsync(FOUND_TTL_MS - PARTIAL_TTL_MS)
+    const retry = lookupSources(ISBN)
+    await vi.advanceTimersByTimeAsync(SOURCE_TIMEOUT_MS)
+    await retry
+    expect(ordinary).toHaveBeenCalledTimes(2)
+  })
   it('builds one candidate per record of the first source, gap-filled, and caches it', async () => {
     const a1 = rec('A', 'a1')
     const a2 = rec('A', 'a2')
@@ -196,6 +305,22 @@ describe('lookupSources circuit breaker', () => {
 
     expect(warn).toHaveBeenCalledOnce()
     expect(String(warn.mock.calls[0]?.[1])).toContain('paused')
+  })
+
+  it('tracks enrichment failures through cooldown without changing found failures', async () => {
+    const [ordinary, enrichment] = serve([rec('A', 'edition')], undefined)
+    fakes[1].enrichment = true
+    await failTimes(BREAKER_FAILURES)
+    expect(warn).toHaveBeenCalledWith(
+      expect.objectContaining({ source: 'B', failures: BREAKER_FAILURES }),
+      expect.stringContaining('paused'),
+    )
+    expect(await fresh()).toMatchObject({ kind: 'found', failed: [] })
+    expect(enrichment).toHaveBeenCalledTimes(BREAKER_FAILURES)
+    expect(ordinary).toHaveBeenCalledTimes(BREAKER_FAILURES + 1)
+    vi.advanceTimersByTime(BREAKER_COOLDOWN_MS)
+    expect(await fresh()).toMatchObject({ kind: 'found', failed: [] })
+    expect(enrichment).toHaveBeenCalledTimes(BREAKER_FAILURES + 1)
   })
 
   it('lists a skipped source as failed', async () => {

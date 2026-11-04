@@ -38,11 +38,14 @@ function copyField<K extends MergedField>(target: SourceResult, from: SourceResu
  * record is read. Every field takes the first non-empty value in that order,
  * `source` and `recordId` are the first answering source's (never gap-filled,
  * so they name the candidate), and `raw` is the union of the records' `raw`
- * (first wins). `null` when no source has a record.
+ * (first wins). Ordinary themes are unioned in order; enrichment can append
+ * themes, fill a still-missing description and supply raw provenance only.
+ * `null` when no ordinary source has a record.
  */
 export function mergeResults(
   lists: SourceResult[][],
   now: Date = new Date(),
+  enrichment: SourceResult[][] = [],
 ): { result: SourceResult; raw: RawMetadata } | null {
   const records = lists.flatMap((list) => list.slice(0, 1))
   const [first] = records
@@ -57,11 +60,40 @@ export function mergeResults(
     if (!(record.source in subjects)) subjects[record.source] = record.subjects
   }
 
-  const result: SourceResult = { ...first, raw: { ...sources } }
+  const result: SourceResult = { ...first, themes: [...first.themes], raw: { ...sources } }
   for (const key of FIELDS) {
     const donor = records.find((record) => !isEmpty(record[key]))
     if (donor) copyField(result, donor, key)
   }
+  result.themes = []
+
+  // Enrichment is deliberately outside the ordinary field loop. Its edition
+  // fields and subjects must never reach a candidate or genre mapping.
+  const seenThemes = new Set<string>()
+  for (const record of records) {
+    for (const theme of record.themes) {
+      const folded = theme.toLocaleLowerCase()
+      if (!seenThemes.has(folded)) {
+        result.themes.push(theme)
+        seenThemes.add(folded)
+      }
+    }
+  }
+  for (const record of enrichment.flatMap((list) => list.slice(0, 1))) {
+    for (const theme of record.themes) {
+      const folded = theme.toLocaleLowerCase()
+      if (!seenThemes.has(folded)) {
+        result.themes.push(theme)
+        seenThemes.add(folded)
+      }
+    }
+    if (isEmpty(result.description) && !isEmpty(record.description))
+      result.description = record.description
+    if (Object.hasOwn(record.raw, record.source) && !(record.source in sources)) {
+      sources[record.source] = record.raw[record.source]
+    }
+  }
+  result.raw = { ...sources }
 
   return {
     result,

@@ -15,7 +15,7 @@ export type SourceResult = {
   pages?: number
   description?: string
   subjects: string[]
-  themes: string[] // Finna subject terms as given
+  themes: string[] // source theme terms as given
   binding?: string // "paperback", "hardcover"; display only, never stored
   coverUrl?: string
   source: SourceId // first source in order that answered
@@ -65,6 +65,7 @@ export type RawMetadata = {
  */
 export type Source = {
   id: SourceId
+  enrichment?: true // work-level metadata only; cannot establish a candidate
   lookupByIsbn(isbn13: string): Promise<SourceResult[] | undefined>
   search?(query: string): Promise<SearchHit[]>
 }

@@ -166,6 +166,18 @@ describe('refetchBook', () => {
     ).toEqual(row)
   })
 
+  it('keeps saved themes when the fresh candidate has enriched themes', async () => {
+    const book = await heldBook(admin, 'shared', { themes: ['Saved'] })
+    vi.mocked(lookupSources).mockResolvedValue(
+      found(book.isbn13!, { themes: ['Enriched'], pages: 180 }),
+    )
+    expect(await refetchBook(asAdmin, book.id)).toMatchObject({
+      kind: 'filled',
+      fields: ['authors', 'pages'],
+    })
+    expect(await bookOf(book.id)).toMatchObject({ themes: ['Saved'], pages: 180 })
+  })
+
   // AD-4: a shared Book's authors and series are shared rows, matched before created.
   it('fills empty authors and series among shared records, and the index with its series', async () => {
     const tag = randomIsbn()

@@ -131,6 +131,23 @@ describe('lookupAgain', () => {
     await untouched()
   })
 
+  it('keeps saved themes when promoting with enriched themes', async () => {
+    const { ctx, isbn, own } = await setup()
+    await payload.update({
+      collection: 'books',
+      id: own.id,
+      data: { themes: ['Saved'] },
+      overrideAccess: true,
+      depth: 0,
+    })
+    vi.mocked(lookupSources).mockResolvedValue(found(record(isbn, { themes: ['Enriched'] })))
+    expect(await lookupAgain(ctx, { bookId: own.id })).toMatchObject({
+      kind: 'shared',
+      bookId: own.id,
+    })
+    expect(await bookById(own.id)).toMatchObject({ themes: ['Saved'] })
+  })
+
   it('merges into the shared Book with the ISBN without asking the sources or counting a lookup', async () => {
     const { user, ctx, isbn, own, untouched } = await setup()
     const shared = await t2Book(isbn)

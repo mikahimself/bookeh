@@ -49,6 +49,39 @@ const lookup = (sources: Source[]) =>
   Promise.all(sources.map(async (s) => (await s.lookupByIsbn(ISBN)) ?? []))
 
 describe('mergeResults', () => {
+  it('accepts only enrichment themes, missing description and raw provenance', () => {
+    const ordinary = { ...finnaRecord, themes: ['Sota'], description: undefined }
+    const enrichment = {
+      ...googleRecord,
+      themes: ['sota', 'Ystävyys'],
+      description: 'Work summary',
+      raw: { google: 'G', impostor: 'ignored' },
+    }
+    const { result, raw } = mergeResults([[ordinary]], NOW, [[enrichment]])!
+    expect(result).toMatchObject({
+      title: 'A',
+      source: 'finna',
+      recordId: 'F1',
+      themes: ['Sota', 'Ystävyys'],
+      description: 'Work summary',
+    })
+    expect(result.pages).toBeUndefined()
+    expect(result.coverUrl).toBeUndefined()
+    expect(raw.sources).toEqual({ finna: 'F', google: 'G' })
+    expect(raw.subjects).toEqual({ finna: [] })
+    expect(ordinary.themes).toEqual(['Sota'])
+    expect(
+      mergeResults([[{ ...ordinary, description: 'Edition summary' }]], NOW, [[enrichment]])!.result
+        .description,
+    ).toBe('Edition summary')
+    expect(
+      mergeResults(
+        [[ordinary], [{ ...googleRecord, description: 'Later ordinary summary' }]],
+        NOW,
+        [[enrichment]],
+      )!.result.description,
+    ).toBe('Later ordinary summary')
+  })
   it('fills each field from the first source that has it', async () => {
     const lists = await lookup([
       fake('finna', [finnaRecord]),

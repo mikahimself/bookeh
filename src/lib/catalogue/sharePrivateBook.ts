@@ -8,7 +8,7 @@ import * as gateway from '@/lib/payload/gateway'
 import { idOf } from '@/lib/payload/ref'
 import { assertLive, onRollback } from '@/lib/payload/transaction'
 import { moveEntriesToBook } from '@/lib/wishlists/entries'
-import type { Author, Series } from '@/payload-types'
+import type { Author, Book, Series } from '@/payload-types'
 
 import {
   attachCover,
@@ -140,7 +140,7 @@ export async function settleHeldBook(
 }
 
 /** The Book's overridable values and cover, with system privileges (the caller's own or a shared Book). */
-async function readBook(tx: Context, id: number): Promise<BookValues> {
+async function readBook(tx: Context, id: number): Promise<BookValues & Pick<Book, 'themes'>> {
   assertLive(tx)
   return tx.req.payload.findByID({
     collection: 'books',
@@ -157,6 +157,7 @@ async function readBook(tx: Context, id: number): Promise<BookValues> {
       pages: true,
       description: true,
       cover: true,
+      themes: true,
     },
     ...system(tx),
     depth: 1,
@@ -231,7 +232,7 @@ async function promote(tx: Context, bookId: number, pending: PendingShare): Prom
       pages: best.pages ?? null,
       description: best.description ?? null,
       cover: coverId,
-      themes: best.themes,
+      themes: own.themes?.length ? own.themes : best.themes,
       genres,
       source: best.source,
       rawMetadata: raw,

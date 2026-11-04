@@ -109,10 +109,12 @@ async function ask(source: Source, isbn13: string): Promise<SourceResult[] | und
 
 /**
  * Asks every source for a normalised ISBN-13 (AD-9). `found` holds one candidate per
- * record of the first source with records, each gap-filled from the other sources in
- * source order; `none` only when every source answered with no records; otherwise
+ * record of the first ordinary source with records, each gap-filled from the other
+ * ordinary sources in source order and enriched with allowed work-level fields;
+ * `none` when every ordinary source answered with no records; otherwise
  * `unavailable`, naming the failed sources; `found` names them too (`[]` when every source
- * answered). A `found` or `none` reached with no source failing is cached (`FOUND_TTL_MS`, `NONE_TTL_MS`); a `found` merged while a source
+ * answered). Enrichment failures are logged and breaker-tracked but do not enter
+ * `failed` or affect TTL. A `found` or `none` reached with no ordinary source failing is cached (`FOUND_TTL_MS`, `NONE_TTL_MS`); a `found` merged while an ordinary source
  * failed is cached for `PARTIAL_TTL_MS`, so the save after the Answer uses the outcome
  * the Answer showed (AD-11); `unavailable` never is. `fresh` skips the cache
  * read and still writes the cache: re-fetch asks the sources again (AD-5).
@@ -133,9 +135,13 @@ export async function lookupSources(
       return list
     }),
   )
-  const failed = sources.filter((_, i) => lists[i] === undefined).map(({ id }) => id)
+  const failed = sources
+    .filter((source, i) => !source.enrichment && lists[i] === undefined)
+    .map(({ id }) => id)
+  const ordinary = lists.flatMap((list, i) => (sources[i].enrichment ? [] : [list]))
+  const enrichment = lists.flatMap((list, i) => (sources[i].enrichment ? [list ?? []] : []))
 
-  const first = lists.findIndex((list) => list !== undefined && list.length > 0)
+  const first = ordinary.findIndex((list) => list !== undefined && list.length > 0)
   if (first === -1) {
     if (failed.length > 0) return { kind: 'unavailable', failed }
     const outcome: SourcesOutcome = { kind: 'none' }
@@ -144,8 +150,10 @@ export async function lookupSources(
   }
 
   const now = new Date()
-  const others = lists.flatMap((list, i) => (i === first ? [] : [list ?? []]))
-  const merged = lists[first]!.map((record) => mergeResults([[record], ...others], now)!)
+  const others = ordinary.flatMap((list, i) => (i === first ? [] : [list ?? []]))
+  const merged = ordinary[first]!.map((record) =>
+    mergeResults([[record], ...others], now, enrichment)!,
+  )
   const outcome: SourcesOutcome = {
     kind: 'found',
     candidates: merged.map(({ result }) => result),
@@ -181,7 +189,7 @@ async function askSearch(source: Source, query: string): Promise<SearchHit[]> {
 }
 
 /**
- * Asks every source in `sources/index.ts` that implements `search` for `query` (AD-9), in
+ * Asks every ordinary source in `sources/index.ts` that implements `search` for `query` (AD-9), in
  * parallel, each under `SOURCE_TIMEOUT_MS`; a timeout or a rejection is one logged warning
  * naming the source and the query, and that source contributes nothing. The hits merge in
  * source order, keeping the first hit per ISBN-13 and filling its missing `coverUrl` from a
@@ -193,7 +201,9 @@ async function askSearch(source: Source, query: string): Promise<SearchHit[]> {
  * is bounded by what each source's own request asks for, with no cap applied here.
  */
 export async function searchSources(query: string): Promise<SearchHit[]> {
-  const lists = await Promise.all(sources.map((source) => askSearch(source, query)))
+  const lists = await Promise.all(
+    sources.filter((source) => !source.enrichment).map((source) => askSearch(source, query)),
+  )
   const hits = new Map<string, SearchHit>()
   for (const hit of lists.flat()) {
     if (!hit.isbn13) continue
