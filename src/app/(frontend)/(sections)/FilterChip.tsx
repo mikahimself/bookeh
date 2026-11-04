@@ -8,7 +8,7 @@ import { parseShelfQuery, shelfHref } from '@/lib/shelf/query'
 import { TextLink } from '../components/Link'
 
 import { useSheetChip } from './BookDetailSheet'
-import { addFilter, type ChipField } from './filterToggle'
+import { addFilter, type ChipField, type ListedValue } from './filterToggle'
 
 /**
  * A Filter chip on Book detail (EXPERIENCE.md, Book detail; UX-DR34): a Link
@@ -22,13 +22,13 @@ import { addFilter, type ChipField } from './filterToggle'
  * and without the Book, and lands there pushing at both widths: a section
  * change, so Back returns to the section.
  */
-export function FilterChip({
+export function FilterChip<F extends ChipField>({
   field,
   id,
   children,
 }: {
-  field: ChipField
-  id: number
+  field: F
+  id: ListedValue<F>
   children: ReactNode
 }) {
   const address = parseShelfQuery(useSearchParams())

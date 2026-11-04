@@ -245,7 +245,8 @@
       "rating": "Arvio",
       "year": "Vuosi",
       "pages": "Sivuja",
-      "sort": "Järjestys"
+      "sort": "Järjestys",
+      "tag": "Tagit"
     },
     "sorts": {
       "author": "Tekijä",
@@ -306,7 +307,8 @@
     "emptyRemark": "Hyllyt odottavat kärsivällisesti.",
     "noMatch": "Ei osumia",
     "loadFailed": "Lataus ei onnistunut.",
-    "tryAgain": "Yritä uudelleen"
+    "tryAgain": "Yritä uudelleen",
+    "personalGenre": "{name} (oma genre)"
   },
   "detail": {
     "description": "Kuvaus",

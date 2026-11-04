@@ -233,10 +233,20 @@ function OptionLists({ values, labels }: { values: FilterValues; labels: Record<
         heading={t('filterFields.genre')}
         options={values.genre.map(({ id, name, count }) => ({
           key: String(id),
-          label: name,
+          label: typeof id === 'string' ? t('personalGenre', { name }) : name,
           count,
           on: f.genre?.includes(id) ?? false,
           tap: tap('genre', id),
+        }))}
+      />
+      <Field
+        heading={t('filterFields.tag')}
+        options={values.tag.map(({ id, name, count }) => ({
+          key: String(id),
+          label: name,
+          count,
+          on: f.tag?.includes(id) ?? false,
+          tap: tap('tag', id),
         }))}
       />
       <Field

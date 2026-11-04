@@ -23,8 +23,7 @@ const inRange = (value: SQL, [from, to]: [number?, number?]): SQL[] => [
  * adds nothing. Book fields use effective values (AD-6); publisher and
  * language match exactly, as `filterValues()` and `suggest()` hand them out.
  * Read and rating come from the viewer's `ub` row: a missing row is unread
- * and unrated. Author, series and genre are `relationFilters`; tag and theme
- * are not handled yet (Epic 9).
+ * and unrated. Author, series, genre and tag are `relationFilters`.
  */
 export function scalarFilters(filters: Filters): SQL | undefined {
   const { publisher, language, year, pages, status, location, read, ratingMin } = filters
@@ -46,13 +45,12 @@ export function scalarFilters(filters: Filters): SQL | undefined {
  * An author or series id stands for every record sharing its `name_key`: a
  * copy matches when a readable effective author (or the readable effective
  * series, AD-6) of its Book shares the `name_key` of a readable record among
- * the ids, so an unreadable id matches nothing, as in `shelfLabels`. Every
- * `genre` id is a system genre id, matched against the Book's own genres
- * (never overridden); user genre tag ids wait for their encoding in the
- * spine (Epic 9).
+ * the ids, so an unreadable id matches nothing, as in `shelfLabels`. Numeric
+ * genres match the Book's system genres; `tag:id` genres and ordinary tags
+ * match only the viewer's user-book assignments and the correct label kind.
  */
 export function relationFilters(viewer: Viewer, filters: Filters): SQL | undefined {
-  const { author, series, genre } = filters
+  const { author, series, genre, tag } = filters
   const conditions: SQL[] = []
   if (author?.length)
     conditions.push(sql`exists (select 1 from authors a
@@ -64,8 +62,21 @@ export function relationFilters(viewer: Viewer, filters: Filters): SQL | undefin
       where s.id = ${effective('series')} and ${readableBy(viewer, 's')}
         and s.name_key in (select f.name_key from series f
           where f.id in ${series} and ${readableBy(viewer, 'f')}))`)
-  if (genre?.length)
-    conditions.push(sql`exists (select 1 from books_rels g
-      where g.parent_id = b.id and g.path = 'genres' and g.genres_id in ${genre})`)
+  const privateMatch = (ids: number[], kind: 'tag' | 'genre'): SQL => sql`exists (
+    select 1 from user_books_rels rel
+    join tags t on t.id = rel.tags_id and t.owner_id = ${viewer.id} and t.kind = ${kind}
+    where rel.parent_id = ub.id and ub.owner_id = ${viewer.id}
+      and rel.path = 'tags' and t.id in ${ids})`
+  if (genre?.length) {
+    const system = genre.filter((id): id is number => typeof id === 'number')
+    const personal = genre.flatMap((id) => (typeof id === 'string' ? [Number(id.slice(4))] : []))
+    const matches: SQL[] = []
+    if (system.length)
+      matches.push(sql`exists (select 1 from books_rels g
+      where g.parent_id = b.id and g.path = 'genres' and g.genres_id in ${system})`)
+    if (personal.length) matches.push(privateMatch(personal, 'genre'))
+    conditions.push(sql`(${sql.join(matches, sql` or `)})`)
+  }
+  if (tag?.length) conditions.push(privateMatch(tag, 'tag'))
   return conditions.length ? sql`(${sql.join(conditions, sql` and `)})` : undefined
 }

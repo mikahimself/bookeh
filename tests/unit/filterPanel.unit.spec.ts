@@ -52,6 +52,7 @@ const values: FilterValues = {
   status: [{ value: 'owned', count: 2 }],
   read: [],
   genre: [],
+  tag: [],
   language: [],
 }
 
@@ -384,5 +385,38 @@ describe('Filter panel sort', () => {
     open('sort=year&dir=desc')
     fireEvent.click(line('sorts.added'))
     expect(router.replace).toHaveBeenCalledWith('/?sort=added', { scroll: false })
+  })
+})
+
+describe('private classification options', () => {
+  afterEach(() => {
+    cleanup()
+    vi.clearAllMocks()
+    vi.unstubAllGlobals()
+    values.genre = []
+    values.tag = []
+  })
+  it('keeps same-id genre choices distinct and toggles ordinary tags', () => {
+    vi.stubGlobal('matchMedia', (query: string) => ({
+      media: query,
+      matches: true,
+      addEventListener: () => {},
+      removeEventListener: () => {},
+    }))
+    search = new URLSearchParams('genre=7')
+    values.genre = [
+      { id: 7, name: 'Same', count: 1 },
+      { id: 'tag:7', name: 'Same', count: 2 },
+    ]
+    values.tag = [{ id: 8, name: 'My tag', count: 3 }]
+    render(page())
+    fireEvent.click(filter())
+    expect(screen.getByRole('button', { name: /^Same/ })).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: /^personalGenre: Same/ }))
+    expect(router.replace).toHaveBeenLastCalledWith('/?genre=7&genre=tag%3A7', { scroll: false })
+    fireEvent.click(screen.getByRole('button', { name: /My tag/ }))
+    expect(router.replace).toHaveBeenLastCalledWith('/?genre=7&genre=tag%3A7&tag=8', {
+      scroll: false,
+    })
   })
 })

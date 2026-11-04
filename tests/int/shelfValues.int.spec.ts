@@ -113,6 +113,7 @@ describe('shelf filter values and suggestions', () => {
         { id: biography.id, name: biography.name, count: 3 },
         { id: fiction.id, name: fiction.name, count: 2 },
       ],
+      tag: [],
       language: [
         { value: 'en', count: 1 },
         { value: 'fi', count: 2 },

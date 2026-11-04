@@ -245,7 +245,8 @@
       "rating": "Rating",
       "year": "Year",
       "pages": "Pages",
-      "sort": "Sort by"
+      "sort": "Sort by",
+      "tag": "Tags"
     },
     "sorts": {
       "author": "Author",
@@ -306,7 +307,8 @@
     "emptyRemark": "The shelves are patient.",
     "noMatch": "No books match",
     "loadFailed": "Couldn't load.",
-    "tryAgain": "Try again"
+    "tryAgain": "Try again",
+    "personalGenre": "{name} (personal genre)"
   },
   "detail": {
     "description": "Description",

@@ -17,6 +17,8 @@ import type { EffectiveBook } from '@/lib/books/effectiveBook'
 import type { CopyLine, Holdings } from '@/lib/books/holdings'
 import { isRowId, type Named } from '@/lib/payload/ref'
 
+export type GenreFilterId = number | `tag:${number}`
+
 /** Spine, Shared shapes: what the collection lists and in what order. */
 export type ShelfQuery = {
   q?: string
@@ -24,7 +26,8 @@ export type ShelfQuery = {
     location: number[]
     status: ('owned' | 'ordered')[]
     read: boolean
-    genre: number[] // system genre ids and the user's genre tag ids
+    genre: GenreFilterId[]
+    tag: number[]
     language: string[]
     author: number[]
     series: number[]
@@ -63,7 +66,8 @@ export type FilterValues = {
   location: Counted<Named>[]
   status: Counted<{ value: 'owned' | 'ordered' }>[]
   read: Counted<{ value: boolean }>[]
-  genre: Counted<Named>[]
+  genre: Counted<{ id: GenreFilterId; name: string }>[]
+  tag: Counted<Named>[]
   language: Counted<{ value: string }>[]
 }
 
@@ -99,6 +103,12 @@ const whole = (text: string): number | undefined => {
 const id = (text: string | undefined): number | undefined => {
   const n = text === undefined ? undefined : whole(text)
   return isRowId(n) ? n : undefined
+}
+
+const genreId = (text: string): GenreFilterId | undefined => {
+  if (!text.startsWith('tag:')) return id(text)
+  const value = id(text.slice(4))
+  return value === undefined ? undefined : `tag:${value}`
 }
 
 const oneOf =
@@ -154,7 +164,8 @@ export function parseShelfQuery(params: ShelfParams): ShelfAddress {
   set('location', list(all('location'), id))
   set('status', list(all('status'), oneOf(STATUSES)))
   set('read', bool(one('read')))
-  set('genre', list(all('genre'), id))
+  set('genre', list(all('genre'), genreId))
+  set('tag', list(all('tag'), id))
   set('language', list(all('language'), text))
   set('author', list(all('author'), id))
   set('series', list(all('series'), id))
@@ -198,6 +209,7 @@ export function shelfSearchParams(
   add('status', f.status)
   add('read', one(f.read))
   add('genre', f.genre)
+  add('tag', f.tag)
   add('language', f.language)
   add('author', f.author)
   add('series', f.series)

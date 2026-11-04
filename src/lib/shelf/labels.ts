@@ -63,34 +63,42 @@ const FIELDS: readonly LabelField[] = ['location', 'genre', 'author', 'series']
  * system genre in the viewer's language, an author or series only when it is
  * readable and shares its `name_key` with a readable effective value of a
  * Book behind the viewer's copies; any other id has no entry. Read-only, one
- * query per field present.
+ * query per field present. Private genres (`genre:tag:id`) and tags
+ * (`tag:id`) resolve only for their owner and correct kind, including admins.
  */
 export async function shelfLabels(
   ctx: Context,
   filters: ShelfQuery['filters'],
 ): Promise<Record<string, string>> {
-  const reads = FIELDS.flatMap((field) => {
-    const ids = filters[field]
-    if (!ids?.length) return []
-    return [
-      drizzleFor(ctx)
-        .execute(statement(ctx.user, field, ids))
-        .then(({ rows }) =>
-          rows.map((row): [string, string] => {
-            const name =
-              field === 'genre'
-                ? genreName(
-                    {
-                      name: String(row.name),
-                      nameFi: row.name_fi == null ? null : String(row.name_fi),
-                    },
-                    ctx.user.language,
-                  )
-                : String(row.name)
-            return [`${field}:${Number(row.id)}`, name]
-          }),
-        ),
-    ]
-  })
-  return Object.fromEntries((await Promise.all(reads)).flat())
+  const labels: Record<string, string> = {}
+  const db = drizzleFor(ctx)
+  for (const field of FIELDS) {
+    const ids = (filters[field] ?? []).filter((id): id is number => typeof id === 'number')
+    if (!ids.length) continue
+    const { rows } = await db.execute(statement(ctx.user, field, ids))
+    for (const row of rows) {
+      labels[`${field}:${Number(row.id)}`] =
+        field === 'genre'
+          ? genreName(
+              { name: String(row.name), nameFi: row.name_fi == null ? null : String(row.name_fi) },
+              ctx.user.language,
+            )
+          : String(row.name)
+    }
+  }
+  for (const kind of ['tag', 'genre'] as const) {
+    const ids =
+      kind === 'tag'
+        ? (filters.tag ?? [])
+        : (filters.genre ?? []).flatMap((id) =>
+            typeof id === 'string' ? [Number(id.slice(4))] : [],
+          )
+    if (!ids.length) continue
+    const { rows } = await db.execute(sql`select id, name from tags
+      where id in (${idList(ids)}) and owner_id = ${ctx.user.id} and kind = ${kind}`)
+    for (const row of rows) {
+      labels[`${kind}:${kind === 'genre' ? 'tag:' : ''}${Number(row.id)}`] = String(row.name)
+    }
+  }
+  return labels
 }

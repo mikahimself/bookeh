@@ -7,7 +7,7 @@ type Filters = ShelfQuery['filters']
  * the comboboxes' short lists (EXPERIENCE.md, Filter panel).
  */
 export type ListedField =
-  'location' | 'status' | 'read' | 'genre' | 'language' | 'author' | 'series' | 'publisher'
+  'location' | 'status' | 'read' | 'genre' | 'tag' | 'language' | 'author' | 'series' | 'publisher'
 
 /** One value of `field`: an element of a listed field, or `read`'s boolean. */
 export type ListedValue<F extends ListedField> = F extends 'read'
@@ -67,15 +67,19 @@ export function sortBy(query: ShelfQuery, sort: ShelfQuery['sort']): ShelfQuery 
 }
 
 /** The fields a Filter chip on Book detail adds to (EXPERIENCE.md, Book detail). */
-export type ChipField = 'author' | 'series' | 'genre' | 'location'
+export type ChipField = 'author' | 'series' | 'genre' | 'location' | 'tag'
 
 /**
  * `query` after a tap on a Filter chip: `id` appended to `field`, widening
  * it. A value already on leaves `query` as it is; chips never take one off.
  * Search, sort, direction and the other fields stay.
  */
-export function addFilter(query: ShelfQuery, field: ChipField, id: number): ShelfQuery {
+export function addFilter<F extends ChipField>(
+  query: ShelfQuery,
+  field: F,
+  id: ListedValue<F>,
+): ShelfQuery {
   const current = query.filters[field] ?? []
-  if (current.includes(id)) return query
+  if ((current as unknown[]).includes(id)) return query
   return { ...query, filters: { ...query.filters, [field]: [...current, id] } }
 }

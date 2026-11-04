@@ -150,7 +150,8 @@ The diagram shows the main directions; the list below is the full table of allow
   - Paging is by offset and limit with one fixed page size, and every sort ends on copy id. The page number is not in the URL.
   - One client list holds the loaded rows: they live in `ShelfRowsProvider` (read with `useShelfRows()`), keyed by the shelf query without `book`. After any successful action or Undo that can change rows, it reloads rows 0 to the number it holds through `/data/shelf`, asking for at most `SHELF_MAX_ROWS` rows. An action on the collection reports its result through `afterAction(result)`, from `useAfterAction()`: `ShelfActionsProvider` provides it above the list, unkeyed, so the action bar and Book detail reach it, and the mounted rows register their reload with it; with no rows mounted (Load failed) it only toasts. `ok` reloads, `NOT_FOUND` shows "Not in library" and then reloads, any other code goes to `reportFailure`. Once the reload has answered (at once, with no rows mounted), `afterAction` refreshes the server render with `router.refresh()` in a transition, so the Filter panel's values, Book detail and the cached first page follow the write and the list never shows a page older than its rows; a component that reports through `afterAction` does not refresh on its own. A successful Undo from the toast reloads through `ToastProvider`'s `onUndone` and refreshes the same way once the reload has answered; while `ReadAndRating` is mounted it claims that refresh, because its remount shares the transition, so on `/` the refresh runs once. Where no rows mount (`/loans`, one wishlist), `RefreshOnUndo` refreshes, on `/loans` as well as a mounted `ReadAndRating`. Rows are never patched locally. Per shelf query, the list keeps in `sessionStorage` only how many rows it held and the scroll position, never row data; on return from another route it loads that many rows in one request, up to `SHELF_MAX_ROWS`, and restores the position. Only the first query the page mounts with restores: reaching a query by changing search, filters or sort on `/` starts at the top with the first page.
   - Search, filters, sort and the open Book live in URL search params. `parseShelfQuery()` and `shelfSearchParams()` in `lib/shelf/query.ts` are the only code that reads or writes them, the latter behind `shelfHref(query, { book })` for links and `shelfRowsPath(query, range)` for `/data/shelf` requests; a Filter chip is a link built with `shelfHref()`.
-  - The values a filter offers and the suggestions for author, series and publisher are shelf queries on `visibleCopies`. `filterValues()` returns the locations, statuses, read and unread (the viewer's `user-books` row, a missing row unread), genres and languages in use on the viewer's copies, each with its copy count, never narrowed by the current query; tags arrive in Epic 9. Suggestions are distinct on `nameKey` and prefer the shared record's id.
+  - Genre URL values retain numeric system ids (`genre=42`); private genres use `genre=tag:42`, while ordinary tags use `tag=42`. Valid repeated values deduplicate; malformed ids are ignored. System and private genres OR within the same field; tag and all other fields intersect that union. Missing, foreign and wrong-kind private ids neither match nor resolve a label.
+  - The values a filter offers and the suggestions for author, series and publisher are shelf queries on `visibleCopies`. `filterValues()` returns the locations, statuses, read and unread (the viewer's `user-books` row, a missing row unread), system and private genres, ordinary tags and languages in use on the viewer's readable own copies, including ordered copies, each with its distinct copy count, never narrowed by the current query. System genres sort first, followed by sorted private genres; equal names remain distinct choices. Private values join the viewer's `user-books.tags` and require the tag's owner to be the viewer and its kind to match, including for admins. Suggestions are distinct on `nameKey` and prefer the shared record's id.
   - Text sort relies on the database's `fi-FI` ICU collation. Author sort uses the `sortName` of the Book's first effective author the viewer may read (AD-4), then the effective title, both in the sort's direction; a Book with no readable author sorts last both ways. Text search is `ILIKE` with no accent folding.
   - No code lists or searches `books`, `authors` or `series` on their own. They are reached through a copy or wishlist entry the viewer can see, or by exact match on ISBN-13 or `nameKey`. Book detail, Edit book and every `{ bookId }` a client sends start with `requireOwnBook(ctx, bookId)` in `lib/books`, which fails with `NOT_FOUND` unless the viewer has a copy or an open wishlist entry of that Book.
   - Lookup's own-library results are a shelf text search over the viewer's copies and open wishlist entries, the entries through a `visibleEntries(viewer)` fragment that mirrors `visibleCopies`. `searchMine(ctx, text)` in `lib/shelf` is that reader: one row per Book, in the `author` ascending order, at most `MINE_SEARCH_LIMIT` Books, hydrated through `getEffectiveBooks()` and `getHoldings()` into `MyBook[]`. Every other list that is not copies (loans, a wishlist) hydrates Books through `getEffectiveBooks()` and does not sort or filter on Book fields.
@@ -501,10 +502,11 @@ type EditBookInput = {
 }
 
 // src/lib/shelf
+type GenreFilterId = number | `tag:${number}` // system id or private kind-genre tag id; positive ids
 type ShelfQuery = {
   q?: string
   filters: Partial<{
-    location: number[]; status: ('owned' | 'ordered')[]; read: boolean; genre: number[]; tag: number[] // genre: system genre ids and the user's genre tag ids
+    location: number[]; status: ('owned' | 'ordered')[]; read: boolean; genre: GenreFilterId[]; tag: number[] // ordinary kind-tag ids
     theme: string[] // by text: system themes exactly, the user's themes by name
     language: string[]; author: number[]; series: number[]; publisher: string[]
     ratingMin: number; year: [number?, number?]; pages: [number?, number?]
@@ -515,14 +517,14 @@ type ShelfQuery = {
 type ShelfAddress = { query: ShelfQuery; book: number | null } // parseShelfQuery()
 type ShelfRange = { offset: number; limit: number }
 type ShelfRow = { copy: CopyLine; book: EffectiveBook }
-type ShelfRows = { rows: ShelfRow[]; total: number; labels: Record<string, string> } // labels keyed `field:id` for location, genre, author, series: a location named for its owner only, a genre in the viewer's language,
+type ShelfRows = { rows: ShelfRow[]; total: number; labels: Record<string, string> } // labels keyed `field:id` for location, genre, tag, author, series (private genres `genre:tag:42`, ordinary tags `tag:42`, owner and kind scoped even for admins): a location named for its owner only, a genre in the viewer's language,
   // an author or series only when readable and sharing its `nameKey` with a readable effective author or series on a visible copy
 type MyBook = { book: EffectiveBook; mine: Holdings } // searchMine(ctx, text): the viewer's Books matching the text, their copies and open entries; at most MINE_SEARCH_LIMIT (20)
 type Counted<T> = T & { count: number }
 type FilterValues = { // filterValues(ctx, locale): values in use on the viewer's copies, each counted in copies
   location: Counted<Named>[]; status: Counted<{ value: 'owned' | 'ordered' }>[]
   read: Counted<{ value: boolean }>[] // read first, then unread
-  genre: Counted<Named>[]; language: Counted<{ value: string }>[]
+  genre: Counted<{ id: GenreFilterId; name: string }>[]; tag: Counted<Named>[]; language: Counted<{ value: string }>[]
 }
 type SuggestField = 'author' | 'series' | 'publisher' // SUGGEST_FIELDS
 type Suggestion = { id: number | null; name: string } // suggest(ctx, field, text); id null for a publisher

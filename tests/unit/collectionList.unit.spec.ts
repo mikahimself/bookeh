@@ -120,7 +120,7 @@ function Probe() {
   return null
 }
 
-const tree = (initial: ShelfRows, q: ShelfQuery = query) =>
+const tree = (initial: ShelfRows, q: ShelfQuery = query, book: number | null = null) =>
   createElement(
     ToastProvider,
     null,
@@ -139,7 +139,7 @@ const tree = (initial: ShelfRows, q: ShelfQuery = query) =>
           createElement(
             ShelfRowsProvider,
             { query: q, initial } as ComponentProps<typeof ShelfRowsProvider>,
-            createElement(CollectionList, { query: q, book: null }),
+            createElement(CollectionList, { query: q, book }),
             createElement(Probe),
           ),
         ),
@@ -177,6 +177,45 @@ const titles = () =>
 const countLine = () => screen.getByText(/\d+ books?/).textContent
 
 describe('CollectionList', () => {
+  it('qualifies private genres and removes each classification while preserving the address', () => {
+    const q: ShelfQuery = {
+      q: 'search text',
+      filters: { genre: [7, 'tag:7', 9], tag: [3, 4], language: ['fi'] },
+      sort: 'year',
+      dir: 'desc',
+    }
+    render(
+      tree(
+        {
+          rows: rows(1, 1),
+          total: 1,
+          labels: {
+            'genre:7': 'Same',
+            'genre:tag:7': 'Same',
+            'genre:9': 'Other',
+            'tag:3': 'Tag A',
+            'tag:4': 'Tag B',
+          },
+        },
+        q,
+        42,
+      ),
+    )
+    const base = '/?q=search+text&'
+    const tail = '&language=fi&sort=year&dir=desc&book=42'
+    for (const [name, filters] of [
+      ['Same', 'genre=tag%3A7&genre=9&tag=3&tag=4'],
+      ['Same (personal genre)', 'genre=7&genre=9&tag=3&tag=4'],
+      ['Other', 'genre=7&genre=tag%3A7&tag=3&tag=4'],
+      ['Tag A', 'genre=7&genre=tag%3A7&genre=9&tag=4'],
+      ['Tag B', 'genre=7&genre=tag%3A7&genre=9&tag=3'],
+    ]) {
+      const link = screen.getByRole('link', { name: `Remove ${name}` })
+      expect(link.getAttribute('href')).toBe(base + filters + tail)
+      expect(link.textContent).toContain(name)
+    }
+  })
+
   afterEach(() => {
     cleanup()
     observers.length = 0

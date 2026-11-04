@@ -1,3 +1,4 @@
+import { sql } from '@payloadcms/db-postgres/drizzle'
 import { getPayload, type Payload } from 'payload'
 import { beforeAll, describe, expect, it } from 'vitest'
 
@@ -284,4 +285,165 @@ describe('shelf filters', () => {
       total: 0,
     })
   })
+})
+
+describe('private shelf classifications', () => {
+  it.each([['user' as const], ['admin' as const]])(
+    'scopes matching, counts and labels by owner and kind for %s',
+    async (role) => {
+      const { filterValues } = await import('@/lib/shelf/filterValues')
+      const { shelfLabels } = await import('@/lib/shelf/labels')
+      const a = await createUser({ roles: [role] })
+      const b = await createUser()
+      const ctx = await contextFor(a)
+      const payload = await getPayload({ config })
+      const label = async (user: User, kind: 'tag' | 'genre' | 'theme', name = unique(kind)) =>
+        gateway.create(await contextFor(user), {
+          collection: 'tags',
+          data: { owner: user.id, kind, name, nameKey: '' },
+          depth: 0,
+        })
+      const ordinary = await label(a, 'tag')
+      const secondTag = await label(a, 'tag')
+      const personal = await label(a, 'genre')
+      const foreign = await label(b, 'genre')
+      const foreignTag = await label(b, 'tag')
+      const theme = await label(a, 'theme')
+      const unused = await label(a, 'tag')
+      const wished = await label(a, 'tag')
+      // A system genre introduced later can share a private genre's name.
+      const system = await payload.create({
+        collection: 'genres',
+        data: { name: personal.name, nameFi: 'Suomi', nameKey: '' },
+        depth: 0,
+        overrideAccess: true,
+      })
+      // Test-only fixture: force a collision across the independent id spaces.
+      const collision = 1_000_000_000 + Math.floor(Math.random() * 100_000_000)
+      await payload.db.drizzle.execute(
+        sql`update tags set id = ${collision} where id = ${personal.id}`,
+      )
+      await payload.db.drizzle.execute(
+        sql`update genres set id = ${collision} where id = ${system.id}`,
+      )
+      personal.id = system.id = collision
+      const first = await sharedBook({ by: a, genres: [system.id] })
+      const second = await sharedBook({ by: a, language: 'sv' })
+      const copy = async (book: Book, status: 'owned' | 'ordered' = 'owned') =>
+        (
+          await gateway.create(ctx, {
+            collection: 'copies',
+            data: { owner: a.id, book: book.id, status },
+            depth: 0,
+          })
+        ).id
+      const c1 = await copy(first)
+      const c2 = await copy(second)
+      const c3 = await copy(second, 'ordered')
+      await upsertUserBook(ctx, first.id, { tags: [ordinary.id, theme.id] })
+      await upsertUserBook(ctx, second.id, { tags: [ordinary.id, secondTag.id, personal.id] })
+      await upsertUserBook(await contextFor(b), first.id, { tags: [foreign.id] })
+      // Corrupt only the test fixture: owner scoping must protect even inconsistent relations.
+      await payload.db.drizzle.execute(sql`insert into user_books_rels(parent_id, path, tags_id)
+        select ub.id, 'tags', t.id from user_books ub cross join tags t
+        where ub.owner_id = ${a.id} and ub.book_id = ${first.id}
+          and t.id in (${foreign.id}, ${foreignTag.id})`)
+
+      // Wishlist-only assignments offer no option.
+      const noCopy = await sharedBook({ by: a })
+      await upsertUserBook(ctx, noCopy.id, { tags: [wished.id] })
+      const wishlist = await gateway.create(ctx, {
+        collection: 'wishlists',
+        data: { owner: a.id, name: unique('Wishlist'), nameKey: '' },
+        depth: 0,
+      })
+      await gateway.create(ctx, {
+        collection: 'wishlist-entries',
+        data: { owner: a.id, wishlist: wishlist.id, book: noCopy.id },
+        depth: 0,
+      })
+      const listed = async (filters: ShelfQuery['filters']) =>
+        (await shelfIds(ctx, { filters, sort: 'added', dir: 'asc' }, ALL)).ids.map(
+          (row) => row.copyId,
+        )
+      expect(await listed({ genre: [system.id] })).toEqual([c1])
+      expect(await listed({ genre: [`tag:${personal.id}`] })).toEqual([c2, c3])
+      expect(await listed({ genre: [system.id, `tag:${personal.id}`] })).toEqual([c1, c2, c3])
+      expect(await listed({ genre: [system.id, `tag:${personal.id}`], language: ['sv'] })).toEqual([
+        c2,
+        c3,
+      ])
+      expect(await listed({ tag: [ordinary.id, secondTag.id] })).toEqual([c1, c2, c3])
+      expect(await listed({ tag: [secondTag.id], genre: [system.id] })).toEqual([])
+      for (const id of [foreign.id, ordinary.id, theme.id, 2147483647]) {
+        expect(await listed({ genre: [`tag:${id}`] })).toEqual([])
+        expect(await shelfLabels(ctx, { genre: [`tag:${id}`] })).toEqual({})
+      }
+      for (const id of [personal.id, theme.id, foreign.id, foreignTag.id, 2147483647]) {
+        expect(await listed({ tag: [id] })).toEqual([])
+        expect(await shelfLabels(ctx, { tag: [id] })).toEqual({})
+      }
+      const values = await filterValues(ctx, 'en')
+      expect(values.genre).toEqual([
+        { id: system.id, name: personal.name, count: 1 },
+        { id: `tag:${personal.id}`, name: personal.name, count: 2 },
+      ])
+      expect(values.tag).toEqual(
+        expect.arrayContaining([
+          { id: ordinary.id, name: ordinary.name, count: 3 },
+          { id: secondTag.id, name: secondTag.name, count: 2 },
+        ]),
+      )
+      expect(values.tag).toHaveLength(2)
+      expect(values.tag.map((v) => v.id)).not.toContain(unused.id)
+      expect(values.tag.map((v) => v.id)).not.toContain(wished.id)
+      expect(
+        await shelfLabels(ctx, { genre: [system.id, `tag:${personal.id}`], tag: [ordinary.id] }),
+      ).toEqual({
+        [`genre:${system.id}`]: personal.name,
+        [`genre:tag:${personal.id}`]: personal.name,
+        [`tag:${ordinary.id}`]: ordinary.name,
+      })
+      expect((await filterValues(ctx, 'fi')).genre[0].name).toBe('Suomi')
+      const overlap = await sharedBook({ by: a, genres: [system.id] })
+      const overlapCopy = await copy(overlap)
+      await upsertUserBook(ctx, overlap.id, { tags: [personal.id] })
+      const union = await shelfIds(
+        ctx,
+        {
+          filters: { genre: [system.id, `tag:${personal.id}`] },
+          sort: 'added',
+          dir: 'asc',
+        },
+        ALL,
+      )
+      expect(union.ids.map((row) => row.copyId)).toEqual([c1, c2, c3, overlapCopy])
+      expect(union.total).toBe(4)
+
+      const hiddenTag = await label(a, 'tag')
+      const hiddenGenre = await label(a, 'genre')
+      const hidden = await sharedBook({ by: b })
+      const hiddenCopies = [await copy(hidden), await copy(hidden, 'ordered')]
+      await upsertUserBook(ctx, hidden.id, { tags: [hiddenTag.id, hiddenGenre.id] })
+      // Its other creator makes the Book private after the viewer acquired copies.
+      await payload.update({
+        collection: 'books',
+        id: hidden.id,
+        data: { visibility: 'private', createdBy: b.id },
+        req: (await contextFor(b)).req,
+        overrideAccess: true,
+        depth: 0,
+      })
+      const readableCopies = role === 'admin' ? hiddenCopies : []
+      expect(await listed({ tag: [hiddenTag.id] })).toEqual(readableCopies)
+      expect(await listed({ genre: [`tag:${hiddenGenre.id}`] })).toEqual(readableCopies)
+      const readableValues = await filterValues(ctx, 'en')
+      expect(readableValues.tag.filter((value) => value.id === hiddenTag.id)).toEqual(
+        role === 'admin' ? [{ id: hiddenTag.id, name: hiddenTag.name, count: 2 }] : [],
+      )
+      expect(readableValues.genre.filter((value) => value.id === `tag:${hiddenGenre.id}`)).toEqual(
+        role === 'admin' ? [{ id: `tag:${hiddenGenre.id}`, name: hiddenGenre.name, count: 2 }] : [],
+      )
+    },
+  )
 })

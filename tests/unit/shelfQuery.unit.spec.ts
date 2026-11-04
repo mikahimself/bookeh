@@ -33,7 +33,8 @@ describe('shelf query parameters', () => {
         location: [4, 2],
         status: ['ordered', 'owned'],
         read: false,
-        genre: [11, 12],
+        genre: [11, 'tag:12'],
+        tag: [12, 13],
         language: ['fin', 'swe'],
         author: [3, 7],
         series: [8, 9],
@@ -66,8 +67,11 @@ describe('shelf query parameters', () => {
     ['sort=title&sort=year&q=a&q=b', { query: { ...DEFAULT, q: 'a', sort: 'title' }, book: null }],
     ['q=&language=', { query: DEFAULT, book: null }],
     ['page=3&foo=1', { query: DEFAULT, book: null }],
-    // Tag and theme filters arrive with Epic 9: until then neither narrows nor survives in links.
-    ['tag=1&theme=Sota', { query: DEFAULT, book: null }],
+    ['tag=1&theme=Sota', { query: { ...DEFAULT, filters: { tag: [1] } }, book: null }],
+    [
+      'genre=1&genre=tag:1&genre=tag:01&genre=tag:0&genre=tag:-2&genre=tag:2.1&genre=tag:2147483648&tag=2&tag=2&tag=x',
+      { query: { ...DEFAULT, filters: { genre: [1, 'tag:1'], tag: [2] } }, book: null },
+    ],
     // `q` is NFC-normalised: a combining diaeresis becomes the precomposed letter.
     ['q=a%CC%88', { query: { ...DEFAULT, q: 'ä' }, book: null }],
     [
@@ -78,7 +82,7 @@ describe('shelf query parameters', () => {
     for (const address of both(search)) expect(address).toStrictEqual(expected)
     const href = shelfHref(expected.query, { book: expected.book })
     const params = new URLSearchParams(href.slice(href.indexOf('?') + 1))
-    for (const dropped of ['page', 'foo', 'tag', 'theme']) expect(params.has(dropped)).toBe(false)
+    for (const dropped of ['page', 'foo', 'theme']) expect(params.has(dropped)).toBe(false)
   })
 
   it('gives / for the default query and no book', () => {

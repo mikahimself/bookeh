@@ -8,18 +8,22 @@ import { drizzleFor } from '@/lib/payload/drizzle'
 import { effective } from './effective'
 import type { FilterValues } from './query'
 import { readableBy, visibleCopies } from './visibleCopies'
+import { tagValues } from './tagValues'
 
 const STATUSES = ['owned', 'ordered'] as const
 const READ = [true, false] as const
 
 /**
  * Spine, AD-7: the values the Filter panel offers, each with how many of the
- * viewer's copies carry it: own locations and system genres by name (a copy
+ * viewer's copies carry it: own locations and genres by name (a copy
  * counts once under each of its Book's genres), effective languages (AD-6) by
  * value, statuses `owned` then `ordered`, read then unread (the viewer's
  * `user-books` row; a missing row is unread). Only values in use; a copy with no
  * location or language adds none. Counts run over all the viewer's copies,
- * never narrowed by a shelf query. Read-only, one grouped query per field.
+ * never narrowed by a shelf query. System genres precede sorted private genres;
+ * ordinary tags have their own list. Private labels require the viewer's
+ * assignments and owner/kind, including admins. Read-only, sequential queries
+ * so a shared transaction context is never used concurrently.
  */
 export async function filterValues(ctx: Context, locale: Locale): Promise<FilterValues> {
   const viewer = ctx.user
@@ -37,26 +41,26 @@ export async function filterValues(ctx: Context, locale: Locale): Promise<Filter
       .then(({ rows }) => rows)
 
   const language = effective('language')
-  const [locations, statuses, reads, genres, languages] = await Promise.all([
-    grouped(
-      sql`l.id, l.name`,
-      sql`join locations l on l.id = copies.location_id and l.owner_id = ${viewer.id}`,
-      sql`group by l.id, l.name order by l.name, l.id`,
-    ),
-    grouped(sql`copies.status as value`, sql``, sql`group by copies.status`),
-    grouped(sql`ub.read is true as value`, sql``, sql`group by 1`),
-    grouped(
-      sql`g.id, g.name, g.name_fi`,
-      sql`join books_rels r on r.parent_id = b.id and r.path = 'genres'
+  const locations = await grouped(
+    sql`l.id, l.name`,
+    sql`join locations l on l.id = copies.location_id and l.owner_id = ${viewer.id}`,
+    sql`group by l.id, l.name order by l.name, l.id`,
+  )
+  const statuses = await grouped(sql`copies.status as value`, sql``, sql`group by copies.status`)
+  const reads = await grouped(sql`ub.read is true as value`, sql``, sql`group by 1`)
+  const genres = await grouped(
+    sql`g.id, g.name, g.name_fi`,
+    sql`join books_rels r on r.parent_id = b.id and r.path = 'genres'
         join genres g on g.id = r.genres_id`,
-      sql`group by g.id, g.name, g.name_fi`,
-    ),
-    grouped(
-      sql`${language} as value`,
-      sql``,
-      sql`and coalesce(${language}, '') <> '' group by 1 order by 1`,
-    ),
-  ])
+    sql`group by g.id, g.name, g.name_fi`,
+  )
+  const languages = await grouped(
+    sql`${language} as value`,
+    sql``,
+    sql`and coalesce(${language}, '') <> '' group by 1 order by 1`,
+  )
+  const personalGenres = await tagValues(ctx, 'genre')
+  const tags = await tagValues(ctx, 'tag')
 
   const collator = new Intl.Collator(locale)
   return {
@@ -73,16 +77,22 @@ export async function filterValues(ctx: Context, locale: Locale): Promise<Filter
       const row = reads.find((r) => r.value === value)
       return row ? [{ value, count: Number(row.count) }] : []
     }),
-    genre: genres
-      .map((row) => ({
-        id: Number(row.id),
-        name: genreName(
-          { name: String(row.name), nameFi: row.name_fi == null ? null : String(row.name_fi) },
-          locale,
-        ),
-        count: Number(row.count),
-      }))
-      .sort((a, b) => collator.compare(a.name, b.name) || a.id - b.id),
+    genre: [
+      ...genres
+        .map((row) => ({
+          id: Number(row.id),
+          name: genreName(
+            { name: String(row.name), nameFi: row.name_fi == null ? null : String(row.name_fi) },
+            locale,
+          ),
+          count: Number(row.count),
+        }))
+        .sort((a, b) => collator.compare(a.name, b.name) || a.id - b.id),
+      ...personalGenres
+        .sort((a, b) => collator.compare(a.name, b.name) || a.id - b.id)
+        .map((value) => ({ ...value, id: `tag:${value.id}` as const })),
+    ],
+    tag: tags.sort((a, b) => collator.compare(a.name, b.name) || a.id - b.id),
     language: languages.map((row) => ({ value: String(row.value), count: Number(row.count) })),
   }
 }

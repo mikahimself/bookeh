@@ -17,11 +17,13 @@ import { BookRow } from './BookRow'
 import { useCollectionDisplay } from './CollectionDisplay'
 import { activeValues, clearHref, isNarrowed } from './countLine'
 import { CoverTile } from './CoverTile'
+import { toggleFilter } from './filterToggle'
 import { useSelection } from './Selection'
 import { useShelfRows } from './ShelfRows'
 
 /** Between the count line's parts (EXPERIENCE.md, Count line). */
 const SEPARATOR = ' · '
+const REMOVE_MARK = '×'
 
 /** DESIGN.md, Collection density: cover columns at least this wide, with this gap. */
 const GRID: Record<DevicePrefs['size'], string> = {
@@ -75,9 +77,35 @@ export function CollectionList({ query, book }: { query: ShelfQuery; book: numbe
       {t('clear')}
     </TextLink>
   )
-  const values = activeValues(query, shelf.labels, t, locale).join(', ')
+  const chips = (['genre', 'tag'] as const).flatMap((field) =>
+    (query.filters[field] ?? []).flatMap((id) => {
+      const rawName = shelf.labels[`${field}:${id}`]
+      if (rawName === undefined) return []
+      const name =
+        field === 'genre' && typeof id === 'string'
+          ? t('personalGenre', { name: rawName })
+          : rawName
+      return [
+        <TextLink
+          key={`${field}:${id}`}
+          href={shelfHref(toggleFilter(query, field, id), { book })}
+          replace
+          scroll={false}
+          aria-label={t('filterRemove', { name })}
+        >
+          {name} <span aria-hidden="true">{REMOVE_MARK}</span>
+        </TextLink>,
+      ]
+    }),
+  )
+  const { genre: _genre, tag: _tag, ...otherFilters } = query.filters
+  const values = activeValues({ ...query, filters: otherFilters }, shelf.labels, t, locale).join(
+    ', ',
+  )
   const count = t('count', { n: shelf.total })
-  const parts: ReactNode[] = narrowed ? [...(values ? [values] : []), count, clear] : [count]
+  const parts: ReactNode[] = narrowed
+    ? [...(values ? [values] : []), ...chips, count, clear]
+    : [count]
   const lent = (person: string) => root('loans.lentMarker', { person })
   const opens = (row: ShelfRow) => ({
     href: shelfHref(query, { book: row.book.bookId }),
