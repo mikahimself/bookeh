@@ -9,31 +9,7 @@ followup_review_recommended: true
 context:
   - '{project-root}/_bmad-output/implementation-artifacts/epic-8-context.md'
 warnings: ['oversized']
-deferred:
-  - summary: >-
-      The story's criterion names the literal array `[finna, google,
-      openLibrary]`, but membership is gated on `OPEN_LIBRARY_CONTACT`, so a
-      clone or deploy without that variable runs two sources and Open Library's
-      new source names, the three-way merge order and its place in the partial
-      line are unreachable there.
-    evidence: |-
-      `src/lib/metadata/sources/index.ts` builds
-      `[finna, google, ...(openLibraryContact() ? [openLibrary] : [])]`, and
-      `.env.example` ships `OPEN_LIBRARY_CONTACT=` empty. The reading is
-      deliberate and recorded in this spec's Boundaries and in AD-9: Open
-      Library asks every client to identify itself, and the epic's standing
-      rule is that a source whose credential is absent is left out rather than
-      degraded. The competing reading is the criterion's literal one — the
-      source is always third and the variable only supplies the header's text,
-      Open Library permitting unidentified calls at 1 request per second. The
-      test-parity half of the harm is fixed: `vitest.setup.ts` pins a
-      test-only contact, so the int lane always runs three sources. What would
-      settle the rest: the owner's call on whether an environment with no
-      contact should have Open Library at all. Either way it is one line in
-      `sources/index.ts` plus a documentation line.
-    location: >-
-      src/lib/metadata/sources/index.ts:12
-    severity: medium
+deferred: []
 ---
 
 <intent-contract>
@@ -165,7 +141,7 @@ deferred:
   - `[medium]` `[patch]` (verification-gap) No test in the normal verification path asserts app-level lookup behaviour with Open Library in the array; the `none` → `unavailable` flip the build already hit by accident would ship green — filed pre-verified. Fixed: the lane pins the contact and `saveCopyAction.int.spec.ts` gains one case asserting `{}` leaves the outcome and 500 puts `openlibrary` in `failed`.
   - `[low]` `[patch]` (verification-gap) The "contact never written to a fixture" loop passes vacuously if no fixture is written — real; fixed directly by asserting the file count (2) before the loop.
   - `[low]` `[patch]` (verification-gap) The adapter's "read at call time" comment overstates, since the gate is evaluated at module load — grouped with the edge-case comment finding and fixed.
-  - `[medium]` `[defer]` (intent alignment) The criterion names the literal array `[finna, google, openLibrary]`; the build makes membership conditional on `OPEN_LIBRARY_CONTACT`, so a clone without it runs two sources and the new source names and three-way order are unreachable — real, and a deliberate reading recorded in the spec and in AD-9. The test-parity half is fixed (the lane now pins a contact); whether a fresh environment should have Open Library at all is the owner's call, so it is deferred as a question, not a defect.
+  - `[medium]` `[defer]` (intent alignment) The criterion names the literal array `[finna, google, openLibrary]`; the build makes membership conditional on `OPEN_LIBRARY_CONTACT`, so a clone without it runs two sources and the new source names and three-way order are unreachable — real, and a deliberate reading recorded in the spec and in AD-9. The test-parity half is fixed (the lane now pins a contact); whether a fresh environment should have Open Library at all was put to the owner on 2026-11-04, who chose to keep it gated as built; the deferral is closed and nothing further is owed.
   - `[low]` `[reject]` (intent alignment) The AD-9 edit is wider than the criterion asked, adding a general credential-gated-membership rule — the criterion asked for the spine to name the source and its order; the gating rule had to be recorded somewhere, and an unwritten contract would be worse than a written one.
   - `[low]` `[reject]` (intent alignment) Behaviours the criterion calls fixture-verified are tested against hand-written bodies — a malformed body, a missing key and an HTTP 500 are states no recorded response exhibits; no test reaches the network either way, which is what the criterion protects.
   - `[medium]` `[patch]` (intent alignment) The fan-out surface is edited only to stop existing tests 404-ing, with no assertion about a third source — same cause as the verification-gap finding; grouped and fixed.
@@ -209,7 +185,7 @@ Status: done
 - `tests/unit/openLibrary.unit.spec.ts` (new), `tests/unit/captureFixtures.unit.spec.ts`, `tests/int/pickEdition.int.spec.ts`, `tests/int/saveCopy.int.spec.ts`, `tests/int/saveCopyAction.int.spec.ts` — the adapter's behaviour, the capture script's, and the fan-out's.
 - `_bmad-output/implementation-artifacts/sprint-status.yaml` — 8-12 done.
 
-**Review findings.** Four layers ran; 31 findings. **Patched (9 entries):** the int lane depending on the developer's `.env` so CI verified a two-source app while a configured machine verified three (medium, found by three layers independently); no assertion anywhere that Open Library's answer reaches an outcome (medium); the fixture secret-leak guard covering the lookup writes only while the search loop wrote unchecked (medium); `npm run fixtures` refusing to run without a contact and so making its own documented no-contact path unreachable; uncapped search hits (40 from 20 works) and a wrong parity comment; `pages` dropping `pagination`; the AD-9 author-name exception unrecorded; a shadowed `names` identifier; and a "read at call time" comment that overstated what setting the variable does, plus a vacuous assertion in the leak-guard loop. **Deferred (1, medium):** the criterion names the literal array `[finna, google, openLibrary]` while membership is gated on the contact, so a clone without it runs two sources — the owner's call, recorded in `deferred`. **Rejected (13):** three refuted against the recorded fixtures (`publish_date` is a string in all 30; no edition doc carries two distinct ISBN-13s or two `publish_year`s), the rest on convention or on harm that could not be named — generated report prose, a shared test helper "for later", a fix that would only edit this build's spec, a year guard that would diverge from Finna's identical rule, and a test asserting an absent header.
+**Review findings.** Four layers ran; 31 findings. **Patched (9 entries):** the int lane depending on the developer's `.env` so CI verified a two-source app while a configured machine verified three (medium, found by three layers independently); no assertion anywhere that Open Library's answer reaches an outcome (medium); the fixture secret-leak guard covering the lookup writes only while the search loop wrote unchecked (medium); `npm run fixtures` refusing to run without a contact and so making its own documented no-contact path unreachable; uncapped search hits (40 from 20 works) and a wrong parity comment; `pages` dropping `pagination`; the AD-9 author-name exception unrecorded; a shadowed `names` identifier; and a "read at call time" comment that overstated what setting the variable does, plus a vacuous assertion in the leak-guard loop. **Deferred (1, medium), then closed:** the criterion names the literal array `[finna, google, openLibrary]` while membership is gated on the contact, so a clone without it runs two sources. Put to the owner on 2026-11-04, who chose to keep it gated as built — nothing unidentified ever leaves the app, and dev, CI and a fresh deploy work without the variable. AD-9 already states that rule generally, and Story 8.13's `HARDCOVER_API_TOKEN` follows it. **Rejected (13):** three refuted against the recorded fixtures (`publish_date` is a string in all 30; no edition doc carries two distinct ISBN-13s or two `publish_year`s), the rest on convention or on harm that could not be named — generated report prose, a shared test helper "for later", a fix that would only edit this build's spec, a year guard that would diverge from Finna's identical rule, and a test asserting an absent header.
 
 **Follow-up review recommended: true.** Patched entries by verdict: high 0, medium 2, low 7. The named unverified risk: pinning the contact in `vitest.setup.ts` makes every int spec that reaches the sources responsible for stubbing `openlibrary.org`, and the three patched specs are the only ones doing so today — a spec added later that asks the sources without that stub will read a 404 as a source failure and flip `none` to `unavailable`, the same way this build did. Story 8.13 meets the same stubs for `hardcover.app`.
 
@@ -244,4 +220,3 @@ Status: done
 - `git grep -i <contact>` -- no match in this story's diff; the two pre-existing hits are older specs quoting `SEED_EMAIL`.
 
 **Deviation from the task list.** Three int specs stub `fetch` per hostname and fell through to `404` (or, in `saveCopy`, to a JPEG) for any other host. With Open Library in the array that read as a source *failure*, turning `none` into `unavailable` and adding `openlibrary` to `failed`, so four tests failed. Each stub gained one branch: `if (url.hostname === 'openlibrary.org') return Response.json({})` — Open Library answered, does not hold the ISBN. `tests/int/pickEdition.int.spec.ts` (1), `tests/int/saveCopyAction.int.spec.ts` (4 stubs), `tests/int/saveCopy.int.spec.ts` (1). No assertion changed.
-
