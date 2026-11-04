@@ -26,7 +26,9 @@ services:
     environment:
       DATABASE_URL: postgres://bookeh:${POSTGRES_PASSWORD}@postgres:5432/bookeh
       PAYLOAD_SECRET: ${PAYLOAD_SECRET}
+      GOOGLE_BOOKS_API_KEY: ${GOOGLE_BOOKS_API_KEY:-}
       OPEN_LIBRARY_CONTACT: ${OPEN_LIBRARY_CONTACT:-}
+      HARDCOVER_API_TOKEN: ${HARDCOVER_API_TOKEN:-}
       # Defaulted to empty: the operator clears these lines from .env once
       # the first account exists (README step 4), and compose must not warn
       # on every later invocation.

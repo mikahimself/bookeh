@@ -334,8 +334,11 @@ way (`install -m 700 /root/backup.sh /opt/bookeh/backup.sh`,
 re-copy to `/etc/systemd/system/` followed by `systemctl daemon-reload`.
 
 When a change introduces new variables (compare the new `.env.example`),
-add them to `/opt/bookeh/.env` by hand — this story added the three
-`BOOKEH_BACKUP_*` lines.
+add them to `/opt/bookeh/.env` by hand. The metadata source settings
+`GOOGLE_BOOKS_API_KEY`, `OPEN_LIBRARY_CONTACT`, and `HARDCOVER_API_TOKEN`
+are forwarded by `compose.prod.yml`; copy the updated Compose file before
+recreating the app container. This story added the three `BOOKEH_BACKUP_*`
+lines.
 
 ## Backups — [lxc]
 
