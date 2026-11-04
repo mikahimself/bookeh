@@ -50,7 +50,7 @@ export function scalarFilters(filters: Filters): SQL | undefined {
  * match only the viewer's user-book assignments and the correct label kind.
  */
 export function relationFilters(viewer: Viewer, filters: Filters): SQL | undefined {
-  const { author, series, genre, tag } = filters
+  const { author, series, genre, tag, theme } = filters
   const conditions: SQL[] = []
   if (author?.length)
     conditions.push(sql`exists (select 1 from authors a
@@ -78,5 +78,15 @@ export function relationFilters(viewer: Viewer, filters: Filters): SQL | undefin
     conditions.push(sql`(${sql.join(matches, sql` or `)})`)
   }
   if (tag?.length) conditions.push(privateMatch(tag, 'tag'))
+  if (theme?.length) {
+    const names = sql.join(theme.map((name) => sql`lower(${name}::text)`), sql`, `)
+    conditions.push(sql`(
+      exists (select 1 from books_texts t where t.parent_id = b.id
+        and t.path = 'themes' and lower(t.text) in (${names}))
+      or exists (select 1 from user_books_rels rel
+        join tags t on t.id = rel.tags_id and t.owner_id = ${viewer.id} and t.kind = 'theme'
+        where rel.parent_id = ub.id and ub.owner_id = ${viewer.id}
+          and rel.path = 'tags' and lower(t.name) in (${names})))`)
+  }
   return conditions.length ? sql`(${sql.join(conditions, sql` and `)})` : undefined
 }

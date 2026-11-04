@@ -55,6 +55,7 @@ export function activeValues(
     ...(f.read === undefined ? [] : [t(f.read ? 'read' : 'unread')]),
     ...named('genre', f.genre),
     ...named('tag', f.tag),
+    ...(f.theme ?? []),
     ...(f.language ?? []).map((code) => languageName(code, locale)),
     ...named('author', f.author),
     ...named('series', f.series),

@@ -157,7 +157,7 @@ type Go = (update: (query: ShelfQuery) => ShelfQuery) => void
 
 /**
  * Location, status, read, genre and language as option lists of the values
- * in use, then author, series and publisher as comboboxes with short lists,
+ * in use, then author, series, publisher and theme as comboboxes with short lists,
  * then rating, year and pages, then "Sort by"; those only for a viewer with
  * copies. Every change replaces the address at once through `go`, keeping
  * search, `book` and whatever it does not change. Until the address reaches
@@ -261,7 +261,7 @@ function OptionLists({ values, labels }: { values: FilterValues; labels: Record<
       />
       {values.status.length > 0 && (
         <>
-          {(['author', 'series', 'publisher'] as const).map((field) => (
+          {(['author', 'series', 'publisher', 'theme'] as const).map((field) => (
             <AddedValues
               key={field}
               field={field}
@@ -461,7 +461,7 @@ const NONE: AddedValue[] = []
  * with too many values to list, and under it the values that are on, in
  * address order. Choosing a suggestion adds it, tapping a listed value
  * removes it; both through `tap`. A suggestion's value is its id, or a
- * publisher's name. An id is named by `labels`, or until the server render
+ * publisher or theme name. An id is named by `labels`, or until the server render
  * brings that by the suggestion chosen here; an id named by neither is not
  * listed.
  */
@@ -484,7 +484,7 @@ function AddedValues({
     () => suggestions.filter((s) => !on.includes(s.id ?? s.name)),
     [suggestions, on],
   )
-  // Positional ids: publishers have none of their own.
+  // Positional ids: text values have none of their own.
   const options = useMemo<ComboboxOption[]>(
     () => offered.map(({ name }, i) => ({ id: i, label: name })),
     [offered],

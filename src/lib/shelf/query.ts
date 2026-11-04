@@ -28,6 +28,7 @@ export type ShelfQuery = {
     read: boolean
     genre: GenreFilterId[]
     tag: number[]
+    theme: string[]
     language: string[]
     author: number[]
     series: number[]
@@ -50,12 +51,12 @@ export const SHELF_PAGE_SIZE = 50
 export const SHELF_MAX_ROWS = 1000
 
 /** The fields `/data/suggest` suggests names for; the route checks `field` against it. */
-export const SUGGEST_FIELDS = ['author', 'series', 'publisher'] as const
+export const SUGGEST_FIELDS = ['author', 'series', 'publisher', 'theme'] as const
 
 /** Spine, Shared shapes. */
 export type SuggestField = (typeof SUGGEST_FIELDS)[number]
 
-/** Spine, Shared shapes: one suggested name; `id` is `null` for a publisher. */
+/** Spine, Shared shapes: one suggested name; `id` is `null` for a publisher or theme. */
 export type Suggestion = { id: number | null; name: string }
 
 /** Spine, Shared shapes: a filter value with how many of the viewer's copies carry it. */
@@ -166,6 +167,7 @@ export function parseShelfQuery(params: ShelfParams): ShelfAddress {
   set('read', bool(one('read')))
   set('genre', list(all('genre'), genreId))
   set('tag', list(all('tag'), id))
+  set('theme', list(all('theme'), text))
   set('language', list(all('language'), text))
   set('author', list(all('author'), id))
   set('series', list(all('series'), id))
@@ -210,6 +212,7 @@ export function shelfSearchParams(
   add('read', one(f.read))
   add('genre', f.genre)
   add('tag', f.tag)
+  add('theme', f.theme)
   add('language', f.language)
   add('author', f.author)
   add('series', f.series)

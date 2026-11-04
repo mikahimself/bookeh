@@ -16,7 +16,8 @@ export const SUGGEST_LIMIT = 10
  * Only effective values (AD-6) of Books behind the viewer's copies; authors
  * and series pass the AD-4 read rule and are distinct on `name_key`, the
  * shared record's id first, else the lowest. Publishers are distinct values,
- * with `id: null`. Blank text suggests nothing. Read-only.
+ * with `id: null`. Themes combine system themes and owned kind-theme assignments,
+ * distinct apart from case, with null ids. Blank text suggests nothing. Read-only.
  */
 export async function suggest(
   ctx: Context,
@@ -33,6 +34,24 @@ export async function suggest(
     left join user_books ub on ub.book_id = b.id and ub.owner_id = ${viewer.id}
     ${join}
     where ${visibleCopies(viewer)}`
+
+  if (field === 'theme') {
+    const { rows } = await drizzleFor(ctx).execute(sql`
+      select name from (
+        select distinct on (lower(name)) name from (
+          select t.text as name ${from(sql`join books_texts t
+            on t.parent_id = b.id and t.path = 'themes'`)}
+            and t.text ilike ${pattern} escape '\\'
+          union all
+          select t.name ${from(sql`join user_books_rels rel
+            on rel.parent_id = ub.id and rel.path = 'tags'
+            join tags t on t.id = rel.tags_id
+              and t.owner_id = ${viewer.id} and t.kind = 'theme'`)}
+            and t.name ilike ${pattern} escape '\\'
+        ) themes order by lower(name), name
+      ) named order by name limit ${SUGGEST_LIMIT}`)
+    return rows.map((row) => ({ id: null, name: String(row.name) }))
+  }
 
   if (field === 'publisher') {
     const publisher = effective('publisher')

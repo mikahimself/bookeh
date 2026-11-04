@@ -30,6 +30,10 @@ const suggestions: Record<SuggestField, Suggestion[]> = {
     { id: 9, name: 'Kalle Päätalo' },
   ],
   series: [],
+  theme: [
+    { id: null, name: 'Adventure' },
+    { id: null, name: 'My theme' },
+  ],
   publisher: [{ id: null, name: 'WSOY' }],
 }
 vi.mock('@/app/(frontend)/components/suggest', () => ({
@@ -204,6 +208,32 @@ describe('Filter panel author, series and publisher', () => {
     expect(screen.getByRole('button', { name: 'filterRemove: Väinö Linna' })).toBeTruthy()
     expect(screen.getByRole('button', { name: 'filterRemove: Kalle Päätalo' })).toBeTruthy()
     await waitFor(() => expect(author().value).toBe(''))
+  })
+
+  it('adds and removes text themes while preserving the rest of the address', async () => {
+    search = new URLSearchParams('q=book&tag=3&sort=title&book=7')
+    const view = render(page())
+    fireEvent.click(filter())
+    const theme = screen.getByRole('combobox', { name: 'filterFields.theme' })
+    act(() => theme.focus())
+    fireEvent.input(theme, { target: { value: 'ad' }, inputType: 'insertText' })
+    fireEvent.click(await screen.findByRole('option', { name: 'Adventure' }))
+    expect(router.replace).toHaveBeenCalledWith(
+      '/?q=book&tag=3&theme=Adventure&sort=title&book=7',
+      {
+        scroll: false,
+      },
+    )
+    expect(screen.getByRole('button', { name: 'filterRemove: Adventure' })).toBeTruthy()
+    search = new URLSearchParams('q=book&tag=3&theme=Adventure&theme=My+theme&sort=title&book=7')
+    view.rerender(page())
+    fireEvent.click(screen.getByRole('button', { name: 'filterRemove: Adventure' }))
+    expect(router.replace).toHaveBeenLastCalledWith(
+      '/?q=book&tag=3&theme=My+theme&sort=title&book=7',
+      {
+        scroll: false,
+      },
+    )
   })
 
   it('adds a chosen publisher by name and lists it', async () => {

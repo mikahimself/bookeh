@@ -242,6 +242,7 @@
       "author": "Author",
       "series": "Series",
       "publisher": "Publisher",
+      "theme": "Theme",
       "rating": "Rating",
       "year": "Year",
       "pages": "Pages",

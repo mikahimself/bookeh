@@ -7,7 +7,16 @@ type Filters = ShelfQuery['filters']
  * the comboboxes' short lists (EXPERIENCE.md, Filter panel).
  */
 export type ListedField =
-  'location' | 'status' | 'read' | 'genre' | 'tag' | 'language' | 'author' | 'series' | 'publisher'
+  | 'location'
+  | 'status'
+  | 'read'
+  | 'genre'
+  | 'tag'
+  | 'language'
+  | 'author'
+  | 'series'
+  | 'publisher'
+  | 'theme'
 
 /** One value of `field`: an element of a listed field, or `read`'s boolean. */
 export type ListedValue<F extends ListedField> = F extends 'read'

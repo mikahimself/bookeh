@@ -1,9 +1,11 @@
+import { sql } from '@payloadcms/db-postgres/drizzle'
 import { getPayload, type Payload } from 'payload'
 import { beforeAll, describe, expect, it } from 'vitest'
 
 import { upsertUserBook } from '@/lib/books/upsertUserBook'
 import * as gateway from '@/lib/payload/gateway'
 import { filterValues } from '@/lib/shelf/filterValues'
+import { shelfIds } from '@/lib/shelf/shelfIds'
 import { suggest } from '@/lib/shelf/suggest'
 import config from '@/payload.config'
 import type { Book, User } from '@/payload-types'
@@ -66,6 +68,152 @@ describe('shelf filter values and suggestions', () => {
 
   beforeAll(async () => {
     payload = await getPayload({ config })
+  })
+
+  it.each(['user' as const, 'admin' as const])(
+    'keeps foreign private theme names hidden from %s even on malformed assignments',
+    async (role) => {
+      const a = await createUser({ roles: [role] })
+      const b = await createUser()
+      const ctx = await contextFor(a)
+      const book = await sharedBook({ by: a })
+      await copyOf(a, book)
+      const foreign = await gateway.create(await contextFor(b), {
+        collection: 'tags',
+        data: { owner: b.id, name: 'Foreign private theme', nameKey: '', kind: 'theme' },
+        depth: 0,
+      })
+      const wrong = await gateway.create(ctx, {
+        collection: 'tags',
+        data: { owner: a.id, name: 'Wrong kind theme', nameKey: '', kind: 'tag' },
+        depth: 0,
+      })
+      await upsertUserBook(ctx, book.id, { tags: [wrong.id] })
+      await payload.db.drizzle.execute(sql`insert into user_books_rels(parent_id,path,tags_id)
+      select id, 'tags', ${foreign.id} from user_books where owner_id = ${a.id} and book_id = ${book.id}`)
+      for (const name of [foreign.name, wrong.name]) {
+        expect(await suggest(ctx, 'theme', name)).toEqual([])
+        expect(
+          (
+            await shelfIds(
+              ctx,
+              { filters: { theme: [name] }, sort: 'added', dir: 'asc' },
+              { offset: 0, limit: 50 },
+            )
+          ).total,
+        ).toBe(0)
+      }
+    },
+  )
+
+  it('excludes themes on Books that became unreadable after acquiring copies', async () => {
+    const a = await createUser()
+    const b = await createUser()
+    const ctx = await contextFor(a)
+    const book = await sharedBook({ by: b, themes: ['Hidden system theme'] })
+    await copyOf(a, book)
+    const own = await gateway.create(ctx, {
+      collection: 'tags',
+      data: { owner: a.id, name: 'Hidden private theme', nameKey: '', kind: 'theme' },
+      depth: 0,
+    })
+    await upsertUserBook(ctx, book.id, { tags: [own.id] })
+    await payload.update({
+      collection: 'books',
+      id: book.id,
+      data: { visibility: 'private' },
+      overrideAccess: true,
+      req: await reqFor(b),
+    })
+    expect(await suggest(ctx, 'theme', 'hidden')).toEqual([])
+    expect(
+      (
+        await shelfIds(
+          ctx,
+          { filters: { theme: ['Hidden system theme', own.name] }, sort: 'added', dir: 'asc' },
+          { offset: 0, limit: 50 },
+        )
+      ).total,
+    ).toBe(0)
+  })
+
+  it('suggests used system and private themes once, including ordered copies, with literal wildcards and a ten-name cap', async () => {
+    const a = await createUser()
+    const b = await createUser()
+    const ctx = await contextFor(a)
+    const book = await sharedBook({
+      by: a,
+      themes: [
+        'Walk Theme',
+        'walk theme',
+        '100%_\\ Theme',
+        ...Array.from({ length: 12 }, (_, i) => `Theme ${String(i).padStart(2, '0')}`),
+      ],
+    })
+    await copyOf(a, book, { status: 'ordered' })
+    await copyOf(a, book)
+    const label = async (user: User, kind: 'theme' | 'tag', name: string) =>
+      gateway.create(await contextFor(user), {
+        collection: 'tags',
+        data: { owner: user.id, name, kind, nameKey: '' },
+        depth: 0,
+      })
+    const orderedOnly = await sharedBook({ by: a, themes: ['Ordered system theme'] })
+    await copyOf(a, orderedOnly, { status: 'ordered' })
+    const orderedLabel = await label(a, 'theme', 'Ordered private theme')
+    await upsertUserBook(ctx, orderedOnly.id, { tags: [orderedLabel.id] })
+    expect(await suggest(ctx, 'theme', 'Ordered system')).toEqual([
+      { id: null, name: 'Ordered system theme' },
+    ])
+    expect(await suggest(ctx, 'theme', 'Ordered private')).toEqual([
+      { id: null, name: 'Ordered private theme' },
+    ])
+    const collision = await label(a, 'theme', 'walk theme')
+    const own = await label(a, 'theme', 'Private Theme')
+    const wrong = await label(a, 'tag', 'Wrong Theme')
+    await label(a, 'theme', 'Unused Theme')
+    const foreign = await label(b, 'theme', 'Foreign Theme')
+    await upsertUserBook(ctx, book.id, { tags: [own.id, wrong.id, collision.id] })
+    await upsertUserBook(await contextFor(b), book.id, { tags: [foreign.id] })
+    const wished = await sharedBook({ by: a, themes: ['Wishlist Theme'] })
+    const wishTag = await label(a, 'theme', 'Wishlist Private Theme')
+    await upsertUserBook(ctx, wished.id, { tags: [wishTag.id] })
+    expect(
+      (await suggest(ctx, 'theme', 'walk')).map(({ id, name }) => ({
+        id,
+        name: name.toLowerCase(),
+      })),
+    ).toEqual([{ id: null, name: 'walk theme' }])
+    expect(await suggest(ctx, 'theme', 'Private Theme')).toEqual([
+      { id: null, name: 'Ordered private theme' },
+      { id: null, name: 'Private Theme' },
+    ])
+    for (const text of ['wrong', 'unused', 'foreign', 'wishlist', '  '])
+      expect(await suggest(ctx, 'theme', text)).toEqual([])
+    for (const text of ['%', '_', '\\'])
+      expect(await suggest(ctx, 'theme', text)).toEqual([{ id: null, name: '100%_\\ Theme' }])
+    const suggestions = await suggest(ctx, 'theme', 'theme')
+    expect(suggestions).toHaveLength(10)
+    await copyOf(
+      a,
+      await sharedBook({
+        by: a,
+        themes: [
+          'Järjestys Öljy',
+          'Järjestys Äiti',
+          'Järjestys Zulu',
+          'Järjestys Åland',
+          'Järjestys Aamu',
+        ],
+      }),
+    )
+    expect(await suggest(ctx, 'theme', 'Järjestys')).toEqual([
+      { id: null, name: 'Järjestys Aamu' },
+      { id: null, name: 'Järjestys Zulu' },
+      { id: null, name: 'Järjestys Åland' },
+      { id: null, name: 'Järjestys Äiti' },
+      { id: null, name: 'Järjestys Öljy' },
+    ])
   })
 
   it("counts the values in use on the viewer's copies, overrides applied, no one else's", async () => {

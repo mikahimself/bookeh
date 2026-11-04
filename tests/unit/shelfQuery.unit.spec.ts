@@ -67,7 +67,10 @@ describe('shelf query parameters', () => {
     ['sort=title&sort=year&q=a&q=b', { query: { ...DEFAULT, q: 'a', sort: 'title' }, book: null }],
     ['q=&language=', { query: DEFAULT, book: null }],
     ['page=3&foo=1', { query: DEFAULT, book: null }],
-    ['tag=1&theme=Sota', { query: { ...DEFAULT, filters: { tag: [1] } }, book: null }],
+    [
+      'tag=1&theme=Sota',
+      { query: { ...DEFAULT, filters: { tag: [1], theme: ['Sota'] } }, book: null },
+    ],
     [
       'genre=1&genre=tag:1&genre=tag:01&genre=tag:0&genre=tag:-2&genre=tag:2.1&genre=tag:2147483648&tag=2&tag=2&tag=x',
       { query: { ...DEFAULT, filters: { genre: [1, 'tag:1'], tag: [2] } }, book: null },
@@ -82,7 +85,7 @@ describe('shelf query parameters', () => {
     for (const address of both(search)) expect(address).toStrictEqual(expected)
     const href = shelfHref(expected.query, { book: expected.book })
     const params = new URLSearchParams(href.slice(href.indexOf('?') + 1))
-    for (const dropped of ['page', 'foo', 'theme']) expect(params.has(dropped)).toBe(false)
+    for (const dropped of ['page', 'foo']) expect(params.has(dropped)).toBe(false)
   })
 
   it('gives / for the default query and no book', () => {
@@ -101,4 +104,18 @@ describe('shelf query parameters', () => {
       `/data/shelf?${params}&offset=50&limit=50`,
     )
   })
+})
+
+it('round trips distinct text themes with other address values and ignores empty themes', () => {
+  const address = parseShelfQuery(
+    new URLSearchParams(
+      'theme=Seikkailu&theme=Oma&theme=Seikkailu&theme=&q=book&sort=title&book=12&tag=3',
+    ),
+  )
+  expect(address.query.filters.theme).toEqual(['Seikkailu', 'Oma'])
+  expect(
+    parseShelfQuery(
+      new URL(shelfHref(address.query, { book: address.book }), 'http://test').searchParams,
+    ),
+  ).toEqual(address)
 })

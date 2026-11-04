@@ -81,6 +81,43 @@ describe('shelf filters', () => {
     payload = await getPayload({ config })
   })
 
+  it('matches exact case-insensitive system and private themes, ORs names and intersects other fields', async () => {
+    const a = await createUser()
+    const ctx = await contextFor(a)
+    const system = await sharedBook({ by: a, themes: ['Seikkailu', 'Café'] })
+    const privateBook = await sharedBook({ by: a })
+    const first = await copyOf(a, system)
+    const duplicate = await copyOf(a, system, { status: 'ordered' })
+    const personal = await copyOf(a, privateBook)
+    const tag = await gateway.create(ctx, {
+      collection: 'tags',
+      data: { owner: a.id, kind: 'theme', name: 'Oma', nameKey: '' },
+      depth: 0,
+    })
+    await upsertUserBook(ctx, privateBook.id, { tags: [tag.id] })
+    const overlap = await gateway.create(ctx, {
+      collection: 'tags',
+      data: { owner: a.id, kind: 'theme', name: 'Seikkailu', nameKey: '' },
+      depth: 0,
+    })
+    await upsertUserBook(ctx, system.id, { tags: [overlap.id] })
+    expect(await listed(ctx, { theme: ['SEIKKAILU'] })).toEqual({
+      copies: [first, duplicate],
+      total: 2,
+    })
+    expect((await listed(ctx, { theme: ['oma'] })).copies).toEqual([personal])
+    expect((await listed(ctx, { theme: ['seikkail'] })).copies).toEqual([])
+    expect((await listed(ctx, { theme: ['Cafe'] })).copies).toEqual([])
+    expect((await listed(ctx, { theme: ['café', 'OMA'] })).copies).toEqual([
+      first,
+      duplicate,
+      personal,
+    ])
+    expect(
+      (await listed(ctx, { theme: ['Seikkailu', 'Oma'], status: ['ordered'] })).copies,
+    ).toEqual([duplicate])
+  })
+
   it('ORs values within a field and ANDs fields, the total with them', async () => {
     const a = await createUser({ displayName: 'Filters Mix' })
     const asA = await contextFor(a)

@@ -39,6 +39,11 @@ describe('/data/suggest', () => {
     expect(suggest).not.toHaveBeenCalled()
   })
 
+  it('accepts authenticated theme suggestions', async () => {
+    expect(await answer('field=theme&q=adventure')).toEqual({ ok: true, data: [] })
+    expect(suggest).toHaveBeenCalledExactlyOnceWith(ctx, 'theme', 'adventure')
+  })
+
   it('passes q to suggest NFC-normalised', async () => {
     expect(await answer('field=author&q=a%CC%88')).toEqual({ ok: true, data: [] })
     expect(suggest).toHaveBeenCalledExactlyOnceWith(ctx, 'author', 'ä')
