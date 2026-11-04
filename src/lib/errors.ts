@@ -18,6 +18,7 @@ export type ErrorCode =
   | 'IMAGE_TOO_LARGE'
   | 'INVALID_CORNERS'
   | 'COVER_FAILED'
+  | 'SYSTEM_NAME'
   | 'NAME_TAKEN'
   | 'PERSON_IN_USE'
   // Client-only: no server code returns these. `components/request.ts` maps

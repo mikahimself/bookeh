@@ -68,6 +68,7 @@ describe('message catalogues', () => {
     IMAGE_TOO_LARGE: true,
     INVALID_CORNERS: true,
     COVER_FAILED: true,
+    SYSTEM_NAME: true,
     NAME_TAKEN: true,
     PERSON_IN_USE: true,
     NO_CONNECTION: true,

@@ -1,10 +1,10 @@
-import { DomainError } from '@/lib/errors'
 import type { Context } from '@/lib/payload/context'
 import * as gateway from '@/lib/payload/gateway'
-import { idOf, isRowId } from '@/lib/payload/ref'
+import { idOf } from '@/lib/payload/ref'
 import { withTransaction } from '@/lib/payload/transaction'
 import type { Undone } from '@/lib/undo/undo'
 
+import { booksOfCopies } from './booksOfCopies'
 import { requireOwnBook } from './requireOwnBook'
 import { upsertUserBook } from './upsertUserBook'
 
@@ -73,22 +73,6 @@ export async function setRead(
       restore: (rtx) => restoreRead(rtx, changed),
     }
   })
-}
-
-async function booksOfCopies(tx: Context, copyIds: readonly number[]): Promise<number[]> {
-  const ids = [...new Set(copyIds)]
-  if (ids.length === 0 || !ids.every(isRowId)) {
-    throw new DomainError('NOT_FOUND')
-  }
-  const { docs } = await gateway.find(tx, {
-    collection: 'copies',
-    where: { and: [{ id: { in: ids } }, { owner: { equals: tx.user.id } }] },
-    select: { book: true },
-    depth: 0,
-    pagination: false,
-  })
-  if (docs.length < ids.length) throw new DomainError('NOT_FOUND')
-  return [...new Set(docs.map((doc) => idOf(doc.book)))]
 }
 
 // `count` first: a failed write would end the transaction.

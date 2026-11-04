@@ -34,11 +34,12 @@ export type UserBookChanges = {
   dropOverrides?: readonly OverridableBookField[]
   read?: boolean
   rating?: number | null
+  tags?: readonly number[]
 }
 
-/** What one write stores: the override fields, `overridden`, the flag, the rating and its time. */
+/** What one write stores: the override fields, `overridden`, the flags, rating, time and tags. */
 type RowData = Partial<
-  Pick<UserBook, OverridableBookField | 'overridden' | 'read' | 'rating' | 'ratedAt'>
+  Pick<UserBook, OverridableBookField | 'overridden' | 'read' | 'rating' | 'ratedAt' | 'tags'>
 >
 type Stored = BookOverrides[OverridableBookField]
 
@@ -62,7 +63,7 @@ const normalise = (key: OverridableBookField, value: Stored): Stored => {
  * after the write is the row's current list, plus the keys of `overrides`,
  * minus `dropOverrides`, in `OVERRIDABLE_BOOK_FIELDS` order; a key in both
  * `overrides` and `dropOverrides` is overridden. A dropped field's stored
- * value is set to `null`. A state-only write (`read`, `rating`) sends those
+ * value is set to `null`. A state-only write (`read`, `rating`, `tags`) sends those
  * fields alone and leaves the override fields and `overridden` untouched.
  * The read-modify-write of `overridden` is unlocked, so two concurrent
  * override writes on one row can lose the earlier list.
@@ -87,11 +88,11 @@ export async function upsertUserBook(
   bookId: number,
   changes: UserBookChanges,
 ): Promise<void> {
-  const { overrides, read, rating } = changes
+  const { overrides, read, rating, tags } = changes
   const overriding = OVERRIDABLE_BOOK_FIELDS.filter((key) => overrides?.[key] !== undefined)
   const drop = new Set<OverridableBookField>(changes.dropOverrides ?? [])
   const touchesOverrides = overriding.length > 0 || drop.size > 0
-  const hasState = read !== undefined || rating !== undefined
+  const hasState = read !== undefined || rating !== undefined || tags !== undefined
   if (!touchesOverrides && !hasState) return
   if (overrides?.title !== undefined && normalise('title', overrides.title) === null) {
     throw new DomainError('VALIDATION', { fields: { title: 'VALIDATION' } })
@@ -144,6 +145,7 @@ export async function upsertUserBook(
     if (!row && overriding.length === 0 && !hasState) return
 
     const data: RowData = touchesOverrides ? overrideData(row?.overridden) : {}
+    if (tags !== undefined) data.tags = [...new Set(tags)]
     if (read !== undefined) data.read = read
     if (rating !== undefined) {
       data.rating = rating
@@ -172,7 +174,7 @@ export async function upsertUserBook(
  * Without a row on `toBookId`, the row on `fromBookId` is re-pointed to it.
  * With a row on both, the target's row stays: it takes `read: true` if either
  * row has it, and the moved row's `rating` and `ratedAt` when it has no
- * rating; the `from` row is then deleted. Then `overrides` are written
+ * rating, and the union of both rows' tags; the `from` row is then deleted. Then `overrides` are written
  * through `upsertUserBook()` for the fields the target row does not already
  * override, so the target must already be shared.
  */
@@ -208,10 +210,12 @@ export async function mergeUserBook(
         data.rating = from.rating
         data.ratedAt = from.ratedAt ?? null
       }
-      await gateway.deleteByID(tx, { collection: 'user-books', id: from.id, depth: 0 })
+      const tags = [...new Set([...(to.tags ?? []), ...(from.tags ?? [])].map((tag) => idOf(tag)))]
+      if (tags.length > (to.tags?.length ?? 0)) data.tags = tags
       if (Object.keys(data).length > 0) {
         await gateway.updateByID(tx, { collection: 'user-books', id: to.id, data, depth: 0 })
       }
+      await gateway.deleteByID(tx, { collection: 'user-books', id: from.id, depth: 0 })
     }
 
     const kept = new Set<OverridableBookField>(to?.overridden ?? [])

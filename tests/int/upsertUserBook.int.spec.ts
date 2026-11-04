@@ -4,7 +4,7 @@ import { getPayload, NotFound, type Payload, ValidationError } from 'payload'
 import { beforeAll, describe, expect, it } from 'vitest'
 
 import { getEffectiveBooks } from '@/lib/books/effectiveBook'
-import { upsertUserBook } from '@/lib/books/upsertUserBook'
+import { mergeUserBook, upsertUserBook } from '@/lib/books/upsertUserBook'
 import { DomainError } from '@/lib/errors'
 import type { Context } from '@/lib/payload/context'
 import { withTransaction } from '@/lib/payload/transaction'
@@ -169,9 +169,9 @@ describe('upsertUserBook', () => {
 
   it("fails with NotFound on another user's private Book", async () => {
     const foreign = await bookFor(b, 'private')
-    await expect(
-      upsertUserBook(asA, foreign.id, { overrides: { title: 'x' } }),
-    ).rejects.toThrow(NotFound)
+    await expect(upsertUserBook(asA, foreign.id, { overrides: { title: 'x' } })).rejects.toThrow(
+      NotFound,
+    )
     expect(await countOf(a, foreign)).toBe(0)
   })
 
@@ -193,6 +193,29 @@ describe('upsertUserBook', () => {
       }),
     ).rejects.toBe(e)
     expect(await countOf(a, book)).toBe(0)
+  })
+
+  it('unions source and target tags when merging two existing state rows', async () => {
+    const from = await bookFor(a, 'private')
+    const to = await bookFor(a, 'shared')
+    const ids: number[] = []
+    for (const kind of ['tag', 'genre', 'theme'] as const) {
+      const tag = await payload.create({
+        collection: 'tags',
+        data: { owner: a.id, name: `Merge ${randomUUID()}`, nameKey: '', kind },
+        req: asA.req,
+      })
+      ids.push(tag.id)
+    }
+    await upsertUserBook(asA, from.id, { tags: [ids[0], ids[1]], read: true })
+    await upsertUserBook(asA, to.id, { tags: [ids[1], ids[2]], rating: 4 })
+    await mergeUserBook(asA, from.id, to.id, {})
+    expect(await rowsOf(a, from)).toEqual([])
+    expect((await rowsOf(a, to))[0]).toMatchObject({
+      tags: [ids[1], ids[2], ids[0]],
+      read: true,
+      rating: 4,
+    })
   })
 
   it('leaves one row after two concurrent first writes', async () => {
