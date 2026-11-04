@@ -243,3 +243,7 @@ Deferred 1 (low): NFR-1's phone-over-4G measurement for a held Book, Story 8.15 
 - The In library heading stays bare; FR-20's "In library · {location}" is carried by the copy lines, which name every location. Story 8.8 owns the same choice for Lookup's rows.
 - A copy received elsewhere since the Answer rendered fails with `VALIDATION`, which is reported without a refresh, so that line keeps its Received Link until the next render. This matches `afterAction`, which refreshes on `ok` and `NOT_FOUND` alone; the error toast is the feedback. Diverging here for one surface was judged worse than the stale Link.
 - The Undo refresh and the focus move have no committed test (see the follow-up recommendation); the walk is their only evidence.
+
+## Owner verification — 2026-11-04
+
+Mika confirms the deployed app met the scan-to-Answer targets on mobile over **4G**. Held Book: **1.2 s** (target ≤2 s); source result: **3.2 s** (target ≤5 s). This closes the phone/4G timing check recorded as owed above. Exact device/browser, deployed revision, ISBNs and cache state were not supplied. Source: Mika’s retrospective reply on 2026-11-04. Historical verification notes are retained.

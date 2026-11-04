@@ -111,3 +111,7 @@ deferred:
 **Residual risks:** The deployed phone-over-4G check is owed. The live-source result is sensitive to upstream outages and latency; Google returned HTTP 503 during the fresh lookup. The original four-layer unattended review did not complete, so a follow-up review is recommended before the next story.
 
 **Files:** `kirjasampo.ts` implements exact ISBN variants and SPARQL parsing; `index.ts` registers the source; `fixture.ts` serves captured Finna and Kirjasampo data in test mode; `capture-fixtures.ts`, `isbns.txt`, `REPORT.md`, and `kirjasampo/` record responses; unit and browser tests cover adapter, merge, Answer and save; the Epic 8 context, architecture spine, README and production Compose config document and enable the source.
+
+## Owner verification — 2026-11-04
+
+Mika confirms the deployed app met the scan-to-Answer targets on mobile over **4G**. Source result: **3.2 s** (target ≤5 s); held Book: **1.2 s** (target ≤2 s). This closes the phone/4G timing check recorded as owed above. Exact device/browser, deployed revision, ISBNs and cache state were not supplied. Source: Mika’s retrospective reply on 2026-11-04. Historical verification notes are retained.

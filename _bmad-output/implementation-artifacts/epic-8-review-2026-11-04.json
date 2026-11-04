@@ -1,0 +1,40 @@
+[
+  {
+    "lens": "adversarial",
+    "location": "src/lib/shelf/searchMine.ts:68-71",
+    "trigger_condition": "Own-library search runs two Payload gateway readers concurrently on one context.",
+    "guard_snippet": "Await getEffectiveBooks and then getHoldings sequentially.",
+    "potential_consequence": "Shared mutable request/transaction state is used outside the gateway serialization contract; no runtime failure reproduced."
+  },
+  {
+    "lens": "adversarial",
+    "location": "src/lib/catalogue/searchBooks.ts:39-40; src/lib/catalogue/coverPreview.ts:47,64-80,121",
+    "trigger_condition": "A search in another tab replaces the indexed edition cover previews for the same user and ISBN.",
+    "guard_snippet": "Give search previews and Answer candidate arrays independent preview identities.",
+    "potential_consequence": "A later candidate cover request can show the search cover instead of the selected edition cover; source-traced, not browser reproduced."
+  },
+  {
+    "lens": "edge-case-hunter",
+    "location": "src/lib/shelf/searchMine.ts:68-71",
+    "trigger_condition": "Own-library search runs two Payload gateway readers concurrently on one context.",
+    "guard_snippet": "Await getEffectiveBooks and then getHoldings sequentially.",
+    "potential_consequence": "Shared mutable request/transaction state is used outside the gateway serialization contract; no runtime failure reproduced."
+  },
+  {
+    "lens": "edge-case-hunter",
+    "location": "src/lib/catalogue/searchBooks.ts:39-40; src/lib/catalogue/coverPreview.ts:47,64-80,121",
+    "trigger_condition": "A search in another tab replaces the indexed edition cover previews for the same user and ISBN.",
+    "guard_snippet": "Give search previews and Answer candidate arrays independent preview identities.",
+    "potential_consequence": "A later candidate cover request can show the search cover instead of the selected edition cover; source-traced, not browser reproduced."
+  },
+  {
+    "lens": "verification-gap",
+    "location": "src/lib/metadata/sources/kirjasampo.ts:103; tests/unit/kirjasampo.unit.spec.ts:81-87",
+    "trigger_condition": "Positive tests bypass the production Finnish-ISBN HTTP adapter path.",
+    "guard_snippet": "Invoke the production adapter with a fixture-backed fetch stub; check query and parsed result, plus a request failure.",
+    "potential_consequence": "Production request/query/parser wiring can regress while parser and fixture-mode browser tests pass.",
+    "gap_shape": "regression-gap",
+    "consumer": "lookupSources -> kirjasampo.lookupByIsbn",
+    "evidence": "Positive unit cases call kirjasampoResults or fixtureKirjasampo; the production adapter is invoked only for an out-of-prefix ISBN, without a request."
+  }
+]

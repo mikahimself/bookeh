@@ -29,7 +29,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 10-06-2026 17:50
-last_updated: 11-04-2026 06:30
+last_updated: 11-04-2026 14:36
 project: bookeh
 project_key: NOKEY
 tracking_system: file-system
@@ -241,7 +241,7 @@ development_status:
   7-27-k33-owed-checks-on-the-phone-and-the-lxc: done
   epic-7-retrospective: done
 
-  epic-8: in-progress
+  epic-8: done
   8-1-i1-answer-heading-and-fact-lines: done
   8-2-i2-in-library-ordered-and-on-wishlist-answers: done
   8-3-i4-finna-search: done
@@ -257,9 +257,12 @@ development_status:
   8-13-i14-hardcover-source: done
   8-14-i15-enrichment-sources: done
   8-15-i16-kirjasampo-enrichment: done
-  epic-8-retrospective: optional
+  epic-8-retrospective: done
 
   epic-9: backlog
+  9-17-k34-sequential-own-search-hydration: backlog
+  9-18-k35-independent-search-and-answer-cover-previews: backlog
+  9-19-k36-production-kirjasampo-adapter-verification: backlog
   9-1-g1-tags-collection-with-kinds: backlog
   9-2-g7-change-tags: backlog
   9-3-g8-rename-merge-and-delete-tags: backlog
@@ -818,7 +821,10 @@ action_items:
       one int case each (X1, X2, X4, S3, A4, V3; decisions 1, 2, 4)"
     owner: "Mika"
     status: done
-    resolution: "2026-10-30: story 7.17. setStatus refuses Ordered on a lent copy (field error under the Status switch); Lend Undo refuses a returned loan; the two loan counts filter on owner; the Lend picker reads today at open, lib/loans/dates on the client allowlist; spine updated."
+    resolution: "2026-10-30: story 7.17. setStatus refuses Ordered on a lent copy
+      (field error under the Status switch); Lend Undo refuses a returned loan; the
+      two loan counts filter on owner; the Lend picker reads today at open, lib/loans/dates
+      on the client allowlist; spine updated."
     ref: "_bmad-output/implementation-artifacts/epic-6-retro-2026-10-26.md"
   - id: "epic-6-retro-item-66-foreign-keys-loans-copy_id-and-person_id"
     epic: 6
@@ -830,7 +836,10 @@ action_items:
       (7.2), generated as ON DELETE set null with wishlist_id and book_id NOT NULL"
     owner: "Mika"
     status: done
-    resolution: "2026-10-30: story 7.18. foreignKeyActions sets every relationship key (owners and creators cascade, references restrict, optional links set null); beforeDelete refusals on copies, People, Books, authors and series; AD-19 records it. Production-dump check owed in Story 7.27."
+    resolution: "2026-10-30: story 7.18. foreignKeyActions sets every relationship
+      key (owners and creators cascade, references restrict, optional links set null);
+      beforeDelete refusals on copies, People, Books, authors and series; AD-19 records
+      it. Production-dump check owed in Story 7.27."
     ref: "_bmad-output/implementation-artifacts/epic-6-retro-2026-10-26.md"
   - id: "epic-6-retro-item-67-ad-20-test-gaps-received-undo-succeeds-w"
     epic: 6
@@ -891,7 +900,9 @@ action_items:
       to library while the wishlist press is pending (X3); one case each"
     owner: "Mika"
     status: done
-    resolution: "2026-10-30: story 7.17. Entry-only scans answer Not in library; closeEntry closes own entries through closeEntriesForBook, AD-18 updated; NotFoundForm disables Add to library while the wish saves."
+    resolution: "2026-10-30: story 7.17. Entry-only scans answer Not in library; closeEntry
+      closes own entries through closeEntriesForBook, AD-18 updated; NotFoundForm
+      disables Add to library while the wish saves."
     ref: "_bmad-output/implementation-artifacts/epic-7-retro-2026-10-29.md"
   - id: "epic-7-retro-item-74-foreign-keys-wishlists-and-wishlist-entr"
     epic: 7
@@ -899,7 +910,8 @@ action_items:
       item 66 restrict/cascade migration; closes the 7.1, 7.2 and 7.4 deferrals (X5)"
     owner: "Mika"
     status: done
-    resolution: "2026-10-30: story 7.18. wishlists and wishlist-entries keys are in the same migration."
+    resolution: "2026-10-30: story 7.18. wishlists and wishlist-entries keys are in
+      the same migration."
     ref: "_bmad-output/implementation-artifacts/epic-7-retro-2026-10-29.md"
   - id: "epic-7-retro-item-75-spec-reconciliation-ad-18-names-mergeper"
     epic: 7
@@ -938,7 +950,8 @@ action_items:
       8.1/8.2 ACs gain: a scan never resets silently (P2, P3, decision 2)"
     owner: "Mika"
     status: done
-    resolution: "2026-10-30: stories 7.16 and 7.17 took the items; epics.md 8.1/8.2 carry the no-silent-reset ACs."
+    resolution: "2026-10-30: stories 7.16 and 7.17 took the items; epics.md 8.1/8.2
+      carry the no-silent-reset ACs."
     ref: "_bmad-output/implementation-artifacts/epic-7-retro-2026-10-29.md"
   - id: "epic-7-retro-item-79-housekeeping-set-epic-5-epic-6-and-epic"
     epic: 7
@@ -949,3 +962,43 @@ action_items:
     owner: "Mika"
     status: done
     ref: "_bmad-output/implementation-artifacts/epic-7-retro-2026-10-29.md"
+  - id: "epic-8-retro-item-80-serialize-own-search-hydration"
+    epic: 8
+    action: "Serialize searchMine effective-book and holdings hydration on its shared
+      Payload context (X1; AD-16). Verify own-title search still returns its holdings."
+    owner: "Mika"
+    status: open
+    ref: "_bmad-output/implementation-artifacts/epic-8-retro-2026-11-04.md"
+    story: '9.17'
+  - id: "epic-8-retro-item-81-isolate-search-answer-cover-previews"
+    epic: 8
+    action: "Isolate search cover previews from indexed Answer candidate arrays so
+      another tab cannot replace the selected edition cover (X2). Preserve server-only
+      URLs and authenticated host checks; one focused AD-10/AD-14 collision case;
+      update the spine if the contract changes."
+    owner: "Mika"
+    status: open
+    ref: "_bmad-output/implementation-artifacts/epic-8-retro-2026-11-04.md"
+    story: '9.18'
+  - id: "epic-8-retro-item-82-verify-kirjasampo-production-adapter"
+    epic: 8
+    action: "Exercise kirjasampo.lookupByIsbn for a Finnish ISBN with a recorded-response
+      fetch stub, asserting generated query and parsed work/themes, plus one request-failure
+      case returning undefined (V1; Story 8.15). No live requests in tests."
+    owner: "Mika"
+    status: open
+    ref: "_bmad-output/implementation-artifacts/epic-8-retro-2026-11-04.md"
+    story: '9.19'
+  - id: "epic-8-retro-item-83-record-deployed-phone-4g-latency"
+    epic: 8
+    action: "Record deployed phone-over-4G submit-to-Answer timings: held Book <=2
+      s, new source result <=5 s, with all configured sources available; record revision,
+      device/browser, ISBNs, cache state and observed times. Fix or explicitly accept
+      any measured miss (S1; Stories 8.2/8.15, NFR-1). Mobile usability was confirmed,
+      without timings."
+    owner: "Mika"
+    status: done
+    ref: "_bmad-output/implementation-artifacts/epic-8-retro-2026-11-04.md"
+    resolution: '2026-11-04: Mika reports deployed phone-over-4G scan-to-Answer timings
+      of 1.2 s held and 3.2 s source; both targets met. Recorded in Stories 8.2 and
+      8.15.'
