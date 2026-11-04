@@ -4,11 +4,12 @@ import { requireUserOrThrow } from '@/lib/payload/context'
 
 /**
  * Spine, AD-10 and AD-14: the pre-save cover preview, `coverUrl({ isbn13,
- * pick })`. Sends the signed-in user's recorded cover for the ISBN's
+ * pick, context })`. Sends the signed-in user's recorded cover for the ISBN's
  * candidate `?pick=` (none: the best), fetched and checked on the server, or
  * served from the bytes the server holds from an earlier fetch
  * (`fetchCoverPreview()`); the request supplies nothing but the ISBN and that
- * index, and a `pick` that is not a non-negative integer is a 404. The body is
+ * index and context (`answer` by default, or `search`); an unknown context
+ * is a 404, and a `pick` that is not a non-negative integer is a 404. The body is
  * buffered and checked before any byte is sent, and goes out with our own
  * type and `nosniff`, so a source never serves content at this origin. The
  * answer is the status alone (spine, Errors): 401 signed out, 404 without a
@@ -22,13 +23,17 @@ export async function GET(
   try {
     const ctx = await requireUserOrThrow()
     const { isbn13 } = await params
-    const param = new URL(request.url).searchParams.get('pick')
+    const query = new URL(request.url).searchParams
+    const context = query.get('context') ?? 'answer'
+    if (context !== 'answer' && context !== 'search') return new Response(null, { status: 404 })
+    const param = query.get('pick')
     if (param !== null && !/^\d+$/.test(param)) return new Response(null, { status: 404 })
     const cover = await fetchCoverPreview(
       ctx,
       isbn13,
       undefined,
       param === null ? 0 : Number(param),
+      context,
     )
     if (!cover) return new Response(null, { status: 404 })
     return new Response(

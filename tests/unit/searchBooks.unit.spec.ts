@@ -217,7 +217,7 @@ describe('searchBooks and the cover preview', () => {
     const drafts = await searchBooks(as, 'tove')
 
     expect(drafts[0]!.hasCover).toBe(true)
-    const served = await fetchCoverPreview(as, ISBN(1), policy)
+    const served = await fetchCoverPreview(as, ISBN(1), policy, 0, 'search')
     expect(served?.mimeType).toBe('image/jpeg')
     vi.unstubAllGlobals()
   })
@@ -231,7 +231,7 @@ describe('searchBooks and the cover preview', () => {
     const drafts = await searchBooks(as, 'tove')
 
     expect(drafts[0]!.hasCover).toBe(false)
-    await expect(fetchCoverPreview(as, ISBN(1), policy)).resolves.toBeUndefined()
+    await expect(fetchCoverPreview(as, ISBN(1), policy, 0, 'search')).resolves.toBeUndefined()
     expect(fetchMock).not.toHaveBeenCalled()
     vi.unstubAllGlobals()
   })

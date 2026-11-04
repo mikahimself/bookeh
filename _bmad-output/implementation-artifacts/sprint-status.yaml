@@ -261,7 +261,7 @@ development_status:
 
   epic-9: in-progress
   9-17-k34-sequential-own-search-hydration: done
-  9-18-k35-independent-search-and-answer-cover-previews: backlog
+  9-18-k35-independent-search-and-answer-cover-previews: done
   9-19-k36-production-kirjasampo-adapter-verification: backlog
   9-1-g1-tags-collection-with-kinds: backlog
   9-2-g7-change-tags: backlog
@@ -977,9 +977,10 @@ action_items:
       URLs and authenticated host checks; one focused AD-10/AD-14 collision case;
       update the spine if the contract changes."
     owner: "Mika"
-    status: open
+    status: done
     ref: "_bmad-output/implementation-artifacts/epic-8-retro-2026-11-04.md"
     story: '9.18'
+    resolution: '2026-11-04: Story 9.18 separates search and Answer preview contexts; bidirectional collision integration coverage and cross-tab fixture browser walk passed.'
   - id: "epic-8-retro-item-82-verify-kirjasampo-production-adapter"
     epic: 8
     action: "Exercise kirjasampo.lookupByIsbn for a Finnish ISBN with a recorded-response

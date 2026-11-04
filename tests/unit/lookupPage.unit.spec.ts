@@ -158,7 +158,9 @@ describe('Lookup', () => {
     within(rows[0]).getByText('1954 · WSOY')
     within(rows[0]).getByText('Lent · Hilla')
     within(rows[1]).getByText('nidottu · 1945 · WSOY')
-    expect(rows[1].querySelector('img')?.getAttribute('src')).toBe('/data/cover/9789511111118')
+    expect(rows[1].querySelector('img')?.getAttribute('src')).toBe(
+      '/data/cover/9789511111118?context=search',
+    )
     // Not servable: the cloth placeholder with the title in it.
     expect(rows[2].querySelector('img')).toBe(null)
     within(rows[2]).getByText('Sinuhe egyptiläinen', { selector: 'span' })

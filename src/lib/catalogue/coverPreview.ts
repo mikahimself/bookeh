@@ -1,3 +1,4 @@
+import type { CoverPreviewContext } from '@/lib/books/coverUrl'
 import type { Context } from '@/lib/payload/context'
 import { processState } from '@/lib/processState'
 
@@ -7,7 +8,7 @@ import { pickIndex } from './pick'
 
 // Spine, AD-9, AD-10, AD-12 and AD-14: the pre-save cover preview. `lookupBook`
 // (and `lookupAgain`)
-// records every candidate's cover URL per user and ISBN-13, and `searchBooks`
+// records every candidate's cover URL per user, ISBN-13 and Answer context, and `searchBooks`
 // the one URL of each search hit that has one; the
 // `/data/cover/[isbn13]` handler serves the one at the requested index. The
 // first request for an image fetches it through `fetchCover()`, the same
@@ -16,7 +17,7 @@ import { pickIndex } from './pick'
 // from them. A record counts one lookup (`limitLookups()`) for its first
 // fetch, whichever cover, and again for a cover whose fetch failed. The
 // browser never asks a source, and the URL never comes from the client: it
-// sends an index at most.
+// sends only an index and preview context.
 
 export const PREVIEW_SIZE = 500
 export const PREVIEW_TTL_MS = 60 * 60 * 1000
@@ -44,7 +45,8 @@ type PreviewEntry = {
 const previews = () =>
   processState('catalogue.coverPreviews', () => new Map<string, PreviewEntry>())
 
-const keyOf = (ctx: Context, isbn13: string) => `${ctx.user.id}:${isbn13}`
+const keyOf = (ctx: Context, isbn13: string, context: CoverPreviewContext) =>
+  `${ctx.user.id}:${isbn13}:${context}`
 
 /**
  * Records `urls`, every candidate's cover URL in candidate order, as
@@ -53,16 +55,17 @@ const keyOf = (ctx: Context, isbn13: string) => `${ctx.user.id}:${isbn13}`
  * kept; the rest go. Called by `lookupBook`, `lookupAgain` and `searchBooks`
  * alone — a search records one URL per hit, so its `urls` is one element and
  * the preview route's `pick` resolves to index 0. Bounded
- * to `PREVIEW_SIZE` entries (one per user and ISBN), each living
+ * to `PREVIEW_SIZE` entries across both contexts (one per user, ISBN and context), each living
  * `PREVIEW_TTL_MS`.
  */
 export function recordCoverPreview(
   ctx: Context,
   isbn13: string,
   urls: readonly (string | undefined)[],
+  context: CoverPreviewContext = 'answer',
 ): void {
   const entries = previews()
-  const key = keyOf(ctx, isbn13)
+  const key = keyOf(ctx, isbn13, context)
   const previous = entries.get(key)
   entries.delete(key)
   if (urls.every((url) => url === undefined)) return
@@ -108,9 +111,10 @@ export async function fetchCoverPreview(
   isbn13: string,
   policy: CoverPolicy = coverPolicy,
   pick = 0,
+  context: CoverPreviewContext = 'answer',
 ): Promise<HeldCover | undefined> {
   const entries = previews()
-  const key = keyOf(ctx, isbn13)
+  const key = keyOf(ctx, isbn13, context)
   const entry = entries.get(key)
   if (!entry) return undefined
   if (entry.expiresAt <= Date.now()) {

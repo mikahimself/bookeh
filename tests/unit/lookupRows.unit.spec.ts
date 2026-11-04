@@ -72,7 +72,7 @@ describe('lookupRows', () => {
       [hit({ hasCover: true }), hit({ isbn13: '9789510222222' })],
     )
     expect(own[0].cover).toBe('/api/media/file/cover.jpg')
-    expect(elsewhere[0].cover).toBe('/data/cover/9789511111118')
+    expect(elsewhere[0].cover).toBe('/data/cover/9789511111118?context=search')
     expect(elsewhere[1].cover).toBe(null)
   })
 

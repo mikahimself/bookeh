@@ -16,7 +16,9 @@ import {
 import { coverPolicy } from '@/lib/catalogue/covers'
 import { lookupBook } from '@/lib/catalogue/lookupBook'
 import { LOOKUP_LIMIT, limitLookups } from '@/lib/catalogue/lookupLimit'
-import { lookupSources } from '@/lib/metadata/lookup'
+import { lookupSources, searchSources } from '@/lib/metadata/lookup'
+import { searchBooks } from '@/lib/catalogue/searchBooks'
+import { coverUrl } from '@/lib/books/coverUrl'
 import type { SourceResult, SourcesOutcome } from '@/lib/metadata/source'
 import type { Context } from '@/lib/payload/context'
 import config from '@/payload.config'
@@ -34,7 +36,7 @@ import { randomIsbn } from '../helpers/isbn'
 const fixture = vi.hoisted(() => ({ origin: '' }))
 
 vi.mock('next/headers', () => ({ headers: vi.fn() }))
-vi.mock('@/lib/metadata/lookup', () => ({ lookupSources: vi.fn() }))
+vi.mock('@/lib/metadata/lookup', () => ({ lookupSources: vi.fn(), searchSources: vi.fn() }))
 vi.mock('@/lib/catalogue/covers', async (importOriginal) => {
   const actual = await importOriginal<typeof import('@/lib/catalogue/covers')>()
   return {
@@ -80,6 +82,7 @@ describe('cover preview', () => {
   let server: Server
   let jpeg: Buffer
   let png: Buffer
+  let searchPng: Buffer
   const hits = new Map<string, number>()
 
   const totalHits = () => [...hits.values()].reduce((a, b) => a + b, 0)
@@ -133,12 +136,21 @@ describe('cover preview', () => {
       .png()
       .toBuffer()
 
+    searchPng = await sharp({
+      create: { width: 4, height: 6, channels: 3, background: '#20a050' },
+    })
+      .png()
+      .toBuffer()
+
     server = createServer((req, res) => {
       const route = req.url ?? ''
       hits.set(route, (hits.get(route) ?? 0) + 1)
       switch (route) {
         case '/cover.jpg':
           res.writeHead(200, { 'Content-Type': 'image/jpeg' }).end(jpeg)
+          return
+        case '/search.png':
+          res.writeHead(200, { 'Content-Type': 'image/png' }).end(searchPng)
           return
         case '/other.png':
           res.writeHead(200, { 'Content-Type': 'image/png' }).end(png)
@@ -185,6 +197,52 @@ describe('cover preview', () => {
       'x-content-type-options': 'nosniff',
     })
   })
+
+  it.each(['answer-first', 'search-first'])(
+    'keeps indexed Answer and search covers independent (%s)',
+    async (order) => {
+      const isbn = randomIsbn()
+      const answer = async () => {
+        vi.mocked(lookupSources).mockResolvedValue(
+          found(candidate(isbn, at('/cover.jpg')), candidate(isbn, at('/other.png'))),
+        )
+        await lookupBook(asA, { isbn, pick: 1 })
+      }
+      const search = async () => {
+        vi.mocked(searchSources).mockResolvedValue([
+          {
+            isbn13: isbn,
+            title: 'Search edition',
+            authors: [],
+            source: 'finna',
+            coverUrl: at('/search.png'),
+          },
+        ])
+        await searchBooks(asA, 'Search edition')
+      }
+      if (order === 'answer-first') {
+        await answer()
+        await search()
+      } else {
+        await search()
+        await answer()
+      }
+      for (const [input, expected] of [
+        [{ isbn13: isbn }, jpeg],
+        [{ isbn13: isbn, pick: 1 }, png],
+        [{ isbn13: isbn, context: 'search' as const }, searchPng],
+      ] as const) {
+        const url = new URL(coverUrl(input), 'http://localhost')
+        const response = await get(isbn, cookieA, url.search)
+        expect(response.status).toBe(200)
+        expect(Buffer.from(await response.arrayBuffer()).equals(expected)).toBe(true)
+      }
+      expect(await fetchCoverPreview(asB, isbn, coverPolicy, 0, 'search')).toBeUndefined()
+      expect((await get(isbn, undefined, '?context=invalid')).status).toBe(401)
+      expect((await get(isbn, cookieA, '?context=invalid')).status).toBe(404)
+      expect((await get(isbn, cookieA, '?context=https://example.com/cover.jpg')).status).toBe(404)
+    },
+  )
 
   // The limit is in process and shared by every test in the run, so the
   // counting cases have their own users.
@@ -299,7 +357,9 @@ describe('cover preview', () => {
 
   it('drops the oldest record past PREVIEW_SIZE', async () => {
     const isbns = Array.from({ length: PREVIEW_SIZE + 1 }, () => randomIsbn())
-    for (const isbn of isbns) recordCoverPreview(asA, isbn, [at('/cover.jpg')])
+    for (const [i, isbn] of isbns.entries()) {
+      recordCoverPreview(asA, isbn, [at('/cover.jpg')], i % 2 ? 'search' : 'answer')
+    }
     const before = totalHits()
     expect(await fetchCoverPreview(asA, isbns[0]!)).toBeUndefined()
     expect(totalHits()).toBe(before)

@@ -60,7 +60,7 @@ export function lookupRows(
     .filter((hit) => !held.has(hit.isbn13))
     .map((hit) => ({
       href: `/scan?isbn=${encodeURIComponent(hit.isbn13)}`,
-      cover: hit.hasCover ? coverUrl({ isbn13: hit.isbn13 }) : null,
+      cover: hit.hasCover ? coverUrl({ isbn13: hit.isbn13, context: 'search' }) : null,
       title: hit.title,
       // A hit carries no language; the placeholder hyphenates in Finnish.
       language: null,

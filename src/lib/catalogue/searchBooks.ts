@@ -37,7 +37,7 @@ export async function searchBooks(ctx: Context, text: string): Promise<SearchDra
 
   const hits = await searchSources(query)
   for (const { isbn13, coverUrl } of hits) {
-    if (coverUrl !== undefined) recordCoverPreview(ctx, isbn13, [coverUrl])
+    if (coverUrl !== undefined) recordCoverPreview(ctx, isbn13, [coverUrl], 'search')
   }
   return hits.map(toSearchDraft)
 }
