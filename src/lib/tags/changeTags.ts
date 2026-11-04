@@ -8,9 +8,10 @@ import * as gateway from '@/lib/payload/gateway'
 import { normalisedName } from '@/lib/payload/ownedName'
 import { idOf, isRowId, type Ref } from '@/lib/payload/ref'
 import { withTransaction } from '@/lib/payload/transaction'
-import { systemThemes } from '@/lib/shelf/systemThemes'
 import type { Undone } from '@/lib/undo/undo'
 import type { Tag } from '@/payload-types'
+
+import { systemNameValidator } from './systemName'
 
 export type TagTarget = { copyIds: readonly number[] } | { bookId: number }
 type Changes = { add: readonly Ref[]; remove: readonly number[]; kind: Tag['kind'] }
@@ -52,7 +53,7 @@ export async function changeTags(
     }
     await checkIds(remove)
     const additions: number[] = []
-    let systemKeys: Set<string> | undefined
+    const checkSystemName = systemNameValidator(tx, kind, field)
     for (const ref of add) {
       if (typeof ref === 'number') {
         await checkIds([ref])
@@ -78,27 +79,7 @@ export async function changeTags(
         additions.push(docs[0].id)
         continue
       }
-      if (kind !== 'tag') {
-        if (!systemKeys) {
-          let names: string[]
-          if (kind === 'theme') names = await systemThemes(tx)
-          else {
-            const genres = await gateway.find(tx, {
-              collection: 'genres',
-              pagination: false,
-              depth: 0,
-            })
-            names = genres.docs.flatMap((genre) => [
-              genre.name,
-              ...(genre.nameFi ? [genre.nameFi] : []),
-            ])
-          }
-          systemKeys = new Set(names.map(toNameKey))
-        }
-        if (systemKeys.has(key)) {
-          throw new DomainError('VALIDATION', { fields: { [field]: 'SYSTEM_NAME' } })
-        }
-      }
+      await checkSystemName(name)
       const created = await gateway.create(tx, {
         collection: 'tags',
         data: { owner: tx.user.id, kind, name, nameKey: '' },
@@ -116,7 +97,8 @@ export async function changeTags(
     const removing = new Set(remove)
     const changed: Changed[] = []
     for (const bookId of bookIds) {
-      const previous = docs.find((row) => idOf(row.book) === bookId)?.tags?.map((tag) => idOf(tag)) ?? []
+      const previous =
+        docs.find((row) => idOf(row.book) === bookId)?.tags?.map((tag) => idOf(tag)) ?? []
       const next = [...new Set([...previous.filter((id) => !removing.has(id)), ...additions])]
       if (next.length === previous.length && next.every((id) => previous.includes(id))) continue
       await upsertUserBook(tx, bookId, { tags: next })

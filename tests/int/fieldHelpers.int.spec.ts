@@ -16,10 +16,12 @@ import { beforeAll, describe, expect, it } from 'vitest'
 import { asRequestUser } from '@/access/asRequestUser'
 import { ownerField } from '@/fields/owner'
 import { ownedRelation, readableRelation } from '@/fields/relation'
+import { upsertUserBook } from '@/lib/books/upsertUserBook'
+import * as gateway from '@/lib/payload/gateway'
 import { withTransaction } from '@/lib/payload/transaction'
 import appConfig from '@/payload.config'
 
-import { ownerId } from '../helpers/builders'
+import { freshUser, ownerId, sharedBook } from '../helpers/builders'
 import { rejectedPaths } from '../helpers/validation'
 
 // Throwaway collections on a second, keyed Payload instance in its own
@@ -174,6 +176,34 @@ describe('ownedRelation / readableRelation', () => {
     await expect(create(pins, a, { user: a.id })).resolves.toBeDefined()
     expect(await rejectedPaths(create(pins, a, { user: b.id }))).toEqual(['user'])
     expect(await countPins({ user: { equals: b.id } })).toBe(0)
+  })
+
+  it('allows an omitted now-unreadable Book but rejects explicitly resubmitting it', async () => {
+    const owner = await freshUser()
+    const reader = await freshUser()
+    const book = await sharedBook({ by: owner.user })
+    await upsertUserBook(reader.ctx, book.id, { read: false })
+    const row = (await gateway.find(reader.ctx, { collection: 'user-books', depth: 0 })).docs[0]
+    const app = await getPayload({ config: appConfig })
+    await app.update({
+      collection: 'books',
+      id: book.id,
+      data: { visibility: 'private' },
+      req: owner.ctx.req,
+    })
+    await expect(upsertUserBook(reader.ctx, book.id, { read: true })).resolves.toBeUndefined()
+    expect(
+      await rejectedPaths(
+        gateway.updateByID(reader.ctx, {
+          collection: 'user-books',
+          id: row.id,
+          data: { book: book.id, read: false },
+        }),
+      ),
+    ).toEqual(['book'])
+    expect(
+      (await gateway.findByID(reader.ctx, { collection: 'user-books', id: row.id })).read,
+    ).toBe(true)
   })
 
   it("sees a target created earlier in the request's transaction", async () => {

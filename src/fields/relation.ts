@@ -1,9 +1,27 @@
-import type { CollectionSlug, RelationshipFieldValidation, SingleRelationshipField } from 'payload'
+import type {
+  CollectionSlug,
+  FieldHook,
+  PayloadRequest,
+  RelationshipFieldValidation,
+  SingleRelationshipField,
+} from 'payload'
 import { relationship } from 'payload/shared'
 
 import { asRequestUser } from '@/access/asRequestUser'
 
 type RelationOptions = { name: string; required?: boolean; hasMany?: boolean }
+
+// Payload fills omitted relationships from the stored document before validate.
+// Capture submission before that fallback, without exposing a bypass to callers.
+const omittedRelations = new WeakMap<PayloadRequest, Map<string, boolean>>()
+const relationKey = (collection: string | undefined, path: (string | number)[]) =>
+  `${collection ?? ''}:${path.join('.')}`
+const rememberSubmission: FieldHook = ({ collection, field, path, req, siblingData }) => {
+  if (!field.name) return
+  let fields = omittedRelations.get(req)
+  if (!fields) omittedRelations.set(req, (fields = new Map()))
+  fields.set(relationKey(collection?.slug, path), !Object.hasOwn(siblingData, field.name))
+}
 
 /**
  * The distinct target ids of a relationship value (one, or a hasMany list).
@@ -24,6 +42,12 @@ const relationIds = (value: unknown): number[] =>
 const readableTargets =
   (slug: CollectionSlug): RelationshipFieldValidation =>
   async (value, options) => {
+    if (
+      options.operation === 'update' &&
+      omittedRelations.get(options.req)?.get(relationKey(options.collectionSlug, options.path)) &&
+      JSON.stringify(value) === JSON.stringify(options.previousValue)
+    )
+      return true
     const builtIn = await relationship(value, options)
     if (builtIn !== true) return builtIn
     if (options.event === 'onChange') return true
@@ -46,10 +70,16 @@ const readableTargets =
 
 function relation(slug: CollectionSlug, { name, required, hasMany }: RelationOptions) {
   const validate = readableTargets(slug)
-  const base = { name, type: 'relationship', relationTo: slug, required } as const
+  const base = {
+    name,
+    type: 'relationship',
+    relationTo: slug,
+    required,
+  } as const
   const field: SingleRelationshipField = hasMany
     ? { ...base, hasMany: true, validate }
     : { ...base, hasMany: false, validate }
+  field.hooks = { beforeValidate: [rememberSubmission] }
   return field
 }
 
