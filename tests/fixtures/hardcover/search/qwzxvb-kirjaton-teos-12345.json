@@ -1,0 +1,747 @@
+{
+  "search": {
+    "data": {
+      "search": {
+        "results": {
+          "facet_counts": [],
+          "found": 6,
+          "hits": [
+            {
+              "document": {
+                "activities_count": 0,
+                "alternative_titles": [
+                  "Mujeres Alteradas 1-2-3-4-5"
+                ],
+                "author_names": [
+                  "Maitena"
+                ],
+                "book_category_id": 1,
+                "compilation": true,
+                "content_warnings": [],
+                "contribution_specializations": [],
+                "contribution_types": [
+                  "Author"
+                ],
+                "contributions": [
+                  {
+                    "author": {
+                      "id": 939694,
+                      "image": {},
+                      "name": "Maitena",
+                      "slug": "maitena"
+                    },
+                    "contribution": "Author",
+                    "contributor_role_blurb": "The author of a written work.",
+                    "contributor_role_id": 1,
+                    "contributor_role_name": "Author",
+                    "contributor_specialization_blurb": null,
+                    "contributor_specialization_id": null,
+                    "contributor_specialization_name": null,
+                    "primary": true
+                  }
+                ],
+                "cover_color": "Yellow",
+                "description": "Maitena ha usado su talento y sus dotes de observación para contar historias que ayudan a hombres y mujeres a conocerse mejor y a reírse de las desventuras de cada día. Gracias a su sentido del humor y a su ironía, descubrimos que hay otra manera de mirar el lado oscuro de la vida. Las mujeres que retrata Maitena viven agobiadas por las pequeñas tragedias domésticas, la tiranía de las dietas y de los ideales de belleza, la traición masculina, los reclamos de sus hijos, de sus maridos y de sus madres, las presiones del trabajo e infinidad de otros tironeos de la vida cotidiana. Y sus preocupaciones están próximas a la problemática psicológica y vital de cualquier mujer contemporánea.",
+                "featured_series": {
+                  "collection": false,
+                  "details": "1-5",
+                  "featured": true,
+                  "id": 373085,
+                  "position": 1,
+                  "series": {
+                    "books_count": 3,
+                    "id": 139089,
+                    "name": "Mujeres Alteradas",
+                    "primary_books_count": 1,
+                    "slug": "mujeres-alteradas"
+                  },
+                  "unreleased": false
+                },
+                "featured_series_position": 1,
+                "genres": [
+                  "Comics"
+                ],
+                "has_audiobook": false,
+                "has_ebook": false,
+                "id": "1542334",
+                "image": {
+                  "color": "#fbfb42",
+                  "color_name": "Yellow",
+                  "height": 500,
+                  "id": 3898045,
+                  "url": "https://assets.hardcover.app/edition/31601790/9fa4e130aa458ea68c9a3d9c5c1f2f837a3803c3.jpeg",
+                  "width": 336
+                },
+                "isbns": [
+                  "9500727757",
+                  "9789500727754"
+                ],
+                "lists_count": 1,
+                "moods": [],
+                "pages": 413,
+                "prompts_count": 0,
+                "rating": 5,
+                "ratings_count": 1,
+                "release_date": "2005-03-30",
+                "release_year": 2005,
+                "reviews_count": 0,
+                "series_ids": [
+                  139089
+                ],
+                "series_names": [
+                  "Mujeres Alteradas"
+                ],
+                "slug": "mujeres-alteradas-1-2-3-4-5",
+                "tags": [],
+                "title": "Mujeres Alteradas 1-2-3-4-5",
+                "users_count": 2,
+                "users_read_count": 2
+              },
+              "highlight": {
+                "alternative_titles": [
+                  {
+                    "matched_tokens": [
+                      "1-2-3-4-5"
+                    ],
+                    "snippet": "Mujeres Alteradas <mark>1-2-3-4-5</mark>"
+                  }
+                ],
+                "title": {
+                  "matched_tokens": [
+                    "1-2-3-4-5"
+                  ],
+                  "snippet": "Mujeres Alteradas <mark>1-2-3-4-5</mark>"
+                }
+              },
+              "highlights": [
+                {
+                  "field": "title",
+                  "matched_tokens": [
+                    "1-2-3-4-5"
+                  ],
+                  "snippet": "Mujeres Alteradas <mark>1-2-3-4-5</mark>"
+                },
+                {
+                  "field": "alternative_titles",
+                  "indices": [
+                    0
+                  ],
+                  "matched_tokens": [
+                    [
+                      "1-2-3-4-5"
+                    ]
+                  ],
+                  "snippets": [
+                    "Mujeres Alteradas <mark>1-2-3-4-5</mark>"
+                  ]
+                }
+              ],
+              "text_match": 578730123365187600,
+              "text_match_info": {
+                "best_field_score": "1108091338752",
+                "best_field_weight": 5,
+                "fields_matched": 2,
+                "num_tokens_dropped": 3,
+                "score": "578730123365187626",
+                "tokens_matched": 1,
+                "typo_prefix_score": 0
+              }
+            },
+            {
+              "document": {
+                "activities_count": 0,
+                "alternative_titles": [
+                  "Icky bug numbers 12345"
+                ],
+                "author_names": [
+                  "Jerry Pallotta"
+                ],
+                "book_category_id": 1,
+                "compilation": false,
+                "content_warnings": [],
+                "contribution_specializations": [],
+                "contribution_types": [
+                  "Author"
+                ],
+                "contributions": [
+                  {
+                    "author": {
+                      "id": 184834,
+                      "image": {
+                        "color": "#b8b8b1",
+                        "color_name": "Silver",
+                        "height": 300,
+                        "id": 6855782,
+                        "url": "https://assets.hardcover.app/author/184834/c9dff65b-7e73-45e3-a5cf-4faa011b5f93.jpg",
+                        "width": 225
+                      },
+                      "name": "Jerry Pallotta",
+                      "slug": "jerry-pallotta"
+                    },
+                    "contribution": "Author",
+                    "contributor_role_blurb": "The author of a written work.",
+                    "contributor_role_id": 1,
+                    "contributor_role_name": "Author",
+                    "primary": true
+                  }
+                ],
+                "cover_color": "Beige",
+                "description": "Uses insects to teach numbers.",
+                "featured_series": {},
+                "genres": [],
+                "has_audiobook": false,
+                "has_ebook": false,
+                "id": "240213",
+                "image": {
+                  "color": "#f4efa8",
+                  "color_name": "Beige",
+                  "height": 399,
+                  "id": 267386,
+                  "url": "https://assets.hardcover.app/books/240213/278447-L.jpg",
+                  "width": 500
+                },
+                "isbns": [
+                  "0439560101",
+                  "9780439560108"
+                ],
+                "lists_count": 0,
+                "moods": [],
+                "prompts_count": 0,
+                "rating": 0,
+                "ratings_count": 0,
+                "reviews_count": 0,
+                "series_ids": [],
+                "series_names": [],
+                "slug": "icky-bug-numbers-12345",
+                "tags": [],
+                "title": "Icky bug numbers 12345",
+                "users_count": 0,
+                "users_read_count": 0
+              },
+              "highlight": {
+                "alternative_titles": [
+                  {
+                    "matched_tokens": [
+                      "12345"
+                    ],
+                    "snippet": "Icky bug numbers <mark>12345</mark>"
+                  }
+                ],
+                "title": {
+                  "matched_tokens": [
+                    "12345"
+                  ],
+                  "snippet": "Icky bug numbers <mark>12345</mark>"
+                }
+              },
+              "highlights": [
+                {
+                  "field": "title",
+                  "matched_tokens": [
+                    "12345"
+                  ],
+                  "snippet": "Icky bug numbers <mark>12345</mark>"
+                },
+                {
+                  "field": "alternative_titles",
+                  "indices": [
+                    0
+                  ],
+                  "matched_tokens": [
+                    [
+                      "12345"
+                    ]
+                  ],
+                  "snippets": [
+                    "Icky bug numbers <mark>12345</mark>"
+                  ]
+                }
+              ],
+              "text_match": 578730123365187600,
+              "text_match_info": {
+                "best_field_score": "1108091338752",
+                "best_field_weight": 5,
+                "fields_matched": 2,
+                "num_tokens_dropped": 3,
+                "score": "578730123365187626",
+                "tokens_matched": 1,
+                "typo_prefix_score": 0
+              }
+            },
+            {
+              "document": {
+                "activities_count": 0,
+                "alternative_titles": [
+                  "Qamer Javed writes "
+                ],
+                "author_names": [
+                  "نايلة أبي نادر"
+                ],
+                "book_category_id": 1,
+                "compilation": false,
+                "content_warnings": [],
+                "contribution_specializations": [],
+                "contribution_types": [
+                  "Author"
+                ],
+                "contributions": [
+                  {
+                    "author": {
+                      "id": 1415761,
+                      "image": {},
+                      "name": "نايلة أبي نادر",
+                      "slug": "9e7e16ff-98d3-4bc0-b313-35a0da3e5f4a"
+                    },
+                    "contribution": "Author",
+                    "contributor_role_blurb": "The author of a written work.",
+                    "contributor_role_id": 1,
+                    "contributor_role_name": "Author",
+                    "primary": true
+                  }
+                ],
+                "cover_color": "Beige",
+                "description": "Cahokia Mounds State Historic Site preserves the remains of the most sophisticated prehistoric Indian civilization north of Mexico, circa A.D. 900-1300. Designated a UNESCO World Heritage Site in 1982, Cahokia is noted for its important role in the prehistory of North America. This book, written for a general audience, introduces the reader to this ancient metropolis, with its towering 100 foot-high Monks Mound and American Woodhenge sun calendar. This is the astounding story of an advanced Indian culture in North America that thrived and then declined before European contact.",
+                "featured_series": {},
+                "genres": [
+                  "Folklore",
+                  "Native Americans"
+                ],
+                "has_audiobook": false,
+                "has_ebook": false,
+                "id": "2526963",
+                "image": {
+                  "color": "#f3f5f1",
+                  "color_name": "Beige",
+                  "height": 134,
+                  "id": 6943612,
+                  "url": "https://assets.hardcover.app/external_data/2806264/a4516b407649b3cb2c2264be58e3fd1fd1bdb589.jpeg",
+                  "width": 98
+                },
+                "isbns": [
+                  "1234567890"
+                ],
+                "lists_count": 0,
+                "moods": [],
+                "pages": 449,
+                "prompts_count": 0,
+                "rating": 0,
+                "ratings_count": 0,
+                "release_date": "2023-07-01",
+                "release_year": 2023,
+                "reviews_count": 0,
+                "series_ids": [],
+                "series_names": [],
+                "slug": "qamer-javed-writes",
+                "tags": [],
+                "title": "Qamer Javed writes ",
+                "users_count": 1,
+                "users_read_count": 0
+              },
+              "highlight": {
+                "isbns": [
+                  {
+                    "matched_tokens": [
+                      "12345"
+                    ],
+                    "snippet": "<mark>12345</mark>67890"
+                  }
+                ]
+              },
+              "highlights": [
+                {
+                  "field": "isbns",
+                  "indices": [
+                    0
+                  ],
+                  "matched_tokens": [
+                    [
+                      "12345"
+                    ]
+                  ],
+                  "snippets": [
+                    "<mark>12345</mark>67890"
+                  ]
+                }
+              ],
+              "text_match": 578730089005449200,
+              "text_match_info": {
+                "best_field_score": "1108074561536",
+                "best_field_weight": 5,
+                "fields_matched": 1,
+                "num_tokens_dropped": 3,
+                "score": "578730089005449257",
+                "tokens_matched": 1,
+                "typo_prefix_score": 1
+              }
+            },
+            {
+              "document": {
+                "activities_count": 1,
+                "alternative_titles": [
+                  "Risk: Doing the Ridiculous to See the Miraculous"
+                ],
+                "author_names": [
+                  "Roger Archer",
+                  "Rich Wilkerson",
+                  "Tommy Barnett"
+                ],
+                "book_category_id": 1,
+                "compilation": false,
+                "content_warnings": [],
+                "contribution_specializations": [],
+                "contribution_types": [
+                  "Author",
+                  "Foreword"
+                ],
+                "contributions": [
+                  {
+                    "author": {
+                      "id": 1391337,
+                      "image": {},
+                      "name": "Roger Archer",
+                      "slug": "roger-archer"
+                    },
+                    "contribution": "Author",
+                    "contributor_role_blurb": "The author of a written work.",
+                    "contributor_role_id": 1,
+                    "contributor_role_name": "Author",
+                    "contributor_specialization_blurb": null,
+                    "contributor_specialization_id": null,
+                    "contributor_specialization_name": null,
+                    "primary": true
+                  },
+                  {
+                    "author": {
+                      "id": 1391331,
+                      "image": {},
+                      "name": "Rich Wilkerson",
+                      "slug": "rich-wilkerson"
+                    },
+                    "contribution": "Author",
+                    "contributor_role_blurb": "The author of a written work.",
+                    "contributor_role_id": 1,
+                    "contributor_role_name": "Author",
+                    "contributor_specialization_blurb": null,
+                    "contributor_specialization_id": null,
+                    "contributor_specialization_name": null,
+                    "primary": true
+                  },
+                  {
+                    "author": {
+                      "id": 105991,
+                      "image": {},
+                      "name": "Tommy Barnett",
+                      "slug": "tommy-barnett"
+                    },
+                    "contribution": "Foreword",
+                    "contributor_role_blurb": "An introductory text that presents or endorses a work.",
+                    "contributor_role_id": 146,
+                    "contributor_role_name": "Foreword",
+                    "contributor_specialization_blurb": null,
+                    "contributor_specialization_id": null,
+                    "contributor_specialization_name": null,
+                    "primary": false
+                  }
+                ],
+                "cover_color": "White",
+                "description": "“Risk” is all about living a faith filled life. Within the pages of this work you will discover the year-by-year history of the ups and downs of the happenings regarding Foursquare Church.\n\nThere are no sure things in this crazy epic journey called life. The only constant we can hang our hope upon is the name of Jesus. Christ has called us to live beyond what we can see and lean only to what He has said.\n\nIn the parable of the talents Jesus was very clear about how He felt regarding those who would not risk. In Matthew 25:28-30 He states, “‘Take the thousand and give it to the one who risked the most and get rid of this “play-it-safe-mentality” who won’t go out on a limb.\n\nJesus rewards those who Risk. Foursquare Church and its history is one successive detail regarding progressive risking on God and his faithfulness to reward said risk.\n\nI invite you to read and risk on God. You will find great joy in discovering the rewards of a life that is lived by faith.",
+                "featured_series": {},
+                "genres": [],
+                "has_audiobook": true,
+                "has_ebook": true,
+                "id": "2457798",
+                "image": {
+                  "color": "#fbfbfb",
+                  "color_name": "White",
+                  "height": 500,
+                  "id": 6814238,
+                  "url": "https://assets.hardcover.app/edition/32740103/f98eaabe-6221-4f36-8e64-82aa968e067c.jpg",
+                  "width": 324
+                },
+                "isbns": [
+                  "123456789X",
+                  "9781234567897"
+                ],
+                "lists_count": 0,
+                "moods": [],
+                "pages": 139,
+                "prompts_count": 0,
+                "rating": 4,
+                "ratings_count": 1,
+                "release_date": "2018-02-09",
+                "release_year": 2018,
+                "reviews_count": 0,
+                "series_ids": [],
+                "series_names": [],
+                "slug": "risk-doing-the-ridiculous-to-see-the-miraculous",
+                "subtitle": "Doing the Ridiculous to See the Miraculous",
+                "tags": [],
+                "title": "Risk: Doing the Ridiculous to See the Miraculous",
+                "users_count": 1,
+                "users_read_count": 1
+              },
+              "highlight": {
+                "isbns": [
+                  {
+                    "matched_tokens": [
+                      "12345"
+                    ],
+                    "snippet": "<mark>12345</mark>6789X"
+                  },
+                  {
+                    "matched_tokens": [],
+                    "snippet": "9781234567897"
+                  }
+                ]
+              },
+              "highlights": [
+                {
+                  "field": "isbns",
+                  "indices": [
+                    0
+                  ],
+                  "matched_tokens": [
+                    [
+                      "12345"
+                    ]
+                  ],
+                  "snippets": [
+                    "<mark>12345</mark>6789X"
+                  ]
+                }
+              ],
+              "text_match": 578730089005449200,
+              "text_match_info": {
+                "best_field_score": "1108074561536",
+                "best_field_weight": 5,
+                "fields_matched": 1,
+                "num_tokens_dropped": 3,
+                "score": "578730089005449257",
+                "tokens_matched": 1,
+                "typo_prefix_score": 1
+              }
+            },
+            {
+              "document": {
+                "activities_count": 0,
+                "alternative_titles": [
+                  "ತೆಂಕನಿಡಿಯೂರಿನ ಕುಳುವಾರಿಗಳು - Tenkanidiyurina Kuluvarigalu"
+                ],
+                "author_names": [
+                  "Vyasarao Ninjur"
+                ],
+                "book_category_id": 1,
+                "compilation": false,
+                "content_warnings": [],
+                "contribution_specializations": [],
+                "contribution_types": [
+                  "Author"
+                ],
+                "contributions": [
+                  {
+                    "author": {
+                      "id": 557150,
+                      "image": {},
+                      "name": "Vyasarao Ninjur",
+                      "slug": "vyasarao-ninjur"
+                    },
+                    "contribution": "Author",
+                    "contributor_role_blurb": "The author of a written work.",
+                    "contributor_role_id": 1,
+                    "contributor_role_name": "Author",
+                    "primary": true
+                  }
+                ],
+                "cover_color": "Gray",
+                "featured_series": {},
+                "genres": [],
+                "has_audiobook": false,
+                "has_ebook": false,
+                "id": "940010",
+                "image": {
+                  "color": "#b5967b",
+                  "color_name": "Gray",
+                  "height": 74,
+                  "id": 1348634,
+                  "url": "https://assets.hardcover.app/external_data/60094785/7e577f9bba87f2af4671dc0257036922f9aa648c.jpeg",
+                  "width": 98
+                },
+                "isbns": [
+                  "1234567182916"
+                ],
+                "lists_count": 0,
+                "moods": [],
+                "pages": 272,
+                "prompts_count": 0,
+                "rating": 5,
+                "ratings_count": 1,
+                "reviews_count": 1,
+                "series_ids": [],
+                "series_names": [],
+                "slug": "tenkanidiyurina-kuluvarigalu",
+                "tags": [],
+                "title": "ತೆಂಕನಿಡಿಯೂರಿನ ಕುಳುವಾರಿಗಳು - Tenkanidiyurina Kuluvarigalu",
+                "users_count": 1,
+                "users_read_count": 1
+              },
+              "highlight": {
+                "isbns": [
+                  {
+                    "matched_tokens": [
+                      "12345"
+                    ],
+                    "snippet": "<mark>12345</mark>67182916"
+                  }
+                ]
+              },
+              "highlights": [
+                {
+                  "field": "isbns",
+                  "indices": [
+                    0
+                  ],
+                  "matched_tokens": [
+                    [
+                      "12345"
+                    ]
+                  ],
+                  "snippets": [
+                    "<mark>12345</mark>67182916"
+                  ]
+                }
+              ],
+              "text_match": 578730089005449200,
+              "text_match_info": {
+                "best_field_score": "1108074561536",
+                "best_field_weight": 5,
+                "fields_matched": 1,
+                "num_tokens_dropped": 3,
+                "score": "578730089005449257",
+                "tokens_matched": 1,
+                "typo_prefix_score": 1
+              }
+            },
+            {
+              "document": {
+                "activities_count": 0,
+                "alternative_titles": [
+                  "Bheeshma"
+                ],
+                "author_names": [
+                  "Rudramurthy Sastry"
+                ],
+                "book_category_id": 1,
+                "compilation": false,
+                "content_warnings": [],
+                "contribution_specializations": [],
+                "contribution_types": [
+                  "Author"
+                ],
+                "contributions": [
+                  {
+                    "author": {
+                      "id": 557156,
+                      "image": {},
+                      "name": "Rudramurthy Sastry",
+                      "slug": "rudramurthy-sastry"
+                    },
+                    "contribution": "Author",
+                    "contributor_role_blurb": "The author of a written work.",
+                    "contributor_role_id": 1,
+                    "contributor_role_name": "Author",
+                    "contributor_specialization_blurb": null,
+                    "contributor_specialization_id": null,
+                    "contributor_specialization_name": null,
+                    "primary": true
+                  }
+                ],
+                "cover_color": "Brown",
+                "featured_series": {},
+                "genres": [],
+                "has_audiobook": false,
+                "has_ebook": false,
+                "id": "940017",
+                "image": {
+                  "color": "#c2680a",
+                  "color_name": "Brown",
+                  "height": 157,
+                  "id": 1348644,
+                  "url": "https://assets.hardcover.app/external_data/60094796/09ed2f671e149b96cdbed69945bfd1a97eb4fa5d.jpeg",
+                  "width": 98
+                },
+                "isbns": [
+                  "1234567141980"
+                ],
+                "lists_count": 0,
+                "moods": [],
+                "pages": 1050,
+                "prompts_count": 0,
+                "rating": 4,
+                "ratings_count": 1,
+                "reviews_count": 0,
+                "series_ids": [],
+                "series_names": [],
+                "slug": "bheeshma",
+                "tags": [],
+                "title": "Bheeshma",
+                "users_count": 1,
+                "users_read_count": 1
+              },
+              "highlight": {
+                "isbns": [
+                  {
+                    "matched_tokens": [
+                      "12345"
+                    ],
+                    "snippet": "<mark>12345</mark>67141980"
+                  }
+                ]
+              },
+              "highlights": [
+                {
+                  "field": "isbns",
+                  "indices": [
+                    0
+                  ],
+                  "matched_tokens": [
+                    [
+                      "12345"
+                    ]
+                  ],
+                  "snippets": [
+                    "<mark>12345</mark>67141980"
+                  ]
+                }
+              ],
+              "text_match": 578730089005449200,
+              "text_match_info": {
+                "best_field_score": "1108074561536",
+                "best_field_weight": 5,
+                "fields_matched": 1,
+                "num_tokens_dropped": 3,
+                "score": "578730089005449257",
+                "tokens_matched": 1,
+                "typo_prefix_score": 1
+              }
+            }
+          ],
+          "out_of": 2673679,
+          "page": 1,
+          "request_params": {
+            "collection_name": "Book_production_1760914612",
+            "first_q": "qwzxvb kirjaton teos 12345",
+            "per_page": 20,
+            "q": "qwzxvb kirjaton teos 12345"
+          },
+          "search_cutoff": false,
+          "search_time_ms": 67
+        }
+      }
+    }
+  },
+  "editions": {
+    "data": {
+      "books": []
+    }
+  }
+}

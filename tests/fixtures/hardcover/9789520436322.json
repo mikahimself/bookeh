@@ -1,0 +1,34 @@
+{
+  "data": {
+    "editions": [
+      {
+        "id": 31479119,
+        "book_id": 779983,
+        "isbn_13": "9789520436322",
+        "title": "Naisen taistelut ja muodonmuutokset",
+        "subtitle": null,
+        "physical_format": null,
+        "pages": 102,
+        "release_date": "2021-04-01",
+        "publisher": {
+          "name": "Tammi"
+        },
+        "image": {
+          "url": "https://assets.hardcover.app/external_data/61183404/c3f6970d9fe42ad8246dd66488d585f99654afba.jpeg"
+        },
+        "book": {
+          "title": "Naisen taistelut ja muodonmuutokset",
+          "description": "Ranskan kohutuimman ja kiitetyimmän nykykirjailijan neljäs teos maalaa intiimin kirjallisen muotokuvan, joka on kunnianosoitus kirjailijan äidin periksiantamattomuudelle ja rinnakkaisteos Kuka tappoi isäni -romaanille.",
+          "contributions": [
+            {
+              "contributor_role_id": 1,
+              "author": {
+                "name": "Édouard Louis"
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

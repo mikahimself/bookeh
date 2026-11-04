@@ -13,7 +13,11 @@ import { assertLive } from '@/lib/payload/transaction'
 import { system } from './system'
 
 /** Spine, AD-14: the hosts a cover is downloaded from. */
-export const COVER_HOSTS: readonly string[] = ['api.finna.fi', 'books.google.com']
+export const COVER_HOSTS: readonly string[] = [
+  'api.finna.fi',
+  'books.google.com',
+  'assets.hardcover.app',
+]
 
 export type CoverPolicy = { allows(url: URL): boolean; maxBytes: number; timeoutMs: number }
 

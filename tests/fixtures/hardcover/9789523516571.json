@@ -1,0 +1,32 @@
+{
+  "data": {
+    "editions": [
+      {
+        "id": 31303443,
+        "book_id": 1278377,
+        "isbn_13": "9789523516571",
+        "title": "Pikkuporvarit",
+        "subtitle": null,
+        "physical_format": null,
+        "pages": 194,
+        "release_date": null,
+        "publisher": null,
+        "image": {
+          "url": "https://assets.hardcover.app/external_data/60419645/6c0e265937019e64eb3fbb57742bc7b076af86bc.jpeg"
+        },
+        "book": {
+          "title": "Pikkuporvarit",
+          "description": null,
+          "contributions": [
+            {
+              "contributor_role_id": 1,
+              "author": {
+                "name": "Anna Kontula"
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

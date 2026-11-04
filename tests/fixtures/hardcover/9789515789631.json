@@ -1,0 +1,40 @@
+{
+  "data": {
+    "editions": [
+      {
+        "id": 31771314,
+        "book_id": 1680441,
+        "isbn_13": "9789515789631",
+        "title": "Supernaiivi",
+        "subtitle": null,
+        "physical_format": null,
+        "pages": 224,
+        "release_date": "1996-01-01",
+        "publisher": {
+          "name": "LIKE"
+        },
+        "image": {
+          "url": "https://assets.hardcover.app/external_data/61927581/5974c6b37acf944b025701c2c5db876da0bb9b0c.jpeg"
+        },
+        "book": {
+          "title": "Supernaiivi",
+          "description": null,
+          "contributions": [
+            {
+              "contributor_role_id": 1,
+              "author": {
+                "name": "Erlend Loe"
+              }
+            },
+            {
+              "contributor_role_id": 64,
+              "author": {
+                "name": "Outi Menna"
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

@@ -197,12 +197,14 @@
   "sources": {
     "finna": "Finna",
     "google": "Google Books",
-    "openlibrary": "Open Library"
+    "openlibrary": "Open Library",
+    "hardcover": "Hardcover"
   },
   "sourcesPartitive": {
     "finna": "Finnaa",
     "google": "Google Booksia",
-    "openlibrary": "Open Librarya"
+    "openlibrary": "Open Librarya",
+    "hardcover": "Hardcoveria"
   },
   "errorPage": {
     "heading": "Sivua ei voitu näyttää.",

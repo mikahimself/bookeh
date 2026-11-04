@@ -1,0 +1,30 @@
+{
+  "data": {
+    "editions": [
+      {
+        "id": 32443049,
+        "book_id": 2217981,
+        "isbn_13": "9789523630062",
+        "title": "Patriarkaatti",
+        "subtitle": null,
+        "physical_format": null,
+        "pages": null,
+        "release_date": "2019-08-01",
+        "publisher": null,
+        "image": null,
+        "book": {
+          "title": "Patriarkaatti",
+          "description": null,
+          "contributions": [
+            {
+              "contributor_role_id": 1,
+              "author": {
+                "name": "Ossi Nyman"
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

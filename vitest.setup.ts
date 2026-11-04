@@ -27,3 +27,4 @@ process.env.MEDIA_DIR = path.resolve('media-test')
 // narrower one. The value only has to be non-empty; no request leaves the
 // lane, because every spec that asks the sources stubs `fetch`.
 process.env.OPEN_LIBRARY_CONTACT = 'int-tests@bookeh.invalid'
+process.env.HARDCOVER_API_TOKEN = 'int-tests-catalog-token'

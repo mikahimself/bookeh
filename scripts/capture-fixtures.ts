@@ -1,8 +1,9 @@
-// Records live Finna, Google Books and Open Library responses for the ISBNs in
-// tests/fixtures/isbns.txt, the Finna and Open Library search responses for the queries in
-// tests/fixtures/queries.txt (Stories 8.3, 8.12), and writes tests/fixtures/REPORT.md
+// Records live Finna, Google Books, Open Library and Hardcover responses for the ISBNs in
+// tests/fixtures/isbns.txt, and Finna, Open Library and Hardcover search responses for the
+// queries in tests/fixtures/queries.txt (Stories 8.3, 8.12, 8.13). Writes tests/fixtures/REPORT.md
 // (Story 3.2). Existing fixtures are never fetched again.
-// Needs GOOGLE_BOOKS_API_KEY and OPEN_LIBRARY_CONTACT in .env. Run: npm run fixtures
+// Needs GOOGLE_BOOKS_API_KEY; OPEN_LIBRARY_CONTACT and HARDCOVER_API_TOKEN enable optional sources.
+// Run: npm run fixtures
 import { existsSync } from 'node:fs'
 import { mkdir, readFile, rm, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
@@ -27,24 +28,59 @@ import {
   openLibrarySearchUrl,
   openLibraryUrl,
 } from '@/lib/metadata/sources/openLibrary'
+import {
+  HARDCOVER_LOOKUP_QUERY,
+  HARDCOVER_SEARCH_QUERY,
+  hardcoverEditionsRequest,
+  hardcoverResults,
+  hardcoverSearchHits,
+  hardcoverSearchIds,
+} from '@/lib/metadata/sources/hardcover'
 
-export const SOURCES = ['finna', 'google', 'openlibrary'] as const
+export const SOURCES = ['finna', 'google', 'openlibrary', 'hardcover'] as const
 export type Source = (typeof SOURCES)[number]
 
 /** The sources whose `search` has fixtures; Google Books' search is not recorded. */
-export const SEARCH_SOURCES = ['finna', 'openlibrary'] as const
+export const SEARCH_SOURCES = ['finna', 'openlibrary', 'hardcover'] as const
 export type SearchSource = (typeof SEARCH_SOURCES)[number]
 
 /** What one source needs for one request. */
 interface SourceRequest {
   url: string
   headers: Record<string, string>
+  body?: string
+}
+
+function hardcoverLookupShape(body: unknown): boolean {
+  return isObject(body) && isObject(body.data) && Array.isArray(body.data.editions)
+}
+
+function hardcoverSearchShape(body: unknown): boolean {
+  return (
+    isObject(body) &&
+    isObject(body.data) &&
+    isObject(body.data.search) &&
+    isObject(body.data.search.results) &&
+    Array.isArray(body.data.search.results.hits)
+  )
+}
+
+function hardcoverEditionsShape(body: unknown): boolean {
+  return (
+    isObject(body) &&
+    isObject(body.data) &&
+    Array.isArray(body.data.books) &&
+    body.data.books.every(
+      (book) => isObject(book) && Number.isSafeInteger(book.id) && Array.isArray(book.editions),
+    )
+  )
 }
 
 export interface CaptureOptions {
   googleKey?: string
   /** `OPEN_LIBRARY_CONTACT`; empty leaves Open Library uncaptured rather than unidentified. */
   contact?: string
+  hardcoverToken?: string
   queries?: readonly string[]
 }
 
@@ -137,20 +173,31 @@ function lookupRequest(
   isbn13: string,
   googleKey: string,
   openLibrary: Record<string, string>,
+  hardcoverToken: string,
 ): SourceRequest {
   if (source === 'finna') return { url: finnaUrl(isbn13), headers: {} }
   if (source === 'google') return { url: googleUrl(isbn13, googleKey), headers: {} }
-  return { url: openLibraryUrl(isbn13), headers: openLibrary }
+  if (source === 'openlibrary') return { url: openLibraryUrl(isbn13), headers: openLibrary }
+  return hardcoverRequest(HARDCOVER_LOOKUP_QUERY, { isbn: isbn13 }, hardcoverToken)
+}
+
+function hardcoverRequest(query: string, variables: Json, token: string): SourceRequest {
+  return {
+    url: 'https://api.hardcover.app/v1/graphql',
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+    body: JSON.stringify({ query, variables }),
+  }
 }
 
 function searchRequest(
   source: SearchSource,
   query: string,
   openLibrary: Record<string, string>,
+  hardcoverToken: string,
 ): SourceRequest {
-  return source === 'finna'
-    ? { url: finnaSearchUrl(query), headers: {} }
-    : { url: openLibrarySearchUrl(query), headers: openLibrary }
+  if (source === 'finna') return { url: finnaSearchUrl(query), headers: {} }
+  if (source === 'openlibrary') return { url: openLibrarySearchUrl(query), headers: openLibrary }
+  return hardcoverRequest(HARDCOVER_SEARCH_QUERY, { query }, hardcoverToken)
 }
 
 function retryable(status: number): boolean {
@@ -163,11 +210,14 @@ async function attempt(
   url: string,
   fetchFn: FetchFn,
   headers: Record<string, string> = {},
+  body?: string,
 ): Promise<Attempt> {
   let response: Response
   try {
     response = await fetchFn(url, {
+      method: body === undefined ? 'GET' : 'POST',
       headers: { Accept: 'application/json', ...headers },
+      ...(body === undefined ? {} : { body }),
       signal: AbortSignal.timeout(TIMEOUT_MS),
     })
   } catch (error) {
@@ -178,7 +228,13 @@ async function attempt(
     return { ok: false, reason: `HTTP ${response.status}`, retry: retryable(response.status) }
   }
   try {
-    return { ok: true, body: await response.json() }
+    const parsed: unknown = await response.json()
+    if (
+      body !== undefined &&
+      (!isObject(parsed) || (Array.isArray(parsed.errors) && parsed.errors.length > 0))
+    )
+      return { ok: false, reason: 'GraphQL response error', retry: false }
+    return { ok: true, body: parsed }
   } catch (error) {
     // The timeout signal also covers reading the body.
     const name = error instanceof Error ? error.name : ''
@@ -194,9 +250,10 @@ async function fetchJson(
   fetchFn: FetchFn,
   sleepFn: SleepFn,
   headers: Record<string, string> = {},
+  body?: string,
 ): Promise<{ ok: true; body: unknown } | { ok: false; reason: string }> {
   for (let i = 0; ; i++) {
-    const result = await attempt(url, fetchFn, headers)
+    const result = await attempt(url, fetchFn, headers, body)
     if (result.ok) return result
     if (!result.retry || i >= BACKOFF_MS.length) {
       const tries = i + 1
@@ -241,15 +298,17 @@ export async function capture(
   dir: string,
   fetchFn: FetchFn,
   sleepFn: SleepFn,
-  { googleKey = '', contact = '', queries = [] }: CaptureOptions = {},
+  { googleKey = '', contact = '', hardcoverToken = '', queries = [] }: CaptureOptions = {},
 ): Promise<{ requests: number; written: number; notCaptured: NotCaptured[] }> {
   const notCaptured: NotCaptured[] = []
   const openLibrary = openLibraryHeaders({ OPEN_LIBRARY_CONTACT: contact })
   const noContact = contact ? null : 'OPEN_LIBRARY_CONTACT is not set'
+  const noHardcoverToken = hardcoverToken ? null : 'HARDCOVER_API_TOKEN is not set'
   /** The secrets that must never reach a fixture file, on either write path. */
   const secrets: [string, string][] = [
     [googleKey, 'the API key'],
     [contact, 'the contact'],
+    [hardcoverToken, 'the Hardcover token'],
   ]
   const leaks = (text: string): string | undefined =>
     secrets.find(([secret]) => secret && text.includes(secret))?.[1]
@@ -269,17 +328,34 @@ export async function capture(
     for (const source of SOURCES) {
       const path = fixturePath(dir, source, isbn13)
       if (existsSync(path)) continue
-      const blocked = source === 'google' ? googleDown : source === 'openlibrary' ? noContact : null
+      const blocked =
+        source === 'google'
+          ? googleDown
+          : source === 'openlibrary'
+            ? noContact
+            : source === 'hardcover'
+              ? noHardcoverToken
+              : null
       if (blocked) {
         notCaptured.push({ source, isbn13, reason: blocked })
         continue
       }
       fetched = true
-      const { url, headers } = lookupRequest(source, isbn13, googleKey, openLibrary)
-      const result = await fetchJson(url, fetchFn, sleepFn, headers)
+      const { url, headers, body } = lookupRequest(
+        source,
+        isbn13,
+        googleKey,
+        openLibrary,
+        hardcoverToken,
+      )
+      const result = await fetchJson(url, fetchFn, sleepFn, headers, body)
       requests++
       if (!result.ok) {
         notCaptured.push({ source, isbn13, reason: result.reason })
+        continue
+      }
+      if (source === 'hardcover' && !hardcoverLookupShape(result.body)) {
+        notCaptured.push({ source, isbn13, reason: 'GraphQL lookup data is malformed' })
         continue
       }
       const text = `${JSON.stringify(result.body, null, 2)}\n`
@@ -310,13 +386,56 @@ export async function capture(
         notCaptured.push({ source, isbn13: '', query, reason: noContact })
         continue
       }
-      const { url, headers } = searchRequest(source, query, openLibrary)
-      const result = await fetchJson(url, fetchFn, sleepFn, headers)
+      if (source === 'hardcover' && noHardcoverToken) {
+        notCaptured.push({ source, isbn13: '', query, reason: noHardcoverToken })
+        continue
+      }
+      const { url, headers, body } = searchRequest(source, query, openLibrary, hardcoverToken)
+      const result = await fetchJson(url, fetchFn, sleepFn, headers, body)
       requests++
       if (!result.ok) {
         notCaptured.push({ source, isbn13: '', query, reason: result.reason })
       } else {
-        const text = `${JSON.stringify(result.body, null, 2)}\n`
+        let capturedBody = result.body
+        if (source === 'hardcover') {
+          if (!hardcoverSearchShape(result.body)) {
+            notCaptured.push({
+              source,
+              isbn13: '',
+              query,
+              reason: 'GraphQL search data is malformed',
+            })
+            continue
+          }
+          const ids = hardcoverSearchIds(result.body, query)
+          if (ids.length) {
+            const request = hardcoverEditionsRequest(ids)
+            const editions = hardcoverRequest(request.query, request.variables, hardcoverToken)
+            const resolved = await fetchJson(
+              editions.url,
+              fetchFn,
+              sleepFn,
+              editions.headers,
+              editions.body,
+            )
+            requests++
+            if (!resolved.ok) {
+              notCaptured.push({ source, isbn13: '', query, reason: resolved.reason })
+              continue
+            }
+            if (!hardcoverEditionsShape(resolved.body)) {
+              notCaptured.push({
+                source,
+                isbn13: '',
+                query,
+                reason: 'GraphQL edition data is malformed',
+              })
+              continue
+            }
+            capturedBody = { search: result.body, editions: resolved.body }
+          } else capturedBody = { search: result.body, editions: { data: { books: [] } } }
+        }
+        const text = `${JSON.stringify(capturedBody, null, 2)}\n`
         const leak = leaks(text)
         if (leak) {
           notCaptured.push({ source, isbn13: '', query, reason: `response contains ${leak}` })
@@ -377,6 +496,15 @@ function volumeInfo(item: Json): Json {
   return isObject(item.volumeInfo) ? item.volumeInfo : {}
 }
 
+function googleHasUsableCover(info: Json): boolean {
+  const links = isObject(info.imageLinks) ? info.imageLinks : {}
+  return Object.values(links).some((value) => {
+    if (typeof value !== 'string' || !URL.canParse(value)) return false
+    const protocol = new URL(value).protocol
+    return protocol === 'http:' || protocol === 'https:'
+  })
+}
+
 /** The Open Library entry for the ISBN asked for: `[entry]` or `[]` (`{}`, or another key). */
 export function openLibraryMatches(body: unknown, isbn13: string): Json[] {
   if (!isObject(body)) return []
@@ -412,6 +540,7 @@ interface Row extends ListedIsbn {
   finna: SourceRow
   google: SourceRow
   openlibrary: SourceRow
+  hardcover: SourceRow
   title: string
   categories: string[]
   subjects: string[]
@@ -419,6 +548,7 @@ interface Row extends ListedIsbn {
   openLibrarySubjects: string[]
   /** Fields Open Library has that neither Finna nor Google Books gives for this ISBN. */
   openLibraryAdds: string[]
+  hardcoverAdds: string[]
 }
 
 async function readFixture(dir: string, source: Source, isbn13: string): Promise<unknown> {
@@ -467,17 +597,27 @@ async function buildRow(dir: string, entry: ListedIsbn): Promise<Row> {
   const finnaBody = await readFixture(dir, 'finna', entry.isbn13)
   const googleBody = await readFixture(dir, 'google', entry.isbn13)
   const openLibraryBody = await readFixture(dir, 'openlibrary', entry.isbn13)
+  const hardcoverBody = await readFixture(dir, 'hardcover', entry.isbn13)
   const finna = finnaMatches(finnaBody, entry.isbn13)
   const google = googleMatches(googleBody, entry.isbn13)
   const openlibrary = openLibraryMatches(openLibraryBody, entry.isbn13)
+  const hardcover =
+    isObject(hardcoverBody) && isObject(hardcoverBody.data)
+      ? list(hardcoverBody.data.editions)
+          .filter(isObject)
+          .filter((e) => e.isbn_13 === entry.isbn13)
+      : []
   const parsed = {
     finna: finnaResults(finnaBody, entry.isbn13) ?? [],
     openlibrary: openLibraryResults(openLibraryBody, entry.isbn13) ?? [],
+    hardcover:
+      hardcoverBody === undefined ? [] : (hardcoverResults(hardcoverBody, entry.isbn13) ?? []),
   }
   const titles = [
     ...finna.map((r) => r.title),
     ...google.map((i) => volumeInfo(i).title),
     ...openlibrary.map((e) => e.title),
+    ...hardcover.map((e) => e.title),
   ]
   return {
     ...entry,
@@ -497,7 +637,7 @@ async function buildRow(dir: string, entry: ListedIsbn): Promise<Row> {
           ? googleBody.totalItems
           : 0,
       matching: google.length,
-      cover: google.some((i) => isObject(volumeInfo(i).imageLinks)),
+      cover: google.some((i) => googleHasUsableCover(volumeInfo(i))),
     },
     openlibrary: {
       captured: openLibraryBody !== undefined,
@@ -506,12 +646,49 @@ async function buildRow(dir: string, entry: ListedIsbn): Promise<Row> {
       // Recorded for the report only: the adapter sets no coverUrl (AD-14, redirects).
       cover: openlibrary.some((e) => isObject(e.cover)),
     },
+    hardcover: {
+      captured: hardcoverBody !== undefined,
+      total:
+        isObject(hardcoverBody) && isObject(hardcoverBody.data)
+          ? list(hardcoverBody.data.editions).length
+          : 0,
+      matching: hardcover.length,
+      cover: parsed.hardcover.some((e) => Boolean(e.coverUrl)),
+    },
     title: strings(titles)[0] ?? '',
     categories: unique(google.flatMap((i) => strings(volumeInfo(i).categories))),
     subjects: unique(finna.flatMap(finnaSubjects)),
     genres: unique(finna.flatMap((r) => strings(r.genres))),
     openLibrarySubjects: unique(openlibrary.flatMap((e) => subjectNames(e.subjects))),
     openLibraryAdds: openLibraryAdds(parsed.openlibrary[0], parsed.finna, google),
+    hardcoverAdds: parsed.hardcover[0]
+      ? (
+          ['authors', 'publisher', 'year', 'pages', 'subtitle', 'description', 'coverUrl'] as const
+        ).filter(
+          (field) =>
+            filled(parsed.hardcover[0], field) &&
+            ![...parsed.finna, ...parsed.openlibrary].some((result) => filled(result, field)) &&
+            !google.some((item) => {
+              const info = volumeInfo(item)
+              const key = (
+                {
+                  authors: 'authors',
+                  publisher: 'publisher',
+                  year: 'publishedDate',
+                  pages: 'pageCount',
+                  subtitle: 'subtitle',
+                  description: 'description',
+                  coverUrl: 'imageLinks',
+                } as const
+              )[field]
+              return field === 'coverUrl'
+                ? googleHasUsableCover(info)
+                : info[key] !== undefined &&
+                    info[key] !== null &&
+                    (!Array.isArray(info[key]) || info[key].length > 0)
+            }),
+        )
+      : [],
   }
 }
 
@@ -545,13 +722,29 @@ async function buildQueryRow(dir: string, source: SearchSource, query: string): 
   const body: unknown = existsSync(path)
     ? (JSON.parse(await readFile(path, 'utf8')) as unknown)
     : undefined
-  const records = isObject(body) ? (source === 'finna' ? body.records : body.docs) : undefined
+  const records = isObject(body)
+    ? source === 'finna'
+      ? body.records
+      : source === 'openlibrary'
+        ? body.docs
+        : isObject(body.search) &&
+            isObject(body.search.data) &&
+            isObject(body.search.data.search) &&
+            isObject(body.search.data.search.results)
+          ? body.search.data.search.results.hits
+          : undefined
+    : undefined
   const hits =
     body === undefined
       ? 0
       : source === 'finna'
         ? finnaSearchHits(body, query).length
-        : openLibrarySearchHits(body, query).length
+        : source === 'openlibrary'
+          ? openLibrarySearchHits(body, query).length
+          : isObject(body)
+            ? hardcoverSearchHits(body.editions, hardcoverSearchIds(body.search, query), query)
+                .length
+            : 0
   return {
     query,
     source,
@@ -577,6 +770,7 @@ export async function buildReport(
   const inFinna = rows.filter((r) => r.finna.matching > 0)
   const inGoogle = rows.filter((r) => r.google.matching > 0)
   const inOpenLibrary = rows.filter((r) => r.openlibrary.matching > 0)
+  const inHardcover = rows.filter((r) => r.hardcover.matching > 0)
   const inBoth = rows.filter((r) => r.finna.matching > 0 && r.google.matching > 0)
   const inNeither = rows.filter((r) => SOURCES.every((source) => r[source].matching === 0))
   const withCategories = rows.filter((r) => r.categories.length > 0)
@@ -643,7 +837,7 @@ export async function buildReport(
   const lines = [
     '# Real-book fixtures',
     '',
-    'Generated by `npm run fixtures` (`scripts/capture-fixtures.ts`) from the files in `finna/`, `google/` and `openlibrary/`. Do not edit by hand.',
+    'Generated by `npm run fixtures` (`scripts/capture-fixtures.ts`) from the files in `finna/`, `google/`, `openlibrary/` and `hardcover/`. Do not edit by hand.',
     '',
     `Captured: ${capturedOn}`,
     '',
@@ -654,6 +848,7 @@ export async function buildReport(
     '- Open Library: `GET https://openlibrary.org/api/books?bibkeys=ISBN:<isbn13>&jscmd=data&format=json`',
     `- Finna search: \`GET https://api.finna.fi/api/v1/search?lookfor=<query>&type=AllFields&limit=20\` plus one \`field[]\` per search field below`,
     '- Open Library search: `GET https://openlibrary.org/search.json?q=<query>&fields=<fields below>&limit=20`',
+    '- Hardcover: `POST https://api.hardcover.app/v1/graphql` with exact `isbn_13` edition query; search uses a book search followed by edition resolution for those book IDs.',
     '',
     'Every Open Library request carries `User-Agent: bookeh (<contact>)` from `OPEN_LIBRARY_CONTACT`; the contact itself is never written here.',
     '',
@@ -667,8 +862,8 @@ export async function buildReport(
     '',
     '## Books',
     '',
-    '| As listed | ISBN-13 | Finna records / matching | Finna cover | Google items / matching | Google cover | OL keys / matching | OL cover | OL adds | Google categories | Title |',
-    '|---|---|---|---|---|---|---|---|---|---|---|',
+    '| As listed | ISBN-13 | Finna records / matching | Finna cover | Google items / matching | Google cover | OL keys / matching | OL cover | OL adds | HC editions / matching | HC cover | HC adds | Google categories | Title |',
+    '|---|---|---|---|---|---|---|---|---|---|---|---|---|---|',
     ...rows.map((r) =>
       [
         r.listed,
@@ -677,6 +872,8 @@ export async function buildReport(
         ...sourceCells(r.google),
         ...sourceCells(r.openlibrary),
         r.openLibraryAdds.join('; ') || '–',
+        ...sourceCells(r.hardcover),
+        r.hardcoverAdds.join('; ') || '–',
         r.categories.join('; ') || '–',
         r.title || '–',
       ]
@@ -691,9 +888,17 @@ export async function buildReport(
     `- Found by Finna: ${inFinna.length} of ${total}${uncaptured('finna')}`,
     `- Found by Google: ${inGoogle.length} of ${total}${uncaptured('google')}`,
     `- Found by Open Library: ${inOpenLibrary.length} of ${total}${uncaptured('openlibrary')}`,
+    `- Found by Hardcover: ${inHardcover.length} of ${total}${uncaptured('hardcover')}`,
     `- Found by Finna and Google both: ${inBoth.length} of ${total}`,
     `- Found by no source: ${inNeither.length} of ${total} (${names(inNeither)})`,
     `- Covers: Finna ${rows.filter((r) => r.finna.cover).length}, Google ${rows.filter((r) => r.google.cover).length}, Open Library ${rows.filter((r) => r.openlibrary.cover).length} (unused)`,
+    `- Direct Hardcover covers: ${rows.filter((r) => r.hardcover.cover).length}`,
+    `- Books where Hardcover adds a field over the first three sources: ${rows.filter((r) => r.hardcoverAdds.length > 0).length} (${tally(
+      rows,
+      (r) => r.hardcoverAdds,
+    )
+      .map(([field, n]) => `${field} ${n}`)
+      .join(', ')})`,
     `- Books where Open Library adds a field the other two leave empty: ${rows.filter((r) => r.openLibraryAdds.length > 0).length} (${tally(
       rows,
       (r) => r.openLibraryAdds,
@@ -721,7 +926,7 @@ export async function buildReport(
     '',
     '## Search queries',
     '',
-    "Recorded under `<source>/search/<slug>.json`. Records are Finna `records` or Open Library `docs` (works); hits are the distinct ISBN-13s the response yields — for Open Library, from each work's edition docs only.",
+    "Recorded under `<source>/search/<slug>.json`. Hardcover fixtures contain the book search and its resolved editions; hits use each edition's own ISBN-13.",
     '',
     '| Query | Source | Fixture | Records | Hits |',
     '|---|---|---|---|---|',
@@ -769,6 +974,7 @@ async function main(): Promise<number> {
   // Open Library asks every client to identify itself, so without a contact it is skipped
   // rather than asked unidentified; Finna and Google are captured either way.
   const contact = process.env.OPEN_LIBRARY_CONTACT?.trim() ?? ''
+  const hardcoverToken = process.env.HARDCOVER_API_TOKEN?.trim() ?? ''
   if (!contact) {
     process.stderr.write(
       'OPEN_LIBRARY_CONTACT is not set in .env; skipping Open Library (it asks every client to identify itself).\n',
@@ -790,7 +996,7 @@ async function main(): Promise<number> {
   const sleep: SleepFn = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
   const loggingFetch: FetchFn = (url, init) => {
     process.stdout.write(
-      `GET ${url.replace(encodeURIComponent(key), '<key>').replace(/&field%5B%5D=[^&]*/g, '')}\n`,
+      `${init.method ?? 'GET'} ${url.replace(encodeURIComponent(key), '<key>').replace(/&field%5B%5D=[^&]*/g, '')}\n`,
     )
     return fetch(url, init)
   }
@@ -799,7 +1005,7 @@ async function main(): Promise<number> {
     dir,
     loggingFetch,
     sleep,
-    { googleKey: key, contact, queries },
+    { googleKey: key, contact, hardcoverToken, queries },
   )
 
   // A run that wrote nothing keeps the date of the capture it reports on.
@@ -808,6 +1014,8 @@ async function main(): Promise<number> {
   const capturedOn = written === 0 ? (/^Captured: (.+)$/m.exec(previous)?.[1] ?? today) : today
 
   const { markdown, missing } = await buildReport(isbns, dir, capturedOn, notCaptured, queries)
+  if (hardcoverToken && markdown.includes(hardcoverToken))
+    throw new Error('report contains the Hardcover token')
   await writeFile(reportPath, markdown)
   process.stdout.write(`${requests} fixtures requested; report written to ${reportPath}\n`)
   for (const m of missing)

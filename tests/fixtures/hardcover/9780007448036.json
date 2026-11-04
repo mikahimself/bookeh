@@ -1,0 +1,34 @@
+{
+  "data": {
+    "editions": [
+      {
+        "id": 25383277,
+        "book_id": 644,
+        "isbn_13": "9780007448036",
+        "title": "A Game of Thrones",
+        "subtitle": null,
+        "physical_format": null,
+        "pages": 801,
+        "release_date": "2012-09-01",
+        "publisher": {
+          "name": "HarperCollins UK"
+        },
+        "image": {
+          "url": "https://assets.hardcover.app/edition/25383277/11298620-L.jpg"
+        },
+        "book": {
+          "title": "A Game of Thrones",
+          "description": "As Warden of the north, Lord Eddard Stark counts it a curse when King Robert bestows on him the office of the Hand. His honour weighs him down at court where a true man does what he will, not what he must ...and a dead enemy is a thing of beauty. \n\nThe old gods have no power in the south, Stark's family is split and there is treachery at court. Worse, the vengeance-mad heir of the deposed Dragon King has grown to maturity in exile in the Free Cities. He claims the Iron Throne.",
+          "contributions": [
+            {
+              "contributor_role_id": 1,
+              "author": {
+                "name": "George R.R. Martin"
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

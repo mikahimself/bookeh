@@ -1,0 +1,34 @@
+{
+  "data": {
+    "editions": [
+      {
+        "id": 30625294,
+        "book_id": 427374,
+        "isbn_13": "9780007447831",
+        "title": "A Clash of Kings",
+        "subtitle": null,
+        "physical_format": null,
+        "pages": 930,
+        "release_date": "1998-11-16",
+        "publisher": {
+          "name": "HarperCollins UK"
+        },
+        "image": {
+          "url": "https://assets.hardcover.app/edition/30625294/aa191a358e8c71ccbe9d19c7289d8b16c41c928f.jpeg"
+        },
+        "book": {
+          "title": "A Clash of Kings",
+          "description": "A comet the color of blood and flame cuts across the sky. And from the ancient citadel of Dragonstone to the forbidding shores of Winterfell, chaos reigns. Six factions struggle for control of a divided land and the Iron Throne of the Seven Kingdoms, preparing to stake their claims through tempest, turmoil, and war. It is a tale in which brother plots against brother and the dead rise to walk in the night. Here a princess masquerades as an orphan boy; a knight of the mind prepares a poison for a treacherous sorceress; and wild men descend from the Mountains of the Moon to ravage the countryside. Against a backdrop of incest and fratricide, alchemy and murder, victory may go to the men and women possessed of the coldest steel . . . and the coldest hearts. For when kings clash, the whole land trembles.",
+          "contributions": [
+            {
+              "contributor_role_id": 1,
+              "author": {
+                "name": "George R.R. Martin"
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

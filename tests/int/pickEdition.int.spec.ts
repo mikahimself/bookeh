@@ -58,6 +58,7 @@ describe('pick the edition', () => {
         // Open Library joins the fan-out when OPEN_LIBRARY_CONTACT is set; `{}` is its
         // answer for an ISBN it does not hold.
         if (url.hostname === 'openlibrary.org') return Response.json({})
+        if (url.hostname === 'api.hardcover.app') return Response.json({ data: { editions: [] } })
         return new Response(null, { status: 404 })
       }),
     )
@@ -76,6 +77,36 @@ describe('pick the edition', () => {
     expect(result.candidates).toHaveLength(2)
     expect(result.candidates[0]).toMatchObject({ isbn13: isbn, binding: 'nidottu', hasCover: true })
     expect(result.candidates[1]).toMatchObject({ isbn13: isbn, hasCover: false })
+  })
+
+  it('shows a Finna edition with a Hardcover cover filling its gap', async () => {
+    const finnaBody = readFileSync(
+      new URL('../fixtures/finna/9789511319177.json', import.meta.url),
+      'utf8',
+    )
+      .replaceAll('9789511319177', isbn)
+      .replaceAll('978-951-1-31917-7', isbn)
+    const hardcoverBody = readFileSync(
+      new URL('../fixtures/hardcover/9789511319177.json', import.meta.url),
+      'utf8',
+    ).replaceAll('9789511319177', isbn)
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async (input: string | URL) => {
+        const url = new URL(String(input))
+        if (url.hostname === 'api.finna.fi')
+          return new Response(finnaBody, { headers: { 'Content-Type': 'application/json' } })
+        if (url.hostname === 'www.googleapis.com') return Response.json({ totalItems: 0 })
+        if (url.hostname === 'openlibrary.org') return Response.json({})
+        if (url.hostname === 'api.hardcover.app')
+          return new Response(hardcoverBody, { headers: { 'Content-Type': 'application/json' } })
+        return new Response(null, { status: 404 })
+      }),
+    )
+    const result = await lookupBook(ctx, { isbn })
+    expect(result).toMatchObject({ kind: 'source' })
+    if (result.kind !== 'source') throw new Error('Expected a source answer')
+    expect(result.candidates[0]).toMatchObject({ source: 'finna', isbn13: isbn, hasCover: true })
   })
 
   it('creates the shared Book from the picked candidate, keeping the ISBN', async () => {

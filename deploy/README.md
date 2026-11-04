@@ -236,12 +236,22 @@ file), then lock it down:
 chmod 600 /opt/bookeh/.env
 ```
 
-`OPEN_LIBRARY_CONTACT` is the one variable that may stay empty: it is the
+`OPEN_LIBRARY_CONTACT` may stay empty: it is the
 contact address sent to Open Library as `User-Agent: bookeh (<contact>)`,
 which Open Library asks every API client for (identified clients get 3
 requests per second instead of 1). Left empty, the Open Library source is
 left out of the source array entirely — lookup and search ask Finna and
 Google Books only — so a fresh deploy works without it.
+
+`HARDCOVER_API_TOKEN` is also optional. Create a Hardcover personal access token with
+`read:catalog` scope, enter it in the server's `.env`, and restart the app. It expires:
+record its expiry privately and renew it in Hardcover account settings before that date.
+On an HTTP 401 or 403, renew the token and confirm its scope, then replace the value and
+restart. Without it, Hardcover is absent from lookup and partial-result messages.
+This integration reads public catalogue records for authenticated per-book use and no
+Hardcover account data. Hardcover's API terms permit catalogue reads; publicly exposing
+Hardcover images requires a DMCA takedown policy. Establish that policy before a public
+deployment of this cover feature.
 
 `bookeh.service`, `bookeh-backup.service` and `bookeh-backup.timer` are
 installed in step 7, not under `/opt/bookeh`.
@@ -532,7 +542,7 @@ permitted` / `find: ... Permission denied`:** the data directory's owner
 - [ ] `systemctl list-timers bookeh-backup.timer` shows the timer with a
       next-run time.
 - [ ] Status mount: `docker compose -f compose.prod.yml exec app cat
-  /app/backup-status/last-backup.json` prints the status JSON from
+/app/backup-status/last-backup.json` prints the status JSON from
       inside the app container.
 - [ ] Restore rehearsal at the cataloguing gate: `./restore-rehearsal.sh`
       prints `OK`, `docker ps -a` and `docker network ls` show no

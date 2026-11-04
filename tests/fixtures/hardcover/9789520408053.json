@@ -1,0 +1,30 @@
+{
+  "data": {
+    "editions": [
+      {
+        "id": 31478905,
+        "book_id": 779981,
+        "isbn_13": "9789520408053",
+        "title": "Ei enää Eddy",
+        "subtitle": null,
+        "physical_format": null,
+        "pages": null,
+        "release_date": "2014-01-02",
+        "publisher": null,
+        "image": null,
+        "book": {
+          "title": "Ei enää Eddy",
+          "description": "Ei enää Eddy on Ranskan viime vuosien kohutuin ja puhutuin romaani, joka nousee lähes julman niukkaa kerrontaansa suuremmaksi kuvaksi unohdetusta Ranskasta, köyhyydestä, tuomitsemisesta ja näköalattomuudesta.",
+          "contributions": [
+            {
+              "contributor_role_id": 1,
+              "author": {
+                "name": "Édouard Louis"
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

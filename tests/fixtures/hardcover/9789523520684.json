@@ -1,0 +1,40 @@
+{
+  "data": {
+    "editions": [
+      {
+        "id": 30566295,
+        "book_id": 597303,
+        "isbn_13": "9789523520684",
+        "title": "Mikä liberalismia vaivaa?",
+        "subtitle": null,
+        "physical_format": null,
+        "pages": 207,
+        "release_date": null,
+        "publisher": {
+          "name": "Kosmos"
+        },
+        "image": {
+          "url": "https://assets.hardcover.app/external_data/59635390/ce4aea9fc289cd0a33d2183f8e0853f2b85dd7f1.jpeg"
+        },
+        "book": {
+          "title": "Mikä liberalismia vaivaa?",
+          "description": null,
+          "contributions": [
+            {
+              "contributor_role_id": 1,
+              "author": {
+                "name": "Veikka Lahtinen"
+              }
+            },
+            {
+              "contributor_role_id": 1,
+              "author": {
+                "name": "Pontus Purokuru"
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

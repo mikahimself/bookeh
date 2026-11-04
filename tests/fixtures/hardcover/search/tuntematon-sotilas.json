@@ -1,0 +1,813 @@
+{
+  "search": {
+    "data": {
+      "search": {
+        "results": {
+          "facet_counts": [],
+          "found": 5,
+          "hits": [
+            {
+              "document": {
+                "activities_count": 0,
+                "alternative_titles": [
+                  "Tuntematon sotilas"
+                ],
+                "author_names": [],
+                "compilation": false,
+                "content_warnings": [],
+                "contribution_types": [],
+                "contributions": [],
+                "featured_series": {},
+                "genres": [],
+                "has_audiobook": false,
+                "has_ebook": false,
+                "id": "988136",
+                "image": {},
+                "isbns": [],
+                "lists_count": 0,
+                "moods": [],
+                "prompts_count": 0,
+                "rating": 0,
+                "ratings_count": 0,
+                "release_date": "1972-01-01",
+                "release_year": 1972,
+                "reviews_count": 0,
+                "series_names": [],
+                "slug": "tuntematon-sotilas-1972",
+                "tags": [],
+                "title": "Tuntematon sotilas",
+                "users_count": 0,
+                "users_read_count": 0
+              },
+              "highlight": {
+                "alternative_titles": [
+                  {
+                    "matched_tokens": [
+                      "Tuntematon",
+                      "sotilas"
+                    ],
+                    "snippet": "<mark>Tuntematon</mark> <mark>sotilas</mark>"
+                  }
+                ],
+                "title": {
+                  "matched_tokens": [
+                    "Tuntematon",
+                    "sotilas"
+                  ],
+                  "snippet": "<mark>Tuntematon</mark> <mark>sotilas</mark>"
+                }
+              },
+              "highlights": [
+                {
+                  "field": "title",
+                  "matched_tokens": [
+                    "Tuntematon",
+                    "sotilas"
+                  ],
+                  "snippet": "<mark>Tuntematon</mark> <mark>sotilas</mark>"
+                },
+                {
+                  "field": "alternative_titles",
+                  "indices": [
+                    0
+                  ],
+                  "matched_tokens": [
+                    [
+                      "Tuntematon",
+                      "sotilas"
+                    ]
+                  ],
+                  "snippets": [
+                    "<mark>Tuntematon</mark> <mark>sotilas</mark>"
+                  ]
+                }
+              ],
+              "text_match": 1157451471441625000,
+              "text_match_info": {
+                "best_field_score": "2211897868544",
+                "best_field_weight": 5,
+                "fields_matched": 2,
+                "num_tokens_dropped": 0,
+                "score": "1157451471441625130",
+                "tokens_matched": 2,
+                "typo_prefix_score": 0
+              }
+            },
+            {
+              "document": {
+                "activities_count": 9,
+                "alternative_titles": [
+                  "The Unknown Soldier",
+                  "Tuntematon sotilas"
+                ],
+                "author_names": [
+                  "Väinö Linna"
+                ],
+                "book_category_id": 1,
+                "compilation": false,
+                "content_warnings": [],
+                "contribution_specializations": [],
+                "contribution_types": [
+                  "Author"
+                ],
+                "contributions": [
+                  {
+                    "author": {
+                      "id": 282749,
+                      "image": {
+                        "color": "#6d6d6d",
+                        "color_name": "Gray",
+                        "height": 2711,
+                        "id": 5920699,
+                        "url": "https://assets.hardcover.app/author/282749/87caf5f0-0ccb-4787-a338-0a5b1a5e60e0.jpg",
+                        "width": 1920
+                      },
+                      "name": "Väinö Linna",
+                      "slug": "vaino-linna"
+                    },
+                    "contribution": "Author",
+                    "contributor_role_blurb": "The author of a written work.",
+                    "contributor_role_id": 1,
+                    "contributor_role_name": "Author",
+                    "primary": true
+                  }
+                ],
+                "cover_color": "Brown",
+                "description": "Väinö Linnan kirjailijanuran loistava, historiallinen läpimurto. Sodan kritiikki ja suomalaisen sotilaan muistomerkki. Romaani, joka kulkee isältä pojalle.",
+                "featured_series": {},
+                "genres": [
+                  "War",
+                  "Classics",
+                  "Finnish literature"
+                ],
+                "has_audiobook": true,
+                "has_ebook": false,
+                "id": "490821",
+                "image": {
+                  "color": "#524e45",
+                  "color_name": "Brown",
+                  "height": 500,
+                  "id": 7019423,
+                  "url": "https://assets.hardcover.app/edition/30438218/dc57d94decb5b3117b172ece6e5479bee12f9e32.jpeg",
+                  "width": 375
+                },
+                "isbns": [
+                  "9510024260",
+                  "9789510024263",
+                  "9519912061",
+                  "9789519912066",
+                  "951034317X",
+                  "9789510343173",
+                  "9510468037",
+                  "9789510468036",
+                  "9510292745",
+                  "9789510292747"
+                ],
+                "lists_count": 43,
+                "moods": [],
+                "pages": 338,
+                "prompts_count": 0,
+                "rating": 3.941176470588236,
+                "ratings_count": 17,
+                "release_date": "1954-01-01",
+                "release_year": 1954,
+                "reviews_count": 3,
+                "series_ids": [],
+                "series_names": [],
+                "slug": "the-unknown-soldier-1954",
+                "tags": [
+                  "World war II",
+                  "Continuation War",
+                  "soldiers",
+                  "Finland"
+                ],
+                "title": "The Unknown Soldier",
+                "users_count": 44,
+                "users_read_count": 24
+              },
+              "highlight": {
+                "alternative_titles": [
+                  {
+                    "matched_tokens": [],
+                    "snippet": "The Unknown Soldier"
+                  },
+                  {
+                    "matched_tokens": [
+                      "Tuntematon",
+                      "sotilas"
+                    ],
+                    "snippet": "<mark>Tuntematon</mark> <mark>sotilas</mark>"
+                  }
+                ]
+              },
+              "highlights": [
+                {
+                  "field": "alternative_titles",
+                  "indices": [
+                    1
+                  ],
+                  "matched_tokens": [
+                    [
+                      "Tuntematon",
+                      "sotilas"
+                    ]
+                  ],
+                  "snippets": [
+                    "<mark>Tuntematon</mark> <mark>sotilas</mark>"
+                  ]
+                }
+              ],
+              "text_match": 1157451471441625000,
+              "text_match_info": {
+                "best_field_score": "2211897868544",
+                "best_field_weight": 1,
+                "fields_matched": 1,
+                "num_tokens_dropped": 0,
+                "score": "1157451471441625097",
+                "tokens_matched": 2,
+                "typo_prefix_score": 0
+              }
+            },
+            {
+              "document": {
+                "activities_count": 0,
+                "alternative_titles": [
+                  "Väinö Linnan Tuntematon sotilas konfliktiromaanina"
+                ],
+                "author_names": [
+                  "Pekka Lilja"
+                ],
+                "book_category_id": 1,
+                "compilation": false,
+                "content_warnings": [],
+                "contribution_specializations": [],
+                "contribution_types": [
+                  "Author"
+                ],
+                "contributions": [
+                  {
+                    "author": {
+                      "id": 586283,
+                      "image": {},
+                      "name": "Pekka Lilja",
+                      "slug": "pekka-lilja"
+                    },
+                    "contribution": "Author",
+                    "contributor_role_blurb": "The author of a written work.",
+                    "contributor_role_id": 1,
+                    "contributor_role_name": "Author",
+                    "primary": true
+                  }
+                ],
+                "cover_color": "White",
+                "description": "Abstract.",
+                "featured_series": {},
+                "genres": [],
+                "has_audiobook": false,
+                "has_ebook": false,
+                "id": "988134",
+                "image": {
+                  "color": "#fafafa",
+                  "color_name": "White",
+                  "height": 80,
+                  "id": 1442163,
+                  "url": "https://assets.hardcover.app/external_data/60148014/5d35b5f855ff7d3d3c11b7d522120e6419b4734b.jpeg",
+                  "width": 54
+                },
+                "isbns": [],
+                "lists_count": 0,
+                "moods": [],
+                "pages": 234,
+                "prompts_count": 0,
+                "rating": 0,
+                "ratings_count": 0,
+                "release_date": "1984-01-01",
+                "release_year": 1984,
+                "reviews_count": 0,
+                "series_ids": [],
+                "series_names": [],
+                "slug": "vaino-linnan-tuntematon-sotilas-konfliktiromaanina",
+                "tags": [],
+                "title": "Väinö Linnan Tuntematon sotilas konfliktiromaanina",
+                "users_count": 0,
+                "users_read_count": 0
+              },
+              "highlight": {
+                "alternative_titles": [
+                  {
+                    "matched_tokens": [
+                      "Tuntematon",
+                      "sotilas"
+                    ],
+                    "snippet": "Väinö Linnan <mark>Tuntematon</mark> <mark>sotilas</mark> konfliktiromaanina"
+                  }
+                ],
+                "title": {
+                  "matched_tokens": [
+                    "Tuntematon",
+                    "sotilas"
+                  ],
+                  "snippet": "Väinö Linnan <mark>Tuntematon</mark> <mark>sotilas</mark> konfliktiromaanina"
+                }
+              },
+              "highlights": [
+                {
+                  "field": "title",
+                  "matched_tokens": [
+                    "Tuntematon",
+                    "sotilas"
+                  ],
+                  "snippet": "Väinö Linnan <mark>Tuntematon</mark> <mark>sotilas</mark> konfliktiromaanina"
+                },
+                {
+                  "field": "alternative_titles",
+                  "indices": [
+                    0
+                  ],
+                  "matched_tokens": [
+                    [
+                      "Tuntematon",
+                      "sotilas"
+                    ]
+                  ],
+                  "snippets": [
+                    "Väinö Linnan <mark>Tuntematon</mark> <mark>sotilas</mark> konfliktiromaanina"
+                  ]
+                }
+              ],
+              "text_match": 1157451471441100800,
+              "text_match_info": {
+                "best_field_score": "2211897868288",
+                "best_field_weight": 5,
+                "fields_matched": 2,
+                "num_tokens_dropped": 0,
+                "score": "1157451471441100842",
+                "tokens_matched": 2,
+                "typo_prefix_score": 0
+              }
+            },
+            {
+              "document": {
+                "activities_count": 0,
+                "alternative_titles": [
+                  "Tuntematon sotilas. Elokuvakirja"
+                ],
+                "author_names": [
+                  "Jari Olavi Rantala"
+                ],
+                "book_category_id": 1,
+                "compilation": false,
+                "content_warnings": [],
+                "contribution_specializations": [],
+                "contribution_types": [
+                  "Author"
+                ],
+                "contributions": [
+                  {
+                    "author": {
+                      "id": 586280,
+                      "image": {},
+                      "name": "Jari Olavi Rantala",
+                      "slug": "jari-olavi-rantala"
+                    },
+                    "contribution": "Author",
+                    "contributor_role_blurb": "The author of a written work.",
+                    "contributor_role_id": 1,
+                    "contributor_role_name": "Author",
+                    "primary": true
+                  }
+                ],
+                "cover_color": "Gray",
+                "description": "Tuntematon sotilas - Elokuvakirja on poikkeuksellinen matka Aku Louhimiehen ohjaaman elokuvan tekemiseen, sen kuvauspaikoille ja kameran taakse. Runsaasti kuvitettu teos avaa suomalaisten rakastaman tarinan uuden elokuvaversion pala palalta ja kertoo työskentelystä Suomen oloissa poikkeuksellisen suuren tuotannon kuvauksissa.",
+                "featured_series": {},
+                "genres": [],
+                "has_audiobook": false,
+                "has_ebook": false,
+                "id": "988132",
+                "image": {
+                  "color": "#9e9f99",
+                  "color_name": "Gray",
+                  "height": 170,
+                  "id": 1442161,
+                  "url": "https://assets.hardcover.app/external_data/60148010/b640c6450c964ac6d6ea213baedcf49d821bb892.jpeg",
+                  "width": 128
+                },
+                "isbns": [
+                  "9510428361",
+                  "9789510428368"
+                ],
+                "lists_count": 0,
+                "moods": [],
+                "prompts_count": 0,
+                "rating": 0,
+                "ratings_count": 0,
+                "release_date": "2017-10-09",
+                "release_year": 2017,
+                "reviews_count": 0,
+                "series_ids": [],
+                "series_names": [],
+                "slug": "tuntematon-sotilas-elokuvakirja",
+                "tags": [],
+                "title": "Tuntematon sotilas. Elokuvakirja",
+                "users_count": 0,
+                "users_read_count": 0
+              },
+              "highlight": {
+                "alternative_titles": [
+                  {
+                    "matched_tokens": [
+                      "Tuntematon",
+                      "sotilas"
+                    ],
+                    "snippet": "<mark>Tuntematon</mark> <mark>sotilas</mark>. Elokuvakirja"
+                  }
+                ],
+                "title": {
+                  "matched_tokens": [
+                    "Tuntematon",
+                    "sotilas"
+                  ],
+                  "snippet": "<mark>Tuntematon</mark> <mark>sotilas</mark>. Elokuvakirja"
+                }
+              },
+              "highlights": [
+                {
+                  "field": "title",
+                  "matched_tokens": [
+                    "Tuntematon",
+                    "sotilas"
+                  ],
+                  "snippet": "<mark>Tuntematon</mark> <mark>sotilas</mark>. Elokuvakirja"
+                },
+                {
+                  "field": "alternative_titles",
+                  "indices": [
+                    0
+                  ],
+                  "matched_tokens": [
+                    [
+                      "Tuntematon",
+                      "sotilas"
+                    ]
+                  ],
+                  "snippets": [
+                    "<mark>Tuntematon</mark> <mark>sotilas</mark>. Elokuvakirja"
+                  ]
+                }
+              ],
+              "text_match": 1157451471441100800,
+              "text_match_info": {
+                "best_field_score": "2211897868288",
+                "best_field_weight": 5,
+                "fields_matched": 2,
+                "num_tokens_dropped": 0,
+                "score": "1157451471441100842",
+                "tokens_matched": 2,
+                "typo_prefix_score": 0
+              }
+            },
+            {
+              "document": {
+                "activities_count": 0,
+                "alternative_titles": [
+                  "Tuntematon sotilas ja pikkulotta"
+                ],
+                "author_names": [
+                  "Elinor Schildt"
+                ],
+                "book_category_id": 1,
+                "compilation": false,
+                "content_warnings": [],
+                "contribution_specializations": [],
+                "contribution_types": [
+                  "Author"
+                ],
+                "contributions": [
+                  {
+                    "author": {
+                      "id": 586284,
+                      "image": {},
+                      "name": "Elinor Schildt",
+                      "slug": "elinor-schildt"
+                    },
+                    "contribution": "Author",
+                    "contributor_role_blurb": "The author of a written work.",
+                    "contributor_role_id": 1,
+                    "contributor_role_name": "Author",
+                    "primary": true
+                  }
+                ],
+                "featured_series": {},
+                "genres": [],
+                "has_audiobook": false,
+                "has_ebook": false,
+                "id": "988135",
+                "image": {},
+                "isbns": [
+                  "952920261X",
+                  "9789529202614"
+                ],
+                "lists_count": 0,
+                "moods": [],
+                "pages": 302,
+                "prompts_count": 0,
+                "rating": 0,
+                "ratings_count": 0,
+                "release_date": "2006-01-01",
+                "release_year": 2006,
+                "reviews_count": 0,
+                "series_ids": [],
+                "series_names": [],
+                "slug": "tuntematon-sotilas-ja-pikkulotta",
+                "tags": [],
+                "title": "Tuntematon sotilas ja pikkulotta",
+                "users_count": 0,
+                "users_read_count": 0
+              },
+              "highlight": {
+                "alternative_titles": [
+                  {
+                    "matched_tokens": [
+                      "Tuntematon",
+                      "sotilas"
+                    ],
+                    "snippet": "<mark>Tuntematon</mark> <mark>sotilas</mark> ja pikkulotta"
+                  }
+                ],
+                "title": {
+                  "matched_tokens": [
+                    "Tuntematon",
+                    "sotilas"
+                  ],
+                  "snippet": "<mark>Tuntematon</mark> <mark>sotilas</mark> ja pikkulotta"
+                }
+              },
+              "highlights": [
+                {
+                  "field": "title",
+                  "matched_tokens": [
+                    "Tuntematon",
+                    "sotilas"
+                  ],
+                  "snippet": "<mark>Tuntematon</mark> <mark>sotilas</mark> ja pikkulotta"
+                },
+                {
+                  "field": "alternative_titles",
+                  "indices": [
+                    0
+                  ],
+                  "matched_tokens": [
+                    [
+                      "Tuntematon",
+                      "sotilas"
+                    ]
+                  ],
+                  "snippets": [
+                    "<mark>Tuntematon</mark> <mark>sotilas</mark> ja pikkulotta"
+                  ]
+                }
+              ],
+              "text_match": 1157451471441100800,
+              "text_match_info": {
+                "best_field_score": "2211897868288",
+                "best_field_weight": 5,
+                "fields_matched": 2,
+                "num_tokens_dropped": 0,
+                "score": "1157451471441100842",
+                "tokens_matched": 2,
+                "typo_prefix_score": 0
+              }
+            }
+          ],
+          "out_of": 2673679,
+          "page": 1,
+          "request_params": {
+            "collection_name": "Book_production_1760914612",
+            "first_q": "tuntematon sotilas",
+            "per_page": 20,
+            "q": "tuntematon sotilas"
+          },
+          "search_cutoff": false,
+          "search_time_ms": 1
+        }
+      }
+    }
+  },
+  "editions": {
+    "data": {
+      "books": [
+        {
+          "id": 490821,
+          "editions": [
+            {
+              "id": 30438218,
+              "book_id": 490821,
+              "isbn_13": "9789510024263",
+              "title": "The Unknown Soldier",
+              "subtitle": null,
+              "physical_format": null,
+              "pages": 338,
+              "release_date": "1954-01-01",
+              "publisher": {
+                "name": "W. Söderström"
+              },
+              "image": {
+                "url": "https://assets.hardcover.app/edition/30438218/dc57d94decb5b3117b172ece6e5479bee12f9e32.jpeg"
+              },
+              "book": {
+                "title": "The Unknown Soldier",
+                "description": "Väinö Linnan kirjailijanuran loistava, historiallinen läpimurto. Sodan kritiikki ja suomalaisen sotilaan muistomerkki. Romaani, joka kulkee isältä pojalle.",
+                "contributions": [
+                  {
+                    "contributor_role_id": 1,
+                    "author": {
+                      "name": "Väinö Linna"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "id": 30856800,
+              "book_id": 490821,
+              "isbn_13": "9789510292747",
+              "title": "Tuntematon sotilas",
+              "subtitle": null,
+              "physical_format": null,
+              "pages": 258,
+              "release_date": "1954-12-03",
+              "publisher": {
+                "name": "WSOY"
+              },
+              "image": {
+                "url": "https://assets.hardcover.app/external_data/60148009/f91627e27acf77dfe47c466fde4e77f761cc4a78.jpeg"
+              },
+              "book": {
+                "title": "The Unknown Soldier",
+                "description": "Väinö Linnan kirjailijanuran loistava, historiallinen läpimurto. Sodan kritiikki ja suomalaisen sotilaan muistomerkki. Romaani, joka kulkee isältä pojalle.",
+                "contributions": [
+                  {
+                    "contributor_role_id": 1,
+                    "author": {
+                      "name": "Väinö Linna"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "id": 32162407,
+              "book_id": 490821,
+              "isbn_13": "9789519912066",
+              "title": "Tuntematon sotilas",
+              "subtitle": null,
+              "physical_format": null,
+              "pages": 575,
+              "release_date": "1977-01-01",
+              "publisher": {
+                "name": "Yhtyneet kuvalehdet, Suur-Seura"
+              },
+              "image": null,
+              "book": {
+                "title": "The Unknown Soldier",
+                "description": "Väinö Linnan kirjailijanuran loistava, historiallinen läpimurto. Sodan kritiikki ja suomalaisen sotilaan muistomerkki. Romaani, joka kulkee isältä pojalle.",
+                "contributions": [
+                  {
+                    "contributor_role_id": 1,
+                    "author": {
+                      "name": "Väinö Linna"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "id": 31975795,
+              "book_id": 490821,
+              "isbn_13": "9789510468036",
+              "title": "Tuntematon sotilas",
+              "subtitle": null,
+              "physical_format": null,
+              "pages": null,
+              "release_date": "2000-01-01",
+              "publisher": {
+                "name": "WSOY"
+              },
+              "image": {
+                "url": "https://assets.hardcover.app/external_data/213551/a148447a7273504dbfce7cc405c338d38c6c2a35.jpeg"
+              },
+              "book": {
+                "title": "The Unknown Soldier",
+                "description": "Väinö Linnan kirjailijanuran loistava, historiallinen läpimurto. Sodan kritiikki ja suomalaisen sotilaan muistomerkki. Romaani, joka kulkee isältä pojalle.",
+                "contributions": [
+                  {
+                    "contributor_role_id": 1,
+                    "author": {
+                      "name": "Väinö Linna"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "id": 32510877,
+              "book_id": 490821,
+              "isbn_13": "9789510343173",
+              "title": "Tuntematon sotilas",
+              "subtitle": null,
+              "physical_format": null,
+              "pages": null,
+              "release_date": "2000-01-01",
+              "publisher": {
+                "name": "WSOY"
+              },
+              "image": {
+                "url": "https://assets.hardcover.app/external_data/2012101/dcd36afc7d842e7c27943fe751cb7db83f5d5200.jpeg"
+              },
+              "book": {
+                "title": "The Unknown Soldier",
+                "description": "Väinö Linnan kirjailijanuran loistava, historiallinen läpimurto. Sodan kritiikki ja suomalaisen sotilaan muistomerkki. Romaani, joka kulkee isältä pojalle.",
+                "contributions": [
+                  {
+                    "contributor_role_id": 1,
+                    "author": {
+                      "name": "Väinö Linna"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": 988132,
+          "editions": [
+            {
+              "id": 31012951,
+              "book_id": 988132,
+              "isbn_13": "9789510428368",
+              "title": "Tuntematon sotilas. Elokuvakirja",
+              "subtitle": null,
+              "physical_format": null,
+              "pages": null,
+              "release_date": "2017-10-09",
+              "publisher": null,
+              "image": {
+                "url": "https://assets.hardcover.app/external_data/60148010/b640c6450c964ac6d6ea213baedcf49d821bb892.jpeg"
+              },
+              "book": {
+                "title": "Tuntematon sotilas. Elokuvakirja",
+                "description": "Tuntematon sotilas - Elokuvakirja on poikkeuksellinen matka Aku Louhimiehen ohjaaman elokuvan tekemiseen, sen kuvauspaikoille ja kameran taakse. Runsaasti kuvitettu teos avaa suomalaisten rakastaman tarinan uuden elokuvaversion pala palalta ja kertoo työskentelystä Suomen oloissa poikkeuksellisen suuren tuotannon kuvauksissa.",
+                "contributions": [
+                  {
+                    "contributor_role_id": 1,
+                    "author": {
+                      "name": "Jari Olavi Rantala"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": 988134,
+          "editions": []
+        },
+        {
+          "id": 988135,
+          "editions": [
+            {
+              "id": 31012954,
+              "book_id": 988135,
+              "isbn_13": "9789529202614",
+              "title": "Tuntematon sotilas ja pikkulotta",
+              "subtitle": null,
+              "physical_format": null,
+              "pages": 302,
+              "release_date": "2006-01-01",
+              "publisher": null,
+              "image": null,
+              "book": {
+                "title": "Tuntematon sotilas ja pikkulotta",
+                "description": null,
+                "contributions": [
+                  {
+                    "contributor_role_id": 1,
+                    "author": {
+                      "name": "Elinor Schildt"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "id": 988136,
+          "editions": []
+        }
+      ]
+    }
+  }
+}

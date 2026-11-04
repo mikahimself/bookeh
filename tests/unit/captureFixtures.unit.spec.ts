@@ -79,6 +79,99 @@ describe('Finna matching', () => {
 })
 
 describe('capture', () => {
+  it('records Hardcover POST lookup and two-stage search without writing its token', async () => {
+    const dir = await tempDir()
+    const token = 'private-test-hardcover-token'
+    const lookupBody = { data: { editions: [] } }
+    const searchBody = {
+      data: {
+        search: {
+          results: {
+            hits: [
+              {
+                document: { id: '42', isbns: ['9780007448036'] },
+                text_match_info: { num_tokens_dropped: 0 },
+              },
+            ],
+          },
+        },
+      },
+    }
+    const editionsBody = {
+      data: {
+        books: [
+          {
+            id: 42,
+            editions: [
+              {
+                id: 7,
+                book_id: 42,
+                isbn_13: '9780007448036',
+                title: 'Edition',
+                book: { title: 'Work' },
+              },
+            ],
+          },
+        ],
+      },
+    }
+    const fetchFn = vi.fn<FetchFn>(async (url, init) => {
+      if (url.includes('hardcover.app')) {
+        expect(init.method).toBe('POST')
+        expect(init.headers).toMatchObject({ Authorization: `Bearer ${token}` })
+        const request = JSON.parse(String(init.body)) as { query: string }
+        return Response.json(
+          request.query.includes('HardcoverSearch')
+            ? searchBody
+            : request.query.includes('HardcoverEditions')
+              ? editionsBody
+              : lookupBody,
+        )
+      }
+      if (isOpenLibrary(url)) return Response.json({})
+      if (isGoogle(url)) return Response.json({ totalItems: 0 })
+      return Response.json({ resultCount: 0, status: 'OK' })
+    })
+    await capture(['9780007448036'], dir, fetchFn, noSleep, {
+      contact: CONTACT,
+      hardcoverToken: token,
+      queries: ['Edition'],
+    })
+    const lookup = await readFile(join(dir, 'hardcover', '9780007448036.json'), 'utf8')
+    const search = await readFile(join(dir, 'hardcover', 'search', 'edition.json'), 'utf8')
+    expect(lookup).not.toContain(token)
+    expect(search).not.toContain(token)
+    expect(JSON.parse(search).editions).toEqual(editionsBody)
+  })
+
+  it('does not persist malformed Hardcover GraphQL data', async () => {
+    const dir = await tempDir()
+    const fetchFn = vi.fn<FetchFn>(async (url) => {
+      if (url.includes('hardcover.app')) return Response.json({ data: {} })
+      if (isOpenLibrary(url)) return Response.json({})
+      if (isGoogle(url)) return Response.json({ totalItems: 0 })
+      return Response.json({ resultCount: 0, status: 'OK', records: [] })
+    })
+    const { notCaptured } = await capture(['9780007448036'], dir, fetchFn, noSleep, {
+      contact: CONTACT,
+      hardcoverToken: 'test-token',
+      queries: ['missing'],
+    })
+    expect(notCaptured).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          source: 'hardcover',
+          reason: 'GraphQL lookup data is malformed',
+        }),
+        expect.objectContaining({
+          source: 'hardcover',
+          reason: 'GraphQL search data is malformed',
+        }),
+      ]),
+    )
+    expect(await readdir(join(dir, 'hardcover'))).toEqual(['search'])
+    expect(await readdir(join(dir, 'hardcover', 'search'))).toEqual([])
+  })
   it('writes nothing for a source still failing after four attempts', async () => {
     const dir = await tempDir()
     const fetchFn = vi.fn<FetchFn>(async () => new Response('{"error":{}}', { status: 503 }))
@@ -92,6 +185,7 @@ describe('capture', () => {
       ['finna', '9789520408053'],
       ['google', '9789520408053'],
       ['openlibrary', '9789520408053'],
+      ['hardcover', '9789520408053'],
     ])
     expect(await readdir(join(dir, 'finna'))).toEqual([])
     expect(await readdir(join(dir, 'google'))).toEqual([])
@@ -134,7 +228,9 @@ describe('capture', () => {
     expect(notCaptured.map((n) => [n.source, n.reason])).toEqual([
       ['google', expect.stringContaining('Google health check failed')],
       ['openlibrary', 'OPEN_LIBRARY_CONTACT is not set'],
+      ['hardcover', 'HARDCOVER_API_TOKEN is not set'],
       ['openlibrary', 'OPEN_LIBRARY_CONTACT is not set'],
+      ['hardcover', 'HARDCOVER_API_TOKEN is not set'],
     ])
   })
 
@@ -161,6 +257,7 @@ describe('capture', () => {
     expect(await readdir(join(dir, 'openlibrary'))).toEqual(['9789520408053.json'])
     expect(notCaptured).toEqual([
       expect.objectContaining({ source: 'google', isbn13: '9789520408053' }),
+      expect.objectContaining({ source: 'hardcover', isbn13: '9789520408053' }),
     ])
   })
 
@@ -181,7 +278,7 @@ describe('capture', () => {
 
     const { notCaptured, written } = await capture(['9789520408053'], dir, fetchFn, noSleep, OPTS)
 
-    expect(notCaptured).toEqual([])
+    expect(notCaptured).toEqual([expect.objectContaining({ source: 'hardcover' })])
     expect(written).toBe(3)
     for (const source of ['finna', 'google', 'openlibrary']) {
       expect(await readdir(join(dir, source))).toEqual(['9789520408053.json'])
@@ -190,11 +287,11 @@ describe('capture', () => {
 
   it('makes no request when every fixture exists, searches included', async () => {
     const dir = await tempDir()
-    for (const source of ['finna', 'google', 'openlibrary']) {
+    for (const source of ['finna', 'google', 'openlibrary', 'hardcover']) {
       await mkdir(join(dir, source))
       await writeFile(join(dir, source, '9789520408053.json'), '{}\n')
     }
-    for (const source of ['finna', 'openlibrary']) {
+    for (const source of ['finna', 'openlibrary', 'hardcover']) {
       await mkdir(join(dir, source, 'search'))
       await writeFile(join(dir, source, 'search', 'tuntematon-sotilas.json'), '{}\n')
     }
@@ -235,12 +332,63 @@ describe('capture', () => {
     ])
     expect(notCaptured).toEqual([
       expect.objectContaining({ source: 'google', isbn13: '9789520408053' }),
+      expect.objectContaining({ source: 'hardcover', isbn13: '9789520408053' }),
+      expect.objectContaining({ source: 'hardcover', query: 'tuntematon sotilas' }),
       expect.objectContaining({ source: 'finna', query: 'ei löydy' }),
+      expect.objectContaining({ source: 'hardcover', query: 'ei löydy' }),
     ])
   })
 })
 
 describe('buildReport', () => {
+  it('reports a usable cover that only Hardcover adds', async () => {
+    const dir = await tempDir()
+    const isbn13 = '9780007448036'
+    for (const source of ['finna', 'google', 'openlibrary', 'hardcover']) {
+      await mkdir(join(dir, source), { recursive: true })
+    }
+    await writeFile(
+      join(dir, 'finna', `${isbn13}.json`),
+      JSON.stringify({ resultCount: 0, status: 'OK', records: [] }),
+    )
+    await writeFile(
+      join(dir, 'google', `${isbn13}.json`),
+      JSON.stringify({
+        totalItems: 1,
+        items: [
+          {
+            volumeInfo: {
+              industryIdentifiers: [{ type: 'ISBN_13', identifier: isbn13 }],
+              imageLinks: { thumbnail: 'not a URL' },
+            },
+          },
+        ],
+      }),
+    )
+    await writeFile(join(dir, 'openlibrary', `${isbn13}.json`), '{}')
+    await writeFile(
+      join(dir, 'hardcover', `${isbn13}.json`),
+      JSON.stringify({
+        data: {
+          editions: [
+            {
+              id: 1,
+              isbn_13: isbn13,
+              title: 'Edition',
+              image: { url: 'https://assets.hardcover.app/edition/1/cover.jpg' },
+              book: { contributions: [] },
+            },
+          ],
+        },
+      }),
+    )
+    const { markdown } = await buildReport([{ listed: isbn13, isbn13 }], dir, '2026-11-04')
+    expect(markdown).toContain('| 1 / 1 | yes | coverUrl |')
+    expect(markdown).toContain(
+      'Books where Hardcover adds a field over the first three sources: 1 (coverUrl 1)',
+    )
+  })
+
   it('decides D-2 from matched Google volumes only, and not while a response is missing', async () => {
     const dir = await tempDir()
     const volume = (identifier: string) => ({
@@ -341,12 +489,14 @@ describe('buildReport', () => {
     expect(markdown).toContain('| ei löydy | finna | not captured | – | – |')
     expect(markdown).toContain('| ei löydy | openlibrary | not captured | – | – |')
     expect(missing).toEqual([
+      expect.objectContaining({ source: 'hardcover', query: 'tuntematon sotilas' }),
       expect.objectContaining({ source: 'finna', query: 'ei löydy', reason: 'no fixture on disk' }),
       expect.objectContaining({
         source: 'openlibrary',
         query: 'ei löydy',
         reason: 'no fixture on disk',
       }),
+      expect.objectContaining({ source: 'hardcover', query: 'ei löydy' }),
     ])
   })
 })

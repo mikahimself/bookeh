@@ -1,0 +1,32 @@
+{
+  "data": {
+    "editions": [
+      {
+        "id": 31303579,
+        "book_id": 1278513,
+        "isbn_13": "9789523520745",
+        "title": "Kaltainen valmiste",
+        "subtitle": null,
+        "physical_format": null,
+        "pages": 208,
+        "release_date": "2021-05-20",
+        "publisher": null,
+        "image": {
+          "url": "https://assets.hardcover.app/external_data/60419780/05d137c5cf46d54c33b0b1aa500ce7f85d189525.jpeg"
+        },
+        "book": {
+          "title": "Kaltainen valmiste",
+          "description": null,
+          "contributions": [
+            {
+              "contributor_role_id": 1,
+              "author": {
+                "name": "Suvi Auvinen"
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

@@ -197,12 +197,14 @@
   "sources": {
     "finna": "Finna",
     "google": "Google Books",
-    "openlibrary": "Open Library"
+    "openlibrary": "Open Library",
+    "hardcover": "Hardcover"
   },
   "sourcesPartitive": {
     "finna": "Finna",
     "google": "Google Books",
-    "openlibrary": "Open Library"
+    "openlibrary": "Open Library",
+    "hardcover": "Hardcover"
   },
   "errorPage": {
     "heading": "Couldn't show this page.",

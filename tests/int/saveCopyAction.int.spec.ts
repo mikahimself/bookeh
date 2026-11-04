@@ -217,6 +217,7 @@ describe('saveCopyAction', () => {
         // Open Library joins the fan-out when OPEN_LIBRARY_CONTACT is set; `{}` is its
         // answer for an ISBN it does not hold.
         if (url.hostname === 'openlibrary.org') return Response.json({})
+        if (url.hostname === 'api.hardcover.app') return Response.json({ data: { editions: [] } })
         return new Response(null, { status: 404 })
       }),
     )
@@ -261,6 +262,7 @@ describe('saveCopyAction', () => {
         // Open Library joins the fan-out when OPEN_LIBRARY_CONTACT is set; `{}` is its
         // answer for an ISBN it does not hold.
         if (url.hostname === 'openlibrary.org') return Response.json({})
+        if (url.hostname === 'api.hardcover.app') return Response.json({ data: { editions: [] } })
         return new Response(null, { status: 404 })
       }),
     )
@@ -299,6 +301,7 @@ describe('saveCopyAction', () => {
         // Open Library joins the fan-out when OPEN_LIBRARY_CONTACT is set; `{}` is its
         // answer for an ISBN it does not hold.
         if (url.hostname === 'openlibrary.org') return Response.json({})
+        if (url.hostname === 'api.hardcover.app') return Response.json({ data: { editions: [] } })
         return new Response(null, { status: 404 })
       }),
     )
@@ -332,6 +335,7 @@ describe('saveCopyAction', () => {
         // Open Library joins the fan-out when OPEN_LIBRARY_CONTACT is set; `{}` is its
         // answer for an ISBN it does not hold.
         if (url.hostname === 'openlibrary.org') return Response.json({})
+        if (url.hostname === 'api.hardcover.app') return Response.json({ data: { editions: [] } })
         return new Response(null, { status: 404 })
       }),
     )
@@ -364,6 +368,7 @@ describe('saveCopyAction', () => {
             return Response.json({ resultCount: 0, status: 'OK' })
           if (url.hostname === 'www.googleapis.com') return Response.json({ totalItems: 0 })
           if (url.hostname === 'openlibrary.org') return openLibrary()
+          if (url.hostname === 'api.hardcover.app') return Response.json({ data: { editions: [] } })
           return new Response(null, { status: 404 })
         }),
       )

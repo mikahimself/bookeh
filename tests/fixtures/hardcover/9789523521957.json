@@ -1,0 +1,40 @@
+{
+  "data": {
+    "editions": [
+      {
+        "id": 31772439,
+        "book_id": 1681508,
+        "isbn_13": "9789523521957",
+        "title": "Mikä internetiä vaivaa?",
+        "subtitle": null,
+        "physical_format": null,
+        "pages": 264,
+        "release_date": null,
+        "publisher": {
+          "name": "Kosmos"
+        },
+        "image": {
+          "url": "https://assets.hardcover.app/external_data/61928555/166b0e14fc7cd7a0cc50a73fc79a3f5a6fc6e4c8.jpeg"
+        },
+        "book": {
+          "title": "Mikä internetiä vaivaa?",
+          "description": null,
+          "contributions": [
+            {
+              "contributor_role_id": 1,
+              "author": {
+                "name": "Veikka Lahtinen"
+              }
+            },
+            {
+              "contributor_role_id": 1,
+              "author": {
+                "name": "Pontus Purokuru"
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

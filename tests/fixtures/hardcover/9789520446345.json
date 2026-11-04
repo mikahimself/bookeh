@@ -1,0 +1,34 @@
+{
+  "data": {
+    "editions": [
+      {
+        "id": 32324627,
+        "book_id": 779982,
+        "isbn_13": "9789520446345",
+        "title": "Muutos: metodi",
+        "subtitle": null,
+        "physical_format": null,
+        "pages": 272,
+        "release_date": "2021-09-16",
+        "publisher": {
+          "name": "Tammi"
+        },
+        "image": {
+          "url": "https://assets.hardcover.app/external_data/1455093/5afc469ddad4c20fb3649dfde6fd170da3abb25b.jpeg"
+        },
+        "book": {
+          "title": "Muutos: metodi",
+          "description": "Tarina siitä, miten väkivaltaisen ja kurjan lapsuuden eläneestä Eddy Bellegueulesta tuli palkittu kirjailija Édouard Louis.",
+          "contributions": [
+            {
+              "contributor_role_id": 1,
+              "author": {
+                "name": "Édouard Louis"
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

@@ -2,15 +2,21 @@ import type { Source } from '../source'
 import { finna } from './finna'
 import { fixture, usesFixtureSources } from './fixture'
 import { google } from './google'
+import { hardcover, hardcoverToken } from './hardcover'
 import { openLibrary, openLibraryContact } from './openLibrary'
 
 /**
- * The real sources, in merge order. Open Library joins only when `OPEN_LIBRARY_CONTACT` is
- * set: Open Library asks every client to identify itself, and a source whose credential is
- * absent is left out rather than degraded, so dev, CI and a fresh deploy work without it.
+ * The real sources, in merge order. Open Library requires its identifying contact;
+ * Hardcover requires its catalogue token. Missing credentials keep those sources out
+ * of development, CI and a fresh deploy.
  */
 function realSources(): Source[] {
-  return [finna, google, ...(openLibraryContact() ? [openLibrary] : [])]
+  return [
+    finna,
+    google,
+    ...(openLibraryContact() ? [openLibrary] : []),
+    ...(hardcoverToken() ? [hardcover] : []),
+  ]
 }
 
 // The order is the merge priority (AD-9): the first source that answers wins, later ones gap-fill.

@@ -1,0 +1,34 @@
+{
+  "data": {
+    "editions": [
+      {
+        "id": 30856552,
+        "book_id": 842706,
+        "isbn_13": "9789518517590",
+        "title": "Röyhkeys",
+        "subtitle": null,
+        "physical_format": null,
+        "pages": 188,
+        "release_date": "2017-01-01",
+        "publisher": {
+          "name": "Teos"
+        },
+        "image": {
+          "url": "https://assets.hardcover.app/external_data/59995377/e7fee06e7c1fa0b2f616dff6abf51859899d6c98.jpeg"
+        },
+        "book": {
+          "title": "Röyhkeys",
+          "description": null,
+          "contributions": [
+            {
+              "contributor_role_id": 1,
+              "author": {
+                "name": "Ossi Nyman"
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "data": {
+    "editions": [
+      {
+        "id": 32147557,
+        "book_id": 1982582,
+        "isbn_13": "9789511463788",
+        "title": "Erään kissan tutkimuksia",
+        "subtitle": null,
+        "physical_format": null,
+        "pages": 355,
+        "release_date": "2023-01-01",
+        "publisher": {
+          "name": "Otava"
+        },
+        "image": {
+          "url": "https://assets.hardcover.app/external_data/844406/bd6d6b1a5ac0adadbe087ce80d84033e9bf43277.jpeg"
+        },
+        "book": {
+          "title": "Erään kissan tutkimuksia",
+          "description": "Katja Ketun huikaiseva romaani kieppuu aikojen lävitse ja antautuu villille luonnolle ja perillistä ikävöivän veren kutsulle.\n\nKirjailija saa keskenmenon ja menettää kykynsä puhua ja kirjoittaa. Paikalle lähetetään Taivaiden Tutkimustoimistosta Etsivä, mutta jokin menee pieleen, ja tuvan nurkkaan ilmestyykin Kissa, joka käy tutkimaan vintin lattialuukusta löytynyttä Isoisoäidin päiväkirjaa.\n\nKun uusi elämä on menetetty, kääntää Kirjailija katseensa menneisyyteen ja ikiaikaisiin syntysanoihin. Niiden taitajalla, Isoisoäidillä, on suomen kielen väessä ja voimassa parantajien mahti.\n\nVoiko menneestä löytää lohdun ja tarkoituksen elämälle, kun tulevaisuutta ei ole?",
+          "contributions": [
+            {
+              "contributor_role_id": 1,
+              "author": {
+                "name": "Katja Kettu"
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "data": {
+    "editions": [
+      {
+        "id": 31771688,
+        "book_id": 1680800,
+        "isbn_13": "9789518581041",
+        "title": "Löytöretki suomeen",
+        "subtitle": null,
+        "physical_format": null,
+        "pages": null,
+        "release_date": "2019-08-20",
+        "publisher": null,
+        "image": null,
+        "book": {
+          "title": "Löytöretki suomeen",
+          "description": null,
+          "contributions": [
+            {
+              "contributor_role_id": 1,
+              "author": {
+                "name": "Kersti Juva"
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

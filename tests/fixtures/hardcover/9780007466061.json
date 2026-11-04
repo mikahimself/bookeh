@@ -1,0 +1,34 @@
+{
+  "data": {
+    "editions": [
+      {
+        "id": 2665418,
+        "book_id": 470741,
+        "isbn_13": "9780007466061",
+        "title": "A Dance with Dragons: Dreams and Dust",
+        "subtitle": null,
+        "physical_format": null,
+        "pages": 704,
+        "release_date": "2012-02-29",
+        "publisher": {
+          "name": "Harper Voyager"
+        },
+        "image": {
+          "url": "https://assets.hardcover.app/edition/2665418/b141e71464bc76efb550f2e01d5df102d11b526c.jpeg"
+        },
+        "book": {
+          "title": "A Dance with Dragons, Part 1: Dreams and Dust",
+          "description": "HBO's hit series A GAME OF THRONES is based on George R.R. Martin's internationally bestselling series A SONG OF ICE AND FIRE, the greatest fantasy epic of the modern age. A DANCE WITH DRAGONS: DREAMS AND DUST is the first part of the fifth volume in the series. In the aftermath of a colossal battle, new threats are emerging from every direction. Tyrion Lannister, having killed his father, and wrongfully accused of killing his nephew, King Joffrey, has escaped from King's Landing with a price on his head. To the north lies the great Wall of ice and stone - a structure only as strong as those guarding it. Eddard Stark's bastard son Jon Snow has been elected 998th Lord Commander of the Night's Watch. But Jon has enemies both inside and beyond the Wall. And in the east Daenerys Targaryen struggles to hold a city built on dreams and dust.",
+          "contributions": [
+            {
+              "contributor_role_id": 1,
+              "author": {
+                "name": "George R.R. Martin"
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

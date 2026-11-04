@@ -1,0 +1,34 @@
+{
+  "data": {
+    "editions": [
+      {
+        "id": 32512748,
+        "book_id": 841989,
+        "isbn_13": "9789510397077",
+        "title": "Hytti nro 6",
+        "subtitle": null,
+        "physical_format": null,
+        "pages": 200,
+        "release_date": "2011-01-01",
+        "publisher": {
+          "name": "WSOY"
+        },
+        "image": {
+          "url": "https://assets.hardcover.app/external_data/2015847/02d0a3e11f3cac7002a34c240f9767e99e9e54cf.jpeg"
+        },
+        "book": {
+          "title": "Hytti nro 6",
+          "description": null,
+          "contributions": [
+            {
+              "contributor_role_id": 1,
+              "author": {
+                "name": "Rosa Liksom"
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+}

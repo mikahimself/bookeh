@@ -1,0 +1,32 @@
+{
+  "data": {
+    "editions": [
+      {
+        "id": 30562853,
+        "book_id": 594443,
+        "isbn_13": "9789511319177",
+        "title": "Taivaanpallo",
+        "subtitle": null,
+        "physical_format": null,
+        "pages": 461,
+        "release_date": "2018-01-01",
+        "publisher": null,
+        "image": {
+          "url": "https://assets.hardcover.app/edition/30562853/8cf8afc492beff679e2ec41d44766ae1fc3ede50.jpeg"
+        },
+        "book": {
+          "title": "Taivaanpallo",
+          "description": null,
+          "contributions": [
+            {
+              "contributor_role_id": 1,
+              "author": {
+                "name": "Olli Jalonen"
+              }
+            }
+          ]
+        }
+      }
+    ]
+  }
+}
