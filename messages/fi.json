@@ -309,7 +309,8 @@
     "noMatch": "Ei osumia",
     "loadFailed": "Lataus ei onnistunut.",
     "tryAgain": "Yritä uudelleen",
-    "personalGenre": "{name} (oma genre)"
+    "personalGenre": "{name} (oma genre)",
+    "tag": "Tunniste"
   },
   "detail": {
     "description": "Kuvaus",
@@ -435,5 +436,17 @@
     "edit": "Muokkaa tageja, genrejä ja teemoja",
     "tagged": "Tagattu {count}",
     "removeSymbol": "×"
+  },
+  "selectionTags": {
+    "add": {
+      "tag": "Lisää tunniste kaikille",
+      "genre": "Lisää genre kaikille",
+      "theme": "Lisää teema kaikille"
+    },
+    "remove": {
+      "tag": "Poista tunniste kaikilta",
+      "genre": "Poista genre kaikilta",
+      "theme": "Poista teema kaikilta"
+    }
   }
 }

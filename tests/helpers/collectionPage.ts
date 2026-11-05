@@ -22,6 +22,7 @@ export const heldBook =
   vi.fn<(ctx: unknown, bookId: number) => Promise<EffectiveBook | undefined>>()
 export const getHoldings = vi.fn<(ctx: unknown, ids: number[]) => Promise<Map<number, Holdings>>>()
 export const getUserBookState = vi.fn<() => Promise<UserBookState>>()
+export const tagUse = vi.fn<typeof import('@/lib/tags/tags').tagUse>()
 export const logError = vi.fn()
 export const devicePrefs = vi.fn<() => Promise<DevicePrefs>>()
 export const setDevicePrefsAction = vi.fn()
@@ -32,6 +33,7 @@ export const toggleCopiesReadAction = vi.fn()
 export const setNoteAction = vi.fn()
 export const receiveCopyAction = vi.fn()
 export const moveCopiesAction = vi.fn()
+export const changeSelectionTagsAction = vi.fn()
 export const listLocations = vi.fn<(ctx: unknown) => Promise<LocationOption[]>>()
 export const lendingPeople = vi.fn<(ctx: unknown) => Promise<{ id: number; name: string }[]>>()
 export const lendCopyAction = vi.fn()
@@ -93,8 +95,9 @@ vi.mock('@/app/(frontend)/(sections)/actions', () => ({
   toggleCopiesReadAction,
   moveCopiesAction,
   changeBookTagsAction: vi.fn(),
+  changeSelectionTagsAction,
 }))
-vi.mock('@/lib/tags/tags', () => ({ tagUse: async () => [] }))
+vi.mock('@/lib/tags/tags', () => ({ tagUse }))
 vi.mock('@/lib/copies/locations', () => ({ listLocations }))
 vi.mock('@/lib/people/people', () => ({ lendingPeople }))
 vi.mock('@/lib/loans/loans', () => ({ returnedLoans: async () => [] }))
@@ -275,6 +278,7 @@ export function resetCollectionPage() {
   beforeEach(() => {
     devicePrefs.mockResolvedValue({ ...DEFAULT_PREFS })
     listLocations.mockResolvedValue([])
+    tagUse.mockResolvedValue([])
     lendingPeople.mockResolvedValue([])
     requireUser.mockResolvedValue({ user: { roles: ['user'] } })
   })

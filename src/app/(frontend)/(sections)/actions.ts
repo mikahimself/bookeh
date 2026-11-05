@@ -202,3 +202,33 @@ export async function changeBookTagsAction(
     })
   })
 }
+
+/** Select mode applies one kind's delta to every distinct targeted Book, including ordered copies. */
+export async function changeSelectionTagsAction(
+  input: unknown,
+): Promise<ActionResult<Undoable<{ count: number }>>> {
+  return runAction(async () => {
+    const ctx = await requireUserOrThrow()
+    if (typeof input !== 'object' || input === null || Array.isArray(input))
+      throw new DomainError('VALIDATION')
+    const { copyIds, kind, add, remove } = input as Record<string, unknown>
+    const copies = ids(copyIds)
+    if (copies.length === 0 || (kind !== 'tag' && kind !== 'genre' && kind !== 'theme'))
+      throw new DomainError('VALIDATION')
+    const removing = ids(remove)
+    if (!Array.isArray(add)) throw new DomainError('VALIDATION')
+    const refs = add.map(parseRef)
+    if (refs.some((ref) => ref === undefined)) throw new DomainError('VALIDATION')
+    return withUndo(ctx, (tx) =>
+      changeTags(
+        tx,
+        { copyIds: copies },
+        {
+          kind,
+          add: refs as NonNullable<ReturnType<typeof parseRef>>[],
+          remove: removing,
+        },
+      ),
+    )
+  })
+}

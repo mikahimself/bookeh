@@ -1,11 +1,12 @@
 'use client'
 
 import { useTranslations } from 'next-intl'
-import { useRef, useState, useTransition } from 'react'
+import { useEffect, useRef, useState, useTransition } from 'react'
 
 import type { LocationOption } from '@/lib/copies/locations'
 import type { ActionResult } from '@/lib/errors'
 
+import type { TagOptions } from '../components/TagPicker'
 import { Button } from '../components/Button'
 import { settleAction } from '../components/request'
 import { useToast } from '../components/toast/ToastProvider'
@@ -13,6 +14,7 @@ import { Dialog } from '../components/ui/Dialog'
 
 import { removeCopiesAction, toggleCopiesReadAction } from './actions'
 import { MovePicker, type MoveSettled } from './MovePicker'
+import { SelectionTagPicker } from './SelectionTagPicker'
 import { useSelection } from './Selection'
 import { useAfterAction } from './ShelfRows'
 
@@ -41,7 +43,13 @@ import { useAfterAction } from './ShelfRows'
  * Read settle and after Remove's dialog closes, whatever the result, since
  * the pending state disables the button that had it.
  */
-export function SelectBar({ locations }: { locations: readonly LocationOption[] }) {
+export function SelectBar({
+  locations,
+  tagOptions,
+}: {
+  locations: readonly LocationOption[]
+  tagOptions: TagOptions | null
+}) {
   const t = useTranslations('collection')
   const tToast = useTranslations('toast')
   const { show } = useToast()
@@ -50,10 +58,15 @@ export function SelectBar({ locations }: { locations: readonly LocationOption[] 
   const [pending, startTransition] = useTransition()
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [moveOpen, setMoveOpen] = useState(false)
+  const [tagOpen, setTagOpen] = useState(false)
   // Kept while the dialog closes, so its text does not change on the way out.
   const [removing, setRemoving] = useState({ n: 0, lent: false })
   const doneButton = useRef<HTMLButtonElement>(null)
   const confirmed = useRef(false)
+
+  useEffect(() => {
+    if (!pending && selecting && !tagOpen && !moveOpen && !confirmOpen) doneButton.current?.focus()
+  }, [pending, selecting, tagOpen, moveOpen, confirmOpen])
 
   if (!selecting) return null
 
@@ -120,7 +133,7 @@ export function SelectBar({ locations }: { locations: readonly LocationOption[] 
       <p aria-live="polite" className="text-body text-text">
         {t('selected', { n: ticked.size })}
       </p>
-      <div className="flex gap-2 max-wide:col-span-2 max-wide:row-start-2 wide:ml-auto">
+      <div className="flex gap-2 max-wide:[&>button]:min-w-0 max-wide:[&>button]:flex-1 max-wide:[&>button]:px-2 max-wide:col-span-2 max-wide:row-start-2 wide:ml-auto">
         {locations.length > 0 && (
           <Button
             variant="secondary"
@@ -130,6 +143,13 @@ export function SelectBar({ locations }: { locations: readonly LocationOption[] 
             {t('move')}
           </Button>
         )}
+        <Button
+          variant="secondary"
+          disabled={ticked.size === 0 || pending}
+          onClick={() => setTagOpen(true)}
+        >
+          {t('tag')}
+        </Button>
         <Button
           variant="secondary"
           disabled={ticked.size === 0 || pending}
@@ -149,9 +169,19 @@ export function SelectBar({ locations }: { locations: readonly LocationOption[] 
         </Button>
       </div>
       {/* Select unmounts on entering, so focus moves here rather than to the page. */}
-      <Button ref={doneButton} variant="primary" onClick={done} autoFocus>
+      <Button ref={doneButton} variant="primary" onClick={done} disabled={pending} autoFocus>
         {t('done')}
       </Button>
+      <SelectionTagPicker
+        open={tagOpen}
+        onOpenChange={setTagOpen}
+        onClosed={() => doneButton.current?.focus()}
+        options={tagOptions}
+        copyIds={[...ticked]}
+        pending={pending}
+        startTransition={startTransition}
+        onSettled={(result, sent) => untickActed(result, sent)}
+      />
       <MovePicker
         open={moveOpen}
         onOpenChange={setMoveOpen}
@@ -184,9 +214,7 @@ export function SelectBar({ locations }: { locations: readonly LocationOption[] 
           </Button>
         }
       >
-        {removing.lent ? (
-          <p className="text-body">{t('removeLoans', { n: removing.n })}</p>
-        ) : null}
+        {removing.lent ? <p className="text-body">{t('removeLoans', { n: removing.n })}</p> : null}
       </Dialog>
     </div>
   )

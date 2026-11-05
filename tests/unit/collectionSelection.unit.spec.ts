@@ -1,9 +1,10 @@
 // @vitest-environment jsdom
-import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
+import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 
 import {
   book,
+  changeSelectionTagsAction,
   CollectionPage,
   fetchStub,
   getShelfRows,
@@ -14,6 +15,7 @@ import {
   row,
   showToast,
   toggleCopiesReadAction,
+  tagUse,
 } from '../helpers/collectionPage'
 
 import type { ShelfRows } from '@/lib/shelf/query'
@@ -213,5 +215,96 @@ describe('CollectionPage', () => {
       await waitFor(() => expect(screen.queryByText('Sinuhe', { selector: 'p' })).toBeNull())
       expect(fetchStub).toHaveBeenCalledOnce()
     })
+  })
+  it('tags a selection, preserves failed ticks, clears stale/success ticks and refreshes while keeping select mode', async () => {
+    const shelf = {
+      rows: [row(11, book(1, 'Sinuhe')), row(12, book(2, 'Kätilö'), 'ordered')],
+      total: 2,
+      labels: {},
+    }
+    getShelfRows.mockResolvedValue(shelf)
+    fetchStub.mockResolvedValue({ status: 200, json: async () => ({ ok: true, data: shelf }) })
+    await renderPage()
+    fireEvent.click(screen.getByRole('button', { name: 'Select' }))
+    const tag = () => screen.getByRole<HTMLButtonElement>('button', { name: 'Tag' })
+    expect(tag().disabled).toBe(true)
+    fireEvent.click(screen.getByText('Sinuhe', { selector: 'p' }))
+    fireEvent.click(screen.getByText('Kätilö', { selector: 'p' }))
+    const choose = async () => {
+      await waitFor(() =>
+        expect(screen.getByRole('combobox', { name: 'Add tag to all' })).toBeTruthy(),
+      )
+      const input = screen.getByRole('combobox', { name: 'Add tag to all' })
+      act(() => input.focus())
+      fireEvent.input(input, { target: { value: 'All' }, inputType: 'insertText' })
+      fireEvent.keyDown(input, { key: 'ArrowDown' })
+      await waitFor(() => expect(screen.getByRole('option', { name: 'New: All' })).toBeTruthy())
+      fireEvent.click(screen.getByRole('option', { name: 'New: All' }))
+    }
+    changeSelectionTagsAction.mockResolvedValueOnce({ ok: false, code: 'NO_CONNECTION' })
+    fireEvent.click(tag())
+    await choose()
+    await waitFor(() =>
+      expect(showToast).toHaveBeenCalledWith({ kind: 'error', code: 'NO_CONNECTION' }),
+    )
+    expect(screen.getByText('2 selected')).toBeTruthy()
+    changeSelectionTagsAction.mockResolvedValueOnce({
+      ok: true,
+      data: { count: 2, undoToken: 'tags', undoSeconds: 1800 },
+    })
+    await choose()
+    await waitFor(() => expect(screen.getByText('0 selected')).toBeTruthy())
+    expect(changeSelectionTagsAction).toHaveBeenLastCalledWith({
+      copyIds: [11, 12],
+      kind: 'tag',
+      add: [{ create: 'All' }],
+      remove: [],
+    })
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
+    await waitFor(() =>
+      expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Done' })),
+    )
+    expect(showToast).toHaveBeenCalledWith({
+      kind: 'success',
+      message: 'Tagged 2',
+      undo: { token: 'tags', seconds: 1800 },
+    })
+    await waitFor(() => expect(router.refresh).toHaveBeenCalled())
+    fireEvent.click(screen.getByText('Sinuhe', { selector: 'p' }))
+    changeSelectionTagsAction.mockResolvedValueOnce({ ok: false, code: 'NOT_FOUND' })
+    fireEvent.click(tag())
+    await choose()
+    await waitFor(() => expect(screen.getByText('0 selected')).toBeTruthy())
+  })
+  it('loads existing private options for every kind and recovers a failed reader through Try again', async () => {
+    const shelf = { rows: [row(11, book(1, 'Sinuhe'))], total: 1, labels: {} }
+    getShelfRows.mockResolvedValue(shelf)
+    tagUse.mockRejectedValueOnce(new Error('reader failed'))
+    const view = await renderPage()
+    fireEvent.click(screen.getByRole('button', { name: 'Select' }))
+    fireEvent.click(screen.getByText('Sinuhe', { selector: 'p' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Tag' }))
+    await waitFor(() => expect(screen.getByText("Couldn't load.")).toBeTruthy())
+    expect(screen.queryByRole('combobox')).toBeNull()
+    expect(changeSelectionTagsAction).not.toHaveBeenCalled()
+    fireEvent.click(screen.getByRole('button', { name: 'Try again' }))
+    expect(router.refresh).toHaveBeenCalledOnce()
+    const labels = { tag: 'Shelf', genre: 'History', theme: 'Sea' }
+    tagUse.mockImplementation(async (_ctx, kind) => [
+      { id: { tag: 5, genre: 6, theme: 7 }[kind], name: labels[kind], copies: 0 },
+    ])
+    view.rerender(await CollectionPage({ searchParams: Promise.resolve({}) }))
+    await waitFor(() => expect(screen.queryByText("Couldn't load.")).toBeNull())
+    for (const kind of ['tag', 'genre', 'theme'] as const) {
+      fireEvent.click(
+        screen.getByRole('button', { name: { tag: 'Tag', genre: 'Genre', theme: 'Theme' }[kind] }),
+      )
+      const input = screen.getByRole('combobox', { name: `Remove ${kind} from all` })
+      act(() => input.focus())
+      fireEvent.input(input, { target: { value: labels[kind] }, inputType: 'insertText' })
+      await waitFor(() => expect(screen.getByRole('option', { name: labels[kind] })).toBeTruthy())
+      fireEvent.keyDown(input, { key: 'Escape' })
+    }
+    expect(changeSelectionTagsAction).not.toHaveBeenCalled()
   })
 })

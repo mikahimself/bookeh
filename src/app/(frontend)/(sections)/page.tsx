@@ -14,6 +14,9 @@ import {
   type ShelfRows,
 } from '@/lib/shelf/query'
 
+import { tagUse } from '@/lib/tags/tags'
+import type { TagOptions } from '../components/TagPicker'
+
 import { devicePrefs } from '../prefs'
 
 import { BookDetail } from './BookDetail'
@@ -53,7 +56,7 @@ export default async function CollectionPage({
 
   const locale = resolveLocale(await getLocale(), null)
 
-  const [shelf, values, locations] = await Promise.all([
+  const [shelf, values, locations, tagOptions] = await Promise.all([
     getShelfRows(ctx, query, { offset: 0, limit: SHELF_PAGE_SIZE }).catch(
       (err: unknown): ShelfRows | null => {
         logger().error({ err }, 'The collection failed to load')
@@ -68,6 +71,17 @@ export default async function CollectionPage({
       logger().error({ err }, 'The locations failed to load')
       return []
     }),
+    (async (): Promise<TagOptions | null> => {
+      try {
+        const tag = await tagUse(ctx, 'tag')
+        const genre = await tagUse(ctx, 'genre')
+        const theme = await tagUse(ctx, 'theme')
+        return { tag, genre, theme }
+      } catch (err) {
+        logger().error({ err }, 'The selection labels failed to load')
+        return null
+      }
+    })(),
   ])
 
   return (
@@ -97,7 +111,7 @@ export default async function CollectionPage({
                   />
                 )}
               </div>
-              <SelectBar locations={locations} />
+              <SelectBar locations={locations} tagOptions={tagOptions} />
             </ShelfActionsProvider>
           </SelectionProvider>
         </FilterPanelProvider>

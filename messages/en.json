@@ -309,7 +309,8 @@
     "noMatch": "No books match",
     "loadFailed": "Couldn't load.",
     "tryAgain": "Try again",
-    "personalGenre": "{name} (personal genre)"
+    "personalGenre": "{name} (personal genre)",
+    "tag": "Tag"
   },
   "detail": {
     "description": "Description",
@@ -435,5 +436,17 @@
     "edit": "Edit tags, genres and themes",
     "tagged": "Tagged {count}",
     "removeSymbol": "×"
+  },
+  "selectionTags": {
+    "add": {
+      "tag": "Add tag to all",
+      "genre": "Add genre to all",
+      "theme": "Add theme to all"
+    },
+    "remove": {
+      "tag": "Remove tag from all",
+      "genre": "Remove genre from all",
+      "theme": "Remove theme from all"
+    }
   }
 }
