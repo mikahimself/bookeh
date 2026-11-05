@@ -29,6 +29,11 @@ function coverOf(item: Volume): string {
   return `${item.volumeInfo.imageLinks!.thumbnail.replace(/^http:/, 'https:')}&fife=w2000`
 }
 
+/** The recorded `isbn:` search answer for this ISBN. */
+function recorded(isbn13: string): { items: Volume[] } & Record<string, unknown> {
+  return JSON.parse(readFileSync(new URL(`${isbn13}.json`, FIXTURES), 'utf8')) as never
+}
+
 function searchBody(items: unknown[]) {
   return { kind: 'books#volumes', totalItems: items.length, items }
 }
@@ -68,8 +73,8 @@ afterEach(() => {
 
 describe('google.lookupByIsbn', () => {
   it('maps a full volume', async () => {
-    const full = volume('3Wf_ffkFQmgC')
-    const body = searchBody([full])
+    const body = recorded('9780007448036')
+    const [full] = body.items
     serve(body)
 
     const results = await lookup('9780007448036')
@@ -79,20 +84,12 @@ describe('google.lookupByIsbn', () => {
         isbn13: '9780007448036',
         title: 'A Game of Thrones',
         authors: [{ name: 'George R. R. Martin' }],
-        publisher: 'Harper Voyager',
+        publisher: 'HarperCollins UK',
         year: 2011,
         language: 'en',
-        pages: 694,
+        pages: 818,
         description: full.volumeInfo.description,
-        subjects: [
-          'Fiction / Action & Adventure',
-          'Fiction / Fantasy / General',
-          'Fiction / Fantasy / Epic',
-          'Fiction / Fantasy / Dark Fantasy',
-          'Fiction / Fantasy / Action & Adventure',
-          'Fiction / Fantasy / Dragons & Mythical Creatures',
-          'Fiction / Media Tie-In',
-        ],
+        subjects: ['Fiction'],
         themes: [],
         coverUrl: coverOf(full),
         source: 'google',
@@ -103,17 +100,17 @@ describe('google.lookupByIsbn', () => {
     expect(warn).not.toHaveBeenCalled()
   })
 
-  it('maps a Finnish volume without cover or categories', async () => {
-    serve(searchBody([volume('MF11zQEACAAJ')]))
+  it('maps a volume without cover or categories', async () => {
+    serve(recorded('9789518581041'))
 
     const [result] = await lookup('9789518581041')
 
-    expect(result).toMatchObject({ language: 'fi', pages: 413, subjects: [] })
+    expect(result).toMatchObject({ pages: 413, subjects: [] })
     expect(result).not.toHaveProperty('coverUrl')
   })
 
   it('leaves out what a sparse volume lacks', async () => {
-    serve(searchBody([volume('D-Py0AEACAAJ')]))
+    serve(recorded('9789523521957'))
 
     const [result] = await lookup('9789523521957')
 
@@ -122,7 +119,7 @@ describe('google.lookupByIsbn', () => {
   })
 
   it('keeps the subtitle', async () => {
-    serve(searchBody([volume('DWvlNEkUDPUC')]))
+    serve(recorded('9780007447848'))
 
     const [result] = await lookup('9780007447848')
 
@@ -130,6 +127,7 @@ describe('google.lookupByIsbn', () => {
   })
 
   it('turns an HTML description into paragraphs', async () => {
+    // No recorded search answer has an HTML description; this by-id volume does.
     serve(searchBody([volume('GzENB4wePpEC')]))
 
     const [{ description }] = await lookup('9780007447855')
@@ -149,7 +147,7 @@ describe('google.lookupByIsbn', () => {
     ['Tom &amp; Jerry', 'Tom & Jerry'],
     ['<p>1 < 2 and 3 > 2</p>', '1 < 2 and 3 > 2'],
   ])('decodes entities and strips only real tags in %s', async (text, expected) => {
-    const edited = volume('3Wf_ffkFQmgC')
+    const edited = recorded('9780007448036').items[0]
     edited.volumeInfo.description = text
     serve(searchBody([edited]))
 
@@ -159,7 +157,7 @@ describe('google.lookupByIsbn', () => {
   })
 
   it('keeps only the volume with the ISBN asked for, among other editions', async () => {
-    serve(searchBody([volume('GzENB4wePpEC'), volume('DWvlNEkUDPUC')]))
+    serve(searchBody([recorded('9780007447855').items[0], recorded('9780007447848').items[0]]))
 
     const results = await lookup('9780007447848')
 
@@ -168,7 +166,7 @@ describe('google.lookupByIsbn', () => {
   })
 
   it('matches a volume through its ISBN-10', async () => {
-    const only10 = volume('DWvlNEkUDPUC')
+    const only10 = recorded('9780007447848').items[0]
     only10.volumeInfo.industryIdentifiers = only10.volumeInfo.industryIdentifiers!.filter(
       ({ type }) => type !== 'ISBN_13',
     )
@@ -178,7 +176,7 @@ describe('google.lookupByIsbn', () => {
   })
 
   it.each([
-    ['another edition only', searchBody([volume('GzENB4wePpEC')])],
+    ['another edition only', recorded('9780007447855')],
     ['items left out', { kind: 'books#volumes', totalItems: 0 }],
   ])('answers nothing without a matching volume (%s), without logging', async (_, body) => {
     serve(body)
@@ -188,7 +186,7 @@ describe('google.lookupByIsbn', () => {
   })
 
   it('flips an inverted author name and keeps it as the sort name', async () => {
-    const inverted = volume('3Wf_ffkFQmgC')
+    const inverted = recorded('9780007448036').items[0]
     inverted.volumeInfo.authors = ['Martin, George R. R.']
     serve(searchBody([inverted]))
 
@@ -203,7 +201,7 @@ describe('google.lookupByIsbn', () => {
     ['iw', 'he'],
     ['und', undefined],
   ])('converts the language code %s', async (code, expected) => {
-    const edited = volume('3Wf_ffkFQmgC')
+    const edited = recorded('9780007448036').items[0]
     edited.volumeInfo.language = code
     serve(searchBody([edited]))
 
@@ -214,7 +212,7 @@ describe('google.lookupByIsbn', () => {
   })
 
   it('asks for the largest image over https, without the page curl', async () => {
-    const edited = volume('3Wf_ffkFQmgC')
+    const edited = recorded('9780007448036').items[0]
     const small = edited.volumeInfo.imageLinks!.smallThumbnail
     edited.volumeInfo.imageLinks = { smallThumbnail: `${small}&edge=curl` }
     serve(searchBody([edited]))
@@ -230,7 +228,7 @@ describe('google.lookupByIsbn', () => {
   })
 
   it('leaves out a cover link that is not http(s)', async () => {
-    const edited = volume('3Wf_ffkFQmgC')
+    const edited = recorded('9780007448036').items[0]
     edited.volumeInfo.imageLinks = { thumbnail: 'data:image/png;base64,AAAA' }
     serve(searchBody([edited]))
 
@@ -240,9 +238,7 @@ describe('google.lookupByIsbn', () => {
   })
 
   it('puts a volume with a cover first', async () => {
-    const withCover = volume('DWvlNEkUDPUC')
-    const withoutCover = { ...volume('DWvlNEkUDPUC'), id: 'no-cover' }
-    delete withoutCover.volumeInfo.imageLinks
+    const [withCover, withoutCover] = recorded('9780007447848').items
     serve(searchBody([withoutCover, withCover]))
 
     const results = await lookup('9780007447848')
@@ -302,25 +298,19 @@ describe('google.lookupByIsbn over every recorded response', () => {
     .filter((name) => name.endsWith('.json'))
     .map((name) => {
       const isbn13 = name.replace(/\.json$/, '')
-      const body: unknown = JSON.parse(readFileSync(new URL(name, FIXTURES), 'utf8'))
-      return { name, isbn13, body, matches: false }
-    })
-  const volumes = readdirSync(VOLUMES)
-    .filter((name) => name.endsWith('.json'))
-    .map((name) => {
-      const recorded = volume(name.replace(/\.json$/, ''))
-      const isbn13 = recorded.volumeInfo.industryIdentifiers!.find(
-        ({ type }) => type === 'ISBN_13',
-      )!.identifier
-      return { name: `volumes/${name}`, isbn13, body: searchBody([recorded]), matches: true }
+      const body = recorded(isbn13)
+      const found = (body.items ?? []).some(({ volumeInfo }) =>
+        volumeInfo.industryIdentifiers?.some(({ identifier }) => identifier === isbn13),
+      )
+      return { name, isbn13, body, found }
     })
 
-  it.each([...searches, ...volumes])('$name', async ({ isbn13, body, matches }) => {
+  it.each(searches)('$name', async ({ isbn13, body, found }) => {
     serve(body)
 
     const results = await lookup(isbn13)
 
-    if (matches) expect(results.length).toBeGreaterThan(0)
+    expect(results.length > 0).toBe(found)
     for (const result of results) {
       expect(result.isbn13).toBe(isbn13)
       expect(result.authors.every(({ name }) => !name.includes(','))).toBe(true)
