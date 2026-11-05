@@ -10,8 +10,9 @@ import { DomainError, runAction, type ActionResult } from '@/lib/errors'
 import { requireUserOrThrow } from '@/lib/payload/context'
 import { isRowId } from '@/lib/payload/ref'
 import { createPerson, deletePerson, mergePerson, renamePerson } from '@/lib/people/people'
+import { deleteTag, mergeTag, renameTag } from '@/lib/tags/tags'
 
-// Settings → Locations (FR-31) and People (FR-34), UX-DR50. Client input is
+// Settings → Locations (FR-31), People (FR-34) and private labels (9.9), UX-DR50. Client input is
 // checked here, never repaired: a name must be a string and an id a row id
 // (`isRowId()`), else `VALIDATION` with no write. Normalising, the blank check
 // and ownership are the services'. The client calls `router.refresh()` on
@@ -107,6 +108,36 @@ export async function deletePersonAction(person: unknown): Promise<ActionResult<
   return runAction(async () => {
     const ctx = await requireUserOrThrow()
     await deletePerson(ctx, id(person))
+    return null
+  })
+}
+
+/** Renames an own label; another label's name fails `NAME_TAKEN` with its id, a system name `VALIDATION`. */
+export async function renameTagAction(tag: unknown, value: unknown): Promise<ActionResult<null>> {
+  return runAction(async () => {
+    const ctx = await requireUserOrThrow()
+    await renameTag(ctx, id(tag), name(value))
+    return null
+  })
+}
+
+/** Moves the source's books to the target label of the same kind, then deletes the source. */
+export async function mergeTagAction(
+  source: unknown,
+  target: unknown,
+): Promise<ActionResult<null>> {
+  return runAction(async () => {
+    const ctx = await requireUserOrThrow()
+    await mergeTag(ctx, id(source), id(target))
+    return null
+  })
+}
+
+/** Removes the label from every book, then deletes it. */
+export async function deleteTagAction(tag: unknown): Promise<ActionResult<null>> {
+  return runAction(async () => {
+    const ctx = await requireUserOrThrow()
+    await deleteTag(ctx, id(tag))
     return null
   })
 }

@@ -12,6 +12,7 @@ import { listLocations } from '@/lib/copies/locations'
 import { requireUser } from '@/lib/payload/context'
 import { personUse } from '@/lib/people/people'
 import { filterValues } from '@/lib/shelf/filterValues'
+import { tagUse } from '@/lib/tags/tags'
 
 import { SignOutButton } from '../../components/SignOutButton'
 import { devicePrefs, THEMES } from '../../prefs'
@@ -20,6 +21,7 @@ import { DisplayNameField } from './DisplayNameField'
 import { LanguageSwitch } from './LanguageSwitch'
 import { LocationsGroup } from './LocationsGroup'
 import { PeopleGroup } from './PeopleGroup'
+import { TagsGroup } from './TagsGroup'
 import { ThemeSwitch } from './ThemeSwitch'
 import { VisibilitySwitch } from './VisibilitySwitch'
 
@@ -40,13 +42,13 @@ function Group({ heading, id, children }: { heading: string; id?: string; childr
 /**
  * Settings (EXPERIENCE.md, Settings): profile, language, theme, visibility,
  * default location and Sign out in the first of two columns on wide screens,
- * the managed lists (Locations, People) and, for admins only, Backup (NFR-6)
+ * the managed lists (Locations, People, Tags, My genres, My themes) and, for admins only, Backup (NFR-6)
  * in the second; one column on the phone. Backup shows the last backup from
  * `readLastBackup()`, in `danger` with "Backup is overdue." when overdue.
  * Reads go through `getProfile()`, `listLocations()`, `filterValues()`,
- * `personUse()` and `devicePrefs()`; the controls write through
+ * `personUse()`, `tagUse()` and `devicePrefs()`; the controls write through
  * `updateProfileAction`, `setDefaultLocationAction`, `setDevicePrefsAction`
- * and the location and People actions in `./actions`.
+ * and the location, People and tag actions in `./actions`.
  */
 export default async function SettingsPage() {
   const ctx = await requireUser()
@@ -68,6 +70,11 @@ export default async function SettingsPage() {
     count: counts.get(location.id) ?? 0,
   }))
   const people = await personUse(ctx)
+  const toItems = (uses: Awaited<ReturnType<typeof tagUse>>) =>
+    uses.map(({ id, name, copies }) => ({ id, name, count: copies }))
+  const tags = toItems(await tagUse(ctx, 'tag'))
+  const genres = toItems(await tagUse(ctx, 'genre'))
+  const themes = toItems(await tagUse(ctx, 'theme'))
   // A refresh after a rename, merge or delete remounts the field with the fresh default and list.
   const defaultLocationKey = [
     profile.defaultLocation,
@@ -116,13 +123,22 @@ export default async function SettingsPage() {
         </Group>
         <SignOutButton />
       </div>
-      {/* Second column: the managed lists, then Backup (admin only); tags arrive with a later story. */}
+      {/* Second column: the managed lists, then Backup (admin only). */}
       <div className="flex max-w-panel-width flex-col gap-7 max-wide:mt-7">
         <Group heading={t('locations')}>
           <LocationsGroup locations={counted} />
         </Group>
         <Group heading={t('people')}>
           <PeopleGroup people={people} />
+        </Group>
+        <Group heading={t('tags')}>
+          <TagsGroup kind="tag" items={tags} />
+        </Group>
+        <Group heading={t('myGenres')}>
+          <TagsGroup kind="genre" items={genres} />
+        </Group>
+        <Group heading={t('myThemes')}>
+          <TagsGroup kind="theme" items={themes} />
         </Group>
         {backup && (
           <Group heading={t('backup')}>

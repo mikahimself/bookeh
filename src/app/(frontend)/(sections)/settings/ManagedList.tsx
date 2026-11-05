@@ -21,7 +21,8 @@ export type ManagedItem = Named & { count: number }
 
 /** The group's server actions; each answers `null` and the list refreshes on success. */
 export type ManagedListActions = {
-  create: (name: string) => Promise<ActionResult<null>>
+  /** Absent for a list whose items are created elsewhere (private labels): no Add link. */
+  create?: (name: string) => Promise<ActionResult<null>>
   rename: (id: number, name: string) => Promise<ActionResult<null>>
   merge: (source: number, target: number) => Promise<ActionResult<null>>
   remove: (id: number) => Promise<ActionResult<null>>
@@ -36,7 +37,8 @@ export const typed = (chunks: ReactNode) => <span className="normal-case">{chunk
 /** The group's own strings, translated by its wrapper; titles name items through `typed`. */
 export type ManagedListStrings = {
   empty: string
-  add: string
+  /** The Add link's text; with `actions.create` absent there is no Add link. */
+  add?: string
   count: (item: ManagedItem) => string
   mergeInto: (item: ManagedItem) => ReactNode
   mergeTitle: (source: ManagedItem, target: ManagedItem) => ReactNode
@@ -100,6 +102,7 @@ export function NameField({
     conflictId?: number,
   ) => {
     if (code === 'VALIDATION' && fields?.name === 'TOO_LONG') return t('errors.TOO_LONG')
+    if (code === 'VALIDATION' && fields?.name === 'SYSTEM_NAME') return t('errors.SYSTEM_NAME')
     if (code === 'VALIDATION' && fields?.name) return t('settings.nameRequired')
     if (code !== 'NAME_TAKEN') return null
     const merge = conflictId === undefined ? null : (mergeInto?.(conflictId) ?? null)
@@ -258,7 +261,7 @@ export function ManagedList({
       )}
       {(adding || items.length > 0) && (
         <ul>
-          {adding && (
+          {adding && actions.create && (
             <li className="py-1">
               <NameField initial="" save={actions.create} onDone={() => setAdding(false)} />
             </li>
@@ -304,7 +307,7 @@ export function ManagedList({
           )}
         </ul>
       )}
-      {!adding && (
+      {!adding && actions.create && strings.add && (
         <div>
           <ActionLink onClick={() => setAdding(true)}>{strings.add}</ActionLink>
         </div>
