@@ -284,7 +284,7 @@ Under the Book, the Answer names the source ("From Finna") and any author, serie
 | Part | Behaviour |
 |---|---|
 | List of lists | One List row per wishlist: its name and count. "New list" asks for a name; a name already in use is rejected under the field. |
-| Wishlist | A Back link above the heading returns to the list of lists. The heading is the list's name as typed. Under it, Links: Rename, and Delete (destructive; removes the list and its entries). [ASSUMPTION] |
+| Wishlist | A Back link above the heading returns to the list of lists. Below 900px, a Close X at the right end of that row also returns to `/wishlists`, labelled “Close” / “Sulje” with a target at least 44px square; it is hidden from 900px. Both remain on failed reads and behind an open entry sheet, preserving heading and layer focus. The entry’s own close still closes only the entry. The heading is the list's name as typed. Under it, Links: Rename, and Delete (destructive; removes the list and its entries). [ASSUMPTION] |
 | Entry row | Cover, title, author, and "For {person}" at the end. No recipient means the entry is for the user (FR-38). |
 | Entry opened | Tapping an entry opens it at `?entry={entryId}`: a sheet or panel with the Book's header, "On {list}", and a "For" combobox of People that can be set, changed or cleared at any time. It is the entry, not Book detail. |
 | Closed entries | A bought, ordered or removed entry leaves the list. |

@@ -1,3 +1,4 @@
+import NextLink from 'next/link'
 import { getTranslations } from 'next-intl/server'
 import { redirect } from 'next/navigation'
 
@@ -104,8 +105,17 @@ export default async function WishlistPage({
 
   return (
     <div className="flex flex-1 flex-col px-page-margin-phone wide:px-page-margin">
-      <div className="flex flex-col items-start pt-2">
+      <div className="flex items-start justify-between pt-2">
         <BackLink href="/wishlists">{t('sections.wishlists')}</BackLink>
+        <NextLink
+          href="/wishlists"
+          aria-label={t('task.close')}
+          className="flex min-h-tap min-w-tap items-center justify-center text-text wide:hidden"
+        >
+          <svg viewBox="0 0 16 16" aria-hidden="true" className="size-4 shrink-0">
+            <path d="M2 2 L14 14 M14 2 L2 14" stroke="currentColor" strokeWidth="2" />
+          </svg>
+        </NextLink>
       </div>
       {loaded === 'failed' ? (
         <LoadFailed />
