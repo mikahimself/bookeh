@@ -3827,6 +3827,57 @@ So that I can see what it is about without opening Edit book.
 **And** existing held-Book access checks, editing, close behaviour and scrolling remain intact; the Answer and wishlist entry detail are outside this story
 **And** focused unit coverage verifies visible, omitted and literal-text cases; an uncommitted browser walk checks phone and desktop, long text, both locales and editing then returning to detail, with observations recorded in the story
 
+### Story 9.21: Corner crop shows straight edges and has larger handles
+
+As Mika,
+I want the Corner crop to show when a side of the rectangle is straight,
+So that I can line a cover up without guessing, and grab the handles more easily.
+
+**Acceptance Criteria:**
+
+**Given** the story starts with rendered mock-up options of the straight-edge indication (for example the edge changing colour, a tick or a guide line), and Mika has picked one
+**When** a side of the quadrilateral is vertical or horizontal within a small tolerance (decided in the story, in photo pixels or degrees, not screen pixels)
+**Then** that side shows the chosen indication while it holds, and drops it when it does not; it works for pointer drags and arrow-key moves, and each side is judged on its own
+**And** the indication does not rely on colour alone (UX-DR55), uses tokens only, and is the same in both themes (the step is always dark)
+**And** the four handles are drawn 20 % larger (the 20px square becomes 24px); the 44px tap area, the halo, the focus ring and the handle's position over its corner are unchanged
+**And** the straightness rule is a pure function beside `checkCorners()` in `src/lib/catalogue/corners.ts`, with one focused unit test for within and outside tolerance; it does not change what `checkCorners()` accepts, so Use stays enabled or disabled exactly as before
+**And** DESIGN.md → Corner crop (handle size, the indication) and EXPERIENCE.md → Corner crop are updated in the same commit
+**And** an uncommitted phone walk checks a drag onto straight, off straight, a skewed photo and the handles' feel
+
+### Story 9.22: Suggest existing authors when adding by hand
+
+As Mika,
+I want the Author field on the Not found Answer to suggest authors already in the library,
+So that I reuse an existing name instead of typing a near duplicate.
+
+**Acceptance Criteria:**
+
+**Given** the Not found Answer (reached by Add by hand, Add without ISBN or Nothing found)
+**When** I type in the Author field
+**Then** it suggests existing authors whose names contain the text, through the same `/data/suggest` path and name Combobox that Edit book's author rows use; choosing one fills the field with that name
+**And** free text is still accepted: a name with no match is typed and saved as before, and authors are matched case-insensitively and created if missing (CLAUDE.md, Metadata sources)
+**And** Enter in Author still submits, except while a suggestion is highlighted, where it chooses that suggestion first; Title's Enter-to-Author, the required-title and required-author messages, `enterKeyHint` and the autofocus on Title are unchanged
+**And** a failed suggestion request shows no toast and leaves a plain text field
+**And** the Edit book author rows are checked for the same behaviour and fixed in this story if they differ; any other by-hand author field found is listed in the story's Residual risks
+**And** a focused test covers choosing a suggestion and submitting free text; no change to the data model or `/data/suggest`
+
+### Story 9.23: Close X on the wishlist screen
+
+As Mika,
+I want a close X on one wishlist's screen on the phone,
+So that leaving the list is as easy to find as the Back link above it is easy to miss.
+
+**Acceptance Criteria:**
+
+**Given** a wishlist is open at `/wishlists/<listId>` on the phone
+**When** the screen shows
+**Then** a Close X (DESIGN.md → Close) sits at the right end of the Back link's row, labelled for assistive tech ("Close" / "Sulje"), with a tap area of at least 44px, and it goes to `/wishlists`
+**And** the Back link stays, with its text and place unchanged
+**And** from 900px the X is absent, as the wide layout keeps the Back link alone, and the entry detail's own close is unchanged
+**And** the X shows on the failed-read state and with an `?entry=` layer open, and does not take focus from the heading or the layer
+**And** DESIGN.md or EXPERIENCE.md → Wishlists gains the X in the same commit
+**And** an uncommitted phone walk checks the X, the Back link, the open entry sheet and the failed read; no test beyond that, as the criterion is markup
+
 ### Story 9.1: [G1] `tags` collection with kinds
 
 As the developer,
