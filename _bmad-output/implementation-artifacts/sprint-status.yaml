@@ -282,7 +282,7 @@ development_status:
   9-12-g15-new-genre-on-the-answer: done
   9-13-g11-genre-admin-service: done
   9-14-g12-genres-in-settings-admin-only: done
-  9-15-k13-phase-1-acceptance: backlog
+  9-15-k13-phase-1-acceptance: done
   epic-9-retrospective: optional
 action_items:
   - id: 'epic-1-retro-item-1-fix-the-flash-toast-cookie-contract-doub'
