@@ -202,7 +202,11 @@
     "tl": "Vasen yläkulma",
     "tr": "Oikea yläkulma",
     "br": "Oikea alakulma",
-    "bl": "Vasen alakulma"
+    "bl": "Vasen alakulma",
+    "top": "Yläreuna",
+    "right": "Oikea reuna",
+    "bottom": "Alareuna",
+    "left": "Vasen reuna"
   },
   "sources": {
     "finna": "Finna",

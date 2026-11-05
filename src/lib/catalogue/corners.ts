@@ -70,3 +70,37 @@ export function squareToQuad(corners: Corners): QuadMap {
     return { x: (a * u + b * v + c) / w, y: (d * u + e * v + f) / w }
   }
 }
+
+/** A side within this many degrees of vertical or horizontal counts as straight. */
+export const STRAIGHT_TOLERANCE = 1
+
+/** Degrees from the nearest axis of the side `a` → `b`, in `[0, 45]`. */
+export function offAxis(a: Point, b: Point): number {
+  const angle = (Math.abs(Math.atan2(b.y - a.y, b.x - a.x) * 180) / Math.PI) % 90
+  return Math.min(angle, 90 - angle)
+}
+
+/** Whether the side `a` → `b` is within `STRAIGHT_TOLERANCE` of an axis. */
+export function isStraight(a: Point, b: Point): boolean {
+  return offAxis(a, b) <= STRAIGHT_TOLERANCE + 1e-9
+}
+
+/**
+ * `to` pulled toward straight from `from`: an angle `d` off the axis of up to
+ * 1° becomes 0, from 3° on it is unchanged, between them `(d - 1) · 1.5`.
+ * Side length and the sign of the offset are kept; under 1px nothing moves.
+ */
+export function snapToStraight(from: Point, to: Point): Point {
+  const dx = to.x - from.x
+  const dy = to.y - from.y
+  const length = Math.hypot(dx, dy)
+  if (length < 1) return to
+  const angle = (Math.atan2(dy, dx) * 180) / Math.PI
+  const axis = Math.round(angle / 90) * 90
+  const off = angle - axis
+  const d = Math.abs(off)
+  if (d >= 3) return to
+  const mapped = d <= 1 ? 0 : (d - 1) * 1.5
+  const radians = ((axis + (Math.sign(off) || 1) * mapped) * Math.PI) / 180
+  return { x: from.x + Math.cos(radians) * length, y: from.y + Math.sin(radians) * length }
+}

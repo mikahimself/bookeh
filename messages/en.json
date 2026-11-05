@@ -202,7 +202,11 @@
     "tl": "Top left corner",
     "tr": "Top right corner",
     "br": "Bottom right corner",
-    "bl": "Bottom left corner"
+    "bl": "Bottom left corner",
+    "top": "Top edge",
+    "right": "Right edge",
+    "bottom": "Bottom edge",
+    "left": "Left edge"
   },
   "sources": {
     "finna": "Finna",
