@@ -5,6 +5,9 @@ import { OVERRIDABLE_BOOK_FIELDS, type OverridableBookField } from '@/fields/boo
 import { toIsbn13 } from '@/fields/isbn'
 import { limits } from '@/fields/limits'
 import { normaliseName, normaliseText } from '@/fields/sortName'
+import type { TagKind } from '@/lib/books/effectiveBook'
+import { getUserBookState } from '@/lib/books/userBookState'
+import { changeTags } from '@/lib/tags/changeTags'
 import { requireOwnBook } from '@/lib/books/requireOwnBook'
 import { type BookOverrides, upsertUserBook } from '@/lib/books/upsertUserBook'
 import { moveCopies } from '@/lib/copies/moveCopies'
@@ -47,6 +50,8 @@ export type BookEdits = Partial<{
 export type EditBookInput = {
   bookId: number
   edits: BookEdits
+  /** Full desired sets for supplied kinds; omitted kinds remain unchanged, [] clears. */
+  tags?: Partial<Record<TagKind, Ref[]>>
   copy?: { id: number; status?: 'owned' | 'ordered'; location?: Ref | null }
 }
 
@@ -173,7 +178,7 @@ const isIsbnClash = (err: unknown): boolean =>
  */
 export async function editBook(
   ctx: Context,
-  { bookId, edits, copy }: EditBookInput,
+  { bookId, edits, copy, tags }: EditBookInput,
 ): Promise<void> {
   const admin = canEditShared(ctx.user)
   const rejected = new Map<string, ErrorCode>()
@@ -217,6 +222,30 @@ export async function editBook(
     await requireOwnBook(tx, bookId)
     await writeBook(tx, bookId, changes, admin)
     if (copy) await writeCopy(tx, copy)
+    if (tags !== undefined) {
+      const current = await getUserBookState(tx, bookId)
+      for (const [kind, desired] of Object.entries(tags)) {
+        if (!['tag', 'genre', 'theme'].includes(kind) || !Array.isArray(desired))
+          throw invalid(['tags'])
+        try {
+          await changeTags(
+            tx,
+            { bookId },
+            {
+              kind: kind as TagKind,
+              add: desired,
+              remove: current.tags.filter((tag) => tag.kind === kind).map(({ id }) => id),
+            },
+          )
+        } catch (err) {
+          if (err instanceof DomainError) {
+            const code = err.fields?.tags ?? err.code
+            throw new DomainError('VALIDATION', { fields: { [`tags.${kind}`]: code } })
+          }
+          throw err
+        }
+      }
+    }
   })
 }
 

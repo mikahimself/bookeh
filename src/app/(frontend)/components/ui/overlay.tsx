@@ -19,8 +19,11 @@ import { leftAddress, OVERLAY_TOKENS_KEY } from '../navigation'
  * leave): Base UI's popup already stops its `Esc` propagating, and this
  * keeps one that gets through from closing more than the dialog.
  */
-export const inDialog = (target: EventTarget | null): boolean =>
-  target instanceof Element && target.closest('[role="dialog"], [role="alertdialog"]') !== null
+export const inDialog = (target: EventTarget | null, path: EventTarget[] = []): boolean =>
+  (target instanceof Element && target.closest('[role="dialog"], [role="alertdialog"]') !== null) ||
+  path.some(
+    (node) => node instanceof Element && node.matches('[role="dialog"], [role="alertdialog"]'),
+  )
 
 /** How many overlays an element sits inside. */
 const OverlayDepth = createContext(0)

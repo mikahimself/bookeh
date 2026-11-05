@@ -9,6 +9,7 @@ import { DomainError, runAction, type ActionResult, type ErrorCode } from '@/lib
 import { requireUserOrThrow } from '@/lib/payload/context'
 import { isRowId } from '@/lib/payload/ref'
 
+import { parseRef } from '../../../ref'
 import { isPlainObject } from '../../../plainObject'
 
 const text = (value: unknown): boolean => typeof value === 'string' || value === null
@@ -78,7 +79,7 @@ export async function editBookAction(input: unknown): Promise<ActionResult<null>
   return runAction(async () => {
     const ctx = await requireUserOrThrow()
     if (typeof input !== 'object' || input === null) throw new DomainError('VALIDATION')
-    const { bookId, edits, copy, cover } = input as Record<string, unknown>
+    const { bookId, edits, copy, cover, tags } = input as Record<string, unknown>
     if (!isRowId(bookId)) throw new DomainError('VALIDATION')
     if (!isPlainObject(edits)) throw new DomainError('VALIDATION')
     const fields: Record<string, ErrorCode> = {}
@@ -87,8 +88,25 @@ export async function editBookAction(input: unknown): Promise<ActionResult<null>
     }
     if (!isCopy(copy)) fields.copy = 'VALIDATION'
     if (!isCover(cover)) fields.cover = 'VALIDATION'
+    if (tags !== undefined) {
+      if (!isPlainObject(tags)) fields.tags = 'VALIDATION'
+      else
+        for (const [kind, refs] of Object.entries(tags)) {
+          if (
+            !['tag', 'genre', 'theme'].includes(kind) ||
+            !Array.isArray(refs) ||
+            refs.some((ref) => parseRef(ref) === undefined)
+          )
+            fields[`tags.${kind}`] = 'VALIDATION'
+        }
+    }
     if (Object.keys(fields).length > 0) throw new DomainError('VALIDATION', { fields })
-    await editBook(ctx, { bookId, edits: edits as BookEdits, copy: copy as EditBookInput['copy'] })
+    await editBook(ctx, {
+      bookId,
+      edits: edits as BookEdits,
+      copy: copy as EditBookInput['copy'],
+      tags: tags as EditBookInput['tags'],
+    })
     const change = cover as CoverInput
     if (change === null) await removeCover(ctx, bookId)
     else if (change) await setCover(ctx, bookId, change.image, change.corners)

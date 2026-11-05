@@ -1,5 +1,6 @@
 import type { BookEdits, EditBookInput } from '@/lib/catalogue/editBook'
 
+import { parseRef } from '../../../ref'
 import { isPlainObject } from '../../../plainObject'
 
 /**
@@ -10,7 +11,7 @@ import { isPlainObject } from '../../../plainObject'
  * hold anything; either way there is no draft, and an entry that is not a
  * JSON object is removed.
  */
-export type Draft = BookEdits & { copy?: EditBookInput['copy'] }
+export type Draft = BookEdits & { copy?: EditBookInput['copy']; tags?: EditBookInput['tags'] }
 
 const keyFor = (bookId: number): string => `bookeh:edit-book:${bookId}`
 
@@ -27,7 +28,19 @@ export function readDraft(bookId: number): Draft {
   if (text === null) return {}
   try {
     const value: unknown = JSON.parse(text)
-    if (isPlainObject(value)) return value as Draft
+    if (isPlainObject(value)) {
+      const { tags: storedTags, ...rest } = value
+      const tags: NonNullable<Draft['tags']> = {}
+      if (isPlainObject(storedTags)) {
+        for (const kind of ['tag', 'genre', 'theme'] as const) {
+          const refs = storedTags[kind]
+          if (!Array.isArray(refs)) continue
+          const parsed = refs.map(parseRef)
+          if (parsed.every((ref) => ref !== undefined)) tags[kind] = parsed
+        }
+      }
+      return { ...rest, ...(Object.keys(tags).length ? { tags } : {}) } as Draft
+    }
   } catch {
     // Malformed: removed below.
   }

@@ -1,5 +1,8 @@
 'use server'
 
+import { getUserBookState } from '@/lib/books/userBookState'
+import type { UserBookState } from '@/lib/books/effectiveBook'
+import { changeTags } from '@/lib/tags/changeTags'
 import { setRating } from '@/lib/books/setRating'
 import { setRead } from '@/lib/books/setRead'
 import { refetchBook, type RefetchResult } from '@/lib/catalogue/refetchBook'
@@ -168,6 +171,34 @@ export async function moveCopiesAction(
           : (await listLocations(tx)).find(({ id }) => id === data.location)
       if (target === undefined) throw new Error('moveCopies() answered no location of the viewer')
       return { data: { location: target, count: data.moved, skipped: data.skipped }, restore }
+    })
+  })
+}
+
+/** Book detail uses deltas; the returned assignments seed its next mutation. */
+export async function changeBookTagsAction(
+  input: unknown,
+): Promise<ActionResult<Undoable<{ tags: UserBookState['tags']; count: number }>>> {
+  return runAction(async () => {
+    const ctx = await requireUserOrThrow()
+    const { bookId, kind, add, remove } = bookInput(input)
+    if (kind !== 'tag' && kind !== 'genre' && kind !== 'theme') throw new DomainError('VALIDATION')
+    if (!Array.isArray(add) || !Array.isArray(remove) || !remove.every(isRowId))
+      throw new DomainError('VALIDATION')
+    const refs = add.map(parseRef)
+    if (refs.some((ref) => ref === undefined)) throw new DomainError('VALIDATION')
+    return withUndo(ctx, async (tx) => {
+      const { data, restore } = await changeTags(
+        tx,
+        { bookId },
+        {
+          kind,
+          add: refs as NonNullable<ReturnType<typeof parseRef>>[],
+          remove,
+        },
+      )
+      const { tags } = await getUserBookState(tx, bookId)
+      return { data: { ...data, tags }, restore }
     })
   })
 }

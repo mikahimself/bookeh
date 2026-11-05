@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl'
 import { useState, type ReactNode, type RefObject } from 'react'
 
 import { CloseButton } from '../CloseButton'
+import { ToastHost } from '../toast/ToastHost'
 import { useSuspendSwipe } from '../swipe'
 import { useCloseOnBack, useOverlayLayer } from './overlay'
 
@@ -94,8 +95,9 @@ export function Sheet({
             aria-label={label}
             aria-labelledby={labelledBy}
             initialFocus={initialFocus}
-            className="flex h-sheet-height w-full touch-none flex-col border-t-2 border-text bg-background sheet-motion"
+            className="relative flex h-sheet-height w-full touch-none flex-col border-t-2 border-text bg-background sheet-motion"
           >
+            <ToastHost />
             <div className="relative flex shrink-0 justify-center">
               <button
                 type="button"

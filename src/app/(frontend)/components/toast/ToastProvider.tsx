@@ -4,6 +4,7 @@ import { useTranslations } from 'next-intl'
 import { useRouter } from 'next/navigation'
 import {
   createContext,
+  useCallback,
   useContext,
   useMemo,
   useState,
@@ -12,6 +13,9 @@ import {
   type ReactNode,
 } from 'react'
 
+import { createPortal } from 'react-dom'
+
+import { ToastHostsContext } from './ToastHost'
 import { undoAction } from '../../actions/undo'
 import { ActionLink, TextLink } from '../Link'
 import { reportFailure, settleAction } from '../request'
@@ -41,6 +45,16 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   const [undoneListeners] = useState(() => new Set<() => void>())
   const state = useSyncExternalStore(store.subscribe, store.getState, () => null)
   const router = useRouter()
+  const [hosts] = useState(() => new Map<string, HTMLDivElement>())
+  const [host, setHost] = useState<HTMLDivElement | null>(null)
+  const registerHost = useCallback(
+    (id: string, node: HTMLDivElement | null) => {
+      if (node) hosts.set(id, node)
+      else hosts.delete(id)
+      setHost([...hosts.values()].at(-1) ?? null)
+    },
+    [hosts],
+  )
   const [undoPending, startUndo] = useTransition()
   const value = useMemo(
     () => ({
@@ -92,12 +106,12 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   const edit =
     state?.input.kind === 'success' && !state.leaving && !undoPending ? state.input.edit : undefined
 
-  return (
-    <ToastContext.Provider value={value}>
-      {children}
-      {/* The status region is SSR'd and stays mounted, empty with no toast:
-          a polite live region only announces content inserted after the
-          region exists. An error's own role="alert" announces on insertion.
+  const region = (
+    <>
+      {/* The status region is SSR'd at the root, empty with no toast.
+          Opening a modal remounts the region inside its host; closing returns
+          it to the preceding host or root. The store survives those portal changes.
+          A polite region announces inserted content; errors use role="alert".
           Under 900px it rises above a bar pinned to the bottom (Scan book):
           the region follows the layout's `peer` <main>. From 900px it rises
           only above a bar pinned on every width (`data-pinned-wide`, Save on
@@ -106,7 +120,11 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       <div
         role="status"
         data-toast-region
-        className="fixed inset-x-page-margin-phone bottom-4 z-10 max-wide:peer-has-data-pinned-bottom:bottom-[calc(var(--spacing-pinned-bar)+var(--spacing-4)+env(safe-area-inset-bottom))] wide:inset-x-page-margin wide:peer-has-data-pinned-wide:bottom-[calc(var(--spacing-pinned-bar)+var(--spacing-4)+env(safe-area-inset-bottom))]"
+        className={
+          host
+            ? 'absolute inset-x-4 bottom-[calc(max(0px,var(--sheet-offset,0px))+var(--spacing-4))] z-10'
+            : 'fixed inset-x-page-margin-phone bottom-4 z-10 max-wide:peer-has-data-pinned-bottom:bottom-[calc(var(--spacing-pinned-bar)+var(--spacing-4)+env(safe-area-inset-bottom))] wide:inset-x-page-margin wide:peer-has-data-pinned-wide:bottom-[calc(var(--spacing-pinned-bar)+var(--spacing-4)+env(safe-area-inset-bottom))]'
+        }
       >
         {state && (
           /* Keyed per show: remounts for the enter transition and so the
@@ -146,6 +164,14 @@ export function ToastProvider({ children }: { children: ReactNode }) {
           </div>
         )}
       </div>
+    </>
+  )
+  return (
+    <ToastContext.Provider value={value}>
+      <ToastHostsContext value={registerHost}>
+        {children}
+        {host ? createPortal(region, host) : region}
+      </ToastHostsContext>
     </ToastContext.Provider>
   )
 }

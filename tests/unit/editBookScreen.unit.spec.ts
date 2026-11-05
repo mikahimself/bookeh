@@ -49,6 +49,15 @@ const { NotHeld } = await import('@/app/(frontend)/books/[bookId]/edit/NotHeld')
 
 installNavigationTracking()
 
+Object.defineProperty(window, 'matchMedia', {
+  configurable: true,
+  value: () => ({
+    matches: true,
+    addEventListener: () => undefined,
+    removeEventListener: () => undefined,
+  }),
+})
+
 const KEY = 'bookeh:edit-book:7'
 const PATH = '/books/7/edit'
 
@@ -71,7 +80,10 @@ type Details = Pick<
   'effective' | 'isbnEditable' | 'genreOptions' | 'genres' | 'themes'
 > &
   Partial<
-    Pick<ComponentProps<typeof EditBookScreen>, 'copy' | 'locations' | 'cover' | 'coverEditable'>
+    Pick<
+      ComponentProps<typeof EditBookScreen>,
+      'copy' | 'locations' | 'cover' | 'coverEditable' | 'assignedTags' | 'tagOptions'
+    >
   >
 
 /** A shared Book seen by someone who is not the admin. */
@@ -133,6 +145,101 @@ describe('EditBookScreen', () => {
     await new Promise((resolve) => setTimeout(resolve, 50))
   })
 
+  it.each(
+    [
+      null,
+      [],
+      { tag: 'invalid' },
+      { tag: null },
+      { tag: [null] },
+      { tag: [{ create: 'x', id: 3 }] },
+    ].map((tags) => ({ tags })),
+  )('discards malformed stored tags while preserving other draft edits: %j', async ({ tags }) => {
+    editBookAction.mockResolvedValue({ ok: false, code: 'VALIDATION' })
+    open({ year: 2015, tags })
+    expect(screen.getByText('tagPicker.empty')).toBeTruthy()
+    save()
+    await waitFor(() =>
+      expect(editBookAction).toHaveBeenCalledWith({ bookId: 7, edits: { year: 2015 } }),
+    )
+  })
+
+  it('stages an empty set for the last removed label, preserves another kind and clears dirty on restoration', async () => {
+    open(undefined, {
+      ...shared,
+      assignedTags: [
+        { id: 9, name: 'Original', kind: 'tag' },
+        { id: 10, name: 'Sea', kind: 'theme' },
+      ],
+      tagOptions: {
+        tag: [{ id: 9, name: 'Original' }],
+        genre: [],
+        theme: [{ id: 10, name: 'Sea' }],
+      },
+    })
+    expect(screen.getByText('tagPicker.tag: Original · tagPicker.theme: Sea')).toBeTruthy()
+    fireEvent.click(screen.getByRole('button', { name: 'tagPicker.edit' }))
+    const picker = await screen.findByRole('dialog', { name: 'tagPicker.heading' })
+    fireEvent.click(within(picker).getByRole('button', { name: 'tagPicker.remove' }))
+    expect(JSON.parse(window.sessionStorage.getItem(KEY)!)).toEqual({ tags: { tag: [] } })
+    expect(screen.getByText('tagPicker.theme: Sea')).toBeTruthy()
+    expect(editBookAction).not.toHaveBeenCalled()
+    const field = within(picker).getByRole('combobox', { name: 'tagPicker.find.tag' })
+    act(() => field.focus())
+    fireEvent.input(field, { target: { value: 'Original' }, inputType: 'insertText' })
+    fireEvent.click(await screen.findByRole('option', { name: 'Original' }))
+    await waitFor(() => expect(window.sessionStorage.getItem(KEY)).toBeNull())
+    // The form guard pops before the picker's own close traverses history.
+    await waitFor(() => expect(window.history.state[OVERLAY_TOKENS_KEY]).toHaveLength(1))
+    fireEvent.click(within(picker).getByRole('button', { name: 'overlay.cancel' }))
+    await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
+    await waitFor(() => expect(guarded()).toBe(false))
+  })
+
+  it('prevents exact duplicate staged create refs and labels summary by kind', async () => {
+    open()
+    fireEvent.click(screen.getByRole('button', { name: 'tagPicker.edit' }))
+    const picker = await screen.findByRole('dialog', { name: 'tagPicker.heading' })
+    const field = within(picker).getByRole<HTMLInputElement>('combobox', {
+      name: 'tagPicker.find.tag',
+    })
+    for (let count = 0; count < 2; count++) {
+      act(() => field.focus())
+      fireEvent.input(field, { target: { value: 'Exact name' }, inputType: 'insertText' })
+      fireEvent.click(await screen.findByRole('option', { name: 'combobox.create' }))
+      await waitFor(() => expect(field.value).toBe(''))
+    }
+    expect(JSON.parse(window.sessionStorage.getItem(KEY)!)).toEqual({
+      tags: { tag: [{ create: 'Exact name' }] },
+    })
+    expect(screen.getByText('tagPicker.tag: Exact name')).toBeTruthy()
+    expect(within(picker).getAllByRole('button', { name: 'tagPicker.remove' })).toHaveLength(1)
+  })
+
+  it('retains staged label names, sends them separately, and shows Save name errors in the picker', async () => {
+    open({ title: 'Changed', tags: { genre: [{ create: 'New genre' }] } })
+    expect(screen.getByText('tagPicker.genre: New genre')).toBeTruthy()
+    editBookAction.mockResolvedValue({
+      ok: false,
+      code: 'VALIDATION',
+      fields: { 'tags.genre': 'SYSTEM_NAME' },
+    })
+    save()
+    await waitFor(() =>
+      expect(editBookAction).toHaveBeenCalledWith(
+        expect.objectContaining({
+          edits: { title: 'Changed' },
+          tags: { genre: [{ create: 'New genre' }] },
+        }),
+      ),
+    )
+    await waitFor(() => expect(screen.getByText('errors.SYSTEM_NAME')).toBeTruthy())
+    expect(screen.getByRole('button', { name: 'tagPicker.genre', pressed: true })).toBeTruthy()
+    expect(JSON.parse(window.sessionStorage.getItem(KEY)!)).toMatchObject({
+      tags: { genre: [{ create: 'New genre' }] },
+    })
+  })
+
   it('saves the stored draft, shows "Saved", closes and clears the draft', async () => {
     editBookAction.mockResolvedValue({ ok: true, data: null })
     open({ year: 2015 })
@@ -152,7 +259,7 @@ describe('EditBookScreen', () => {
     router.replace.mockImplementationOnce(() => {
       replacedGuard = guarded()
     })
-    open({ year: 2015 })
+    open({ year: 2015, tags: { tag: [{ create: 'Staged' }] } })
     await waitFor(() => expect(guarded()).toBe(true))
     save()
 
@@ -160,7 +267,9 @@ describe('EditBookScreen', () => {
       expect(router.replace).toHaveBeenCalledWith(`/login?next=${encodeURIComponent(PATH)}`),
     )
     expect(replacedGuard).toBe(false)
-    expect(window.sessionStorage.getItem(KEY)).toBe(JSON.stringify({ year: 2015 }))
+    expect(window.sessionStorage.getItem(KEY)).toBe(
+      JSON.stringify({ year: 2015, tags: { tag: [{ create: 'Staged' }] } }),
+    )
   })
 
   it('reports a rejected field, stays and keeps the draft', async () => {
@@ -178,7 +287,7 @@ describe('EditBookScreen', () => {
   })
 
   it('asks before the X leaves changes, and Discard clears them and closes', async () => {
-    open({ year: 2015 })
+    open({ tags: { tag: [{ create: 'Staged' }] } })
     await waitFor(() => expect(guarded()).toBe(true))
     fireEvent.click(screen.getByRole('button', { name: 'task.close' }))
     fireEvent.click(within(await discardAsked()).getByRole('button', { name: 'editBook.discard' }))

@@ -86,7 +86,8 @@ function BookDetailPanel({ label, back, openId, children }: FrameProps) {
         event.key === 'Escape' &&
         !event.defaultPrevented &&
         !inField(event.target) &&
-        !inDialog(event.target)
+        !inDialog(event.target, event.composedPath()) &&
+        document.querySelector('[role="dialog"], [role="alertdialog"]') === null
       ) {
         // Taken here: select mode's `Esc` stays for the next press.
         event.preventDefault()
@@ -94,8 +95,8 @@ function BookDetailPanel({ label, back, openId, children }: FrameProps) {
         setLeaving(true)
       }
     }
-    document.addEventListener('keydown', onKeyDown)
-    return () => document.removeEventListener('keydown', onKeyDown)
+    document.addEventListener('keydown', onKeyDown, true)
+    return () => document.removeEventListener('keydown', onKeyDown, true)
   }, [])
 
   useEffect(() => {

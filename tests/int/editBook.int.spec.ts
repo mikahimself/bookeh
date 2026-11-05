@@ -3,6 +3,8 @@ import { randomUUID } from 'node:crypto'
 import { getPayload, NotFound, type Payload } from 'payload'
 import { beforeAll, describe, expect, it } from 'vitest'
 
+import { getUserBookState } from '@/lib/books/userBookState'
+import { changeTags } from '@/lib/tags/changeTags'
 import { savedCopy } from '@/app/(frontend)/books/[bookId]/edit/savedCopy'
 import { getEffectiveBooks } from '@/lib/books/effectiveBook'
 import { upsertUserBook } from '@/lib/books/upsertUserBook'
@@ -87,6 +89,57 @@ describe('editBook', () => {
 
   const seen = async (ctx: Context, book: Book) =>
     (await getEffectiveBooks(ctx, [book.id])).get(book.id)
+
+  it('replaces supplied private kinds, preserves omitted kinds, and rolls back all edits on a rejected label', async () => {
+    const book = await sharedX()
+    await changeTags(
+      asB,
+      { bookId: book.id },
+      { kind: 'tag', add: [{ create: unique('Old tag') }], remove: [] },
+    )
+    await changeTags(
+      asB,
+      { bookId: book.id },
+      { kind: 'theme', add: [{ create: unique('Keep theme') }], remove: [] },
+    )
+    await editBook(asB, { bookId: book.id, edits: { year: 2020 }, tags: { tag: [] } })
+    const after = await getUserBookState(asB, book.id)
+    expect(after.tags.map(({ kind }) => kind)).toEqual(['theme'])
+    const themeId = after.tags[0].id
+    const foreignTag = await gateway.create(asA, {
+      collection: 'tags',
+      data: { owner: a.id, kind: 'tag', name: unique('Foreign'), nameKey: '' },
+      depth: 0,
+    })
+    await expect(
+      editBook(asB, { bookId: book.id, edits: { year: 2023 }, tags: { tag: [foreignTag.id] } }),
+    ).rejects.toMatchObject({ code: 'VALIDATION', fields: { 'tags.tag': 'VALIDATION' } })
+    expect((await seen(asB, book))?.year).toBe(2020)
+
+    await expect(
+      editBook(asB, { bookId: book.id, edits: { year: 2021 }, tags: { tag: [themeId] } }),
+    ).rejects.toMatchObject({ code: 'VALIDATION', fields: { 'tags.tag': 'VALIDATION' } })
+    expect((await seen(asB, book))?.year).toBe(2020)
+    const rollbackName = unique('Rollback tag')
+    await expect(
+      editBook(asB, {
+        bookId: book.id,
+        edits: { year: 2022 },
+        tags: { tag: [{ create: rollbackName }], genre: [{ create: genre.name }] },
+      }),
+    ).rejects.toMatchObject({ code: 'VALIDATION', fields: { 'tags.genre': 'SYSTEM_NAME' } })
+    expect((await seen(asB, book))?.year).toBe(2020)
+    expect((await getUserBookState(asB, book.id)).tags).toEqual(after.tags)
+    expect(
+      (
+        await gateway.find(asB, {
+          collection: 'tags',
+          where: { name: { equals: rollbackName } },
+          depth: 0,
+        })
+      ).docs,
+    ).toEqual([])
+  })
 
   beforeAll(async () => {
     payload = await getPayload({ config })

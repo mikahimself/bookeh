@@ -16,6 +16,7 @@ vi.mock('next/navigation', async (importOriginal) => ({
 }))
 vi.mock('@/app/(frontend)/actions/undo', () => ({ undoAction }))
 
+const { ToastHost } = await import('@/app/(frontend)/components/toast/ToastHost')
 const { ToastProvider, useToast } = await import('@/app/(frontend)/components/toast/ToastProvider')
 
 /** Raises `input` through the context once mounted, as a page would. */
@@ -45,6 +46,30 @@ describe('Undo on the toast', () => {
     vi.resetAllMocks()
     vi.useRealTimers()
     vi.unstubAllGlobals()
+  })
+
+  it('keeps the single Undo toast in the active overlay and returns it after close', async () => {
+    undoAction.mockResolvedValue({ ok: true, data: null })
+    const tree = (open: boolean) =>
+      createElement(
+        ToastProvider,
+        null,
+        createElement(Raise, { input: saved }),
+        open
+          ? createElement(
+              'div',
+              { role: 'dialog', 'aria-label': 'Picker' },
+              createElement(ToastHost),
+            )
+          : null,
+      )
+    const { rerender } = render(tree(true))
+    await waitFor(() => expect(screen.getByRole('dialog').contains(undoLink())).toBe(true))
+    expect(screen.getAllByRole('status')).toHaveLength(1)
+    rerender(tree(false))
+    await waitFor(() => expect(undoLink()?.closest('[role="dialog"]')).toBeNull())
+    fireEvent.click(undoLink()!)
+    await waitFor(() => expect(undoAction).toHaveBeenCalledWith('tok'))
   })
 
   it('calls undoAction with the token once and becomes "Undone" without an Undo Link', async () => {

@@ -128,9 +128,7 @@ describe('CollectionPage', () => {
       )
       await renderPage({ book: '5' })
       const surface = await detail(linna.title)
-      const group = within(surface)
-        .getByRole('heading', { name: 'Themes' })
-        .closest('section')!
+      const group = within(surface).getByRole('heading', { name: 'Themes' }).closest('section')!
       const links = within(group).getAllByRole('link')
       expect(links.map(({ textContent }) => textContent)).toEqual([
         '  Stored theme  ',
@@ -193,13 +191,13 @@ describe('CollectionPage', () => {
 
       const sheet = await detail('Tuntematon sotilas')
       expect(within(sheet).queryByRole('heading', { name: 'Description' })).toBeNull()
-      // With no description the next group after classification is the foot.
+      // With no description the picker opener follows classification.
       const classification = within(sheet)
         .getByRole('heading', { name: 'Genres' })
         .closest('section')!
       expect(
         classification.nextElementSibling?.contains(
-          within(sheet).getByRole('link', { name: 'Edit' }),
+          within(sheet).getByRole('button', { name: 'Add tag' }),
         ),
       ).toBe(true)
     })
@@ -569,6 +567,18 @@ describe('CollectionPage', () => {
         expect(await panel('Tuntematon sotilas')).toBe(aside)
         expect(router.replace).not.toHaveBeenCalled()
         expect(moveCopiesAction).not.toHaveBeenCalled()
+      })
+
+      it('keeps the panel open when Escape targets the body while a picker is active', async () => {
+        listLocations.mockResolvedValue([{ id: 4, name: 'Mökki' }])
+        await renderPage({ book: '5' })
+        const aside = await panel('Tuntematon sotilas')
+        fireEvent.click(within(aside).getByRole('button', { name: 'Move' }))
+        await screen.findByRole('dialog', { name: 'Move to' })
+        fireEvent.keyDown(document.body, { key: 'Escape' })
+        await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
+        expect(await panel('Tuntematon sotilas')).toBe(aside)
+        expect(router.replace).not.toHaveBeenCalled()
       })
 
       it('closes after removing the only copy, and reloads the rows', async () => {

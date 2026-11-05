@@ -92,7 +92,9 @@ vi.mock('@/app/(frontend)/(sections)/actions', () => ({
   setNoteAction,
   toggleCopiesReadAction,
   moveCopiesAction,
+  changeBookTagsAction: vi.fn(),
 }))
+vi.mock('@/lib/tags/tags', () => ({ tagUse: async () => [] }))
 vi.mock('@/lib/copies/locations', () => ({ listLocations }))
 vi.mock('@/lib/people/people', () => ({ lendingPeople }))
 vi.mock('@/lib/loans/loans', () => ({ returnedLoans: async () => [] }))

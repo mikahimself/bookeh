@@ -14,6 +14,7 @@ import { markerSlotClass, optionClass, popupClass } from './classes'
 export type ComboboxOption = { id: number; label: string }
 
 export type ComboboxProps = {
+  resetKey?: string | number
   label: string
   options: readonly ComboboxOption[]
   value: Ref | null
@@ -53,6 +54,7 @@ const sameOption = (item: Item, value: Item): boolean =>
  * no history entry.
  */
 export function Combobox({
+  resetKey,
   label,
   options,
   value,
@@ -80,6 +82,11 @@ export function Combobox({
   const selectedLabel = selected ? itemLabel(selected) : ''
   const [query, setQuery] = useState(selectedLabel)
   const [open, setOpen] = useState(false)
+  const [lastReset, setLastReset] = useState(resetKey)
+  if (!open && resetKey !== lastReset) {
+    setLastReset(resetKey)
+    setQuery('')
+  }
   // A controlled `inputValue` gets no label sync from Base UI: a new value or
   // option list (undo, refresh, reset) shows its label once the popup is closed.
   const [shownLabel, setShownLabel] = useState(selectedLabel)

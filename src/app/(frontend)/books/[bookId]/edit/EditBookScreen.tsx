@@ -4,6 +4,10 @@ import { useTranslations } from 'next-intl'
 import { useRouter } from 'next/navigation'
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore, useTransition } from 'react'
 
+import type { TagKind, UserBookState } from '@/lib/books/effectiveBook'
+import type { Ref } from '@/lib/payload/ref'
+import { TagPicker, TAG_KINDS, type TagOptions } from '../../../components/TagPicker'
+import { ActionLink } from '../../../components/Link'
 import type { LocationOption } from '@/lib/copies/locations'
 import type { ErrorCode } from '@/lib/errors'
 import type { Named } from '@/lib/payload/ref'
@@ -86,7 +90,11 @@ export function EditBookScreen({
   themes,
   copy,
   locations,
+  assignedTags = [],
+  tagOptions = { tag: [], genre: [], theme: [] },
 }: {
+  assignedTags?: UserBookState['tags']
+  tagOptions?: TagOptions
   bookId: number
   title: string
   /** Joined ", ". */
@@ -128,6 +136,7 @@ export function EditBookScreen({
   // Per key, the code of a field Save had rejected.
   const [marks, setMarks] = useState<Record<string, ErrorCode>>({})
   const [coverChange, setCoverChange] = useState<CoverChange | undefined>(undefined)
+  const [tagsOpen, setTagsOpen] = useState(false)
   const [asking, setAsking] = useState(false)
   const [armed, setArmed] = useState(true)
   const [pending, startTransition] = useTransition()
@@ -149,7 +158,25 @@ export function EditBookScreen({
   }, [])
 
   const dirty = !isEmpty(draft) || coverChange !== undefined
-  const { copy: copyChange, ...bookEdits } = draft
+  const { copy: copyChange, tags: tagsChange, ...bookEdits } = draft
+  const originalTags = Object.fromEntries(
+    TAG_KINDS.map((kind) => [
+      kind,
+      assignedTags.filter((tag) => tag.kind === kind).map(({ id }) => id),
+    ]),
+  ) as Record<TagKind, Ref[]>
+  const selectedTags = { ...originalTags, ...tagsChange }
+  const editTags = (kind: TagKind, refs: Ref[]) => {
+    const { [kind]: _old, ...rest } = tagsChange ?? {}
+    const same =
+      refs.length === originalTags[kind].length &&
+      refs.every((ref) => originalTags[kind].includes(ref))
+    const tags = same ? rest : { ...rest, [kind]: refs }
+    update(
+      setEdit(draft, 'tags', Object.keys(tags).length ? tags : undefined, undefined),
+      `tags.${kind}`,
+    )
+  }
 
   const setMark = (mark: string, code: ErrorCode | undefined) =>
     setMarks((current) => {
@@ -223,7 +250,13 @@ export function EditBookScreen({
             ? {}
             : { cover: coverChange && { image: coverChange.image, corners: coverChange.corners } }
         const result = await settleAction(
-          editBookAction({ bookId, edits: bookEdits, copy: copyChange, ...cover }),
+          editBookAction({
+            bookId,
+            edits: bookEdits,
+            copy: copyChange,
+            tags: tagsChange,
+            ...cover,
+          }),
         )
         if (!result.ok && result.code === 'UNAUTHENTICATED' && guarding) {
           leaving.current = true
@@ -241,7 +274,9 @@ export function EditBookScreen({
         }
         if (!result.ok) {
           setMarks(result.code === 'VALIDATION' && result.fields ? result.fields : {})
-          reportFailure(result.code)
+          if (result.fields && Object.keys(result.fields).some((key) => key.startsWith('tags.')))
+            setTagsOpen(true)
+          else reportFailure(result.code)
           return
         }
         leaving.current = true
@@ -293,6 +328,53 @@ export function EditBookScreen({
           onChange={editCopy}
         />
       )}
+      <section className="flex flex-col gap-2">
+        <p className="text-body normal-case">
+          {TAG_KINDS.filter((kind) => selectedTags[kind].length > 0)
+            .map(
+              (kind) =>
+                `${t(`tagPicker.${kind}`)}: ${selectedTags[kind]
+                  .map((ref) =>
+                    typeof ref === 'number'
+                      ? (tagOptions[kind].find(({ id }) => id === ref)?.name ?? String(ref))
+                      : ref.create,
+                  )
+                  .join(', ')}`,
+            )
+            .join(' · ') || t('tagPicker.empty')}
+        </p>
+        <ActionLink onClick={() => setTagsOpen(true)}>{t('tagPicker.edit')}</ActionLink>
+      </section>
+      <TagPicker
+        open={tagsOpen}
+        onOpenChange={setTagsOpen}
+        options={tagOptions}
+        selected={selectedTags}
+        pending={pending}
+        errors={Object.fromEntries(
+          TAG_KINDS.flatMap((kind) =>
+            marks[`tags.${kind}`] ? [[kind, t(`errors.${marks[`tags.${kind}`]}`)]] : [],
+          ),
+        )}
+        onAdd={(kind, ref) => {
+          if (
+            selectedTags[kind].some((value) =>
+              typeof value === 'number'
+                ? value === ref
+                : typeof ref !== 'number' && value.create === ref.create,
+            )
+          )
+            return true
+          editTags(kind, [...selectedTags[kind], ref])
+          return true
+        }}
+        onRemove={(kind, ref) =>
+          editTags(
+            kind,
+            selectedTags[kind].filter((value) => value !== ref),
+          )
+        }
+      />
       <MoreDetails
         effective={effective}
         draft={bookEdits}

@@ -65,7 +65,7 @@ Mock-ups, in the final tokens. The spines win on any conflict with a mock-up.
 | [mockups/key-wishlists.html](mockups/key-wishlists.html) | The list of wishlists, one wishlist, an entry opened. |
 | [mockups/key-settings.html](mockups/key-settings.html) | Settings on wide and phone. |
 
-Not mocked, built from this spine alone: Sign in, Lookup, the Filter panel on the phone, pickers and dialogs, select mode on the phone, and sizes s and l. The Genres group in Settings is not mocked either; its story starts with a rendered mock-up choice. So does the tag picker. The app icon and theme colour are settled in DESIGN.md → App Icon & Theme Colour, and the Corner crop in DESIGN.md → Components.
+Not mocked, built from this spine alone: Sign in, Lookup, the Filter panel on the phone, pickers and dialogs, select mode on the phone, and sizes s and l. The Genres group in Settings is not mocked either; its story starts with a rendered mock-up choice. The tag picker choice is recorded under Book detail below. The app icon and theme colour are settled in DESIGN.md → App Icon & Theme Colour, and the Corner crop in DESIGN.md → Components.
 
 ## Voice and Tone
 
@@ -201,6 +201,8 @@ The same content in the panel and the sheet. Changes save at once; there is no S
 | Look it up again | On the creator's own private Book with an ISBN: a Link that calls the sources. Found: the Book takes the source's values and becomes shared (the edition picker when there are several), toast "Shared · from {source}". None: toast "Still not found." Sources didn't answer: the toast names them. Without an ISBN the line reads "Add the ISBN on Edit book to look it up." Not undoable. |
 | Re-fetch | Admin only, on a shared Book: fills empty fields, themes and the cover included; never overwrites. A "Re-fetch" Link line above the foot, after Description when present, with the muted hint "Fills empty fields from the sources." under it; it reads "Re-fetching…" while the sources run. The result is a toast only, no Undo: "Filled {fields} · from {source}" (themes as "{n} themes"), "Nothing to fill.", or "{sources} didn't answer." Book detail redraws after a fill. (Mock-up A + 1, Mika, 2026-10-23.) |
 | Foot | Edit (opens Edit book) and Add to wishlist. No primary button. |
+
+The tag picker uses Tag / Genre / Theme tabs above a kind-aware find-or-create combobox, followed by the selected values of that kind with × removal. Book detail opens it through “Add tag”; each add/remove saves immediately with “Tagged 1 · Undo”. Edit book shows a compact classification summary on its first screen and “Edit tags, genres and themes” to open the same picker; changes remain in the form draft and save only with Save, without Undo. Name errors appear beneath the field. Use a phone bottom sheet and a wide-screen dialog, keeping overlays one level deep. (Mock-up A, Mika, 2026-11-05; `.working/tag-picker-9-7.html`.)
 
 The half-open sheet shows the header, read and rating, and the first copies, so Lend and Returned are reachable without opening it fully.
 

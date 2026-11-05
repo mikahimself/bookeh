@@ -5,6 +5,7 @@ import { useTranslations } from 'next-intl'
 import type { ReactNode, RefObject } from 'react'
 
 import { Button } from '../Button'
+import { ToastHost } from '../toast/ToastHost'
 import { useSuspendSwipe } from '../swipe'
 import { useCloseOnBack, useOverlayLayer } from './overlay'
 
@@ -58,8 +59,9 @@ export function Dialog({
         <BaseDialog.Viewport className="fixed inset-0 flex items-center justify-center p-page-margin-phone">
           <BaseDialog.Popup
             initialFocus={initialFocus}
-            className="flex max-h-full w-full max-w-dialog-width flex-col gap-6 overflow-y-auto border-2 border-text bg-background p-6 overlay-fade"
+            className="relative flex max-h-full w-full max-w-dialog-width flex-col gap-6 overflow-y-auto border-2 border-text bg-background p-6 overlay-fade"
           >
+            <ToastHost />
             <BaseDialog.Title className="text-heading-group ui-case">{title}</BaseDialog.Title>
             {/* A confirm's body describes it; a choice's rows (a Picker) are no description. */}
             {children != null &&

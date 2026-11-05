@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { getFormatter, getTranslations } from 'next-intl/server'
 
+import { tagUse } from '@/lib/tags/tags'
 import { canEditShared } from '@/access/roles'
 import { getHoldings } from '@/lib/books/holdings'
 import { getUserBookState } from '@/lib/books/userBookState'
@@ -24,6 +25,7 @@ import { FilterChip } from './FilterChip'
 import { DetailLookUpAgain } from './LookUpAgain'
 import { NotInLibrary } from './NotInLibrary'
 import { ReadAndRating } from './ReadAndRating'
+import { DetailTags } from './DetailTags'
 import { Refetch } from './Refetch'
 
 const DOT = ' · '
@@ -88,6 +90,11 @@ export async function BookDetail({
     entries: [],
   }
   const state = await getUserBookState(ctx, bookId)
+  const tagOptions = {
+    tag: await tagUse(ctx, 'tag'),
+    genre: await tagUse(ctx, 'genre'),
+    theme: await tagUse(ctx, 'theme'),
+  }
   const lendable = copies.some((copy) => copy.status === 'owned' && !isLent(copy))
   const people = lendable
     ? await lendingPeople(ctx).catch((err: unknown) => {
@@ -268,6 +275,12 @@ export async function BookDetail({
               </section>
             ),
         )}
+        <DetailTags
+          key={`tags-${bookId}`}
+          bookId={bookId}
+          initial={state.tags}
+          options={tagOptions}
+        />
         {book.description?.trim() && (
           <section className="flex min-w-0 flex-col gap-2">
             <h3 className="text-heading-group text-text-muted ui-case">

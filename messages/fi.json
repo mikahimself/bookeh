@@ -417,5 +417,23 @@
     "PERSON_IN_USE": "Henkilöä ei voi poistaa, koska hänellä on lainoja tai toiveita.",
     "NO_CONNECTION": "Ei yhteyttä.",
     "APP_UPDATED": "bookeh päivittyi."
+  },
+  "tagPicker": {
+    "heading": "Tagit, genret ja teemat",
+    "kind": "Laji",
+    "tag": "Tagi",
+    "genre": "Genre",
+    "theme": "Teema",
+    "find": {
+      "tag": "Etsi tai luo tagi",
+      "genre": "Etsi tai luo genre",
+      "theme": "Etsi tai luo teema"
+    },
+    "empty": "Ei valintoja",
+    "remove": "Poista {name}",
+    "add": "Lisää tagi",
+    "edit": "Muokkaa tageja, genrejä ja teemoja",
+    "tagged": "Tagattu {count}",
+    "removeSymbol": "×"
   }
 }

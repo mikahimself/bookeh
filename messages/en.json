@@ -417,5 +417,23 @@
     "PERSON_IN_USE": "This person has loans or wishes, so they can't be deleted.",
     "NO_CONNECTION": "No connection.",
     "APP_UPDATED": "bookeh was updated."
+  },
+  "tagPicker": {
+    "heading": "Tags, genres and themes",
+    "kind": "Kind",
+    "tag": "Tag",
+    "genre": "Genre",
+    "theme": "Theme",
+    "find": {
+      "tag": "Find or create tag",
+      "genre": "Find or create genre",
+      "theme": "Find or create theme"
+    },
+    "empty": "None selected",
+    "remove": "Remove {name}",
+    "add": "Add tag",
+    "edit": "Edit tags, genres and themes",
+    "tagged": "Tagged {count}",
+    "removeSymbol": "×"
   }
 }

@@ -1,6 +1,8 @@
 import { getTranslations } from 'next-intl/server'
 import { ViewTransition } from 'react'
 
+import { getUserBookState } from '@/lib/books/userBookState'
+import { tagUse } from '@/lib/tags/tags'
 import { canEditShared } from '@/access/roles'
 import type { EffectiveBook } from '@/lib/books/effectiveBook'
 import { listGenres } from '@/lib/catalogue/listGenres'
@@ -72,6 +74,12 @@ export default async function EditBookPage({
   const genreOptions = genresEditable ? await listGenres(ctx) : null
   const copy = await savedCopy(ctx, book.bookId, (await searchParams).copy)
   const locations = copy ? await listLocations(ctx) : []
+  const state = await getUserBookState(ctx, book.bookId)
+  const tagOptions = {
+    tag: await tagUse(ctx, 'tag'),
+    genre: await tagUse(ctx, 'genre'),
+    theme: await tagUse(ctx, 'theme'),
+  }
 
   return (
     <ViewTransition enter="task-enter" exit="task-exit" default="none">
@@ -89,6 +97,8 @@ export default async function EditBookPage({
         themes={book.themes}
         copy={copy}
         locations={locations}
+        assignedTags={state.tags}
+        tagOptions={tagOptions}
       />
     </ViewTransition>
   )

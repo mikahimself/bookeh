@@ -3,7 +3,11 @@ import { getPayload, type Payload } from 'payload'
 import sharp from 'sharp'
 import { beforeAll, describe, expect, it, vi } from 'vitest'
 
+import { changeBookTagsAction } from '@/app/(frontend)/(sections)/actions'
+import { undoAction } from '@/app/(frontend)/actions/undo'
 import { editBookAction } from '@/app/(frontend)/books/[bookId]/edit/actions'
+import { getUserBookState } from '@/lib/books/userBookState'
+import type { Context } from '@/lib/payload/context'
 import type { Corners } from '@/lib/catalogue/corners'
 import config from '@/payload.config'
 import type { Book } from '@/payload-types'
@@ -32,6 +36,7 @@ describe('editBookAction with a cover', () => {
   let payload: Payload
   let book: Book
   let jpeg: File
+  let ctx: Context
 
   const stored = () =>
     payload.findByID({ collection: 'books', id: book.id, depth: 0, overrideAccess: true })
@@ -39,6 +44,7 @@ describe('editBookAction with a cover', () => {
   beforeAll(async () => {
     payload = await getPayload({ config })
     const admin = await createUser({ password, displayName: 'Edit Admin', roles: ['admin'] })
+    ctx = await contextFor(admin)
     book = await payload.create({
       collection: 'books',
       data: { title: 'Muumipapan urotyöt', isbn13: randomIsbn(), visibility: 'shared' },
@@ -67,6 +73,65 @@ describe('editBookAction with a cover', () => {
     const requestHeaders = new Headers({ cookie: `payload-token=${login.token}` })
     vi.mocked(headers).mockImplementation(async () => requestHeaders as never)
     vi.mocked(cookies).mockImplementation(async () => ({ get: () => undefined }) as never)
+  })
+
+  it('returns fresh assignments for repeated detail mutations and Undo retains created labels', async () => {
+    const name = `Detail action ${Date.now()}`
+    const added = await changeBookTagsAction({
+      bookId: book.id,
+      kind: 'tag',
+      add: [{ create: name }],
+      remove: [],
+    })
+    expect(added.ok).toBe(true)
+    if (!added.ok) return
+    expect(added.data.tags).toHaveLength(1)
+    const id = added.data.tags[0].id
+    const removed = await changeBookTagsAction({
+      bookId: book.id,
+      kind: 'tag',
+      add: [],
+      remove: [id],
+    })
+    expect(removed.ok && removed.data.tags).toEqual([])
+    if (!removed.ok) return
+    expect(await undoAction(removed.data.undoToken)).toMatchObject({ ok: true })
+    expect(await undoAction(added.data.undoToken)).toMatchObject({ ok: true })
+    expect((await payload.findByID({ collection: 'tags', id, overrideAccess: true })).name).toBe(
+      name,
+    )
+    expect(
+      await changeBookTagsAction({
+        bookId: book.id,
+        kind: 'tag',
+        add: [{ create: 'x', id }],
+        remove: [],
+      }),
+    ).toMatchObject({ ok: false, code: 'VALIDATION' })
+  })
+
+  it('forwards successful classification Save into stored assignments', async () => {
+    const name = `Save action ${Date.now()}`
+    expect(
+      await editBookAction({
+        bookId: book.id,
+        edits: {},
+        tags: { theme: [{ create: name }] },
+      }),
+    ).toEqual({ ok: true, data: null })
+    expect((await getUserBookState(ctx, book.id)).tags).toEqual([
+      expect.objectContaining({ name, kind: 'theme' }),
+    ])
+  })
+
+  it('rejects unknown kinds and malformed refs before saving', async () => {
+    for (const tags of [{ tag: [{ create: 'x', id: 1 }] }, { unknown: [] }, { tag: [0] }, []]) {
+      expect(await editBookAction({ bookId: book.id, edits: { year: 999 }, tags })).toMatchObject({
+        ok: false,
+        code: 'VALIDATION',
+      })
+    }
+    expect((await stored()).year).not.toBe(999)
   })
 
   it('writes no cover when the edits fail', async () => {

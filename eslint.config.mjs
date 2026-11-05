@@ -20,7 +20,7 @@ const appDir = path.join(srcDir, 'app')
 // Allowed imports from `src/lib` per service, besides the service itself,
 // `errors.ts` and `processState.ts`.
 const serviceImports = {
-  catalogue: ['copies', 'wishlists', 'books', 'metadata', 'payload', 'undo'],
+  catalogue: ['copies', 'wishlists', 'books', 'metadata', 'tags', 'payload', 'undo'],
   wishlists: ['copies', 'people', 'payload', 'undo'],
   loans: ['copies', 'people', 'payload', 'undo'],
   shelf: ['books', 'payload', 'undo'],
