@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>bookeh corner crop straight edges</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400&display=swap">
+<style>
+/* Mock-up page for Story 9.21. Governed by DESIGN.md (Corner crop) and UX-DR55 (never colour alone).
+   The stage is always dark, so every option uses the dark tokens only. */
+:root{--page:#ECEEF0;--pfg:#1F2933;--pmu:#5F6B78;--pln:#C9CFD5;--pacc:#F0604F}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--page:#0E1115;--pfg:#E3E8EE;--pmu:#94A0AD;--pln:#2C343D;--pacc:#FF8E7F;color-scheme:dark}}
+:root[data-theme="dark"]{--page:#0E1115;--pfg:#E3E8EE;--pmu:#94A0AD;--pln:#2C343D;--pacc:#FF8E7F;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--page);color:var(--pfg);font:14px/1.45 'Open Sans',"Segoe UI","Helvetica Neue",sans-serif;margin:0}
+main{max-width:1120px;margin:0 auto;padding:28px 16px 80px}
+h1{font-weight:300;font-size:34px;line-height:1.1;margin:0 0 8px}
+.lede{max-width:70ch;color:var(--pmu);margin:0 0 6px}
+.bar{display:flex;flex-wrap:wrap;gap:8px 20px;align-items:center;margin:18px 0 0}
+.bar button{all:unset;cursor:pointer;border-bottom:2px solid var(--pacc);padding:2px 0}
+.bar button:focus-visible{outline:2px solid var(--pfg);outline-offset:3px}
+.bar label{color:var(--pmu)}
+.opts{display:flex;flex-wrap:wrap;gap:36px 32px;margin-top:26px}
+.opt{width:320px;max-width:100%}
+.opt h3{font-weight:400;font-size:17px;margin:0 0 4px}
+.cap{font-size:13px;color:var(--pmu);margin:0 0 8px}
+.cap strong{font-weight:400;color:var(--pfg)}
+.fr{background:#0B0E12;color:#E3E8EE;position:relative;width:320px;max-width:100%;height:470px;user-select:none;-webkit-user-select:none}
+.fr svg{position:absolute;inset:0;width:100%;height:100%;touch-action:none}
+.fr .h{cursor:grab;outline:none}
+.fr .h:focus .ring{display:block}
+.ring{display:none}
+.state{margin-top:8px;font-size:13px;color:var(--pmu);min-height:2.9em}
+</style>
+</head>
+<body>
+<main>
+<h1>Corner crop: straight edges</h1>
+<p class="lede">Each frame is live. Drag a handle (or focus it and use the arrow keys, 1 photo pixel per press, Shift for 10) and bring a side to vertical or horizontal. The stage is always dark, so only dark tokens are used. Handles are 24px; the 44px tap area is unchanged.</p>
+<p class="lede">Every option says “straight” with something besides colour (UX-DR55): a heavier line, a tick, or a dashed guide.</p>
+<div class="bar">
+  <label>Tolerance <input id="tol" type="range" min="0.25" max="3" step="0.25" value="1"> <output id="tolv">1.0°</output></label>
+  <button id="reset" type="button">reset skewed</button>
+</div>
+<div class="opts" id="opts"></div>
+</main>
+<script>
+const W=320,H=470,HS=24,INK='#E3E8EE',ACC='#FF8E7F',HALO='#0000008C',DIM='#00000099';
+const START=[[62,86],[262,70],[256,420],[56,402]]; // TL TR BR BL
+let tol=1;
+const OPTS=[
+ {k:'A',t:'Heavier edge in the accent',d:'A straight side thickens from 2px to 4px and turns <strong>accent</strong>. Weight carries it, colour backs it up. Nothing is added to the stage.'},
+ {k:'B',t:'Tick on the side',d:'A straight side gets a <strong>tick</strong> (✓) drawn in two strokes at its midpoint, just outside the outline. Same stroke as the Close X and checkbox.'},
+ {k:'C',t:'Dashed guide line',d:'A straight side extends as a <strong>dashed accent line</strong> across the whole photo, so you can check it against the cover’s edge and the next side.'}
+];
+// pure rule: a side is straight when it is within tol degrees of horizontal or vertical
+function straight(a,b,tolDeg){const d=Math.abs(Math.atan2(b[1]-a[1],b[0]-a[0])*180/Math.PI)%90;return Math.min(d,90-d)<=tolDeg}
+const sides=p=>[0,1,2,3].map(i=>[p[i],p[(i+1)%4]]);
+const NS='http://www.w3.org/2000/svg';
+const el=(n,a={},par)=>{const e=document.createElementNS(NS,n);for(const k in a)e.setAttribute(k,a[k]);par&&par.appendChild(e);return e};
+
+function photo(svg){ // a stand-in cover photo: a tilted blue book on a wooden desk
+  el('rect',{width:W,height:H,fill:'#5b4a3b'},svg);
+  const g=el('g',{transform:'rotate(2.4 160 245)'},svg);
+  el('rect',{x:52,y:84,width:216,height:336,fill:'#012534'},g);
+  el('rect',{x:70,y:110,width:180,height:6,fill:'#3B8EA5'},g);
+  el('text',{x:70,y:190,fill:'#FBFAF6','font-size':22,'font-family':'Open Sans'},g).textContent='Tuntematon';
+  el('text',{x:70,y:216,fill:'#FBFAF6','font-size':22,'font-family':'Open Sans'},g).textContent='sotilas';
+  el('rect',{x:70,y:380,width:60,height:4,fill:'#F7D117'},g);
+}
+
+function build(o,host){
+  const wrap=document.createElement('div');wrap.className='opt';
+  wrap.innerHTML=`<h3>${o.k}. ${o.t}</h3><p class="cap">${o.d}</p>`;
+  const fr=document.createElement('div');fr.className='fr';wrap.appendChild(fr);
+  const state=document.createElement('p');state.className='state';wrap.appendChild(state);
+  host.appendChild(wrap);
+  const svg=el('svg',{viewBox:`0 0 ${W} ${H}`});fr.appendChild(svg);
+  photo(svg);
+  const dim=el('path',{fill:DIM,'fill-rule':'evenodd'},svg);
+  const overlay=el('g',{},svg);
+  const pts=START.map(p=>p.slice());
+  const hs=pts.map((_,i)=>{
+    const g=el('g',{class:'h',tabindex:0,role:'slider','aria-label':'Corner '+(i+1)},svg);
+    el('rect',{x:-22,y:-22,width:44,height:44,fill:'transparent'},g);
+    el('rect',{class:'halo',x:-HS/2-2,y:-HS/2-2,width:HS+4,height:HS+4,fill:'none',stroke:HALO,'stroke-width':4},g);
+    el('rect',{x:-HS/2,y:-HS/2,width:HS,height:HS,fill:'none',stroke:INK,'stroke-width':2},g);
+    el('rect',{class:'ring',x:-HS/2-5,y:-HS/2-5,width:HS+10,height:HS+10,fill:'none',stroke:INK,'stroke-width':2},g);
+    let drag=false;
+    g.addEventListener('pointerdown',e=>{drag=true;g.setPointerCapture(e.pointerId);g.focus();e.preventDefault()});
+    g.addEventListener('pointerup',()=>drag=false);
+    g.addEventListener('pointermove',e=>{
+      if(!drag)return;const r=svg.getBoundingClientRect();
+      pts[i]=[Math.max(0,Math.min(W,(e.clientX-r.left)*W/r.width)),Math.max(0,Math.min(H,(e.clientY-r.top)*H/r.height))];draw()});
+    g.addEventListener('keydown',e=>{
+      const s=e.shiftKey?10:1,m={ArrowLeft:[-s,0],ArrowRight:[s,0],ArrowUp:[0,-s],ArrowDown:[0,s]}[e.key];
+      if(!m)return;e.preventDefault();pts[i]=[pts[i][0]+m[0],pts[i][1]+m[1]];draw()});
+    return g;
+  });
+  function draw(){
+    const d=pts.map((p,i)=>(i?'L':'M')+p[0]+' '+p[1]).join('')+'Z';
+    dim.setAttribute('d',`M0 0H${W}V${H}H0Z`+d);
+    overlay.textContent='';
+    const ss=sides(pts),st=ss.map(([a,b])=>straight(a,b,tol));
+    // halo, then outline, one side at a time
+    ss.forEach(([a,b],i)=>{
+      const ok=st[i];
+      el('line',{x1:a[0],y1:a[1],x2:b[0],y2:b[1],stroke:HALO,'stroke-width':ok&&o.k==='A'?6:4},overlay);
+      if(ok&&o.k==='C'){
+        const dx=b[0]-a[0],dy=b[1]-a[1],L=Math.hypot(dx,dy)||1,u=[dx/L,dy/L],f=1000;
+        el('line',{x1:a[0]-u[0]*f,y1:a[1]-u[1]*f,x2:b[0]+u[0]*f,y2:b[1]+u[1]*f,stroke:HALO,'stroke-width':3},overlay);
+        el('line',{x1:a[0]-u[0]*f,y1:a[1]-u[1]*f,x2:b[0]+u[0]*f,y2:b[1]+u[1]*f,stroke:ACC,'stroke-width':1,'stroke-dasharray':'6 5'},overlay);
+      }
+    });
+    ss.forEach(([a,b],i)=>{
+      const ok=st[i];
+      el('line',{x1:a[0],y1:a[1],x2:b[0],y2:b[1],stroke:ok&&o.k==='A'?ACC:INK,'stroke-width':ok&&o.k==='A'?4:2},overlay);
+      if(ok&&o.k==='B'){
+        const mx=(a[0]+b[0])/2,my=(a[1]+b[1])/2,dx=b[0]-a[0],dy=b[1]-a[1],L=Math.hypot(dx,dy)||1;
+        let nx=dy/L,ny=-dx/L;const cx=pts.reduce((s,p)=>s+p[0],0)/4,cy=pts.reduce((s,p)=>s+p[1],0)/4;
+        if((mx-cx)*nx+(my-cy)*ny<0){nx=-nx;ny=-ny}
+        const tx=mx+nx*16,ty=my+ny*16,t='M-6 0L-2 5L6 -5';
+        el('path',{d:t,transform:`translate(${tx} ${ty})`,fill:'none',stroke:HALO,'stroke-width':6},overlay);
+        el('path',{d:t,transform:`translate(${tx} ${ty})`,fill:'none',stroke:INK,'stroke-width':2},overlay);
+      }
+    });
+    hs.forEach((g,i)=>g.setAttribute('transform',`translate(${pts[i][0]} ${pts[i][1]})`));
+    overlay.parentNode.appendChild(overlay); hs.forEach(g=>svg.appendChild(g));
+    const names=['top','right','bottom','left'],ok=names.filter((_,i)=>st[i]);
+    state.textContent=ok.length?'Straight: '+ok.join(', ')+'.':'No side is straight.';
+  }
+  wrap.reset=()=>{START.forEach((p,i)=>pts[i]=p.slice());draw()};
+  wrap.redraw=draw;draw();return wrap;
+}
+const host=document.getElementById('opts'),frames=OPTS.map(o=>build(o,host));
+document.getElementById('tol').addEventListener('input',e=>{tol=+e.target.value;document.getElementById('tolv').textContent=tol.toFixed(1)+'°';frames.forEach(f=>f.redraw())});
+document.getElementById('reset').addEventListener('click',()=>frames.forEach(f=>f.reset()));
+</script>
+</body>
+</html>

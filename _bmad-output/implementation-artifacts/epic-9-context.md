@@ -4,7 +4,7 @@
 
 ## Goal
 
-Let users classify and find their books through private tags, genres and themes alongside shared system classification. Provide tagging on Book detail, Edit book and selections, filters and Settings management, plus bilingual system genres derived from source metadata. Close preceding search and metadata verification gaps, expose effective descriptions on Book detail, and measure Phase 1 acceptance on the catalogued collection.
+Let Mika classify and find his books through private tags, user genres and user themes, alongside shared system genres and themes taken from source metadata. The epic delivers tagging on Book detail, Edit book and selections (with Undo), filters, and management in Settings, plus bilingual system genres created on save from Google Books categories (and Finna genre terms) and administered by the admin. It also closes Epic 8 verification follow-ups, a few small UI backlog items, and ends with Phase 1 acceptance on the real collection.
 
 ## Stories
 
@@ -12,6 +12,9 @@ Let users classify and find their books through private tags, genres and themes 
 - Story 9.18: Independent search and Answer cover previews
 - Story 9.19: Production Kirjasampo adapter verification
 - Story 9.20: Description on Book detail
+- Story 9.21: Corner crop straight edges, snap, side handles and larger handles
+- Story 9.22: Suggest existing authors when adding by hand
+- Story 9.23: Close X on the wishlist screen
 - Story 9.1: Tags collection with kinds
 - Story 9.2: Change tags
 - Story 9.3: Rename, merge and delete tags
@@ -28,48 +31,47 @@ Let users classify and find their books through private tags, genres and themes 
 - Story 9.13: Genre admin service
 - Story 9.14: Genres in Settings, admin only
 - Story 9.15: Phase 1 acceptance
-- Story 9.21: Corner crop straight edges and larger handles
-- Story 9.22: Suggest existing authors when adding by hand
-- Story 9.23: Close X on the wishlist screen
 
 ## Requirements & Constraints
 
-- Personal classifications remain private for every role, including admin. Shared system genres and themes cannot be overridden; private genres and themes supplement them. Do not restore the retired genre-override slice.
-- User genres cannot use a system genre's English or Finnish name; user themes cannot use a system theme name on a Book the user holds. A system genre introduced later leaves an existing user genre intact. Name matching normalizes whitespace and case without accent folding.
-- Classification belongs to the Book for a user: tagging either copy changes both. Private-label usage counts are copy counts; system genre administration uses Book counts.
-- Filters combine fields with AND and values within a field with OR. Theme filtering uses strings: system themes match exactly apart from case, without accent folding; user themes match through the viewer's private theme tags by name. Active themes appear in the count line. Theme suggestions cover system and private themes in use on the viewer's copies through `/data/suggest`.
-- Seed system genres with reviewed Finnish names. Shared-Book saves derive genres from Google categories, creating unmatched English-only genres. If Google covers fewer than half the fixture books or remains unavailable, also map stored Finna genre terms. Admin re-runs fill empty assignments only. Lookup previews creation without writing.
-- Preserve own-search visibility, deduplication, order and limits. Search and edition Answer cover previews survive collisions in either direction, retaining authentication, user isolation, expiry, bounded storage and host checks; clients never supply remote URLs.
-- Cover previews distinguish Answer and search contexts, share bounded storage caps, and count once per context against lookup limits. Authentication precedes parameter validation; invalid contexts or candidate indexes fail with 404.
-- Phase 1 acceptance records catalogue/location coverage, five phone location checks each under 10 seconds, lookup and entry speed evidence, and the restore rehearsal. Known-book lookup targets 2 seconds, external lookup 5 seconds, and saving without edits under 20 seconds. Flag manual corrections above one in ten held Books for a decision; record results in `docs/phase-1-acceptance.md`.
-- Corner crop: a side within a tolerance of vertical or horizontal shows a non-colour-only indication (tokens, same in both themes) chosen by Mika from rendered options; the rule is a pure function beside `checkCorners()` and does not change what it accepts. Handles are 24px with the 44px tap area unchanged.
-- Not found Answer's Author field suggests existing authors through `/data/suggest` and the name Combobox, still accepting free text; Enter submits unless a suggestion is highlighted. A failed suggestion request shows no toast.
-- Phone wishlist screen gets a Close X (44px tap area, localized label) beside the Back link, going to `/wishlists`; absent from 900px.
+- Personal tags, user genres and user themes are private to their owner; the admin role cannot read them. A user's name within a kind may not equal a system genre's English or Finnish name, nor a system theme on a Book the user holds. A system genre created later with a user genre's name leaves the user genre alone.
+- System genres are shared, have English and Finnish names, are shown in the user's language, and are not overridable. The list is seeded from Google Books' top-level categories and grows when a save meets a missing one (created with no Finnish name). The admin adds Finnish names, adds genres, merges and deletes duplicates; a merge or delete touches shared rows only.
+- System themes are source data (ordinary sources first, then enrichment terms, deduplicated case-insensitively), not translated, not overridable, and filled by re-fetch when empty. Enrichment subjects never create genres.
+- Tags apply to the Book, so every copy of a Book changes together; they work for a Book that is only on a wishlist.
+- Filters: genre, theme and tag cover system and user values; values within one field widen (OR). Chips on an opened Book add that value to the active filters.
+- Rename, merge and delete exist for tags of every kind; renaming onto an existing name offers a merge; delete confirms what loses its tag.
+- Answer screen says when a save would create a genre ("New genre").
+- Book detail shows the effective description as read-only escaped plain text, honouring an explicitly cleared override.
 
 ## Technical Decisions
 
-- Private labels share one owner-scoped `tags` collection with kind `tag`, `genre` or `theme` and database uniqueness on `(owner, kind, nameKey)`. `user-books.tags` references owned labels only. Missing user Book state means no tags. `upsertUserBook` is its sole writer.
-- Shelf reads use one visible-copy rule and readable Book joins; every row is one copy. All shelf matching, options and suggestions use `lib/shelf`. Option counts are distinct readable own copies, including ordered copies, independent of current filters. Private labels require viewer ownership and the correct kind, including for admins. Suggestions are bounded and blank input returns none.
-- Preserve numeric system genre URLs; private genre values use `tag:<id>`, ordinary tags their numeric tag field. System and private genres OR together and remain distinct choices even with equal names. Query parsing and writing stay centralized; filters and open Book live in the URL.
-- `lib/tags` owns private-label matching and mutations; `lib/catalogue` owns system genres behind `canEditShared`. Screens do not match names. Non-admin system administration fails with `NOT_FOUND`.
-- Mutations share a transaction and request context; gateway operations on that context run sequentially. Selection actions authorize every copy before writes, apply to distinct Books and commit all or none. Merge moves references and deletes the source atomically; delete removes references first.
-- Tag Undo restores prior Book assignments and retains inline-created labels. Edit book saves classification with its form transaction and has no Undo. Rename, merge, delete and system genre administration have no Undo.
-- Retain raw source metadata for repeatable genre mapping. Ordinary-source categories feed genres; enrichment subjects do not. Kirjasampo contributes Finnish themes and a missing description; failure returns `undefined`. Verify production adapters with recorded-response fetch stubs, without live test requests.
-- Database constraints enforce expressible invariants from the first migration. Owner foreign keys cascade on user deletion; relationship-table keys retain cascade.
-- Schema initialization rejects unclassified or invalid foreign-key actions.
+- One `tags` collection with `kind: tag | genre | theme`, using `ownerField()` and `nameKeyField()`; `(owner, kind, nameKey)` is a database unique constraint. `user-books.tags` is a has-many owned relation to it. Read, update and delete are owner-only for every role, admin included; a foreign tag id must be rejected.
+- Writers (AD-18): `changeTags()` in `lib/tags` is the single tag writer and accepts copy ids or a Book id; `upsertUserBook()` in `lib/books` is the only `user-books` writer. Tags are matched by `nameKey`, created, renamed, merged and deleted only by `lib/tags`.
+- Import direction: `tags` may import `books` and `shelf`; `catalogue` may import `tags`.
+- System genres: `mapSubjectsToGenres()` in `lib/catalogue` writes `books.genres` on a shared Book from Google categories in `rawMetadata.subjects.google` (match by English `nameKey`, create missing). Finna genre terms map match-only (English or Finnish name, never create) and are used when Google coverage is under half or unchecked. Google's ids come first, ids distinct. `remapGenres(ctx)` is admin-only, fills only Books with empty genres, and returns `NOT_FOUND` to others. Users have no write access to `genres`; all writes go through `lib/catalogue`, guarded by `canEditShared`.
+- Undo (AD-20): a tag change is undoable through server-held receipts in `lib/undo` (restores each Book's previous tags). Removals, deletes, merges, `editBook`, and genre administration are not undoable.
+- Genre URL filter values: system genres `genre=42`, private genres `genre=tag:42`, tags `tag=42`; malformed ids ignored, repeats deduplicated.
+- Shared-context contract (AD-16): gateway reads sharing one context run sequentially, not concurrently (story 9.17); cover preview state must distinguish search and Answer contexts (9.18).
+- Slice G6 (genre override on Edit book) is retired; genres and themes are never overridable.
+- Tests only where acceptance criteria or a spine rule name the behaviour (access, Undo, source order); integration tests use stored fixture raw data.
+- Spine changes ship with the story that changes a contract.
+- Stories that change UI docs (9.21, 9.23) update DESIGN.md / EXPERIENCE.md in the same commit.
 
 ## UX & Interaction Patterns
 
-- Book detail shows nonempty classification groups as Filter chips. Chips add to existing collection filters; another value widens its field. Phone detail closes after applying a chip. From loans or wishlists, navigate to the collection with that filter.
-- Theme, author, series and publisher filters use comboboxes that add values to short lists. Listed genres show system choices in the viewer's language first, then private genres; Finnish falls back to English when no translation exists.
-- The approved private-label picker uses Tag / Genre / Theme tabs, a kind-aware find-or-create combobox and selected values with × removal. Book detail saves each add/remove immediately with a tagging toast and Undo. Edit book presents a compact classification summary and opens the same picker; changes remain in its draft until Save, without Undo. Selection tagging offers add-to-all and remove-from-all. Validation messages appear beneath the field.
-- Pickers use phone bottom sheets and wide-screen dialogs; overlays stay one level deep. The single toast region follows the active modal so Undo remains accessible, returning to the preceding modal or root on close. Settings separates private-label groups, supports inline rename, offers merge on conflicts, and confirms merge/delete with affected-book counts. The admin Genres group edits bilingual names and marks missing Finnish names.
-- Mika approved picker option A, recorded in `EXPERIENCE.md`; retain that interaction across Book detail and Edit book. The admin Genres group still requires rendered options and Mika's recorded choice before implementation.
-- Book detail displays the full nonblank effective description after classification and before source actions/the foot as plain text preserving line breaks and wrapping long words. Omit empty or cleared descriptions. Use Description/Kuvaus at both widths; Answer and wishlist entry detail are outside this change.
+- Tag picker: Tag / Genre / Theme tabs above a kind-aware find-or-create combobox, then the selected values with × removal; each add or remove saves immediately. Book detail opens it via "Add tag"; Edit book hosts the same picker.
+- Book detail Classification group shows system genres (user's language), user genres, system themes, user themes and tags as Filter chips; empty kinds are absent.
+- Select mode: the Tag action offers add-to-all and remove-from-all; toast "Tagged {n}" with Undo. Pickers are bottom sheets on phone, dialogs on wide screens.
+- Settings lists Tags, My genres, My themes as rows with usage counts and Rename / Merge / Delete; admin-only Genres list shows Book counts, a "No Finnish name" mark, in-place English/Finnish editing and Add genre.
+- Description section sits after classification and before source actions, headed "Description" / "Kuvaus", omitted when blank, no truncation.
+- Corner crop (9.21): a side within 1 degree of an axis (measured on the photo) is drawn heavier (weight change, not colour alone; accent dark value in both themes, tokens only). While a corner is dragged by pointer, touching sides are pulled toward straight between 1 and 3 degrees; arrow keys never snap and Alt skips it on desktop. Each side gets a diamond midpoint handle (44px tap area, keyboard-movable, Tab after corners) that moves the whole side keeping angle and staying on the photo. Corner handles grow 20px to 24px, 44px tap area unchanged. Straightness and snap are pure functions beside `checkCorners()` in `lib/catalogue/corners.ts` and do not change what it accepts. Indication, snap and side handles were chosen from rendered mock-ups.
+- Wishlist close X (9.23): phone only (absent from 900px), 44px target, goes to `/wishlists`, Back link stays.
+- Author field on the Not found Answer (9.22) reuses Edit book's `/data/suggest` name Combobox; free text still accepted.
 
 ## Cross-Story Dependencies
 
-- Run retrospective follow-ups 9.17–9.19 first, in order; independent 9.20 can follow.
-- Private-label model and services underpin pickers, Settings and filters. System genre vocabulary and mapping underpin saved classification and Answer creation markers.
-- Run 9.16 before 9.11 when Google Books recovers. An outage leaves 9.16 open while 9.11 proceeds with Finna.
-- Final acceptance draws on the production catalogue, earlier lookup/entry measurements and backup restore rehearsal.
+- Run order: 9.17 to 9.19 first, then 9.20 (independent of tagging); 9.1 underpins 9.2 to 9.9 (collection, then writer, then filters, detail, pickers, selection, Settings).
+- 9.10 seeds genres before 9.11 maps them; 9.16 runs before 9.11 when Google answers, but 9.11 never waits for it and falls back to Finna mapping.
+- 9.12 (Answer "New genre") and 9.13 to 9.14 (admin service, then Settings UI) build on 9.11.
+- 9.15 (Phase 1 acceptance) closes the epic and depends on the rest.
+- Depends on earlier epics: Book/user-books model, selection mode, Settings, filters, Undo receipts, Answer screen, and metadata sources (Finna, Google, Kirjasampo).

@@ -3827,22 +3827,24 @@ So that I can see what it is about without opening Edit book.
 **And** existing held-Book access checks, editing, close behaviour and scrolling remain intact; the Answer and wishlist entry detail are outside this story
 **And** focused unit coverage verifies visible, omitted and literal-text cases; an uncommitted browser walk checks phone and desktop, long text, both locales and editing then returning to detail, with observations recorded in the story
 
-### Story 9.21: Corner crop shows straight edges and has larger handles
+### Story 9.21: Corner crop shows straight edges, snaps to them and has larger handles and side handles
 
 As Mika,
-I want the Corner crop to show when a side of the rectangle is straight,
-So that I can line a cover up without guessing, and grab the handles more easily.
+I want the Corner crop to show when a side of the rectangle is straight, to settle onto straight gently, and to let me move a whole side,
+So that I can line a cover up without guessing, and grab and place it more easily.
 
 **Acceptance Criteria:**
 
-**Given** the story starts with rendered mock-up options of the straight-edge indication (for example the edge changing colour, a tick or a guide line), and Mika has picked one
-**When** a side of the quadrilateral is vertical or horizontal within a small tolerance (decided in the story, in photo pixels or degrees, not screen pixels)
-**Then** that side shows the chosen indication while it holds, and drops it when it does not; it works for pointer drags and arrow-key moves, and each side is judged on its own
-**And** the indication does not rely on colour alone (UX-DR55), uses tokens only, and is the same in both themes (the step is always dark)
-**And** the four handles are drawn 20 % larger (the 20px square becomes 24px); the 44px tap area, the halo, the focus ring and the handle's position over its corner are unchanged
-**And** the straightness rule is a pure function beside `checkCorners()` in `src/lib/catalogue/corners.ts`, with one focused unit test for within and outside tolerance; it does not change what `checkCorners()` accepts, so Use stays enabled or disabled exactly as before
-**And** DESIGN.md → Corner crop (handle size, the indication) and EXPERIENCE.md → Corner crop are updated in the same commit
-**And** an uncommitted phone walk checks a drag onto straight, off straight, a skewed photo and the handles' feel
+**Given** the indication was chosen from rendered options on 2026-11-05 (`.working/corner-crop-straight.html`, option A) and the snap and side handles from `.working/corner-crop-snap.html` (option C, sticky zone, with the diamond side handles)
+**When** a side of the quadrilateral is within 1° of vertical or horizontal (measured on the photo, not the screen)
+**Then** that side is drawn 4px in `{colors.accent}` (dark value) over a 6px halo instead of 2px in `{colors.text}`, and drops it when it is not; it works for pointer drags, side-handle drags and arrow-key moves, and each side is judged on its own
+**And** the indication does not rely on colour alone (UX-DR55: the weight changes too), uses tokens only, and is the same in both themes (the step is always dark)
+**And** while a corner is dragged by pointer, each side that corner touches is pulled toward straight: between 1° and 3° off an axis the side's angle is the pointer's angle off the axis mapped through `(d - 1) * 1.5`, which reaches 3° at 3° and is exactly 0 inside 1°, so a corner can land on a vertical and a horizontal at once; arrow-key moves never snap; holding Alt on desktop skips the snap
+**And** each side has a side handle at its midpoint: a 16px diamond drawn like the corner handles (`{spacing.stroke-control}` outline over the `{colors.crop-halo}` line) with a 44px tap area; dragging it, or moving it with the arrow keys when focused, moves both ends of that side by the same amount, keeps its angle and keeps both ends on the photo; it carries the focus ring and Tab reaches it after the corners
+**And** the four corner handles are drawn 20 % larger (the 20px square becomes 24px); the 44px tap area, the halo, the focus ring and the handle's position over its corner are unchanged
+**And** the straightness rule and the snap mapping are pure functions beside `checkCorners()` in `src/lib/catalogue/corners.ts`, with one focused unit test for within and outside tolerance and one for the snap mapping at 0.5°, 2° and 4°; they do not change what `checkCorners()` accepts, so Use stays enabled or disabled exactly as before
+**And** DESIGN.md → Corner crop (handle size, the indication, the side handles) and EXPERIENCE.md → Corner crop (snap, side handles, keys) are updated in the same commit
+**And** an uncommitted phone walk checks a drag onto straight, off straight, the snap landing on two sides at once, a side moved by its handle, a skewed photo and the handles' feel
 
 ### Story 9.22: Suggest existing authors when adding by hand
 
