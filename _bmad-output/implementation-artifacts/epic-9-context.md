@@ -34,6 +34,7 @@ Let Mika classify and find his books through private tags, user genres and user 
 
 ## Requirements & Constraints
 
+- Phase 1 is a signed-in personal catalogue on the tailnet; later public phases are outside this epic.
 - Personal tags, user genres and user themes are private to their owner; the admin role cannot read them. A user's name within a kind may not equal a system genre's English or Finnish name, nor a system theme on a Book the user holds. A system genre created later with a user genre's name leaves the user genre alone.
 - System genres are shared, have English and Finnish names, are shown in the user's language, and are not overridable. The list is seeded from Google Books' top-level categories and grows when a save meets a missing one (created with no Finnish name). The admin adds Finnish names, adds genres, merges and deletes duplicates; a merge or delete touches shared rows only.
 - System themes are source data (ordinary sources first, then enrichment terms, deduplicated case-insensitively), not translated, not overridable, and filled by re-fetch when empty. Enrichment subjects never create genres.
@@ -53,7 +54,7 @@ Let Mika classify and find his books through private tags, user genres and user 
 - Genre URL filter values: system genres `genre=42`, private genres `genre=tag:42`, tags `tag=42`; malformed ids ignored, repeats deduplicated.
 - Shared-context contract (AD-16): gateway reads sharing one context run sequentially, not concurrently (story 9.17); cover preview state must distinguish search and Answer contexts (9.18).
 - Slice G6 (genre override on Edit book) is retired; genres and themes are never overridable.
-- Tests only where acceptance criteria or a spine rule name the behaviour (access, Undo, source order); integration tests use stored fixture raw data.
+- Tests guard acceptance criteria and spine rules such as access, Undo and source order; fixture data keeps metadata tests offline. Screen changes receive an uncommitted browser walk against fixture-backed e2e configuration, with observations recorded in the story.
 - Spine changes ship with the story that changes a contract.
 - Stories that change UI docs (9.21, 9.23) update DESIGN.md / EXPERIENCE.md in the same commit.
 
@@ -64,9 +65,9 @@ Let Mika classify and find his books through private tags, user genres and user 
 - Select mode: the Tag action offers add-to-all and remove-from-all; toast "Tagged {n}" with Undo. Pickers are bottom sheets on phone, dialogs on wide screens.
 - Settings lists Tags, My genres, My themes as rows with usage counts and Rename / Merge / Delete; admin-only Genres list shows Book counts, a "No Finnish name" mark, in-place English/Finnish editing and Add genre.
 - Description section sits after classification and before source actions, headed "Description" / "Kuvaus", omitted when blank, no truncation.
-- Corner crop (9.21): a side within 1 degree of an axis (measured on the photo) is drawn heavier (weight change, not colour alone; accent dark value in both themes, tokens only). While a corner is dragged by pointer, touching sides are pulled toward straight between 1 and 3 degrees; arrow keys never snap and Alt skips it on desktop. Each side gets a diamond midpoint handle (44px tap area, keyboard-movable, Tab after corners) that moves the whole side keeping angle and staying on the photo. Corner handles grow 20px to 24px, 44px tap area unchanged. Straightness and snap are pure functions beside `checkCorners()` in `lib/catalogue/corners.ts` and do not change what it accepts. Indication, snap and side handles were chosen from rendered mock-ups.
+- Cover cropping provides a full-screen dark step with draggable corners and whole-side handles, keyboard movement, straight-side indication and gentle pointer snapping; Cancel discards the crop and Use requires valid geometry. Targets remain at least 44px and indication must not rely on colour alone.
 - Wishlist close X (9.23): phone only (absent from 900px), 44px target, goes to `/wishlists`, Back link stays.
-- Author field on the Not found Answer (9.22) reuses Edit book's `/data/suggest` name Combobox; free text still accepted.
+- Manual-entry authors and Edit book author rows share the name Combobox and `/data/suggest`. Existing names are suggestions rather than a restriction: free text remains accepted and matching ignores case. A highlighted suggestion consumes Enter before form submission; manual entry retains Title-to-Author keyboard flow, required-field messages, autofocus and input hints. Suggestion failures silently fall back to text entry.
 
 ## Cross-Story Dependencies
 

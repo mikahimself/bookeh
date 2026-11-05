@@ -75,7 +75,9 @@ describe('CollectionPage', () => {
       })
       await waitFor(() => expect(fetchStub).toHaveBeenCalledOnce())
       expect(fetchStub.mock.calls[0]![0]).toMatch(/^\/data\/shelf\?q=sinuhe&/)
-      expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Done' }))
+      await waitFor(() =>
+        expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Done' })),
+      )
       expect(readButton().disabled).toBe(true)
 
       toggleCopiesReadAction.mockResolvedValueOnce(toggled(false, 1))

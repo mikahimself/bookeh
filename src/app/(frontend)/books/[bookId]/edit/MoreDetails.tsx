@@ -12,7 +12,7 @@ import { TextAreaField, TextField } from '../../../components/TextField'
 import { markerSlotClass } from '../../../components/ui/classes'
 
 import { isEmpty } from './draft'
-import { NameCombobox } from './NameCombobox'
+import { NameCombobox } from '../../../components/NameCombobox'
 
 /**
  * Every `BookEdits` key's value as the viewer sees the Book: author and

@@ -92,6 +92,7 @@ vi.mock('@/app/(frontend)/prefs', async (importOriginal) => ({
 vi.mock('@/app/(frontend)/actions/prefs', () => ({ setDevicePrefsAction }))
 vi.mock('@/app/(frontend)/heldBook', () => ({ heldBook }))
 vi.mock('@/lib/books/holdings', () => ({ getHoldings }))
+vi.mock('@/lib/tags/tags', () => ({ tagUse: async () => [] }))
 vi.mock('@/lib/books/userBookState', () => ({
   getUserBookState: async () => ({ read: false, rating: null, tags: [] }),
 }))

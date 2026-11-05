@@ -1,12 +1,19 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState } from 'react'
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type Ref as InputRef,
+  type HTMLAttributes,
+} from 'react'
 
 import type { Ref } from '@/lib/payload/ref'
 import type { SuggestField } from '@/lib/shelf/query'
 
-import { useSuggestions } from '../../../components/suggest'
-import { Combobox, type ComboboxOption } from '../../../components/ui/Combobox'
+import { useSuggestions } from './suggest'
+import { Combobox, type ComboboxOption } from './ui/Combobox'
 
 type Props = {
   label: string
@@ -17,6 +24,9 @@ type Props = {
   onChange: (name: string) => void
   error?: string
   autoFocus?: boolean
+  inputRef?: InputRef<HTMLInputElement>
+  name?: string
+  enterKeyHint?: HTMLAttributes<HTMLInputElement>['enterKeyHint']
 }
 
 /**
@@ -28,7 +38,17 @@ type Props = {
  * arrow keys reach one, so Enter keeps the typed name. The name is resolved
  * to a record on save (AD-5).
  */
-export function NameCombobox({ label, field, value, onChange, error, autoFocus }: Props) {
+export function NameCombobox({
+  label,
+  field,
+  value,
+  onChange,
+  error,
+  autoFocus,
+  inputRef,
+  name,
+  enterKeyHint,
+}: Props) {
   const [text, setText] = useState('')
   const suggestions = useSuggestions(field, text)
   const options = useMemo<ComboboxOption[]>(
@@ -47,6 +67,9 @@ export function NameCombobox({ label, field, value, onChange, error, autoFocus }
   return (
     <div ref={box}>
       <Combobox
+        inputRef={inputRef}
+        name={name}
+        enterKeyHint={enterKeyHint}
         label={label}
         options={options}
         value={ref}

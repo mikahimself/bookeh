@@ -276,6 +276,7 @@ export const linna = book(5, 'Tuntematon sotilas', {
 /** Every case's defaults and clean-up. Call inside `describe('CollectionPage')`. */
 export function resetCollectionPage() {
   beforeEach(() => {
+    getUserBookState.mockResolvedValue({ read: false, rating: null, tags: [] })
     devicePrefs.mockResolvedValue({ ...DEFAULT_PREFS })
     listLocations.mockResolvedValue([])
     tagUse.mockResolvedValue([])
@@ -288,7 +289,6 @@ export function resetCollectionPage() {
     // A reset, not a clear: a case that fails early leaves `…Once` results
     // queued, and a clear would hand them to the next case.
     vi.resetAllMocks()
-    getUserBookState.mockResolvedValue({ read: false, rating: null, tags: [] })
     // An overlay unmounted while open leaves its history entry, and a back
     // with no traversal stays in flight: settle both as a browser back would,
     // so the next case's close starts at depth 0 and replaces.

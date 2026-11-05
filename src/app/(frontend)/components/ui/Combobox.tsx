@@ -2,7 +2,7 @@
 
 import { Combobox as BaseCombobox } from '@base-ui/react/combobox'
 import { useLocale, useTranslations } from 'next-intl'
-import { useId, useMemo, useState } from 'react'
+import { useId, useMemo, useState, type Ref as InputRef, type HTMLAttributes } from 'react'
 
 import type { Ref } from '@/lib/payload/ref'
 
@@ -14,6 +14,9 @@ import { markerSlotClass, optionClass, popupClass } from './classes'
 export type ComboboxOption = { id: number; label: string }
 
 export type ComboboxProps = {
+  inputRef?: InputRef<HTMLInputElement>
+  name?: string
+  enterKeyHint?: HTMLAttributes<HTMLInputElement>['enterKeyHint']
   resetKey?: string | number
   label: string
   options: readonly ComboboxOption[]
@@ -54,6 +57,9 @@ const sameOption = (item: Item, value: Item): boolean =>
  * no history entry.
  */
 export function Combobox({
+  inputRef,
+  name: inputName,
+  enterKeyHint,
   resetKey,
   label,
   options,
@@ -132,6 +138,9 @@ export function Combobox({
         </label>
         <div className="flex items-end gap-2">
           <BaseCombobox.Input
+            ref={inputRef}
+            name={inputName}
+            enterKeyHint={enterKeyHint}
             id={id}
             placeholder=" "
             aria-invalid={error ? true : undefined}

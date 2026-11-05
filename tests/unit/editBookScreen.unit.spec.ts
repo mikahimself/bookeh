@@ -407,6 +407,30 @@ describe('EditBookScreen, More details', () => {
     )
   })
 
+  it('selects a highlighted author with Enter before saving', async () => {
+    editBookAction.mockResolvedValue({ ok: true, data: null })
+    suggested = [
+      { id: 9, name: 'Väinö Linna' },
+      { id: 10, name: 'Mika Waltari' },
+    ]
+    open()
+    unfold()
+    const author = field('author')
+    await typeName(author, 'linna')
+    expect(screen.queryByRole('option', { name: 'Mika Waltari' })).toBeNull()
+    fireEvent.keyDown(author, { key: 'ArrowDown' })
+    fireEvent.keyDown(author, { key: 'Enter' })
+    expect(author).toHaveProperty('value', 'Väinö Linna')
+    expect(editBookAction).not.toHaveBeenCalled()
+    save()
+    await waitFor(() =>
+      expect(editBookAction).toHaveBeenCalledWith({
+        bookId: 7,
+        edits: { authors: ['Väinö Linna'] },
+      }),
+    )
+  })
+
   it('saves a chosen series suggestion as the series', async () => {
     editBookAction.mockResolvedValue({ ok: true, data: null })
     suggested = [{ id: 4, name: 'Muumit' }]

@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { createElement } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -9,8 +9,9 @@ const saveManualAction = vi.fn()
 const saveEntryAction = vi.fn()
 
 vi.mock('next-intl', () => ({
-  useTranslations: () => (key: string, values?: { location: string }) =>
-    values ? `${key}:${values.location}` : key,
+  useTranslations: (namespace?: string) => (key: string, values?: { location: string }) =>
+    values ? `${key}:${values.location}` : namespace ? `${namespace}.${key}` : key,
+  useLocale: () => 'en',
 }))
 vi.mock('next/navigation', async (importOriginal) => ({
   ...(await importOriginal<typeof import('next/navigation')>()),
@@ -34,12 +35,88 @@ installNavigationTracking()
 
 const ISBN = '9789510397077'
 
-const type = (label: string, value: string) =>
-  fireEvent.change(screen.getByLabelText(label), { target: { value } })
+const type = (label: string, value: string) => {
+  const input = screen.getByLabelText(label)
+  act(() => input.focus())
+  fireEvent.input(input, { target: { value }, inputType: 'insertText' })
+  fireEvent.keyDown(input, { key: 'Escape' })
+}
 const add = () => fireEvent.click(screen.getByRole('button', { name: 'answer.addToLibrary' }))
 
 describe('NotFoundForm', () => {
+  it('chooses a containing author with highlighted Enter before saving', async () => {
+    vi.mocked(fetch).mockResolvedValue({
+      json: async () => ({
+        ok: true,
+        data: [
+          { id: 9, name: 'Väinö Linna' },
+          { id: 10, name: 'Mika Waltari' },
+        ],
+      }),
+    } as Response)
+    saveManualAction.mockResolvedValue({ ok: false, code: 'SAVE_FAILED' })
+    render(createElement(NotFoundForm, { isbn13: null, title: 'Book', lists: [] }))
+    const author = screen.getByLabelText<HTMLInputElement>('answer.author')
+    act(() => author.focus())
+    fireEvent.input(author, { target: { value: 'linna' }, inputType: 'insertText' })
+    expect(await screen.findByRole('option', { name: 'Väinö Linna' })).toBeTruthy()
+    expect(screen.queryByRole('option', { name: 'Mika Waltari' })).toBeNull()
+    expect(fireEvent.keyDown(author, { key: 'Enter' })).toBe(true)
+    await waitFor(() => expect(screen.queryByRole('listbox')).toBeNull())
+    fireEvent.input(author, { target: { value: 'Linna' }, inputType: 'insertText' })
+    expect(await screen.findByRole('option', { name: 'Väinö Linna' })).toBeTruthy()
+    fireEvent.keyDown(author, { key: 'ArrowDown' })
+    expect(fireEvent.keyDown(author, { key: 'Enter' })).toBe(false)
+    expect(author.value).toBe('Väinö Linna')
+    expect(saveManualAction).not.toHaveBeenCalled()
+    add()
+    await waitFor(() =>
+      expect(saveManualAction).toHaveBeenCalledWith(
+        expect.objectContaining({ author: 'Väinö Linna' }),
+      ),
+    )
+  })
+
+  it('keeps free text usable after a silent suggestion failure and permits Enter submission', async () => {
+    let rejectRequest!: (reason: Error) => void
+    const request = new Promise<Response>((_, reject) => {
+      rejectRequest = reject
+    })
+    vi.mocked(fetch).mockReturnValue(request)
+    saveManualAction.mockResolvedValue({
+      ok: false,
+      code: 'VALIDATION',
+      fields: { authors: 'VALIDATION' },
+    })
+    render(createElement(NotFoundForm, { isbn13: null, title: 'Book', lists: [] }))
+    const author = screen.getByLabelText<HTMLInputElement>('answer.author')
+    act(() => author.focus())
+    fireEvent.input(author, { target: { value: 'Unmatched Author' }, inputType: 'insertText' })
+    await waitFor(() => expect(fetch).toHaveBeenCalled())
+    await act(async () => {
+      rejectRequest(new TypeError('offline'))
+      await request.catch(() => {})
+    })
+    expect(author.value).toBe('Unmatched Author')
+    expect(show).not.toHaveBeenCalled()
+    // jsdom does not perform the browser's implicit submit; check that Enter
+    // is allowed, then dispatch that default action explicitly.
+    expect(fireEvent.keyDown(author, { key: 'Enter' })).toBe(true)
+    fireEvent.submit(author.closest('form')!)
+    await waitFor(() =>
+      expect(saveManualAction).toHaveBeenCalledWith(
+        expect.objectContaining({ author: 'Unmatched Author' }),
+      ),
+    )
+    expect(await screen.findByText('answer.authorRequired')).toBeTruthy()
+    expect(document.activeElement).toBe(author)
+  })
+
   beforeEach(() => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({ json: async () => ({ ok: true, data: [] }) }),
+    )
     // The picker under Add to wishlist reads the wide query.
     vi.stubGlobal(
       'matchMedia',

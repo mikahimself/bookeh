@@ -9,6 +9,7 @@ import type { WishlistLine } from '@/lib/wishlists/wishlists'
 import { AddToWishlist } from '../components/AddToWishlist'
 import { Button } from '../components/Button'
 import type { EntryTarget } from '../components/entryTarget'
+import { NameCombobox } from '../components/NameCombobox'
 import { ProgressLine } from '../components/ProgressLine'
 import { TextField } from '../components/TextField'
 import type { OnRefused } from '../components/useSavePress'
@@ -48,13 +49,14 @@ export function NotFoundForm({
   const titleField = useRef<HTMLInputElement>(null)
   const authorField = useRef<HTMLInputElement>(null)
   const [marks, setMarks] = useState<{ title?: ErrorCode; author?: ErrorCode }>({})
+  const [typedAuthor, setTypedAuthor] = useState('')
   const [typedTitle, setTypedTitle] = useState(title)
   /** Add to wishlist is saving or leaving: Add to library would add a second private Book. */
   const [wishing, setWishing] = useState(false)
 
   const typed = () => ({
     title: titleField.current?.value ?? '',
-    author: authorField.current?.value ?? '',
+    author: typedAuthor,
   })
 
   const mark = (marked: { title?: ErrorCode; author?: ErrorCode }) => {
@@ -126,8 +128,11 @@ export function NotFoundForm({
           onKeyDown={nextOnEnter}
           onChange={(event) => setTypedTitle(event.target.value)}
         />
-        <TextField
-          ref={authorField}
+        <NameCombobox
+          inputRef={authorField}
+          field="author"
+          value={typedAuthor}
+          onChange={setTypedAuthor}
           name="author"
           label={t('answer.author')}
           error={message(marks.author, 'answer.authorRequired')}
