@@ -1,6 +1,7 @@
 import { getFormatter, getTranslations } from 'next-intl/server'
 import type { ReactNode } from 'react'
 
+import { canEditShared } from '@/access/roles'
 import {
   COLLECTION_VISIBILITIES,
   DISPLAY_NAME_MAX_LENGTH,
@@ -8,6 +9,8 @@ import {
   PROFILE_VISIBILITIES,
 } from '@/lib/account/profile'
 import { readLastBackup } from '@/lib/backup/lastBackup'
+import { genreName } from '@/lib/books/genreName'
+import { genreUse } from '@/lib/catalogue/genres'
 import { listLocations } from '@/lib/copies/locations'
 import { requireUser } from '@/lib/payload/context'
 import { personUse } from '@/lib/people/people'
@@ -18,6 +21,7 @@ import { SignOutButton } from '../../components/SignOutButton'
 import { devicePrefs, THEMES } from '../../prefs'
 import { DefaultLocationField } from './DefaultLocationField'
 import { DisplayNameField } from './DisplayNameField'
+import { GenresGroup } from './GenresGroup'
 import { LanguageSwitch } from './LanguageSwitch'
 import { LocationsGroup } from './LocationsGroup'
 import { PeopleGroup } from './PeopleGroup'
@@ -42,13 +46,13 @@ function Group({ heading, id, children }: { heading: string; id?: string; childr
 /**
  * Settings (EXPERIENCE.md, Settings): profile, language, theme, visibility,
  * default location and Sign out in the first of two columns on wide screens,
- * the managed lists (Locations, People, Tags, My genres, My themes) and, for admins only, Backup (NFR-6)
+ * the managed lists (Locations, People, Tags, My genres, My themes, and for admins only Genres) and, for admins only, Backup (NFR-6)
  * in the second; one column on the phone. Backup shows the last backup from
  * `readLastBackup()`, in `danger` with "Backup is overdue." when overdue.
  * Reads go through `getProfile()`, `listLocations()`, `filterValues()`,
- * `personUse()`, `tagUse()` and `devicePrefs()`; the controls write through
+ * `personUse()`, `tagUse()`, `genreUse()` (admin only) and `devicePrefs()`; the controls write through
  * `updateProfileAction`, `setDefaultLocationAction`, `setDevicePrefsAction`
- * and the location, People and tag actions in `./actions`.
+ * and the location, People, tag and genre actions in `./actions`.
  */
 export default async function SettingsPage() {
   const ctx = await requireUser()
@@ -75,6 +79,17 @@ export default async function SettingsPage() {
   const tags = toItems(await tagUse(ctx, 'tag'))
   const genres = toItems(await tagUse(ctx, 'genre'))
   const themes = toItems(await tagUse(ctx, 'theme'))
+  // System genres are the admin's: anyone else neither sees the group nor triggers the read.
+  const systemGenres = canEditShared(ctx.user)
+    ? (await genreUse(ctx)).map(({ id, name, nameFi, books }) => ({
+        id,
+        name: genreName({ name, nameFi }, profile.language),
+        nameEn: name,
+        nameFi: nameFi ?? '',
+        count: books,
+        note: nameFi ? undefined : t('noFinnishName'),
+      }))
+    : null
   // A refresh after a rename, merge or delete remounts the field with the fresh default and list.
   const defaultLocationKey = [
     profile.defaultLocation,
@@ -140,6 +155,11 @@ export default async function SettingsPage() {
         <Group heading={t('myThemes')}>
           <TagsGroup kind="theme" items={themes} />
         </Group>
+        {systemGenres && (
+          <Group heading={t('genres')}>
+            <GenresGroup items={systemGenres} />
+          </Group>
+        )}
         {backup && (
           <Group heading={t('backup')}>
             <div

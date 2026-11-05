@@ -2,7 +2,14 @@
 
 import { useTranslations } from 'next-intl'
 import { useRouter } from 'next/navigation'
-import { useRef, useState, useTransition, type KeyboardEvent, type ReactNode } from 'react'
+import {
+  Fragment,
+  useRef,
+  useState,
+  useTransition,
+  type KeyboardEvent,
+  type ReactNode,
+} from 'react'
 
 import { limits } from '@/fields/limits'
 import type { ActionResult, ErrorCode } from '@/lib/errors'
@@ -17,13 +24,18 @@ import { Dialog } from '../../components/ui/Dialog'
 import { Picker } from '../../components/ui/Picker'
 
 /** A managed name as Settings lists it: its name and its use (a location's copies, a Person's loans and wishes). */
-export type ManagedItem = Named & { count: number }
+export type ManagedItem = Named & {
+  count: number
+  /** A mark shown beside the count in the row's meta (a genre without a Finnish name). */
+  note?: string
+}
 
 /** The group's server actions; each answers `null` and the list refreshes on success. */
 export type ManagedListActions = {
   /** Absent for a list whose items are created elsewhere (private labels): no Add link. */
   create?: (name: string) => Promise<ActionResult<null>>
-  rename: (id: number, name: string) => Promise<ActionResult<null>>
+  /** Absent when an `editor` replaces the single-field Rename. */
+  rename?: (id: number, name: string) => Promise<ActionResult<null>>
   merge: (source: number, target: number) => Promise<ActionResult<null>>
   remove: (id: number) => Promise<ActionResult<null>>
 }
@@ -58,6 +70,15 @@ export type InUseRule = {
   title: (item: ManagedItem) => ReactNode
   body: (item: ManagedItem) => string
   mergeOffer: string
+}
+
+/**
+ * Replaces the single-field Rename: the row's first Link is `label` and opens
+ * `render`'s fields in place under the row; `done` closes them (after a refresh).
+ */
+export type ItemEditor<T extends ManagedItem> = {
+  label: string
+  render: (item: T, done: () => void) => ReactNode
 }
 
 /** The service's normalisation, repeated only to tell an empty or unchanged name. */
@@ -192,16 +213,18 @@ const STALE: readonly ErrorCode[] = ['NOT_FOUND', 'PERSON_IN_USE']
  * success calls `router.refresh()`, as do `NOT_FOUND` and `PERSON_IN_USE`; no
  * Undo, no toast.
  */
-export function ManagedList({
+export function ManagedList<T extends ManagedItem = ManagedItem>({
   items,
   actions,
   strings,
   inUse,
+  editor,
 }: {
-  items: readonly ManagedItem[]
+  items: readonly T[]
   actions: ManagedListActions
   strings: ManagedListStrings
   inUse?: InUseRule
+  editor?: ItemEditor<T>
 }) {
   const t = useTranslations('settings')
   const router = useRouter()
@@ -266,45 +289,62 @@ export function ManagedList({
               <NameField initial="" save={actions.create} onDone={() => setAdding(false)} />
             </li>
           )}
-          {items.map((item) =>
-            renaming === item.id ? (
-              <li key={item.id} className="py-1">
-                <NameField
-                  initial={item.name}
-                  save={(name) => actions.rename(item.id, name)}
-                  // Only this row's field: another row's Rename may have opened meanwhile.
-                  onDone={() => setRenaming((open) => (open === item.id ? null : open))}
-                  mergeInto={offerMerge(item)}
-                />
-              </li>
-            ) : (
-              <ListRow key={item.id} title={item.name} meta={strings.count(item)}>
-                <ActionLink disabled={pending} onClick={() => setRenaming(item.id)}>
-                  {t('rename')}
-                </ActionLink>
-                {canMerge && (
-                  <ActionLink disabled={pending} onClick={() => openPicker(item)}>
-                    {t('merge')}
-                  </ActionLink>
-                )}
-                <ActionLink
-                  destructive
-                  disabled={pending}
-                  onClick={() => {
-                    if (inUse?.test(item)) {
-                      setBlocked(item)
-                      setBlockedOpen(true)
-                      return
-                    }
-                    setDeleting(item)
-                    setDeleteOpen(true)
-                  }}
+          {items.map((item) => {
+            const editing = renaming === item.id
+            if (editing && !editor && actions.rename) {
+              const { rename } = actions
+              return (
+                <li key={item.id} className="py-1">
+                  <NameField
+                    initial={item.name}
+                    save={(name) => rename(item.id, name)}
+                    // Only this row's field: another row's Rename may have opened meanwhile.
+                    onDone={() => setRenaming((open) => (open === item.id ? null : open))}
+                    mergeInto={offerMerge(item)}
+                  />
+                </li>
+              )
+            }
+            return (
+              <Fragment key={item.id}>
+                <ListRow
+                  title={item.name}
+                  meta={item.note ? `${item.note} · ${strings.count(item)}` : strings.count(item)}
                 >
-                  {t('delete')}
-                </ActionLink>
-              </ListRow>
-            ),
-          )}
+                  <ActionLink disabled={pending} onClick={() => setRenaming(item.id)}>
+                    {editor?.label ?? t('rename')}
+                  </ActionLink>
+                  {canMerge && (
+                    <ActionLink disabled={pending} onClick={() => openPicker(item)}>
+                      {t('merge')}
+                    </ActionLink>
+                  )}
+                  <ActionLink
+                    destructive
+                    disabled={pending}
+                    onClick={() => {
+                      if (inUse?.test(item)) {
+                        setBlocked(item)
+                        setBlockedOpen(true)
+                        return
+                      }
+                      setDeleting(item)
+                      setDeleteOpen(true)
+                    }}
+                  >
+                    {t('delete')}
+                  </ActionLink>
+                </ListRow>
+                {editing && editor && (
+                  <li className="py-1">
+                    {editor.render(item, () =>
+                      setRenaming((open) => (open === item.id ? null : open)),
+                    )}
+                  </li>
+                )}
+              </Fragment>
+            )
+          })}
         </ul>
       )}
       {!adding && actions.create && strings.add && (
