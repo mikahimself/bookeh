@@ -279,8 +279,8 @@ development_status:
   9-10-g4-seeded-system-genres: done
   9-16-c13-revalidate-google-books: done
   9-11-g5-genres-from-google-books-on-save: done
-  9-12-g15-new-genre-on-the-answer: backlog
-  9-13-g11-genre-admin-service: backlog
+  9-12-g15-new-genre-on-the-answer: done
+  9-13-g11-genre-admin-service: done
   9-14-g12-genres-in-settings-admin-only: backlog
   9-15-k13-phase-1-acceptance: backlog
   epic-9-retrospective: optional
