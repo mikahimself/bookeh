@@ -1,0 +1,114 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>bookeh: Genres group in Settings, options</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400&display=swap">
+<style>
+/* Tokens from DESIGN.md. Open Sans from Google Fonts; offline falls back to system sans. */
+.L{--bg:#FFFFFF;--ink:#1F2933;--mu:#5F6B78;--dim:#87919C;--ln:#DDE2E7;--co:#F0604F;--rd:#9B1C31;--scrim:#00000033}
+.D{--bg:#14181D;--ink:#E3E8EE;--mu:#94A0AD;--dim:#626B76;--ln:#2C343D;--co:#FF8E7F;--rd:#E0566F;--scrim:#00000066}
+*{box-sizing:border-box}
+body{margin:0;font:14px/1.45 system-ui,-apple-system,sans-serif;color:#222;background:#e4e4e4}
+main{max-width:1400px;margin:0 auto;padding:24px 16px 96px}
+h1{font:600 22px system-ui;margin:0 0 4px}
+h2{font:600 17px system-ui;margin:44px 0 2px}
+.note{color:#444;max-width:90ch;margin:2px 0 12px}
+.row{display:flex;gap:28px;flex-wrap:wrap;align-items:flex-start}
+.cap{font-size:12px;color:#555;margin:6px 2px 0;max-width:420px}
+.pn{background:var(--bg);color:var(--ink);font:14px/1.45 'Open Sans',"Segoe UI","Helvetica Neue",sans-serif;position:relative;overflow:hidden;padding:6px 24px 20px}
+.w{width:460px;border:1px solid #c8c8c8}
+.p{width:320px;border:2px solid #222;border-radius:30px;padding:14px 20px 20px}
+.gh{font-size:20px;font-weight:300;line-height:1.3;text-transform:lowercase;color:var(--mu);margin:12px 0 6px}
+.gh.sm{font-size:16px}
+u{text-decoration-color:var(--co);text-decoration-thickness:2px;text-underline-offset:3px}
+u.d{text-decoration-color:var(--rd)}
+.bt{display:inline-block;border:2px solid var(--ink);padding:6px 16px;font-size:15px;line-height:1.3;text-transform:lowercase;white-space:nowrap}
+.bt.pr{border-color:var(--co)}.bt.rd{border-color:var(--rd)}
+.mu{color:var(--mu);font-size:13px}
+.mk{font-size:13px;color:var(--ink);white-space:nowrap}
+.mk::before{content:"";display:inline-block;width:8px;height:8px;background:var(--co);margin-right:7px}
+.ops{display:flex;gap:14px;font-size:13px}
+.r{display:flex;gap:12px;align-items:baseline;padding:5px 0;flex-wrap:wrap}
+.r b{font-weight:400;font-size:15px;margin-right:auto}
+.p .r .ops{flex:0 0 100%}
+.in{border-bottom:2px solid var(--ink);padding:2px 0 3px;font-size:15px;min-height:26px}
+.in.e{border-bottom-color:var(--ln)}
+.in .ph{color:var(--dim)}
+.lab{font-size:12px;color:var(--mu)}
+.sw{display:flex;gap:14px;font-size:15px;color:var(--dim)}.sw em{font-style:normal;color:var(--ink)}
+.edit{padding:6px 0 10px;box-shadow:inset 4px 0 0 var(--co);padding-left:12px;margin:2px 0}
+.edit2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.p .edit2{grid-template-columns:1fr}
+.tbl{display:grid;grid-template-columns:1.1fr 1.1fr auto;gap:0 14px;align-items:baseline}
+.tbl .in{font-size:15px}
+.tbl .cnt{font-size:13px;color:var(--mu);text-align:right}
+.tbl .hdr{font-size:12px;color:var(--mu);padding-bottom:2px}
+.tbl>*{margin-bottom:6px}
+.sep{height:0;border-top:1px solid var(--ln);margin:10px 0}
+.dialog{position:absolute;inset:0;background:var(--scrim);display:flex;align-items:center;justify-content:center}
+.dlg{background:var(--bg);border:2px solid var(--ink);padding:16px 18px;width:86%}
+.dlg h3{margin:0 0 6px;font-size:20px;font-weight:300}
+.dlg p{margin:0 0 12px;font-size:14px}
+.dlg .bs{display:flex;gap:10px;justify-content:flex-end}
+.toast{border:2px solid var(--ink);padding:8px 12px;font-size:13px;margin-top:10px;display:flex;gap:14px}
+.toast span:first-child{margin-right:auto}
+.pick{display:inline-block;background:#222;color:#fff;border-radius:3px;padding:1px 8px;font-size:13px;margin-right:6px}
+</style></head><body><main>
+<h1>Genres group in Settings (admin only): three options</h1>
+<p class="note">Same data in each: system genres in my language (English UI here), Book count, "No Finnish name" mark. Same actions: edit English and Finnish in place, Add genre, Merge, Delete (dialog, no Undo), Re-map genres. The options differ in how a row is laid out and how editing opens. Real Google Books categories, light and dark, wide column and phone. Reply with A, B or C plus any tweak.</p>
+
+<div id="out"></div>
+
+<script>
+const G=[ // en, fi, books
+ ['Fiction','Kaunokirjallisuus',212],['Biography & Autobiography','Elämäkerrat',18],['Cooking','',6],
+ ['History','Historia',24],['Humor','',3],['Juvenile Fiction','Lasten kaunokirjallisuus',11],['Poetry','Runous',9],['Self-Help','',2]
+];
+const ops='<span class="ops"><u>Edit</u><u>Merge</u><u class="d">Delete</u></span>';
+const bk=n=>n+(n==1?' book':' books');
+const remap='<div class="sep"></div><div class="r"><span class="bt">Re-map genres</span><span class="mu">Fills Books that have no genre yet, from their source categories.</span></div>';
+const remapDone='<div class="toast"><span>Re-mapped: 14 Books updated</span><span>✕</span></div>';
+
+/* A: ordinary list row, like Tags. Edit opens an inline pair of fields under the row. */
+function A(){
+ let h='<h3 class="gh">Genres</h3>';
+ G.forEach((g,i)=>{
+  if(i==1){h+=`<div class="edit"><div class="edit2"><div><div class="lab">English</div><div class="in">Biography &amp; Autobiography</div></div><div><div class="lab">Suomi</div><div class="in">Elämäkerrat</div></div></div><div class="ops" style="margin-top:8px"><u>Save</u><u>Cancel</u></div></div>`;return}
+  h+=`<div class="r"><b>${g[0]}</b>${g[1]?'':'<span class="mk">No Finnish name</span>'}<span class="mu">${bk(g[2])}</span>${ops}</div>`;
+ });
+ return h+'<p style="margin:8px 0 0"><u>Add genre</u></p>'+remap;
+}
+/* B: two-field table, English and Suomi always visible, edited by tapping the field. */
+function B(phone){
+ if(phone){
+  let h='<h3 class="gh">Genres</h3>';
+  G.forEach((g,i)=>{h+=`<div style="padding:6px 0 8px"><div class="lab">English · ${bk(g[2])}</div><div class="in">${g[0]}</div><div class="lab" style="margin-top:6px">Suomi</div><div class="in ${g[1]?'':'e'}">${g[1]||'<span class="ph">No Finnish name</span>'}</div><div class="ops" style="margin-top:6px"><u>Merge</u><u class="d">Delete</u></div></div>`;if(i<G.length-1)h+='<div class="sep" style="margin:4px 0"></div>'});
+  return h+'<p style="margin:8px 0 0"><u>Add genre</u></p>'+remap;
+ }
+ let h='<h3 class="gh">Genres</h3><div class="tbl"><div class="hdr">English</div><div class="hdr">Suomi</div><div class="hdr"></div>';
+ G.forEach(g=>{h+=`<div class="in">${g[0]}</div><div class="in ${g[1]?'':'e'}">${g[1]||'<span class="ph">No Finnish name</span>'}</div><div class="cnt">${bk(g[2])}</div>`;h+=`<div></div><div></div><div class="ops" style="justify-content:flex-end;margin-top:-4px"><u>Merge</u><u class="d">Delete</u></div>`});
+ h+='</div>';
+ return h+'<p style="margin:8px 0 0"><u>Add genre</u></p>'+remap;
+}
+/* C: needs-attention first. Switch All / No Finnish name, rows compact, Finnish name edited in place on the row. */
+function C(){
+ let h='<h3 class="gh">Genres</h3><div class="sw" style="margin-bottom:6px"><span>All 8</span><em>No Finnish name 4</em></div>';
+ G.filter(g=>!g[1]).concat([['Games & Activities','',1]]).forEach(g=>{
+  h+=`<div class="r"><b>${g[0]}</b><span class="mu">${bk(g[2])}</span><span class="ops"><u>Rename</u><u>Merge</u><u class="d">Delete</u></span></div>`;
+  h+=`<div style="margin:-2px 0 8px"><div class="lab">Suomi</div><div class="in e"><span class="ph">Add Finnish name</span></div></div>`;
+ });
+ return h+'<p style="margin:8px 0 0"><u>Add genre</u></p>'+remap;
+}
+const mergeDlg=`<div class="dialog"><div class="dlg"><h3>Merge Humor</h3><p>Every Book with Humor moves to the genre you pick. Humor is deleted. This cannot be undone.</p><div class="in e" style="margin-bottom:14px"><span class="ph">Pick a genre</span></div><div class="bs"><span class="bt">Cancel</span><span class="bt pr">Merge</span></div></div></div>`;
+const delDlg=`<div class="dialog"><div class="dlg"><h3>Delete Cooking</h3><p>6 Books lose this genre. The Books stay. This cannot be undone.</p><div class="bs"><span class="bt">Cancel</span><span class="bt rd">Delete</span></div></div></div>`;
+const block=(t,n,fn,notes)=>`<h2>${t}</h2><p class="note">${n}</p><div class="row">
+ <div><div class="pn w L">${fn(false)}</div><p class="cap">Wide, light. ${notes[0]}</p></div>
+ <div><div class="pn p D">${fn(true)}</div><p class="cap">Phone, dark.</p></div>
+ <div><div class="pn w D" style="height:100%;min-height:360px">${fn(false)}${notes[2]||''}</div><p class="cap">Wide, dark.${notes[1]||''}</p></div></div>`;
+document.getElementById('out').innerHTML=
+ block('<span class="pick">A</span>Row like every other list','Genres look and act exactly like Tags, People and Locations: name, mark, count, then Edit / Merge / Delete. "Edit" opens both names in place under the row (shown on Biography). Fewest new patterns; two taps to add a Finnish name.',A,['Row two is open for editing.',''])+
+ block('<span class="pick">B</span>English and Suomi side by side','Every genre shows both names as fields at all times; tap a field to edit it, leaving the field saves. The empty Finnish field carries the placeholder "No Finnish name". One tap to translate; denser and less like the other lists. The phone stacks the two fields.',B,['Empty Finnish names are dim.',''])+
+ block('<span class="pick">C</span>Translate queue first','The group opens on a "No Finnish name" filter (the admin\'s main job) with a Finnish field open under each row; "All" shows the plain A-style list. Quickest way to clear the backlog, one more control than A.',C,['Opens on the filter.',''])+
+ `<h2>Shared across options: dialogs and Re-map result</h2><p class="note">Merge and Delete are confirmed by a dialog and say they cannot be undone (no Undo, per the story). Re-map reports how many Books it updated in a toast.</p><div class="row">
+ <div><div class="pn w L" style="height:300px"><h3 class="gh">Genres</h3><div class="r"><b>Humor</b><span class="mk">No Finnish name</span><span class="mu">3 books</span>${ops}</div><div class="r"><b>History</b><span class="mu">24 books</span>${ops}</div>${mergeDlg}</div><p class="cap">Merge dialog (light).</p></div>
+ <div><div class="pn w D" style="height:300px"><h3 class="gh">Genres</h3><div class="r"><b>Cooking</b><span class="mk">No Finnish name</span><span class="mu">6 books</span>${ops}</div><div class="r"><b>Fiction</b><span class="mu">212 books</span>${ops}</div>${delDlg}</div><p class="cap">Delete dialog (dark).</p></div>
+ <div><div class="pn w L" style="height:300px"><h3 class="gh">Genres</h3><div class="r"><b>Fiction</b><span class="mu">212 books</span>${ops}</div><div class="r"><b>History</b><span class="mu">24 books</span>${ops}</div><div class="sep"></div><div class="r"><span class="bt">Re-map genres</span></div>${remapDone}</div><p class="cap">After Re-map genres.</p></div></div>`;
+</script></main></body></html>

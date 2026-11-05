@@ -65,7 +65,7 @@ Mock-ups, in the final tokens. The spines win on any conflict with a mock-up.
 | [mockups/key-wishlists.html](mockups/key-wishlists.html) | The list of wishlists, one wishlist, an entry opened. |
 | [mockups/key-settings.html](mockups/key-settings.html) | Settings on wide and phone. |
 
-Not mocked, built from this spine alone: Sign in, Lookup, the Filter panel on the phone, pickers and dialogs, select mode on the phone, and sizes s and l. The Genres group in Settings is not mocked either; its story starts with a rendered mock-up choice. The tag picker choice is recorded under Book detail below. The app icon and theme colour are settled in DESIGN.md → App Icon & Theme Colour, and the Corner crop in DESIGN.md → Components.
+Not mocked, built from this spine alone: Sign in, Lookup, the Filter panel on the phone, pickers and dialogs, select mode on the phone, and sizes s and l. The Genres group in Settings is mocked as options in [mockups/genres-settings-options.html](mockups/genres-settings-options.html); Mika picked A (2026-11-05). The tag picker choice is recorded under Book detail below. The app icon and theme colour are settled in DESIGN.md → App Icon & Theme Colour, and the Corner crop in DESIGN.md → Components.
 
 ## Voice and Tone
 
@@ -307,7 +307,7 @@ Two columns on wide screens: profile, language, theme, visibility, default locat
 | Rename | Edits the name in place. Renaming to a name that already exists offers to merge instead. A user genre or theme may not take a system genre's or theme's name. |
 | Merge | Picks another item of the same kind; everything that used this one moves to it. Confirmed by a dialog. |
 | Delete | Confirmed by a dialog that says what will lose its location or tag. A Person who has loans, open or returned, or wishlist entries cannot be deleted; the dialog says so and offers Merge (AD-18). |
-| Genres (admin only) | One List row per system genre in the user's language with its Book count and a "No Finnish name" mark where missing. The English and Finnish names are edited in place; "Add genre" adds one; Merge and Delete are confirmed by a dialog and have no Undo. Absent for other users. Not mocked; its story starts with a rendered mock-up choice. |
+| Genres (admin only) | One List row per system genre in the user's language with its Book count and a "No Finnish name" mark where missing. The English and Finnish names are edited in place; "Add genre" adds one; Merge and Delete are confirmed by a dialog and have no Undo. Absent for other users. Laid out as an ordinary List row, name then mark then count then Edit, Merge and Delete (mock-up option A); Edit opens the English and Finnish fields in place under the row, with Save and Cancel. "Add genre" and an admin-only "Re-map genres" button (reports "Re-mapped: {n} Books updated", no Undo) follow the list. |
 | Last backup (admin only) | "Last backup: {date}"; "Last backup failed: {date}" when the last run failed; "Last backup: none found" when there is no readable record. Marked in {colors.danger} with "Backup is overdue." when the last successful backup is older than 48 hours, missing or failed. |
 | Sign out | A secondary button at the end of the first column. |
 
