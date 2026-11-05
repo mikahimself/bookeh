@@ -76,7 +76,7 @@ export function sortBy(query: ShelfQuery, sort: ShelfQuery['sort']): ShelfQuery 
 }
 
 /** The fields a Filter chip on Book detail adds to (EXPERIENCE.md, Book detail). */
-export type ChipField = 'author' | 'series' | 'genre' | 'location' | 'tag'
+export type ChipField = 'author' | 'series' | 'genre' | 'location' | 'tag' | 'theme'
 
 /**
  * `query` after a tap on a Filter chip: `id` appended to `field`, widening

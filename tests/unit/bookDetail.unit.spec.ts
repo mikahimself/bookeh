@@ -11,6 +11,7 @@ import {
   fetchStub,
   getHoldings,
   getShelfRows,
+  getUserBookState,
   heldBook,
   holds,
   installNavigationTracking,
@@ -36,6 +37,122 @@ describe('CollectionPage', () => {
   resetCollectionPage()
 
   describe('Book detail', () => {
+    it.each([false, true])(
+      'shows all classifications once before Description (wide: %s)',
+      async (wide) => {
+        if (wide) setScreen((query) => !query.includes('1200px'))
+        getShelfRows.mockResolvedValue({ rows: [row(11, linna)], total: 1, labels: {} })
+        holds({ ...linna, themes: ['System theme'], description: 'Description text' }, [
+          copy(21),
+          copy(22),
+        ])
+        getUserBookState.mockResolvedValue({
+          read: false,
+          rating: null,
+          tags: [
+            { id: 41, name: 'Private genre', kind: 'genre' },
+            { id: 42, name: 'Private theme', kind: 'theme' },
+            { id: 43, name: 'Private tag', kind: 'tag' },
+          ],
+        })
+        setSearchParams('q=linna&sort=title&dir=desc&genre=2&theme=Existing&tag=3&book=5')
+        await renderPage({ book: '5' })
+        const surface = wide
+          ? await screen.findByRole('complementary', { name: linna.title })
+          : await detail(linna.title)
+        const headings = within(surface)
+          .getAllByRole('heading', { level: 3 })
+          .map(({ textContent }) => textContent)
+        expect(headings.slice(-6)).toEqual([
+          'Genres',
+          'My genres',
+          'Themes',
+          'My themes',
+          'My tags',
+          'Description',
+        ])
+        for (const [name, field, value] of [
+          ['Sotaromaani', 'genre', '8'],
+          ['Private genre', 'genre', 'tag:41'],
+          ['System theme', 'theme', 'System theme'],
+          ['Private theme', 'theme', 'Private theme'],
+          ['Private tag', 'tag', '43'],
+        ]) {
+          const link = within(surface).getByRole('link', { name })
+          const params = new URL(link.getAttribute('href')!, 'http://localhost').searchParams
+          expect(params.getAll(field)).toContain(value)
+          expect(params.get('q')).toBe('linna')
+          expect(params.get('sort')).toBe('title')
+          expect(params.get('dir')).toBe('desc')
+          expect(params.get('book')).toBe(wide ? '5' : null)
+        }
+      },
+    )
+
+    it.each(['genre', 'theme', 'tag'] as const)(
+      'omits only the missing private %s kind',
+      async (missing) => {
+        getShelfRows.mockResolvedValue({ rows: [], total: 0, labels: {} })
+        holds({ ...linna, themes: ['System theme'] }, [copy(21)])
+        const labels = [
+          { id: 41, name: 'Private genre', kind: 'genre' as const, heading: 'My genres' },
+          { id: 42, name: 'Private theme', kind: 'theme' as const, heading: 'My themes' },
+          { id: 43, name: 'Private tag', kind: 'tag' as const, heading: 'My tags' },
+        ]
+        getUserBookState.mockResolvedValue({
+          read: false,
+          rating: null,
+          tags: labels.filter(({ kind }) => kind !== missing),
+        })
+        await renderPage({ book: '5' })
+        const surface = await detail(linna.title)
+        within(surface).getByRole('heading', { name: 'Genres' })
+        within(surface).getByRole('heading', { name: 'Themes' })
+        for (const { kind, name, heading } of labels) {
+          expect(Boolean(within(surface).queryByRole('heading', { name: heading }))).toBe(
+            kind !== missing,
+          )
+          expect(Boolean(within(surface).queryByRole('link', { name }))).toBe(kind !== missing)
+        }
+      },
+    )
+
+    it('omits blank system themes and deduplicates exact values while preserving valid names', async () => {
+      getShelfRows.mockResolvedValue({ rows: [], total: 0, labels: {} })
+      holds(
+        {
+          ...linna,
+          themes: ['', '  ', '\n\t', '  Stored theme  ', '  Stored theme  ', 'Stored theme'],
+        },
+        [copy(21)],
+      )
+      await renderPage({ book: '5' })
+      const surface = await detail(linna.title)
+      const group = within(surface)
+        .getByRole('heading', { name: 'Themes' })
+        .closest('section')!
+      const links = within(group).getAllByRole('link')
+      expect(links.map(({ textContent }) => textContent)).toEqual([
+        '  Stored theme  ',
+        'Stored theme',
+      ])
+      expect(
+        links.map((link) =>
+          new URL(link.getAttribute('href')!, 'http://localhost').searchParams.get('theme'),
+        ),
+      ).toEqual(['  Stored theme  ', 'Stored theme'])
+    })
+
+    it('omits all empty classification groups', async () => {
+      getShelfRows.mockResolvedValue({ rows: [], total: 0, labels: {} })
+      holds({ ...linna, genres: [], themes: [] }, [copy(21)])
+      await renderPage({ book: '5' })
+      const surface = await detail(linna.title)
+      for (const name of ['Genres', 'My genres', 'Themes', 'My themes', 'My tags']) {
+        expect(within(surface).queryByRole('heading', { name })).toBeNull()
+      }
+    })
+
     it.each([false, true])(
       'renders the full effective description as literal text (override: %s)',
       async (override) => {

@@ -3,7 +3,7 @@ import { createElement, type ComponentProps } from 'react'
 import { afterEach, beforeEach, vi } from 'vitest'
 
 import type { DevicePrefs } from '@/app/(frontend)/prefs'
-import type { EffectiveBook } from '@/lib/books/effectiveBook'
+import type { EffectiveBook, UserBookState } from '@/lib/books/effectiveBook'
 import type { CopyLine, EntryLine, Holdings } from '@/lib/books/holdings'
 import type { LocationOption } from '@/lib/copies/locations'
 import type { ShelfRow, ShelfRows } from '@/lib/shelf/query'
@@ -21,6 +21,7 @@ export const getShelfRows = vi.fn<() => Promise<ShelfRows>>()
 export const heldBook =
   vi.fn<(ctx: unknown, bookId: number) => Promise<EffectiveBook | undefined>>()
 export const getHoldings = vi.fn<(ctx: unknown, ids: number[]) => Promise<Map<number, Holdings>>>()
+export const getUserBookState = vi.fn<() => Promise<UserBookState>>()
 export const logError = vi.fn()
 export const devicePrefs = vi.fn<() => Promise<DevicePrefs>>()
 export const setDevicePrefsAction = vi.fn()
@@ -99,7 +100,7 @@ vi.mock('@/app/(frontend)/actions/loans', () => ({ lendCopyAction, returnLoanAct
 vi.mock('@/app/(frontend)/heldBook', () => ({ heldBook }))
 vi.mock('@/lib/books/holdings', () => ({ getHoldings }))
 vi.mock('@/lib/books/userBookState', () => ({
-  getUserBookState: async () => ({ read: false, rating: null }),
+  getUserBookState,
 }))
 // The client list's provider: no Undo and no scrolling here.
 vi.mock('@/app/(frontend)/components/toast/ToastProvider', () => ({
@@ -281,6 +282,7 @@ export function resetCollectionPage() {
     // A reset, not a clear: a case that fails early leaves `…Once` results
     // queued, and a clear would hand them to the next case.
     vi.resetAllMocks()
+    getUserBookState.mockResolvedValue({ read: false, rating: null, tags: [] })
     // An overlay unmounted while open leaves its history entry, and a back
     // with no traversal stays in flight: settle both as a browser back would,
     // so the next case's close starts at depth 0 and replaces.

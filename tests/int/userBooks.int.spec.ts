@@ -1,3 +1,4 @@
+import { sql } from '@payloadcms/db-postgres/drizzle'
 import {
   createLocalReq,
   Forbidden,
@@ -8,6 +9,7 @@ import {
 } from 'payload'
 import { beforeAll, describe, expect, it } from 'vitest'
 
+import { getUserBookState } from '@/lib/books/userBookState'
 import * as gateway from '@/lib/payload/gateway'
 import config from '@/payload.config'
 import type { Book, User, UserBook } from '@/payload-types'
@@ -195,6 +197,49 @@ describe('user-books', () => {
       expect((await update([second.id])).tags).toEqual([second.id])
       expect((await update([])).tags).toEqual([])
     }
+  })
+
+  it('reads only assigned owned classifications, including malformed foreign relations and admin reads', async () => {
+    const shared = await bookFor(a, 'shared')
+    const foreign = await gateway.create(await contextFor(b), {
+      collection: 'tags',
+      data: { owner: b.id, name: 'Hidden', nameKey: 'ignored', kind: 'tag' },
+    })
+    for (const user of [a, admin]) {
+      const ctx = await contextFor(user)
+      expect(await getUserBookState(ctx, shared.id)).toEqual({
+        read: false,
+        rating: null,
+        tags: [],
+      })
+      const own = []
+      for (const kind of ['genre', 'theme', 'tag'] as const) {
+        own.push(
+          await gateway.create(ctx, {
+            collection: 'tags',
+            data: { owner: user.id, name: `Reader ${kind}`, nameKey: 'ignored', kind },
+          }),
+        )
+      }
+      const row = await createRow(user, shared, {
+        read: true,
+        rating: 3,
+        tags: own.map(({ id }) => id),
+      })
+      await payload.db.drizzle.execute(
+        sql`insert into user_books_rels(parent_id,path,tags_id) values(${row.id},'tags',${foreign.id})`,
+      )
+      expect(await getUserBookState(ctx, shared.id)).toEqual({
+        read: true,
+        rating: 3,
+        tags: own.map(({ id, name, kind }) => ({ id, name, kind })),
+      })
+    }
+    expect(await getUserBookState(await contextFor(b), shared.id)).toEqual({
+      read: false,
+      rating: null,
+      tags: [],
+    })
   })
 
   it('refuses every operation without a user', async () => {

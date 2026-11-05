@@ -38,11 +38,7 @@ export type EffectiveBook = {
 
 export type TagKind = 'tag' | 'genre' | 'theme'
 
-/**
- * The viewer's own state on a Book. Declared with `EffectiveBook` as the spine
- * places it; `tags` is typed now and its reader arrives with the tag stories
- * (E11, G-stories), which also add the `tags` collection it reads from.
- */
+/** The viewer's own read state, rating and assigned private classifications. */
 export type UserBookState = {
   read: boolean
   rating: number | null

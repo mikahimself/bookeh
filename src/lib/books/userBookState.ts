@@ -1,25 +1,26 @@
 import type { Context } from '@/lib/payload/context'
 import * as gateway from '@/lib/payload/gateway'
+import { idOf } from '@/lib/payload/ref'
 
 import type { UserBookState } from './effectiveBook'
 
-/**
- * The viewer's read flag and rating on one Book, from their `user-books` row;
- * without a row, unread and unrated (AD-6). `user-books` access scopes the
- * find to the viewer. Tags arrive with Epic 9. The caller gates the Book id
- * (`requireOwnBook()`, AD-7).
- */
-export async function getUserBookState(
-  ctx: Context,
-  bookId: number,
-): Promise<Pick<UserBookState, 'read' | 'rating'>> {
+/** The viewer's private Book state; missing state is unread, unrated and unclassified. */
+export async function getUserBookState(ctx: Context, bookId: number): Promise<UserBookState> {
   const { docs } = await gateway.find(ctx, {
     collection: 'user-books',
-    where: { book: { equals: bookId } },
-    select: { read: true, rating: true },
+    where: { and: [{ book: { equals: bookId } }, { owner: { equals: ctx.user.id } }] },
+    select: { read: true, rating: true, tags: true },
     limit: 1,
-    depth: 0,
+    depth: 1,
   })
   const row = docs[0]
-  return { read: row?.read ?? false, rating: row?.rating ?? null }
+  return {
+    read: row?.read ?? false,
+    rating: row?.rating ?? null,
+    tags: (row?.tags ?? []).flatMap((tag) =>
+      typeof tag === 'object' && idOf(tag.owner) === ctx.user.id
+        ? [{ id: tag.id, name: tag.name, kind: tag.kind }]
+        : [],
+    ),
+  }
 }

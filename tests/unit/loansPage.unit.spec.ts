@@ -93,7 +93,7 @@ vi.mock('@/app/(frontend)/actions/prefs', () => ({ setDevicePrefsAction }))
 vi.mock('@/app/(frontend)/heldBook', () => ({ heldBook }))
 vi.mock('@/lib/books/holdings', () => ({ getHoldings }))
 vi.mock('@/lib/books/userBookState', () => ({
-  getUserBookState: async () => ({ read: false, rating: null }),
+  getUserBookState: async () => ({ read: false, rating: null, tags: [] }),
 }))
 vi.mock('@/app/(frontend)/components/toast/ToastProvider', () => ({
   useToast: () => ({

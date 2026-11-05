@@ -36,19 +36,19 @@ const DOT = ' · '
  * an owned copy's Lend, Move and Remove (Move only when the viewer has
  * locations, FR-32); a lent one's marker with "Lent to {person} since
  * {date}" under its line and Returned only (FR-35, FR-36); an ordered
- * copy's Received, whatever its loans. Genres when the Book
- * has system genres, then a nonblank effective Description in full as plain
+ * copy's Received, whatever its loans. Nonempty system and private
+ * classification groups, then a nonblank effective Description in full as plain
  * text with preserved line breaks, the admin's Re-fetch on a shared Book (`Refetch`,
  * `canEditShared`) or, in its place on a private Book, Look it up again
  * (`DetailLookUpAgain`; without an ISBN a muted line pointing to Edit book),
  * and the foot with Edit and Add to wishlist, both secondary, no primary
  * (`AddToWishlist`, staying open after the save; a failed read of the
- * viewer's wishlists leaves its picker with New list alone). Each genre and
+ * viewer's wishlists leaves its picker with New list alone). Each classification and
  * each copy's location, like the header's authors and series, is a Filter
  * chip (`FilterChip`) that adds it to the current filters; an ordered copy
  * has no location and so no chip. The one component later groups are added
- * to; it reads the Book, the viewer's copies and entries and their read flag
- * and rating only, never the client rows, so it stays open when its row
+ * to; it reads the Book, the viewer's copies and entries and their read flag,
+ * rating and classifications, never the client rows, so it stays open when its row
  * leaves the list. `locations` are the page's, for Move; none when that
  * read failed.
  * The viewer's People (`lendingPeople()`) are read only when some copy can
@@ -217,20 +217,56 @@ export async function BookDetail({
             </ul>
           </section>
         )}
-        {book.genres.length > 0 && (
-          <section className="flex flex-col gap-2">
-            <h3 className="text-heading-group text-text-muted ui-case">{t('detail.genres')}</h3>
-            <p className="text-body text-text">
-              {joined(
-                book.genres.map(({ id, name }) => (
-                  <FilterChip key={id} field="genre" id={id}>
-                    {name}
-                  </FilterChip>
-                )),
-                DOT,
-              )}
-            </p>
-          </section>
+        {[
+          {
+            heading: 'genres' as const,
+            chips: book.genres.map(({ id, name }) => ({ field: 'genre' as const, id, name })),
+          },
+          {
+            heading: 'myGenres' as const,
+            chips: state.tags
+              .filter(({ kind }) => kind === 'genre')
+              .map(({ id, name }) => ({ field: 'genre' as const, id: `tag:${id}` as const, name })),
+          },
+          {
+            heading: 'themes' as const,
+            chips: [...new Set(book.themes.filter((name) => name.trim()))].map((name) => ({
+              field: 'theme' as const,
+              id: name,
+              name,
+            })),
+          },
+          {
+            heading: 'myThemes' as const,
+            chips: state.tags
+              .filter(({ kind }) => kind === 'theme')
+              .map(({ name }) => ({ field: 'theme' as const, id: name, name })),
+          },
+          {
+            heading: 'myTags' as const,
+            chips: state.tags
+              .filter(({ kind }) => kind === 'tag')
+              .map(({ id, name }) => ({ field: 'tag' as const, id, name })),
+          },
+        ].map(
+          ({ heading, chips }) =>
+            chips.length > 0 && (
+              <section key={heading} className="flex flex-col gap-2">
+                <h3 className="text-heading-group text-text-muted ui-case">
+                  {t(`detail.${heading}`)}
+                </h3>
+                <p className="text-body text-text">
+                  {joined(
+                    chips.map(({ field, id, name }) => (
+                      <FilterChip key={id} field={field} id={id}>
+                        {name}
+                      </FilterChip>
+                    )),
+                    DOT,
+                  )}
+                </p>
+              </section>
+            ),
         )}
         {book.description?.trim() && (
           <section className="flex min-w-0 flex-col gap-2">

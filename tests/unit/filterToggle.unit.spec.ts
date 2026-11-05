@@ -37,6 +37,19 @@ describe('addFilter', () => {
     )
   })
 
+  it('appends classification values and preserves already selected values', () => {
+    const initial = query({ genre: [2], theme: ['System'], tag: [3] })
+    const genre = addFilter(initial, 'genre', 'tag:4')
+    const theme = addFilter(genre, 'theme', 'Private theme')
+    const tags = addFilter(theme, 'tag', 5)
+    expect(tags).toEqual(
+      query({ genre: [2, 'tag:4'], theme: ['System', 'Private theme'], tag: [3, 5] }),
+    )
+    expect(addFilter(tags, 'theme', 'Private theme')).toBe(tags)
+    expect(addFilter(tags, 'genre', 'tag:4')).toBe(tags)
+    expect(addFilter(tags, 'tag', 5)).toBe(tags)
+  })
+
   it('widens a field that has a value', () => {
     expect(addFilter(query({ author: [3] }), 'author', 7)).toEqual(query({ author: [3, 7] }))
   })

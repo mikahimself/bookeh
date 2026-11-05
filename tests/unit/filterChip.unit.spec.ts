@@ -42,7 +42,7 @@ vi.mock('next/link', () => ({
 
 const { FilterChip } = await import('@/app/(frontend)/(sections)/FilterChip')
 
-const chip = (field: 'author' | 'location', id: number) =>
+const chip = (field: 'author' | 'location' | 'genre' | 'theme' | 'tag', id: number | string) =>
   render(
     // `children` comes as the argument after props.
     createElement(FilterChip, { field, id } as ComponentProps<typeof FilterChip>, 'Väinö Linna'),
@@ -58,6 +58,18 @@ afterEach(() => {
 })
 
 describe('a Filter chip', () => {
+  it.each(['/loans', '/wishlists/3'])(
+    'routes classification chips from %s with only the chosen filter',
+    (path) => {
+      pathname = path
+      search = new URLSearchParams('q=ignored&genre=2&book=5')
+      chip('theme', 'Private theme')
+      expect(link().getAttribute('href')).toBe('/?theme=Private+theme')
+      fireEvent.click(link())
+      expect(router.push).toHaveBeenCalledWith('/?theme=Private+theme', { scroll: undefined })
+    },
+  )
+
   it('in the wide panel widens the field and keeps the open Book, replacing', () => {
     search = new URLSearchParams('q=linna&author=3&book=5')
     chip('author', 7)
