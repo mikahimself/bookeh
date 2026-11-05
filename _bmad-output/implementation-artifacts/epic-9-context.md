@@ -28,6 +28,9 @@ Let users classify and find their books through private tags, genres and themes 
 - Story 9.13: Genre admin service
 - Story 9.14: Genres in Settings, admin only
 - Story 9.15: Phase 1 acceptance
+- Story 9.21: Corner crop straight edges and larger handles
+- Story 9.22: Suggest existing authors when adding by hand
+- Story 9.23: Close X on the wishlist screen
 
 ## Requirements & Constraints
 
@@ -39,6 +42,9 @@ Let users classify and find their books through private tags, genres and themes 
 - Preserve own-search visibility, deduplication, order and limits. Search and edition Answer cover previews survive collisions in either direction, retaining authentication, user isolation, expiry, bounded storage and host checks; clients never supply remote URLs.
 - Cover previews distinguish Answer and search contexts, share bounded storage caps, and count once per context against lookup limits. Authentication precedes parameter validation; invalid contexts or candidate indexes fail with 404.
 - Phase 1 acceptance records catalogue/location coverage, five phone location checks each under 10 seconds, lookup and entry speed evidence, and the restore rehearsal. Known-book lookup targets 2 seconds, external lookup 5 seconds, and saving without edits under 20 seconds. Flag manual corrections above one in ten held Books for a decision; record results in `docs/phase-1-acceptance.md`.
+- Corner crop: a side within a tolerance of vertical or horizontal shows a non-colour-only indication (tokens, same in both themes) chosen by Mika from rendered options; the rule is a pure function beside `checkCorners()` and does not change what it accepts. Handles are 24px with the 44px tap area unchanged.
+- Not found Answer's Author field suggests existing authors through `/data/suggest` and the name Combobox, still accepting free text; Enter submits unless a suggestion is highlighted. A failed suggestion request shows no toast.
+- Phone wishlist screen gets a Close X (44px tap area, localized label) beside the Back link, going to `/wishlists`; absent from 900px.
 
 ## Technical Decisions
 
