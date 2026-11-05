@@ -4095,6 +4095,7 @@ So that adding a Finnish name is quick (D-2, UX-DR50).
 **Then** a Genres group lists every system genre in my language with its Book count and a "No Finnish name" mark where `nameFi` is empty
 **And** the English and Finnish names edit in place; "Add genre" adds one; Merge and Delete are confirmed by a dialog, with no Undo
 **And** the group is absent for non-admins
+**And** an admin-only "Re-map genres" action calls `remapGenres(ctx)` (Story 9.11) and reports how many Books it updated, with no Undo
 
 ### Story 9.15: [K13] Phase 1 acceptance
 

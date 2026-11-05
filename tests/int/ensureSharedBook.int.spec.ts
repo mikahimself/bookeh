@@ -146,7 +146,8 @@ describe('ensureSharedBook', () => {
       coverUrl: 'https://covers.example/muumi.jpg',
     })
     expect(book.createdBy ?? null).toBeNull()
-    expect(book.genres ?? []).toEqual([])
+    // The raw subjects name `Fiction`, a seeded genre (AD-5).
+    expect(book.genres).toHaveLength(1)
 
     expect(book.authors).toHaveLength(2)
     const [first, second] = book.authors as number[]
