@@ -5,7 +5,7 @@ import { getPayload, type Payload } from 'payload'
 import { beforeAll, describe, expect, it } from 'vitest'
 
 import { toNameKey } from '@/fields/nameKey'
-import { mapSubjectsToGenres } from '@/lib/catalogue/mapSubjectsToGenres'
+import { mapSubjectsToGenres, previewGenres } from '@/lib/catalogue/mapSubjectsToGenres'
 import { remapGenres } from '@/lib/catalogue/remapGenres'
 import { DomainError } from '@/lib/errors'
 import type { RawMetadata } from '@/lib/metadata/source'
@@ -86,6 +86,21 @@ describe('mapSubjectsToGenres', () => {
   it('returns a genre named by both sources once', async () => {
     const ids = await mapSubjectsToGenres(await contextFor(admin), withFinna(google('Fiction')))
     expect(ids).toEqual([fiction])
+  })
+
+  it('previews what the save then sets, naming Finna matches by English name', async () => {
+    const ctx = await contextFor(admin)
+    const name = unique('Preview Genre')
+    const raw = withFinna(google(name))
+    const preview = await previewGenres(ctx, raw)
+    expect(preview).toEqual([
+      { name, id: null },
+      { name: 'Fiction', id: fiction },
+    ])
+    expect(await genreByKey(name)).toHaveLength(0)
+    const ids = await mapSubjectsToGenres(ctx, raw)
+    const [created] = await genreByKey(name)
+    expect(ids).toEqual([created!.id, fiction])
   })
 
   it('returns nothing for no data', async () => {

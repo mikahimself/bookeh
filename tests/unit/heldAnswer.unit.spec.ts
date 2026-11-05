@@ -72,6 +72,7 @@ const answer = (over: Partial<Held>): Held => ({
   source: null,
   newAuthors: [],
   newSeries: null,
+  newGenres: [],
   pick: undefined,
   candidate: undefined,
   editions: [],

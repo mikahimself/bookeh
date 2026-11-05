@@ -12,6 +12,7 @@ import { recordCoverPreview } from './coverPreview'
 import { findBookByIsbn } from './findBookByIsbn'
 import { findByName, type NamedCollection } from './findOrCreateByName'
 import { limitLookups } from './lookupLimit'
+import { previewGenres } from './mapSubjectsToGenres'
 import { pickIndex } from './pick'
 
 // Spine, Structural Seed (Shared shapes, `src/lib/catalogue`) and AD-9.
@@ -33,16 +34,15 @@ export type LookupTarget = { isbn: string; pick?: number } | { bookId: number }
 /**
  * A name of the picked candidate and the shared row a save would link it to;
  * `id: null` means the save would create it, which the Answer marks "New
- * author" or "New series" (FR-13).
+ * author", "New series" or "New genre" (FR-13).
  */
 export type Match = { name: string; id: number | null }
 
 /**
  * What an ISBN is (AD-9, FR-11): a Book the viewer can already read, with
  * what they hold of it; the sources' candidates with the picked index, the
- * picked one's author and series matches and the sources that failed; no
- * source knows it; or the sources could not be asked. `rawMetadata` and `raw` never appear in any kind. The
- * spine's `genres` in `matches` arrives with `mapSubjectsToGenres` (Epic 9).
+ * picked one's author, series and genre matches and the sources that failed; no
+ * source knows it; or the sources could not be asked. `rawMetadata` and `raw` never appear in any kind.
  */
 export type LookupResult =
   | { kind: 'existing'; book: EffectiveBook; mine: Holdings }
@@ -50,7 +50,7 @@ export type LookupResult =
       kind: 'source'
       candidates: Draft[]
       pick: number
-      matches: { authors: Match[]; series: Match | null }
+      matches: { authors: Match[]; series: Match | null; genres: Match[] }
       failed: SourceId[]
     }
   | { kind: 'none' }
@@ -152,11 +152,13 @@ export async function lookupBook(ctx: Context, target: LookupTarget): Promise<Lo
       for (const { name } of picked.authors) authors.push(await sharedMatch(ctx, 'authors', name))
       const series =
         picked.series === undefined ? null : await sharedMatch(ctx, 'series', picked.series)
+      // The save stores `outcome.raw`: `chooseCandidate()` changes only the cover.
+      const genres = await previewGenres(ctx, outcome.raw)
       return {
         kind: 'source',
         candidates: candidates.map(toDraft),
         pick,
-        matches: { authors, series },
+        matches: { authors, series, genres },
         failed: outcome.failed,
       }
     }

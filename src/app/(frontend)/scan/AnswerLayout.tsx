@@ -43,6 +43,7 @@ export async function AnswerLayout({
     pages: (pages) => t('answer.pages', { pages }),
     newAuthor: (name) => t('answer.newAuthor', { name }),
     newSeries: (name) => t('answer.newSeries', { name }),
+    newGenre: (name) => t('answer.newGenre', { name }),
   })
 
   return (

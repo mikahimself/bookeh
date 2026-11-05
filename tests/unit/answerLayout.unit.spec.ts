@@ -31,6 +31,7 @@ const book: AnswerBook = {
   source: null,
   newAuthors: [],
   newSeries: null,
+  newGenres: [],
   pick: undefined,
   candidate: undefined,
   editions: [],

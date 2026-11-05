@@ -57,6 +57,7 @@ const book: SourceAnswer = {
   source: 'google',
   newAuthors: [],
   newSeries: null,
+  newGenres: [],
   pick: undefined,
   candidate: { source: 'google', recordId: 'g1' },
   editions: [],

@@ -184,7 +184,7 @@ describe('lookupBook', () => {
           { ...first, hasCover: true },
           { ...second, hasCover: false },
         ],
-        matches: { authors: [{ name: defaultAuthor, id: null }], series: null },
+        matches: { authors: [{ name: defaultAuthor, id: null }], series: null, genres: [] },
       })
       if (result.kind !== 'source') throw new Error('unreachable')
       for (const draft of result.candidates) {
@@ -248,6 +248,16 @@ describe('lookupBook', () => {
         })
       ).totalDocs
 
+    const genresByKey = async (name: string) =>
+      (
+        await payload.find({
+          collection: 'genres',
+          where: { nameKey: { equals: toNameKey(name) } },
+          overrideAccess: true,
+          depth: 0,
+        })
+      ).docs
+
     const matchesOf = async (target: { isbn: string; pick?: number }) => {
       const result = await lookupBook(asA, target)
       if (result.kind !== 'source') throw new Error(`expected a source answer, got ${result.kind}`)
@@ -271,6 +281,7 @@ describe('lookupBook', () => {
         // Shown normalised, as a save stores it.
         authors: [{ name: author.replace('Tove Jansson', 'tove JANSSON'), id: sharedAuthor.id }],
         series: { name: seriesName.toUpperCase(), id: sharedSeries.id },
+        genres: [],
       })
     })
 
@@ -291,11 +302,39 @@ describe('lookupBook', () => {
           { name: second, id: null },
         ],
         series: { name: seriesName, id: null },
+        genres: [],
       })
       expect(await rowsWithName('authors', first)).toBe(0)
       expect(await rowsWithName('authors', second)).toBe(0)
       expect(await rowsWithName('series', seriesName)).toBe(0)
       expect(await booksWithIsbn(isbn)).toBe(0)
+    })
+
+    it('previews genres: matched with ids, new as null, one entry per genre, nothing created', async () => {
+      const weird = unique('Weird Science')
+      const fiction = (await genresByKey('Fiction'))[0]!
+      const before = (await payload.count({ collection: 'genres', overrideAccess: true })).totalDocs
+      vi.mocked(lookupSources).mockResolvedValue({
+        kind: 'found',
+        failed: [],
+        candidates: [candidate(isbn, 'Genres')],
+        raw: {
+          v: 1,
+          fetchedAt: '2026-10-19T00:00:00.000Z',
+          sources: {},
+          subjects: { google: ['fiction', 'Fiction', weird, weird.toUpperCase()] },
+          coverUrl: null,
+        },
+      })
+
+      expect((await matchesOf({ isbn })).genres).toEqual([
+        { name: 'fiction', id: fiction.id },
+        { name: weird, id: null },
+      ])
+      expect((await genresByKey(weird)).length).toBe(0)
+      expect((await payload.count({ collection: 'genres', overrideAccess: true })).totalDocs).toBe(
+        before,
+      )
     })
 
     it('ignores the viewer’s and other users’ private authors', async () => {
@@ -307,6 +346,7 @@ describe('lookupBook', () => {
       expect(await matchesOf({ isbn })).toEqual({
         authors: [{ name: author, id: null }],
         series: null,
+        genres: [],
       })
       expect(await rowsWithName('authors', author)).toBe(2)
     })
@@ -318,6 +358,7 @@ describe('lookupBook', () => {
       expect(await matchesOf({ isbn, pick: 1 })).toEqual({
         authors: [{ name: other, id: null }],
         series: null,
+        genres: [],
       })
     })
   })

@@ -135,6 +135,7 @@
     "from": "From {source}",
     "newAuthor": "New author · {name}",
     "newSeries": "New series · {name}",
+    "newGenre": "New genre · {name}",
     "pages": "{pages, plural, one {# page} other {# pages}}",
     "back": "Back",
     "notFound": "Not found",

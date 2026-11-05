@@ -135,6 +135,7 @@
     "from": "Lähde: {source}",
     "newAuthor": "Uusi kirjailija · {name}",
     "newSeries": "Uusi sarja · {name}",
+    "newGenre": "Uusi genre · {name}",
     "pages": "{pages, plural, one {# sivu} other {# sivua}}",
     "back": "Takaisin",
     "notFound": "Ei löytynyt",

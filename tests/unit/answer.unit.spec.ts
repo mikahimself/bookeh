@@ -93,6 +93,10 @@ describe('notInLibrary', () => {
       matches: {
         authors: [{ name: 'Väinö Linna', id: null }],
         series: { name: 'Sotaromaanit', id: 4 },
+        genres: [
+          { name: 'Fiction', id: 1 },
+          { name: 'Weird Science', id: null },
+        ],
       },
       failed: [],
     }
@@ -108,6 +112,7 @@ describe('notInLibrary', () => {
       source: 'finna',
       newAuthors: ['Väinö Linna'],
       newSeries: null,
+      newGenres: ['Weird Science'],
       pick: 1,
       candidate: { source: 'finna', recordId: 'helka.2' },
       editions: [
@@ -143,6 +148,7 @@ describe('notInLibrary', () => {
         matches: {
           authors: [{ name: 'Väinö Linna', id: 3 }],
           series: { name: 'Uusi', id: null },
+          genres: [],
         },
         failed: ['finna'],
       },
@@ -156,6 +162,7 @@ describe('notInLibrary', () => {
       source: 'fixture',
       newAuthors: [],
       newSeries: 'Uusi',
+      newGenres: [],
       // One candidate: nothing about editions, and no pick to send, but its identity.
       pick: undefined,
       candidate: { source: 'fixture', recordId: 'helka.1' },
@@ -182,6 +189,7 @@ describe('notInLibrary', () => {
       source: null,
       newAuthors: [],
       newSeries: null,
+      newGenres: [],
       pick: undefined,
       candidate: undefined,
       editions: [],
@@ -231,6 +239,7 @@ describe('held', () => {
       source: null,
       newAuthors: [],
       newSeries: null,
+      newGenres: [],
       pick: undefined,
       candidate: undefined,
       editions: [],
@@ -321,7 +330,7 @@ describe('held', () => {
           kind: 'source',
           candidates: [draft()],
           pick: 0,
-          matches: { authors: [], series: null },
+          matches: { authors: [], series: null, genres: [] },
           failed: [],
         },
         ISBN,
@@ -392,6 +401,7 @@ describe('answerLines', () => {
     pages: (pages) => `${pages} ${pages === 1 ? 'page' : 'pages'}`,
     newAuthor: (name) => `New author · ${name}`,
     newSeries: (name) => `New series · ${name}`,
+    newGenre: (name) => `New genre · ${name}`,
   }
   const answer = (over: Partial<AnswerBook> = {}): AnswerBook => ({
     isbn13: '9789510396353',
@@ -405,6 +415,7 @@ describe('answerLines', () => {
     source: 'finna',
     newAuthors: ['Kristiina Kivivuori'],
     newSeries: 'Muumit',
+    newGenres: ['Weird Science'],
     pick: 0,
     candidate: undefined,
     editions: [],
@@ -416,13 +427,25 @@ describe('answerLines', () => {
     expect(answerLines(answer(), text)).toEqual({
       authors: 'Tove Jansson, Kristiina Kivivuori',
       edition: 'WSOY · 2014 · 180 pages',
-      notes: ['From Finna', 'New author · Kristiina Kivivuori', 'New series · Muumit'],
+      notes: [
+        'From Finna',
+        'New author · Kristiina Kivivuori',
+        'New series · Muumit',
+        'New genre · Weird Science',
+      ],
     })
   })
 
   it('skips missing edition parts and shows an unlabelled source by its id', () => {
     const lines = answerLines(
-      answer({ publisher: null, pages: 1, source: 'fixture', newAuthors: [], newSeries: null }),
+      answer({
+        publisher: null,
+        pages: 1,
+        source: 'fixture',
+        newAuthors: [],
+        newSeries: null,
+        newGenres: [],
+      }),
       text,
     )
     expect(lines.edition).toBe('2014 · 1 page')
@@ -440,6 +463,7 @@ describe('answerLines', () => {
           source: null,
           newAuthors: [],
           newSeries: null,
+          newGenres: [],
         }),
         text,
       ),
@@ -568,7 +592,7 @@ describe('answerFor', () => {
         kind: 'source',
         candidates: [draft()],
         pick: 0,
-        matches: { authors: [], series: null },
+        matches: { authors: [], series: null, genres: [] },
         failed: [],
       },
     ],
@@ -578,7 +602,7 @@ describe('answerFor', () => {
         kind: 'source',
         candidates: [],
         pick: 0,
-        matches: { authors: [], series: null },
+        matches: { authors: [], series: null, genres: [] },
         failed: [],
       },
     ],
@@ -595,7 +619,7 @@ describe('answerFor', () => {
         kind: 'source',
         candidates: [],
         pick: 0,
-        matches: { authors: [], series: null },
+        matches: { authors: [], series: null, genres: [] },
         failed: [],
       })),
     ).resolves.toEqual({ kind: 'notFound', isbn13: ISBN, title: '' })

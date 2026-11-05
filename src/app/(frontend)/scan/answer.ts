@@ -27,7 +27,7 @@ export type AnswerEdition = {
 
 /**
  * The Book an Answer shows (EXPERIENCE.md, Answer). `source` is the source
- * id, `null` for a shared Book; `newAuthors` and `newSeries` are the rows a
+ * id, `null` for a shared Book; `newAuthors`, `newSeries` and `newGenres` are the rows a
  * save would create; `isbn13` is the ISBN the Answer was asked for, `null`
  * for a held Book that has none (I12), in which case the saves target the
  * Book by id instead, with `pick`, the source candidate shown when there are
@@ -52,6 +52,7 @@ export type AnswerBook = {
   source: string | null
   newAuthors: string[]
   newSeries: string | null
+  newGenres: string[]
   pick: number | undefined
   candidate: CandidateId | undefined
   editions: AnswerEdition[]
@@ -113,6 +114,7 @@ const existingBook = (book: ExistingResult['book'], isbn13: string | null): Answ
   source: null,
   newAuthors: [],
   newSeries: null,
+  newGenres: [],
   pick: undefined,
   candidate: undefined,
   editions: [],
@@ -154,6 +156,7 @@ export function notInLibrary(result: LookupResult, isbn13: string): SourceAnswer
         source: draft.source,
         newAuthors: result.matches.authors.filter(({ id }) => id === null).map(({ name }) => name),
         newSeries: series !== null && series.id === null ? series.name : null,
+        newGenres: result.matches.genres.filter(({ id }) => id === null).map(({ name }) => name),
         pick: several ? pick : undefined,
         candidate: { source: draft.source, recordId: draft.recordId },
         editions: several ? answerEditions(isbn13, candidates) : [],
@@ -197,6 +200,7 @@ export type AnswerText = {
   pages: (pages: number) => string
   newAuthor: (name: string) => string
   newSeries: (name: string) => string
+  newGenre: (name: string) => string
 }
 
 /**
@@ -220,6 +224,7 @@ export function answerLines(
     ...(answer.source === null ? [] : [text.from(text.source(answer.source) ?? answer.source)]),
     ...answer.newAuthors.map(text.newAuthor),
     ...(answer.newSeries === null ? [] : [text.newSeries(answer.newSeries)]),
+    ...answer.newGenres.map(text.newGenre),
   ]
   return { authors: answer.authors.join(', '), edition, notes }
 }
