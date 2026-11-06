@@ -14,7 +14,7 @@ Phase 1 meets its success metrics. The counter-metric stays under its threshold 
 | Adding a book (NFR-2) | under 20 s per book | about 10-15 s | yes |
 | Restore (NFR-6) | a backup brings the catalogue back | rehearsed, see below | yes |
 | Counter-metric | at most 1 in 10 Books corrected after saving | 25 of 282 (8.9%) | not flagged |
-| No duplicate purchases | none after cataloguing | not measured here; no duplicate was reported during acceptance | open |
+| No duplicate purchases | none after cataloguing | not measured here; no duplicate was reported during acceptance | closed (2026-11-05, Mika): a use-over-time metric, not measurable at one date |
 
 ## "Where is it?"
 

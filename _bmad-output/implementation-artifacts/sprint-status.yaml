@@ -29,7 +29,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 10-06-2026 17:50
-last_updated: 11-04-2026 20:38
+last_updated: 11-05-2026 19:11
 project: bookeh
 project_key: NOKEY
 tracking_system: file-system
@@ -283,7 +283,7 @@ development_status:
   9-13-g11-genre-admin-service: done
   9-14-g12-genres-in-settings-admin-only: done
   9-15-k13-phase-1-acceptance: done
-  epic-9-retrospective: optional
+  epic-9-retrospective: done
 action_items:
   - id: 'epic-1-retro-item-1-fix-the-flash-toast-cookie-contract-doub'
     epic: 1
@@ -984,7 +984,9 @@ action_items:
     status: done
     ref: "_bmad-output/implementation-artifacts/epic-8-retro-2026-11-04.md"
     story: '9.18'
-    resolution: '2026-11-04: Story 9.18 separates search and Answer preview contexts; bidirectional collision integration coverage and cross-tab fixture browser walk passed.'
+    resolution: '2026-11-04: Story 9.18 separates search and Answer preview contexts;
+      bidirectional collision integration coverage and cross-tab fixture browser walk
+      passed.'
   - id: "epic-8-retro-item-82-verify-kirjasampo-production-adapter"
     epic: 8
     action: "Exercise kirjasampo.lookupByIsbn for a Finnish ISBN with a recorded-response
@@ -994,7 +996,9 @@ action_items:
     status: done
     ref: "_bmad-output/implementation-artifacts/epic-8-retro-2026-11-04.md"
     story: '9.19'
-    resolution: '2026-11-04: Story 9.19 verifies production POST/query wiring and recorded Finnish work/themes plus rejected-request undefined behavior; all 9 offline focused tests and scoped ESLint passed.'
+    resolution: '2026-11-04: Story 9.19 verifies production POST/query wiring and
+      recorded Finnish work/themes plus rejected-request undefined behavior; all 9
+      offline focused tests and scoped ESLint passed.'
   - id: "epic-8-retro-item-83-record-deployed-phone-4g-latency"
     epic: 8
     action: "Record deployed phone-over-4G submit-to-Answer timings: held Book <=2
@@ -1008,3 +1012,19 @@ action_items:
     resolution: '2026-11-04: Mika reports deployed phone-over-4G scan-to-Answer timings
       of 1.2 s held and 3.2 s source; both targets met. Recorded in Stories 8.2 and
       8.15.'
+  - id: "epic-9-retro-item-84-before-committing-a-story-that-changes-a"
+    epic: 9
+    action: "Before committing a story that changes a type consumed by tests/helpers/*
+      or shared screen fixtures, run the full npm run test:unit so fixture drift cannot
+      stay red across stories (P1; CI runs 41980800427, 42002694544, 42029739265)."
+    owner: "Mika"
+    status: open
+    ref: "_bmad-output/implementation-artifacts/epic-9-retro-2026-11-05.md"
+  - id: "epic-9-retro-item-85-decide-how-the-no-duplicate-purchases-su"
+    epic: 9
+    action: "Decide how the no-duplicate-purchases success metric is closed (observation
+      window or accepted as unmeasurable in Phase 1) and record it in docs/phase-1-acceptance.md
+      (S3)."
+    owner: "Mika"
+    status: done
+    ref: "_bmad-output/implementation-artifacts/epic-9-retro-2026-11-05.md"
