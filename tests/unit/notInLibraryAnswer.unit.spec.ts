@@ -66,7 +66,7 @@ const book: SourceAnswer = {
 
 /** The server component's tree, its async `AnswerLayout` resolved as `render` cannot. */
 const renderAnswer = async (answer: SourceAnswer) => {
-  const { props } = await NotInLibraryAnswer({ answer, lists: [] })
+  const { props } = await NotInLibraryAnswer({ answer, lists: [], others: [] })
   return render(await AnswerLayout(props as Parameters<typeof AnswerLayout>[0]))
 }
 

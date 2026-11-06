@@ -23,12 +23,14 @@ export async function AnswerLayout({
   book,
   lines = [],
   sourceNote,
+  otherEditions,
   editions,
   children,
 }: {
   book: AnswerBook
   lines?: AnswerLine[]
   sourceNote?: ReactNode
+  otherEditions?: ReactNode
   editions?: ReactNode
   children: ReactNode
 }) {
@@ -86,6 +88,7 @@ export async function AnswerLayout({
           {sourceNote}
         </div>
       )}
+      {otherEditions}
       {editions}
       <div className="flex flex-col gap-2">{children}</div>
     </div>

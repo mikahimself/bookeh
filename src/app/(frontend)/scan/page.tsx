@@ -12,6 +12,7 @@ import { viewerWishlists } from '../components/viewerWishlists'
 import { HeldAnswer } from './HeldAnswer'
 import { NotFoundAnswer } from './NotFoundAnswer'
 import { NotInLibraryAnswer } from './NotInLibraryAnswer'
+import { otherEditionsFor } from './otherEditionsFor'
 import { answerFor, answerForBook, scanParams, type ScanOutcome } from './answer'
 import { ScanScreen } from './ScanScreen'
 import { UnavailableAnswer } from './UnavailableAnswer'
@@ -46,6 +47,13 @@ import { UnavailableAnswer } from './UnavailableAnswer'
  * The Answers with Add to wishlist (Not in library, Not found, and Couldn't
  * look it up through Add by hand) get the viewer's wishlists; a failed read
  * is logged and leaves the picker with New list alone.
+ *
+ * Not in library, On wishlist and Ordered also get the other editions the
+ * viewer holds a copy of (FR-20, `otherEditions()`), read after the
+ * wishlists on the same context (AD-16). The Book answered for is excluded
+ * by id when it exists: a Not in library Book is one the viewer holds no
+ * copy of, so only a held Answer has one to exclude. A failed read is
+ * logged and the Answer renders without the notice.
  */
 export default async function ScanPage({
   searchParams,
@@ -67,6 +75,7 @@ export default async function ScanPage({
     outcome.kind === 'notInLibrary' || outcome.kind === 'notFound' || outcome.kind === 'unavailable'
       ? await viewerWishlists(ctx)
       : []
+  const others = await otherEditionsFor(ctx, outcome)
 
   return (
     <ViewTransition enter="task-enter" exit="task-exit" default="none">
@@ -95,9 +104,9 @@ export default async function ScanPage({
           title={t(`answer.${outcome.kind === 'held' ? outcome.answer.heading : outcome.kind}`)}
         >
           {outcome.kind === 'held' ? (
-            <HeldAnswer answer={outcome.answer} />
+            <HeldAnswer answer={outcome.answer} others={others} />
           ) : outcome.kind === 'notInLibrary' ? (
-            <NotInLibraryAnswer answer={outcome.answer} lists={lists} />
+            <NotInLibraryAnswer answer={outcome.answer} lists={lists} others={others} />
           ) : outcome.kind === 'unavailable' ? (
             <UnavailableAnswer isbn13={outcome.isbn13} failed={outcome.failed} lists={lists} />
           ) : (

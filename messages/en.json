@@ -163,7 +163,9 @@
     "tryAgain": "Try again",
     "addByHand": "Add by hand",
     "partial": "{sources} didn't answer. Saving now uses {found} alone.",
-    "tryPartial": "Try {sources} again"
+    "tryPartial": "Try {sources} again",
+    "otherEditions": "{count, plural, one {You already own another edition} other {You already own other editions}}",
+    "openOther": "Open"
   },
   "lookup": {
     "open": "Find by title or author",

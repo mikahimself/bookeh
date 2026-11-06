@@ -163,7 +163,9 @@
     "tryAgain": "Yritä uudelleen",
     "addByHand": "Lisää käsin",
     "partial": "{count, plural, one {{sources} ei vastannut.} other {{sources} eivät vastanneet.}} Tallennus käyttää nyt vain {found}.",
-    "tryPartial": "Yritä {sources} uudelleen"
+    "tryPartial": "Yritä {sources} uudelleen",
+    "otherEditions": "{count, plural, one {Sinulla on jo eri painos} other {Sinulla on jo muita painoksia}}",
+    "openOther": "Avaa"
   },
   "lookup": {
     "open": "Hae nimellä tai tekijällä",

@@ -5,10 +5,11 @@ import type { WishlistLine } from '@/lib/wishlists/wishlists'
 import { AddToWishlist } from '../components/AddToWishlist'
 
 import { AddToLibrary } from './AddToLibrary'
-import { editionLines, type SourceAnswer } from './answer'
+import { editionLines, type OtherEdition, type SourceAnswer } from './answer'
 import { AnswerBack } from './AnswerBack'
 import { AnswerLayout } from './AnswerLayout'
 import { EditionPicker } from './EditionPicker'
+import { OtherEditions } from './OtherEditions'
 import { PartialLookupLine } from './PartialLookupLine'
 
 /**
@@ -20,14 +21,17 @@ import { PartialLookupLine } from './PartialLookupLine'
  * `PartialLookupLine`. Finnish objects decline, hence `sourcesPartitive`; a
  * source with no label shows its id, in either catalogue. The Answer always
  * carries an ISBN (`SourceAnswer`): the picker, the cover preview and both
- * saves address it.
+ * saves address it. `others` are the other editions the viewer holds, shown
+ * in the notice before the buttons (FR-20).
  */
 export async function NotInLibraryAnswer({
   answer,
   lists,
+  others,
 }: {
   answer: SourceAnswer
   lists: readonly WishlistLine[]
+  others: readonly OtherEdition[]
 }) {
   const t = await getTranslations()
   const labels = await getTranslations('sources')
@@ -70,6 +74,7 @@ export async function NotInLibraryAnswer({
           />
         ) : undefined
       }
+      otherEditions={others.length > 0 ? <OtherEditions editions={others} /> : undefined}
       editions={
         editions.length > 1 && pick !== undefined ? (
           <EditionPicker

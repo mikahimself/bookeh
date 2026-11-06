@@ -4,11 +4,12 @@ import { RefreshOnUndo } from '../(sections)/RefreshOnUndo'
 import type { CopyTarget } from '../saveInput'
 
 import { AddToLibrary } from './AddToLibrary'
-import { factLines, type HeldAnswer as Held } from './answer'
+import { factLines, type HeldAnswer as Held, type OtherEdition } from './answer'
 import { AnswerBack } from './AnswerBack'
 import { AnswerLayout } from './AnswerLayout'
 import { AnswerLookUpAgain } from './AnswerLookUpAgain'
 import { OpenBook } from './OpenBook'
+import { OtherEditions } from './OtherEditions'
 
 /**
  * The held Answer (EXPERIENCE.md, Answer screens; FR-16, FR-20, FR-30): the
@@ -28,11 +29,21 @@ import { OpenBook } from './OpenBook'
  *   closes the viewer's own open entries for the Book in the save's
  *   transaction (`saveCopy`), then Back.
  *
+ * `others` are the other editions the viewer holds, for the notice (FR-20):
+ * the page reads them for Ordered and On wishlist alone, so In library gets
+ * none.
+ *
  * `RefreshOnUndo` sits here rather than on the Received Link: an undone
  * Received orders the copy again, and the Link that raised the toast is gone
  * by then, unmounted by its own refresh.
  */
-export async function HeldAnswer({ answer }: { answer: Held }) {
+export async function HeldAnswer({
+  answer,
+  others,
+}: {
+  answer: Held
+  others: readonly OtherEdition[]
+}) {
   const t = await getTranslations()
   // A Book with no ISBN is saved by id, which `requireOwnBook()` gates (I12).
   const target: CopyTarget =
@@ -49,6 +60,7 @@ export async function HeldAnswer({ answer }: { answer: Held }) {
     <AnswerLayout
       book={answer}
       lines={lines}
+      otherEditions={others.length > 0 ? <OtherEditions editions={others} /> : undefined}
       editions={answer.lookAgain ? <AnswerLookUpAgain bookId={answer.bookId} /> : undefined}
     >
       {answer.heading === 'inLibrary' && (

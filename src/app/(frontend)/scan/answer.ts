@@ -7,6 +7,8 @@ import { DomainError } from '@/lib/errors'
 import type { SourceId } from '@/lib/metadata/source'
 import { isRowId } from '@/lib/payload/ref'
 
+import type { MyBook } from '@/lib/shelf/query'
+
 import { isLent } from '../isLent'
 
 /**
@@ -311,6 +313,39 @@ export function factLines(facts: readonly AnswerFactLine[], text: FactText): Ans
       receive: copy.status === 'ordered' ? copy.copyId : null,
     }
   })
+}
+
+/**
+ * Another edition the viewer holds, for the Answer's notice (FR-20; option B
+ * of `mockups/other-edition-options.html`): a different Book of the same work
+ * that the viewer has a copy of. `edition` is "publisher · year", the parts
+ * that exist (empty when none); `facts` are that Book's copies alone, for
+ * `factLines()`; `title` and `language` feed the cover placeholder.
+ */
+export type OtherEdition = {
+  bookId: number
+  cover: string | null
+  title: string
+  language: string | null
+  edition: string
+  facts: AnswerFactLine[]
+}
+
+/**
+ * The notice's rows, one per Book in `otherEditions()` order. Only copies
+ * make a line: an entry on the other Book never counts as holding it.
+ */
+export function otherEditionRows(books: readonly MyBook[]): OtherEdition[] {
+  return books.map(({ book, mine }) => ({
+    bookId: book.bookId,
+    cover: book.coverUrl,
+    title: book.title,
+    language: book.language,
+    edition: [book.publisher, book.year === null ? null : String(book.year)]
+      .filter((part) => part)
+      .join(' · '),
+    facts: mine.copies.map((copy): AnswerFactLine => ({ kind: 'copy', copy })),
+  }))
 }
 
 /**

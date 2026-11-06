@@ -126,6 +126,7 @@ Mika is working through a stack of books at home. His default location is Tamper
   - **In <friend>'s library**, for friends whose collection is open and who own a copy
   - **Ordered**, for the user's own ordered copy
   - **Wishlist**, when the Book is on any of the user's wishlists
+  - When the heading is Not in library, Wishlist or Ordered and the user has a copy (owned, lent or ordered) of a different Book with the same title (exact, the subtitle ignored) and a shared author, the result also says they already own another edition and links to it. The heading is unchanged; a wishlist entry for the other edition does not count.
 - **FR-21** For a book the user doesn't own, the result offers **Add to wishlist** (pick a list) and **Add to library** (owned copy at the default location), with no rescan. The same two actions serve shop checks and cataloguing.
 - **FR-22** If no source finds the ISBN, the user enters title and author and can still add the book to a wishlist or to the library (FR-12).
 

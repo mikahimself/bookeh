@@ -86,7 +86,7 @@ const answer = (over: Partial<Held>): Held => ({
 
 /** The server component's tree, its async `AnswerLayout` resolved as `render` cannot. */
 const renderAnswer = async (held: Held) => {
-  const { props } = await HeldAnswer({ answer: held })
+  const { props } = await HeldAnswer({ answer: held, others: [] })
   return render(await AnswerLayout(props as Parameters<typeof AnswerLayout>[0]))
 }
 
