@@ -121,7 +121,7 @@ export async function BookDetail({
     <BookDetailFrame label={book.title} back={back} openId={bookId}>
       <div className="flex flex-col gap-6">
         <BookHeader book={book} />
-        <ReadAndRating key={bookId} bookId={bookId} initial={state} />
+        <ReadAndRating key={bookId} bookId={bookId} title={book.title} initial={state} />
         {/* Focus lands here when a copy's line goes or changes (`RemoveCopy`, `ReceiveCopy`, `MoveCopy`, `LendCopy`, `ReturnLoan`). */}
         {copies.length > 0 && (
           <section tabIndex={-1} className="flex flex-col gap-2">

@@ -470,7 +470,9 @@ type ReadTarget = { copyIds: readonly number[] } | { bookId: number } // setRead
 // finishedDays: set when exactly one changed Book went reading → read (the finish toast); days are calendar days from start to finish, at least 1
 // setReadingDates(ctx, bookId, { readingSince: string | null; finishedAt: string | null }): UserBookState — no Undo
 // Only select mode's copyIds path is undoable (withUndo). Book detail's bookId path is not: setReadAction drops the restore (PRD FR-15).
-// Until 10.2, existing Read actions translate boolean inputs to read/unread and return { read: state === 'read', count }, preserving the select-mode restore callback.
+// Book detail: setReadAction({ bookId, state: ReadState }): { state: UserBookState; finishedDays: number | null } — no Undo; finishedDays drives the switch's finish toast
+// Book detail: setReadingDatesAction({ bookId, readingSince: string | null, finishedAt: string | null }): UserBookState — no Undo; a reading → read save also shows the finish toast, its days from the two stored dates (finishedDays(readingSince, finishedAt)); no other toast
+// Select mode: toggleCopiesReadAction(copyIds): Undoable<{ read: boolean; count }> — translates 'toggle' to read/unread, keeps the restore, no finish toast
 // setRating(ctx, bookId, rating | null): void — no Undo
 // getUserBookState(ctx, bookId): UserBookState — the caller gates the Book id (AD-7)
 

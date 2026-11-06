@@ -5,6 +5,7 @@ import type { UserBookState } from '@/lib/books/effectiveBook'
 import { changeTags } from '@/lib/tags/changeTags'
 import { setRating } from '@/lib/books/setRating'
 import { setRead } from '@/lib/books/setRead'
+import { setReadingDates } from '@/lib/books/setReadingDates'
 import { refetchBook, type RefetchResult } from '@/lib/catalogue/refetchBook'
 import { listLocations, type LocationOption } from '@/lib/copies/locations'
 import { moveCopies } from '@/lib/copies/moveCopies'
@@ -86,20 +87,43 @@ export async function receiveCopyAction(
 }
 
 /**
- * Book detail's read switch: marks one Book read or unread. No Undo, so no
- * receipt (PRD FR-15): one tap puts it back. The `Undone` shape `setRead`
- * returns is for select mode's undoable path and is dropped here.
+ * Book detail's reading switch: moves one Book to unread, reading or read by
+ * FR-53's transitions. No Undo, so no receipt (PRD FR-15): one tap puts it
+ * back. Answers the stored state and `finishedDays`, set only when the Book
+ * went reading → read (the finish toast).
  */
 export async function setReadAction(
   input: unknown,
-): Promise<ActionResult<{ read: boolean; count: number }>> {
+): Promise<ActionResult<{ state: UserBookState; finishedDays: number | null }>> {
   return runAction(async () => {
     const ctx = await requireUserOrThrow()
-    const { bookId, read } = bookInput(input)
-    if (typeof read !== 'boolean') throw new DomainError('VALIDATION')
-    // `setRead` opens its own transaction (AD-16).
-    const { data } = await setRead(ctx, { bookId }, read ? 'read' : 'unread')
-    return { read: data.state === 'read', count: data.count }
+    const { bookId, state } = bookInput(input)
+    if (state !== 'unread' && state !== 'reading' && state !== 'read')
+      throw new DomainError('VALIDATION')
+    // `setRead` opens its own transaction (AD-16); the restore is select mode's.
+    const { data } = await setRead(ctx, { bookId }, state)
+    return { state: await getUserBookState(ctx, bookId), finishedDays: data.finishedDays }
+  })
+}
+
+/**
+ * Book detail's reading-dates Picker: sets both dates of one Book, `null`
+ * clearing one. No Undo. The format, the date rules and Finished turning a
+ * Book being read into read are the service's and the collection's, as
+ * field errors (`VALIDATION`). Answers the stored state.
+ */
+export async function setReadingDatesAction(input: unknown): Promise<ActionResult<UserBookState>> {
+  return runAction(async () => {
+    const ctx = await requireUserOrThrow()
+    const { bookId, readingSince, finishedAt } = bookInput(input)
+    const date = (value: unknown): string | null => {
+      if (value !== null && typeof value !== 'string') throw new DomainError('VALIDATION')
+      return value
+    }
+    return setReadingDates(ctx, bookId, {
+      readingSince: date(readingSince),
+      finishedAt: date(finishedAt),
+    })
   })
 }
 

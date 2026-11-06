@@ -80,6 +80,7 @@ vi.mock('@/app/(frontend)/(sections)/actions', () => ({
   removeCopiesAction: vi.fn(),
   receiveCopyAction: vi.fn(),
   setReadAction: vi.fn(),
+  setReadingDatesAction: vi.fn(),
   setRatingAction: vi.fn(),
   setNoteAction: vi.fn(),
   toggleCopiesReadAction: vi.fn(),
@@ -94,7 +95,14 @@ vi.mock('@/app/(frontend)/heldBook', () => ({ heldBook }))
 vi.mock('@/lib/books/holdings', () => ({ getHoldings }))
 vi.mock('@/lib/tags/tags', () => ({ tagUse: async () => [] }))
 vi.mock('@/lib/books/userBookState', () => ({
-  getUserBookState: async () => ({ read: false, rating: null, tags: [] }),
+  getUserBookState: async () => ({
+    read: false,
+    state: 'unread',
+    readingSince: null,
+    finishedAt: null,
+    rating: null,
+    tags: [],
+  }),
 }))
 vi.mock('@/app/(frontend)/components/toast/ToastProvider', () => ({
   useToast: () => ({

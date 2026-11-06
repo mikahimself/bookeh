@@ -17,14 +17,16 @@ type Failure = Extract<ActionResult<never>, { ok: false }>
  * call's failure is reported: by `onFailed` when given (returning the error
  * toast it raised, if any), otherwise by the built-in report. A success newer
  * than the call that raised this switch's error toast withdraws that toast,
- * and only that one. `onSaved` gets each success's data.
+ * and only that one. `onSaved` gets each success's data. The third element
+ * takes a value stored by another control (Book detail's reading-dates
+ * Picker): it becomes the stored value, shown once no call is in flight.
  */
 export function useSavedSwitch<V, T = unknown>(
   initial: V,
   save: (value: V) => Promise<ActionResult<T>>,
   onSaved?: (data: T) => void,
   onFailed?: (failure: Failure) => number | null,
-): [V, (next: V) => void] {
+): [V, (next: V) => void, (stored: V) => void] {
   const report = useReportFailure()
   const { withdraw } = useToast()
   const [value, setValue] = useState(initial)
@@ -56,5 +58,10 @@ export function useSavedSwitch<V, T = unknown>(
     })
   }
 
-  return [value, change]
+  const set = (next: V) => {
+    stored.current = { value: next, call: latest.current }
+    if (inFlight.current === 0) setValue(next)
+  }
+
+  return [value, change, set]
 }

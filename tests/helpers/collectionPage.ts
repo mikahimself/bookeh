@@ -90,6 +90,7 @@ vi.mock('@/app/(frontend)/(sections)/actions', () => ({
   removeCopiesAction,
   receiveCopyAction,
   setReadAction: vi.fn(),
+  setReadingDatesAction: vi.fn(),
   setRatingAction: vi.fn(),
   setNoteAction,
   toggleCopiesReadAction,

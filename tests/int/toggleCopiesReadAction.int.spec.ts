@@ -74,13 +74,15 @@ describe('toggleCopiesReadAction', () => {
     await undo(await contextFor(user), result.data.undoToken)
     expect(await isRead()).toBe(false)
 
-    for (const read of [true, false]) {
-      expect(await setReadAction({ bookId, read })).toEqual({ ok: true, data: { read, count: 1 } })
+    for (const state of ['reading', 'read', 'unread'] as const) {
+      const result = await setReadAction({ bookId, state })
+      if (!result.ok) throw new Error(`expected ok, got ${result.code}`)
+      expect(result.data.state).toMatchObject({ state, read: state === 'read' })
+      expect(result.data.finishedDays).toBe(state === 'read' ? 1 : null)
       expect(await getUserBookState(await contextFor(user), bookId)).toMatchObject({
-        read,
-        state: read ? 'read' : 'unread',
-        readingSince: null,
-        finishedAt: null,
+        state,
+        readingSince: state === 'unread' ? null : expect.any(String),
+        finishedAt: state === 'read' ? expect.any(String) : null,
       })
     }
   })

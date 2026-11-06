@@ -26,6 +26,7 @@ vi.mock('next-intl', async (importOriginal) => {
     ...actual,
     useTranslations: (namespace?: string) =>
       actual.createTranslator({ locale: 'en', messages, namespace: namespace as 'collection' }),
+    useFormatter: () => actual.createFormatter({ locale: 'en' }),
     useLocale: () => 'en',
   }
 })
@@ -39,7 +40,11 @@ vi.mock('@/app/(frontend)/actions/undo', () => ({ undoAction }))
 vi.mock('@/app/(frontend)/actions/prefs', () => ({ setDevicePrefsAction: vi.fn() }))
 vi.mock('@/app/(frontend)/(sections)/actions', () => ({
   setReadAction: vi.fn(),
+  setReadingDatesAction: vi.fn(),
   setRatingAction: vi.fn(),
+}))
+vi.mock('@/app/(frontend)/(sections)/ReadingDatesPicker', () => ({
+  ReadingDatesPicker: () => null,
 }))
 
 /** Every observer made, with the elements it watches. */
@@ -304,7 +309,11 @@ describe('CollectionList', () => {
         createElement(
           ShelfActionsProvider,
           null,
-          createElement(ReadAndRating, { bookId: 1, initial: { read: false, rating: null } }),
+          createElement(ReadAndRating, {
+            bookId: 1,
+            title: 'Kätilö',
+            initial: { state: 'unread', readingSince: null, finishedAt: null, rating: null },
+          }),
           createElement(
             ShelfRowsProvider,
             {
