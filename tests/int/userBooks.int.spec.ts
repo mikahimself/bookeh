@@ -209,6 +209,9 @@ describe('user-books', () => {
       const ctx = await contextFor(user)
       expect(await getUserBookState(ctx, shared.id)).toEqual({
         read: false,
+        state: 'unread',
+        readingSince: null,
+        finishedAt: null,
         rating: null,
         tags: [],
       })
@@ -231,12 +234,18 @@ describe('user-books', () => {
       )
       expect(await getUserBookState(ctx, shared.id)).toEqual({
         read: true,
+        state: 'read',
+        readingSince: null,
+        finishedAt: null,
         rating: 3,
         tags: own.map(({ id, name, kind }) => ({ id, name, kind })),
       })
     }
     expect(await getUserBookState(await contextFor(b), shared.id)).toEqual({
       read: false,
+      state: 'unread',
+      readingSince: null,
+      finishedAt: null,
       rating: null,
       tags: [],
     })

@@ -98,8 +98,8 @@ export async function setReadAction(
     const { bookId, read } = bookInput(input)
     if (typeof read !== 'boolean') throw new DomainError('VALIDATION')
     // `setRead` opens its own transaction (AD-16).
-    const { data } = await setRead(ctx, { bookId }, read)
-    return data
+    const { data } = await setRead(ctx, { bookId }, read ? 'read' : 'unread')
+    return { read: data.state === 'read', count: data.count }
   })
 }
 
@@ -139,7 +139,10 @@ export async function toggleCopiesReadAction(
   return runAction(async () => {
     const ctx = await requireUserOrThrow()
     const copies = ids(copyIds)
-    return withUndo(ctx, (tx) => setRead(tx, { copyIds: copies }, 'toggle'))
+    return withUndo(ctx, async (tx) => {
+      const { data, restore } = await setRead(tx, { copyIds: copies }, 'toggle')
+      return { data: { read: data.state === 'read', count: data.count }, restore }
+    })
   })
 }
 

@@ -276,7 +276,14 @@ export const linna = book(5, 'Tuntematon sotilas', {
 /** Every case's defaults and clean-up. Call inside `describe('CollectionPage')`. */
 export function resetCollectionPage() {
   beforeEach(() => {
-    getUserBookState.mockResolvedValue({ read: false, rating: null, tags: [] })
+    getUserBookState.mockResolvedValue({
+      read: false,
+      state: 'unread',
+      readingSince: null,
+      finishedAt: null,
+      rating: null,
+      tags: [],
+    })
     devicePrefs.mockResolvedValue({ ...DEFAULT_PREFS })
     listLocations.mockResolvedValue([])
     tagUse.mockResolvedValue([])

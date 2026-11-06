@@ -29,7 +29,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 10-06-2026 17:50
-last_updated: 11-06-2026 12:00
+last_updated: 11-06-2026 19:30
 project: bookeh
 project_key: NOKEY
 tracking_system: file-system
@@ -285,8 +285,8 @@ development_status:
   9-15-k13-phase-1-acceptance: done
   epic-9-retrospective: done
 
-  epic-10: backlog
-  10-1-reading-state-on-user-books: backlog
+  epic-10: in-progress
+  10-1-reading-state-on-user-books: done
   10-2-reading-switch-and-dates-on-book-detail: backlog
   10-3-acquired-date-and-price-on-copies: backlog
   10-4-currently-reading-in-the-collection: backlog

@@ -44,7 +44,7 @@ describe('foreign keys', () => {
     const shared = await sharedBook()
 
     const sharedCopy = (await createCopy(ctx, { bookId: shared.id, status: 'owned' })).data
-    await setRead(ctx, { bookId: shared.id }, true)
+    await setRead(ctx, { bookId: shared.id }, 'read')
     const { data: loan } = await lendCopy(ctx, sharedCopy, { create: 'Liisa' })
     await returnLoan(ctx, loan.loanId)
     await lendCopy(ctx, sharedCopy, loan.person.id)

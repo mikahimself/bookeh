@@ -48,6 +48,9 @@ describe('CollectionPage', () => {
         ])
         getUserBookState.mockResolvedValue({
           read: false,
+          state: 'unread',
+          readingSince: null,
+          finishedAt: null,
           rating: null,
           tags: [
             { id: 41, name: 'Private genre', kind: 'genre' },
@@ -101,6 +104,9 @@ describe('CollectionPage', () => {
         ]
         getUserBookState.mockResolvedValue({
           read: false,
+          state: 'unread',
+          readingSince: null,
+          finishedAt: null,
           rating: null,
           tags: labels.filter(({ kind }) => kind !== missing),
         })

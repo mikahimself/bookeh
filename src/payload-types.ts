@@ -369,6 +369,8 @@ export interface UserBook {
     | null;
   tags?: (number | Tag)[] | null;
   read?: boolean | null;
+  readingSince?: string | null;
+  finishedAt?: string | null;
   rating?: number | null;
   ratedAt?: string | null;
   updatedAt: string;
@@ -684,6 +686,8 @@ export interface UserBooksSelect<T extends boolean = true> {
   overridden?: T;
   tags?: T;
   read?: T;
+  readingSince?: T;
+  finishedAt?: T;
   rating?: T;
   ratedAt?: T;
   updatedAt?: T;

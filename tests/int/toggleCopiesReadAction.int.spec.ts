@@ -2,7 +2,8 @@ import { cookies, headers } from 'next/headers'
 import { getPayload, type Payload } from 'payload'
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { toggleCopiesReadAction } from '@/app/(frontend)/(sections)/actions'
+import { setReadAction, toggleCopiesReadAction } from '@/app/(frontend)/(sections)/actions'
+import { getUserBookState } from '@/lib/books/userBookState'
 import { createCopy } from '@/lib/copies/createCopy'
 import { undo } from '@/lib/undo/undo'
 import config from '@/payload.config'
@@ -72,6 +73,16 @@ describe('toggleCopiesReadAction', () => {
 
     await undo(await contextFor(user), result.data.undoToken)
     expect(await isRead()).toBe(false)
+
+    for (const read of [true, false]) {
+      expect(await setReadAction({ bookId, read })).toEqual({ ok: true, data: { read, count: 1 } })
+      expect(await getUserBookState(await contextFor(user), bookId)).toMatchObject({
+        read,
+        state: read ? 'read' : 'unread',
+        readingSince: null,
+        finishedAt: null,
+      })
+    }
   })
 
   it('answers VALIDATION for a non-array and writes nothing', async () => {

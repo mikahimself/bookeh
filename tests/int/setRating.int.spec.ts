@@ -61,8 +61,22 @@ describe('setRating', () => {
     const [rated] = await rowsOf(a, x)
     expect(rated).toMatchObject({ rating: 4 })
     expect(rated.ratedAt).toEqual(expect.any(String))
-    expect(await getUserBookState(asA, x.id)).toEqual({ read: false, rating: 4, tags: [] })
-    expect(await getUserBookState(asA, y.id)).toEqual({ read: false, rating: null, tags: [] })
+    expect(await getUserBookState(asA, x.id)).toEqual({
+      read: false,
+      state: 'unread',
+      readingSince: null,
+      finishedAt: null,
+      rating: 4,
+      tags: [],
+    })
+    expect(await getUserBookState(asA, y.id)).toEqual({
+      read: false,
+      state: 'unread',
+      readingSince: null,
+      finishedAt: null,
+      rating: null,
+      tags: [],
+    })
 
     await setRating(asA, x.id, 2)
     const [changed] = await rowsOf(a, x)

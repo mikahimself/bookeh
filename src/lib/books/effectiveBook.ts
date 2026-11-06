@@ -37,10 +37,14 @@ export type EffectiveBook = {
 }
 
 export type TagKind = 'tag' | 'genre' | 'theme'
+export type ReadState = 'unread' | 'reading' | 'read'
 
 /** The viewer's own read state, rating and assigned private classifications. */
 export type UserBookState = {
   read: boolean
+  state: ReadState
+  readingSince: string | null
+  finishedAt: string | null
   rating: number | null
   tags: (Named & { kind: TagKind })[]
 }

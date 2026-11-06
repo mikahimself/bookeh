@@ -33,13 +33,25 @@ export type UserBookChanges = {
   overrides?: BookOverrides
   dropOverrides?: readonly OverridableBookField[]
   read?: boolean
+  readingSince?: string | null
+  finishedAt?: string | null
   rating?: number | null
   tags?: readonly number[]
 }
 
 /** What one write stores: the override fields, `overridden`, the flags, rating, time and tags. */
 type RowData = Partial<
-  Pick<UserBook, OverridableBookField | 'overridden' | 'read' | 'rating' | 'ratedAt' | 'tags'>
+  Pick<
+    UserBook,
+    | OverridableBookField
+    | 'overridden'
+    | 'read'
+    | 'readingSince'
+    | 'finishedAt'
+    | 'rating'
+    | 'ratedAt'
+    | 'tags'
+  >
 >
 type Stored = BookOverrides[OverridableBookField]
 
@@ -63,7 +75,7 @@ const normalise = (key: OverridableBookField, value: Stored): Stored => {
  * after the write is the row's current list, plus the keys of `overrides`,
  * minus `dropOverrides`, in `OVERRIDABLE_BOOK_FIELDS` order; a key in both
  * `overrides` and `dropOverrides` is overridden. A dropped field's stored
- * value is set to `null`. A state-only write (`read`, `rating`, `tags`) sends those
+ * value is set to `null`. A state-only write (reading values, `rating`, `tags`) sends those
  * fields alone and leaves the override fields and `overridden` untouched.
  * The read-modify-write of `overridden` is unlocked, so two concurrent
  * override writes on one row can lose the earlier list.
@@ -88,11 +100,16 @@ export async function upsertUserBook(
   bookId: number,
   changes: UserBookChanges,
 ): Promise<void> {
-  const { overrides, read, rating, tags } = changes
+  const { overrides, read, readingSince, finishedAt, rating, tags } = changes
   const overriding = OVERRIDABLE_BOOK_FIELDS.filter((key) => overrides?.[key] !== undefined)
   const drop = new Set<OverridableBookField>(changes.dropOverrides ?? [])
   const touchesOverrides = overriding.length > 0 || drop.size > 0
-  const hasState = read !== undefined || rating !== undefined || tags !== undefined
+  const hasState =
+    read !== undefined ||
+    readingSince !== undefined ||
+    finishedAt !== undefined ||
+    rating !== undefined ||
+    tags !== undefined
   if (!touchesOverrides && !hasState) return
   if (overrides?.title !== undefined && normalise('title', overrides.title) === null) {
     throw new DomainError('VALIDATION', { fields: { title: 'VALIDATION' } })
@@ -147,6 +164,8 @@ export async function upsertUserBook(
     const data: RowData = touchesOverrides ? overrideData(row?.overridden) : {}
     if (tags !== undefined) data.tags = [...new Set(tags)]
     if (read !== undefined) data.read = read
+    if (readingSince !== undefined) data.readingSince = readingSince
+    if (finishedAt !== undefined) data.finishedAt = finishedAt
     if (rating !== undefined) {
       data.rating = rating
       data.ratedAt = rating === null ? null : new Date().toISOString()
