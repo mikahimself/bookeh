@@ -7,7 +7,7 @@ sources:
   - _bmad-output/planning-artifacts/architecture/architecture-bookeh-2026-10-03/ARCHITECTURE-SPINE.md
   - _bmad-output/planning-artifacts/architecture/architecture-bookeh-2026-10-03/STORY-SLICING.md
   - _bmad-output/planning-artifacts/epics.md
-updated: 2026-10-06
+updated: 2026-11-06
 ---
 
 # bookeh — Experience Spine
@@ -28,31 +28,32 @@ The interface is in English and Finnish (FR-51). There is no offline use and no 
 
 ## Information Architecture
 
-Four sections, plus full-screen tasks that sit outside them.
+Five sections, plus full-screen tasks that sit outside them.
 
 | Surface | Address | Reached from | Purpose |
 |---|---|---|---|
 | Sign in | `/login` | Any address when signed out | Email and password (FR-1). |
 | **Collection** (section) | `/` with search, filters and sort as parameters | Opening the app; its section heading | The user's copies. Search, filter, sort, layout and size, select several. The first screen; there is no home. |
-| Book detail | `?book={bookId}` on the collection or loans | Tapping a row in the collection or loans; "Open book" on an Answer | One Book for this user (FR-26). A bottom sheet on the phone, a side panel on wide screens. |
+| Book detail | `?book={bookId}` on the collection or loans | Tapping a row in the collection or loans; a cover in the Currently reading strip; a Book in Stats' Currently reading (it opens on the collection); "Open book" on an Answer | One Book for this user (FR-26). A bottom sheet on the phone, a side panel on wide screens. |
 | Filter panel | Part of the collection | "Filter" in the collection | Every filter field and the sort order (FR-25). |
 | Select mode | Part of the collection | "Select" in the collection | Tick several copies, then act on them all. |
 | **Loans** (section) | `/loans` | Its section heading | What is out now, by person or by date; returned loans below (FR-37). |
 | **Wishlists** (section) | `/wishlists` | Its section heading | The list of wishlists, each with a count (FR-39). |
 | Wishlist | `/wishlists/{listId}` | Tapping a list | That list's entries with their recipients. |
 | Wishlist entry | `?entry={entryId}` on its wishlist | Tapping an entry | One entry: the Book, its list, the For field; Bought, Ordered, Remove. A bottom sheet on the phone, a side panel on wide screens. |
+| **Stats** (section) | `/stats`, with `?year={year}` for another year | Its section heading | What has been read and spent, per year (FR-57, FR-58). See Stats. |
 | **Settings** (section) | `/settings` | Its section heading | Profile, language, theme, profile and collection visibility, default location; manage locations, People, tags, my genres and my themes; for the admin, genres and the last backup; sign out. |
-| Scan | `/scan` | "Scan book", present on every section | Full screen. Camera, ISBN entry, "Find by title or author" and "Add without ISBN". |
+| Add book | `/scan` | "Add book", present on every section | Full screen, headed "add book". Camera, ISBN entry, "Find by title or author" and "Add without ISBN". |
 | Lookup | `/scan/find` | "Find by title or author" on Scan | Search by title or author for a shop check without a barcode (FR-20). |
 | Answer | `/scan?isbn={isbn13}`, with `&pick={n}` for a chosen edition; `/scan?title={text}` for entry without an ISBN; `/scan?book={bookId}` for a Book without an ISBN | A barcode read, an ISBN entered, or a Lookup result tapped | Full screen. Says whether the Book is in the library and offers the next step. |
 | Edit book | `/books/{bookId}/edit` | "Edit" on a save toast; "Edit" in Book detail | Full screen. Book fields, the user's tags, genres and themes, and the cover where the user may change it. The review screen of the PRD, now after the save. |
 | Pickers and dialogs | None | Lend, Move, Tag, Add to wishlist, confirmations | Short choices on top of a screen or a sheet. |
 
-**Moving between sections.** The four section names are {typography.heading-section} headings set side by side. The current one is in full ink and leads the row; the others follow in their fixed order (collection, loans, wishlists, settings), wrapping round. On the phone the row runs off the right edge; tapping a heading or swiping the screen sideways changes section, and swiping wraps from the last section to the first. On wide screens the headings are clicked; where the window is too narrow for all four, the row clips at the right edge as it does on the phone.
+**Moving between sections.** The five section names are {typography.heading-section} headings set side by side. The current one is in full ink and leads the row; the others follow in their fixed order (collection, loans, wishlists, stats, settings), wrapping round. On the phone the row runs off the right edge; tapping a heading or swiping the screen sideways changes section, and swiping wraps from the last section to the first. On wide screens the headings are clicked; where the window is too narrow for all five, the row clips at the right edge as it does on the phone, and Add book never clips. Measured with Open Sans 300 at 44px and the header's gaps (2026-11-06): the five headings and Add book need 974px in English and 1074px in Finnish ("tilastot"; four Finnish headings already need 918px). The clipped heading is always the one before the current section in the order, so every section stays one click away through the headings that show.
 
 **History.** The system Back button closes the topmost thing: a picker, then the sheet or panel, then a full-screen task. On an Answer it returns to Scan; on Scan it returns to the section. Each new Answer replaces the previous one in history, so scanning forty books does not leave forty steps to go back through.
 
-**Scan book** is on every section: pinned to the bottom of the phone screen, and at the top right on wide screens.
+**Add book** is on every section: pinned to the bottom of the phone screen, and at the top right on wide screens. It opens the scanner, the ISBN field, Find by title or author and Add without ISBN, so it is named for the task, not the camera; the route stays `/scan`. (Renamed from "Scan book", Mika, 2026-11-06.)
 
 Mock-ups, in the final tokens. The spines win on any conflict with a mock-up.
 
@@ -64,6 +65,7 @@ Mock-ups, in the final tokens. The spines win on any conflict with a mock-up.
 | [mockups/key-loans.html](mockups/key-loans.html) | Loans by person and by date, nothing lent. |
 | [mockups/key-wishlists.html](mockups/key-wishlists.html) | The list of wishlists, one wishlist, an entry opened. |
 | [mockups/key-settings.html](mockups/key-settings.html) | Settings on wide and phone. |
+| [mockups/reading-options.html](mockups/reading-options.html) | The reading switch and dates on Book detail, the copy's acquired date and price, Currently reading in the collection, and Stats, wide and phone. The "Picked" section is authoritative; the options below it are the record (Mika, 2026-11-06). |
 
 Not mocked, built from this spine alone: Sign in, Lookup, the Filter panel on the phone, pickers and dialogs, select mode on the phone, and sizes s and l. The Genres group in Settings is mocked as options in [mockups/genres-settings-options.html](mockups/genres-settings-options.html); Mika picked A (2026-11-05). The tag picker choice is recorded under Book detail below. The app icon and theme colour are settled in DESIGN.md → App Icon & Theme Colour, and the Corner crop in DESIGN.md → Components.
 
@@ -94,8 +96,8 @@ Behaviour. Visual specs live in `DESIGN.md` → Components.
 | Component | Use | Behavioural rules |
 |---|---|---|
 | Section heading | Top of every section | Tap or click a heading to go to that section. Swiping sideways on the phone moves to the next or previous section. A swipe that starts within 24px of a screen edge is ignored, so the device's own back gesture still works. Swiping does nothing while a sheet, picker or full-screen task is open. |
-| Text switch | Rows / covers; s / m / l; by person / by date; read / unread; status; language; theme | Exactly one option is chosen. Tapping another switches at once, with no confirm. |
-| Button, primary | One per layer: Scan book on a section; Add to library or Back on an Answer; Save on Edit book; Bought on a wishlist entry; Done on the action bar; the confirming button of a dialog | A layer is a section, a sheet or panel, a full-screen task, the action bar, or a dialog. Each has at most one primary button. |
+| Text switch | Rows / covers; s / m / l; by person / by date; unread / reading / read; status; language; theme; the Stats year | Exactly one option is chosen. Tapping another switches at once, with no confirm. |
+| Button, primary | One per layer: Add book on a section; Add to library or Back on an Answer; Save on Edit book; Bought on a wishlist entry; Done on the action bar; the confirming button of a dialog | A layer is a section, a sheet or panel, a full-screen task, the action bar, or a dialog. Each has at most one primary button. |
 | Button, secondary | Every other button | Acts on tap. |
 | Button, destructive | Remove in the action bar and on a wishlist entry; the confirming button of a removal dialog | Always confirmed by a dialog before it acts. No Undo afterwards. Exception: Remove cover on Edit book takes effect on Save, so "Discard changes?" is its confirmation. |
 | Link | "Find by title or author", "More details", "Clear", "Filter", "Select", "Returned", "Lend", "Move", toast actions | Acts on tap. Not used to move between sections. |
@@ -104,7 +106,7 @@ Behaviour. Visual specs live in `DESIGN.md` → Components.
 | Filter chip | Author, series, genre, theme, tag and location on an opened Book | Tapping one adds that value to the collection's filters; filters already active stay, and a second value in the same field widens that field (see Filter panel). The sheet closes on the phone. From loans or a wishlist it goes to the collection with that one filter. |
 | Text field | Search, ISBN, Edit book, settings, notes | Search filters as the user types, after a short pause. A field that failed validation shows its message beneath it. A single-line field with text has a clear X at its right end: tapping it empties the field and keeps focus there. Not on notes or other multi-line fields, passwords, dates or the Filter panel's years; the Combobox keeps its "Clear" Link. |
 | Combobox | Location, Person, tags, author, series, theme | Type to narrow the options. A value that does not exist can be created from the same field (FR-31, FR-34). Its popup is not an overlay for the one-level rule. |
-| Date field | Lend | The platform's own date control. Defaults to today. |
+| Date field | Lend; reading dates; a copy's acquired date | The platform's own date control. Lend's defaults to today; the reading Picker's start with the stored dates, empty when there are none. |
 | Book row / Cover tile | Collection, loans, wishlists, Lookup results | Tap opens Book detail (Lookup results open the Answer). In select mode, tap ticks it and does not open. |
 | Cover placeholder | Any Book with no cover | Stands in for the cover everywhere a cover would show. |
 | List row | The list of wishlists; the managed lists in settings | In wishlists, tap opens the list. In settings the row is not tappable; its Links act. |
@@ -113,10 +115,10 @@ Behaviour. Visual specs live in `DESIGN.md` → Components.
 | Rating | Book detail; the Filter panel | Five stars. Tap a star to set that rating; tap another to change it; tapping the current star does nothing. A "Clear" Link beside the stars, shown only while a rating is set, clears it. Saved at once (FR-29). |
 | Detail panel | Book detail on wide screens | Slides out on the right and the list narrows beside it. Clicking another row swaps its content without closing it. It is not modal: the list stays usable and focus is not trapped. X and `Esc` close it. |
 | Bottom sheet | Book detail and a wishlist entry on the phone; the Filter panel on the phone [ASSUMPTION]; pickers on the phone | Slides up to a little over half the screen; the list stays visible above, dimmed. Dragging up or tapping the handle opens it fully. Tapping the dimmed list, dragging down, X or Back closes it. The list keeps its scroll position. Modal: focus is held inside. |
-| Picker | Location (Move), tags (Tag), Person and date (Lend), wishlist (Add to wishlist) | A bottom sheet on the phone; a dialog on wide screens. One choice, then it closes. Location ends with a "New location" field under its rows: a name and Move move to the location of that name, creating it when none matches. Wishlist ends the same way with a "New list" field and Add: see Answer → Add to wishlist. Person and date (Lend) does not close on a choice: see Loans → Lend. |
+| Picker | Location (Move), tags (Tag), Person and date (Lend), wishlist (Add to wishlist), reading dates, a copy's acquired date and price | A bottom sheet on the phone; a dialog on wide screens. One choice, then it closes. Location ends with a "New location" field under its rows: a name and Move move to the location of that name, creating it when none matches. Wishlist ends the same way with a "New list" field and Add: see Answer → Add to wishlist. Person and date (Lend) does not close on a choice: see Loans → Lend. The reading-dates and acquired-and-price Pickers have fields, Cancel and Save (primary): see Book detail. |
 | Dialog | Confirmations of removals and merges; "Discard changes?"; New list | Centred, modal, with the screen behind dimmed. The confirming button is on the right. `Esc` and tapping outside cancel. |
 | Toast | After a save or a reversible action | Sits above whatever is pinned to the bottom. Shows the result and its actions as Links. About 4 seconds, then gone; one at a time, a new one replacing the old. A toast raised on Scan has no timer: it stays until the next Answer opens, so Edit and Undo wait while the next book is lined up. Leaving Scan gives it the usual 4 seconds. An error toast has no timer and stays until dismissed or replaced. Every toast has a close (X). Undo is hidden once its receipt has expired (30 minutes). |
-| Action bar | Select mode | Pinned to the bottom. The count, then Move, Tag, Read, Remove, and Done. On the phone it takes the place of the pinned Scan book button and is two rows: the count and Done above, the four actions below. [ASSUMPTION] On wide screens Scan book stays in the header. Buttons other than Done are disabled while nothing is ticked. |
+| Action bar | Select mode | Pinned to the bottom. The count, then Move, Tag, Read, Remove, and Done. On the phone it takes the place of the pinned Add book button and is two rows: the count and Done above, the four actions below. [ASSUMPTION] On wide screens Add book stays in the header. Buttons other than Done are disabled while nothing is ticked. |
 | Checkbox | Select mode | Appears on every row or tile when select mode starts. |
 | Close (X) | Scan, Lookup, Answer, Edit book; the sheet and the panel | Closes the whole task or overlay in one tap and returns to the section underneath. |
 | Progress line | Any wait | Shown while a lookup, save or next page is in flight. Nothing else blocks the screen. |
@@ -133,13 +135,14 @@ Undo is offered where the action has a plain opposite. Removals are confirmed fi
 | Add to wishlist | "Added to {list} · Undo" | Removes the entry, and the Book on the same rule. |
 | Move (one or many) | "{n} moved to {location} · Undo" | Puts each copy back where it was; a copy whose previous location has since been deleted or merged away returns to no location. |
 | Tag (one or many, any kind) | "Tagged {n} · Undo" | Restores each Book's tags. |
-| Read (a selection, in select mode) | "Marked {n} read · Undo" ("unread" when it marks them unread) | Restores each Book's read flag. |
+| Read (a selection, in select mode) | "Marked {n} read · Undo" ("unread" when it marks them unread) | Restores each Book's read flag and reading dates (a ticked Book being read was given today as its finish date, FR-53). |
 | Lend | "Lent to {person} · Undo" | Removes the loan. |
 | Returned | "Returned · Undo" | Reopens the loan. |
 | Bought (wishlist entry, for me) | "Saved to {location} · Undo" | Removes the copy and reopens every entry the press closed. |
 | Ordered (wishlist entry) | "Ordered · Undo" | Removes the ordered copy, if one was made, and reopens every entry the press closed. |
 | Bought (wishlist entry, for a Person) | "Bought · Undo" | Reopens the entry. No copy is made. |
-| Received | "Saved to {location} · Undo" | Sets the copy back to ordered. |
+| Received | "Saved to {location} · Undo" | Sets the copy back to ordered, with its previous acquired date. |
+| Reading switch, reading dates, acquired date and price | Only Reading → Read: "Finished {title} · {n} days" | No Undo: one tap or one Picker puts it back (FR-15). |
 | Save on Edit book | "Saved" | No Undo. |
 | Cover on Edit book | "Saved" | No Undo. |
 | Look it up again | "Shared · from {source}" | No Undo. |
@@ -153,10 +156,11 @@ Undo is offered where the action has a plain opposite. Removals are confirmed fi
 | Layout | Rows or covers. Remembered per device. |
 | Size | s, m, l, as specified in `DESIGN.md` → Layout & Spacing. Remembered per device. Size changes what fits on screen, not how much is fetched. |
 | Filter | Opens and closes the Filter panel. |
+| Currently reading | A strip above the count line, shown only while at least one held Book is being read: "Currently reading" as a {typography.heading-group} heading, then one cover tile per Book with its title and "since {date}", oldest start first, in one row that scrolls sideways when it overflows. Tapping a cover opens Book detail. It ignores search and filters, and is absent in select mode. |
 | Count line | Always under the search. With nothing active: "{n} books". With a search or filter active: the active values, the count, and "Clear", for example "Tampere, unread · 14 books · Clear". |
 | Select | Enters select mode. |
-| Scrolling | Endless: the next page loads as the end approaches. On the phone, in every section (collection, loans, wishlists, settings), once the page is scrolled past two screens, a back-to-top square (↑) shows beside Scan book in the pinned bar; tapping it returns to the top (instantly under reduced motion), and it hides again within one screen of the top. Not on wide screens, and not while the action bar replaces Scan book. |
-| Row ending | The copy's location; or the lent marker and "Lent · {person}"; or "Ordered" for an ordered copy. Blank when the user has no locations. |
+| Scrolling | Endless: the next page loads as the end approaches. On the phone, in every section (collection, loans, wishlists, settings), once the page is scrolled past two screens, a back-to-top square (↑) shows beside Add book in the pinned bar; tapping it returns to the top (instantly under reduced motion), and it hides again within one screen of the top. Not on wide screens, and not while the action bar replaces Add book. |
+| Row ending | The copy's location; or the lent marker and "Lent · {person}"; or "Ordered" for an ordered copy; or, for a Book being read, the 8px marker and "Reading" instead of the location. Lent and Ordered win over Reading. Otherwise blank when the user has no locations. |
 
 ### Filter panel
 
@@ -164,7 +168,7 @@ Opens to the left of the list on wide screens and as a bottom sheet on the phone
 
 | Field | Control | Notes |
 |---|---|---|
-| Location, status, read, genre, personal tag, language | A list of the values in use; tap to switch each on or off | Several values in one field mean "any of these". Genre lists the system genres in the user's language, then the user's own. |
+| Location, status, read (unread, reading, read), genre, personal tag, language | A list of the values in use; tap to switch each on or off | Several values in one field mean "any of these". Genre lists the system genres in the user's language, then the user's own. |
 | Author, series, publisher, theme | Combobox that adds values to a short list | Too many values to list. Several mean "any of these". Theme covers Finna's themes and the user's own. |
 | Rating | The Rating component, meaning "at least" | Removed with its Clear Link. |
 | Year, pages | From and to | Either end may be empty. |
@@ -180,7 +184,7 @@ Fields combine with AND (FR-25); values within a field combine with OR. [ASSUMPT
 | What is selected | Only rows the user ticked. The selection survives searching, filtering and scrolling; the count shows all ticked rows, including ones no longer in view. There is no "select all". [ASSUMPTION] |
 | Move | Location picker. Applies to every ticked owned copy (FR-33); an ordered copy has no location, so it is skipped and stays ticked, and the toast says how many were: "{n} moved to {location} · {m} ordered skipped", with Undo only when something moved. Rows that no longer match the active filters leave the list. |
 | Tag | Tag picker with two parts: add a tag to all, remove a tag from all. Tags belong to the Book, so both copies of a Book change together. |
-| Read | Marks every ticked Book read, or unread if all are already read. |
+| Read | Marks every ticked Book read, or unread if all are already read, by the transitions of FR-53 (a Book being read gets today as its finish date; unread clears both dates). No finish toast. |
 | Remove | Dialog: "Remove 12 books from library?" with Remove and Cancel (the count names the ticked copies). If any are lent, the dialog says their loans go too. Removes the ticked owned copies and their loans; an ordered copy is skipped and stays ticked, and the toast says how many were: "{n} removed · {m} ordered skipped", no Undo. |
 | Failure | A bulk action applies to all ticked rows or to none; an ordered copy skipped by Move or Remove is not a failure. [ASSUMPTION] |
 | Done | Leaves select mode and clears the selection. |
@@ -192,8 +196,8 @@ The same content in the panel and the sheet. Changes save at once; there is no S
 | Group | Content and behaviour |
 |---|---|
 | Header | Cover, title, author, series and number, edition line (publisher · year · pages · language). Author and series are Filter chips. |
-| Read and rating | A read / unread Text switch and the Rating (FR-29). Both belong to the Book, not a copy. Each saves in place with no toast and no Undo: one tap puts it back (FR-15). |
-| Your copies | One line per copy: its location (a Filter chip) and its status. Each line has its own Links, by state: **owned** — Lend, Move, Remove; **lent** — the lent marker with "Lent to {person} since {date}", and Returned only (no Move or Remove; Remove in select mode still takes a lent copy and its loans); **ordered** — "Ordered", and Received, which makes it owned at the default location (FR-28). A copy's note sits under its line and is edited in place. |
+| Reading and rating | An unread / reading / read Text switch and, once the Book is read, the Rating (FR-29). Both belong to the Book, not a copy, and save in place with no Undo: one tap puts it back (FR-15). The transitions are FR-53's; Reading → Read toasts "Finished {title} · {n} days". Under the switch a muted line: "Since {date} · {n} days" while reading; "{start} – {finish} · {n} days" when read; "Started {date}" or "Finished {date}" with one date; only an "Add dates" Link when read with none; nothing when unread. Each date is a Link. A date or "Add dates" opens the reading-dates Picker, titled "Reading dates" with the title muted under it: Started and Finished Date fields, Cancel and Save. A finish before the start, or a date after today, is rejected under the field; filling Finished on a Book being read marks it read and toasts; clearing Started on a Book being read is rejected with "A book being read has a start date." (FR-54). |
+| Your copies | One line per copy: its location (a Filter chip) and its status. Under it, a muted line "Acquired {date} · €{price}" ("Ordered {date}" on an ordered copy), with "Add price" in place of the price when there is none; the date and the price are Links that open one Picker titled with the Book's title, with an Acquired Date field and a Price field (euros; "24,90", "24.90" and "24" accepted; empty means none; at most €99 999.99), Cancel and Save. No toast, no Undo (FR-55). Each line has its own Links, by state: **owned** — Lend, Move, Remove; **lent** — the lent marker with "Lent to {person} since {date}", and Returned only (no Move or Remove; Remove in select mode still takes a lent copy and its loans); **ordered** — "Ordered", and Received, which makes it owned at the default location (FR-28). A copy's note sits under its line and is edited in place. |
 | Lent before | The closed loans of this Book's copies, newest first: "{person} · {from} to {to}" (FR-36). Absent when there are none. |
 | On wishlists | One line per entry: "{list} · for {person}", or "{list}" alone for my own entries. Absent when there are none. |
 | Classification | System genres (in the user's language), the user's genres, system themes, the user's themes and personal tags as Filter chips; empty kinds are absent. "Add tag" opens the picker for tags, genres and themes. |
@@ -207,6 +211,8 @@ The tag picker uses Tag / Genre / Theme tabs above a kind-aware find-or-create c
 The half-open sheet shows the header, read and rating, and the first copies, so Lend and Returned are reachable without opening it fully.
 
 ### Scan
+
+This document calls the task Scan; on screen its button and heading read "Add book" (Information Architecture).
 
 | Rule | Behaviour |
 |---|---|
@@ -312,12 +318,26 @@ Two columns on wide screens: profile, language, theme, visibility, default locat
 | Last backup (admin only) | "Last backup: {date}"; "Last backup failed: {date}" when the last run failed; "Last backup: none found" when there is no readable record. Marked in {colors.danger} with "Backup is overdue." when the last successful backup is older than 48 hours, missing or failed. |
 | Sign out | A secondary button at the end of the first column. |
 
+### Stats
+
+One column on the phone; on wide screens By month and Nerdy stats sit side by side, as in the mock-up. Content of FR-57; the numbers are FR-58's.
+
+| Part | Behaviour |
+|---|---|
+| Currently reading | {typography.heading-group} heading, then one line per Book being read: its title and "since {date}" at the right. Tapping one opens its Book detail on the collection (`/?book=`). Absent when nothing is being read. |
+| Year | A "This year" group heading ("{year}" for another year) with a Text switch of the years that have a finished Book or a priced copy, plus the current year, newest first. Switching replaces `?year=` in the address. |
+| Big numbers | Books, pages, € spent and books a month (one decimal). A year with nothing finished shows 0 for books and pages. |
+| By month | One line per month up to the current one: the month, one 8px marker per finished Book, and "{n} books · {pages} p"; "–" for a month with none. Absent when the year has nothing finished. |
+| Nerdy stats | Label left, value right in {colors.text-muted}: Pages a day; Days a book, on average; Quickest "{title} · {n} days"; Slowest; Thickest brick "{title} · {pages} p"; Most dust collected "{title} · unread for {n} years" (months under a year, days under a month); Most expensive "{title} · €{price}"; Best month "{month} · {n} books"; Most-read author "{name} · {n}". A stat with no candidate is absent. |
+| By year | One line per year, newest first: "{n} books · {pages} p · €{spent}", then the muted line "{n} read books have no dates and are not counted.", absent when there are none. |
+| Empty | With nothing read, priced or being read: "Nothing read yet" and one dry remark, then the Year group with zeros. |
+
 ## State Patterns
 
 | State | Surface | Treatment |
 |---|---|---|
 | First load | Any section | The section heading appears at once; the progress line runs until the content arrives. No skeletons. [ASSUMPTION] |
-| First run | Collection | "No books yet", one dry remark, and, on wide screens, Scan book (on the phone the pinned Scan book is the one primary). No locations exist yet, so nothing mentions them. |
+| First run | Collection | "No books yet", one dry remark, and, on wide screens, Add book (on the phone the pinned Add book is the one primary). No locations exist yet, so nothing mentions them. |
 | No matches | Collection with search or filters | "No books match" and the "Clear" Link. |
 | Loading more | Collection | Progress line; the list stays usable. |
 | Load failed | Any list | "Couldn't load. Try again." with a Link that retries. |
@@ -392,8 +412,8 @@ Behavioural. Contrast figures live in `DESIGN.md` → Colors. Stakes are persona
 
 | Width | Behaviour |
 |---|---|
-| Phone, under 900px [ASSUMPTION for the value] | Headings row runs off the edge and swipes. Book detail, the Filter panel and pickers are bottom sheets. Scan book is pinned to the bottom. Page margin {spacing.page-margin-phone}. |
-| Wide, 900px and up | All four headings fit. Book detail is the side panel on the right and the Filter panel opens on the left; the list narrows between them. Scan book sits at the top right. Page margin {spacing.page-margin}. |
+| Phone, under 900px [ASSUMPTION for the value] | Headings row runs off the edge and swipes. Book detail, the Filter panel and pickers are bottom sheets. Add book is pinned to the bottom. Page margin {spacing.page-margin-phone}. |
+| Wide, 900px and up | The headings row and Add book share the top: all five headings fit from 974px in English and 1074px in Finnish, and below that the row clips (see Moving between sections). Book detail is the side panel on the right and the Filter panel opens on the left; the list narrows between them. Add book sits at the top right. Page margin {spacing.page-margin}. |
 | Wide but under 1200px [ASSUMPTION] | There is room for one side panel. Opening the Filter panel closes Book detail, and the other way round. |
 | Full-screen tasks on wide screens | Scan, Lookup, the Answer and Edit book are a centred column no wider than a phone screen. |
 
@@ -448,7 +468,7 @@ Drafted from the PRD journeys and the decisions above. Mika is the PRD's protago
 ### UJ-1: Shop check — "Do I already have this?" (Mika, in a bookshop, phone in one hand)
 
 1. Mika opens bookeh from his home screen. The collection appears, in compact rows as he left it.
-2. He taps **Scan book** at the bottom and points the camera at the barcode of a Finnish novel.
+2. He taps **Add book** at the bottom and points the camera at the barcode of a Finnish novel.
 3. The barcode reads. The progress line runs for a moment.
 4. **Climax:** the screen says "in library" in large light type, with the cover, and under it "Tampere · owned". He has it. He puts the book back on the shelf.
 5. He taps the X in the corner. The scanner closes in one tap and he pockets the phone.
@@ -461,7 +481,7 @@ Failure: no source knows the ISBN. The heading is "not found" with title and aut
 
 ### UJ-2: Cataloguing — "Getting the collection in" (Mika, at home in Tampere, a stack of forty books on the table)
 
-1. He taps **Scan book** and scans the first barcode.
+1. He taps **Add book** and scans the first barcode.
 2. "Not in library", with the cover and "From Finna". He taps **Add to library**.
 3. Scan is back at once, with "Saved to Tampere · Edit · Undo" at the bottom. He lifts the next book into view; the toast goes as its Answer opens.
 4. The fifth book is part of a series and Finna has no number for it. After adding it he taps **Edit** on the toast, opens "More details", types the number, adds a tag, and taps **Save**. Scan is back.
@@ -493,7 +513,7 @@ Failure: he tapped Returned on the wrong row. Undo on the toast reopens the loan
 
 ### A gift for Äiti (Mika, at his desk in November, then in a bookshop)
 
-1. Reading a review, he opens **Scan book**, taps "Find by title or author" and types "kultarinta".
+1. Reading a review, he opens **Add book**, taps "Find by title or author" and types "kultarinta".
 2. He taps the result under "Elsewhere". "Not in library". He taps **Add to wishlist** and picks "Christmas".
 3. In **Wishlists** he opens Christmas, taps the new entry, and sets "For" to Äiti.
 4. In December he is in a bookshop with the book in his hand. He opens Christmas and sees "Kultarinta · For Äiti".

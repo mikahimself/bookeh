@@ -7,8 +7,8 @@ paradigm: 'layered modular monolith: Payload collections own data and authorisat
 scope: 'Whole system. Phase 1 (v1: one seeded user, tailnet only) is committed; Phases 2-3 stay possible and are not built.'
 status: final
 created: '2026-10-03'
-updated: '2026-10-06'
-binds: [F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, NFR-1, NFR-2, NFR-3, NFR-4, NFR-5, NFR-6, NFR-7, NFR-8]
+updated: '2026-11-06'
+binds: [F1, F2, F3, F4, F5, F6, F7, F8, F9, F10, F11, F12, NFR-1, NFR-2, NFR-3, NFR-4, NFR-5, NFR-6, NFR-7, NFR-8]
 sources:
   - ../../prds/prd-bookeh-2026-10-02/prd.md
   - ../../prds/prd-bookeh-2026-10-02/addendum.md
@@ -29,7 +29,7 @@ Layered modular monolith in one Next.js process.
 | --- | --- | --- |
 | Surface | `src/app/(frontend)` | Pages, server actions, route handlers, components. No business rules, no authorisation. It reads and writes data only through services. |
 | Back office | `src/app/(payload)` | Payload admin, generated. Theme only. Edits rows as they are and triggers no service behaviour. |
-| Services | `src/lib/*` | Behaviour that spans documents: lookup, save, edit, undo, effective Book, shelf queries, copies, People, loans, wishlists, the profile. |
+| Services | `src/lib/*` | Behaviour that spans documents: lookup, save, edit, undo, effective Book, shelf queries, copies, People, loans, wishlists, the profile, stats. |
 | Data and authorisation | `src/collections`, `src/access`, `src/fields` | Schema, per-object access, single-collection invariants, database constraints. |
 | Storage | Postgres 16, media directory | Rows and files. |
 
@@ -59,7 +59,7 @@ The diagram shows the main directions; the list below is the full table of allow
 - `src/fields` imports only from `src/access` and `lib/errors`. `src/i18n` imports only from `lib/payload`.
 - `src/app/(frontend)` imports only from `src/lib`, `src/fields`, `src/i18n`, `access/roles` (AD-2) and `payload-types`.
 - `lib/metadata` has no database access.
-- Between services, imports are one-way: `catalogue` may import `copies`, `wishlists`, `books`, `metadata` and `tags`; `wishlists` and `loans` may import `copies` and `people`; `shelf` may import `books`; `tags` may import `books` and `shelf` (`catalogue` reaches `tags` for `editBook()`, AD-5); `copies` may import `account` (deleting or merging a location clears or moves the profile default, AD-18); `people`, `books`, `metadata` and `backup` import no other service.
+- Between services, imports are one-way: `catalogue` may import `copies`, `wishlists`, `books`, `metadata` and `tags`; `wishlists` and `loans` may import `copies` and `people`; `shelf` may import `books`; `tags` may import `books` and `shelf` (`catalogue` reaches `tags` for `editBook()`, AD-5); `copies` may import `account` (deleting or merging a location clears or moves the profile default, AD-18); `stats` may import `shelf` and `books`; `people`, `books`, `metadata` and `backup` import no other service.
 - `account` imports no other service.
 - `lib/undo` imports only `lib/payload` and `lib/errors`. Any service may import it. `lib/errors.ts` and `lib/processState.ts` import nothing from the project, and any module under `src/lib` may import them.
 - `src/app/(frontend)` imports from `lib/payload` only `requireUser`, `requireUserOrThrow`, `isRowId` (`lib/payload/ref.ts`, pure) and types. It never calls the gateway. From `lib/metadata` it imports only types and `sources/fixture`, a module that exists for the fixture cover route; lint does not hold it to that file.
@@ -130,12 +130,12 @@ The diagram shows the main directions; the list below is the full table of allow
 - **Binds:** `books`, `user-books`, `editBook`, every screen that shows a Book; FR-14, FR-25, FR-27, FR-43, FR-46
 - **Prevents:** copy-on-write forks; screens showing raw shared values; "cleared" and "not overridden" being confused; a friend's overrides leaking to a viewer later
 - **Rule:**
-  - `user-books` has at most one row per owner and Book. It holds the override fields, `overridden` (a `json` field holding the array of overridden field names), read flag, rating with `ratedAt`, and the user's tags of every kind (AD-8).
+  - `user-books` has at most one row per owner and Book. It holds the override fields, `overridden` (a `json` field holding the array of overridden field names), the reading state (`read`, `readingSince`, `finishedAt`), rating with `ratedAt`, and the user's tags of every kind (AD-8).
   - The overridable field set is declared once in `src/fields/bookFields.ts` and used by both collections. ISBN-13 is identity, the cover changes only through `setCover()` (AD-14), and genres and themes are system data; none of the four is overridable.
   - A field is overridden if and only if its name is in `overridden`; its stored value may then be empty, meaning cleared. Relationship overrides (`authors`, `series`) are relationship fields to the same collections. A typed author or series name that matches nothing becomes a private record (AD-5). A user classifies a shared Book for themselves with user genres and user themes, which are tags (AD-8), not overrides.
   - Overrides exist only on shared Books.
   - The override row is always the viewer's: `user-books` is joined on the requesting user, never on the owner of a copy or entry. A viewer with no row gets shared values.
-  - The row is lazy. `upsertUserBook()` in `lib/books` is its only writer. Every reader treats a missing row as no overrides, unread, unrated, no tags. It is not deleted when copies or entries are removed.
+  - The row is lazy. `upsertUserBook()` in `lib/books` is its only writer. Every reader treats a missing row as no overrides, unread with no dates, unrated, no tags. It is not deleted when copies or entries are removed.
   - Surface code receives only `EffectiveBook` and `UserBookState` from `lib/books`; it never reads a `books` document.
 
 ### AD-7 — One shelf query module answers list, filter, sort and search
@@ -151,20 +151,23 @@ The diagram shows the main directions; the list below is the full table of allow
   - One client list holds the loaded rows: they live in `ShelfRowsProvider` (read with `useShelfRows()`), keyed by the shelf query without `book`. After any successful action or Undo that can change rows, it reloads rows 0 to the number it holds through `/data/shelf`, asking for at most `SHELF_MAX_ROWS` rows. An action on the collection reports its result through `afterAction(result)`, from `useAfterAction()`: `ShelfActionsProvider` provides it above the list, unkeyed, so the action bar and Book detail reach it, and the mounted rows register their reload with it; with no rows mounted (Load failed) it only toasts. `ok` reloads, `NOT_FOUND` shows "Not in library" and then reloads, any other code goes to `reportFailure`. Once the reload has answered (at once, with no rows mounted), `afterAction` refreshes the server render with `router.refresh()` in a transition, so the Filter panel's values, Book detail and the cached first page follow the write and the list never shows a page older than its rows; a component that reports through `afterAction` does not refresh on its own. A successful Undo from the toast reloads through `ToastProvider`'s `onUndone` and refreshes the same way once the reload has answered; while `ReadAndRating` is mounted it claims that refresh, because its remount shares the transition, so on `/` the refresh runs once. Where no rows mount (`/loans`, one wishlist), `RefreshOnUndo` refreshes, on `/loans` as well as a mounted `ReadAndRating`. Rows are never patched locally. Per shelf query, the list keeps in `sessionStorage` only how many rows it held and the scroll position, never row data; on return from another route it loads that many rows in one request, up to `SHELF_MAX_ROWS`, and restores the position. Only the first query the page mounts with restores: reaching a query by changing search, filters or sort on `/` starts at the top with the first page.
   - Search, filters, sort and the open Book live in URL search params. `parseShelfQuery()` and `shelfSearchParams()` in `lib/shelf/query.ts` are the only code that reads or writes them, the latter behind `shelfHref(query, { book })` for links and `shelfRowsPath(query, range)` for `/data/shelf` requests; a Filter chip is a link built with `shelfHref()`.
   - Genre URL values retain numeric system ids (`genre=42`); private genres use `genre=tag:42`, while ordinary tags use `tag=42`. Valid repeated values deduplicate; malformed ids are ignored. System and private genres OR within the same field; tag and all other fields intersect that union. Missing, foreign and wrong-kind private ids neither match nor resolve a label.
-  - The values a filter offers and the suggestions for author, series, publisher and theme are shelf queries on `visibleCopies`. `filterValues()` returns the locations, statuses, read and unread (the viewer's `user-books` row, a missing row unread), system and private genres, ordinary tags and languages in use on the viewer's readable own copies, including ordered copies, each with its distinct copy count, never narrowed by the current query. System genres sort first, followed by sorted private genres; equal names remain distinct choices. Private values join the viewer's `user-books.tags` and require the tag's owner to be the viewer and its kind to match, including for admins. Author and series suggestions are distinct on `nameKey` and prefer the shared record's id. Theme suggestions combine system Book themes and viewer-owned kind-theme tags assigned through the viewer's user-books row, including for admins; they are case-insensitively distinct text values with null ids. All suggestions use readable own copies, including ordered copies, independently of active filters, are ordered by name and capped at ten; blank text returns none and wildcard characters are literal. Theme values match either source exactly apart from case, without accent folding or substring matching; values OR together and fields AND.
+  - The values a filter offers and the suggestions for author, series, publisher and theme are shelf queries on `visibleCopies`. `filterValues()` returns the locations, statuses, reading states unread, reading and read (the viewer's `user-books` row by AD-8's rule, a missing row unread), system and private genres, ordinary tags and languages in use on the viewer's readable own copies, including ordered copies, each with its distinct copy count, never narrowed by the current query. System genres sort first, followed by sorted private genres; equal names remain distinct choices. Private values join the viewer's `user-books.tags` and require the tag's owner to be the viewer and its kind to match, including for admins. Author and series suggestions are distinct on `nameKey` and prefer the shared record's id. Theme suggestions combine system Book themes and viewer-owned kind-theme tags assigned through the viewer's user-books row, including for admins; they are case-insensitively distinct text values with null ids. All suggestions use readable own copies, including ordered copies, independently of active filters, are ordered by name and capped at ten; blank text returns none and wildcard characters are literal. Theme values match either source exactly apart from case, without accent folding or substring matching; values OR together and fields AND.
   - Text sort relies on the database's `fi-FI` ICU collation. Author sort uses the `sortName` of the Book's first effective author the viewer may read (AD-4), then the effective title, both in the sort's direction; a Book with no readable author sorts last both ways. Text search is `ILIKE` with no accent folding.
   - No code lists or searches `books`, `authors` or `series` on their own. They are reached through a copy or wishlist entry the viewer can see, or by exact match on ISBN-13 or `nameKey`. Book detail, Edit book and every `{ bookId }` a client sends start with `requireOwnBook(ctx, bookId)` in `lib/books`, which fails with `NOT_FOUND` unless the viewer has a copy or an open wishlist entry of that Book.
   - Lookup's own-library results are a shelf text search over the viewer's copies and open wishlist entries, the entries through a `visibleEntries(viewer)` fragment that mirrors `visibleCopies`. `searchMine(ctx, text)` in `lib/shelf` is that reader: one row per Book, in the `author` ascending order, at most `MINE_SEARCH_LIMIT` Books, hydrated through `getEffectiveBooks()` and `getHoldings()` into `MyBook[]`. `otherEditions(ctx, …)` beside it is the Answer's other-edition read: the viewer's copies narrowed in SQL by an effective author's `nameKey`, the title compared in code with `editionTitle()`, no limit, hydrated the same way. Every other list that is not copies (loans, a wishlist) hydrates Books through `getEffectiveBooks()` and does not sort or filter on Book fields.
+  - `readingNow(ctx)` in `lib/shelf` is the one reader of the Books being read, for the collection's strip and Stats: the viewer's `user-books` rows in reading (AD-8) whose Book has a visible copy (owned or ordered) or a visible open entry, ordered by `readingSince` ascending, then Book id, hydrated through `getEffectiveBooks()`. A row whose Book the viewer no longer holds is not listed (the row outlives its copies, AD-6). The stats readers beside it (`readingLog(ctx)`, `spending(ctx)`, `dustCandidate(ctx)`) are read-only, on the same fragments, and return ids, dates and prices only; `lib/stats` hydrates Books through `getEffectiveBooks()`.
 
 ### AD-8 — Status, wishlist, loan and reading state each have one home
 
-- **Binds:** `copies`, `wishlist-entries`, `loans`, `user-books`; FR-28, FR-29, FR-35, FR-38
-- **Prevents:** `wishlist` or `loaned` reappearing as a copy status or location; read and rating stored per copy
+- **Binds:** `copies`, `wishlist-entries`, `loans`, `user-books`; FR-28, FR-29, FR-35, FR-38, FR-53 to FR-55
+- **Prevents:** `wishlist` or `loaned` reappearing as a copy status or location; read, reading dates and rating stored per copy; a reading state stored as its own field beside `read`; a purchase date or price stored on `user-books`
 - **Rule:**
   - `copies.status` is `ordered | owned` and nothing else. An ordered copy has no location and is never lent: `lendCopy()` refuses an ordered copy, and `setStatus()` refuses ordered on a copy with an open loan with `VALIDATION` on `status` (a returned loan is history and does not refuse).
   - A wishlist entry is a row in `wishlist-entries`, never a copy. Marking it bought or ordered closes it, and a closed entry keeps its row with `closedAt`; Remove deletes the row. Unless a rule says otherwise, "entry" means an open entry. An entry is addressed by its own id, because one Book can be on a list more than once.
   - A loan is a row in `loans` pointing at a copy and a Person; the copy keeps its location.
-  - Read flag, rating and the user's tags are on `user-books`; notes are on `copies`. Personal tags, user genres and user themes are one `tags` collection with `kind: tag | genre | theme`. A user's name in a kind may not equal a system genre's English or Finnish name, nor a system theme on a Book the user holds (`SYSTEM_NAME`). A system genre created later with a user genre's name leaves the user genre in place.
+  - Reading state is on `user-books`: `read` (checkbox), `readingSince` and `finishedAt` (optional calendar dates, Dates convention). It is derived, never stored on its own: **read** when `read`; **reading** when not `read` and `readingSince` is set; **unread** otherwise. Invariant, enforced in the collection's `beforeValidate` hook (a field `validate` is skipped under `admin.condition`; CLAUDE.md): `finishedAt` only when `read`; `readingSince` ≤ `finishedAt` when both are set; neither after today in `Europe/Helsinki`. Re-reads are not modelled. The transitions are PRD FR-53's, applied only by `setRead()` (AD-18).
+  - A copy's acquisition is on `copies`: `acquiredAt`, a required calendar date, and `price`, an optional whole number of euro cents, 0 to 9 999 999. `createCopy()` sets `acquiredAt` to `helsinkiToday()`; `receiveCopy()` sets it to the day of Received and its restore puts the previous date back; `setCopyPurchase()` edits both. The migration that adds `acquiredAt` fills it from each row's `createdAt`, as its `Europe/Helsinki` date. Currency is euros only, formatted by `next-intl`.
+  - Rating and the user's tags are on `user-books`; notes are on `copies`. Personal tags, user genres and user themes are one `tags` collection with `kind: tag | genre | theme`. A user's name in a kind may not equal a system genre's English or Finnish name, nor a system theme on a Book the user holds (`SYSTEM_NAME`). A system genre created later with a user genre's name leaves the user genre in place.
 
 ### AD-9 — Lookup is read-only, has two layers and merges sources by priority
 
@@ -251,9 +254,9 @@ The diagram shows the main directions; the list below is the full table of allow
 - **Binds:** `lib/copies`, `lib/people`, `lib/books`, `lib/wishlists`, `lib/loans`, `lib/account`, `lib/catalogue`, `lib/payload/ownedName.ts`; FR-4, FR-17, FR-28, FR-31, FR-33, FR-34, FR-35
 - **Prevents:** three modules creating copies with different default-location and wishlist behaviour; a screen writing a row through the gateway; the same rule enforced twice with different errors; deletes failing on foreign keys; a screen looping single actions for a selection and stopping half way; a picker that takes an id on one screen and a name on another
 - **Rule:**
-  - `lib/copies` is the only writer of `copies`. `createCopy()` is its only insert; move, receive, set status, set note and remove are its other functions, and `editBook()` calls them. A `location` of `undefined` on an owned copy means the profile's default location; `null` means none; no hook sets a default. Setting a copy to ordered clears its location; Received makes it owned at the default location.
+  - `lib/copies` is the only writer of `copies`. `createCopy()` is its only insert; move, receive, set status, set note, set purchase (`setCopyPurchase()`: acquired date and price, no Undo) and remove are its other functions, and `editBook()` calls them. A `location` of `undefined` on an owned copy means the profile's default location; `null` means none; no hook sets a default. Setting a copy to ordered clears its location; Received makes it owned at the default location.
   - `lib/wishlists` is the only writer of `wishlist-entries`. `closeEntriesForBook()` closes the user's open entries for a Book that have no recipient; `saveCopy()` calls it before `createCopy()`, in the same transaction, and folds what it closed into the save's restore. `closeEntry()` marks an entry bought or ordered. An entry for a Person closes alone and makes no copy; an entry with no recipient closes as a save does, through `closeEntriesForBook()` (every one of the user's own open entries for the Book, on any list), then calls `createCopy()` once, and its restore deletes the copy and reopens every entry it closed. On a private-Book merge (AD-5), `moveEntriesToBook()` moves the user's entries to the shared Book. `setEntryRecipient()` sets, changes or clears an open entry's recipient, resolving an inline name through `resolvePerson()` (`lib/people`), and `removeEntry()` deletes an open entry; neither has Undo. `mergePerson()` in `lib/people` is the writer of `loans.person` and `wishlist-entries.forPerson` on a merge, through the gateway in the merge's transaction.
-  - `upsertUserBook()` in `lib/books` is the only writer of `user-books` (AD-6). `setRead()` in `lib/books` and `changeTags()` in `lib/tags` take either copy ids or a Book id, so they also work for a Book the user has only on a wishlist. `setRead()` takes a value or `toggle`, which the server resolves: unread when every Book is read, otherwise read.
+  - `upsertUserBook()` in `lib/books` is the only writer of `user-books` (AD-6). `setRead()` in `lib/books` and `changeTags()` in `lib/tags` take either copy ids or a Book id, so they also work for a Book the user has only on a wishlist. `setRead()` takes a `ReadState` or `toggle`, which the server resolves: unread when every Book is read, otherwise read (a Book being read is not read). It applies PRD FR-53's transition to each Book whose state changes, writing `read`, `readingSince` and `finishedAt` together, and its restore puts all three back. It returns, for one Book moved from reading to read, the day count the finish toast shows. `setReadingDates(ctx, bookId, { readingSince, finishedAt })` in `lib/books` edits the dates by FR-54's rules (Finished on a Book being read marks it read; clearing Started on one is `VALIDATION`), with no Undo.
   - `findOrCreateByName()` in `lib/catalogue` is the only matcher for authors and series (AD-5).
   - Each private name-keyed collection has one owning service that matches by `nameKey`, creates, renames and deletes its rows, and merges them where the interface offers a merge: locations in `lib/copies`, People in `lib/people`, tags of every kind in `lib/tags` (which reads system genre names and, through `lib/shelf`, system theme names for `SYSTEM_NAME`), wishlists in `lib/wishlists`. The profile, `profileVisibility` and `collectionVisibility` included, is read and updated only through `lib/account`. System genres are managed only through `lib/catalogue`, admin only. Screens never match names.
   - An input that picks one of these rows or creates it inline is a `Ref`: an id, or a name to create. The owning service resolves it inside the action's transaction, for locations, People and wishlists through `resolveOwnedName()` in `lib/payload`: shared code that a service calls only for its own collection, and that makes `lib/payload` no owner. Undo leaves a row created this way.
@@ -302,7 +305,7 @@ The diagram shows the main directions; the list below is the full table of allow
 | Names | `authors`, `series`, `genres`, `tags`, `locations`, `people` and `wishlists` include `nameKeyField()` from `src/fields`: a hook-maintained `nameKey` (trimmed, inner whitespace collapsed, lower-cased). Matching is `equals` on `nameKey`. No accent folding anywhere. |
 | Text input | Text from sources and from users is trimmed and normalised to NFC at the adapter or action boundary. Single-line text a user types (title, subtitle, author and series names, publisher, language) also has its whitespace runs collapsed to one space (`normaliseName()`); a description is NFC and trimmed only, so it keeps its line breaks (`normaliseText()` in `src/fields/sortName.ts`, used by `editBook()`, `upsertUserBook()` and, through `normaliseName()`, `normaliseManual()`). `''` is stored as `null`. A user's value over its `src/fields/limits.ts` limit after normalising is never clipped: the service fails with `VALIDATION` and marks that field `TOO_LONG` in `fields`, which the screen shows on the field. |
 | Language codes | ISO 639-1 two-letter where one exists, otherwise ISO 639-2. Adapters convert. |
-| Dates | ISO 8601 UTC as Payload stores them. A loan date is a calendar date: sent as `YYYY-MM-DD`, stored at 12:00 UTC, read back by its UTC date. Every date and number shown is formatted by `next-intl`, with the time zone `Europe/Helsinki` set once in its request config. |
+| Dates | ISO 8601 UTC as Payload stores them. A loan date, the reading dates and a copy's `acquiredAt` are calendar dates: sent as `YYYY-MM-DD`, stored at 12:00 UTC, read back by its UTC date. Every date and number shown is formatted by `next-intl`, with the time zone `Europe/Helsinki` set once in its request config. |
 | Errors | `src/lib/errors.ts` defines `DomainError`, `ActionResult`, the `ErrorCode` union (`SCREAMING_SNAKE`), `runAction()` and `runRoute()`. The message key for a code is `errors.<CODE>`. Both wrappers map Payload `Forbidden` and `NotFound` to `NOT_FOUND`, `ValidationError` to `VALIDATION` with field errors, and anything else to `INTERNAL` with a log line. Actions return `ActionResult` and never redirect. `runRoute()` answers with `ActionResult` as JSON, `Cache-Control: no-store`, and status 401 for `UNAUTHENTICATED`; the cover handler streams bytes and uses the status alone. On the client, actions and `/data` requests go through one helper, which turns a network failure into `NO_CONNECTION` and `UNAUTHENTICATED` into a move to sign-in. |
 | Toasts | One toast provider in the frontend root layout, so a toast survives navigation. It renders from `ActionResult`; an action's result carries the names its toast shows and the seconds remaining on its `undoToken`. Every toast has a close (X). The one toast region renders inside the active modal and returns to the preceding modal or frontend root when it closes, so its controls remain accessible. |
 | Navigation and history | Opening Book detail, an entry or a full-screen task pushes a history entry. Swapping the open Book, changing search, filters or sort, and one Answer following another replace it. Closing is history back, falling back to `/` when there is nothing to go back to; a close that lands elsewhere (an opened entry's Bought, Ordered or Remove, a Filter chip) is "back, then replace", `useCloseDetail()(to)` from `detailClose.ts`, so the list renders fresh; no address carries a return parameter. Overlays without an address (pickers, dialogs, the Filter sheet on the phone) handle Back inside their `components/ui` wrapper. A replace that keeps the pathname keeps the open overlays' history tokens, and an overlay whose address changed while open (a filter tap under the Filter sheet) lands on its latest address when it closes, by X, scrim or Back. Overlay links use router navigation with `scroll: false` and no prefetch. `cacheComponents` stays off. |
@@ -442,17 +445,30 @@ type EffectiveBook = {
   overridden: string[]
 }
 type TagKind = 'tag' | 'genre' | 'theme'
-type UserBookState = { read: boolean; rating: number | null; tags: (Named & { kind: TagKind })[] }
+type ReadState = 'unread' | 'reading' | 'read' // derived from read and readingSince (AD-8)
+type UserBookState = {
+  read: boolean
+  state: ReadState
+  readingSince: string | null // YYYY-MM-DD
+  finishedAt: string | null // YYYY-MM-DD; only when read
+  rating: number | null
+  tags: (Named & { kind: TagKind })[]
+}
 type CopyLine = {
   copyId: number
   status: 'owned' | 'ordered'
   location: Named | null
   note: string | null
   loan: { loanId: number; person: Named; since: string } | null // open loan only; since: lending date as YYYY-MM-DD
+  acquiredAt: string // YYYY-MM-DD; the order date on an ordered copy
+  price: number | null // euro cents
 }
+// setCopyPurchase(ctx, copyId, { acquiredAt?: string; price?: number | null }): void — no Undo
 type EntryLine = { entryId: number; wishlist: Named; forPerson: Named | null }
 type Holdings = { copies: CopyLine[]; entries: EntryLine[] } // open entries only
-type ReadTarget = { copyIds: readonly number[] } | { bookId: number } // setRead(ctx, target, value | 'toggle'): Undone<{ read; count }>
+type ReadTarget = { copyIds: readonly number[] } | { bookId: number } // setRead(ctx, target, ReadState | 'toggle'): Undone<{ state: ReadState; count: number; finishedDays: number | null }>
+// finishedDays: set when one Book went reading → read (the finish toast); days are calendar days from start to finish, at least 1
+// setReadingDates(ctx, bookId, { readingSince: string | null; finishedAt: string | null }): UserBookState — no Undo
 // Only select mode's copyIds path is undoable (withUndo). Book detail's bookId path is not: setReadAction drops the restore (PRD FR-15).
 // setRating(ctx, bookId, rating | null): void — no Undo
 // getUserBookState(ctx, bookId): UserBookState — the caller gates the Book id (AD-7)
@@ -506,7 +522,7 @@ type GenreFilterId = number | `tag:${number}` // system id or private kind-genre
 type ShelfQuery = {
   q?: string
   filters: Partial<{
-    location: number[]; status: ('owned' | 'ordered')[]; read: boolean; genre: GenreFilterId[]; tag: number[] // ordinary kind-tag ids
+    location: number[]; status: ('owned' | 'ordered')[]; read: ReadState[]; genre: GenreFilterId[]; tag: number[] // ordinary kind-tag ids
     theme: string[] // by text: system themes exactly, the user's themes by name
     language: string[]; author: number[]; series: number[]; publisher: string[]
     ratingMin: number; year: [number?, number?]; pages: [number?, number?]
@@ -525,11 +541,36 @@ type MyBook = { book: EffectiveBook; mine: Holdings } // searchMine(ctx, text): 
 type Counted<T> = T & { count: number }
 type FilterValues = { // filterValues(ctx, locale): values in use on the viewer's copies, each counted in copies
   location: Counted<Named>[]; status: Counted<{ value: 'owned' | 'ordered' }>[]
-  read: Counted<{ value: boolean }>[] // read first, then unread
+  read: Counted<{ value: ReadState }>[] // unread, reading, read; URL values `read=unread|reading|read`, repeatable
   genre: Counted<{ id: GenreFilterId; name: string }>[]; tag: Counted<Named>[]; language: Counted<{ value: string }>[]
 }
 type SuggestField = 'author' | 'series' | 'publisher' | 'theme' // SUGGEST_FIELDS
 type Suggestion = { id: number | null; name: string } // suggest(ctx, field, text); id null for a publisher or theme
+type ReadingBook = { book: EffectiveBook; since: string } // readingNow(ctx): held Books being read, readingSince ascending, then Book id (AD-7)
+
+// src/lib/stats
+type BookDays = { book: EffectiveBook; days: number }
+type YearStats = {
+  year: number
+  books: number; pages: number; spent: number // spent in euro cents
+  booksPerMonth: number // books ÷ months elapsed, one decimal
+  months: { month: number; books: number; pages: number }[] // 1 to 12, up to the current month in the current year
+  pagesPerDay: number | null; daysPerBook: number | null
+  quickest: BookDays | null; slowest: BookDays | null
+  thickest: { book: EffectiveBook; pages: number } | null
+  mostExpensive: { book: EffectiveBook; price: number } | null
+  bestMonth: { month: number; books: number } | null
+  topAuthor: { author: Named; books: number } | null // at least 2
+}
+type Stats = {
+  reading: ReadingBook[]
+  years: number[] // with a finished Book or a priced copy, plus the current year, newest first
+  year: YearStats
+  byYear: { year: number; books: number; pages: number; spent: number }[] // newest first
+  undated: number // read Books with no finishedAt
+  dust: { book: EffectiveBook; since: string } | null // since: the earliest owned copy's acquiredAt
+}
+// getStats(ctx, year?): Stats — PRD FR-58's definitions, computed by the pure computeStats() over the lib/shelf readers (AD-7); no stored state
 
 // src/lib/people
 type PersonUse = Named & { loans: number; entries: number } // personUse(ctx): every Person of the viewer by name; loans open and returned, entries (wishlist entries for them) open and closed
@@ -570,7 +611,7 @@ The addresses are those of `EXPERIENCE.md` → Information Architecture, with th
 | `/scan` | Scanner and ISBN field. With `?isbn=<text>` or `?book=<bookId>`, the Answer, rendered by the page; `&pick=<n>` selects an edition. With `?title=<text>`, the Not found Answer with the title filled in; also reached from Scan's "Add without ISBN" Link, for a book with no barcode. |
 | `/scan/find` | Lookup by title or author. The search text is `?q=`, and the page renders the results. |
 | `/books/[bookId]/edit` | Edit book, a page on every screen width. With `?copy=<copyId>`, that copy's status and location too. |
-| `/loans`, `/wishlists`, `/settings` | Loans, the list of wishlists, settings |
+| `/loans`, `/wishlists`, `/stats`, `/settings` | Loans, the list of wishlists, Stats (`?year=<yyyy>`; a missing or unknown year is the current one), settings. Stats' Currently reading links to `/?book=<bookId>`. |
 | `/wishlists/[listId]` | One wishlist. `?entry=<entryId>` opens that entry in its own sheet or panel. |
 | `/data/shelf?<shelf params>&offset=<n>&limit=<n>` | Route handler (AD-10): `ActionResult<ShelfRows>` for that range of the viewer's shelf; shelf params as `shelfRowsPath()` writes them (`book` ignored); `offset` a whole number ≥ 0, `limit` 1–1000 (`SHELF_MAX_ROWS`); a missing or out-of-bounds range is `VALIDATION`, with no query run |
 | `/data/cover/[isbn13]` | Route handler for client-initiated reads (AD-10) |
@@ -620,10 +661,11 @@ src/
     undo/              # receipt store, withUndo, undo
     metadata/          # source contract, sources/, merge, lookupSources, cache
     catalogue/         # lookupBook, retryLookup, searchBooks, saveCopy, saveEntry, editBook, findOrCreateByName, isUnreferenced, covers (download, upload and warp), re-fetch, lookupAgain, answerFacts, genre admin
-    books/             # EffectiveBook, getEffectiveBooks, getHoldings, getUserBookState, requireOwnBook, upsertUserBook, setRead, setRating, coverUrl
-    shelf/             # Drizzle query module, read-only: getShelfRows, values and suggestions, searchMine, otherEditions; query.ts (pure): parseShelfQuery, shelfHref, shelfRowsPath
+    books/             # EffectiveBook, getEffectiveBooks, getHoldings, getUserBookState, requireOwnBook, upsertUserBook, setRead, setReadingDates, setRating, coverUrl
+    shelf/             # Drizzle query module, read-only: getShelfRows, values and suggestions, searchMine, otherEditions, readingNow, the stats readers; query.ts (pure): parseShelfQuery, shelfHref, shelfRowsPath
     tags/              # tags of every kind: changeTags, rename, merge, delete, tagUse; SYSTEM_NAME checks
-    copies/            # createCopy, move, receive, status, note, remove; locations
+    copies/            # createCopy, move, receive, status, note, purchase (acquired date and price), remove; locations
+    stats/             # getStats, computeStats (pure)
     people/            # resolvePerson, createPerson, rename, merge, delete, personUse, lendingPeople
     loans/             # lendCopy, returnLoan, openLoans, returnedLoans; dates: helsinkiToday, isCalendarDate
     wishlists/         # resolveWishlist, listWishlists, getWishlist, createWishlist, rename, delete; createEntry, closeEntriesForBook, closeEntry, moveEntriesToBook, setEntryRecipient, removeEntry
@@ -651,6 +693,7 @@ deploy/                # production compose file, backup script
 | F9 Curation | Phase 1 builds admin re-fetch (FR-19), the admin's edits of shared Books on Edit book (FR-14), genre management (FR-17) and the Phase 1 part of FR-47 (cover upload). The rest enters through `visibility` and the back office. | AD-3, AD-4, AD-5, AD-14 |
 | F10 Administration | `app/(payload)`, `users.roles` | AD-1, AD-2, AD-3 |
 | F11 Platform (PWA, localisation) | `app/manifest.ts`, `messages/` | AD-15, Caching and Product name conventions |
+| F12 Reading and stats (FR-53 to FR-58) | `collections/UserBooks`, `collections/Copies`, `lib/books`, `lib/copies`, `lib/shelf`, `lib/stats`, `/`, `/stats` | AD-6, AD-7, AD-8, AD-13, AD-18, AD-20 |
 | Look and behaviour of the interface | `app/(frontend)`, `DESIGN.md`, `EXPERIENCE.md` | Styling, UI primitives, Font, Toasts, Navigation and history, and Device preferences conventions |
 | NFR-1, NFR-2 Speed | `lib/metadata`, `lib/catalogue` | AD-9, AD-11, AD-14 |
 | NFR-3, NFR-7 Search and Finnish text | `lib/shelf`, database init | AD-7, Names convention |

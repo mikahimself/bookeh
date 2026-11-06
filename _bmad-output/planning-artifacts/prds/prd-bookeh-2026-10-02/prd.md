@@ -2,7 +2,7 @@
 title: Bookie PRD
 status: final
 created: 2026-10-02
-updated: 2026-10-06
+updated: 2026-11-06
 ---
 
 # Bookie — Product Requirements Document
@@ -34,8 +34,9 @@ If it works, Bookie spreads from one collector to family and friends, and possib
 - **Book.** One edition, identified by ISBN-13 when it has one. The paperback and hardcover of the same work are different Books. A Book holds the shared metadata and the raw source response.
 - **Shared catalogue.** All shared Books. A Book becomes shared when it is created from an external source, or when the admin approves it (FR-46). Users never browse the shared catalogue as a whole (FR-20).
 - **Private Book.** A Book created by manual entry with no external source match. It is visible only to its creator, and to the creator's friends when it appears in an open collection (FR-12).
-- **Copy.** One physical book owned by one user. A copy has a status (**ordered** or **owned**), an optional location, loans and notes.
+- **Copy.** One physical book owned by one user. A copy has a status (**ordered** or **owned**), an optional location, loans and notes, the date it was acquired and an optional price (FR-55).
 - **Wishlist entry.** A Book on one of a user's named wishlists, optionally *for* a Person. It is not a copy.
+- **Reading state.** Per user and Book: **unread**, **reading** or **read**, with an optional start date and finish date (FR-53). Several Books can be in reading at once. Re-reads are not tracked.
 - **Override.** A user's own edit to a Book field. It is visible only to that user.
 - **Location.** A user's private place name (Helsinki, Cottage, …). The **default location** is the profile setting that new owned copies get.
 - **Person.** An entry in a user's private People list (a borrower or gift recipient). A Person is not a user account.
@@ -52,8 +53,8 @@ If it works, Bookie spreads from one collector to family and friends, and possib
 
 Mika is in a bookshop holding a Finnish novel, and isn't sure whether it's already on a shelf in Tampere.
 
-1. He opens Bookie from his phone's home screen (installed PWA). It opens in his collection, so he can also browse when a friend asks "do you have…?". A **Scan book** button is always within thumb reach.
-2. He taps **Scan book** and points the camera at the barcode. If there's no barcode, he searches by title or author.
+1. He opens Bookie from his phone's home screen (installed PWA). It opens in his collection, so he can also browse when a friend asks "do you have…?". An **Add book** button is always within thumb reach.
+2. He taps **Add book** and points the camera at the barcode. If there's no barcode, he searches by title or author.
 3. The answer screen shows the book's basic details (cover, title, author, edition) and every fact that applies. The first one is the heading and the rest are listed under the book:
    - **In library · Tampere**
    - **In Partner's library**, for friends with an open collection
@@ -61,13 +62,13 @@ Mika is in a bookshop holding a Finnish novel, and isn't sure whether it's alrea
    - **Wishlist**
 4. If none apply, he sees the fetched details and three actions: **Add to wishlist**, **Add to library** or **Back**. Add to library adds an owned copy at his default location, so there's no rescan at home. (Ordered is for online purchases; they are marked Received when they arrive.)
 5. If no source has the book, he types the title and author and adds it to a wishlist or to the library. He can fill in the other details later.
-6. He puts the phone away. From tapping Scan to seeing the answer takes a few seconds.
+6. He puts the phone away. From tapping Add book to seeing the answer takes a few seconds.
 
 ### UJ-2: Cataloguing — "Getting the collection in"
 
 Mika is working through a stack of books at home. His default location is Tampere.
 
-1. He taps **Scan book** and scans the first barcode.
+1. He taps **Add book** and scans the first barcode.
 2. The answer screen shows the fetched book. It names the source the data came from (Finna, Google Books or another source) and says whether an author or series will be created.
 3. He taps **Add to library**. The copy is saved as fetched at his default location, a toast confirms it with **Edit** and **Undo**, and the scanner is ready for the next book. A failure also shows as a toast.
 4. He mostly trusts the fetched data. When something is missing, such as a series index or a personal tag, he taps **Edit** on the toast and adds it on the edit screen. The same screen is where he would change the location or mark the copy as ordered.
@@ -93,7 +94,7 @@ Mika is working through a stack of books at home. His default location is Tamper
 - **FR-5** A user who forgets their password gets a reset link from the admin. The link is single-use, expiring and rate-limited. Self-service reset by email comes with email delivery (FR-52).
 - **FR-6** Users can change their email address. Verifying the new address by email comes with email delivery (FR-52).
 - **FR-7** Users can see their active sessions and sign out of any of them, or all of them at once.
-- **FR-8** Users can export all their own data (copies, overrides, tags, People, loans, wishlists, ratings) in a portable format.
+- **FR-8** Users can export all their own data (copies with their acquired dates and prices, overrides, tags, People, loans, wishlists, reading states and dates, ratings) in a portable format.
 - **FR-9** Users can delete their account, and the admin can deactivate or delete any account. See [Account lifecycle](#account-lifecycle).
 
 ### F2 — Adding a book
@@ -112,7 +113,7 @@ Mika is working through a stack of books at home. His default location is Tamper
 - **FR-14** Who gets the edits:
   - A shared Book keeps the source's values, and a user's edits are stored as their overrides [ASSUMPTION]. The admin's edits change the shared Book itself, for everyone. System genres and themes cannot be overridden (FR-17, FR-17a).
   - On a private Book, the creator's values are the Book's values.
-- **FR-15** Saving to the library shows a toast with **Edit** and **Undo** and returns to the scanner; saving to a wishlist shows **Undo**. Undo removes the copy or wishlist entry, plus any Book, author or series that nothing else references. Undo is also offered after a move, a tag change, marking a selection read, lending, Returned, Received, and marking a wishlist entry bought or ordered. Book detail's read switch saves in place with no toast and no Undo: one tap puts it back. Removals are confirmed first and have no Undo. A failed save shows an error toast and leaves the screen as it was.
+- **FR-15** Saving to the library shows a toast with **Edit** and **Undo** and returns to the scanner; saving to a wishlist shows **Undo**. Undo removes the copy or wishlist entry, plus any Book, author or series that nothing else references. Undo is also offered after a move, a tag change, marking a selection read or unread, lending, Returned, Received, and marking a wishlist entry bought or ordered. Book detail's reading switch saves in place with no Undo: one tap puts it back (FR-53). Its only toast is the finish toast, when a Book being read is marked read. Removals are confirmed first and have no Undo. A failed save shows an error toast and leaves the screen as it was.
 - **FR-16** If the user already owns a copy of the same edition, the answer says so and lists the copies, but still allows adding another copy.
 - **FR-17** Authors and series are matched to existing shared records by name, ignoring case, and created if missing. Those created from a private Book stay private along with it. System genres come from Google Books categories: a save matches them by English name to the seeded genre list and creates the missing ones, without a Finnish name. The admin adds Finnish names, adds genres, and merges or deletes duplicates. System genres are shared and not overridable; each user can add their own user genres to a Book alongside them. Personal tags, user genres and user themes are matched within the user's own, and the user can rename, merge and delete them. A user genre may not take a system genre's name, nor a user theme the name of a system theme on a Book the user holds.
 - **FR-17a** A shared Book stores themes from ordinary sources followed by enrichment source terms in source order, deduplicated without regard to case while keeping the first spelling. Enrichment can also fill a missing description after ordinary sources, and its raw response is retained as provenance; its subjects do not create genres. Themes are shown on the Book and are a filter. They are source data: not overridable, and filled by a re-fetch when empty (FR-19). Each user can add their own user themes alongside them.
@@ -132,28 +133,28 @@ Mika is working through a stack of books at home. His default location is Tamper
 
 ### F4 — My collection
 
-- **FR-23** The app opens in the user's collection; there is no separate home screen. A **Scan book** button is within reach on every section.
+- **FR-23** The app opens in the user's collection; there is no separate home screen. An **Add book** button is within reach on every section.
 - **FR-24** Users search their collection by title, author, series or ISBN, or by free text across those fields and notes.
 - **FR-25** Users filter and sort their collection by any metadata field. Filters combine with AND. Fields include:
   - author, series, genre, theme and personal tag (genre and theme cover the system values and the user's own)
   - publisher, year, language and page count (as a range)
-  - status, location, read and rating
+  - status, location, reading state (unread, reading, read) and rating
 
   Filters and sorting use the user's overrides where they exist. On an opened Book, its author, series, genres, themes, tags and location are shortcuts that add that value to the active filters.
-- **FR-26** Book detail shows the user's copies, wishlist entries, loans, read flag, rating, notes, genres, themes and personal tags. Read, rating, notes and tags are changed in place; the Book's own fields are changed on the edit screen (FR-13).
+- **FR-26** Book detail shows the user's copies (with each copy's acquired date and price), wishlist entries, loans, reading state and dates, rating, notes, genres, themes and personal tags. Reading state and dates, rating, notes, tags and a copy's acquired date and price are changed in place; the Book's own fields are changed on the edit screen (FR-13).
 - **FR-27** Overrides are visible only to the user who made them, everywhere the Book appears for that user. To change a shared value, the user suggests a fix (FR-45); the admin changes it directly on the edit screen (FR-14).
 - **FR-28** Status on a copy is **ordered** or **owned**. Adding a Book to the library closes the user's own open wishlist entries for it; entries for a Person stay open.
   - Users set **Ordered** on the edit screen right after adding a book, or from a wishlist entry, for example after buying online.
   - **Received** turns an ordered copy into an owned one, defaulting to the default location.
   - Marking a wishlist entry bought or ordered closes the entry. If the entry is for the user, it creates a copy. If it's for another Person, it closes the entry without creating a copy [ASSUMPTION].
-- **FR-29** Each user can mark a Book as read and give it an optional 1–5 rating. Read and rating belong to the user and the Book, not to a copy.
+- **FR-29** Each user can set a Book's reading state (FR-53) and give it an optional 1–5 rating once it is read. Reading state, reading dates and rating belong to the user and the Book, not to a copy.
 - **FR-30** A user can own several copies of the same edition. Users can add a Book they see in a friend's open collection to their own collection or wishlist without scanning.
 
 ### F5 — Locations
 
 - **FR-31** Each user keeps a private list of locations and can add new ones inline. Locations can be renamed, merged and deleted.
 - **FR-32** Locations are optional. A user with no locations sees no location fields.
-- **FR-33** Users can select several copies and, in one action, change their location, add or remove a tag, mark them read or unread, or remove them. Removing asks for confirmation.
+- **FR-33** Users can select several copies and, in one action, change their location, add or remove a tag, mark them read or unread (each Book by the transitions of FR-53, with no finish toast), or remove them. Removing asks for confirmation.
 
 ### F6 — People and loans
 
@@ -182,7 +183,7 @@ Mika is working through a stack of books at home. His default location is Tamper
   - The recipient accepts or declines. Either side can remove the friendship, or block the other user.
   - Requests are rate-limited. After a decline, the same pair has to wait before another request [ASSUMPTION: 30 days].
   - Email addresses are never shown to users who aren't friends.
-- **FR-43** Each user sets their collection to **open** or **closed**. Friends see an open collection's **owned** copies only. Ordered copies, wishlists, locations, loans, notes, overrides and personal tags are never part of it.
+- **FR-43** Each user sets their collection to **open** or **closed**. Friends see an open collection's **owned** copies only. Ordered copies, wishlists, locations, loans, notes, copies' acquired dates and prices, reading states and dates, overrides and personal tags are never part of it.
 - **FR-44** Every revocation takes effect on the next request. Re-establishing a relationship does not restore earlier shares. Revocations are:
   - unfriend or block
   - closing a collection
@@ -209,6 +210,37 @@ Mika is working through a stack of books at home. His default location is Tamper
 - **FR-51** The interface is in English and Finnish, and each user picks their language. All interface text is localisable from the start, so more languages can be added without changing feature code.
 - **FR-52** Email delivery is not part of v1. Invites and resets work through links (FR-2, FR-5) and notifications appear in the app. The account model must allow adding email later for invites, resets, verification and notifications.
 
+### F12 — Reading and stats
+
+Added 2026-11-06 (Mika), with the UX picks in `mockups/reading-options.html`.
+
+- **FR-53** Each user's reading state of a Book is unread, reading or read, stored as the read flag and two optional calendar dates, `readingSince` and `finishedAt`. Book detail sets it with one three-way switch:
+
+  | From → to | Read | Started | Finished | Toast |
+  |---|---|---|---|---|
+  | Unread → Reading | no | today | none | none |
+  | Reading → Read | yes | kept | today | "Finished {title} · {n} days", no Undo |
+  | Unread → Read | yes | none | none | none |
+  | Read → Reading | no | kept, or today if none | none | none |
+  | any → Unread | no | none | none | none |
+
+  Stopping a book is tapping Unread. Several Books can be in reading at once. Re-reads are not tracked. A selection's Read and Unread (FR-33) apply the same transitions per Book, so a ticked Book being read gets today as its finish date; its Undo restores all three values. `{n}` days is the calendar days from start to finish (or to today), at least 1.
+- **FR-54** The reading dates are editable. Under the switch a muted line shows "Since {date} · {n} days" while reading, and "{start} – {finish} · {n} days" when read; a read Book with one date shows "Started {date}" or "Finished {date}", and one with none shows only an "Add dates" Link. Tapping a date or "Add dates" opens one Picker with Started and Finished. Rules:
+  - a finish date before the start date, or a date after today, is rejected under the field
+  - filling Finished on a Book being read marks it read with that date and shows the finish toast
+  - a Book being read keeps a start date: clearing Started is rejected; to stop, tap Unread
+  - no Undo; the Rating shows once the Book is read, as before (FR-29)
+- **FR-55** Each copy has an acquired date and an optional price in euros. The acquired date defaults to the day the copy is saved; **Received** sets it to that day. It is editable. A copy without a price (a gift, an unknown price) has none. The copy line in Book detail reads "Acquired {date} · €{price}" ("Ordered {date}" on an ordered copy), with "Add price" when there is none; the date and price are Links that open one small Picker. No Undo. Existing copies take the day they were saved.
+- **FR-56** The collection shows a "Currently reading" strip of covers above the count line while at least one Book is being read; tapping a cover opens Book detail. The Read filter offers unread, reading and read. A row of a Book being read ends with the 8px marker and "Reading" instead of the location.
+- **FR-57** A fifth section, **Stats** (`/stats`), shows: the Books being read with "since {date}"; a year switch; for the year, books, pages, money spent and books a month as large numbers; by month, one 8px marker per finished Book and "{n} books · {pages} p"; Nerdy stats (FR-58); and by year, "{n} books · {pages} p · €{spent}" for each year, with "{n} read books have no dates and are not counted."
+- **FR-58** What the stats count:
+  - Only Books the user holds (a copy or an open wishlist entry), and for book stats only those with a finish date, placed in the year and month of that date. Pages are the effective Book's (overrides applied); a Book without a page count counts as a book and adds no pages.
+  - Money spent is the sum of the prices of the user's copies acquired in the year, read or not, ordered or owned.
+  - The years shown are those with a finished Book or a priced copy, plus the current year, newest first. Books a month and Pages a day divide by the months or days elapsed: all of a past year, up to today in the current one.
+  - Nerdy stats, for the year: **Pages a day**; **Days a book**, on average over Books with both dates; **Quickest** and **Slowest** (both dates; ties to the earlier finish); **Thickest brick** (most pages); **Most expensive** (the priced copy acquired in the year with the highest price); **Best month** (most finished Books, then most pages, then the earlier month); **Most-read author** (most finished Books by an effective author, every author of a Book counting, at least 2; ties by name).
+  - **Most dust collected**, not tied to the year: the unread Book, not being read, whose earliest owned copy has the oldest acquired date; ties go to the copy created first, so the same Book keeps the title until it is read. Nothing about it is stored.
+  - A stat with no candidate is left out.
+
 ## Visibility
 
 Who can see what. Every read and write is authorised per object on the server, including uploaded files and search, filter and count results. These rules become acceptance tests.
@@ -219,10 +251,10 @@ Who can see what. Every read and write is authorised per object on the server, i
 | Private Book | yes | when it is an owned copy in the collection | no | no | entry fields only | yes, to approve or merge |
 | Owned copy (exists) | yes | yes | no | no | no | no |
 | Ordered copy | yes | no | no | no | no | no |
-| Location, notes, loans, People | yes | no | no | no | no | no |
+| Location, notes, loans, People, a copy's acquired date and price | yes | no | no | no | no | no |
 | Override, personal tag | yes | no | no | no | no | no |
 | Wishlist and entries | yes | if the list is shared with them | if the list is shared with them | no | if the link is valid | no |
-| Read flag, rating | yes | no [ASSUMPTION] | no | no | no | no |
+| Read flag, reading dates, rating | yes | no [ASSUMPTION] | no | no | no | no |
 | Unapproved uploaded cover | yes | no | no | no | no | yes, to review |
 | Pending suggestion | own | no | no | no | no | yes |
 | Profile (display name) | yes | yes | yes | public profiles only | owner's name only | yes |
@@ -256,6 +288,9 @@ This replaces the M1–M5 milestones in CLAUDE.md. **Only Phase 1 is committed.*
 Within Phase 1, the first shop check is the scan Answer of F2 (In library / Not in library). Title search across the sources and the Ordered and On wishlist Answers come after wishlists (Mika, 2026-10-06).
 
 Search is on the phone in this phase, because checks in webshops depend on it. Done when the Phase 1 success metrics are met.
+
+**Phase 1 addition: reading and stats (Mika, 2026-11-06)**
+- Reading state and dates, copies' acquired dates and prices, Currently reading in the collection and the Stats section (F12, FR-53 to FR-58). Committed like Phase 1, built after it. The button on every section is renamed **Add book**, since the screen it opens does more than scan.
 
 **Phase 2 (possible): Public internet, Partner joins**
 - Public ingress with the security NFRs, and the back office kept on the tailnet (FR-49, NFR-5)
@@ -313,7 +348,7 @@ Done when Partner is using the app (Phase 2 metric).
 - offline use
 - order details such as shop and due date (the status is enough)
 - view tracking (cataloguing and editing would distort it; ratings are the signal)
-- selling or valuing books
+- selling or valuing books (a copy records what was paid for it, FR-55, for the spending stats; nothing estimates what a book is worth)
 - email delivery (FR-52 keeps the door open)
 - open self-registration and OAuth (FR-3 keeps the door open)
 - committing to Phases 2 and 3 (see Build Order)

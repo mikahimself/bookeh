@@ -110,6 +110,15 @@ Phase tags follow the PRD Build Order. **P1** = Phase 1 (committed), **P2** / **
 - FR-51 [P1]: Interface in English and Finnish, chosen per user; all interface text is localisable from the start.
 - FR-52 [P1-constraint]: No email delivery in v1. Invites and resets work through links and notifications appear in the app. The account model must allow adding email later.
 
+**F12 — Reading and stats** (added 2026-11-06, `sprint-change-proposal-2026-11-06.md`)
+
+- FR-53 [P1]: Reading state unread / reading / read per user and Book, as `read` plus optional `readingSince` and `finishedAt`; the three-way switch's transitions; bulk Read and Unread apply them per Book; the finish toast without Undo.
+- FR-54 [P1]: Reading dates are editable in one Picker; finish before start, or after today, rejected; Finished on a Book being read marks it read; a Book being read keeps its start date.
+- FR-55 [P1]: Each copy has an acquired date (save day; Received's day; migrated from `createdAt`) and an optional price in euros, edited from the copy line.
+- FR-56 [P1]: Currently reading strip above the collection's count line; Reading in the Read filter; the Reading row ending.
+- FR-57 [P1]: The Stats section at `/stats`: Currently reading, year switch, big numbers, by month, Nerdy stats, by year and the undated line.
+- FR-58 [P1]: What the stats count: held Books with a finish date; effective pages; spending by acquired date; years shown; each Nerdy stat; Most dust collected without stored state.
+
 **Visibility table and Account lifecycle (PRD)**: Phase 1 enforces the owner and admin columns (private data readable and writable only by its owner; admin excluded; private Books, authors and series readable only by creator and admin). Friend, other-user and share-link columns and the account lifecycle are Phase 2–3.
 
 ### NonFunctional Requirements
@@ -349,7 +358,7 @@ Phase 1 only. Phase 2–3 FRs (FR-2, FR-5 to FR-9, FR-40 to FR-46, FR-48, FR-49,
 | FR-26 | E5–E7, E9 | Book detail (E5); each later epic adds its group |
 | FR-27 | E4, E5 | Overrides shown everywhere for their owner |
 | FR-28 | E4, E5, E7 | Set ordered on Edit book (E4); Received (E5); Bought and Ordered on entries (E7) |
-| FR-29 | E5 | Read flag and rating |
+| FR-29 | E5, E10 | Read flag and rating (E5); reading state (E10) |
 | FR-30 | E3 | Several copies of one edition (friend part is P2) |
 | FR-31 | E3, E5 | Inline add with the default location (E3); list, rename, merge, delete (E5) |
 | FR-32 | E5 | No locations, no location fields |
@@ -364,6 +373,11 @@ Phase 1 only. Phase 2–3 FRs (FR-2, FR-5 to FR-9, FR-40 to FR-46, FR-48, FR-49,
 | FR-50 | E1 | PWA install |
 | FR-51 | E1 (and every story) | English and Finnish |
 | FR-52 | E1 | No email; account model open for it (constraint) |
+| FR-53 | E10 | Reading state, the switch's transitions, bulk read per Book |
+| FR-54 | E10 | Reading dates and their Picker |
+| FR-55 | E10 | A copy's acquired date and price |
+| FR-56 | E10 | Currently reading in the collection, Reading filter and row ending |
+| FR-57, FR-58 | E10 | The Stats section and its definitions |
 
 | NFR | Epic(s) |
 |---|---|
@@ -377,7 +391,7 @@ Phase 1 only. Phase 2–3 FRs (FR-2, FR-5 to FR-9, FR-40 to FR-46, FR-48, FR-49,
 
 ## Epic List
 
-Nine epics, in build order. Each needs only the epics before it. Later epics add their own lines to screens built earlier (Book detail, the Answer, Settings) as small stories in the epic that owns the data. The order puts what the Phase 1 success metrics measure (have it, where is it, who has it, shop check) before tags, genres and themes, which no metric depends on.
+Ten epics, in build order (Epic 10 added 2026-11-06). Each needs only the epics before it. Later epics add their own lines to screens built earlier (Book detail, the Answer, Settings) as small stories in the epic that owns the data. The order puts what the Phase 1 success metrics measure (have it, where is it, who has it, shop check) before tags, genres and themes, which no metric depends on.
 
 **Story ids.** Every story title carries its slice id from STORY-SLICING.md, for example "Story 3.5 [C2] Finna adapter: core fields", so the slice dependency columns stay usable. Slices new in this document (fixture capture, default location in Settings, cover upload, genre creation and admin, themes) take the next free number in their track and are added to STORY-SLICING.md in the doc sync below.
 
@@ -451,6 +465,10 @@ The full Answer: In library, Ordered, On wishlist or Not in library as the headi
 Personal tags, user genres and user themes (one `tags` collection with a kind, D-6) on Book detail, Edit book and a selection, with Undo, filters, and rename, merge, delete in Settings. System genres seeded and created on save from Google Books categories (and Finna genre terms if the Epic 3 checkpoint decided so), re-run over Books saved earlier, shown in the user's language, and managed by the admin in Settings (Finnish names, add, merge, delete, touching shared rows only), with "New genre" on the Answer. Finna system themes as chips and a filter.
 **Slices:** G1–G10 (G6, the genre override on Edit book, is retired by D-6), and new slices for tag kinds, genre creation on save, genre admin and themes.
 **FRs covered:** FR-13 (genre note on the Answer), FR-17 (system and user genres, tags), FR-17a (system and user themes), FR-25 (genre, tag, theme), FR-33 (tag, genre, theme on a selection).
+
+### Epic 10: Track what I read and see my stats
+Mika marks a book as being read and then read with one three-way switch, with start and finish dates he can edit; each copy records when it was acquired and what it cost; the collection shows what he is reading; a fifth section, Stats, counts books, pages and money per year with a set of nerdy stats. "Scan book" becomes "Add book". Added by `sprint-change-proposal-2026-11-06.md`; UX picks in `mockups/reading-options.html`.
+**FRs covered:** FR-53 to FR-58; FR-15, FR-25, FR-26, FR-29 and FR-33 amended.
 
 ## Epic 1: Sign in to bookeh, in my language and theme
 
@@ -4113,3 +4131,112 @@ So that "done" is a measurement, not a feeling (PRD Success Metrics).
 **And** a SQL query counts Books with any override or edit after saving against all Books held, and the ratio is recorded; above 1 in 10, the counter-metric is flagged for a decision
 **And** the count of catalogued books with a location, the NFR-1 and NFR-2 measurements from Stories 3.46 and 8.2, and the restore rehearsal from Story 4.10 are listed
 **And** the results are written in `docs/phase-1-acceptance.md`
+
+## Epic 10: Track what I read and see my stats
+
+Reading state and dates on `user-books`, acquired date and price on copies, Currently reading in the collection, the Stats section, and the Add book rename (PRD F12, FR-53 to FR-58; spine AD-7, AD-8, AD-18, shared shapes; EXPERIENCE.md → Book detail, Collection controls, Stats; DESIGN.md → Components). Decided in `sprint-change-proposal-2026-11-06.md`; the UX picks are the Picked section of `mockups/reading-options.html`.
+
+**Order.** 10.1, then 10.2 and 10.4 in either order. 10.3 has no dependency, but it changes schema, so it merges one at a time with 10.1 (AD-13). 10.5 needs 10.1 and 10.3; 10.6 needs 10.5.
+
+### Story 10.1: Reading state on `user-books`
+
+As Mika,
+I want a Book to be unread, being read or read, with its start and finish dates,
+So that the app knows what I am reading and when I finished each book (FR-53, FR-54).
+
+**Acceptance Criteria:**
+
+**Given** `user-books` gains `readingSince` and `finishedAt` (optional calendar dates, Dates convention) beside `read`
+**When** a row is written, by a service or in the back office
+**Then** a `beforeValidate` hook rejects `finishedAt` without `read`, `readingSince` after `finishedAt`, and either date after today in `Europe/Helsinki` (AD-8), and the migration and regenerated types are committed (AD-13)
+**And** `setRead(ctx, target, 'unread' | 'reading' | 'read' | 'toggle')` applies FR-53's table to each Book whose state changes: Unread → Reading sets today; Reading → Read keeps the start and sets today as the finish; Unread → Read sets no dates; Read → Reading keeps the start (today if none) and clears the finish; → Unread clears both
+**And** `toggle` resolves to unread when every target Book is read, otherwise to read, with a Book being read counted as not read; the copy-ids path stays undoable and its restore puts `read`, `readingSince` and `finishedAt` back on each changed Book; the result carries `finishedDays` when one Book went from reading to read
+**And** `setReadingDates(ctx, bookId, dates)` follows FR-54: Finished on a Book being read marks it read; clearing Started on a Book being read fails with `VALIDATION` on `readingSince`; Book id gated by `requireOwnBook()`; no Undo
+**And** `UserBookState` gains `state`, `readingSince` and `finishedAt` (spine shared shapes); a missing row reads unread with no dates
+**And** one integration test covers the transitions and `toggle`, one the invariant through the service, and one undoes a bulk Read that finished a Book being read; no other tests
+**And** ARCHITECTURE-SPINE.md is checked against the built signatures and corrected in the same commit if they differ
+
+### Story 10.2: Reading switch and dates on Book detail
+
+As Mika,
+I want one unread / reading / read switch on Book detail and a line with my dates,
+So that I can start and finish a book in one tap and fix its dates later (FR-53, FR-54).
+
+**Acceptance Criteria:**
+
+**Given** Book detail (sheet and panel) on a held Book
+**When** it shows the Reading and rating group
+**Then** the read / unread Text switch is replaced by unread / reading / read, saving in place with no Undo, and the Rating shows once the Book is read, as now
+**And** Reading → Read toasts "Finished {title} · {n} days" with no Undo; no other transition toasts
+**And** the muted line under the switch reads "Since {date} · {n} days", "{start} – {finish} · {n} days", "Started {date}", "Finished {date}" or only an "Add dates" Link, as EXPERIENCE.md → Book detail says; nothing when unread; each date is a Link
+**And** a date or "Add dates" opens the reading-dates Picker (sheet on the phone, dialog on wide screens; one overlay deep) with Started and Finished Date fields, Cancel and Save; a finish before the start, a date after today, and clearing Started on a Book being read show their message under the field; filling Finished on a Book being read saves it as read and toasts
+**And** select mode's Read keeps its toast and Undo and shows no finish toast
+**And** strings in English and Finnish; a focused unit test of the dates line wording for the five cases only if it holds logic beyond markup; an uncommitted phone and desktop walk covers each transition, the Picker's rejections and the toast
+
+### Story 10.3: Acquired date and price on copies
+
+As Mika,
+I want each copy to record when I got it and what I paid,
+So that Stats can count spending and find the book that has waited longest (FR-55).
+
+**Acceptance Criteria:**
+
+**Given** `copies` gains `acquiredAt` (required calendar date) and `price` (optional integer euro cents, 0 to 9 999 999)
+**When** the migration runs
+**Then** every existing copy gets its `createdAt` as a `Europe/Helsinki` calendar date at 12:00 UTC, and the migration and regenerated types are committed (AD-13)
+**And** `createCopy()` sets `acquiredAt` to `helsinkiToday()`; `receiveCopy()` sets it to the day of Received, and its Undo restores the status and the previous date
+**And** `setCopyPurchase(ctx, copyId, { acquiredAt?, price? })` in `lib/copies` edits both, gated to the viewer's copy, no Undo; a date after today or a price out of range is `VALIDATION` on that field
+**And** `CopyLine` gains `acquiredAt` and `price` (spine shared shapes), read through `getHoldings()`
+**And** Book detail's copy line shows "Acquired {date} · €{price}" ("Ordered {date}" on an ordered copy), or "Add price"; the date and price are Links opening one Picker with an Acquired Date field and a Price field accepting "24,90", "24.90" and "24", empty meaning none; amounts are formatted by `next-intl` as EUR
+**And** Edit book and the save flow are unchanged (AD-11)
+**And** one integration test proves the migration back-fill, one undoes Received and gets the date back, and the price parser has one unit test; an uncommitted phone walk checks the line and the Picker
+
+### Story 10.4: Currently reading in the collection
+
+As Mika,
+I want to see the books I am reading at the top of my collection and filter by them,
+So that what I am reading is one tap away (FR-56).
+
+**Acceptance Criteria:**
+
+**Given** one or more held Books being read
+**When** the collection shows
+**Then** a "Currently reading" strip of cover tiles with "since {date}" sits above the count line, oldest start first, scrolling sideways when it overflows; tapping one opens Book detail; it is absent when nothing is being read and in select mode, and ignores search and filters
+**And** `readingNow(ctx)` in `lib/shelf` returns `ReadingBook[]` for Books with a visible copy or open entry only (AD-7); a Book whose last copy was removed is not listed
+**And** the Read filter offers unread, reading and read with copy counts (`ShelfQuery.filters.read: ReadState[]`, `FilterValues.read` per the spine; URL `read=unread|reading|read`, repeatable, values OR within the field); the count line names the active value
+**And** a row of a Book being read ends with the 8px marker and "Reading" in place of the location; Lent and Ordered endings win over it
+**And** the strip and rows follow the shelf reload after any action that changes reading state (AD-7)
+**And** the shelf access test gains a second user's Book being read, which neither the strip nor the filter returns; an uncommitted phone and desktop walk checks the strip, the filter and the row ending
+
+### Story 10.5: Stats service
+
+As the developer,
+I want one stats service that computes every number on the Stats page from the stored rows,
+So that the page renders without its own logic and each definition is tested once (FR-58).
+
+**Acceptance Criteria:**
+
+**Given** the viewer's `user-books` rows, copies and effective Books
+**When** `getStats(ctx, year?)` runs
+**Then** it returns `Stats` as the spine declares, reading through read-only `lib/shelf` readers on `visibleCopies` and `visibleEntries` and hydrating Books through `getEffectiveBooks()`, so overrides apply to pages and authors; `lib/stats` imports only `shelf` and `books` (spine import rules)
+**And** the figures are computed by the pure `computeStats()` exactly by PRD FR-58 and the definitions in the change proposal: books by `finishedAt`; pages from the effective Book, missing pages adding nothing; spending by `acquiredAt`, ordered or owned; months and days elapsed for the averages; the tie rules of Quickest, Slowest, Best month and Most-read author; Most dust collected over owned copies with the copy created first winning ties; stats with no candidate are null
+**And** a missing or unknown `year` is the current year in `Europe/Helsinki`; `years` and `byYear` are newest first
+**And** `computeStats()` has one unit test per definition that can break (finished-in-year counting, missing pages, spending year, books a month in the current year, each tie rule, dust ties); one integration test proves another user's rows never count
+**And** nothing is stored: no table, no cached champion (AD-12 not used)
+
+### Story 10.6: Stats section and the Add book rename
+
+As Mika,
+I want a Stats section beside the others and the add button named for what it does,
+So that I can see my reading year at a glance and find Add book where I expect it (FR-57, FR-23).
+
+**Acceptance Criteria:**
+
+**Given** `getStats()` from Story 10.5
+**When** I open `/stats`
+**Then** the page shows Currently reading (linking to `/?book=`), the year Text switch (`?year=` replaced in the address), the big numbers, By month with one 8px marker per finished Book, Nerdy stats, By year and the undated line, as EXPERIENCE.md → Stats and DESIGN.md → Components say, one column on the phone and two on wide screens; the empty state follows EXPERIENCE.md
+**And** Stats is the fifth section in the order collection, loans, wishlists, stats, settings: in `SECTIONS`, the headings row, swiping and wrapping; `requireUser()` first
+**And** the heading is "Stats" / "Tilastot" in the message catalogue, with every Stats string in both languages
+**And** the button on every section reads "Add book" / "Lisää kirja" and the scan task's heading the same (`scan.open`, `scan.heading`); routes and code names stay `/scan`
+**And** on wide screens Add book never clips and the headings row clips at its right edge below the measured widths (974px English, 1074px Finnish), checked in a browser at 900, 980 and 1100px in both languages
+**And** no new tests beyond any pure formatting helper that holds logic; an uncommitted phone and desktop walk covers both locales, a past year, an empty year and swiping into and out of Stats

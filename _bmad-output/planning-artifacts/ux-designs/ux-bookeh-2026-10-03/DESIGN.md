@@ -2,7 +2,7 @@
 name: bookeh
 description: Type-led, line-only visual system for a personal book catalogue. White or dark slate ground, one coral accent used as lines, square corners, no fills, one soft shadow. Built with Tailwind CSS 4 tokens on headless primitives.
 status: final
-updated: 2026-10-26
+updated: 2026-11-06
 colors:
   # Light
   background: '#FFFFFF'
@@ -246,7 +246,7 @@ Three rules define the look more than any others:
 
 The system is built on Tailwind CSS 4 with tokens in `src/app/(frontend)/styles.css`, on unstyled headless primitives. Nothing is inherited from a component library's look.
 
-→ Reference mock-ups, in the final tokens: [collection, wide](mockups/key-collection-wide.html) · [collection, phone](mockups/key-collection-phone.html) · [scan and answer](mockups/key-scan-phone.html) · [loans](mockups/key-loans.html) · [wishlists](mockups/key-wishlists.html) · [settings](mockups/key-settings.html). The spines win on any conflict with a mock-up. Earlier explorations, including the rejected options, are kept in `.working/`.
+→ Reference mock-ups, in the final tokens: [collection, wide](mockups/key-collection-wide.html) · [collection, phone](mockups/key-collection-phone.html) · [add book and answer](mockups/key-scan-phone.html) · [loans](mockups/key-loans.html) · [wishlists](mockups/key-wishlists.html) · [settings](mockups/key-settings.html) · [reading and stats](mockups/reading-options.html) (its Picked section). The spines win on any conflict with a mock-up. Earlier explorations, including the rejected options, are kept in `.working/`.
 
 ## Colors
 
@@ -259,7 +259,7 @@ Every colour has a light and a dark value. Dark tokens carry the `-dark` suffix 
 | `text-muted` | `#5F6B78` | `#94A0AD` | Second lines, labels, group headings, locations. |
 | `text-dim` | `#87919C` | `#626B76` | Inactive section headings and switch options; unrated stars; placeholder text and the underline of an empty field; disabled controls. |
 | `border` | `#DDE2E7` | `#2C343D` | The detail panel's left border, and nothing else. It is too faint to carry meaning. |
-| `accent` | `#F0604F` | `#FF8E7F` | Primary button outline, selection bar, link underline, lent marker, progress line. |
+| `accent` | `#F0604F` | `#FF8E7F` | Primary button outline, selection bar, link underline, lent and reading markers, the Stats month markers, progress line. |
 | `danger` | `#9B1C31` | `#E0566F` | Errors and destructive actions only: the destructive button's outline, the underline of a field with a mistake, the marker before an error message. |
 | `scrim` | `#00000033` | `#00000066` | Dims what is behind a bottom sheet or a dialog. |
 | `shadow` | `#1F293324` | `#00000073` | The detail panel's shadow, and nothing else. |
@@ -282,7 +282,7 @@ Every colour has a light and a dark value. Dark tokens carry the `-dark` suffix 
 Rules for {colors.accent}:
 
 - In light mode it is never text. Coral on white is about 3.2:1, enough for a line but not for text. In dark mode it may be text.
-- It marks two things: what is selected or flagged (selection bar, lent marker), and the primary action (button outline, link underline).
+- It marks two things: what is selected or flagged (selection bar, lent and reading markers, one marker per finished book in Stats), and the primary action (button outline, link underline).
 - It outlines the primary button, and a layer has at most one (`EXPERIENCE.md` → Component Patterns).
 
 Contrast against {colors.background}, approximate:
@@ -308,7 +308,7 @@ One typeface: **Open Sans**, self-hosted, in weights 300 and 400. There is no bo
 
 | Role | Token | Used for |
 |---|---|---|
-| Section heading | `heading-section` (44px / 300), `heading-section-phone` (38px / 300) | Section names (collection, loans, wishlists, settings) and full-screen screen names (scan, not in library). |
+| Section heading | `heading-section` (44px / 300), `heading-section-phone` (38px / 300) | Section names (collection, loans, wishlists, stats, settings) and full-screen screen names (add book, not in library). |
 | Detail heading | `heading-detail` (26px / 300) | The book title in the detail panel and sheet. |
 | Group heading | `heading-group` (20px / 300, muted) | Groups inside a panel or screen: your copies, lent before, genres and tags. |
 | Title | `title` (17px / 400) | Book title in a row; author in the detail header. |
@@ -383,7 +383,7 @@ Visual specs. Behaviour lives in `EXPERIENCE.md` → Component Patterns.
 | Button, secondary | As primary, with a {colors.text} outline. |
 | Button, destructive | As primary, with a {colors.danger} outline. The label names the action. |
 | Button, compact | A secondary button with {spacing.1} above and below and {spacing.3} left and right, so it is drawn under the tap height; the tap area is still 44px. Used for "find" beside the ISBN field, aligned to its underline. Chosen 2026-10-27 (`phone-polish-options.html`, option A). |
-| Back to top | A 44px square with a {spacing.stroke-control} {colors.text} outline and an ↑ drawn in two {spacing.stroke-control} strokes, no fill. On the phone only, in the pinned bar to the right of Scan book, which narrows to make room. Chosen 2026-10-27 (`phone-polish-options.html`, option A). |
+| Back to top | A 44px square with a {spacing.stroke-control} {colors.text} outline and an ↑ drawn in two {spacing.stroke-control} strokes, no fill. On the phone only, in the pinned bar to the right of Add book, which narrows to make room. Chosen 2026-10-27 (`phone-polish-options.html`, option A). |
 | Link | {colors.text} with a {spacing.stroke-control} {colors.accent} underline, offset 3px. |
 | Link, destructive | A Link whose underline is {colors.danger}. Used wherever a Link removes something. |
 | Back link | A Link in {typography.meta} above a screen heading, naming the section it returns to. Used on an opened wishlist. |
@@ -395,6 +395,12 @@ Visual specs. Behaviour lives in `EXPERIENCE.md` → Component Patterns.
 | Book row | Cover, then title in {typography.title} and a {typography.meta} second line in {colors.text-muted}, then the location in {typography.meta}. No divider. Sizes per the density table. |
 | Cover tile | Cover at 2:3, square corners, with title and author beneath, for every cover, photo or placeholder. Every cover has the cover frame: a 1px {colors.cover-frame} hairline inside its edge, so a white or black cover still has an edge. A lent copy has the 8px marker before its title and "Lent · {person}" after the authors. An ordered copy's tile carries a red-white-blue airmail band across the top-left corner of its cover: a 10px strip of {colors.airmail-red}, {colors.airmail-white}, {colors.airmail-blue}, {colors.airmail-white} stripes at 45°, clipped by the cover's box, no word (the row layout still ends the row with "Ordered"). The open tile has the selection bar along the bottom edge of its cover. In select mode the checkbox sits before the title. [ASSUMPTION for the lent, open and select states] |
 | Cover placeholder | A book with no cover shows a cloth cover: one of the seven `cloth-*` colours in the shares under Colors, picked by a hash of the title, so a Book wears the same cloth before it is saved (the Answer, the edition picker) and after, under a Perlin-noise mottle (one SVG `feTurbulence` fractal-noise tile at twice the cover's width, blended soft-light; the same hash picks which part shows) and the cover frame. The title only, never the author, in {typography.cover-title} in the cloth's ink, top-left, inset 13% of the cover's width at the top and 11% at the sides. Long words hyphenate in the Book's language (its stored code as `lang`; Finnish when it has none or holds free text; where the browser supports the limit, only words of nine letters or more, at least four letters each side); a word still too wide for the cover breaks where it must. By cover width: from 150px, 14px, 0.08em, at most five lines; from 96px, 10.5px, 0.06em, four lines; below that, 8.5px, 0.04em, three lines; under 48px wide (every row) the cloth alone. On an ordered copy the title starts below the airmail band, at least 40px down. → `.working/cover-treatment-2.html` |
+| Reading marker | The 8px {colors.accent} square with "Reading" in {colors.text}, ending the row of a Book being read in place of its location, as the lent marker does. |
+| Reading dates line | One {typography.meta} line in {colors.text-muted} under the reading switch in Book detail; each date, and "Add dates", is a Link in {colors.text}. The copy line's "Acquired {date} · €{price}" is the same, under the copy's line. |
+| Currently reading strip | Above the count line: a {typography.heading-group} heading, then cover tiles at the covers-s width (76px in the mock-up's frame: at least 70px) with the title in {typography.label} and "since {date}" in {typography.label} {colors.text-muted}, {spacing.3} apart, in one row that scrolls sideways. No divider, no box; the space below it and the count line separate it. |
+| Stats numbers | Big numbers in {typography.heading-section} (44px / 300; {typography.heading-section-phone} on the phone), each with its {typography.meta} {colors.text-muted} label under it, in one row that wraps, {spacing.7} apart on wide screens and {spacing.6} on the phone. |
+| Stats by month | A three-column grid: the month in {typography.meta} {colors.text-muted}; one 8px {colors.accent} square per finished book, 4px apart, wrapping; "{n} books · {pages} p" right-aligned in {typography.meta} {colors.text-muted}. A month with none shows "–" in {colors.text-dim}. No bars or fills (Brand & Style). |
+| Stats facts | Label left in {typography.body}, value right in {colors.text-muted}, as the detail panel's value rows. By year is the same grid as By month without the markers. |
 | Selection bar | A {spacing.stroke-selection} {colors.accent} bar on the left edge of the open row. The row is not tinted. |
 | Lent marker | An 8px {colors.accent} square, with the text "Lent · {person}" in {colors.text}. On a Cover tile the square sits before the title and the text after the authors. |
 | Detail panel | {spacing.panel-width} wide on the plain ground, with the left border and shadow described under Elevation & Depth. Cover 72 × 108px beside the {typography.heading-detail} title. Groups headed in {typography.heading-group}. Values in rows with the label left and the value right in {colors.text-muted}. Buttons at the foot. |
