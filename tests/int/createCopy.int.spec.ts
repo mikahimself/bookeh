@@ -2,6 +2,7 @@ import { getPayload, NotFound, type Payload, type Where } from 'payload'
 import { beforeAll, describe, expect, it } from 'vitest'
 
 import { limits } from '@/fields/limits'
+import { helsinkiToday } from '@/fields/readingDates'
 import { createCopy } from '@/lib/copies/createCopy'
 import { DomainError } from '@/lib/errors'
 import type { Context } from '@/lib/payload/context'
@@ -51,6 +52,9 @@ describe('createCopy', () => {
     expect(copy).toMatchObject({ owner: user.id, book: book.id, status })
     expect(copy.location ?? null).toBeNull()
     expect(copy.notes ?? null).toBeNull()
+    // FR-55: acquired today in Helsinki, no price.
+    expect(copy.acquiredAt).toBe(`${helsinkiToday()}T12:00:00.000Z`)
+    expect(copy.price ?? null).toBeNull()
   }
 
   /** A location created by `user` through Payload's owner access. */

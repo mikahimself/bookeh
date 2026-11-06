@@ -41,7 +41,7 @@ export const sharedBook = async ({ by, ...data }: Partial<Book> & { by?: User } 
 export const copyAs = async (user: User, data: Pick<Copy, 'book'> & Partial<Copy>) =>
   gateway.create(await contextFor(user), {
     collection: 'copies',
-    data: { owner: user.id, status: 'owned', ...data },
+    data: { owner: user.id, acquiredAt: '2026-01-01T12:00:00.000Z', status: 'owned', ...data },
     depth: 0,
   })
 

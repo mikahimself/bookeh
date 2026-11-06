@@ -20,7 +20,15 @@ import { isLent } from '../isLent'
 
 import { BookDetailFrame } from './BookDetailPanel'
 import { BookHeader, joined } from './BookHeader'
-import { CopyNote, LendCopy, MoveCopy, ReceiveCopy, RemoveCopy, ReturnLoan } from './CopyLine'
+import {
+  CopyNote,
+  CopyPurchase,
+  LendCopy,
+  MoveCopy,
+  ReceiveCopy,
+  RemoveCopy,
+  ReturnLoan,
+} from './CopyLine'
 import { FilterChip } from './FilterChip'
 import { DetailLookUpAgain } from './LookUpAgain'
 import { NotInLibrary } from './NotInLibrary'
@@ -34,7 +42,8 @@ const DOT = ' · '
  * Book detail (EXPERIENCE.md, Book detail; DESIGN.md, Detail panel): the
  * header (`BookHeader`), the read switch and Rating (keyed
  * by the Book, so swapping it resets them), Your copies, one line per copy
- * with its location and status and the copy's note under it (`CopyLine`):
+ * with its location and status, the muted "Acquired {date} · €{price}"
+ * line under it (`CopyPurchase`, FR-55) and the copy's note (`CopyLine`):
  * an owned copy's Lend, Move and Remove (Move only when the viewer has
  * locations, FR-32); a lent one's marker with "Lent to {person} since
  * {date}" under its line and Returned only (FR-35, FR-36); an ordered
@@ -122,7 +131,7 @@ export async function BookDetail({
       <div className="flex flex-col gap-6">
         <BookHeader book={book} />
         <ReadAndRating key={bookId} bookId={bookId} title={book.title} initial={state} />
-        {/* Focus lands here when a copy's line goes or changes (`RemoveCopy`, `ReceiveCopy`, `MoveCopy`, `LendCopy`, `ReturnLoan`). */}
+        {/* Focus lands here when a copy's line goes or changes (`RemoveCopy`, `ReceiveCopy`, `MoveCopy`, `LendCopy`, `ReturnLoan`, `CopyPurchase`). */}
         {copies.length > 0 && (
           <section tabIndex={-1} className="flex flex-col gap-2">
             <h3 className="text-heading-group text-text-muted ui-case">{t('detail.yourCopies')}</h3>
@@ -176,6 +185,13 @@ export async function BookDetail({
                       )}
                       {copy.status === 'ordered' && <ReceiveCopy copyId={copy.copyId} />}
                     </div>
+                    <CopyPurchase
+                      copyId={copy.copyId}
+                      status={copy.status}
+                      acquiredAt={copy.acquiredAt}
+                      price={copy.price}
+                      title={book.title}
+                    />
                     {isLent(copy) && (
                       <p className="flex items-center gap-2 text-body text-text">
                         <span aria-hidden="true" className={`${markerSlotClass} bg-accent`} />

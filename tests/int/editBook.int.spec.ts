@@ -72,7 +72,13 @@ describe('editBook', () => {
     // `owner` only satisfies the create type.
     gateway.create(ctx, {
       collection: 'copies',
-      data: { owner: ctx.user.id, book: book.id, status: 'owned', location },
+      data: {
+        owner: ctx.user.id,
+        acquiredAt: '2026-01-01T12:00:00.000Z',
+        book: book.id,
+        status: 'owned',
+        location,
+      },
       depth: 0,
     })
 
@@ -403,7 +409,12 @@ describe('editBook', () => {
       // `owner` only satisfies the create type.
       const copy = await gateway.create(ctx, {
         collection: 'copies',
-        data: { owner: ctx.user.id, book: x.id, status: 'ordered' },
+        data: {
+          owner: ctx.user.id,
+          acquiredAt: '2026-01-01T12:00:00.000Z',
+          book: x.id,
+          status: 'ordered',
+        },
         depth: 0,
       })
       return { x, copy }

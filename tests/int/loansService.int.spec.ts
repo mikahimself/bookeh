@@ -426,7 +426,13 @@ describe('loans service', () => {
     })
     const elsewhere = await gateway.create(ctx, {
       collection: 'copies',
-      data: { owner: user.id, book: otherBook.id, status: 'owned', location: null },
+      data: {
+        owner: user.id,
+        acquiredAt: '2026-01-01T12:00:00.000Z',
+        book: otherBook.id,
+        status: 'owned',
+        location: null,
+      },
       depth: 0,
     })
     const lentReturned = async (

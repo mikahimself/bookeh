@@ -1,3 +1,5 @@
+import { maxPrice } from '@/fields/limits'
+import { helsinkiToday, isCalendarDate, noonUtc } from '@/fields/readingDates'
 import { DomainError } from '@/lib/errors'
 import type { Context } from '@/lib/payload/context'
 import * as gateway from '@/lib/payload/gateway'
@@ -57,6 +59,48 @@ export async function setNote(ctx: Context, copyId: number, note: string): Promi
       collection: 'copies',
       id: copyId,
       data: { notes: text === '' ? null : text },
+      depth: 0,
+    })
+  })
+}
+
+/**
+ * Spine, AD-8 and AD-18, FR-55: sets the purchase of one of the viewer's
+ * copies, its acquired date and its price in whole euro cents, `null`
+ * clearing the price; only the given keys are written, in the caller's
+ * transaction or one of its own (AD-16). A copy that is not the viewer's
+ * (the admin included, FR-48) fails with `NOT_FOUND`; a date that is not a
+ * real `YYYY-MM-DD` day or is after today in `Europe/Helsinki`, or a price
+ * that is not an integer from 0 to `maxPrice`, fails with `VALIDATION` on
+ * that field. Both before any write. No Undo (AD-20).
+ */
+export async function setCopyPurchase(
+  ctx: Context,
+  copyId: number,
+  purchase: { acquiredAt?: string; price?: number | null },
+): Promise<void> {
+  const { acquiredAt, price } = purchase
+  const fields: Record<string, 'VALIDATION'> = {}
+  if (acquiredAt !== undefined && (!isCalendarDate(acquiredAt) || acquiredAt > helsinkiToday())) {
+    fields.acquiredAt = 'VALIDATION'
+  }
+  if (
+    price !== undefined &&
+    price !== null &&
+    (!Number.isInteger(price) || price < 0 || price > maxPrice)
+  ) {
+    fields.price = 'VALIDATION'
+  }
+  await withTransaction(ctx, async (tx) => {
+    await requireOwnCopy(tx, copyId)
+    if (Object.keys(fields).length > 0) throw new DomainError('VALIDATION', { fields })
+    await gateway.updateByID(tx, {
+      collection: 'copies',
+      id: copyId,
+      data: {
+        ...(acquiredAt !== undefined && { acquiredAt: noonUtc(acquiredAt) }),
+        ...(price !== undefined && { price }),
+      },
       depth: 0,
     })
   })

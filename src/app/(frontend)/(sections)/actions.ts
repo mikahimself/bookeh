@@ -11,7 +11,7 @@ import { listLocations, type LocationOption } from '@/lib/copies/locations'
 import { moveCopies } from '@/lib/copies/moveCopies'
 import { receiveCopy } from '@/lib/copies/receiveCopy'
 import { removeCopies, type RemoveResult } from '@/lib/copies/removeCopies'
-import { setNote } from '@/lib/copies/updateCopy'
+import { setCopyPurchase, setNote } from '@/lib/copies/updateCopy'
 import { DomainError, runAction, type ActionResult } from '@/lib/errors'
 import { requireUserOrThrow } from '@/lib/payload/context'
 import { isRowId, type Named } from '@/lib/payload/ref'
@@ -68,6 +68,23 @@ export async function setNoteAction(input: unknown): Promise<ActionResult<null>>
     const { copyId, note } = copyInput(input)
     if (typeof note !== 'string') throw new DomainError('VALIDATION')
     await setNote(ctx, copyId, note)
+    return null
+  })
+}
+
+/**
+ * Book detail's purchase Picker: sets the acquired date (`YYYY-MM-DD`) and
+ * the price (euro cents, `null` for none) of one of the viewer's copies. No
+ * Undo. The date and price rules are the service's, as field errors
+ * (`VALIDATION`).
+ */
+export async function setCopyPurchaseAction(input: unknown): Promise<ActionResult<null>> {
+  return runAction(async () => {
+    const ctx = await requireUserOrThrow()
+    const { copyId, acquiredAt, price } = copyInput(input)
+    if (typeof acquiredAt !== 'string') throw new DomainError('VALIDATION')
+    if (price !== null && typeof price !== 'number') throw new DomainError('VALIDATION')
+    await setCopyPurchase(ctx, copyId, { acquiredAt, price })
     return null
   })
 }

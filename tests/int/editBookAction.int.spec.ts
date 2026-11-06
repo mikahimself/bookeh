@@ -53,7 +53,12 @@ describe('editBookAction with a cover', () => {
     })
     await payload.create({
       collection: 'copies',
-      data: { owner: admin.id, book: book.id, status: 'owned' },
+      data: {
+        owner: admin.id,
+        acquiredAt: '2026-01-01T12:00:00.000Z',
+        book: book.id,
+        status: 'owned',
+      },
       overrideAccess: true,
       depth: 0,
       req: (await contextFor(admin)).req,

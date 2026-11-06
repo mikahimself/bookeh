@@ -9,6 +9,8 @@ import { idOf, type Named } from '@/lib/payload/ref'
  * One of the viewer's copies of a Book as the surface shows it. `loan` is the
  * copy's open loan, or `null` when the copy is not lent (returned loans are
  * history, not holdings); `since` is its lending date as `YYYY-MM-DD`.
+ * `acquiredAt` is the copy's acquired date as `YYYY-MM-DD` (the order date on
+ * an ordered copy) and `price` what it cost in euro cents, `null` for none.
  */
 export type CopyLine = {
   copyId: number
@@ -16,6 +18,8 @@ export type CopyLine = {
   location: Named | null
   note: string | null
   loan: { loanId: number; person: Named; since: string } | null
+  acquiredAt: string
+  price: number | null
 }
 
 /**
@@ -85,6 +89,9 @@ export async function getHoldings(
         // empty stores `''`. Both are no note here.
         note: copy.notes ? copy.notes : null,
         loan: loanByCopy.get(copy.id) ?? null,
+        // Spine, Dates: stored at 12:00 UTC and read back by its UTC date.
+        acquiredAt: copy.acquiredAt.slice(0, 10),
+        price: copy.price ?? null,
       }
       // Never missing: the `where` is `book in bookIds` and every id was seeded.
       result.get(idOf(copy.book))!.copies.push(line)

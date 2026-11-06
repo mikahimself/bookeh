@@ -552,7 +552,12 @@ describe('saveCopy of a held private Book', () => {
     // No app path can do this (AD-4): written past validation and access.
     const copyOfB = await payload.db.create({
       collection: 'copies',
-      data: { owner: b.user.id, book: own.id, status: 'owned' },
+      data: {
+        owner: b.user.id,
+        acquiredAt: '2026-01-01T12:00:00.000Z',
+        book: own.id,
+        status: 'owned',
+      },
     })
     const [copiesBefore, rowsBefore] = [await copiesOf(user), await rowsOf(user)]
 

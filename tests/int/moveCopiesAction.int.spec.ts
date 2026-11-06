@@ -57,7 +57,13 @@ describe('moveCopiesAction', () => {
     for (let i = 0; i < 2; i++) {
       const copy = await payload.create({
         collection: 'copies',
-        data: { owner: user.id, book: book.id, status: 'owned', location: home },
+        data: {
+          owner: user.id,
+          acquiredAt: '2026-01-01T12:00:00.000Z',
+          book: book.id,
+          status: 'owned',
+          location: home,
+        },
         overrideAccess: false,
         depth: 0,
         req,
@@ -92,7 +98,12 @@ describe('moveCopiesAction', () => {
     const ordered = (
       await payload.create({
         collection: 'copies',
-        data: { owner: user.id, book: bookId, status: 'ordered' },
+        data: {
+          owner: user.id,
+          acquiredAt: '2026-01-01T12:00:00.000Z',
+          book: bookId,
+          status: 'ordered',
+        },
         overrideAccess: false,
         depth: 0,
         req,

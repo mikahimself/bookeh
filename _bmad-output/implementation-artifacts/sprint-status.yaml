@@ -288,7 +288,7 @@ development_status:
   epic-10: in-progress
   10-1-reading-state-on-user-books: done
   10-2-reading-switch-and-dates-on-book-detail: done
-  10-3-acquired-date-and-price-on-copies: backlog
+  10-3-acquired-date-and-price-on-copies: done
   10-4-currently-reading-in-the-collection: backlog
   10-5-stats-service: backlog
   10-6-stats-section-and-the-add-book-rename: backlog

@@ -3,9 +3,10 @@ import { randomUUID } from 'node:crypto'
 import { getPayload, NotFound, type Payload } from 'payload'
 import { beforeAll, describe, expect, it } from 'vitest'
 
+import { helsinkiToday } from '@/fields/readingDates'
 import { createCopy } from '@/lib/copies/createCopy'
 import { removeCopies } from '@/lib/copies/removeCopies'
-import { setNote, setStatus } from '@/lib/copies/updateCopy'
+import { setCopyPurchase, setNote, setStatus } from '@/lib/copies/updateCopy'
 import { DomainError } from '@/lib/errors'
 import type { Context } from '@/lib/payload/context'
 import * as gateway from '@/lib/payload/gateway'
@@ -237,5 +238,43 @@ describe('copy writes', () => {
       notes: 'Lainassa',
       updatedAt: before.updatedAt,
     })
+  })
+
+  // FR-55, FR-48, AD-18: the purchase is the owner's alone, checked before any write.
+  it('sets the purchase, refuses another user and the admin, and rejects bad values', async () => {
+    const id = await copyOf(asA)
+    await setCopyPurchase(asA, id, { acquiredAt: '2026-09-01', price: 2490 })
+    expect(await systemRead(id)).toMatchObject({
+      acquiredAt: '2026-09-01T12:00:00.000Z',
+      price: 2490,
+    })
+    await setCopyPurchase(asA, id, { price: null })
+    expect(await systemRead(id)).toMatchObject({
+      acquiredAt: '2026-09-01T12:00:00.000Z',
+      price: null,
+    })
+
+    await setCopyPurchase(asA, id, { price: 2490 })
+    const before = await systemRead(id)
+    const admin = await contextFor(await createUser({ roles: ['admin'] }))
+    for (const ctx of [asB, admin]) {
+      await expect(setCopyPurchase(ctx, id, { price: 1 })).rejects.toMatchObject(notFound)
+    }
+    const tomorrow = new Date(Date.parse(`${helsinkiToday()}T12:00:00Z`) + 86_400_000)
+      .toISOString()
+      .slice(0, 10)
+    for (const acquiredAt of ['2026-02-30', tomorrow]) {
+      await expect(setCopyPurchase(asA, id, { acquiredAt })).rejects.toMatchObject({
+        code: 'VALIDATION',
+        fields: { acquiredAt: 'VALIDATION' },
+      })
+    }
+    for (const price of [1.5, -1, 10_000_000]) {
+      await expect(setCopyPurchase(asA, id, { price })).rejects.toMatchObject({
+        code: 'VALIDATION',
+        fields: { price: 'VALIDATION' },
+      })
+    }
+    expect(await systemRead(id)).toEqual(before)
   })
 })

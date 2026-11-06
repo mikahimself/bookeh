@@ -293,6 +293,11 @@ export interface Copy {
   status: 'ordered' | 'owned';
   location?: (number | null) | UserLocation;
   notes?: string | null;
+  acquiredAt: string;
+  /**
+   * Euro cents: 2490 is €24.90.
+   */
+  price?: number | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -573,6 +578,8 @@ export interface CopiesSelect<T extends boolean = true> {
   status?: T;
   location?: T;
   notes?: T;
+  acquiredAt?: T;
+  price?: T;
   updatedAt?: T;
   createdAt?: T;
 }

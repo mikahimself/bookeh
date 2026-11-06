@@ -17,6 +17,7 @@ import * as migration_20261030_122655_foreign_keys from './20261030_122655_forei
 import * as migration_20261104_151042_tags from './20261104_151042_tags'
 import * as migration_20261105_090000_seed_system_genres from './20261105_090000_seed_system_genres'
 import * as migration_20261106_144405_reading_state from './20261106_144405_reading_state'
+import * as migration_20261106_180131_copy_purchase from './20261106_180131_copy_purchase'
 
 export const migrations = [
   {
@@ -113,5 +114,10 @@ export const migrations = [
     up: migration_20261106_144405_reading_state.up,
     down: migration_20261106_144405_reading_state.down,
     name: '20261106_144405_reading_state',
+  },
+  {
+    up: migration_20261106_180131_copy_purchase.up,
+    down: migration_20261106_180131_copy_purchase.down,
+    name: '20261106_180131_copy_purchase',
   },
 ]

@@ -53,7 +53,12 @@ describe('requireOwnBook', () => {
       // `owner` only satisfies the create type.
       await gateway.create(asA, {
         collection: 'copies',
-        data: { owner: a.id, book: book.id, status: 'owned' },
+        data: {
+          owner: a.id,
+          acquiredAt: '2026-01-01T12:00:00.000Z',
+          book: book.id,
+          status: 'owned',
+        },
         depth: 0,
       })
     }

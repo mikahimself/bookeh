@@ -96,11 +96,12 @@ describe('shelf timing at 10,000 copies', () => {
     await db.execute(sql`
       with b as (${seededBooks}),
            l as (select array_agg(id order by id) ids from locations where owner_id = ${v}::int)
-      insert into copies (owner_id, book_id, status, notes, location_id)
+      insert into copies (owner_id, book_id, status, notes, location_id, acquired_at)
       select ${v}::int, b.id,
              (case when b.i % 20 = 0 then 'ordered' else 'owned' end)::enum_copies_status,
              case when b.i % 5 = 0 then 'Muistiinpano ' || b.i end,
-             case when b.i % 20 <> 0 then l.ids[1 + b.i % 6] end
+             case when b.i % 20 <> 0 then l.ids[1 + b.i % 6] end,
+             '2026-01-01T12:00:00Z'
         from b, l, generate_series(1, 2) k
        where k = 1 or b.i % 9 = 0`)
     await db.execute(sql`

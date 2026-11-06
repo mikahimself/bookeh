@@ -35,7 +35,13 @@ describe('shelf filters', () => {
     (
       await gateway.create(await contextFor(user), {
         collection: 'copies',
-        data: { owner: user.id, book: book.id, status: 'owned', ...data },
+        data: {
+          owner: user.id,
+          acquiredAt: '2026-01-01T12:00:00.000Z',
+          book: book.id,
+          status: 'owned',
+          ...data,
+        },
         depth: 0,
       })
     ).id
@@ -370,7 +376,7 @@ describe('private shelf classifications', () => {
         (
           await gateway.create(ctx, {
             collection: 'copies',
-            data: { owner: a.id, book: book.id, status },
+            data: { owner: a.id, acquiredAt: '2026-01-01T12:00:00.000Z', book: book.id, status },
             depth: 0,
           })
         ).id

@@ -1,6 +1,7 @@
 import { getPayload, type Payload } from 'payload'
 import { beforeAll, describe, expect, it } from 'vitest'
 
+import { helsinkiToday } from '@/fields/readingDates'
 import { receiveCopy } from '@/lib/copies/receiveCopy'
 import { DomainError } from '@/lib/errors'
 import { lendCopy, returnLoan } from '@/lib/loans/loans'
@@ -27,7 +28,13 @@ describe('receiveCopy', () => {
   ): Promise<Copy> =>
     payload.create({
       collection: 'copies',
-      data: { owner: user.id, book: book.id, status, location },
+      data: {
+        owner: user.id,
+        acquiredAt: '2026-01-01T12:00:00.000Z',
+        book: book.id,
+        status,
+        location,
+      },
       overrideAccess: false,
       depth: 0,
       req: (await contextFor(user)).req,
@@ -149,5 +156,30 @@ describe('receiveCopy', () => {
     expect(err).toBeInstanceOf(DomainError)
     expect(err).toMatchObject({ code: 'VALIDATION', fields: { status: 'VALIDATION' } })
     expect(await stored(owned.id)).toEqual({ status: 'owned', location: null })
+  })
+
+  // FR-55, AD-20: Received is the day the copy is acquired; its Undo puts the order date back.
+  it('acquires the copy today, and Undo restores ordered with the previous date', async () => {
+    const { user } = await userWithDefault('Receive Copy Dated')
+    const asUser = await contextFor(user)
+    const ordered = await copyFor(user, 'ordered')
+    const read = async () => {
+      const { status, location, acquiredAt } = await payload.findByID({
+        collection: 'copies',
+        id: ordered.id,
+        depth: 0,
+      })
+      return { status, location: location ?? null, acquiredAt }
+    }
+
+    const result = await withUndo(asUser, (tx) => receiveCopy(tx, ordered.id))
+    expect((await read()).acquiredAt).toBe(`${helsinkiToday()}T12:00:00.000Z`)
+
+    await undo(asUser, result.undoToken)
+    expect(await read()).toEqual({
+      status: 'ordered',
+      location: null,
+      acquiredAt: '2026-01-01T12:00:00.000Z',
+    })
   })
 })

@@ -102,7 +102,15 @@ const book = (bookId: number): EffectiveBook => ({
 })
 
 const row = (copyId: number): ShelfRow => ({
-  copy: { copyId, status: 'owned', location: null, note: null, loan: null },
+  copy: {
+    copyId,
+    status: 'owned',
+    location: null,
+    note: null,
+    loan: null,
+    acquiredAt: '2026-10-12',
+    price: null,
+  },
   book: book(copyId),
 })
 

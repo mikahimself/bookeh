@@ -62,7 +62,12 @@ describe('setCover', () => {
   const hold = async (ctx: Context, b: Book) => {
     await gateway.create(ctx, {
       collection: 'copies',
-      data: { owner: ctx.user.id, book: b.id, status: 'owned' },
+      data: {
+        owner: ctx.user.id,
+        acquiredAt: '2026-01-01T12:00:00.000Z',
+        book: b.id,
+        status: 'owned',
+      },
       depth: 0,
     })
   }
@@ -159,7 +164,12 @@ describe('setCover', () => {
     // The admin reads every Book, so a held private Book reaches the creator check.
     await payload.create({
       collection: 'copies',
-      data: { owner: admin.id, book: p.id, status: 'owned' },
+      data: {
+        owner: admin.id,
+        acquiredAt: '2026-01-01T12:00:00.000Z',
+        book: p.id,
+        status: 'owned',
+      },
       overrideAccess: true,
       depth: 0,
       req: asAdmin.req,

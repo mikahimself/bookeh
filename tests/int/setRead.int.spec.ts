@@ -35,7 +35,12 @@ describe('setRead', () => {
   const copyFor = async (user: User, book: Book): Promise<Copy> =>
     payload.create({
       collection: 'copies',
-      data: { owner: user.id, book: book.id, status: 'owned' },
+      data: {
+        owner: user.id,
+        acquiredAt: '2026-01-01T12:00:00.000Z',
+        book: book.id,
+        status: 'owned',
+      },
       overrideAccess: false,
       depth: 0,
       req: (await contextFor(user)).req,

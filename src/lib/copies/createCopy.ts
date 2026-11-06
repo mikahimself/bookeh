@@ -1,3 +1,4 @@
+import { helsinkiToday, noonUtc } from '@/fields/readingDates'
 import { DomainError } from '@/lib/errors'
 import type { Context } from '@/lib/payload/context'
 import * as gateway from '@/lib/payload/gateway'
@@ -20,7 +21,8 @@ export type NewCopy = CopyStatus & { bookId: number }
  * `Ref` goes through `resolveLocation()`. An ordered copy never has one.
  * Resolving the location and the insert run in one `withTransaction()`,
  * joining the caller's, so a location created inline never outlives a failed
- * insert.
+ * insert. `acquiredAt` is today in `Europe/Helsinki`, the order date on an
+ * ordered copy; `price` is left empty (FR-55).
  *
  * The restore deletes the copy through the gateway as the restoring user,
  * and does nothing when the copy is already gone. A copy with any loan, open
@@ -34,7 +36,13 @@ export async function createCopy(ctx: Context, input: NewCopy): Promise<Undone<n
     // `owner` is what Payload's create type requires; the hook sets it from the request.
     const copy = await gateway.create(tx, {
       collection: 'copies',
-      data: { owner: tx.user.id, book: input.bookId, status: input.status, location },
+      data: {
+        owner: tx.user.id,
+        book: input.bookId,
+        status: input.status,
+        location,
+        acquiredAt: noonUtc(helsinkiToday()),
+      },
       depth: 0,
     })
     const id = copy.id

@@ -26,3 +26,6 @@ export function clip(value: string, max: number): string {
   const last = cut.charCodeAt(cut.length - 1)
   return (last >= 0xd800 && last <= 0xdbff ? cut.slice(0, -1) : cut).trimEnd()
 }
+
+/** FR-55: a copy's largest price, in euro cents (€99 999.99). */
+export const maxPrice = 9_999_999

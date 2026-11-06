@@ -1,7 +1,7 @@
 'use client'
 
-import { useTranslations } from 'next-intl'
-import { useEffect, useEffectEvent, useRef, useState, useTransition } from 'react'
+import { useFormatter, useTranslations } from 'next-intl'
+import { useEffect, useEffectEvent, useRef, useState, useTransition, type ReactNode } from 'react'
 
 import type { LocationOption } from '@/lib/copies/locations'
 import type { Named } from '@/lib/payload/ref'
@@ -19,6 +19,7 @@ import { receiveCopyAction, removeCopiesAction, setNoteAction } from './actions'
 import { useCloseDetail } from './detailClose'
 import { LendPicker } from './LendPicker'
 import { MovePicker } from './MovePicker'
+import { PurchasePicker } from './PurchasePicker'
 import { useAfterAction } from './ShelfRows'
 
 /**
@@ -71,6 +72,69 @@ export function CopyNote({ copyId, note }: { copyId: number; note: string }) {
         if (event.key === 'Escape') event.currentTarget.blur()
       }}
     />
+  )
+}
+
+/**
+ * EXPERIENCE.md, Book detail → Your copies (FR-55); DESIGN.md, Reading dates
+ * line: the muted line under a copy's line, "Acquired {date} · €{price}"
+ * ("Ordered {date}" on an ordered copy, "Add price" for no price). The date
+ * and the price are Links opening one `PurchasePicker`. Its result goes to
+ * `afterAction`, whose refresh re-renders the line; no toast, no Undo. Focus
+ * goes to the copies' section once it settles, as `MoveCopy`'s.
+ */
+export function CopyPurchase({
+  copyId,
+  status,
+  acquiredAt,
+  price,
+  title,
+}: {
+  copyId: number
+  status: 'owned' | 'ordered'
+  acquiredAt: string
+  price: number | null
+  title: string
+}) {
+  const t = useTranslations('detail')
+  const format = useFormatter()
+  const afterAction = useAfterAction()
+  const [open, setOpen] = useState(false)
+  const line = useRef<HTMLParagraphElement>(null)
+
+  const link = (chunks: ReactNode) => (
+    <ActionLink onClick={() => setOpen(true)}>{chunks}</ActionLink>
+  )
+  const date = format.dateTime(new Date(`${acquiredAt}T12:00:00Z`), { dateStyle: 'medium' })
+
+  return (
+    <>
+      <p ref={line} className="text-meta text-text-muted">
+        {t.rich('acquiredOn', {
+          status,
+          date,
+          price:
+            price === null
+              ? t('addPrice')
+              : format.number(price / 100, { style: 'currency', currency: 'EUR' }),
+          dateLink: link,
+          priceLink: link,
+        })}
+      </p>
+      <PurchasePicker
+        open={open}
+        onOpenChange={setOpen}
+        copyId={copyId}
+        status={status}
+        title={title}
+        acquiredAt={acquiredAt}
+        price={price}
+        onSettled={(result) => {
+          afterAction(result)
+          line.current?.closest('section')?.focus()
+        }}
+      />
+    </>
   )
 }
 

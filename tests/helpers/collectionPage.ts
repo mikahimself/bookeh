@@ -93,6 +93,7 @@ vi.mock('@/app/(frontend)/(sections)/actions', () => ({
   setReadingDatesAction: vi.fn(),
   setRatingAction: vi.fn(),
   setNoteAction,
+  setCopyPurchaseAction: vi.fn(),
   toggleCopiesReadAction,
   moveCopiesAction,
   changeBookTagsAction: vi.fn(),
@@ -213,7 +214,7 @@ export const row = (
   status: 'owned' | 'ordered' = 'owned',
   location: CopyLine['location'] = null,
 ): ShelfRow => ({
-  copy: { copyId, status, location, note: null, loan: null },
+  copy: { copyId, status, location, note: null, loan: null, acquiredAt: '2026-10-12', price: null },
   book: b,
 })
 
@@ -232,6 +233,8 @@ export const copy = (copyId: number, extra: Partial<CopyLine> = {}): CopyLine =>
   location: null,
   note: null,
   loan: null,
+  acquiredAt: '2026-10-12',
+  price: null,
   ...extra,
 })
 

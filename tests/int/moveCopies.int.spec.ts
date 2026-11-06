@@ -37,7 +37,13 @@ describe('moveCopies', () => {
   ): Promise<Copy> =>
     payload.create({
       collection: 'copies',
-      data: { owner: user.id, book: book.id, status, location },
+      data: {
+        owner: user.id,
+        acquiredAt: '2026-01-01T12:00:00.000Z',
+        book: book.id,
+        status,
+        location,
+      },
       overrideAccess: false,
       depth: 0,
       req: (await contextFor(user)).req,

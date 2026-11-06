@@ -1,12 +1,7 @@
-import {
-  createLocalReq,
-  Forbidden,
-  getPayload,
-  NotFound,
-  type Payload,
-} from 'payload'
+import { createLocalReq, Forbidden, getPayload, NotFound, type Payload } from 'payload'
 import { beforeAll, describe, expect, it } from 'vitest'
 
+import { helsinkiToday } from '@/fields/readingDates'
 import * as gateway from '@/lib/payload/gateway'
 import config from '@/payload.config'
 import type { Book, Copy, User } from '@/payload-types'
@@ -138,7 +133,12 @@ describe('copies', () => {
     await expect(
       payload.create({
         collection: 'copies',
-        data: { owner: a.id, book: shared.id, status: 'owned' },
+        data: {
+          owner: a.id,
+          acquiredAt: '2026-01-01T12:00:00.000Z',
+          book: shared.id,
+          status: 'owned',
+        },
         req,
         overrideAccess: false,
       }),
@@ -148,5 +148,27 @@ describe('copies', () => {
   it('rejects a status outside ordered | owned', async () => {
     const status = 'loaned' as Copy['status']
     expect(await rejectedPaths(copyAs(a, { book: shared.id, status }))).toEqual(['status'])
+  })
+
+  // Spine, Dates and FR-55: the collection holds the purchase rules for back-office writes too.
+  it('rejects a bad acquired date or price on create and update', async () => {
+    const tomorrow = new Date(Date.parse(`${helsinkiToday()}T12:00:00Z`) + 86_400_000)
+      .toISOString()
+      .slice(0, 10)
+    const copy = await copyAs(a, { book: shared.id })
+    const asA = await contextFor(a)
+    const cases: [Partial<Copy>, string][] = [
+      [{ acquiredAt: tomorrow }, 'acquiredAt'],
+      [{ acquiredAt: '2026-02-30' }, 'acquiredAt'],
+      [{ price: 1.5 }, 'price'],
+      [{ price: -1 }, 'price'],
+      [{ price: 10_000_000 }, 'price'],
+    ]
+    for (const [data, path] of cases) {
+      expect(await rejectedPaths(copyAs(a, { book: shared.id, ...data }))).toEqual([path])
+      expect(
+        await rejectedPaths(gateway.updateByID(asA, { collection: 'copies', id: copy.id, data })),
+      ).toEqual([path])
+    }
   })
 })

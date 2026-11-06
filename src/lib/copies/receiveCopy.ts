@@ -1,3 +1,4 @@
+import { helsinkiToday, noonUtc } from '@/fields/readingDates'
 import { DomainError } from '@/lib/errors'
 import type { Context } from '@/lib/payload/context'
 import * as gateway from '@/lib/payload/gateway'
@@ -11,9 +12,10 @@ import { locationFor, type LocationOption } from './locations'
 /**
  * Spine, AD-18 and AD-20, FR-28: Received. Turns one of the context user's
  * ordered copies into an owned copy at their default location (none without
- * one), in the caller's transaction or one of its own, and resolves to where
- * it landed (`savedTo`, `null` for none) with the restore that orders it
- * again. Records nothing: callers wrap it in `withUndo()`.
+ * one), acquired today in `Europe/Helsinki` (FR-55), in the caller's
+ * transaction or one of its own, and resolves to where it landed
+ * (`savedTo`, `null` for none) with the restore that orders it again.
+ * Records nothing: callers wrap it in `withUndo()`.
  *
  * An id that is not a row id (`isRowId()`), or not the viewer's copy (a gone
  * copy, or another user's, for the admin too), fails with `NOT_FOUND` before
@@ -21,7 +23,8 @@ import { locationFor, type LocationOption } from './locations'
  * `ownerAccess` (FR-48). A copy that is not ordered fails with `VALIDATION`
  * on `status`, with no write.
  *
- * The restore writes the copy back to ordered with no location (AD-8)
+ * The restore writes the copy back to ordered with no location (AD-8) and
+ * the `acquiredAt` it had before, closing over that stored value only,
  * through the gateway as the restoring user, and skips a copy that is gone.
  * A copy with an open loan is refused with `UNDO_FAILED`: an ordered copy is
  * never lent, while a returned loan on it is harmless history.
@@ -39,7 +42,7 @@ export async function receiveCopy(
     const { docs } = await gateway.find(tx, {
       collection: 'copies',
       where: { and: [{ id: { equals: copyId } }, { owner: { equals: tx.user.id } }] },
-      select: { status: true },
+      select: { status: true, acquiredAt: true },
       limit: 1,
       depth: 0,
       pagination: false,
@@ -54,7 +57,7 @@ export async function receiveCopy(
     await gateway.updateByID(tx, {
       collection: 'copies',
       id: copyId,
-      data: { status: 'owned', location },
+      data: { status: 'owned', location, acquiredAt: noonUtc(helsinkiToday()) },
       depth: 0,
     })
 
@@ -70,12 +73,13 @@ export async function receiveCopy(
     const savedTo =
       typeof landed === 'object' && landed !== null ? { id: landed.id, name: landed.name } : null
 
-    return { data: { savedTo }, restore: (rtx) => restoreOrdered(rtx, copyId) }
+    const previous = copy.acquiredAt
+    return { data: { savedTo }, restore: (rtx) => restoreOrdered(rtx, copyId, previous) }
   })
 }
 
 // `count` first: a failed `updateByID` (`NotFound`) would end the transaction.
-async function restoreOrdered(ctx: Context, copyId: number): Promise<void> {
+async function restoreOrdered(ctx: Context, copyId: number, previous: string): Promise<void> {
   const { totalDocs } = await gateway.count(ctx, {
     collection: 'copies',
     where: { id: { equals: copyId } },
@@ -91,7 +95,7 @@ async function restoreOrdered(ctx: Context, copyId: number): Promise<void> {
   await gateway.updateByID(ctx, {
     collection: 'copies',
     id: copyId,
-    data: { status: 'ordered', location: null },
+    data: { status: 'ordered', location: null, acquiredAt: previous },
     depth: 0,
   })
 }

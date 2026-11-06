@@ -5,13 +5,23 @@ import { answerFacts, type AnswerHeading } from '@/lib/catalogue/answerFacts'
 
 const HOME = { id: 1, name: 'Home' }
 
-const ownedCopy: CopyLine = { copyId: 10, status: 'owned', location: HOME, note: null, loan: null }
+const ownedCopy: CopyLine = {
+  copyId: 10,
+  status: 'owned',
+  location: HOME,
+  note: null,
+  loan: null,
+  acquiredAt: '2026-10-12',
+  price: null,
+}
 const lentCopy: CopyLine = {
   copyId: 11,
   status: 'owned',
   location: HOME,
   note: null,
   loan: { loanId: 5, person: { id: 2, name: 'Anni' }, since: '2026-10-01' },
+  acquiredAt: '2026-10-12',
+  price: null,
 }
 const orderedCopy: CopyLine = {
   copyId: 12,
@@ -19,6 +29,8 @@ const orderedCopy: CopyLine = {
   location: null,
   note: 'from the shop',
   loan: null,
+  acquiredAt: '2026-10-12',
+  price: null,
 }
 const ownEntry: EntryLine = { entryId: 20, wishlist: { id: 3, name: 'Mine' }, forPerson: null }
 const personEntry: EntryLine = {

@@ -81,8 +81,24 @@ describe('getHoldings', () => {
     const seen = await getHoldings(asA, [x.id])
     expect(seen.get(x.id)).toEqual({
       copies: [
-        { copyId: ownedByA.id, status: 'owned', location: shelf, note: 'Signed', loan: null },
-        { copyId: orderedByA.id, status: 'ordered', location: null, note: null, loan: null },
+        {
+          copyId: ownedByA.id,
+          status: 'owned',
+          location: shelf,
+          note: 'Signed',
+          loan: null,
+          acquiredAt: '2026-01-01',
+          price: null,
+        },
+        {
+          copyId: orderedByA.id,
+          status: 'ordered',
+          location: null,
+          note: null,
+          loan: null,
+          acquiredAt: '2026-01-01',
+          price: null,
+        },
       ],
       entries: [],
     })

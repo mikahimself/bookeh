@@ -64,6 +64,8 @@ const copy = (over: Partial<CopyLine> = {}): CopyLine => ({
   location: null,
   note: null,
   loan: null,
+  acquiredAt: '2026-10-12',
+  price: null,
   ...over,
 })
 

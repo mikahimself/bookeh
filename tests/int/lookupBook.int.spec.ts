@@ -97,7 +97,13 @@ describe('lookupBook', () => {
     shelf = { id: location.id, name: location.name }
     copyOfX = await gateway.create(asA, {
       collection: 'copies',
-      data: { owner: a.id, book: x.id, status: 'owned', location: shelf.id },
+      data: {
+        owner: a.id,
+        acquiredAt: '2026-01-01T12:00:00.000Z',
+        book: x.id,
+        status: 'owned',
+        location: shelf.id,
+      },
       depth: 0,
     })
   })
@@ -409,7 +415,12 @@ describe('lookupBook', () => {
       const book = await systemBook(a, 'private')
       const copy = await gateway.create(asA, {
         collection: 'copies',
-        data: { owner: a.id, book: book.id, status: 'ordered' },
+        data: {
+          owner: a.id,
+          acquiredAt: '2026-01-01T12:00:00.000Z',
+          book: book.id,
+          status: 'ordered',
+        },
         depth: 0,
       })
       expect(await lookupBook(asA, { bookId: book.id })).toMatchObject({
@@ -422,7 +433,12 @@ describe('lookupBook', () => {
       const book = await systemBook(b, 'shared')
       await gateway.create(asB, {
         collection: 'copies',
-        data: { owner: b.id, book: book.id, status: 'owned' },
+        data: {
+          owner: b.id,
+          acquiredAt: '2026-01-01T12:00:00.000Z',
+          book: book.id,
+          status: 'owned',
+        },
         depth: 0,
       })
       for (const ctx of [asA, asAdmin]) {
@@ -462,7 +478,12 @@ describe('lookupBook', () => {
       const book = await systemBook(e, 'private')
       await gateway.create(asE, {
         collection: 'copies',
-        data: { owner: e.id, book: book.id, status: 'owned' },
+        data: {
+          owner: e.id,
+          acquiredAt: '2026-01-01T12:00:00.000Z',
+          book: book.id,
+          status: 'owned',
+        },
         depth: 0,
       })
       vi.mocked(lookupSources).mockResolvedValue({ kind: 'none' })

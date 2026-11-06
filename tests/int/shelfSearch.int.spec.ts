@@ -42,7 +42,13 @@ describe('shelfIds text search', () => {
     (
       await gateway.create(await contextFor(user), {
         collection: 'copies',
-        data: { owner: user.id, book: book.id, status: 'owned', notes },
+        data: {
+          owner: user.id,
+          acquiredAt: '2026-01-01T12:00:00.000Z',
+          book: book.id,
+          status: 'owned',
+          notes,
+        },
         depth: 0,
       })
     ).id

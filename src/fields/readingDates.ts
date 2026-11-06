@@ -1,4 +1,4 @@
-/** Calendar dates shared by the reading collection and its services. */
+/** Calendar dates shared by the `user-books` and `copies` collections and the books and copies services. */
 const helsinkiDate = new Intl.DateTimeFormat('en', {
   timeZone: 'Europe/Helsinki',
   year: 'numeric',

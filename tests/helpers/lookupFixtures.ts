@@ -38,6 +38,8 @@ export const copy = (over: Partial<CopyLine> = {}): CopyLine => ({
   location: { id: 2, name: 'Tampere' },
   note: null,
   loan: null,
+  acquiredAt: '2026-10-12',
+  price: null,
   ...over,
 })
 

@@ -83,6 +83,7 @@ vi.mock('@/app/(frontend)/(sections)/actions', () => ({
   setReadingDatesAction: vi.fn(),
   setRatingAction: vi.fn(),
   setNoteAction: vi.fn(),
+  setCopyPurchaseAction: vi.fn(),
   toggleCopiesReadAction: vi.fn(),
   moveCopiesAction: vi.fn(),
 }))
@@ -302,6 +303,8 @@ describe('LoansPage', () => {
       location: null,
       note: null,
       loan: { loanId: 2, person: { id: 202, name: 'Leena' }, since: '2026-07-02' },
+      acquiredAt: '2026-10-12',
+      price: null,
     }
     getHoldings.mockResolvedValue(new Map([[7, { copies: [lentCopy], entries: [] }]]))
     await renderPage({ book: '7' })
@@ -317,7 +320,15 @@ describe('LoansPage', () => {
   it("lists Book 7's returned loans under Lent before, as served; none or a failed read has no group", async () => {
     lent([], [puhdistus])
     heldBook.mockImplementation(async (_, id) => (id === 7 ? puhdistus : undefined))
-    const owned: CopyLine = { copyId: 102, status: 'owned', location: null, note: null, loan: null }
+    const owned: CopyLine = {
+      copyId: 102,
+      status: 'owned',
+      location: null,
+      note: null,
+      loan: null,
+      acquiredAt: '2026-10-12',
+      price: null,
+    }
     getHoldings.mockResolvedValue(new Map([[7, { copies: [owned], entries: [] }]]))
     const forBook = (history: () => Promise<ReturnedLoan[]>) =>
       returnedLoans.mockImplementation(async (_, book) => (book === 7 ? history() : []))

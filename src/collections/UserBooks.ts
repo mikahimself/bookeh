@@ -1,16 +1,11 @@
-import {
-  ValidationError,
-  type CollectionBeforeValidateHook,
-  type CollectionConfig,
-  type NumberFieldValidation,
-} from 'payload'
-import { number } from 'payload/shared'
+import { ValidationError, type CollectionBeforeValidateHook, type CollectionConfig } from 'payload'
 
 import { ownerAccess } from '@/access/owner'
 import { overriddenField, overrideFields } from '@/fields/bookFields'
 import { ownerField } from '@/fields/owner'
 import { ownedRelation, readableRelation } from '@/fields/relation'
 import { helsinkiToday, noonUtc, readingDate } from '@/fields/readingDates'
+import { wholeNumber } from '@/fields/wholeNumber'
 import type { UserBook } from '@/payload-types'
 
 /** Covers partial back-office updates as well as writes through the services. */
@@ -44,14 +39,6 @@ const validateReadingDates: CollectionBeforeValidateHook<UserBook> = ({
   }
   if (errors.length) throw new ValidationError({ collection: collection.slug, errors, req })
   return data
-}
-
-/** Payload's number check (`min`/`max`), then whole stars only: `admin.step` binds the form alone. */
-const wholeNumber: NumberFieldValidation = (value, options) => {
-  const builtIn = number(value, options)
-  if (builtIn !== true) return builtIn
-  if (value === undefined || value === null || Number.isInteger(value)) return true
-  return options.req.t('validation:invalidInput')
 }
 
 /**

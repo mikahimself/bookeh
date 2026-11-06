@@ -278,7 +278,12 @@ describe('lookupAgain', () => {
     const shared = await t2Book(randomIsbn())
     await payload.create({
       collection: 'copies',
-      data: { owner: ctx.user.id, book: shared.id, status: 'owned' },
+      data: {
+        owner: ctx.user.id,
+        acquiredAt: '2026-01-01T12:00:00.000Z',
+        book: shared.id,
+        status: 'owned',
+      },
       overrideAccess: true,
       depth: 0,
       req: ctx.req,
