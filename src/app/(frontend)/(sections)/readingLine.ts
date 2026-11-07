@@ -36,3 +36,36 @@ export function readingLine(
   if (finishedAt) return { kind: 'finished', finish: finishedAt }
   return { kind: 'addDates' }
 }
+
+/**
+ * How a "since {date}" day is formatted (Currently reading, in the
+ * collection's strip and in Stats): day and short month, with the year only
+ * when it is not `today`'s.
+ */
+export function sinceDay(
+  date: string,
+  today: string,
+): Pick<Intl.DateTimeFormatOptions, 'day' | 'month' | 'year'> {
+  return {
+    day: 'numeric',
+    month: 'short',
+    ...(date.slice(0, 4) !== today.slice(0, 4) && { year: 'numeric' }),
+  }
+}
+
+/**
+ * FR-58, Most dust collected: how long a Book has waited since `since`, by
+ * `today`. Whole calendar years; under a year, whole months; under a month,
+ * calendar days (`finishedDays()`, at least 1).
+ */
+export function unreadFor(
+  since: string,
+  today: string,
+): { unit: 'years' | 'months' | 'days'; n: number } {
+  const [sy, sm, sd] = since.split('-').map(Number) as [number, number, number]
+  const [ty, tm, td] = today.split('-').map(Number) as [number, number, number]
+  const months = (ty - sy) * 12 + tm - sm - (td < sd ? 1 : 0)
+  if (months >= 12) return { unit: 'years', n: Math.floor(months / 12) }
+  if (months >= 1) return { unit: 'months', n: months }
+  return { unit: 'days', n: finishedDays(since, today) }
+}

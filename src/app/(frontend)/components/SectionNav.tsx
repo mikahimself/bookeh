@@ -18,7 +18,7 @@ const heading =
  *
  * On a path below a section root (`/wishlists/{id}`) the page brings its own
  * Back link and `h1` (the mock-up's "One list opened"), so the row steps
- * aside: only the empty `flex-1` slot, which keeps the wide Scan book right,
+ * aside: only the empty `flex-1` slot, which keeps the wide Add book right,
  * and no live region, so the page's heading is the only one.
  */
 export function SectionNav() {

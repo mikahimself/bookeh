@@ -9,6 +9,8 @@ import { shelfHref, type ReadingBook, type ShelfQuery } from '@/lib/shelf/query'
 
 import { Cover } from '../components/Cover'
 
+import { sinceDay } from './readingLine'
+
 /**
  * EXPERIENCE.md, Collection controls → Currently reading; DESIGN.md,
  * Currently reading strip: a heading, then one covers-s tile per Book being
@@ -31,13 +33,9 @@ export function ReadingStrip({
   const t = useTranslations('collection')
   const format = useFormatter()
   const heading = useId()
-  const thisYear = helsinkiToday().slice(0, 4)
+  const today = helsinkiToday()
   const day = (since: string) =>
-    format.dateTime(new Date(`${since}T12:00:00Z`), {
-      day: 'numeric',
-      month: 'short',
-      ...(since.slice(0, 4) !== thisYear && { year: 'numeric' }),
-    })
+    format.dateTime(new Date(`${since}T12:00:00Z`), sinceDay(since, today))
 
   return (
     <section aria-labelledby={heading} className="pb-2">

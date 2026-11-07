@@ -315,7 +315,7 @@ describe('CollectionPage', () => {
     expect(countLine().textContent).toBe('0 books')
     screen.getByText('No books yet')
     screen.getByText(en.collection.emptyRemark)
-    expect(screen.getByRole('link', { name: 'Scan book' }).getAttribute('href')).toBe('/scan')
+    expect(screen.getByRole('link', { name: 'Add book' }).getAttribute('href')).toBe('/scan')
   })
 
   it('shows No matches with Clear back to / with sort kept', async () => {

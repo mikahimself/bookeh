@@ -24,13 +24,13 @@ test('shop check: In library and On wishlist', async ({ page, context, baseURL }
   })
 
   const toast = page.locator('[data-toast-region]')
-  const scanHeading = page.getByRole('heading', { name: 'Scan', exact: true })
+  const scanHeading = page.getByRole('heading', { name: 'Add book', exact: true })
 
   await page.goto('/login')
   await page.getByLabel('Email', { exact: true }).fill(E2E_EMAIL)
   await page.getByLabel('Password', { exact: true }).fill(E2E_PASSWORD)
   await page.getByRole('button', { name: 'Sign in' }).click()
-  await page.locator('header').getByRole('link', { name: 'Scan book' }).click()
+  await page.locator('header').getByRole('link', { name: 'Add book' }).click()
   await expect(scanHeading).toBeVisible()
 
   // Book A: add it, then scan it again.

@@ -39,6 +39,7 @@ describe('SectionNav', () => {
     expect(screen.getByRole('heading', { level: 1 }).textContent).toBe('Wishlists')
     const nav = screen.getByRole('navigation')
     expect([...nav.querySelectorAll('a')].map((a) => a.getAttribute('href'))).toEqual([
+      '/stats',
       '/settings',
       '/',
       '/loans',

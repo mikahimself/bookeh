@@ -12,12 +12,12 @@ import { SectionSwipe } from '../components/swipe'
 import { BackToTop } from './BackToTop'
 
 /**
- * The section shell (EXPERIENCE.md, Navigation): the headings row and Scan
- * book, on every section. Scan book is rendered once per width, the other
+ * The section shell (EXPERIENCE.md, Navigation): the headings row and Add
+ * book, on every section. Add book is rendered once per width, the other
  * copy `hidden`: pinned at the bottom under 900px, full width but for the
  * back-to-top square once that shows, top right from 900px. Each keeps DOM
  * and focus order in step with what is drawn. The header and the content
- * slide together on a section change; Scan book, in either place, stays put.
+ * slide together on a section change; Add book, in either place, stays put.
  * Under 900px a sideways swipe changes section.
  */
 export default async function SectionsLayout({ children }: { children: ReactNode }) {

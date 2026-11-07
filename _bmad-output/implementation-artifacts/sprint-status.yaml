@@ -291,7 +291,7 @@ development_status:
   10-3-acquired-date-and-price-on-copies: done
   10-4-currently-reading-in-the-collection: done
   10-5-stats-service: done
-  10-6-stats-section-and-the-add-book-rename: backlog
+  10-6-stats-section-and-the-add-book-rename: done
   epic-10-retrospective: optional
 action_items:
   - id: 'epic-1-retro-item-1-fix-the-flash-toast-cookie-contract-doub'

@@ -23,7 +23,7 @@ import { useAfterAction } from './ShelfRows'
  * the bottom with a 2px `text` top edge. Wide, one row: the count on the
  * left, the actions then Done on the right. On the phone two rows: the count
  * and Done above, the actions below (styles.css lifts the toast over both).
- * Sticky at the bottom with the pinned Scan book's padding, which it hides
+ * Sticky at the bottom with the pinned Add book's padding, which it hides
  * on the phone; `data-pinned-wide` lifts the toast above it on wide screens
  * too.
  *

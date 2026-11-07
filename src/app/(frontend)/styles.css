@@ -133,7 +133,7 @@
   --spacing-star: 22px;
   /* Minimum control height on the phone (DESIGN.md, Tap area). */
   --spacing-tap: 44px;
-  /* The pinned bottom bar (Scan book on the phone): a tap-high control with
+  /* The pinned bottom bar (Add book on the phone): a tap-high control with
      spacing-4 above and below, before the safe area. Select mode's two-row
      bar raises it on the phone (below). */
   --spacing-pinned-bar: calc(var(--spacing-tap) + 2 * var(--spacing-4));
@@ -226,7 +226,7 @@
 /*
  * Full-screen task motion (scan/page.tsx, navigation.ts). On the way in,
  * React's <ViewTransition> slides the task's own snapshot in from the right
- * while the page behind stays still: the Scan book link sets the type
+ * while the page behind stays still: the Add book link sets the type
  * `task-open`, which hides the new root, so the section stays under the task
  * as it slides over it. React renders a history traversal synchronously,
  * with no view transition, so the X going back starts one by hand: it marks
@@ -237,7 +237,7 @@
  * Section motion (SectionTransition.tsx, swipe.ts). A swipe or a heading tap
  * sets `section-next` or `section-prev`, and the header and content slide
  * together that way: the old snapshot out one side, the new one in from the
- * other. For those types alone Scan book (the pinned bar, or the wide copy
+ * other. For those types alone Add book (the pinned bar, or the wide copy
  * in the header) and the toast region get names of their own, so their still
  * snapshots sit above the slide.
  *
@@ -576,7 +576,7 @@
 }
 
 /*
- * Select mode's action bar takes the place of the layout's pinned Scan book
+ * Select mode's action bar takes the place of the layout's pinned Add book
  * (EXPERIENCE.md, Action bar). The toast lift (ToastProvider) reads
  * `pinned-bar`: wide, the bar is one row and keeps it; on the phone it has
  * two tap-high rows with spacing-4 above, between and below.

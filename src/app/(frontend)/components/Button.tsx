@@ -9,7 +9,7 @@ const outlines = {
 export type ButtonVariant = keyof typeof outlines
 
 /**
- * The Button look, shared with links drawn as a button (Scan book). `compact`
+ * The Button look, shared with links drawn as a button (Add book). `compact`
  * (DESIGN.md, Button, compact) pads less and is drawn under the tap height;
  * on the phone a pseudo-element grows its tap area up from its bottom edge to
  * 44px, so it never reaches below the row it sits in.

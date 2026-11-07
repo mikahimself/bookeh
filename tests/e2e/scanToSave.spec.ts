@@ -22,7 +22,7 @@ test('scan to save, undo, save again', async ({ page, context, baseURL }) => {
   })
 
   const toast = page.locator('[data-toast-region]')
-  const scanHeading = page.getByRole('heading', { name: 'Scan', exact: true })
+  const scanHeading = page.getByRole('heading', { name: 'Add book', exact: true })
   const notInLibrary = page.getByRole('heading', { name: 'Not in library' })
   const addToLibrary = page.getByRole('button', { name: 'Add to library' })
 
@@ -39,8 +39,8 @@ test('scan to save, undo, save again', async ({ page, context, baseURL }) => {
   await page.getByLabel('Email', { exact: true }).fill(E2E_EMAIL)
   await page.getByLabel('Password', { exact: true }).fill(E2E_PASSWORD)
   await page.getByRole('button', { name: 'Sign in' }).click()
-  // The header copy: an empty shelf draws a second Scan book in the content.
-  await page.locator('header').getByRole('link', { name: 'Scan book' }).click()
+  // The header copy: an empty shelf draws a second Add book in the content.
+  await page.locator('header').getByRole('link', { name: 'Add book' }).click()
   await expect(scanHeading).toBeVisible()
 
   await enterIsbn(page)
@@ -79,7 +79,7 @@ test('scan to save, undo, save again', async ({ page, context, baseURL }) => {
   await expect(page).toHaveURL(`${origin}/`)
 
   // 5.20: Open book leaves Scan for that Book's detail; closing it lands on the section.
-  await page.locator('header').getByRole('link', { name: 'Scan book' }).click()
+  await page.locator('header').getByRole('link', { name: 'Add book' }).click()
   await expect(scanHeading).toBeVisible()
   await enterIsbn(page)
   await expect(page.getByRole('heading', { name: 'In library' })).toBeVisible()

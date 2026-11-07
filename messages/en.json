@@ -120,12 +120,13 @@
     "collection": "Collection",
     "loans": "Loans",
     "wishlists": "Wishlists",
+    "stats": "Stats",
     "settings": "Settings",
     "backToTop": "Back to top"
   },
   "scan": {
-    "open": "Scan book",
-    "heading": "Scan",
+    "open": "Add book",
+    "heading": "Add book",
     "cameraHint": "Point the camera at the barcode",
     "isbn": "Or type an ISBN",
     "noCamera": "No camera. Type the ISBN.",
@@ -502,5 +503,37 @@
       "genre": "Remove genre from all",
       "theme": "Remove theme from all"
     }
+  },
+  "stats": {
+    "thisYear": "This year",
+    "yearSwitch": "Year",
+    "books": "{n, plural, one {book} other {books}}",
+    "pages": "{n, plural, one {page} other {pages}}",
+    "spent": "spent",
+    "booksPerMonth": "books a month",
+    "byMonth": "By month",
+    "monthLine": "{books, plural, one {# book} other {# books}} · {pages} p",
+    "monthNone": "–",
+    "nerdy": "Nerdy stats",
+    "pagesPerDay": "Pages a day",
+    "daysPerBook": "Days a book, on average",
+    "quickest": "Quickest",
+    "slowest": "Slowest",
+    "thickest": "Thickest brick",
+    "dust": "Most dust collected",
+    "mostExpensive": "Most expensive",
+    "bestMonth": "Best month",
+    "topAuthor": "Most-read author",
+    "bookDays": "{title} · {n, plural, one {# day} other {# days}}",
+    "bookPages": "{title} · {pages} p",
+    "bookPrice": "{title} · {price}",
+    "bookUnread": "{title} · unread for {unit, select, years {{n, plural, one {# year} other {# years}}} months {{n, plural, one {# month} other {# months}}} other {{n, plural, one {# day} other {# days}}}}",
+    "monthBooks": "{month} · {n, plural, one {# book} other {# books}}",
+    "authorBooks": "{name} · {n}",
+    "byYear": "By year",
+    "yearLine": "{books, plural, one {# book} other {# books}} · {pages} p · {spent}",
+    "undated": "{n, plural, one {# read book has no dates and is not counted.} other {# read books have no dates and are not counted.}}",
+    "nothingRead": "Nothing read yet",
+    "nothingReadRemark": "The books can wait. They are good at it."
   }
 }

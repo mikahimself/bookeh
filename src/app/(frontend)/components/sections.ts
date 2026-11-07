@@ -1,8 +1,9 @@
-/** The four sections, in their fixed order (EXPERIENCE.md, Navigation). */
+/** The five sections, in their fixed order (EXPERIENCE.md, Navigation). */
 export const SECTIONS = [
   { key: 'collection', href: '/' },
   { key: 'loans', href: '/loans' },
   { key: 'wishlists', href: '/wishlists' },
+  { key: 'stats', href: '/stats' },
   { key: 'settings', href: '/settings' },
 ] as const
 

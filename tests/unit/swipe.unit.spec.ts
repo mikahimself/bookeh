@@ -68,6 +68,9 @@ describe('swipeTarget', () => {
     ['/loans', rightwards, { href: '/', type: 'section-prev' }],
     ['/settings', leftwards, { href: '/', type: 'section-next' }],
     ['/', rightwards, { href: '/settings', type: 'section-prev' }],
+    ['/wishlists', leftwards, { href: '/stats', type: 'section-next' }],
+    ['/stats', leftwards, { href: '/settings', type: 'section-next' }],
+    ['/stats', rightwards, { href: '/wishlists', type: 'section-prev' }],
     [
       '/loans',
       [

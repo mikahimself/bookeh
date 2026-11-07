@@ -120,12 +120,13 @@
     "collection": "Kokoelma",
     "loans": "Lainat",
     "wishlists": "Toivelistat",
+    "stats": "Tilastot",
     "settings": "Asetukset",
     "backToTop": "Takaisin ylös"
   },
   "scan": {
-    "open": "Skannaa kirja",
-    "heading": "Skannaa",
+    "open": "Lisää kirja",
+    "heading": "Lisää kirja",
     "cameraHint": "Osoita kameralla viivakoodia",
     "isbn": "Tai kirjoita ISBN",
     "noCamera": "Ei kameraa. Kirjoita ISBN.",
@@ -502,5 +503,37 @@
       "genre": "Poista genre kaikilta",
       "theme": "Poista teema kaikilta"
     }
+  },
+  "stats": {
+    "thisYear": "Tänä vuonna",
+    "yearSwitch": "Vuosi",
+    "books": "{n, plural, one {kirja} other {kirjaa}}",
+    "pages": "{n, plural, one {sivu} other {sivua}}",
+    "spent": "käytetty",
+    "booksPerMonth": "kirjaa kuukaudessa",
+    "byMonth": "Kuukausittain",
+    "monthLine": "{books, plural, one {# kirja} other {# kirjaa}} · {pages} s.",
+    "monthNone": "–",
+    "nerdy": "Nörttitilastot",
+    "pagesPerDay": "Sivuja päivässä",
+    "daysPerBook": "Päiviä kirjaa kohden, keskimäärin",
+    "quickest": "Nopein",
+    "slowest": "Hitain",
+    "thickest": "Paksuin tiiliskivi",
+    "dust": "Eniten pölyä kerännyt",
+    "mostExpensive": "Kallein",
+    "bestMonth": "Paras kuukausi",
+    "topAuthor": "Luetuin kirjailija",
+    "bookDays": "{title} · {n, plural, one {# päivä} other {# päivää}}",
+    "bookPages": "{title} · {pages} s.",
+    "bookPrice": "{title} · {price}",
+    "bookUnread": "{title} · lukematta {unit, select, years {{n, plural, one {# vuoden} other {# vuotta}}} months {{n, plural, one {# kuukauden} other {# kuukautta}}} other {{n, plural, one {# päivän} other {# päivää}}}}",
+    "monthBooks": "{month} · {n, plural, one {# kirja} other {# kirjaa}}",
+    "authorBooks": "{name} · {n}",
+    "byYear": "Vuosittain",
+    "yearLine": "{books, plural, one {# kirja} other {# kirjaa}} · {pages} s. · {spent}",
+    "undated": "{n, plural, one {# luetulla kirjalla ei ole päivämääriä, eikä sitä lasketa.} other {# luetulla kirjalla ei ole päivämääriä, eikä niitä lasketa.}}",
+    "nothingRead": "Ei vielä mitään luettua",
+    "nothingReadRemark": "Kirjat jaksavat odottaa. Ne ovat siinä hyviä."
   }
 }

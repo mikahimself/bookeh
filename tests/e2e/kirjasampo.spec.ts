@@ -9,7 +9,7 @@ test('Kirjasampo themes enrich a saved Finna edition', async ({ page }) => {
   await page.getByLabel('Email', { exact: true }).fill(E2E_EMAIL)
   await page.getByLabel('Password', { exact: true }).fill(E2E_PASSWORD)
   await page.getByRole('button', { name: 'Sign in' }).click()
-  await page.locator('header').getByRole('link', { name: 'Scan book' }).click()
+  await page.locator('header').getByRole('link', { name: 'Add book' }).click()
 
   const start = performance.now()
   const field = page.getByLabel('Or type an ISBN', { exact: true })
@@ -20,7 +20,7 @@ test('Kirjasampo themes enrich a saved Finna edition', async ({ page }) => {
   expect(answerMs).toBeLessThan(5_000)
   await expect(page.getByText('From Finna', { exact: true })).toBeVisible()
   await page.getByRole('button', { name: 'Add to library' }).click()
-  await expect(page.getByRole('heading', { name: 'Scan', exact: true })).toBeVisible()
+  await expect(page.getByRole('heading', { name: 'Add book', exact: true })).toBeVisible()
 
   const client = new pg.Client({ connectionString: testDatabaseUrl(process.env.DATABASE_URL) })
   await client.connect()

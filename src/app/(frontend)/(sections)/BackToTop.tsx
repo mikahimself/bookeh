@@ -4,7 +4,7 @@ import { useTranslations } from 'next-intl'
 import { useEffect, useState } from 'react'
 
 /**
- * EXPERIENCE.md, Scrolling: the phone's back-to-top square beside Scan book
+ * EXPERIENCE.md, Scrolling: the phone's back-to-top square beside Add book
  * in the pinned bar (which only the phone draws). It shows once the window is
  * scrolled past two screens and hides again within one, so it does not
  * flicker at a single threshold. The jump is smooth, or instant under reduced
