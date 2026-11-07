@@ -31,3 +31,18 @@ export const readableBy = (viewer: Viewer, alias: string): SQL => {
  * it is simply not a holding.
  */
 export const visibleEntries = (viewer: Viewer): SQL => sql`wishlist_entries.owner_id = ${viewer.id}`
+
+/**
+ * Spine, AD-7: the holding rule on a `books` alias. The viewer holds a Book
+ * with a visible copy (owned or ordered) or a visible open wishlist entry of
+ * it. Readers of per-Book rows that outlive their copies (`user-books`, AD-6)
+ * list only held Books. `alias` is a constant of the calling query.
+ */
+export const holds = (viewer: Viewer, alias: string): SQL => {
+  const t = sql.identifier(alias)
+  return sql`(exists (select 1 from copies
+                       where copies.book_id = ${t}.id and ${visibleCopies(viewer)})
+              or exists (select 1 from wishlist_entries
+                          where wishlist_entries.book_id = ${t}.id and ${visibleEntries(viewer)}
+                            and wishlist_entries.closed_at is null))`
+}

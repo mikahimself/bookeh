@@ -6,7 +6,7 @@ import { drizzleFor } from '@/lib/payload/drizzle'
 
 import { readStateOf } from './effective'
 import type { ReadingBook } from './query'
-import { readableBy, visibleCopies, visibleEntries } from './visibleCopies'
+import { holds, readableBy } from './visibleCopies'
 
 /**
  * Spine, AD-7: the one reader of the Books the viewer is reading, for the
@@ -28,11 +28,7 @@ export async function readingNow(ctx: Context): Promise<ReadingBook[]> {
       from user_books ub
       join books b on b.id = ub.book_id and ${readableBy(viewer, 'b')}
      where ub.owner_id = ${viewer.id} and ${readStateOf} = 'reading'
-       and (exists (select 1 from copies
-                     where copies.book_id = b.id and ${visibleCopies(viewer)})
-            or exists (select 1 from wishlist_entries
-                        where wishlist_entries.book_id = b.id and ${visibleEntries(viewer)}
-                          and wishlist_entries.closed_at is null))
+       and ${holds(viewer, 'b')}
      order by ub.reading_since asc, ub.book_id asc`)
 
   const reading = rows.map((row) => ({ bookId: Number(row.book_id), since: String(row.since) }))

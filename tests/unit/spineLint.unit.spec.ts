@@ -43,6 +43,7 @@ describe('layer zones', () => {
     ['loans', '@/lib/wishlists/wishlists'],
     ['shelf', COPIES],
     ['tags', COPIES],
+    ['stats', COPIES],
     ['copies', '@/lib/people/people'],
     ['people', COPIES],
     ['books', COPIES],

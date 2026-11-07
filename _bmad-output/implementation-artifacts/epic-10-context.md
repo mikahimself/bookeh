@@ -49,12 +49,14 @@ Let each user track a Book as unread, being read or read, with editable start an
   - `lib/copies` is the only writer of `copies`, including `setCopyPurchase()`.
   - The date invariant lives in each collection's `beforeValidate` hook.
 - **Calendar dates:** sent as strict `YYYY-MM-DD`, stored at 12:00 UTC and read back by their UTC date. Today is computed in `Europe/Helsinki`. The primitives `helsinkiToday()` and `finishedDays()` are in `src/fields/readingDates.ts`. Dates, numbers and EUR amounts are formatted by `next-intl`.
-- **`readingNow(ctx)`** in `lib/shelf` is the one reader of Books being read, used by both the collection strip and Stats.
+- **`readingNow(ctx)`** in `lib/shelf` is the one reader of Books being read, used by the collection strip, the collection rows' Reading ending and Stats.
   - It reads the viewer's rows in reading, on the shelf's visible-copy and visible-entry fragments.
   - Order: `readingSince` ascending, then Book id.
-  - It hydrates through `getEffectiveBooks()` and returns `ReadingBook[]` (`{ book, since }`).
+  - It hydrates through `getEffectiveBooks()` and returns `ReadingBook[]` (`{ book, since }`, `since` as `YYYY-MM-DD`).
+  - On `/` the page reads it once and feeds both the strip and the row endings, so the post-action `router.refresh()` updates them together. `ShelfRow` carries no reading state.
+  - The Read filter matches the same derivation in SQL (`readStateOf` in `lib/shelf/effective.ts`).
 - **Shelf filter:** gains `ShelfQuery.filters.read: ReadState[]` and `FilterValues.read` (counted values for unread, reading and read). In the URL it is `read=unread|reading|read`, repeatable, with values ORed within the field.
-- **Stats readers:** `readingLog`, `spending` and `dustCandidate` sit beside `readingNow` in `lib/shelf`. They are read-only, use the same fragments, and return only ids, dates and prices.
+- **Stats readers:** `readingLog`, `spending` and `dustCandidates` sit beside `readingNow` in `lib/shelf`. They are read-only, use the same fragments, and return only ids, dates and prices.
 - **`lib/stats`:**
   - It imports only `shelf` and `books`.
   - `getStats(ctx, year?)` hydrates Books through `getEffectiveBooks()` and calls the pure `computeStats()`.
@@ -100,10 +102,10 @@ Let each user track a Book as unread, being read or read, with editable start an
 
 ## Cross-Story Dependencies
 
-- **Done:** 10.1, 10.2 and 10.3.
-- **10.4** needs 10.1.
-- **10.5** needs 10.1 and 10.3, and **10.6** needs 10.5.
+- **Done:** 10.1, 10.2, 10.3 and 10.4.
+- **10.5** needs 10.1 and 10.3 (both done), and **10.6** needs 10.5.
 - **Walkthroughs still owed:**
-  - 10.3 flagged a walkthrough on the real surface before later stories build on the copy line: the Picker shares Book detail's accessible name, and the phone sheet has no Cancel button.
+  - 10.4 flagged one before 10.6 builds Stats' Currently reading on `readingNow()`: the strip at phone width in Finnish ("28. lokak. alkaen" on a 70px tile) and with long titles, and the scroll shift when select mode removes the strip.
+  - 10.3 flagged one before later stories build on the copy line: the Picker shares Book detail's accessible name, and the phone sheet has no Cancel button.
   - 10.2 flagged the same no-Cancel sheet and focus after a Picker save.
 - **Rename and clipping:** 10.6's header clipping depends on the rename and the fifth heading together. Check it in a browser at 900, 980 and 1100px in both languages.

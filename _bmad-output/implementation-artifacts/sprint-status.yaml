@@ -290,7 +290,7 @@ development_status:
   10-2-reading-switch-and-dates-on-book-detail: done
   10-3-acquired-date-and-price-on-copies: done
   10-4-currently-reading-in-the-collection: done
-  10-5-stats-service: backlog
+  10-5-stats-service: done
   10-6-stats-section-and-the-add-book-rename: backlog
   epic-10-retrospective: optional
 action_items:

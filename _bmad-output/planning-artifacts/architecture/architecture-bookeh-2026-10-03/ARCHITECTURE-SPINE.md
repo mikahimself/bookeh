@@ -155,7 +155,7 @@ The diagram shows the main directions; the list below is the full table of allow
   - Text sort relies on the database's `fi-FI` ICU collation. Author sort uses the `sortName` of the Book's first effective author the viewer may read (AD-4), then the effective title, both in the sort's direction; a Book with no readable author sorts last both ways. Text search is `ILIKE` with no accent folding.
   - No code lists or searches `books`, `authors` or `series` on their own. They are reached through a copy or wishlist entry the viewer can see, or by exact match on ISBN-13 or `nameKey`. Book detail, Edit book and every `{ bookId }` a client sends start with `requireOwnBook(ctx, bookId)` in `lib/books`, which fails with `NOT_FOUND` unless the viewer has a copy or an open wishlist entry of that Book.
   - Lookup's own-library results are a shelf text search over the viewer's copies and open wishlist entries, the entries through a `visibleEntries(viewer)` fragment that mirrors `visibleCopies`. `searchMine(ctx, text)` in `lib/shelf` is that reader: one row per Book, in the `author` ascending order, at most `MINE_SEARCH_LIMIT` Books, hydrated through `getEffectiveBooks()` and `getHoldings()` into `MyBook[]`. `otherEditions(ctx, …)` beside it is the Answer's other-edition read: the viewer's copies narrowed in SQL by an effective author's `nameKey`, the title compared in code with `editionTitle()`, no limit, hydrated the same way. Every other list that is not copies (loans, a wishlist) hydrates Books through `getEffectiveBooks()` and does not sort or filter on Book fields.
-  - `readingNow(ctx)` in `lib/shelf` is the one reader of the Books being read, for the collection's strip, the collection rows' Reading ending and Stats: the viewer's `user-books` rows in reading (AD-8) whose Book has a visible copy (owned or ordered) or a visible open entry, ordered by `readingSince` ascending, then Book id, with `since` the start's `YYYY-MM-DD`, hydrated through `getEffectiveBooks()`. On `/` it is read once by the page and feeds both the strip and the row endings, so `afterAction`'s `router.refresh()` updates them together; `ShelfRow` carries no reading state. The Read filter matches on the same derivation in SQL (`readStateOf` in `lib/shelf/effective.ts`). A row whose Book the viewer no longer holds is not listed (the row outlives its copies, AD-6). The stats readers beside it (`readingLog(ctx)`, `spending(ctx)`, `dustCandidate(ctx)`) are read-only, on the same fragments, and return ids, dates and prices only; `lib/stats` hydrates Books through `getEffectiveBooks()`.
+  - `readingNow(ctx)` in `lib/shelf` is the one reader of the Books being read, for the collection's strip, the collection rows' Reading ending and Stats: the viewer's `user-books` rows in reading (AD-8) whose Book has a visible copy (owned or ordered) or a visible open entry, ordered by `readingSince` ascending, then Book id, with `since` the start's `YYYY-MM-DD`, hydrated through `getEffectiveBooks()`. On `/` it is read once by the page and feeds both the strip and the row endings, so `afterAction`'s `router.refresh()` updates them together; `ShelfRow` carries no reading state. The Read filter matches on the same derivation in SQL (`readStateOf` in `lib/shelf/effective.ts`). A row whose Book the viewer no longer holds is not listed (the row outlives its copies, AD-6). Its held-Book condition is `holds(viewer, alias)` in `visibleCopies.ts`. The stats readers beside it in `lib/shelf/stats.ts` are read-only, on the same fragments, and return ids, dates and prices only: `readingLog(ctx): LoggedRead[]` (`{ bookId, readingSince, finishedAt }`, the viewer's held, readable Books in read, by Book id), `spending(ctx): PricedCopy[]` (`{ copyId, bookId, acquiredAt, price }`, visible copies, owned or ordered, with a price, by copy id) and `dustCandidates(ctx): DustCopy[]` (`{ copyId, bookId, acquiredAt, createdAt }`, the owned copies of readable Books in unread, by copy id). `lib/stats` picks the dust winner (`pickDust()`: oldest `acquiredAt`, then `createdAt`, then copy id) and hydrates every logged and priced Book, plus only the dust winner, through one `getEffectiveBooks()`.
 
 ### AD-8 — Status, wishlist, loan and reading state each have one home
 
@@ -559,12 +559,13 @@ type YearStats = {
   books: number; pages: number; spent: number // spent in euro cents
   booksPerMonth: number // books ÷ months elapsed, one decimal
   months: { month: number; books: number; pages: number }[] // 1 to 12, up to the current month in the current year
-  pagesPerDay: number | null; daysPerBook: number | null
-  quickest: BookDays | null; slowest: BookDays | null
-  thickest: { book: EffectiveBook; pages: number } | null
-  mostExpensive: { book: EffectiveBook; price: number } | null
-  bestMonth: { month: number; books: number } | null
-  topAuthor: { author: Named; books: number } | null // at least 2
+  pagesPerDay: number | null // pages ÷ days elapsed, one decimal; null when no finished Book has pages (0 counts as none)
+  daysPerBook: number | null // one decimal; null when no finished Book has both dates
+  quickest: BookDays | null; slowest: BookDays | null // both dates needed; ties: earlier finish, then Book id
+  thickest: { book: EffectiveBook; pages: number } | null // ties: earlier finish, then Book id
+  mostExpensive: { book: EffectiveBook; price: number } | null // ties: earlier acquiredAt, then copy id
+  bestMonth: { month: number; books: number } | null // most books, then most pages, then the earlier month
+  topAuthor: { author: Named; books: number } | null // at least 2; ties by name (fi collation), then author id
 }
 type Stats = {
   reading: ReadingBook[]
@@ -666,7 +667,7 @@ src/
     metadata/          # source contract, sources/, merge, lookupSources, cache
     catalogue/         # lookupBook, retryLookup, searchBooks, saveCopy, saveEntry, editBook, findOrCreateByName, isUnreferenced, covers (download, upload and warp), re-fetch, lookupAgain, answerFacts, genre admin
     books/             # EffectiveBook, getEffectiveBooks, getHoldings, getUserBookState, requireOwnBook, upsertUserBook, setRead, setReadingDates, setRating, coverUrl
-    shelf/             # Drizzle query module, read-only: getShelfRows, values and suggestions, searchMine, otherEditions, readingNow, the stats readers; query.ts (pure): parseShelfQuery, shelfHref, shelfRowsPath
+    shelf/             # Drizzle query module, read-only: getShelfRows, values and suggestions, searchMine, otherEditions, readingNow, stats.ts (the stats readers); query.ts (pure): parseShelfQuery, shelfHref, shelfRowsPath
     tags/              # tags of every kind: changeTags, rename, merge, delete, tagUse; SYSTEM_NAME checks
     copies/            # createCopy, move, receive, status, note, purchase (acquired date and price), remove; locations
     stats/             # getStats, computeStats (pure)
