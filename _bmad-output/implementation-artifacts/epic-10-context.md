@@ -104,8 +104,5 @@ Let each user track a Book as unread, being read or read, with editable start an
 
 - **Done:** 10.1, 10.2, 10.3 and 10.4.
 - **10.5** needs 10.1 and 10.3 (both done), and **10.6** needs 10.5.
-- **Walkthroughs still owed:**
-  - 10.4 flagged one before 10.6 builds Stats' Currently reading on `readingNow()`: the strip at phone width in Finnish ("28. lokak. alkaen" on a 70px tile) and with long titles, and the scroll shift when select mode removes the strip.
-  - 10.3 flagged one before later stories build on the copy line: the Picker shares Book detail's accessible name, and the phone sheet has no Cancel button.
-  - 10.2 flagged the same no-Cancel sheet and focus after a Picker save.
+- **Walkthroughs:** the follow-ups of 10.2, 10.3 and 10.4 (Picker focus and no-Cancel sheet, duplicate dialog names, the strip in Finnish at phone width and the select-mode shift) were checked on mobile on 2026-11-07 and found fine.
 - **Rename and clipping:** 10.6's header clipping depends on the rename and the fifth heading together. Check it in a browser at 900, 980 and 1100px in both languages.

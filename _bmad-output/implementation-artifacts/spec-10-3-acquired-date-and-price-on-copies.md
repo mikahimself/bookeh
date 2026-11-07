@@ -179,3 +179,5 @@ Status: done
 - Matrix audit — Migration: `copyPurchaseMigration.int`; Save: `createCopy.int` and the walk; Received: `receiveCopy.int`; Line rows, Picker save and rejections: the walk (Finnish formatting is next-intl's, not asserted); Service: `copyWrites.int`.
 
 **Residual risks.** Production-dump restore rehearsal not run (no dump or LXC access here); AD-13 still wants it before deploy. The uncommitted walk specs from earlier stories insert copies without `acquired_at` and now hit NOT NULL. Edit book's ordered→owned keeps the order date (rejected: intent keeps Edit book unchanged) — Stats' dust may read an order date for such a copy. Schema stories merge serially; no parallel worktree shares these files.
+
+**Walkthrough (2026-11-07).** Mika checked the follow-up points above on mobile and found them fine. The phone sheet closing without a Cancel button is accepted.

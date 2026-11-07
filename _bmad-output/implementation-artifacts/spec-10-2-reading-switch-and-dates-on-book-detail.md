@@ -172,3 +172,5 @@ Status: done
 - Matrix audit — every row covered: Start/Finish/Direct read/Resume-stop/One date by `readingLine` and `readAndRating` units plus the walk; Dates edit and Finish via Picker by the new unit case and the walk; Rejections by the unit rejection and server-field cases and the walk; Cancel by the walk (Esc).
 
 **Residual risks.** The phone sheet has no Cancel button (see above). Overlapping switch and Picker saves within one round trip can leave the line briefly out of step (rejected as low). No schema change, so no production-dump rehearsal applies.
+
+**Walkthrough (2026-11-07).** Mika checked the follow-up points above on mobile and found them fine. The phone sheet closing without a Cancel button is accepted.

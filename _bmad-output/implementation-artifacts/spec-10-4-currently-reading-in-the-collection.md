@@ -173,3 +173,5 @@ Status: done
 - Matrix audit — Strip order, Held only: `readingNow.int`; Other user: `shelfIds.int`; Nothing read / select mode, Read fails, Row ending: `collectionPage.unit` and the walk; Search or filter on, After an action: the walk; Read filter, Bad URL values: `shelfFilters.int`, `shelfQuery.unit`, `collectionCountLine.unit`; Filter values: `shelfValues.int`.
 
 **Residual risks.** The AD-4 case in `readingNow.int` passes even without the SQL `readableBy` join, since `getEffectiveBooks()` also drops an unreadable Book. Old `read=true`/`read=false` addresses now show the whole collection. `filters.ts` still fails `prettier --check` as it did at the baseline. No parallel worktree shares these files.
+
+**Walkthrough (2026-11-07).** Mika checked the follow-up points above on mobile and found them fine. The phone sheet closing without a Cancel button is accepted.
