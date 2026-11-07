@@ -115,6 +115,14 @@ describe('CollectionPage', () => {
     expect(screen.queryByRole('region', { name: 'Currently reading' })).toBeNull()
   })
 
+  it('hides the Books being read while a search or filter is on', async () => {
+    getShelfRows.mockResolvedValue({ rows: [row(11, book(1, 'Sinuhe'))], total: 1, labels: {} })
+    readingNow.mockResolvedValue([{ book: book(2, 'Tuntematon sotilas'), since: '2026-10-21' }])
+    await renderPage({ q: 'sinuhe' })
+
+    expect(screen.queryByRole('region', { name: 'Currently reading' })).toBeNull()
+  })
+
   it('logs a failed read of the Books being read and renders the list without the strip', async () => {
     getShelfRows.mockResolvedValue({
       rows: [row(11, book(1, 'Sinuhe'), 'owned', { id: 2, name: 'Tampere' })],

@@ -45,8 +45,8 @@ const GRID: Record<DevicePrefs['size'], string> = {
  * `book` is open, whose rows carry the selection bar. In select mode
  * (`useSelection`) it carries its checkbox and ticks instead.
  * Above the count line, the Currently reading strip of `reading` (the page's
- * `readingNow()`), out of select mode and while not empty; it ignores search
- * and filters. A row of a Book in `reading` ends with the Reading marker
+ * `readingNow()`), while not empty and only on the whole list: absent in
+ * select mode and while a search or filter is on. A row of a Book in `reading` ends with the Reading marker
  * (`BookRow`); cover tiles carry none.
  */
 export function CollectionList({
@@ -136,7 +136,7 @@ export function CollectionList({
   return (
     <>
       {loading && <ProgressLine label={root('progress.loading')} />}
-      {!selecting && reading.length > 0 && (
+      {!selecting && !narrowed && reading.length > 0 && (
         <ReadingStrip reading={reading} query={query} open={book} />
       )}
       <p aria-live="polite" className="pt-1 pb-2 text-meta text-text-muted">
