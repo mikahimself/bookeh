@@ -297,7 +297,8 @@
       "owned": "Owned",
       "ordered": "Ordered",
       "read": "Read",
-      "unread": "Unread"
+      "unread": "Unread",
+      "reading": "Reading"
     },
     "select": "Select",
     "selected": "{n} selected",
@@ -330,6 +331,9 @@
     "read": "read",
     "unread": "unread",
     "reading": "reading",
+    "readingNow": "Currently reading",
+    "readingSince": "since {date}",
+    "readingMarker": "Reading",
     "rating": "{n, plural, =5 {# stars} other {#+ stars}}",
     "yearRange": "{from}–{to}",
     "pagesRange": "{from}–{to} pages",

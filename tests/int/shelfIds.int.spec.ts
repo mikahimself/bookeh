@@ -7,6 +7,7 @@ import { upsertUserBook } from '@/lib/books/upsertUserBook'
 import type { Context } from '@/lib/payload/context'
 import * as gateway from '@/lib/payload/gateway'
 import type { ShelfQuery } from '@/lib/shelf/query'
+import { readingNow } from '@/lib/shelf/readingNow'
 import { shelfIds } from '@/lib/shelf/shelfIds'
 import config from '@/payload.config'
 import type { Book, User } from '@/payload-types'
@@ -75,8 +76,11 @@ describe('shelfIds', () => {
     const ownP = await copyOf(a, p)
     await copyOf(b, x)
     await copyOf(b, y)
-    // B's override must not reach A's rows (AD-6: `user_books` joins on the viewer).
-    await upsertUserBook(await contextFor(b), x.id, { overrides: { title: 'Öljy' } })
+    // B's override and reading must not reach A's rows (AD-6: `user_books` joins on the viewer).
+    const asB = await contextFor(b)
+    const since = '2026-10-21T12:00:00.000Z'
+    await upsertUserBook(asB, x.id, { overrides: { title: 'Öljy' }, readingSince: since })
+    await upsertUserBook(asB, y.id, { readingSince: since })
     const asA = await contextFor(a)
 
     const seen = await shelfIds(asA, { filters: {}, sort: 'title', dir: 'asc' }, ALL)
@@ -97,6 +101,12 @@ describe('shelfIds', () => {
       total: 3,
     })
     expect(await shelfIds(asA, page, { offset: 3, limit: 50 })).toEqual({ ids: [], total: 3 })
+
+    // B reading a Book A owns, and B's own Book, are not A's reading (FR-48).
+    expect(await readingNow(asA)).toEqual([])
+    const reading: ShelfQuery = { filters: { read: ['reading'] }, sort: 'title', dir: 'asc' }
+    expect(await shelfIds(asA, reading, ALL)).toEqual({ ids: [], total: 0 })
+    expect((await readingNow(asB)).map((r) => r.book.bookId)).toEqual([x.id, y.id])
   })
 
   it('sorts titles in Finnish order, an overridden title by its override', async () => {

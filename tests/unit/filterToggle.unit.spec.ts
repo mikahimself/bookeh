@@ -13,8 +13,8 @@ const query = (filters: ShelfQuery['filters']): ShelfQuery => ({
 
 describe('toggleFilter', () => {
   it('adds a value to its field and keeps the rest', () => {
-    expect(toggleFilter(query({ location: [3], read: true }), 'location', 5)).toEqual(
-      query({ location: [3, 5], read: true }),
+    expect(toggleFilter(query({ location: [3], read: ['read'] }), 'location', 5)).toEqual(
+      query({ location: [3, 5], read: ['read'] }),
     )
   })
 
@@ -24,9 +24,11 @@ describe('toggleFilter', () => {
     )
   })
 
-  it('switches read to the other value and clears it when the one on is tapped', () => {
-    expect(toggleFilter(query({ read: true }), 'read', false)).toEqual(query({ read: false }))
-    expect(toggleFilter(query({ read: false }), 'read', false)).toEqual(query({}))
+  it('toggles read states as a list', () => {
+    expect(toggleFilter(query({ read: ['read'] }), 'read', 'reading')).toEqual(
+      query({ read: ['read', 'reading'] }),
+    )
+    expect(toggleFilter(query({ read: ['reading'] }), 'read', 'reading')).toEqual(query({}))
   })
 })
 

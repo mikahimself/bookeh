@@ -5,21 +5,21 @@ import { genreName } from '@/lib/books/genreName'
 import type { Context } from '@/lib/payload/context'
 import { drizzleFor } from '@/lib/payload/drizzle'
 
-import { effective } from './effective'
+import { effective, readStateOf } from './effective'
 import type { FilterValues } from './query'
 import { readableBy, visibleCopies } from './visibleCopies'
 import { tagValues } from './tagValues'
 
 const STATUSES = ['owned', 'ordered'] as const
-const READ = [true, false] as const
+const READ = ['unread', 'reading', 'read'] as const
 
 /**
  * Spine, AD-7: the values the Filter panel offers, each with how many of the
  * viewer's copies carry it: own locations and genres by name (a copy
  * counts once under each of its Book's genres), effective languages (AD-6) by
- * value, statuses `owned` then `ordered`, read then unread (the viewer's
- * `user-books` row; a missing row is unread). Only values in use; a copy with no
- * location or language adds none. Counts run over all the viewer's copies,
+ * value, statuses `owned` then `ordered`, read states unread, reading, read
+ * (AD-8, derived from the viewer's `user-books` row; a missing row is
+ * unread). Only values in use; a copy with no location or language adds none. Counts run over all the viewer's copies,
  * never narrowed by a shelf query. System genres precede sorted private genres;
  * ordinary tags have their own list. Private labels require the viewer's
  * assignments and owner/kind, including admins. Read-only, sequential queries
@@ -47,7 +47,7 @@ export async function filterValues(ctx: Context, locale: Locale): Promise<Filter
     sql`group by l.id, l.name order by l.name, l.id`,
   )
   const statuses = await grouped(sql`copies.status as value`, sql``, sql`group by copies.status`)
-  const reads = await grouped(sql`ub.read is true as value`, sql``, sql`group by 1`)
+  const reads = await grouped(sql`${readStateOf} as value`, sql``, sql`group by 1`)
   const genres = await grouped(
     sql`g.id, g.name, g.name_fi`,
     sql`join books_rels r on r.parent_id = b.id and r.path = 'genres'

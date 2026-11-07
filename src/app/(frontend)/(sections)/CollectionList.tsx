@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useLocale, useTranslations } from 'next-intl'
 import { Fragment, useEffect, useRef, useState, type ReactNode } from 'react'
 
-import { shelfHref, type ShelfQuery, type ShelfRow } from '@/lib/shelf/query'
+import { shelfHref, type ReadingBook, type ShelfQuery, type ShelfRow } from '@/lib/shelf/query'
 
 import { buttonClass } from '../components/Button'
 import { TextLink } from '../components/Link'
@@ -18,6 +18,7 @@ import { useCollectionDisplay } from './CollectionDisplay'
 import { activeValues, clearHref, isNarrowed } from './countLine'
 import { CoverTile } from './CoverTile'
 import { toggleFilter } from './filterToggle'
+import { ReadingStrip } from './ReadingStrip'
 import { useSelection } from './Selection'
 import { useShelfRows } from './ShelfRows'
 
@@ -43,8 +44,20 @@ const GRID: Record<DevicePrefs['size'], string> = {
  * A row or tile opens Book detail (`?book=`): pushing, or replacing while
  * `book` is open, whose rows carry the selection bar. In select mode
  * (`useSelection`) it carries its checkbox and ticks instead.
+ * Above the count line, the Currently reading strip of `reading` (the page's
+ * `readingNow()`), out of select mode and while not empty; it ignores search
+ * and filters. A row of a Book in `reading` ends with the Reading marker
+ * (`BookRow`); cover tiles carry none.
  */
-export function CollectionList({ query, book }: { query: ShelfQuery; book: number | null }) {
+export function CollectionList({
+  query,
+  book,
+  reading,
+}: {
+  query: ShelfQuery
+  book: number | null
+  reading: ReadingBook[]
+}) {
   const t = useTranslations('collection')
   const root = useTranslations()
   const locale = useLocale()
@@ -107,6 +120,7 @@ export function CollectionList({ query, book }: { query: ShelfQuery; book: numbe
     ? [...(values ? [values] : []), ...chips, count, clear]
     : [count]
   const lent = (person: string) => root('loans.lentMarker', { person })
+  const readingIds = new Set(reading.map((r) => r.book.bookId))
   const opens = (row: ShelfRow) => ({
     href: shelfHref(query, { book: row.book.bookId }),
     replace: book !== null,
@@ -122,6 +136,9 @@ export function CollectionList({ query, book }: { query: ShelfQuery; book: numbe
   return (
     <>
       {loading && <ProgressLine label={root('progress.loading')} />}
+      {!selecting && reading.length > 0 && (
+        <ReadingStrip reading={reading} query={query} open={book} />
+      )}
       <p aria-live="polite" className="pt-1 pb-2 text-meta text-text-muted">
         {parts.map((part, i) => (
           <Fragment key={i}>
@@ -170,6 +187,7 @@ export function CollectionList({ query, book }: { query: ShelfQuery; book: numbe
               size={size}
               ordered={t('ordered')}
               lent={lent}
+              reading={readingIds.has(row.book.bookId) ? t('readingMarker') : undefined}
               {...opens(row)}
             />
           ))}

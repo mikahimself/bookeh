@@ -236,19 +236,24 @@ describe('shelf filter values and suggestions', () => {
     const x = await sharedBook({ by: a, genres: [fiction.id, biography.id], language: 'fi' })
     const y = await sharedBook({ by: a, language: 'en' })
     const w = await sharedBook({ by: a, genres: [biography.id] })
+    const v = await sharedBook({ by: a })
     await copyOf(a, x, { location: hylly.id })
     await copyOf(a, x, { location: hylly.id })
     await copyOf(a, y, { status: 'ordered' })
     await copyOf(a, w, { location: arkku.id })
+    await copyOf(a, v)
 
     const z = await sharedBook({ by: b, genres: [other.id], language: 'de' })
     await copyOf(b, z, { location: vintti.id })
     await copyOf(b, x, { status: 'ordered' })
     await upsertUserBook(await contextFor(b), y.id, { overrides: { language: 'it' } })
-    // Read: x by A (two copies); y unread with a row; w without a row; B's read of w not A's.
+    // Read states: x read by A (two copies); y reading; w unread with a row; v without a
+    // row; B's read of w and reading of v are not A's.
     await upsertUserBook(asA, x.id, { read: true })
-    await upsertUserBook(asA, y.id, { read: false })
+    await upsertUserBook(asA, y.id, { readingSince: '2026-10-21T12:00:00.000Z' })
+    await upsertUserBook(asA, w.id, { read: false })
     await upsertUserBook(await contextFor(b), w.id, { read: true })
+    await upsertUserBook(await contextFor(b), v.id, { readingSince: '2026-10-21T12:00:00.000Z' })
 
     expect(await filterValues(asA, 'en')).toEqual({
       location: [
@@ -256,12 +261,13 @@ describe('shelf filter values and suggestions', () => {
         { id: hylly.id, name: hylly.name, count: 2 },
       ],
       status: [
-        { value: 'owned', count: 3 },
+        { value: 'owned', count: 4 },
         { value: 'ordered', count: 1 },
       ],
       read: [
-        { value: true, count: 2 },
-        { value: false, count: 2 },
+        { value: 'unread', count: 2 },
+        { value: 'reading', count: 1 },
+        { value: 'read', count: 2 },
       ],
       genre: [
         { id: biography.id, name: biography.name, count: 3 },

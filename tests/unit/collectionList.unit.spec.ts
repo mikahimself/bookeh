@@ -152,7 +152,7 @@ const tree = (initial: ShelfRows, q: ShelfQuery = query, book: number | null = n
           createElement(
             ShelfRowsProvider,
             { query: q, initial } as ComponentProps<typeof ShelfRowsProvider>,
-            createElement(CollectionList, { query: q, book }),
+            createElement(CollectionList, { query: q, book, reading: [] }),
             createElement(Probe),
           ),
         ),

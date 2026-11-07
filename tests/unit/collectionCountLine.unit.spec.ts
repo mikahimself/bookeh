@@ -23,7 +23,7 @@ describe('activeValues', () => {
         filters: {
           pages: [100, 300],
           author: [5],
-          read: true,
+          read: ['read'],
           status: ['ordered'],
           location: [3],
           publisher: ['WSOY'],
@@ -51,14 +51,14 @@ describe('activeValues', () => {
     ])
   })
 
-  it('leaves out an id without a label and shows read=false as unread', () => {
+  it('leaves out an id without a label and names read states in query order', () => {
     const values = activeValues(
-      query({ filters: { location: [3, 9], read: false } }),
+      query({ filters: { location: [3, 9], read: ['reading', 'unread'] } }),
       { 'location:3': 'Tampere' },
       t,
       'en',
     )
-    expect(values).toEqual(['Tampere', 'unread'])
+    expect(values).toEqual(['Tampere', 'reading', 'unread'])
   })
 
   it('leaves an open end of a range blank', () => {

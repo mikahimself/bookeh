@@ -15,8 +15,8 @@ import { contextFor, createUser } from '../helpers/harness'
 
 // `shelfIds()` filters, AD-7 (FR-25): fields AND, values within a
 // field OR, the count narrowed with the page; Book fields by effective value
-// (AD-6); ranges open at either end exclude no value; read and rating from
-// the viewer's `user-books` row, a missing row unread and unrated.
+// (AD-6); ranges open at either end exclude no value; read states (AD-8) and
+// rating from the viewer's `user-books` row, a missing row unread and unrated.
 // Author and series ids stand for every readable record with their
 // `name_key`, matched against effective values; genres are the Book's own.
 // Each test has its own users; owner scoping keeps them apart. Shared name
@@ -214,18 +214,28 @@ describe('shelf filters', () => {
     const loved = await sharedBook({ by: a })
     const meh = await sharedBook({ by: a })
     const untouched = await sharedBook({ by: a })
+    const started = await sharedBook({ by: a })
     const lovedCopy = await copyOf(a, loved)
     const mehCopy = await copyOf(a, meh)
     const untouchedCopy = await copyOf(a, untouched)
+    const startedCopy = await copyOf(a, started)
     await upsertUserBook(asA, loved.id, { read: true, rating: 4 })
     await upsertUserBook(asA, meh.id, { rating: 2 })
-    // B's row must not count for A (AD-6: `user_books` joins on the viewer).
-    await upsertUserBook(await contextFor(b), untouched.id, { read: true, rating: 5 })
+    await upsertUserBook(asA, started.id, { readingSince: '2026-10-21T12:00:00.000Z' })
+    // B's rows must not count for A (AD-6: `user_books` joins on the viewer).
+    const asB = await contextFor(b)
+    await upsertUserBook(asB, untouched.id, { read: true, rating: 5 })
+    await upsertUserBook(asB, meh.id, { readingSince: '2026-10-21T12:00:00.000Z' })
 
-    expect(await listed(asA, { read: true })).toEqual({ copies: [lovedCopy], total: 1 })
-    expect(await listed(asA, { read: false })).toEqual({
+    expect(await listed(asA, { read: ['read'] })).toEqual({ copies: [lovedCopy], total: 1 })
+    expect(await listed(asA, { read: ['reading'] })).toEqual({ copies: [startedCopy], total: 1 })
+    expect(await listed(asA, { read: ['unread'] })).toEqual({
       copies: [mehCopy, untouchedCopy],
       total: 2,
+    })
+    expect(await listed(asA, { read: ['reading', 'unread'] })).toEqual({
+      copies: [mehCopy, untouchedCopy, startedCopy],
+      total: 3,
     })
     expect(await listed(asA, { ratingMin: 3 })).toEqual({ copies: [lovedCopy], total: 1 })
     expect(await listed(asA, { ratingMin: 4 })).toEqual({ copies: [lovedCopy], total: 1 })

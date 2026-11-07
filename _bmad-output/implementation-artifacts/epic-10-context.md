@@ -4,7 +4,7 @@
 
 ## Goal
 
-Extend the completed private catalogue with reading state and dates per Book, acquisition dates and prices per copy, a view of current reading, and yearly reading and spending statistics. Keep these changes within the existing self-hosted app and its private multi-user model. Rename the scan entry point to Add book because it supports several ways to add a Book.
+Let each user track a Book as unread, being read or read, with editable start and finish dates, and record when each copy was acquired and what it cost. The collection shows what is being read, and a fifth section, Stats, counts books, pages and money per year plus a set of "nerdy" stats. The epic also renames "Scan book" to "Add book", because that screen does more than scan. It all stays inside the private, multi-user, self-hosted app: reading and purchase data belong to their owner, and the admin cannot read them either.
 
 ## Stories
 
@@ -17,30 +17,93 @@ Extend the completed private catalogue with reading state and dates per Book, ac
 
 ## Requirements & Constraints
 
-Reading belongs to a user and Book, never a physical copy. Several Books can be in reading at once; re-reads are not tracked. Derive the state from `read` and optional `readingSince`: read when the flag is true, reading when false with a start date, unread otherwise. `finishedAt` is optional and allowed only when read. Start must not follow finish, and neither date may be after today in Europe/Helsinki. Read Books may have only one date or neither date. A missing user-Book row is unread without dates.
-
-Starting an unread Book sets today; finishing a Book being read keeps its start and sets today's finish. Marking an unread Book read sets no dates. Returning a read Book to reading keeps its start or uses today and clears the finish. Unread clears both dates. Apply transitions only to Books whose state changes. Bulk Read follows the same rules per distinct Book; toggle resolves to unread only when every target is read. Its Undo restores all three values. Day counts are calendar differences with a minimum of one day. Editing Finished on a Book being read marks it read; clearing its Started date is refused. Ratings remain available once read.
-
-Each copy has a required acquisition date and optional integer price in euro cents, from zero to 9,999,999. Save defaults to today; Received resets the date and its Undo restores it. Existing copies take the Europe/Helsinki date of their creation timestamp. Spending includes owned and ordered copies. Reading dates, ratings, acquisition dates and prices are private to their owner, including against admins.
-
-Current reading and book statistics include only Books held through a visible copy or open wishlist entry. Reading is allowed on wishlist-only Books. Finished Books count once in the year and month of their finish; missing effective page counts add no pages. Undated read Books are counted separately. Spending uses acquisition year. Years include finished Books, priced copies and the current year, newest first. Averages use elapsed months or days for the current year and the whole past year. Duration stats need both dates; quickest and slowest ties go to earlier finish. Best month ties use pages then earlier month. Every effective author counts; the most-read needs at least two Books and ties by name. Dust considers only unread, non-reading Books and their earliest owned copy, resolving acquisition-date ties by earlier copy creation. Statistics without a candidate are absent; nothing is stored as a cached champion.
+- **Reading state** belongs to a user and a Book, never to a copy. Several Books can be in reading at once, and re-reads are not tracked. The state is derived from the stored fields and never stored on its own: **read** when `read` is set, **reading** when `read` is not set and `readingSince` is, **unread** otherwise. A missing `user-books` row means unread with no dates. A read Book can have both dates, one date or none.
+- **Transitions:**
+  - Unread → Reading sets today as the start.
+  - Reading → Read keeps the start and sets today as the finish.
+  - Unread → Read sets no dates.
+  - Read → Reading keeps the start (today if there is none) and clears the finish.
+  - → Unread clears both dates.
+  - A day count is the calendar days from start to finish (or to today), at least 1.
+- **Copies:** `acquiredAt` is a required calendar date and `price` is optional, in whole euro cents from 0 to 9 999 999. A copy gets today as `acquiredAt` when it is saved, and Received sets it to that day. Existing copies took the day they were created.
+- **Held Books only.** Currently reading, the Stats list and the book stats count only Books with a visible copy (owned or ordered) or an open wishlist entry. Reading is allowed on a Book the user only has on a wishlist. A `user-books` row whose Book is no longer held is not listed.
+- **Stats definitions:**
+  - Finished Books count in the year and month of `finishedAt`. Read Books without `finishedAt` count only in the "undated" line.
+  - Pages come from the effective Book (overrides applied). A Book without a page count adds a book but no pages.
+  - Spending is the sum of prices of copies acquired in the year, ordered or owned, read or not.
+  - The years listed are those with a finished Book or a priced copy, plus the current year, newest first.
+  - Books a month and Pages a day divide by the months or days elapsed: all of a past year, or up to today in the current year.
+  - Days a book, Quickest and Slowest need both dates. Quickest and Slowest ties go to the earlier finish.
+  - Thickest brick has the most pages. Most expensive is the priced copy acquired in the year with the highest price.
+  - Best month: most finished Books, then most pages, then the earlier month.
+  - Most-read author: every effective author of a Book counts. It needs at least 2 Books, and ties go by name.
+  - Most dust collected is not tied to the year. It is the unread Book (not being read) whose earliest **owned** copy has the oldest `acquiredAt`. Ties go to the copy created first.
+  - A stat with no candidate is null and not shown. Nothing is stored or cached.
 
 ## Technical Decisions
 
-Keep private data access scoped through the request context and existing ownership gates. `upsertUserBook()` remains the sole user-Book writer; `setRead()` owns reading transitions and `setReadingDates()` owns date edits; `lib/copies` stays the only `copies` writer, with `setCopyPurchase()` beside move, receive and the rest. Book-target mutations use `requireOwnBook()`; selections validate every copy before writing and run atomically. Book-detail reading changes and date edits have no Undo; only select mode's copy-ids path is undoable.
-
-Reading state is derived from `read` and `readingSince`, never stored as its own field; reading data never goes on copies and purchase data never on `user-books`. The date invariant lives in `UserBooks.beforeValidate` (field validation is skipped under an admin condition) and validates partial updates against the current row, so back-office writes are covered. Reading calendar primitives live in `src/fields/readingDates.ts`, shared by the collection and the books services without cross-service imports. `setRead()` returns `{ state, count, finishedDays }`; `finishedDays` is set only when exactly one changed Book went reading → read. Book detail's `setReadAction({ bookId, state })` returns `{ state: UserBookState, finishedDays }` and `setReadingDatesAction({ bookId, readingSince, finishedAt })` returns `UserBookState`, both without Undo; select mode's `toggleCopiesReadAction(copyIds)` keeps `Undoable<{ read, count }>`, translating toggle to read/unread with no finish toast. `UserBookState` carries `state`, `readingSince`, `finishedAt`; `CopyLine` gains `acquiredAt` and `price` (cents); shelf gains `ReadingBook` and `FilterValues.read` as counted `ReadState` values; `lib/stats` exposes `Stats` / `YearStats` exactly as the spine declares.
-
-Calendar dates travel as strict, real `YYYY-MM-DD` dates, store at 12:00 UTC, and read back by UTC date. Today and displayed dates use Europe/Helsinki. Format dates, numbers and EUR through next-intl. Use regenerated Payload types and committed migrations together; never migrate the dev database. Schema stories merge serially and regenerate their own migration after rebasing. Integration and browser checks use `bookeh_test` with push disabled.
-
-`readingNow()` and read-only reading, spending and dust readers live in `lib/shelf`, on its visibility fragments. `lib/stats` imports only shelf and books and hydrates through effective Books, so overrides affect pages and authors. Calculate statistics in the pure `computeStats()`; nothing is stored or cached. `/stats` takes `?year=`, a missing or unknown year meaning the current one; its Currently reading links to `/?book=`. Shared contracts changed by a story must be reconciled with the architecture spine in the same commit. Tests stay limited to named acceptance behavior and spine invariants; no network calls. Changes to types consumed by shared fixtures require the full unit suite before commit.
+- **Writers (already built):**
+  - `upsertUserBook()` is the only writer of `user-books`.
+  - `setRead()` owns the reading transitions. It takes copy ids or a Book id, plus a `ReadState` or `toggle`.
+  - `setReadingDates()` owns the date edits.
+  - `lib/copies` is the only writer of `copies`, including `setCopyPurchase()`.
+  - The date invariant lives in each collection's `beforeValidate` hook.
+- **Calendar dates:** sent as strict `YYYY-MM-DD`, stored at 12:00 UTC and read back by their UTC date. Today is computed in `Europe/Helsinki`. The primitives `helsinkiToday()` and `finishedDays()` are in `src/fields/readingDates.ts`. Dates, numbers and EUR amounts are formatted by `next-intl`.
+- **`readingNow(ctx)`** in `lib/shelf` is the one reader of Books being read, used by both the collection strip and Stats.
+  - It reads the viewer's rows in reading, on the shelf's visible-copy and visible-entry fragments.
+  - Order: `readingSince` ascending, then Book id.
+  - It hydrates through `getEffectiveBooks()` and returns `ReadingBook[]` (`{ book, since }`).
+- **Shelf filter:** gains `ShelfQuery.filters.read: ReadState[]` and `FilterValues.read` (counted values for unread, reading and read). In the URL it is `read=unread|reading|read`, repeatable, with values ORed within the field.
+- **Stats readers:** `readingLog`, `spending` and `dustCandidate` sit beside `readingNow` in `lib/shelf`. They are read-only, use the same fragments, and return only ids, dates and prices.
+- **`lib/stats`:**
+  - It imports only `shelf` and `books`.
+  - `getStats(ctx, year?)` hydrates Books through `getEffectiveBooks()` and calls the pure `computeStats()`.
+  - It returns `Stats` / `YearStats` exactly as the spine's shared shapes declare. `spent` and `price` are in cents, and `booksPerMonth` has one decimal.
+  - A missing or unknown year means the current year in Helsinki. `years` and `byYear` are newest first.
+- **Shell and routes:**
+  - `/stats` takes `?year=` and calls `requireUser()` first.
+  - Stats' Currently reading links to `/?book=<id>`.
+  - Stats joins `SECTIONS` as the fifth section: collection, loans, wishlists, stats, settings.
+  - The rename touches only the interface strings `scan.open` and `scan.heading`. Routes and code names stay `/scan`.
+- **Refresh:** shelf screens follow the shelf reload after any action that changes reading state (AD-7).
+- **Conventions:**
+  - A story that changes a shared contract updates ARCHITECTURE-SPINE.md in the same commit.
+  - Tests cover only named behaviours and spine rules. Examples: the shelf access test gains a second user's Book being read, and `computeStats()` gets one unit test per definition that can break. No Playwright for this epic.
+  - Every string is in English and Finnish.
+  - Screen stories record an uncommitted phone and desktop walk.
 
 ## UX & Interaction Patterns
 
-The Picked section of `mockups/reading-options.html` is authoritative. Book detail replaces its two-way read switch with unread / reading / read; changes save immediately. Only finishing from reading shows the finish-days toast, with no Undo (from the switch, or a dates save that moves reading to read, its days from the two stored dates); select mode keeps its existing Undo toast. Muted linked dates open one reading-dates Picker. Acquisition date and price share another Picker on each copy line, without toast or Undo. Price input accepts comma or decimal point and whole euros.
-
-Current reading sits above the collection count, ignores search and filters, disappears in select mode and scrolls horizontally. It follows shelf reloads. Read filters OR unread, reading and read values with copy counts. Lent and Ordered row endings take priority over Reading. Stats is the fifth section between wishlists and settings; phone content is one column and wide-screen month and fact groups sit side by side. All strings are English and Finnish, styles use existing tokens, and overlays remain one level deep. Screen changes require an uncommitted acceptance walk against the fixture e2e server, recorded in the story result.
+- **Source of truth for the look:** the Picked section of `mockups/reading-options.html`. Overlays stay one level deep and use the existing tokens.
+- **Currently reading strip:**
+  - It sits above the count line with a heading-group heading.
+  - Each Book is a covers-s cover tile (at least 70px) with its title and a muted "since {date}".
+  - Oldest start first, in one row that scrolls sideways.
+  - Tapping a tile opens Book detail.
+  - It ignores search and filters, and it is absent in select mode and when nothing is being read.
+- **Row ending:** a row of a Book being read ends with the 8px accent marker and "Reading" instead of the location. Lent and Ordered endings win over it. The count line names the active Read filter value.
+- **Stats layout:** one column on the phone. On wide screens, By month and Nerdy stats sit side by side.
+- **Stats parts, in order:**
+  1. Currently reading: title with "since {date}" at the right.
+  2. Year group: "This year" or "{year}", with a Text switch that replaces `?year=`.
+  3. Big numbers: books, pages, € spent and books a month, in heading-section type with muted labels, in one row that wraps.
+  4. By month: a three-column grid up to the current month, with one 8px accent square per finished Book, "{n} books · {pages} p", and "–" for a month with none. It is absent when nothing was finished that year.
+  5. Nerdy stats: label left, muted value right. Formats include "{title} · {n} days", "{title} · {pages} p", "{title} · €{price}", "{month} · {n} books", "{name} · {n}", and "unread for {n} years" (months under a year, days under a month).
+  6. By year: the same grid as By month without markers, "{n} books · {pages} p · €{spent}".
+  7. The muted undated line "{n} read books have no dates and are not counted."
+- **Stats empty state:** "Nothing read yet" with one dry remark, then the Year group with zeros.
+- **Header:**
+  - "Stats" / "Tilastot" is a section heading.
+  - The button on every section reads "Add book" / "Lisää kirja".
+  - On wide screens Add book never clips. The headings row clips at its right edge below 974px in English and 1074px in Finnish.
+  - Swiping wraps through all five sections.
 
 ## Cross-Story Dependencies
 
-Stories 10.1 and 10.2 are built; 10.4 builds on 10.1. Story 10.3 has no functional dependency, but its schema migration merges separately after 10.1. Story 10.5 needs 10.1 and 10.3; 10.6 needs 10.5. Existing save, Received, Undo, shelf refresh, wishlist holdings and ownership services remain the integration points. The Add book rename changes interface strings while retaining `/scan` routes and code names.
+- **Done:** 10.1, 10.2 and 10.3.
+- **10.4** needs 10.1.
+- **10.5** needs 10.1 and 10.3, and **10.6** needs 10.5.
+- **Walkthroughs still owed:**
+  - 10.3 flagged a walkthrough on the real surface before later stories build on the copy line: the Picker shares Book detail's accessible name, and the phone sheet has no Cancel button.
+  - 10.2 flagged the same no-Cancel sheet and focus after a Picker save.
+- **Rename and clipping:** 10.6's header clipping depends on the rename and the fifth heading together. Check it in a browser at 900, 980 and 1100px in both languages.

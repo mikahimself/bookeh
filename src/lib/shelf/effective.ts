@@ -60,3 +60,12 @@ export const firstAuthorSortName = (viewer: Viewer): SQL => sql`(
     cross join lateral (select a.sort_name from authors a
       where a.id = e.authors_id and ${readableBy(viewer, 'a')} offset 0) a
    order by e."order" limit 1)`
+
+/**
+ * Spine, AD-8: the viewer's reading state of the Book on the `ub` alias,
+ * derived and never stored: `read` when `read` is set, `reading` when not and
+ * `readingSince` is, otherwise `unread`; a missing `ub` row is unread. The SQL
+ * twin of `readState()` in `lib/books/userBookState`.
+ */
+export const readStateOf: SQL = sql`(case when ub.read is true then 'read'
+  when ub.reading_since is not null then 'reading' else 'unread' end)`

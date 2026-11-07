@@ -2,7 +2,7 @@ import { type SQL, sql } from '@payloadcms/db-postgres/drizzle'
 
 import type { Context } from '@/lib/payload/context'
 
-import { effective, effectiveAuthorIds } from './effective'
+import { effective, effectiveAuthorIds, readStateOf } from './effective'
 import type { ShelfQuery } from './query'
 import { readableBy } from './visibleCopies'
 
@@ -22,8 +22,9 @@ const inRange = (value: SQL, [from, to]: [number?, number?]): SQL[] => [
  * field OR; an empty list or an open-ended `[undefined, undefined]` range
  * adds nothing. Book fields use effective values (AD-6); publisher and
  * language match exactly, as `filterValues()` and `suggest()` hand them out.
- * Read and rating come from the viewer's `ub` row: a missing row is unread
- * and unrated. Author, series, genre and tag are `relationFilters`.
+ * Read is a list of states (AD-8, `readStateOf`) and rating a minimum, both
+ * from the viewer's `ub` row: a missing row is unread and unrated. Author,
+ * series, genre and tag are `relationFilters`.
  */
 export function scalarFilters(filters: Filters): SQL | undefined {
   const { publisher, language, year, pages, status, location, read, ratingMin } = filters
@@ -34,7 +35,7 @@ export function scalarFilters(filters: Filters): SQL | undefined {
   if (pages) conditions.push(...inRange(effective('pages'), pages))
   if (status?.length) conditions.push(sql`copies.status in ${status}`)
   if (location?.length) conditions.push(sql`copies.location_id in ${location}`)
-  if (read !== undefined) conditions.push(read ? sql`ub.read is true` : sql`ub.read is not true`)
+  if (read?.length) conditions.push(sql`${readStateOf} in ${read}`)
   if (ratingMin !== undefined) conditions.push(sql`ub.rating >= ${ratingMin}`)
   return conditions.length ? sql`(${sql.join(conditions, sql` and `)})` : undefined
 }

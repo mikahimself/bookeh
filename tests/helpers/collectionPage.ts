@@ -6,7 +6,7 @@ import type { DevicePrefs } from '@/app/(frontend)/prefs'
 import type { EffectiveBook, UserBookState } from '@/lib/books/effectiveBook'
 import type { CopyLine, EntryLine, Holdings } from '@/lib/books/holdings'
 import type { LocationOption } from '@/lib/copies/locations'
-import type { ShelfRow, ShelfRows } from '@/lib/shelf/query'
+import type { ReadingBook, ShelfRow, ShelfRows } from '@/lib/shelf/query'
 
 import { serverTree } from './serverTree'
 
@@ -18,6 +18,7 @@ import { serverTree } from './serverTree'
 export const router = { replace: vi.fn(), refresh: vi.fn(), push: vi.fn(), back: vi.fn() }
 let searchParams = new URLSearchParams()
 export const getShelfRows = vi.fn<() => Promise<ShelfRows>>()
+export const readingNow = vi.fn<() => Promise<ReadingBook[]>>()
 export const heldBook =
   vi.fn<(ctx: unknown, bookId: number) => Promise<EffectiveBook | undefined>>()
 export const getHoldings = vi.fn<(ctx: unknown, ids: number[]) => Promise<Map<number, Holdings>>>()
@@ -77,6 +78,7 @@ vi.mock('next/navigation', async (importOriginal) => ({
 }))
 vi.mock('@/lib/payload/context', () => ({ requireUser }))
 vi.mock('@/lib/shelf/getShelfRows', () => ({ getShelfRows }))
+vi.mock('@/lib/shelf/readingNow', () => ({ readingNow }))
 vi.mock('@/lib/shelf/filterValues', () => ({
   filterValues: async () => ({ location: [], status: [], read: [], genre: [], language: [] }),
 }))
@@ -293,6 +295,7 @@ export function resetCollectionPage() {
     tagUse.mockResolvedValue([])
     lendingPeople.mockResolvedValue([])
     requireUser.mockResolvedValue({ user: { roles: ['user'] } })
+    readingNow.mockResolvedValue([])
   })
 
   afterEach(async () => {

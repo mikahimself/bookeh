@@ -32,7 +32,7 @@ describe('shelf query parameters', () => {
       filters: {
         location: [4, 2],
         status: ['ordered', 'owned'],
-        read: false,
+        read: ['reading', 'unread'],
         genre: [11, 'tag:12'],
         tag: [12, 13],
         language: ['fin', 'swe'],
@@ -78,8 +78,11 @@ describe('shelf query parameters', () => {
     // `q` is NFC-normalised: a combining diaeresis becomes the precomposed letter.
     ['q=a%CC%88', { query: { ...DEFAULT, q: 'ä' }, book: null }],
     [
-      'year=1990-2000&read=true',
-      { query: { ...DEFAULT, filters: { read: true, year: [1990, 2000] } }, book: null },
+      'year=1990-2000&read=reading&read=true&read=foo&read=read&read=reading',
+      {
+        query: { ...DEFAULT, filters: { read: ['reading', 'read'], year: [1990, 2000] } },
+        book: null,
+      },
     ],
   ])('parses %s', (search, expected) => {
     for (const address of both(search)) expect(address).toStrictEqual(expected)

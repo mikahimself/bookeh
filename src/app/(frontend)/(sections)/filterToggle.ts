@@ -18,18 +18,14 @@ export type ListedField =
   | 'publisher'
   | 'theme'
 
-/** One value of `field`: an element of a listed field, or `read`'s boolean. */
-export type ListedValue<F extends ListedField> = F extends 'read'
-  ? boolean
-  : NonNullable<Filters[F]> extends (infer V)[]
-    ? V
-    : never
+/** One value of `field`: an element of its list. */
+export type ListedValue<F extends ListedField> =
+  NonNullable<Filters[F]> extends (infer V)[] ? V : never
 
 /**
  * `query` after a tap on `value` in the Filter panel. A list field gains the
- * value, or loses it when it is on; losing the last drops the field. `read`
- * holds one value: tapping the other switches it, tapping the one on clears
- * it. Search, sort, direction and the other fields stay.
+ * value, or loses it when it is on; losing the last drops the field.
+ * Search, sort, direction and the other fields stay.
  */
 export function toggleFilter<F extends ListedField>(
   query: ShelfQuery,
@@ -37,14 +33,9 @@ export function toggleFilter<F extends ListedField>(
   value: ListedValue<F>,
 ): ShelfQuery {
   const { [field]: current, ...rest } = query.filters
-  let next: unknown
-  if (field === 'read') {
-    next = current === value ? undefined : value
-  } else {
-    const values: unknown[] = Array.isArray(current) ? current : []
-    const toggled = values.includes(value) ? values.filter((v) => v !== value) : [...values, value]
-    next = toggled.length > 0 ? toggled : undefined
-  }
+  const values: unknown[] = Array.isArray(current) ? current : []
+  const toggled = values.includes(value) ? values.filter((v) => v !== value) : [...values, value]
+  const next = toggled.length > 0 ? toggled : undefined
   const filters = (next === undefined ? rest : { ...rest, [field]: next }) as Filters
   return { ...query, filters }
 }

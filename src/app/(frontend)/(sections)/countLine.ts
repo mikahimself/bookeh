@@ -7,6 +7,7 @@ export type CountLineKey =
   | 'statuses.owned'
   | 'statuses.ordered'
   | 'read'
+  | 'reading'
   | 'unread'
   | 'rating'
   | 'yearRange'
@@ -52,7 +53,7 @@ export function activeValues(
     ...(query.q === undefined ? [] : [t('quoted', { text: query.q })]),
     ...named('location', f.location),
     ...(f.status ?? []).map((status) => t(`statuses.${status}`)),
-    ...(f.read === undefined ? [] : [t(f.read ? 'read' : 'unread')]),
+    ...(f.read ?? []).map((state) => t(state)),
     ...named('genre', f.genre),
     ...named('tag', f.tag),
     ...(f.theme ?? []),

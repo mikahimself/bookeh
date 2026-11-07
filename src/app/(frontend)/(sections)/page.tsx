@@ -11,8 +11,10 @@ import {
   SHELF_PAGE_SIZE,
   shelfHref,
   type FilterValues,
+  type ReadingBook,
   type ShelfRows,
 } from '@/lib/shelf/query'
+import { readingNow } from '@/lib/shelf/readingNow'
 
 import { tagUse } from '@/lib/tags/tags'
 import type { TagOptions } from '../components/TagPicker'
@@ -44,6 +46,9 @@ import { ShelfActionsProvider, ShelfRowsProvider } from './ShelfRows'
  * list. The bar and Book detail get the viewer's locations for Move, none
  * when that read fails.
  * `afterAction` sits above the list as well, so the bar reaches it.
+ * One `readingNow()` read feeds the list's Currently reading strip and its
+ * rows' Reading ending, so `afterAction`'s `router.refresh()` updates both; a
+ * failed read shows neither.
  */
 export default async function CollectionPage({
   searchParams,
@@ -56,7 +61,7 @@ export default async function CollectionPage({
 
   const locale = resolveLocale(await getLocale(), null)
 
-  const [shelf, values, locations, tagOptions] = await Promise.all([
+  const [shelf, values, locations, tagOptions, reading] = await Promise.all([
     getShelfRows(ctx, query, { offset: 0, limit: SHELF_PAGE_SIZE }).catch(
       (err: unknown): ShelfRows | null => {
         logger().error({ err }, 'The collection failed to load')
@@ -82,6 +87,10 @@ export default async function CollectionPage({
         return null
       }
     })(),
+    readingNow(ctx).catch((err: unknown): ReadingBook[] => {
+      logger().error({ err }, 'The books being read failed to load')
+      return []
+    }),
   ])
 
   return (
@@ -96,7 +105,7 @@ export default async function CollectionPage({
                 <div className="min-w-0 flex-1">
                   {shelf ? (
                     <ShelfRowsProvider query={query} initial={shelf}>
-                      <CollectionList query={query} book={book} />
+                      <CollectionList query={query} book={book} reading={reading} />
                     </ShelfRowsProvider>
                   ) : (
                     <LoadFailed />

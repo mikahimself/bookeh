@@ -297,7 +297,8 @@
       "owned": "Oma",
       "ordered": "Tilattu",
       "read": "Luettu",
-      "unread": "Lukematon"
+      "unread": "Lukematon",
+      "reading": "Kesken"
     },
     "select": "Valitse",
     "selected": "{n} valittu",
@@ -330,6 +331,9 @@
     "read": "luettu",
     "unread": "lukematon",
     "reading": "kesken",
+    "readingNow": "Luettavana",
+    "readingSince": "{date} alkaen",
+    "readingMarker": "Kesken",
     "rating": "{n, plural, =5 {# tähteä} other {#+ tähteä}}",
     "yearRange": "{from}–{to}",
     "pagesRange": "{from}–{to} sivua",

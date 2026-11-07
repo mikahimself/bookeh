@@ -222,10 +222,10 @@ function OptionLists({ values, labels }: { values: FilterValues; labels: Record<
       <Field
         heading={t('filterFields.read')}
         options={values.read.map(({ value, count }) => ({
-          key: String(value),
-          label: t(value ? 'filterValues.read' : 'filterValues.unread'),
+          key: value,
+          label: t(`filterValues.${value}`),
           count,
-          on: f.read === value,
+          on: f.read?.includes(value) ?? false,
           tap: tap('read', value),
         }))}
       />

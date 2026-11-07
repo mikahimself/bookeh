@@ -30,7 +30,9 @@ const joined = (parts: (string | number | null)[]) =>
  * one line. A placeholder cover is its cloth alone in a row. At every size an ordered
  * copy's row ends with "Ordered", a lent owned copy's with the lent marker and
  * "Lent · {person}" (`lent`) in place of its location, and any other owned
- * copy's with its location's name, truncated when long. Nothing ends an owned
+ * copy's with its location's name, truncated when long. A Book being read
+ * (`reading`, its word) ends with the 8px marker and "Reading" in place of the
+ * location; lent and ordered win over it. Nothing ends an owned
  * row without a location or a loan, so a user with no locations never sees a
  * location there (FR-32). One row is one copy.
  * Hook-free, so the server page and the client list share it; the caller
@@ -48,6 +50,7 @@ export function BookRow({
   replace,
   open,
   select,
+  reading,
 }: {
   row: ShelfRow
   size: Size
@@ -57,6 +60,7 @@ export function BookRow({
   replace: boolean
   open: boolean
   select?: RowSelect
+  reading?: string
 }) {
   const authors = book.authors.map((author) => author.name).join(', ')
   const lines =
@@ -65,6 +69,7 @@ export function BookRow({
       : [joined([authors, book.year, book.publisher])]
   const meta = lines.filter((line) => line !== '')
   const lentTo = isLent(copy) ? copy.loan.person.name : null
+  const marked = lentTo !== null ? lent(lentTo) : copy.status === 'ordered' ? undefined : reading
   const ending = copy.status === 'ordered' ? ordered : copy.location?.name
 
   const content = (
@@ -82,10 +87,10 @@ export function BookRow({
           </p>
         ))}
       </div>
-      {lentTo !== null ? (
+      {marked !== undefined ? (
         <span className="flex max-w-1/3 shrink-0 items-center gap-2 text-meta text-text">
           <span aria-hidden="true" className={`${markerSlotClass} bg-accent`} />
-          <span className="min-w-0 truncate">{lent(lentTo)}</span>
+          <span className="min-w-0 truncate">{marked}</span>
         </span>
       ) : (
         ending !== undefined && (

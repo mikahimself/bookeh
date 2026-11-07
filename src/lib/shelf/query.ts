@@ -13,7 +13,7 @@
  * for a single-valued parameter the first value counts. No page number.
  */
 
-import type { EffectiveBook } from '@/lib/books/effectiveBook'
+import type { EffectiveBook, ReadState } from '@/lib/books/effectiveBook'
 import type { CopyLine, Holdings } from '@/lib/books/holdings'
 import { isRowId, type Named } from '@/lib/payload/ref'
 
@@ -25,7 +25,7 @@ export type ShelfQuery = {
   filters: Partial<{
     location: number[]
     status: ('owned' | 'ordered')[]
-    read: boolean
+    read: ReadState[]
     genre: GenreFilterId[]
     tag: number[]
     theme: string[]
@@ -66,7 +66,7 @@ export type Counted<T> = T & { count: number }
 export type FilterValues = {
   location: Counted<Named>[]
   status: Counted<{ value: 'owned' | 'ordered' }>[]
-  read: Counted<{ value: boolean }>[]
+  read: Counted<{ value: ReadState }>[]
   genre: Counted<{ id: GenreFilterId; name: string }>[]
   tag: Counted<Named>[]
   language: Counted<{ value: string }>[]
@@ -81,6 +81,9 @@ export type ShelfRows = { rows: ShelfRow[]; total: number; labels: Record<string
 /** Spine, Shared shapes: a Book the viewer holds, `searchMine()`. */
 export type MyBook = { book: EffectiveBook; mine: Holdings }
 
+/** Spine, Shared shapes: a Book the viewer is reading, `readingNow()`; `since` is `YYYY-MM-DD`. */
+export type ReadingBook = { book: EffectiveBook; since: string }
+
 /** Spine, Shared shapes: the parsed address; the client list keys on `query` alone. */
 export type ShelfAddress = { query: ShelfQuery; book: number | null }
 
@@ -93,6 +96,7 @@ type Range = [number?, number?]
 const SORTS: readonly ShelfQuery['sort'][] = ['author', 'title', 'year', 'added']
 const DIRS: readonly ShelfQuery['dir'][] = ['asc', 'desc']
 const STATUSES: readonly ('owned' | 'ordered')[] = ['owned', 'ordered']
+const READ_STATES: readonly ReadState[] = ['unread', 'reading', 'read']
 
 const whole = (text: string): number | undefined => {
   if (!/^\d+$/.test(text)) return undefined
@@ -118,9 +122,6 @@ const oneOf =
     values.find((v) => v === text)
 
 const text = (value: string | undefined): string | undefined => (value ? value : undefined)
-
-const bool = (value: string | undefined): boolean | undefined =>
-  value === 'true' ? true : value === 'false' ? false : undefined
 
 const rating = (value: string | undefined): number | undefined => {
   const n = id(value)
@@ -164,7 +165,7 @@ export function parseShelfQuery(params: ShelfParams): ShelfAddress {
   }
   set('location', list(all('location'), id))
   set('status', list(all('status'), oneOf(STATUSES)))
-  set('read', bool(one('read')))
+  set('read', list(all('read'), oneOf(READ_STATES)))
   set('genre', list(all('genre'), genreId))
   set('tag', list(all('tag'), id))
   set('theme', list(all('theme'), text))
@@ -197,7 +198,7 @@ export function shelfSearchParams(
   { book = null }: { book?: number | null } = {},
 ): URLSearchParams {
   const params = new URLSearchParams()
-  const add = (name: string, values: readonly (string | number | boolean)[] | undefined) => {
+  const add = (name: string, values: readonly (string | number)[] | undefined) => {
     for (const value of new Set(values?.map(String))) if (value !== '') params.append(name, value)
   }
   const rangeText = (r: Range | undefined): string[] | undefined =>
@@ -209,7 +210,7 @@ export function shelfSearchParams(
   add('q', one(query.q))
   add('location', f.location)
   add('status', f.status)
-  add('read', one(f.read))
+  add('read', f.read)
   add('genre', f.genre)
   add('tag', f.tag)
   add('theme', f.theme)

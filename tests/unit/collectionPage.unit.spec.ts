@@ -14,6 +14,7 @@ import {
   logError,
   page,
   pressed,
+  readingNow,
   renderPage,
   resetCollectionPage,
   router,
@@ -56,33 +57,76 @@ describe('CollectionPage', () => {
     within(items[2]).getByText('Ordered')
   })
 
-  it('ends a lent row with the marker and its borrower in place of the location', async () => {
+  it('ends a lent row with the marker and its borrower, an ordered one with Ordered, a read-in-progress one with Reading', async () => {
     const tampere = { id: 2, name: 'Tampere' }
+    const tuntematon = book(1, 'Tuntematon sotilas')
     getShelfRows.mockResolvedValue({
       rows: [
-        lentRow(row(11, book(1, 'Tuntematon sotilas'), 'owned', tampere)),
+        lentRow(row(11, tuntematon, 'owned', tampere)),
         row(12, book(2, 'Sinuhe'), 'owned', tampere),
         lentRow(row(13, book(3, 'Seitsemän veljestä'), 'ordered')),
         lentRow(row(14, book(4, 'Taikatalvi'))),
+        row(15, tuntematon, 'owned', tampere),
+        row(16, tuntematon, 'ordered'),
       ],
-      total: 4,
+      total: 6,
       labels: {},
     })
+    // Books 1 and 3 are being read; 2 and 4 are not.
+    readingNow.mockResolvedValue([
+      { book: tuntematon, since: '2026-10-21' },
+      { book: book(3, 'Seitsemän veljestä'), since: '2026-11-03' },
+    ])
     await renderPage()
 
-    const items = screen.getAllByRole('listitem')
+    const items = screen.getAllByRole('listitem').filter((item) => !item.closest('section'))
     expect(items[0].textContent?.endsWith('Lent · Antti')).toBe(true)
     expect(within(items[0]).queryByText('Tampere')).toBeNull()
     expect(items[1].textContent?.endsWith('Tampere')).toBe(true)
     expect(items[2].textContent?.endsWith('Ordered')).toBe(true)
     expect(within(items[2]).queryByText(/Lent/)).toBeNull()
     expect(items[3].textContent?.endsWith('Lent · Antti')).toBe(true)
+    expect(items[4].textContent?.endsWith('Reading')).toBe(true)
+    expect(within(items[4]).queryByText('Tampere')).toBeNull()
+    expect(items[5].textContent?.endsWith('Ordered')).toBe(true)
 
     // Select mode keeps the ending beside the checkbox.
     fireEvent.click(screen.getByRole('button', { name: 'Select' }))
     const ticking = screen.getAllByRole('listitem')
     within(ticking[0]).getByRole('checkbox')
     expect(ticking[0].textContent?.endsWith('Lent · Antti')).toBe(true)
+  })
+
+  it('lists the Books being read above the count line, oldest first, and hides them in select mode', async () => {
+    getShelfRows.mockResolvedValue({ rows: [row(11, book(1, 'Sinuhe'))], total: 1, labels: {} })
+    readingNow.mockResolvedValue([
+      { book: book(2, 'Tuntematon sotilas'), since: '2026-10-21' },
+      { book: book(3, 'Taikatalvi'), since: '2026-11-03' },
+    ])
+    await renderPage()
+
+    const strip = screen.getByRole('region', { name: 'Currently reading' })
+    expect(
+      within(strip)
+        .getAllByRole('listitem')
+        .map((item) => item.querySelector('p')?.textContent),
+    ).toEqual(['Tuntematon sotilas', 'Taikatalvi'])
+    fireEvent.click(screen.getByRole('button', { name: 'Select' }))
+    expect(screen.queryByRole('region', { name: 'Currently reading' })).toBeNull()
+  })
+
+  it('logs a failed read of the Books being read and renders the list without the strip', async () => {
+    getShelfRows.mockResolvedValue({
+      rows: [row(11, book(1, 'Sinuhe'), 'owned', { id: 2, name: 'Tampere' })],
+      total: 1,
+      labels: {},
+    })
+    readingNow.mockRejectedValue(new Error('down'))
+    await renderPage()
+
+    expect(logError).toHaveBeenCalledOnce()
+    expect(screen.queryByRole('region', { name: 'Currently reading' })).toBeNull()
+    expect(screen.getByRole('listitem').textContent?.endsWith('Tampere')).toBe(true)
   })
 
   it("shows a lent tile's borrower", async () => {
@@ -287,7 +331,7 @@ describe('CollectionPage', () => {
 
   it('names the active filters in the count line', async () => {
     getShelfRows.mockResolvedValue({ rows: [], total: 14, labels: { 'location:3': 'Tampere' } })
-    await renderPage({ location: '3', read: 'false' })
+    await renderPage({ location: '3', read: 'unread' })
 
     expect(countLine().textContent).toBe('Tampere, unread · 14 books · Clear')
   })
