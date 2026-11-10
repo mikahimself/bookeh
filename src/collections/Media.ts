@@ -61,5 +61,14 @@ export const Media: CollectionConfig = {
     staticDir: process.env.MEDIA_DIR || 'media',
     filesRequiredOnCreate: false,
     mimeTypes: ['image/jpeg', 'image/png', 'image/webp'],
+    // Spine, Caching: a stored file's name is a fresh UUID and is never
+    // rewritten, so a file answer stays fresh in the viewer's browser for
+    // good. Runs after the access check: a denied request never gets it.
+    modifyResponseHeaders: ({ headers }) => {
+      if (headers.get('Content-Type')?.startsWith('image/')) {
+        headers.set('Cache-Control', 'private, max-age=31536000, immutable')
+      }
+      return headers
+    },
   },
 }
