@@ -133,7 +133,7 @@ export function SelectBar({
       <p aria-live="polite" className="text-body text-text">
         {t('selected', { n: ticked.size })}
       </p>
-      <div className="flex gap-2 max-wide:[&>button]:min-w-0 max-wide:[&>button]:flex-1 max-wide:[&>button]:px-2 max-wide:col-span-2 max-wide:row-start-2 wide:ml-auto">
+      <div className="flex gap-2 max-wide:[&>button]:min-w-0 max-wide:[&>button]:flex-1 max-wide:[&>button]:px-1 max-wide:col-span-2 max-wide:row-start-2 wide:ml-auto">
         {locations.length > 0 && (
           <Button
             variant="secondary"

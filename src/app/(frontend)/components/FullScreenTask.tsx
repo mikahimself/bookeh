@@ -43,8 +43,12 @@ export function FullScreenTask({
     <div ref={frame} className="fixed inset-0 overflow-y-auto bg-background">
       <div className="mx-auto flex min-h-full w-full max-w-task-width flex-col gap-6 px-page-margin-phone pt-page-margin-phone wide:px-page-margin wide:pt-page-margin">
         <header className="flex items-start justify-between gap-4">
-          <h1 className="text-heading-section-phone ui-case wide:text-heading-section">{title}</h1>
-          <CloseButton label={t('close')} onClick={() => (onClose ? onClose(close) : close())} />
+          <h1 className="min-w-0 break-words text-heading-section-phone ui-case wide:text-heading-section">
+            {title}
+          </h1>
+          <div className="flex h-[1lh] shrink-0 items-center text-heading-section-phone wide:text-heading-section">
+            <CloseButton label={t('close')} onClick={() => (onClose ? onClose(close) : close())} />
+          </div>
         </header>
         {children}
         {foot != null && (

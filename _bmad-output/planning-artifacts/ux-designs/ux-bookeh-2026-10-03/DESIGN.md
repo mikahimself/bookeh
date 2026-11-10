@@ -369,7 +369,7 @@ One typeface: **Open Sans**, self-hosted, in weights 300 and 400. There is no bo
 | Group heading | `heading-group` (20px / 300, muted) | Groups inside a panel or screen: your copies, lent before, genres and tags. |
 | Title | `title` (17px / 400) | Book title in a row; author in the detail header. |
 | Control | `control` (17px / 400) | Text switches: rows / covers, s / m / l, by person / by date. |
-| Button | `button` (15px / 400) | Button labels. |
+| Button | `button` (17px / 400) | Button labels. |
 | Body | `body` (14px / 400) | Running text, values. |
 | Meta | `meta` (13px / 400) | Second line of a row, locations, toasts. |
 | Label | `label` (12px / 400) | Field labels, cover captions' second line. |

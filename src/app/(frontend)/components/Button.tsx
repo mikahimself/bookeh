@@ -9,16 +9,19 @@ const outlines = {
 export type ButtonVariant = keyof typeof outlines
 
 /**
- * The Button look, shared with links drawn as a button (Add book). `compact`
- * (DESIGN.md, Button, compact) pads less and is drawn under the tap height;
- * on the phone a pseudo-element grows its tap area up from its bottom edge to
- * 44px, so it never reaches below the row it sits in.
+ * The Button look, shared with links drawn as a button (Add book). DESIGN.md,
+ * Button: a `stroke-button` outline (read through the token, so one line in
+ * styles.css sets every button's weight) and at least `button-height` tall at
+ * every width, so a wrapped label still fits. `compact` (DESIGN.md, Button,
+ * compact) pads less and is drawn under that height; on the phone a
+ * pseudo-element grows its tap area up from its bottom edge to 44px, so it
+ * never reaches below the row it sits in.
  */
 export function buttonClass(variant: ButtonVariant, { compact = false } = {}): string {
   const size = compact
     ? "relative shrink-0 px-3 py-1 max-wide:before:absolute max-wide:before:inset-x-0 max-wide:before:bottom-0 max-wide:before:h-tap max-wide:before:content-['']"
-    : 'px-4 py-2 max-wide:min-h-tap'
-  return `border-2 ${outlines[variant]} bg-transparent ${size} text-button text-text ui-case disabled:border-text-dim disabled:text-text-dim`
+    : 'min-h-button-height px-4'
+  return `border-(length:--spacing-stroke-button) ${outlines[variant]} bg-transparent ${size} text-button text-text ui-case disabled:border-text-dim disabled:text-text-dim`
 }
 
 export type ButtonProps = Omit<ComponentProps<'button'>, 'className'> & {

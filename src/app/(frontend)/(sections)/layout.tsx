@@ -49,7 +49,7 @@ export default async function SectionsLayout({ children }: { children: ReactNode
       <SectionSwipe />
       <div
         data-pinned-bottom
-        className="sticky bottom-0 flex gap-3 bg-background px-page-margin-phone pt-4 pb-[calc(var(--spacing-4)+env(safe-area-inset-bottom))] wide:hidden"
+        className="sticky bottom-0 flex items-center gap-3 bg-background px-page-margin-phone pt-4 pb-[calc(var(--spacing-4)+env(safe-area-inset-bottom))] wide:hidden"
       >
         {scanBook('flex flex-1')}
         <BackToTop />
