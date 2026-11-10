@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Add book, scan</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400&amp;display=swap">
+<style>
+body{margin:0}
+.ph{--bg:#FFFFFF;--ink:#1F2933;--mu:#5F6B78;--dim:#87919C;--co:#F0604F;width:390px;height:844px;box-sizing:border-box;background:var(--bg);color:var(--ink);font:14px/1.45 'Open Sans',sans-serif;position:relative;overflow:hidden;display:flex;flex-direction:column;padding:0 20px}
+.x{position:absolute;top:10px;right:10px;width:44px;height:44px;background:none;border:0;padding:0;color:var(--ink);display:flex;align-items:center;justify-content:center}
+h1{margin:52px 0 0 -3px;font-size:56px;font-weight:300;line-height:1.08;letter-spacing:-.02em;text-transform:lowercase}
+.sub{margin:6px 0 0;font-size:15px;color:var(--mu)}
+.cam{position:relative;height:380px;margin-top:22px;background:#2B2622;overflow:hidden}
+.book{position:absolute;left:-20px;right:-30px;top:40px;bottom:-40px;background:#17191C;transform:rotate(-7deg)}
+.lab{position:absolute;left:96px;top:128px;width:180px;height:96px;background:#F4F1EA;transform:rotate(-7deg);padding:10px 12px 0;box-sizing:border-box}
+.code{height:58px;background:repeating-linear-gradient(90deg,#111 0 2px,transparent 2px 4px,#111 4px 5px,transparent 5px 8px,#111 8px 11px,transparent 11px 12px,#111 12px 13px,transparent 13px 16px)}
+.num{font:11px/1.6 'Open Sans',sans-serif;color:#111;letter-spacing:.14em}
+.cn{position:absolute;width:40px;height:40px;border:0 solid #FFFFFF}
+.cn.a{left:44px;top:84px;border-width:4px 0 0 4px}
+.cn.b{right:44px;top:84px;border-width:4px 4px 0 0}
+.cn.c{left:44px;bottom:84px;border-width:0 0 4px 4px}
+.cn.d{right:44px;bottom:84px;border-width:0 4px 4px 0}
+.guide{position:absolute;left:64px;right:64px;top:50%;border-top:2px solid var(--co)}
+.hint{position:absolute;left:0;right:0;bottom:16px;text-align:center;color:#E3E8EE;font-size:13px}
+.bar{position:absolute;left:0;right:0;bottom:0;height:100px;background:#1F2933;color:#FFFFFF;display:flex;justify-content:center;gap:22px;padding-top:10px;box-sizing:border-box}
+.ab{display:flex;flex-direction:column;align-items:center;gap:4px;width:92px;background:none;border:0;color:inherit;font:12px/1.25 'Open Sans',sans-serif;text-transform:lowercase;text-align:center;padding:0;cursor:pointer}
+.ci{flex:none;width:44px;height:44px;border:2px solid currentColor;border-radius:50%;box-sizing:border-box;display:flex;align-items:center;justify-content:center}
+.fld{margin-top:26px}
+.fld label{display:block;font-size:12px;color:var(--mu)}
+.row{display:flex;align-items:flex-end;gap:12px}
+.in{flex:1;border:0;border-bottom:2px solid var(--dim);padding:4px 0 6px;font:17px 'Open Sans',sans-serif;color:var(--ink);background:transparent;outline:0}
+.in::placeholder{color:var(--dim)}
+.bt{border:2px solid var(--ink);background:transparent;color:var(--ink);font:17px 'Open Sans',sans-serif;text-transform:lowercase;height:44px;padding:0 18px}
+</style>
+</helmet>
+<div class="ph">
+  <button type="button" class="x" aria-label="Close"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 2l14 14M16 2L2 16"/></svg></button>
+  <h1>Add book</h1>
+  <p class="sub">Scan the barcode, or type the ISBN</p>
+
+  <div class="cam" role="img" aria-label="Camera view with a barcode inside the target">
+    <div class="book"></div>
+    <div class="lab"><div class="code"></div><div class="num">9 789510 012345</div></div>
+    <i class="cn a"></i><i class="cn b"></i><i class="cn c"></i><i class="cn d"></i>
+    <i class="guide"></i>
+    <p class="hint">Hold the barcode inside the corners</p>
+  </div>
+
+  <div class="fld">
+    <label for="isbn">ISBN</label>
+    <div class="row"><input id="isbn" class="in" inputmode="numeric" placeholder="978…"><button type="button" class="bt">Find</button></div>
+  </div>
+
+  <div class="bar">
+    <button type="button" class="ab" aria-pressed="false"><span class="ci"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M8 3h8v4l-2 3v11h-4V10L8 7zM8 7h8M12 13v2"/></svg></span>torch</button>
+    <button type="button" class="ab"><span class="ci"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M5 4h10v16H5zM18 9v6M15 12h6"/></svg></span>add without ISBN</button>
+    <button type="button" class="ab"><span class="ci"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6"/><path d="M15 15l5 5"/></svg></span>find by title / author</button>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

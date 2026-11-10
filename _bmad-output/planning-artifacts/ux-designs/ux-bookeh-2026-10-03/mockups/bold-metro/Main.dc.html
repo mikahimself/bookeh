@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="fi">
+<head>
+<meta charset="utf-8">
+<title>Collection, covers, light</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400&amp;display=swap">
+<style>
+body{margin:0}
+.ph{--bg:#FFFFFF;--ink:#1F2933;--mu:#5F6B78;--dim:#87919C;--ln:#DDE2E7;--co:#F0604F;--cof:#D1432F;--bar:#1F2933;--bar-ink:#FFFFFF;--bar-mu:#AEB7C1;width:390px;height:844px;box-sizing:border-box;background:var(--bg);color:var(--ink);font:14px/1.45 'Open Sans',sans-serif;position:relative;overflow:hidden;display:flex;flex-direction:column}
+.app{margin:0;padding:18px 20px 0;font-size:15px;letter-spacing:.02em}
+.pv{display:flex;gap:22px;padding:22px 20px 0;margin:0 0 0 -3px;white-space:nowrap;font-size:56px;line-height:1.08;letter-spacing:-.02em;text-transform:lowercase;color:var(--dim);overflow:hidden}
+.pv .on{color:var(--ink)}
+.sf{margin:14px 20px 0;border-bottom:2px solid var(--ink);padding:6px 0;color:var(--mu);font-size:17px}
+.gh{margin:22px 20px 8px;font-size:22px;font-weight:300;line-height:1.3;text-transform:lowercase}
+.strip{display:flex;gap:12px;padding:0 20px}
+.tile{min-width:0;display:flex;flex-direction:column}
+.cv{aspect-ratio:2/3;box-shadow:inset 0 0 0 1px #1F293324;padding:13% 11% 0;box-sizing:border-box;overflow:hidden;font:600 10.5px/1.15 'Trebuchet MS','Open Sans',sans-serif;letter-spacing:.06em;text-transform:uppercase;hyphens:auto;overflow-wrap:break-word}
+.cv.s{font-size:8.5px;letter-spacing:.04em}
+.cl{color:#F5F2EA}.cd{color:#15171A}
+.tile b{display:block;font-weight:400;font-size:13px;margin-top:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tile span{display:block;font-size:12px;color:var(--mu);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tools{display:flex;align-items:center;gap:14px;padding:22px 20px 12px}
+.cnt{margin-right:auto;font-size:15px;color:var(--mu)}
+.vt{display:flex;gap:6px}
+.vt button{width:40px;height:40px;border:2px solid var(--ink);background:transparent;color:var(--ink);display:flex;align-items:center;justify-content:center;padding:0;cursor:pointer}
+.vt button.on{background:var(--cof);border-color:var(--cof);color:#FFFFFF}
+.sw{display:flex;gap:12px;font-size:17px;color:var(--dim);text-transform:lowercase}
+.sw .on{color:var(--ink)}
+.grid{flex:1;min-height:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px 14px;padding:0 20px;align-content:start;overflow:hidden}
+.bar{position:absolute;left:0;right:0;bottom:0;height:84px;background:var(--bar);color:var(--bar-ink);display:flex;justify-content:center;gap:28px;padding-top:10px;box-sizing:border-box}
+.ab{display:flex;flex-direction:column;align-items:center;gap:4px;background:none;border:0;color:inherit;font:12px/1.2 'Open Sans',sans-serif;text-transform:lowercase;padding:0;cursor:pointer;min-width:56px}
+.ci{width:44px;height:44px;border:2px solid currentColor;border-radius:50%;box-sizing:border-box;display:flex;align-items:center;justify-content:center}
+.ab.pr .ci{border-color:var(--co)}
+.more{position:absolute;right:14px;top:6px;width:44px;height:28px;background:none;border:0;color:var(--bar-ink);display:flex;align-items:center;justify-content:center;padding:0}
+</style>
+</helmet>
+<div class="ph">
+  <nav class="pv" aria-label="Sections" style="font-weight: {{hw}}"><span class="on">Collection</span><span>Loans</span><span>Wishlists</span></nav>
+  <div class="sf">Search your books</div>
+
+  <h2 class="gh">Currently reading</h2>
+  <div class="strip">
+    <div class="tile" style="width: 76px"><div class="cv s cd" style="background: #E56195">Hävitys</div><b style="font-size: 12px">Hävitys</b><span>since 6 Nov</span></div>
+    <div class="tile" style="width: 76px"><div class="cv s cl" style="background: #012534">Täällä Pohjan&shy;tähden alla 1</div><b style="font-size: 12px">Täällä Pohjantähden…</b><span>since 2 Sep</span></div>
+  </div>
+
+  <div class="tools">
+    <span class="cnt">290 books</span>
+    <span class="sw"><span>S</span><span class="on">M</span><span>L</span></span>
+    <div class="vt" role="group" aria-label="Layout">
+      <button type="button" aria-label="Rows"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3 6h2M3 12h2M3 18h2"/></svg></button>
+      <button type="button" class="on" aria-label="Covers" aria-pressed="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg></button>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="tile"><div class="cv cl" style="background: #012534">Tuntematon sotilas</div><b>Tuntematon sotilas</b><span>Väinö Linna</span></div>
+    <div class="tile"><div class="cv cd" style="background: #FBFAF6">Sinuhe egyptiläinen</div><b>Sinuhe egyptiläinen</b><span>Mika Waltari</span></div>
+    <div class="tile"><div class="cv cl" style="background: #1C1C1C">Puhdistus</div><b>Puhdistus</b><span>Sofi Oksanen</span></div>
+    <div class="tile"><div class="cv cd" style="background: #3B8EA5">Muumipappa ja meri</div><b>Muumipappa ja meri</b><span>Tove Jansson</span></div>
+    <div class="tile"><div class="cv cd" style="background: #A3A7AA">Musta aalto</div><b>Musta aalto</b><span>Saana Airtola</span></div>
+    <div class="tile"><div class="cv cd" style="background: #F7D117">Kesäkirja</div><b>Kesäkirja</b><span>Tove Jansson</span></div>
+  </div>
+
+  <div class="bar">
+    <button type="button" class="ab pr"><span class="ci"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></span>add book</button>
+    <button type="button" class="ab"><span class="ci"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4"/></svg></span>filter</button>
+    <button type="button" class="ab"><span class="ci"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="4" y="4" width="16" height="16"/><path d="M8 12l3 3 5-6"/></svg></span>select</button>
+    <button type="button" class="more" aria-label="More"><svg width="24" height="8" viewBox="0 0 24 8" fill="currentColor" aria-hidden="true"><circle cx="4" cy="4" r="2"/><circle cx="12" cy="4" r="2"/><circle cx="20" cy="4" r="2"/></svg></button>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"headingWeight":{"editor":"enum","options":["300","400"],"default":"300"},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return { hw: this.props.headingWeight ?? '300' };
+  }
+}
+</script>
+</body>
+</html>

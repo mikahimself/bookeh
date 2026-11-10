@@ -1,8 +1,8 @@
 ---
 name: bookeh
-description: Type-led, line-only visual system for a personal book catalogue. White or dark slate ground, one coral accent used as lines, square corners, no fills, one soft shadow. Built with Tailwind CSS 4 tokens on headless primitives.
+description: Type-led, bold Metro visual system for a personal book catalogue. White or dark slate ground, one coral accent used as lines with a deeper coral fill in three chosen places, a slate app bar on the phone, square corners, one soft shadow. Built with Tailwind CSS 4 tokens on headless primitives.
 status: final
-updated: 2026-11-06
+updated: 2026-11-10
 colors:
   # Light
   background: '#FFFFFF'
@@ -14,6 +14,10 @@ colors:
   scrim: '#00000033'
   danger: '#9B1C31'
   shadow: '#1F293324'
+  accent-fill: '#D1432F'
+  bar: '#1F2933'
+  bar-ink: '#FFFFFF'
+  bar-danger: '#E0566F'
   # Dark
   background-dark: '#14181D'
   text-dark: '#E3E8EE'
@@ -24,6 +28,10 @@ colors:
   scrim-dark: '#00000066'
   danger-dark: '#E0566F'
   shadow-dark: '#00000073'
+  accent-fill-dark: '#D1432F'
+  bar-dark: '#262E37'
+  bar-ink-dark: '#E3E8EE'
+  bar-danger-dark: '#E0566F'
   # Corner crop stage, the same in both themes
   crop-dim: '#00000099'
   crop-halo: '#0000008C'
@@ -42,16 +50,16 @@ colors:
 typography:
   heading-section:
     fontFamily: 'Open Sans'
-    fontSize: 44px
+    fontSize: 56px
     fontWeight: '300'
-    lineHeight: '1.1'
-    letterSpacing: -0.015em
+    lineHeight: '1.08'
+    letterSpacing: -0.02em
   heading-section-phone:
     fontFamily: 'Open Sans'
-    fontSize: 38px
+    fontSize: 56px
     fontWeight: '300'
-    lineHeight: '1.1'
-    letterSpacing: -0.015em
+    lineHeight: '1.08'
+    letterSpacing: -0.02em
   heading-detail:
     fontFamily: 'Open Sans'
     fontSize: 26px
@@ -74,7 +82,7 @@ typography:
     lineHeight: '1.3'
   button:
     fontFamily: 'Open Sans'
-    fontSize: 15px
+    fontSize: 17px
     fontWeight: '400'
     lineHeight: '1.3'
   body:
@@ -113,6 +121,8 @@ spacing:
   stroke-hairline: 1px
   stroke-control: 2px
   stroke-selection: 4px
+  stroke-button: 2px
+  button-height: 54px
   panel-width: 360px
   filter-width: 220px
 components:
@@ -128,23 +138,26 @@ components:
   button-primary:
     background: transparent
     foreground: '{colors.text}'
-    border: '{spacing.stroke-control} solid {colors.accent}'
+    border: '{spacing.stroke-button} solid {colors.accent}'
     radius: '{rounded.DEFAULT}'
     typography: '{typography.button}'
+    height: '{spacing.button-height}'
     transform: lowercase
   button-secondary:
     background: transparent
     foreground: '{colors.text}'
-    border: '{spacing.stroke-control} solid {colors.text}'
+    border: '{spacing.stroke-button} solid {colors.text}'
     radius: '{rounded.DEFAULT}'
     typography: '{typography.button}'
+    height: '{spacing.button-height}'
     transform: lowercase
   button-destructive:
     background: transparent
     foreground: '{colors.text}'
-    border: '{spacing.stroke-control} solid {colors.danger}'
+    border: '{spacing.stroke-button} solid {colors.danger}'
     radius: '{rounded.DEFAULT}'
     typography: '{typography.button}'
+    height: '{spacing.button-height}'
     transform: lowercase
   text-field:
     border-bottom-error: '{spacing.stroke-control} solid {colors.danger}'
@@ -225,6 +238,40 @@ components:
   disabled:
     foreground: '{colors.text-dim}'
     border-color: '{colors.text-dim}'
+  app-bar:
+    background: '{colors.bar}'
+    foreground: '{colors.bar-ink}'
+    button-size: 44px
+    button-ring: '{spacing.stroke-control} solid {colors.bar-ink}'
+    button-ring-primary: '{colors.accent}'
+    button-ring-destructive: '{colors.bar-danger}'
+    radius-button: 50%
+    label: '{typography.label}'
+    transform: lowercase
+  segmented-control:
+    border: '{spacing.stroke-button} solid {colors.text}'
+    divider: '{spacing.stroke-button} solid {colors.text}'
+    typography: '{typography.control}'
+    chosen-background: '{colors.accent-fill}'
+    chosen-foreground: '#FFFFFF'
+    transform: lowercase
+  icon-switch:
+    size: 40px
+    border: '{spacing.stroke-button} solid {colors.text}'
+    chosen-background: '{colors.accent-fill}'
+    chosen-foreground: '#FFFFFF'
+  folding-section:
+    divider: '{spacing.stroke-hairline} solid {colors.border}'
+    title: '{typography.heading-group}'
+    summary: '{typography.meta}'
+    summary-foreground: '{colors.text-muted}'
+    min-height: 58px
+  stats-tile:
+    background: '{colors.accent-fill}'
+    foreground: '#FFFFFF'
+    gap: 8px
+    number-steps: 64px, 54px, 44px, 36px
+    label: '{typography.title}'
   progress-line:
     height: '{spacing.stroke-control}'
     color: '{colors.accent}'
@@ -236,17 +283,17 @@ components:
 
 bookeh is a private catalogue of physical books, used on a phone in a bookshop and at a desk at home. It should feel calm: no glitz, nothing competing with the book covers, nothing decorative.
 
-The visual language takes its notes from Microsoft's Metro. Type does the work that boxes and lines usually do. Section and screen names are large, light and lowercase. Content sits on a plain ground with whitespace between items instead of dividers. Corners are square. Colour is almost absent: slate text on white (or light text on dark slate), plus one coral that appears only as lines.
+The visual language takes its notes from Microsoft's Metro. Type does the work that boxes and lines usually do. Section and screen names are large, light and lowercase. Content sits on a plain ground with whitespace between items instead of dividers. Corners are square. Colour is almost absent: slate text on white (or light text on dark slate), plus one coral: lines everywhere, and a deeper filled form in three chosen places.
 
 Three rules define the look more than any others:
 
-- **No fills.** No area of the interface is filled with colour: no filled buttons, no tinted rows, no filled chips, no inverted segments, no filled stars. State and emphasis are shown with lines, weight and ink. The only solid marks are lines and the 8px marker. The only solid areas are the book covers, the Cover placeholder's cloth included, and the {colors.scrim} behind a sheet or dialog.
-- **One accent, as lines.** {colors.accent} is the only colour in normal use. It is a line, a bar, an outline or an underline, never an area. {colors.danger} appears only when something has gone wrong or is about to be removed, and follows the same rule.
+- **Fills, sparingly.** Areas are filled in three places only: the chosen part of a Segmented control or Icon switch and the Stats tiles, all in {colors.accent-fill} under white text; and the phone App bar, in {colors.bar}. Otherwise state and emphasis are shown with lines, weight and ink: buttons, rows, chips and stars are never filled. The other solid marks and areas stay as before: lines, the 8px marker (and the Stats by month squares), the book covers with the Cover placeholder's cloth, and the {colors.scrim} behind a sheet or dialog. Chosen 2026-11-10 from the bold Metro canvas (`mockups/bold-metro/`), replacing the earlier "No fills".
+- **One accent.** {colors.accent} is the only colour in normal use. It is a line, a bar, a ring, a marker, an outline or an underline. {colors.accent-fill} is its filled form, deeper so white text on it is readable, used only in the places above. {colors.danger} appears only when something has gone wrong or is about to be removed, and is a line too ({colors.bar-danger} on the App bar).
 - **One raised thing.** The look departs from Metro in one place on purpose: the book detail panel on wide screens has a dim border and a light shadow, because it is something extra that opens over the working view.
 
 The system is built on Tailwind CSS 4 with tokens in `src/app/(frontend)/styles.css`, on unstyled headless primitives. Nothing is inherited from a component library's look.
 
-→ Reference mock-ups, in the final tokens: [collection, wide](mockups/key-collection-wide.html) · [collection, phone](mockups/key-collection-phone.html) · [add book and answer](mockups/key-scan-phone.html) · [loans](mockups/key-loans.html) · [wishlists](mockups/key-wishlists.html) · [settings](mockups/key-settings.html) · [reading and stats](mockups/reading-options.html) (its Picked section). The spines win on any conflict with a mock-up. Earlier explorations, including the rejected options, are kept in `.working/`.
+→ Reference mock-ups, in the final tokens: [collection, wide](mockups/key-collection-wide.html) · [collection, phone](mockups/key-collection-phone.html) · [add book and answer](mockups/key-scan-phone.html) · [loans](mockups/key-loans.html) · [wishlists](mockups/key-wishlists.html) · [settings](mockups/key-settings.html) · [reading and stats](mockups/reading-options.html) (its Picked section) · [bold Metro canvas](mockups/bold-metro/README.md) (Mika, 2026-11-10), which wins over the others on look: headings, buttons, fills, the App bar, Book detail's header and sections, Stats and the Camera frame. The spines win on any conflict with a mock-up. Earlier explorations, including the rejected options, are kept in `.working/`.
 
 ## Colors
 
@@ -258,9 +305,13 @@ Every colour has a light and a dark value. Dark tokens carry the `-dark` suffix 
 | `text` | `#1F2933` | `#E3E8EE` | All primary text, secondary button outlines, field underlines. |
 | `text-muted` | `#5F6B78` | `#94A0AD` | Second lines, labels, group headings, locations. |
 | `text-dim` | `#87919C` | `#626B76` | Inactive section headings and switch options; unrated stars; placeholder text and the underline of an empty field; disabled controls. |
-| `border` | `#DDE2E7` | `#2C343D` | The detail panel's left border, and nothing else. It is too faint to carry meaning. |
-| `accent` | `#F0604F` | `#FF8E7F` | Primary button outline, selection bar, link underline, lent and reading markers, the Stats month markers, progress line. |
+| `border` | `#DDE2E7` | `#2C343D` | The detail panel's left border, the hairlines between Folding sections, and the empty-month dash in Stats by month. It is too faint to carry meaning. |
+| `accent` | `#F0604F` | `#FF8E7F` | Primary button outline and the App bar's primary ring, selection bar, link underline, lent and reading markers, the Stats month markers, progress line. |
 | `danger` | `#9B1C31` | `#E0566F` | Errors and destructive actions only: the destructive button's outline, the underline of a field with a mistake, the marker before an error message. |
+| `accent-fill` | `#D1432F` | `#D1432F` | The filled form of the accent: the chosen part of a Segmented control or Icon switch, and the Stats tiles. Always under white text. Nothing else. |
+| `bar` | `#1F2933` | `#262E37` | The phone App bar's ground, and nothing else. |
+| `bar-ink` | `#FFFFFF` | `#E3E8EE` | Labels, icons and rings on the App bar. |
+| `bar-danger` | `#E0566F` | `#E0566F` | A destructive button's ring on the App bar. |
 | `scrim` | `#00000033` | `#00000066` | Dims what is behind a bottom sheet or a dialog. |
 | `shadow` | `#1F293324` | `#00000073` | The detail panel's shadow, and nothing else. |
 | `crop-dim` | `#00000099` | `#00000099` | Dims the photo outside the four corners in the Corner crop, and nothing else. |
@@ -283,6 +334,7 @@ Rules for {colors.accent}:
 
 - In light mode it is never text. Coral on white is about 3.2:1, enough for a line but not for text. In dark mode it may be text.
 - It marks two things: what is selected or flagged (selection bar, lent and reading markers, one marker per finished book in Stats), and the primary action (button outline, link underline).
+- Its filled form, {colors.accent-fill}, is deeper than {colors.accent} so that white text on it reaches 4.6:1; {colors.accent} itself is never filled, and {colors.accent-fill} is never a line.
 - It outlines the primary button, and a layer has at most one (`EXPERIENCE.md` → Component Patterns).
 
 Contrast against {colors.background}, approximate:
@@ -293,6 +345,10 @@ Contrast against {colors.background}, approximate:
 | {colors.text-muted} | 5.4:1 | 6.6:1 | Any text. |
 | {colors.danger} | 8.1:1 | 4.9:1 | Lines and text. |
 | {colors.accent} | 3.2:1 | 8:1 | Lines. Text in dark mode only. |
+| White on {colors.accent-fill} | 4.6:1 | 4.6:1 | Any text on a fill. |
+| {colors.bar-ink} on {colors.bar} | 14.8:1 | 11.2:1 | Any text on the App bar. |
+| {colors.accent} on {colors.bar} | 4.6:1 | 6.2:1 | The primary ring. |
+| {colors.bar-danger} on {colors.bar} | 4.0:1 | 3.7:1 | The destructive ring, always with its label. |
 | {colors.text-dim} | 3.2:1 | 3.3:1 | Large headings and lines. Small text only where it is the inactive option. |
 | {colors.border} | 1.3:1 | 1.3:1 | Decoration only. |
 
@@ -300,7 +356,7 @@ Contrast against {colors.background}, approximate:
 
 The cloth colours are the palette of `.working/cover-treatment-4.html` (Mika, 2026-10-26), after a first, all-bold palette looked too colourful on a real shelf. Base: the blue of Iida Rauma's *Hävitys* (sampled from the cover), a pacific cyan, a near-black charcoal and a light gray after Saana Airtola's *Musta aalto*. White: the warm white of a plain paperback. Accents: the yellow and, slightly faded, the pink of the earlier mixtape (after Plur1bus and Pontus Purokuru's *Mikä internetiä vaivaa*). A Book falls in the accents one time in five, in white one time in five and in the base the other three, evenly across each group's colours. They are the same in both themes; on the dark ground the charcoal is set off only by the cover frame. They are cover art, not interface colour: they never mark state or appear outside a placeholder. Every title ink reaches at least 4.5:1 on its flat cloth; the mottle moves that a little either way, which is acceptable because the placeholder is decorative and the caption repeats the title.
 
-Avoid: a second accent for anything but errors, status colours, tinted backgrounds, gradients, coloured text in light mode.
+Avoid: a second accent for anything but errors, status colours, tinted backgrounds, fills outside the three places of Brand & Style, gradients, coloured text in light mode.
 
 ## Typography
 
@@ -308,7 +364,7 @@ One typeface: **Open Sans**, self-hosted, in weights 300 and 400. There is no bo
 
 | Role | Token | Used for |
 |---|---|---|
-| Section heading | `heading-section` (44px / 300), `heading-section-phone` (38px / 300) | Section names (collection, loans, wishlists, stats, settings) and full-screen screen names (add book, not in library). |
+| Section heading | `heading-section` and `heading-section-phone`, both 56px / 300 (2026-11-10; two tokens so the phone can differ again) | Section names (collection, loans, wishlists, stats, settings) and full-screen screen names (add book, not in library). |
 | Detail heading | `heading-detail` (26px / 300) | The book title in the detail panel and sheet. |
 | Group heading | `heading-group` (20px / 300, muted) | Groups inside a panel or screen: your copies, lent before, genres and tags. |
 | Title | `title` (17px / 400) | Book title in a row; author in the detail header. |
@@ -331,7 +387,7 @@ Separation is whitespace. Rows in a list have no dividers between them. Groups a
 
 | Where | Space |
 |---|---|
-| Inside a button | {spacing.2} above and below, {spacing.4} left and right |
+| Inside a button | {spacing.button-height} tall, {spacing.4} left and right; the compact button is the exception (Components) |
 | Between a row's cover, text and ending | {spacing.4} |
 | Between section headings | {spacing.7}; {spacing.6} on the phone |
 | Between controls in the tools row | {spacing.6} |
@@ -340,7 +396,7 @@ Separation is whitespace. Rows in a list have no dividers between them. Groups a
 
 The mock-ups were drawn before this table and are a pixel or two off it in places. The table wins.
 
-Three stroke weights exist: {spacing.stroke-control} for button outlines, field underlines and the sheet's top edge; {spacing.stroke-selection} for the selection bar; and {spacing.stroke-hairline} for the detail panel's left border only.
+Four stroke weights exist: {spacing.stroke-button} for button outlines, the Segmented control and the Icon switch (2px; set it to 3px for heavier buttons, the one place to change); {spacing.stroke-control} for field underlines, the sheet's top edge and the App bar's rings; {spacing.stroke-selection} for the selection bar; and {spacing.stroke-hairline} for the detail panel's left border and the Folding section's dividers.
 
 **Collection density.** The collection has two layouts, each in three sizes. The size control is a text switch labelled s, m, l. s is the densest and l the roomiest.
 
@@ -363,13 +419,13 @@ On wide screens the detail panel is {spacing.panel-width} wide and sits beside t
 
 One element is raised: the book detail panel on wide screens. It has a {spacing.stroke-hairline} {colors.border} line down its left edge and a light shadow falling to the left onto the list (`-10px 0 24px -14px` in {colors.shadow}). In dark mode the shadow is barely visible and the line does the separating.
 
-Nothing else has a shadow or a raised surface, and there is no tonal layering. The filter panel is {spacing.filter-width} wide on wide screens and is separated from the list by space. The bottom sheet is separated from the list by its {spacing.stroke-control} top edge and the {colors.scrim}. Toasts, dialogs and combobox popups are outlined boxes on the plain ground, with no shadow.
+Nothing else has a shadow or a raised surface, and there is no tonal layering. The phone App bar is a {colors.bar} band along the bottom edge, not a raised surface: it has no shadow. The filter panel is {spacing.filter-width} wide on wide screens and is separated from the list by space. The bottom sheet is separated from the list by its {spacing.stroke-control} top edge and the {colors.scrim}. Toasts, dialogs and combobox popups are outlined boxes on the plain ground, with no shadow.
 
 → Reference: [collection, wide](mockups/key-collection-wide.html), light and dark.
 
 ## Shapes
 
-Every corner is square: {rounded.DEFAULT} is 0px and there is no other radius. Buttons, fields, covers, checkboxes, the sheet and dialogs are all rectangles. The lent marker is a square, not a dot. There are no pills.
+Every corner is square: {rounded.DEFAULT} is 0px and there is no other radius. Buttons, fields, covers, checkboxes, the sheet and dialogs are all rectangles. The lent marker is a square, not a dot. There are no pills. One exception: the App bar's buttons are 44px circles, after Windows Phone's app bar (2026-11-10).
 
 ## Components
 
@@ -379,11 +435,11 @@ Visual specs. Behaviour lives in `EXPERIENCE.md` → Component Patterns.
 |---|---|
 | Section heading | {typography.heading-section}, lowercase. The current section is {colors.text}; the others sit beside it in {colors.text-dim}. No underline, no box. |
 | Text switch | Options side by side in {typography.control}. The chosen one is {colors.text}; the others are {colors.text-dim}. No outline, no underline, no fill. |
-| Button, primary | Transparent, {colors.text} label, {spacing.stroke-control} {colors.accent} outline, square, lowercase. Full width when pinned at the bottom of a phone screen. |
+| Button, primary | Transparent, {colors.text} label in {typography.button} (17px), {spacing.stroke-button} {colors.accent} outline, {spacing.button-height} tall, square, lowercase. Full width when pinned at the bottom of a phone screen. |
 | Button, secondary | As primary, with a {colors.text} outline. |
 | Button, destructive | As primary, with a {colors.danger} outline. The label names the action. |
-| Button, compact | A secondary button with {spacing.1} above and below and {spacing.3} left and right, so it is drawn under the tap height; the tap area is still 44px. Used for "find" beside the ISBN field, aligned to its underline. Chosen 2026-10-27 (`phone-polish-options.html`, option A). |
-| Back to top | A 44px square with a {spacing.stroke-control} {colors.text} outline and an ↑ drawn in two {spacing.stroke-control} strokes, no fill. On the phone only, in the pinned bar to the right of Add book, which narrows to make room. Chosen 2026-10-27 (`phone-polish-options.html`, option A). |
+| Button, compact | A secondary button that is not {spacing.button-height} tall, with {spacing.1} above and below and {spacing.3} left and right, so it is drawn under the tap height; the tap area is still 44px. Used for "find" beside the ISBN field, aligned to its underline. Chosen 2026-10-27 (`phone-polish-options.html`, option A). |
+| Back to top | Removed 2026-11-10: on the phone it is the App bar's "top" button (EXPERIENCE.md → Collection controls). |
 | Link | {colors.text} with a {spacing.stroke-control} {colors.accent} underline, offset 3px. |
 | Link, destructive | A Link whose underline is {colors.danger}. Used wherever a Link removes something. |
 | Back link | A Link in {typography.meta} above a screen heading, naming the section it returns to. Used on an opened wishlist. |
@@ -398,15 +454,19 @@ Visual specs. Behaviour lives in `EXPERIENCE.md` → Component Patterns.
 | Reading marker | The 8px {colors.accent} square with "Reading" in {colors.text}, ending the row of a Book being read in place of its location, as the lent marker does. |
 | Reading dates line | One {typography.meta} line in {colors.text-muted} under the reading switch in Book detail; each date, and "Add dates", is a Link in {colors.text}. The copy line's "Acquired {date} · €{price}" is the same, under the copy's line. |
 | Currently reading strip | Above the count line: a {typography.heading-group} heading, then cover tiles at the covers-s width (76px in the mock-up's frame: at least 70px) with the title in {typography.label} and "since {date}" in {typography.label} {colors.text-muted}, {spacing.3} apart, in one row that scrolls sideways. No divider, no box; the space below it and the count line separate it. |
-| Stats numbers | Big numbers in {typography.heading-section} (44px / 300; {typography.heading-section-phone} on the phone), each with its {typography.meta} {colors.text-muted} label under it, in one row that wraps, {spacing.7} apart on wide screens and {spacing.6} on the phone. |
-| Stats by month | A three-column grid: the month in {typography.meta} {colors.text-muted}; one 8px {colors.accent} square per finished book, 4px apart, wrapping; "{n} books · {pages} p" right-aligned in {typography.meta} {colors.text-muted}. A month with none shows "–" in {colors.text-dim}. No bars or fills (Brand & Style). |
-| Stats facts | Label left in {typography.body}, value right in {colors.text-muted}, as the detail panel's value rows. By year is the same grid as By month without the markers. |
+| Stats tiles | Four equal squares, {spacing.2} apart, filled {colors.accent-fill}: two by two on the phone, four in a row on wide screens. In each, {spacing.4} inside, the number in Open Sans 300 on the first line and its label in {typography.title} on the second, both white and neither wrapping. All four numbers share one size: the largest of 64, 54, 44 and 36px at which the longest value fits the tile. |
+| Stats by month | A 12-column chart: one 16px {colors.accent} square per finished Book, 3px apart, stacked upward from a shared baseline; a month with none shows a 16px {spacing.stroke-control} {colors.border} dash; months after today in the current year are left empty and their labels are {colors.text-dim}. Single-letter month labels in {typography.label} {colors.text-muted} under the columns. The squares are markers, not bars. |
+| Stats facts | Pages a day and Days a book as two medium numbers, Open Sans 300 at 38px, each with a {typography.meta} muted label, side by side. Then one row per other stat, {spacing.4} apart: a 26px {colors.accent} line icon (2px strokes), then the label in {typography.meta} {colors.text-muted}, the title in {typography.title}, and the value in {typography.meta} {colors.text-muted}, on three lines. By year stays a grid of label and muted value. |
 | Selection bar | A {spacing.stroke-selection} {colors.accent} bar on the left edge of the open row. The row is not tinted. |
 | Lent marker | An 8px {colors.accent} square, with the text "Lent · {person}" in {colors.text}. On a Cover tile the square sits before the title and the text after the authors. |
-| Detail panel | {spacing.panel-width} wide on the plain ground, with the left border and shadow described under Elevation & Depth. Cover 72 × 108px beside the {typography.heading-detail} title. Groups headed in {typography.heading-group}. Values in rows with the label left and the value right in {colors.text-muted}. Buttons at the foot. |
+| Detail panel | {spacing.panel-width} wide on the plain ground, with the left border and shadow described under Elevation & Depth. Header: the cover at 120 × 180px beside the {typography.heading-detail} title, the author, a {typography.meta} muted "{pages} pages · {language}" line, the series line and, once the Book is read, the Rating; the text column ends near the cover's foot. Below the reading control, groups are Folding sections. Values in rows with the label left and the value right in {colors.text-muted}. Buttons at the foot. The bottom sheet holds the same content. |
 | Bottom sheet | Full width, plain ground, {spacing.stroke-control} {colors.text} top edge, {colors.scrim} over the list above. A short {spacing.stroke-control} line at the top centre is the handle. |
 | Toast | An outlined box ({spacing.stroke-control} {colors.text}) above whatever is pinned to the bottom: message on the left, actions as Links and a Close (X) on the right. An error toast starts with an 8px {colors.danger} square. |
-| Action bar | Full width along the bottom edge on the plain ground, with a {spacing.stroke-control} {colors.text} top edge. The count on the left, buttons on the right; Remove is a destructive button and Done the primary. On the phone it is two rows. |
+| Action bar | Full width along the bottom edge on the plain ground, with a {spacing.stroke-control} {colors.text} top edge. The count on the left, buttons on the right; Remove is a destructive button and Done the primary. On the phone it is two rows and takes the App bar's place. |
+| App bar | The phone only. A {colors.bar} band along the bottom edge, above the safe area, about 84px before it. Its buttons sit centred, {spacing.5}–{spacing.7} apart: each a 44px circle with a {spacing.stroke-control} {colors.bar-ink} ring and a 20–22px inline line icon, over a {typography.label} lowercase label in {colors.bar-ink}; a label may wrap to two lines. The layer's primary has an {colors.accent} ring, a destructive button a {colors.bar-danger} ring. A ⋯ (three 4px dots) sits at the top right when the bar has a menu. The circles are the one rounded shape (Shapes). |
+| Segmented control | Three equal parts in a {spacing.stroke-button} {colors.text} outline with {spacing.stroke-button} dividers, 48px tall, labels in {typography.control}, lowercase. The chosen part is filled {colors.accent-fill} with a white label; the others are on the plain ground. Used for reading status. |
+| Icon switch | Two 40px squares, {spacing.1}–6px apart, each a {spacing.stroke-button} {colors.text} outline around a line icon. The chosen one is filled {colors.accent-fill}, its outline the same colour, its icon white. Used for rows / covers, right of the size switch. |
+| Folding section | A full-width row at least 58px tall: the title in {typography.heading-group}, lowercase; a summary at the right in {typography.meta} {colors.text-muted}; then a chevron (2px strokes) that turns over when open. Rows are divided by {spacing.stroke-hairline} {colors.border} lines, one above the first. Open content sits under its row, {spacing.4} below. |
 | Checkbox | 20px square with a {spacing.stroke-control} {colors.text} outline. [ASSUMPTION: checked shows a tick drawn in {colors.text}; it is not filled.] |
 | Rating | Five 22px star outlines. Rated stars are stroked in {colors.text}, the rest in {colors.text-dim}. No star is filled. A "Clear" Link in {typography.meta} sits beside the stars while a rating is set. |
 | Option list | The values of a filter field, one per line in {typography.body}. A value that is switched on is {colors.text} with the 8px {colors.accent} marker before it; the others are {colors.text-muted}. |
@@ -416,7 +476,7 @@ Visual specs. Behaviour lives in `EXPERIENCE.md` → Component Patterns.
 | Dialog | An outlined box ({spacing.stroke-control} {colors.text}) on the plain ground, centred, at most 400px wide, over the {colors.scrim}. Title in {typography.heading-group}, buttons right-aligned at the foot. [ASSUMPTION] |
 | Progress line | [ASSUMPTION: a {spacing.stroke-control} {colors.accent} line moving across the top edge of the screen while something loads.] |
 | Close (X) | Two {spacing.stroke-control} {colors.text} strokes forming an X, in the top right corner. No circle and no box around it. |
-| Camera frame | A {spacing.stroke-control} {colors.text} rectangle around the camera view with a horizontal {colors.accent} guide line. |
+| Camera frame | The camera view, edge to edge in the page margins, with four corner brackets: 40px arms in a 4px white line, inset from the view's edges, and a horizontal {spacing.stroke-control} {colors.accent} guide line across the middle. A {typography.meta} hint in light ink at the foot of the view. |
 | Corner crop | Always in the dark palette, whatever the theme: chosen 2026-10-21 from rendered options (`.working/corner-crop.html`, option B). The photo fills the screen on the dark {colors.background}. Outside the quadrilateral inside the four handles, {colors.crop-dim} dims the photo; inside, it is undimmed. Each side of the quadrilateral is outlined in {spacing.stroke-control} {colors.text} (dark value); a side within 1° of vertical or horizontal is drawn {spacing.stroke-selection} {colors.accent} instead, over a 6px halo (chosen 2026-11-05, `.working/corner-crop-straight.html` option A). Four 24px square handles sit at the corners, outlined the same way, each with a 44px tap area; a 16px diamond handle at each side's midpoint, outlined the same way, also has a 44px tap area. The outline and the handles are drawn over a 4px {colors.crop-halo} line. The hint in {typography.meta} {colors.text-muted} above; Use (primary) and Cancel at the foot, over a {spacing.stroke-control} {colors.text} top edge. The focused handle carries the focus ring. Disabled Use follows Disabled. |
 
 States that apply to every control:
@@ -447,11 +507,11 @@ The mark stays inside the central 80% circle, so one image serves as both `any` 
 
 | Do | Don't |
 |---|---|
-| Show state with a line, a bar, weight or ink | Fill a button, chip, row or segment with colour |
-| Use {colors.accent} as a line only | Use coral as text in light mode, or as an area anywhere |
-| Separate with whitespace and headings | Add dividers between rows or boxes around groups |
+| Show state with a line, a bar, weight or ink; fill only the three places in Brand & Style | Fill a button, chip, row or star, or anything outside those places |
+| Use {colors.accent} as a line and {colors.accent-fill} as the fill | Use coral as text in light mode, or fill with {colors.accent} |
+| Separate with whitespace and headings; hairlines only between Folding sections | Add dividers between rows or boxes around groups |
 | Keep the one shadow on the book detail panel | Give the filter panel, sheet, toasts or dialogs a shadow |
-| Keep every corner square | Round anything, including chips and the sheet |
+| Keep every corner square | Round anything but the App bar's buttons, including chips and the sheet |
 | Let large light lowercase headings carry the structure | Add icons, badges or bold text to do the same job |
 | Let the covers carry the colour | Add status colours, or any accent beyond the coral and the error red |
 | Lowercase through CSS, from one switch | Type interface strings in lowercase in the source |

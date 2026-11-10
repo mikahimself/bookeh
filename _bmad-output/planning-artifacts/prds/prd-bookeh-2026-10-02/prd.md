@@ -2,7 +2,7 @@
 title: Bookie PRD
 status: final
 created: 2026-10-02
-updated: 2026-11-06
+updated: 2026-11-10
 ---
 
 # Bookie — Product Requirements Document
@@ -99,7 +99,7 @@ Mika is working through a stack of books at home. His default location is Tamper
 
 ### F2 — Adding a book
 
-- **FR-10** Users scan an ISBN barcode with the phone camera inside the installed app, including on iOS Safari. They can type an ISBN instead. ISBN-10, ISBN-13, hyphens and spaces are accepted and normalised to ISBN-13.
+- **FR-10** Users scan an ISBN barcode with the phone camera inside the installed app, including on iOS Safari. They can type an ISBN instead. ISBN-10, ISBN-13, hyphens and spaces are accepted and normalised to ISBN-13. Where the camera supports it, a torch can be switched on while scanning.
 - **FR-11** Lookup reuses an existing shared Book for the ISBN if there is one. Otherwise it asks ordinary metadata sources in configured priority order: Finna, then Google Books, then any others. Optional enrichment sources run alongside them, but cannot identify an edition or turn a missing lookup into a found Book. Their failures do not change the ordinary lookup outcome. Adding a source requires no change to the add-book flow.
   - Lookup is read-only: a Book is created only when a copy or wishlist entry is saved.
   - Lookup requires sign-in and is rate-limited per user.
@@ -232,7 +232,7 @@ Added 2026-11-06 (Mika), with the UX picks in `mockups/reading-options.html`.
   - no Undo; the Rating shows once the Book is read, as before (FR-29)
 - **FR-55** Each copy has an acquired date and an optional price in euros. The acquired date defaults to the day the copy is saved; **Received** sets it to that day. It is editable. A copy without a price (a gift, an unknown price) has none. The copy line in Book detail reads "Acquired {date} · €{price}" ("Ordered {date}" on an ordered copy), with "Add price" when there is none; the date and price are Links that open one small Picker. No Undo. Existing copies take the day they were saved.
 - **FR-56** The collection shows a "Currently reading" strip of covers above the count line while at least one Book is being read; tapping a cover opens Book detail. The Read filter offers unread, reading and read. A row of a Book being read ends with the 8px marker and "Reading" instead of the location.
-- **FR-57** A fifth section, **Stats** (`/stats`), shows: the Books being read with "since {date}"; a year switch; for the year, books, pages, money spent and books a month as large numbers; by month, one 8px marker per finished Book and "{n} books · {pages} p"; Nerdy stats (FR-58); and by year, "{n} books · {pages} p · €{spent}" for each year, with "{n} read books have no dates and are not counted."
+- **FR-57** A fifth section, **Stats** (`/stats`), shows: the Books being read with "since {date}"; a year switch; for the year, books, pages, money spent and books a month as large numbers; by month, a chart with one marker per finished Book for each month, its books and pages given to assistive technology; Nerdy stats (FR-58); and by year, "{n} books · {pages} p · €{spent}" for each year, with "{n} read books have no dates and are not counted."
 - **FR-58** What the stats count:
   - Only Books the user holds (a copy or an open wishlist entry), and for book stats only those with a finish date, placed in the year and month of that date. Pages are the effective Book's (overrides applied); a Book without a page count counts as a book and adds no pages.
   - Money spent is the sum of the prices of the user's copies acquired in the year, read or not, ordered or owned.
@@ -291,6 +291,9 @@ Search is on the phone in this phase, because checks in webshops depend on it. D
 
 **Phase 1 addition: reading and stats (Mika, 2026-11-06)**
 - Reading state and dates, copies' acquired dates and prices, Currently reading in the collection and the Stats section (F12, FR-53 to FR-58). Committed like Phase 1, built after it. The button on every section is renamed **Add book**, since the screen it opens does more than scan.
+
+**Phase 1 addition: bold Metro (Mika, 2026-11-10)**
+- A bolder Metro look and a phone app bar (Epic 11, `sprint-change-proposal-2026-11-10.md`). Committed like Phase 1, built after it. No requirement changes beyond FR-10's torch and FR-57's chart.
 
 **Phase 2 (possible): Public internet, Partner joins**
 - Public ingress with the security NFRs, and the back office kept on the tailnet (FR-49, NFR-5)

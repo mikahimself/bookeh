@@ -1,0 +1,127 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Open choices</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400&amp;display=swap">
+<style>
+body{margin:0}
+.bd{--bg:#FFFFFF;--ink:#1F2933;--mu:#5F6B78;--dim:#87919C;--ln:#DDE2E7;--co:#F0604F;--cof:#D1432F;width:1240px;height:1180px;box-sizing:border-box;background:var(--bg);color:var(--ink);font:14px/1.45 'Open Sans',sans-serif;padding:40px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:44px 56px;align-content:start}
+.g h2{margin:0 0 4px;font-size:28px;font-weight:300;text-transform:lowercase}
+.g > p{margin:0 0 16px;color:var(--mu);font-size:13px}
+.opts{display:flex;gap:20px;align-items:flex-start;flex-wrap:wrap}
+.o{display:flex;flex-direction:column;gap:8px}
+.o .k{font-size:13px;color:var(--mu)}
+.o .k b{font-weight:400;color:var(--ink);margin-right:6px}
+.bar{width:270px;height:72px;display:flex;justify-content:center;gap:18px;padding-top:8px;box-sizing:border-box;position:relative}
+.bar.sl{background:var(--ink);color:#FFFFFF}
+.bar.pl{background:var(--bg);color:var(--ink);border-top:2px solid var(--ink)}
+.ab{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;text-transform:lowercase}
+.ci{width:40px;height:40px;border:2px solid currentColor;box-sizing:border-box;display:flex;align-items:center;justify-content:center}
+.rnd .ci{border-radius:50%}
+.ab.pr .ci{border-color:var(--co)}
+.dots{position:absolute;right:10px;top:6px}
+.tl{display:grid;grid-template-columns:repeat(2,64px);gap:4px}
+.t{width:64px;height:64px;box-sizing:border-box;padding:6px;display:flex;flex-direction:column;justify-content:flex-end;font-size:10px}
+.t b{font-weight:300;font-size:24px;line-height:1}
+.t.f{background:var(--cof);color:#FFFFFF}
+.t.ol{border:3px solid var(--ink)}
+.t.oc{border:3px solid var(--co)}
+.seg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border:2px solid var(--ink);width:250px}
+.seg span{height:40px;display:flex;align-items:center;justify-content:center;border-left:2px solid var(--ink);font-size:15px;text-transform:lowercase}
+.seg span:first-child{border-left:0}
+.seg.c .on{background:var(--cof);color:#FFFFFF}
+.seg.i .on{background:var(--ink);color:#FFFFFF}
+.tsw{display:flex;gap:14px;font-size:17px;color:var(--dim);text-transform:lowercase;height:46px;align-items:center}
+.tsw .on{color:var(--ink)}
+.hs{white-space:nowrap;letter-spacing:-.015em;text-transform:lowercase;line-height:1.1}
+.hs span{color:var(--dim)}
+.bt{display:inline-flex;align-items:center;justify-content:center;text-transform:lowercase;color:var(--ink)}
+.bt.cur{border:2px solid var(--ink);font-size:15px;height:36px;padding:0 16px}
+.bt.bold{border:2px solid var(--ink);font-size:17px;height:54px;padding:0 26px}
+.bt.pcur{border:2px solid var(--co);font-size:15px;height:36px;padding:0 16px}
+.bt.pbold{border:2px solid var(--co);font-size:17px;height:54px;padding:0 26px}
+.vt{display:flex;gap:6px}
+.vt i{width:40px;height:40px;border:2px solid var(--ink);box-sizing:border-box;display:flex;align-items:center;justify-content:center;color:var(--ink)}
+.vt.c i.on{background:var(--cof);border-color:var(--cof);color:#FFFFFF}
+.vt.n i.on{background:var(--ink);color:#FFFFFF}
+.rec{font-size:12px;color:var(--ink);border-bottom:2px solid var(--co);align-self:flex-start}
+</style>
+</helmet>
+<div class="bd">
+
+  <section class="g">
+    <h2>App bar</h2>
+    <p>Replaces the pinned Add book button in every section.</p>
+    <div class="opts">
+      <div class="o"><div class="bar sl rnd"><span class="ab pr"><span class="ci"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></span>add book</span><span class="ab"><span class="ci"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4"/></svg></span>filter</span><span class="ab"><span class="ci"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="4" y="4" width="16" height="16"/><path d="M8 12l3 3 5-6"/></svg></span>select</span><svg class="dots" width="20" height="6" viewBox="0 0 24 8" fill="currentColor" aria-hidden="true"><circle cx="4" cy="4" r="2"/><circle cx="12" cy="4" r="2"/><circle cx="20" cy="4" r="2"/></svg></div><span class="k"><b>A</b>Slate, round icons (the Windows Phone look)</span><span class="rec">recommended</span></div>
+      <div class="o"><div class="bar sl"><span class="ab pr"><span class="ci"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></span>add book</span><span class="ab"><span class="ci"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4"/></svg></span>filter</span><span class="ab"><span class="ci"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="4" y="4" width="16" height="16"/><path d="M8 12l3 3 5-6"/></svg></span>select</span><svg class="dots" width="20" height="6" viewBox="0 0 24 8" fill="currentColor" aria-hidden="true"><circle cx="4" cy="4" r="2"/><circle cx="12" cy="4" r="2"/><circle cx="20" cy="4" r="2"/></svg></div><span class="k"><b>B</b>Slate, square icons</span></div>
+      <div class="o"><div class="bar pl rnd"><span class="ab pr"><span class="ci"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></span>add book</span><span class="ab"><span class="ci"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 6h16M7 12h10M10 18h4"/></svg></span>filter</span><span class="ab"><span class="ci"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="4" y="4" width="16" height="16"/><path d="M8 12l3 3 5-6"/></svg></span>select</span><svg class="dots" width="20" height="6" viewBox="0 0 24 8" fill="currentColor" aria-hidden="true"><circle cx="4" cy="4" r="2"/><circle cx="12" cy="4" r="2"/><circle cx="20" cy="4" r="2"/></svg></div><span class="k"><b>C</b>Plain ground, 2px top edge (no fill)</span></div>
+    </div>
+  </section>
+
+  <section class="g">
+    <h2>Stats tiles</h2>
+    <p>Fill is a deeper coral, #D1432F, so white text passes 4.5:1. The line coral stays #F0604F.</p>
+    <div class="opts">
+      <div class="o"><div class="tl"><span class="t f"><b>14</b>books</span><span class="t f"><b>4 210</b>pages</span><span class="t f"><b>€186</b>spent</span><span class="t f"><b>1.3</b>/ month</span></div><span class="k"><b>A</b>All four filled</span><span class="rec">picked</span></div>
+      <div class="o"><div class="tl"><span class="t f"><b>14</b>books</span><span class="t ol"><b>4 210</b>pages</span><span class="t ol"><b>€186</b>spent</span><span class="t ol"><b>1.3</b>/ month</span></div><span class="k"><b>B</b>One filled, three outlined</span></div>
+      <div class="o"><div class="tl"><span class="t oc"><b>14</b>books</span><span class="t oc"><b>4 210</b>pages</span><span class="t oc"><b>€186</b>spent</span><span class="t oc"><b>1.3</b>/ month</span></div><span class="k"><b>C</b>Coral outline, no fill</span></div>
+    </div>
+  </section>
+
+  <section class="g">
+    <h2>Reading status</h2>
+    <p>Segment strokes at 2px.</p>
+    <div class="opts" style="flex-direction: column; gap: 14px">
+      <div class="o" style="flex-direction: row; align-items: center; gap: 16px"><div class="seg c"><span>Unread</span><span class="on">Reading</span><span>Read</span></div><span class="k"><b>A</b>Coral fill</span><span class="rec">picked</span></div>
+      <div class="o" style="flex-direction: row; align-items: center; gap: 16px"><div class="seg i"><span>Unread</span><span class="on">Reading</span><span>Read</span></div><span class="k"><b>B</b>Ink fill</span></div>
+      <div class="o" style="flex-direction: row; align-items: center; gap: 16px"><div class="tsw"><span>Unread</span><span class="on">Reading</span><span>Read</span></div><span class="k"><b>C</b>Current text switch</span></div>
+    </div>
+  </section>
+
+  <section class="g">
+    <h2>Section headings</h2>
+    <p>Phone size. Open Sans has no bold in the app; 400 is the heavier option.</p>
+    <div class="opts" style="flex-direction: column; gap: 10px">
+      <div class="o"><div class="hs" style="font-size: 38px; font-weight: 300">collection <span>loans wishlists</span></div><span class="k"><b>A</b>Current, 38px / 300</span></div>
+      <div class="o"><div class="hs" style="font-size: 56px; font-weight: 300">collection <span>loans</span></div><span class="k"><b>B</b>56px / 300</span><span class="rec">picked</span></div>
+      <div class="o"><div class="hs" style="font-size: 56px; font-weight: 400">collection <span>loans</span></div><span class="k"><b>C</b>56px / 400</span></div>
+    </div>
+  </section>
+
+  <section class="g">
+    <h2>Buttons</h2>
+    <p>Stroke, label size and height together.</p>
+    <div class="opts" style="flex-direction: column; gap: 16px">
+      <div class="o"><div style="display: flex; gap: 8px"><span class="bt cur">Edit</span><span class="bt cur">Add to wishlist</span><span class="bt pcur">Add to library</span></div><span class="k"><b>A</b>Current, 2px / 15px / 36px</span></div>
+      <div class="o"><div style="display: flex; gap: 12px"><span class="bt bold">Edit</span><span class="bt bold">Add to wishlist</span><span class="bt pbold">Add to library</span></div><span class="k"><b>B</b>Bold, 2px / 17px / 54px (stroke is one token; 3px if 2px feels thin)</span><span class="rec">picked</span></div>
+    </div>
+  </section>
+
+  <section class="g">
+    <h2>Layout switch</h2>
+    <p>Rows and covers. The s / m / l text switch stays beside it.</p>
+    <div class="opts">
+      <div class="o"><div class="vt c"><i><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3 6h2M3 12h2M3 18h2"/></svg></i><i class="on"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg></i></div><span class="k"><b>A</b>Icons, coral fill</span><span class="rec">picked</span></div>
+      <div class="o"><div class="vt n"><i><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M8 6h13M8 12h13M8 18h13M3 6h2M3 12h2M3 18h2"/></svg></i><i class="on"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg></i></div><span class="k"><b>B</b>Icons, ink fill</span></div>
+      <div class="o"><div class="tsw"><span>Rows</span><span class="on">Covers</span></div><span class="k"><b>C</b>Current text switch</span></div>
+    </div>
+  </section>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1240,"height":1180}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

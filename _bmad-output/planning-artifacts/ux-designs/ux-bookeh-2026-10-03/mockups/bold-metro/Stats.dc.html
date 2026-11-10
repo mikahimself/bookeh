@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="fi">
+<head>
+<meta charset="utf-8">
+<title>Stats</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400&amp;display=swap">
+<style>
+body{margin:0}
+.ph{--bg:#FFFFFF;--ink:#1F2933;--mu:#5F6B78;--dim:#87919C;--ln:#DDE2E7;--co:#F0604F;--cof:#D1432F;--bar:#1F2933;--bar-ink:#FFFFFF;width:390px;height:1300px;box-sizing:border-box;background:var(--bg);color:var(--ink);font:14px/1.45 'Open Sans',sans-serif;position:relative;overflow:hidden;display:flex;flex-direction:column;padding-bottom:84px}
+.app{margin:0;padding:18px 20px 0;font-size:15px;letter-spacing:.02em}
+.pv{display:flex;gap:22px;padding:22px 20px 0;margin:0 0 0 -3px;white-space:nowrap;font-size:56px;font-weight:300;line-height:1.08;letter-spacing:-.02em;text-transform:lowercase;color:var(--dim);overflow:hidden}
+.pv .on{color:var(--ink)}
+.sw{display:flex;gap:18px;padding:12px 20px 0;font-size:17px;color:var(--dim);text-transform:lowercase}
+.sw .on{color:var(--ink)}
+.tiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;padding:20px 20px 0}
+.t{aspect-ratio:1;min-width:0;display:flex;flex-direction:column;box-sizing:border-box;padding:16px;color:#FFFFFF;background:var(--cof);overflow:hidden;white-space:nowrap}
+.t b{font-weight:300;line-height:1;letter-spacing:-.02em}
+.t span{font-size:17px;margin-top:6px}
+.gh{margin:32px 20px 14px;font-size:22px;font-weight:300;line-height:1.3;text-transform:lowercase}
+.chart{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:6px;padding:0 20px;align-items:end}
+.col{display:flex;flex-direction:column-reverse;align-items:center;gap:3px;min-height:52px}
+.sq{width:16px;height:16px;background:var(--co)}
+.none{width:16px;border-top:2px solid var(--ln)}
+.ml{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:6px;padding:6px 20px 0;font-size:12px;color:var(--mu);text-align:center}
+.ml .fut{color:var(--dim)}
+.pair{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;padding:0 20px 8px}
+.pair b{display:block;font-weight:300;font-size:38px;line-height:1.1}
+.pair span{font-size:13px;color:var(--mu)}
+.facts{display:flex;flex-direction:column;gap:18px;padding:14px 20px 0}
+.f{display:flex;gap:16px;align-items:flex-start}
+.f svg{flex:none;margin-top:3px}
+.f small{display:block;font-size:13px;color:var(--mu)}
+.f b{display:block;font-weight:400;font-size:17px;line-height:1.3}
+.f span{display:block;font-size:13px;color:var(--mu)}
+.bar{position:absolute;left:0;right:0;bottom:0;height:84px;background:var(--bar);color:var(--bar-ink);display:flex;justify-content:center;gap:28px;padding-top:10px;box-sizing:border-box}
+.ab{display:flex;flex-direction:column;align-items:center;gap:4px;background:none;border:0;color:inherit;font:12px/1.2 'Open Sans',sans-serif;text-transform:lowercase;padding:0;cursor:pointer;min-width:56px}
+.ci{width:44px;height:44px;border:2px solid var(--co);border-radius:50%;box-sizing:border-box;display:flex;align-items:center;justify-content:center}
+.more{position:absolute;right:14px;top:6px;width:44px;height:28px;background:none;border:0;color:var(--bar-ink);display:flex;align-items:center;justify-content:center;padding:0}
+</style>
+</helmet>
+<div class="ph">
+  <nav class="pv" aria-label="Sections"><span class="on">Stats</span><span>Settings</span><span>Collection</span></nav>
+  <div class="sw"><span class="on">This year</span><span>2025</span><span>2024</span><span>All</span></div>
+
+  <div class="tiles">
+    <sc-for list="{{tiles}}" as="t" hint-placeholder-count="4">
+      <div class="t" style="justify-content: {{tj}}; align-items: {{ta}}"><b style="font-size: {{numSize}}">{{t.value}}</b><span>{{t.label}}</span></div>
+    </sc-for>
+  </div>
+
+  <h2 class="gh">By month</h2>
+  <div class="chart" role="img" aria-label="Books finished each month: Jan 2, Feb 1, Apr 2, May 1, Jun 3, Jul 2, Sep 1, Oct 1, Nov 1">
+    <sc-for list="{{months}}" as="m" hint-placeholder-count="12">
+      <div class="col">
+        <sc-for list="{{m.squares}}" as="q" hint-placeholder-count="1"><i class="sq"></i></sc-for>
+        <sc-if value="{{m.empty}}" hint-placeholder-val="{{false}}"><i class="none"></i></sc-if>
+      </div>
+    </sc-for>
+  </div>
+  <div class="ml"><span>J</span><span>F</span><span>M</span><span>A</span><span>M</span><span>J</span><span>J</span><span>A</span><span>S</span><span>O</span><span>N</span><span class="fut">D</span></div>
+
+  <h2 class="gh">Nerdy stats</h2>
+  <div class="pair">
+    <div><b>12</b><span>pages a day</span></div>
+    <div><b>24</b><span>days a book, on average</span></div>
+  </div>
+  <div class="facts">
+    <sc-for list="{{facts}}" as="f" hint-placeholder-count="7">
+      <div class="f">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="var(--co)" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="{{f.d}}"/></svg>
+        <div><small>{{f.label}}</small><b>{{f.title}}</b><span>{{f.meta}}</span></div>
+      </div>
+    </sc-for>
+  </div>
+
+  <div class="bar">
+    <button type="button" class="ab"><span class="ci"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></span>add book</button>
+    <button type="button" class="more" aria-label="More"><svg width="24" height="8" viewBox="0 0 24 8" fill="currentColor" aria-hidden="true"><circle cx="4" cy="4" r="2"/><circle cx="12" cy="4" r="2"/><circle cx="20" cy="4" r="2"/></svg></button>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"tileLayout":{"editor":"enum","options":["split","centred"],"default":"split"},"pages":{"editor":"int","min":0,"max":999999,"default":4210},"spent":{"editor":"int","min":0,"max":99999,"default":186},"$preview":{"width":390,"height":1300}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const split = (this.props.tileLayout ?? 'split') === 'split';
+    const group = (n) => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+    const tiles = [
+      { value: '14', label: 'books' },
+      { value: group(this.props.pages ?? 4210), label: 'pages' },
+      { value: '€' + group(this.props.spent ?? 186), label: 'spent' },
+      { value: '1.3', label: 'books / month' }
+    ];
+    // One size for all four: the largest at which the longest value fits the
+    // tile's inner width (171px tile minus 2 × 16px padding), Open Sans 300 widths in em.
+    const em = (s) => Array.from(s).reduce((w, c) => w + (c === ' ' || c === ' ' ? 0.26 : c === '.' ? 0.27 : 0.57), 0);
+    const widest = Math.max.apply(null, tiles.map((t) => em(t.value)));
+    const numSize = Math.min(64, Math.floor(139 / widest)) + 'px';
+    const counts = [2, 1, 0, 2, 1, 3, 2, 0, 1, 1, 1, 0];
+    const months = counts.map((n, i) => ({
+      squares: Array.from({ length: n }, (_, k) => ({ k: k })),
+      empty: n === 0 && i < 11
+    }));
+    const facts = [
+      { label: 'Quickest read', title: 'Kesäkirja', meta: '6 days', d: 'M13 3L5 14h6l-1 7 8-11h-6z' },
+      { label: 'Slowest read', title: 'Täällä Pohjantähden alla 1', meta: '61 days', d: 'M7 3h10M7 21h10M8 3v3l4 6-4 6v3M16 3v3l-4 6 4 6v3' },
+      { label: 'Thickest brick', title: 'Sinuhe egyptiläinen', meta: '784 pages', d: 'M12 4l9 5-9 5-9-5zM3 14l9 5 9-5' },
+      { label: 'Most dust collected', title: 'Seitsemän veljestä', meta: 'unread since 2014', d: 'M3 6c3-1 6-1 9 1 3-2 6-2 9-1v12c-3-1-6-1-9 1-3-2-6-2-9-1zM12 7v12' },
+      { label: 'Most expensive', title: 'Musta aalto', meta: '€34.90', d: 'M17 6.5a6.5 6.5 0 100 11M4 10h10M4 14h10' },
+      { label: 'Best month', title: 'June', meta: '3 books · 980 pages', d: 'M4 5h16v15H4zM4 10h16M9 3v4M15 3v4' },
+      { label: 'Top author', title: 'Tove Jansson', meta: '3 books', d: 'M12 4a4 4 0 110 8 4 4 0 010-8zM4 21c1-4 4-6 8-6s7 2 8 6' }
+    ];
+    return {
+      tiles: tiles,
+      numSize: numSize,
+      tj: split ? 'space-between' : 'center',
+      ta: split ? 'flex-start' : 'center',
+      months: months,
+      facts: facts
+    };
+  }
+}
+</script>
+</body>
+</html>

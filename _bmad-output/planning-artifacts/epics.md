@@ -391,7 +391,7 @@ Phase 1 only. Phase 2–3 FRs (FR-2, FR-5 to FR-9, FR-40 to FR-46, FR-48, FR-49,
 
 ## Epic List
 
-Ten epics, in build order (Epic 10 added 2026-11-06). Each needs only the epics before it. Later epics add their own lines to screens built earlier (Book detail, the Answer, Settings) as small stories in the epic that owns the data. The order puts what the Phase 1 success metrics measure (have it, where is it, who has it, shop check) before tags, genres and themes, which no metric depends on.
+Eleven epics, in build order (Epic 10 added 2026-11-06, Epic 11 on 2026-11-10). Each needs only the epics before it. Later epics add their own lines to screens built earlier (Book detail, the Answer, Settings) as small stories in the epic that owns the data. The order puts what the Phase 1 success metrics measure (have it, where is it, who has it, shop check) before tags, genres and themes, which no metric depends on.
 
 **Story ids.** Every story title carries its slice id from STORY-SLICING.md, for example "Story 3.5 [C2] Finna adapter: core fields", so the slice dependency columns stay usable. Slices new in this document (fixture capture, default location in Settings, cover upload, genre creation and admin, themes) take the next free number in their track and are added to STORY-SLICING.md in the doc sync below.
 
@@ -469,6 +469,10 @@ Personal tags, user genres and user themes (one `tags` collection with a kind, D
 ### Epic 10: Track what I read and see my stats
 Mika marks a book as being read and then read with one three-way switch, with start and finish dates he can edit; each copy records when it was acquired and what it cost; the collection shows what he is reading; a fifth section, Stats, counts books, pages and money per year with a set of nerdy stats. "Scan book" becomes "Add book". Added by `sprint-change-proposal-2026-11-06.md`; UX picks in `mockups/reading-options.html`.
 **FRs covered:** FR-53 to FR-58; FR-15, FR-25, FR-26, FR-29 and FR-33 amended.
+
+### Epic 11: Bold Metro
+The interface gets bolder in the Metro style: 56px headings, a coral fill for chosen states and the Stats tiles, heavier buttons, and a phone app bar in place of the pinned Add book. Book detail gets quieter, with folding sections and the copy actions in the bar. Stats gets tiles, a month chart and icon rows, and Add book gets a corner target and a torch. Added by `sprint-change-proposal-2026-11-10.md`; the look is the canvas in `mockups/bold-metro/`.
+**FRs covered:** FR-10 (torch) and FR-57 (by month chart) amended; no new FRs.
 
 ## Epic 1: Sign in to bookeh, in my language and theme
 
@@ -4240,3 +4244,154 @@ So that I can see my reading year at a glance and find Add book where I expect i
 **And** the button on every section reads "Add book" / "Lisää kirja" and the scan task's heading the same (`scan.open`, `scan.heading`); routes and code names stay `/scan`
 **And** on wide screens Add book never clips and the headings row clips at its right edge below the measured widths (974px English, 1074px Finnish), checked in a browser at 900, 980 and 1100px in both languages
 **And** no new tests beyond any pure formatting helper that holds logic; an uncommitted phone and desktop walk covers both locales, a past year, an empty year and swiping into and out of Stats
+
+## Epic 11: Bold Metro
+
+A bolder Metro look: 56px headings, a coral fill for selected states and the Stats tiles, heavier buttons, a phone app bar in place of the pinned Add book, and a quieter Book detail with folding sections and the copy actions in the bar (PRD FR-10, FR-57, Build Order; spine UI primitives and Styling conventions; DESIGN.md and EXPERIENCE.md as amended by `sprint-change-proposal-2026-11-10.md`). The look is the canvas copied to `ux-designs/ux-bookeh-2026-10-03/mockups/bold-metro/`; the spines win on conflict.
+
+**Order.** 11.1 first. Then 11.2, 11.4 and 11.8 in any order. 11.3 and 11.9 need 11.2. 11.5 needs 11.4. 11.6 needs 11.2 and 11.5. 11.7 needs 11.6. Book detail stories (11.4 → 11.7) touch the same files and run one at a time.
+
+### Story 11.1: Bold tokens, headings and buttons
+
+As Mika,
+I want the bolder headings, buttons and the coral fill across the app,
+So that every screen picks up the new look before its layout changes.
+
+**Acceptance Criteria:**
+
+**Given** DESIGN.md as amended
+**When** `styles.css` is updated
+**Then** it declares `accent-fill` (`#D1432F` in both themes), `bar` (`#1F2933` light, `#262E37` dark), `bar-ink` (`#FFFFFF` / `#E3E8EE`), `bar-danger` (`#E0566F` both), `stroke-button` (2px) and `button-height` (54px), and `heading-section` and `heading-section-phone` become 56px / 300 / -0.02em
+**And** `buttonClass()` draws every button with a `stroke-button` outline, the `button` type (now 17px) and `button-height` tall, primary in `accent`, secondary in `text`, destructive in `danger`; changing `stroke-button` to 3px changes every button outline and nothing else
+**And** the compact button (Find beside the ISBN field) keeps its smaller padding with the new stroke; the Back to top square is untouched here (it goes in 11.2)
+**And** on wide screens the headings row and Add book are re-measured at 56px in both languages; the measured widths in EXPERIENCE.md → Moving between sections are updated, and the clipping rule still keeps Add book whole, checked in a browser at 900, 1100 and 1400px
+**And** no tests; an uncommitted phone and desktop walk in both themes covers a section, Book detail, an Answer and Edit book
+
+### Story 11.2: Phone app bar
+
+As Mika,
+I want a bar at the bottom of the phone with Add book and the section's own actions,
+So that the main actions sit under my thumb, as on a Windows Phone.
+
+**Acceptance Criteria:**
+
+**Given** the phone layout (under 900px) of any section
+**When** it shows
+**Then** an `AppBar` pinned to the bottom (`bar` ground, `bar-ink` labels, safe area respected) replaces the pinned Add book button: round 44px buttons with a 2px ring and an inline SVG icon over a lowercase `label`-size label, centred; Add book's ring is `accent` (the layer's primary)
+**And** the collection's bar holds add book, filter and select, and the tools row loses its Filter and Select Links on the phone; loans, wishlists, stats and settings hold add book; no bar shows a ⋯ when it has nothing behind it
+**And** once a section is scrolled past two screens a "top" button joins the bar and returns to the top (instantly under reduced motion), hiding within one screen of the top; `BackToTop` and its square are removed
+**And** select mode's action bar takes the app bar's place as it took the pinned button's; toasts sit above the bar; the bottom sheet's half-open height still shows the header, reading group and the first copy above the bar
+**And** wide screens are unchanged: no bar, Add book top right, Filter and Select in the tools row
+**And** strings in both languages; buttons have their visible label as their name; no tests; an uncommitted phone walk covers every section, scrolling to and from top, select mode, a toast, the sheet half open, both themes and an installed PWA's safe area
+
+### Story 11.3: Rows and covers as icon buttons
+
+As Mika,
+I want the layout switch as two icon buttons beside the size switch,
+So that rows and covers are one obvious tap.
+
+**Acceptance Criteria:**
+
+**Given** the collection's tools row
+**When** it shows
+**Then** it reads, left to right: the count line, the s / m / l Text switch, and a rows / covers pair of 40px square icon buttons with a 2px `text` outline, the chosen one filled `accent-fill` with a white icon (DESIGN.md → Icon switch), at every width
+**And** the pair is a Toggle Group (one wrapper in `components/ui`, from Base UI): exactly one is pressed, arrow keys move between them, each has an accessible name ("Rows", "Covers"); the layout is still remembered per device and known at first paint
+**And** no tests; an uncommitted phone and desktop walk covers switching, reload and both themes
+
+### Story 11.4: Book detail header and reading control
+
+As Mika,
+I want a calmer Book detail header and a bolder reading switch,
+So that what the book is and where I am with it read at a glance.
+
+**Acceptance Criteria:**
+
+**Given** Book detail (sheet and panel)
+**When** the header shows
+**Then** the cover is 120 × 180, beside the title in {typography.heading-detail}, the author, a muted "{pages} pages · {language}" line and the series line; publisher and year are no longer in the header (they move in 11.5); the Rating sits under these lines once the Book is read (decision 2), and saves as now
+**And** the unread / reading / read Text switch becomes the Segmented control: three equal parts in a 2px `text` outline with 2px dividers, the chosen part filled `accent-fill` with white text; one Toggle Group wrapper from 11.3 (built here if 11.3 has not merged); transitions, toasts and the dates line under it are unchanged (FR-53, FR-54)
+**And** the header text column ends near the cover's foot for a three-line title at phone width (checked with "Täällä Pohjantähden alla 1")
+**And** no tests; an uncommitted phone and desktop walk covers the three transitions, a Book with no pages or language, a long title and both themes
+
+### Story 11.5: Folding sections on Book detail
+
+As Mika,
+I want Book detail's groups folded until I open them,
+So that the screen shows the book, not every list at once.
+
+**Acceptance Criteria:**
+
+**Given** Book detail (sheet and panel)
+**When** it opens
+**Then** below the reading group sit folding sections, each a full-width row with a {typography.heading-group} title, a muted summary at the right and a chevron, divided by `border` hairlines (DESIGN.md → Folding section), in this order: Your copies; Description & details; Genres, themes & tags; Lent before; On wishlists; all start closed and are not remembered (decision 5)
+**And** the summaries are: Your copies — the one copy's location, "Ordered", or "Lent · {person}", or "{n} copies"; Description & details — none; Genres, themes & tags — the count; Lent before and On wishlists — the count; a section with nothing in it is absent, as its group is now
+**And** Description & details holds the description (when there is one) and value rows for Publisher, Published, ISBN, Pages and Language
+**And** Your copies keeps each copy's location chip, status, acquired line with its Links, and note; Lend, Move, Remove, Returned and Received stay on the lines until 11.6 moves them
+**And** the sections are one Accordion wrapper in `components/ui` from Base UI; each row is a button with `aria-expanded`; focus targets that existing actions set on a copy's line or the wishlists group move to that section's row, which opens if a target inside it is needed
+**And** Add to wishlist becomes a full-width secondary button at the foot; Edit stays beside it until 11.6
+**And** no tests; an uncommitted phone and desktop walk covers every section open and closed, a Book with two copies, a Book only on a wishlist, and Remove of the last copy (focus lands on a section row)
+
+### Story 11.6: Copy actions in the bar
+
+As Mika,
+I want Edit, Lend, Move and Remove in Book detail's bar,
+So that I act on the book without hunting for Links on its copy lines.
+
+**Acceptance Criteria:**
+
+**Given** Book detail on the phone
+**When** it shows
+**Then** an `AppBar` (from 11.2) is pinned to the foot of the sheet with edit (primary ring) and the copy actions any copy allows, by the copy states of EXPERIENCE.md → Book detail: Lend, Move and Remove for an owned copy not lent, Returned for a lent copy, Received for an ordered copy; Remove has a `bar-danger` ring; the bar shows edit and at most three copy actions in the order Returned, Received, Lend, Move, Remove, and the rest go behind ⋯ (decision 3)
+**And** ⋯ also holds Look it up again (creator's private Book with an ISBN) or Re-fetch (admin, shared Book), as a Menu from `components/ui`; ⋯ is absent when it would be empty
+**And** these actions leave the copy lines in Your copies; with one eligible copy an action goes straight to its Picker or dialog as today (Lend, Move, Remove's confirm, Returned, Received)
+**And** on wide screens the panel's foot shows the same actions as secondary buttons (Remove destructive), then Add to wishlist; Look it up again and Re-fetch stay as Links above the foot
+**And** which actions show is one pure function of the copy lines, `copyActions(lines)`, with one unit test covering owned, lent, ordered, mixed and none (the rule can break silently)
+**And** strings in both languages; an uncommitted phone and desktop walk covers an owned, a lent, an ordered and a wishlist-only Book, Remove with its confirm, and Undo on the Move and Lend toasts
+
+### Story 11.7: Copy picker
+
+As Mika,
+I want to choose which copy an action is for when I own several,
+So that Lend, Move and Remove still work on a Book I have twice.
+
+**Acceptance Criteria:**
+
+**Given** a Book with two or more copies eligible for an action from 11.6
+**When** I tap that action
+**Then** a Picker opens titled with the action and the Book's title, listing the eligible copies (location or "Ordered", status, acquired line), and a tap on one continues in the same sheet or dialog to that action's step: Lend's person and date, Move's locations, Returned and Received at once, Remove's confirm dialog naming the copy's location; overlays stay one level deep (EXPERIENCE.md → Copy picker)
+**And** Back from the action's step returns to the copy list; Cancel or X closes it all; with one eligible copy the list is skipped
+**And** the Picker wrapper gains the two-step mode once, reused by every action
+**And** no tests beyond 11.6's; an uncommitted phone and desktop walk covers each action on a Book with an owned, a lent and an ordered copy
+
+### Story 11.8: Stats tiles, chart and nerdy rows
+
+As Mika,
+I want Stats as bold coral tiles, a month chart and readable nerdy stats,
+So that my reading year looks like something I want to open.
+
+**Acceptance Criteria:**
+
+**Given** Stats for any year
+**When** it shows
+**Then** the four big numbers are equal square tiles filled `accent-fill` with white text, 8px apart, two by two on the phone and four in a row on wide screens: the number on the first line and its label on the second, neither wrapping
+**And** all four numbers share one size, the largest step of `tile-number-xl` 64px, `-l` 54px, `-m` 44px, `-s` 36px at which the longest formatted value fits the tile, chosen on the server by a pure `tileNumberStep(values)` with one unit test (spine Styling: no inline style)
+**And** By month is a 12-column chart: one 16px `accent` square per finished Book stacked upward, a 2px `border` dash for a month with none, months after today in the current year dimmed, and single-letter month labels; each column's accessible name says "{month}: {n} books, {pages} pages" (FR-57 as amended)
+**And** Nerdy stats shows Pages a day and Days a book as two medium numbers, then one row per remaining stat: a 26px `accent` line icon, the label in {typography.meta} muted, the title in {typography.title}, and the value line in {typography.meta} muted; a stat with no candidate is absent, as now
+**And** By year, the year switch and Currently reading are unchanged
+**And** strings in both languages; an uncommitted phone and desktop walk covers this year, a past year, an empty year, a long pages figure (6 digits) and both themes
+
+### Story 11.9: Add book target and bar
+
+As Mika,
+I want a clear target over the camera and the other ways in at my thumb,
+So that scanning in a dark shop and adding a book without a barcode are both one tap.
+
+**Acceptance Criteria:**
+
+**Given** Add book (`/scan`)
+**When** the camera runs
+**Then** the Camera frame is four 40px white corner brackets (4px) over the camera view with the `accent` guide line across, and a muted hint "Hold the barcode inside the corners" at its foot (DESIGN.md → Camera frame)
+**And** on the phone an `AppBar` holds torch, add without ISBN and find by title / author; Find by title or author and Add without ISBN leave the screen as Links on the phone and stay as Links on wide screens; the ISBN field and Find are unchanged
+**And** torch shows only when the scanner's controls offer `switchTorch` (the camera reports torch support); it toggles the light, is pressed while on, and the light goes off when the task closes; with no camera, or no torch, it is absent
+**And** Playwright's scan-to-save and shop-check flows still pass, reaching Find by title / author and Add without ISBN through the bar on the phone viewport
+**And** strings in both languages; an uncommitted walk on an iPhone and an Android phone covers the torch (or its absence), both Links and a desktop with no camera

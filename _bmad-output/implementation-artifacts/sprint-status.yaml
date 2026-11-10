@@ -29,7 +29,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 10-06-2026 17:50
-last_updated: 11-06-2026 19:30
+last_updated: 11-10-2026 12:00
 project: bookeh
 project_key: NOKEY
 tracking_system: file-system
@@ -293,6 +293,18 @@ development_status:
   10-5-stats-service: done
   10-6-stats-section-and-the-add-book-rename: done
   epic-10-retrospective: optional
+
+  epic-11: backlog
+  11-1-bold-tokens-headings-and-buttons: backlog
+  11-2-phone-app-bar: backlog
+  11-3-rows-and-covers-as-icon-buttons: backlog
+  11-4-book-detail-header-and-reading-control: backlog
+  11-5-folding-sections-on-book-detail: backlog
+  11-6-copy-actions-in-the-bar: backlog
+  11-7-copy-picker: backlog
+  11-8-stats-tiles-chart-and-nerdy-rows: backlog
+  11-9-add-book-target-and-bar: backlog
+  epic-11-retrospective: optional
 action_items:
   - id: 'epic-1-retro-item-1-fix-the-flash-toast-cookie-contract-doub'
     epic: 1

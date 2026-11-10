@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="fi">
+<head>
+<meta charset="utf-8">
+<title>Book detail</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400&amp;display=swap">
+<style>
+body{margin:0}
+.ph{--bg:#FFFFFF;--ink:#1F2933;--mu:#5F6B78;--dim:#87919C;--ln:#DDE2E7;--co:#F0604F;--cof:#D1432F;--bar:#1F2933;--bar-ink:#FFFFFF;--bar-rd:#E0566F;width:390px;height:980px;box-sizing:border-box;background:#7B8189;color:var(--ink);font:14px/1.45 'Open Sans',sans-serif;position:relative;overflow:hidden;display:flex;flex-direction:column}
+.sheet{flex:1;margin-top:36px;background:var(--bg);border-top:2px solid var(--ink);position:relative;padding:0 20px 112px;display:flex;flex-direction:column}
+.grab{width:44px;border-top:2px solid var(--ink);margin:10px auto 14px}
+.x{position:absolute;top:12px;right:12px;width:44px;height:44px;background:none;border:0;padding:0;color:var(--ink);display:flex;align-items:center;justify-content:center}
+.hd{display:flex;gap:16px;align-items:flex-start;padding-right:30px}
+.cv{flex:none;width:120px;height:180px;box-shadow:inset 0 0 0 1px #1F293324;padding:13% 11% 0;box-sizing:border-box;font:600 12px/1.15 'Trebuchet MS','Open Sans',sans-serif;letter-spacing:.07em;text-transform:uppercase;color:#F5F2EA;hyphens:auto}
+h1{margin:0;font-size:26px;font-weight:300;line-height:1.12;letter-spacing:-.01em}
+.by{margin:8px 0 0;font-size:17px}
+u{text-decoration-color:var(--co);text-decoration-thickness:2px;text-underline-offset:3px}
+.meta{margin:4px 0 0;font-size:13px;color:var(--mu)}
+.gh{margin:28px 0 10px;font-size:22px;font-weight:300;line-height:1.3;text-transform:lowercase}
+.seg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border:2px solid var(--ink)}
+.seg button{height:48px;border:0;border-left:2px solid var(--ink);background:transparent;color:var(--ink);font:17px 'Open Sans',sans-serif;text-transform:lowercase;cursor:pointer;padding:0}
+.seg button:first-child{border-left:0}
+.seg button.on{background:var(--cof);color:#FFFFFF}
+.line{margin:10px 0 0;font-size:13px;color:var(--mu)}
+.line u{color:var(--ink)}
+.rate{display:flex;align-items:center;gap:4px;margin-top:10px}
+.acc{margin-top:26px;border-top:1px solid var(--ln)}
+.ar{width:100%;display:flex;align-items:center;gap:10px;min-height:58px;background:none;border:0;border-bottom:1px solid var(--ln);padding:0;color:var(--ink);font:300 22px/1.3 'Open Sans',sans-serif;text-transform:lowercase;text-align:left;cursor:pointer}
+.ar .n{margin-left:auto;font:400 13px 'Open Sans',sans-serif;color:var(--mu);text-transform:none}
+.ar svg{flex:none;transition:transform .2s}
+.ar.open svg{transform:rotate(180deg)}
+.panel{padding:6px 0 18px;border-bottom:1px solid var(--ln)}
+.panel p{margin:0 0 12px;font-size:14px}
+.kv{display:flex;justify-content:space-between;padding:3px 0;font-size:14px}
+.kv span+span{color:var(--mu)}
+.cp{display:flex;gap:12px;align-items:flex-start}
+.cp svg{flex:none;margin-top:2px}
+.cp b{display:block;font-weight:400;font-size:17px}
+.cp p{margin:2px 0 0;font-size:13px;color:var(--mu)}
+.chips{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:15px}
+.chips .add{color:var(--mu)}
+.bt{margin-top:24px;height:54px;border:2px solid var(--ink);background:transparent;color:var(--ink);font:17px 'Open Sans',sans-serif;text-transform:lowercase;cursor:pointer}
+.bar{position:absolute;left:0;right:0;bottom:0;height:84px;background:var(--bar);color:var(--bar-ink);display:flex;justify-content:center;gap:18px;padding:10px 40px 0 0;box-sizing:border-box}
+.ab{display:flex;flex-direction:column;align-items:center;gap:4px;background:none;border:0;color:inherit;font:12px/1.2 'Open Sans',sans-serif;text-transform:lowercase;padding:0;cursor:pointer;min-width:56px}
+.ci{width:44px;height:44px;border:2px solid currentColor;border-radius:50%;box-sizing:border-box;display:flex;align-items:center;justify-content:center}
+.ab.pr .ci{border-color:var(--co)}
+.ab.rd .ci{border-color:var(--bar-rd)}
+.more{position:absolute;right:14px;top:6px;width:44px;height:28px;background:none;border:0;color:var(--bar-ink);display:flex;align-items:center;justify-content:center;padding:0}
+</style>
+</helmet>
+<div class="ph">
+  <div class="sheet">
+    <div class="grab"></div>
+    <button type="button" class="x" aria-label="Close"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M2 2l14 14M16 2L2 16"/></svg></button>
+
+    <div class="hd">
+      <div class="cv" style="background: #012534">Täällä Pohjan&shy;tähden alla 1</div>
+      <div>
+        <h1>Täällä Pohjantähden alla 1</h1>
+        <p class="by"><u>Väinö Linna</u></p>
+        <p class="meta">476 pages · Finnish</p>
+        <p class="meta"><u style="color: var(--ink)">Täällä Pohjantähden alla</u> · 1/3</p>
+        <div class="rate" role="group" aria-label="Rating, 4 of 5">
+          <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.4l-5.8 3.1 1.1-6.5L2.6 9.4l6.5-.9z" fill="none" stroke="var(--ink)" stroke-width="2"/></svg>
+          <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.4l-5.8 3.1 1.1-6.5L2.6 9.4l6.5-.9z" fill="none" stroke="var(--ink)" stroke-width="2"/></svg>
+          <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.4l-5.8 3.1 1.1-6.5L2.6 9.4l6.5-.9z" fill="none" stroke="var(--ink)" stroke-width="2"/></svg>
+          <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.4l-5.8 3.1 1.1-6.5L2.6 9.4l6.5-.9z" fill="none" stroke="var(--ink)" stroke-width="2"/></svg>
+          <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.4l-5.8 3.1 1.1-6.5L2.6 9.4l6.5-.9z" fill="none" stroke="var(--dim)" stroke-width="1.6"/></svg>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="gh">Reading</h2>
+    <div class="seg" role="group" aria-label="Reading status">
+      <sc-for list="{{states}}" as="s" hint-placeholder-count="3">
+        <button type="button" class="{{s.cls}}" aria-pressed="{{s.pressed}}" onClick="{{s.pick}}">{{s.label}}</button>
+      </sc-for>
+    </div>
+    <p class="line">{{dates}}<u>{{dateLink}}</u></p>
+
+    <div class="acc">
+      <button type="button" class="ar {{copyCls}}" aria-expanded="{{copyOpen}}" onClick="{{toggleCopy}}">Your copies<span class="n">Tampere</span><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
+      <sc-if value="{{copyOpen}}" hint-placeholder-val="{{false}}">
+        <div class="panel">
+          <div class="cp">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--co)" stroke-width="2" aria-hidden="true"><path d="M12 21s-6.5-6.2-6.5-11a6.5 6.5 0 0113 0c0 4.8-6.5 11-6.5 11z"/><circle cx="12" cy="10" r="2.2"/></svg>
+            <div><b>Tampere</b><p>Acquired 22 Oct 2026 · €12.90</p><p>Grandfather's copy. The spine is fragile.</p></div>
+          </div>
+        </div>
+      </sc-if>
+      <button type="button" class="ar {{descCls}}" aria-expanded="{{descOpen}}" onClick="{{toggleDesc}}">Description &amp; details<span class="n"></span><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
+      <sc-if value="{{descOpen}}" hint-placeholder-val="{{false}}">
+        <div class="panel">
+          <p>Koskelan torpparisuvun tarina Pentinkulman kylästä 1880-luvulta sisällissotaan.</p>
+          <div class="kv"><span>Publisher</span><span>WSOY</span></div>
+          <div class="kv"><span>Published</span><span>1959</span></div>
+          <div class="kv"><span>ISBN</span><span>978-951-0-01234-5</span></div>
+          <div class="kv"><span>Pages</span><span>476</span></div>
+          <div class="kv"><span>Language</span><span>Finnish</span></div>
+        </div>
+      </sc-if>
+      <button type="button" class="ar {{tagsCls}}" aria-expanded="{{tagsOpen}}" onClick="{{toggleTags}}">Genres, themes &amp; tags<span class="n">5</span><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
+      <sc-if value="{{tagsOpen}}" hint-placeholder-val="{{false}}">
+        <div class="panel"><div class="chips"><u>Fiction</u><u>Historical</u><u>sisällissota</u><u>Pirkanmaa</u><u>klassikot</u><span class="add">+ add tag</span></div></div>
+      </sc-if>
+      <button type="button" class="ar {{lentCls}}" aria-expanded="{{lentOpen}}" onClick="{{toggleLent}}">Lent before<span class="n">2</span><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
+      <sc-if value="{{lentOpen}}" hint-placeholder-val="{{false}}">
+        <div class="panel"><div class="kv"><span>Antti</span><span>Mar – May 2025</span></div><div class="kv"><span>Liisa</span><span>Aug 2023</span></div></div>
+      </sc-if>
+      <button type="button" class="ar {{wishCls}}" aria-expanded="{{wishOpen}}" onClick="{{toggleWish}}">On wishlists<span class="n">1</span><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
+      <sc-if value="{{wishOpen}}" hint-placeholder-val="{{false}}">
+        <div class="panel"><div class="kv"><span><u>Joululahjat</u></span><span>for Liisa</span></div></div>
+      </sc-if>
+    </div>
+
+    <button type="button" class="bt">Add to wishlist</button>
+  </div>
+
+  <div class="bar">
+    <button type="button" class="ab pr"><span class="ci"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M4 20l4-1L19 8l-3-3L5 16z"/></svg></span>edit</button>
+    <button type="button" class="ab"><span class="ci"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8"/></svg></span>lend</button>
+    <button type="button" class="ab"><span class="ci"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 9l-3 3 3 3M19 9l3 3-3 3M2 12h20"/></svg></span>move</button>
+    <button type="button" class="ab rd"><span class="ci"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/></svg></span>remove</button>
+    <button type="button" class="more" aria-label="More"><svg width="24" height="8" viewBox="0 0 24 8" fill="currentColor" aria-hidden="true"><circle cx="4" cy="4" r="2"/><circle cx="12" cy="4" r="2"/><circle cx="20" cy="4" r="2"/></svg></button>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":980}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = { reading: 'reading', open: { copy: false, desc: false, tags: false, lent: false, wish: false } };
+  }
+  toggle(key) {
+    const open = Object.assign({}, this.state.open);
+    open[key] = !open[key];
+    this.setState({ open: open });
+  }
+  renderVals() {
+    const cur = this.state.reading;
+    const open = this.state.open;
+    const states = [
+      { value: 'unread', label: 'Unread' },
+      { value: 'reading', label: 'Reading' },
+      { value: 'read', label: 'Read' }
+    ].map((s) => Object.assign({}, s, {
+      cls: s.value === cur ? 'on' : '',
+      pressed: s.value === cur ? 'true' : 'false',
+      pick: () => this.setState({ reading: s.value })
+    }));
+    const lines = {
+      unread: ['', 'Add dates'],
+      reading: ['Started 2 Sep 2026 · ', 'Add finish date'],
+      read: ['2 Sep – 1 Nov 2026 · 60 days · ', 'Edit dates']
+    };
+    return {
+      states: states,
+      dates: lines[cur][0],
+      dateLink: lines[cur][1],
+      copyOpen: open.copy, copyCls: open.copy ? 'open' : '', toggleCopy: () => this.toggle('copy'),
+      descOpen: open.desc, descCls: open.desc ? 'open' : '', toggleDesc: () => this.toggle('desc'),
+      tagsOpen: open.tags, tagsCls: open.tags ? 'open' : '', toggleTags: () => this.toggle('tags'),
+      lentOpen: open.lent, lentCls: open.lent ? 'open' : '', toggleLent: () => this.toggle('lent'),
+      wishOpen: open.wish, wishCls: open.wish ? 'open' : '', toggleWish: () => this.toggle('wish')
+    };
+  }
+}
+</script>
+</body>
+</html>
