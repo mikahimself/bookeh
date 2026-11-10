@@ -4325,7 +4325,8 @@ So that the screen shows the book, not every list at once.
 **When** it opens
 **Then** below the reading group sit folding sections, each a full-width row with a {typography.heading-group} title, a muted summary at the right and a chevron, divided by `border` hairlines (DESIGN.md → Folding section), in this order: Your copies; Description & details; Genres, themes & tags; Lent before; On wishlists; all start closed and are not remembered (decision 5)
 **And** the summaries are: Your copies — the one copy's location, "Ordered", or "Lent · {person}", or "{n} copies"; Description & details — none; Genres, themes & tags — the count; Lent before and On wishlists — the count; a section with nothing in it is absent, as its group is now
-**And** Description & details holds the description (when there is one) and value rows for Publisher, Published, ISBN, Pages and Language
+**And** Description & details holds the description (when there is one) and value rows for Reading, Publisher, Published, ISBN, Pages and Language
+**And** the reading dates line leaves the reading group for Description & details' Reading row (Mika, 2026-11-10): the same text and Links, opening the reading-dates Picker as now (FR-54), absent while unread; with only "Add dates" on a read Book with none, Description & details is present; after the Picker saves, focus stays in the section
 **And** Your copies keeps each copy's location chip, status, acquired line with its Links, and note; Lend, Move, Remove, Returned and Received stay on the lines until 11.6 moves them
 **And** the sections are one Accordion wrapper in `components/ui` from Base UI; each row is a button with `aria-expanded`; focus targets that existing actions set on a copy's line or the wishlists group move to that section's row, which opens if a target inside it is needed
 **And** Add to wishlist becomes a full-width secondary button at the foot; Edit stays beside it until 11.6
@@ -4342,9 +4343,9 @@ So that I act on the book without hunting for Links on its copy lines.
 **Given** Book detail on the phone
 **When** it shows
 **Then** an `AppBar` (from 11.2) is pinned to the foot of the sheet with edit (primary ring) and the copy actions any copy allows, by the copy states of EXPERIENCE.md → Book detail: Lend, Move and Remove for an owned copy not lent, Returned for a lent copy, Received for an ordered copy; Remove has a `bar-danger` ring; the bar shows edit and at most three copy actions in the order Returned, Received, Lend, Move, Remove, and the rest go behind ⋯ (decision 3)
-**And** ⋯ also holds Look it up again (creator's private Book with an ISBN) or Re-fetch (admin, shared Book), as a Menu from `components/ui`; ⋯ is absent when it would be empty
+**And** ⋯ also holds Look it up again (creator's private Book with an ISBN) or Re-fetch (admin, shared Book), and Add reading dates on a read Book with no dates (Mika, 2026-11-10), which opens the reading-dates Picker, as a Menu from `components/ui`; ⋯ is absent when it would be empty
 **And** these actions leave the copy lines in Your copies; with one eligible copy an action goes straight to its Picker or dialog as today (Lend, Move, Remove's confirm, Returned, Received)
-**And** on wide screens the panel's foot shows the same actions as secondary buttons (Remove destructive), then Add to wishlist; Look it up again and Re-fetch stay as Links above the foot
+**And** on wide screens the panel's foot shows the same actions as secondary buttons (Remove destructive), then Add to wishlist; Look it up again and Re-fetch stay as Links above the foot, joined by an "Add reading dates" Link on a read Book with no dates
 **And** which actions show is one pure function of the copy lines, `copyActions(lines)`, with one unit test covering owned, lent, ordered, mixed and none (the rule can break silently)
 **And** strings in both languages; an uncommitted phone and desktop walk covers an owned, a lent, an ordered and a wishlist-only Book, Remove with its confirm, and Undo on the Move and Lend toasts
 

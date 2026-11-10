@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>bookeh detail header tap areas</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400&display=swap">
+<style>
+/* Mock-up page for Story 11.4. Governed by DESIGN.md (Detail panel, Segmented control, Rating, Tap area).
+   The question: the header's text column against the 120 × 180 cover once the Book is read, given 44px phone tap heights. */
+:root{--page:#ECEEF0;--pfg:#1F2933;--pmu:#5F6B78;--pacc:#F0604F;
+  --bg:#FFFFFF;--text:#1F2933;--muted:#5F6B78;--dim:#87919C;--border:#DDE2E7;--accent:#F0604F;--fill:#D1432F;--tap:#2251A3}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--page:#0E1115;--pfg:#E3E8EE;--pmu:#94A0AD;--pacc:#FF8E7F;
+  --bg:#14181D;--text:#E3E8EE;--muted:#94A0AD;--dim:#626B76;--border:#2C343D;--accent:#FF8E7F;--tap:#6FA8FF;color-scheme:dark}}
+:root[data-theme="dark"]{--page:#0E1115;--pfg:#E3E8EE;--pmu:#94A0AD;--pacc:#FF8E7F;
+  --bg:#14181D;--text:#E3E8EE;--muted:#94A0AD;--dim:#626B76;--border:#2C343D;--accent:#FF8E7F;--tap:#6FA8FF;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--page);color:var(--pfg);font:14px/1.45 'Open Sans',"Segoe UI","Helvetica Neue",sans-serif;margin:0}
+main{max-width:1280px;margin:0 auto;padding:28px 16px 80px}
+h1{font-weight:300;font-size:34px;line-height:1.1;margin:0 0 8px}
+.lede{max-width:72ch;color:var(--pmu);margin:0 0 6px}
+.bar{display:flex;flex-wrap:wrap;gap:8px 20px;align-items:center;margin:18px 0 0}
+.bar button{all:unset;cursor:pointer;border-bottom:2px solid var(--pacc);padding:2px 0}
+.bar button[aria-pressed="true"]{border-bottom-color:var(--pfg)}
+.bar button:focus-visible{outline:2px solid var(--pfg);outline-offset:3px}
+.opts{display:flex;flex-wrap:wrap;gap:36px 28px;margin-top:26px}
+.opt{width:390px;max-width:100%}
+.opt h3{font-weight:400;font-size:17px;margin:0 0 4px}
+.cap{font-size:13px;color:var(--pmu);margin:0 0 10px;min-height:7.4em}
+.cap strong{font-weight:400;color:var(--pfg)}
+.meas{font-size:13px;margin:10px 0 0;color:var(--pfg)}
+.meas b{font-weight:400;border-bottom:2px solid var(--pacc)}
+
+/* The phone sheet, 390px wide, 20px margins (DESIGN.md page-margin-phone). */
+.sheet{width:390px;max-width:100%;background:var(--bg);color:var(--text);border-top:2px solid var(--text);padding:0 20px 24px;position:relative}
+.grab{width:44px;border-top:2px solid var(--text);margin:0 auto;height:30px;position:relative;top:10px}
+.x{position:absolute;top:8px;right:8px;width:44px;height:44px;display:flex;align-items:center;justify-content:center;color:var(--text)}
+.hd{display:flex;gap:16px;align-items:flex-start;margin-top:22px;position:relative}
+.cv{flex:none;width:120px;height:180px;background:#012534;box-shadow:inset 0 0 0 1px #1F293324;padding:13% 11% 0;font:600 10.5px/1.15 'Trebuchet MS','Open Sans',sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#F5F2EA;hyphens:auto;position:relative}
+.col{display:flex;flex-direction:column;gap:4px;min-width:0;position:relative}
+.title{margin:0;font-size:26px;font-weight:300;line-height:1.15;overflow-wrap:break-word}
+.by{margin:0;font-size:17px;line-height:1.3}
+.meta{margin:0;font-size:13px;line-height:1.4;color:var(--muted)}
+.ser{margin:0;font-size:14px;line-height:1.45}
+.chip{color:var(--text);text-decoration:underline;text-decoration-color:var(--accent);text-decoration-thickness:2px;text-underline-offset:3px;position:relative;cursor:pointer}
+.rate{display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:13px}
+.stars{display:flex}
+.star{display:flex;align-items:center;justify-content:center;width:28px;position:relative;color:var(--text);cursor:pointer}
+.star.off{color:var(--dim)}
+.star svg{width:22px;height:22px}
+.clear{color:var(--text);text-decoration:underline;text-decoration-color:var(--accent);text-decoration-thickness:2px;text-underline-offset:3px}
+.foot{position:absolute;left:-20px;right:-20px;border-top:1px dashed var(--accent);pointer-events:none}
+.foot span{position:absolute;right:4px;top:-17px;font-size:11px;color:var(--accent)}
+
+/* A: 44px in the layout (the current build). */
+.A .chip{display:inline-flex;align-items:center;min-height:44px}
+.A .star{height:44px}
+/* B: tap areas drawn outside the layout, as the compact button's before:h-tap. */
+.B .chip::before,.B .star::before{content:'';position:absolute;left:0;right:0;top:50%;height:44px;transform:translateY(-50%)}
+.B .star{height:22px}
+.B .rate{margin-top:19px} /* 4px gap + 19px = 23px: the series' and the stars' 44px areas meet, never overlap. */
+/* C: stars under the cover, full width; chips as B. */
+.C .chip::before{content:'';position:absolute;left:0;right:0;top:50%;height:44px;transform:translateY(-50%)}
+.C .star{height:44px}
+.C .under{margin-top:8px}
+
+/* Tap areas shown. */
+.showtap .A .chip,.showtap .A .star,.showtap .C .star{outline:1px dashed var(--tap);outline-offset:-1px}
+.showtap .B .chip::before,.showtap .B .star::before,.showtap .C .chip::before{outline:1px dashed var(--tap);outline-offset:-1px;background:color-mix(in srgb,var(--tap) 10%,transparent)}
+.showtap .A .chip,.showtap .A .star,.showtap .C .star{background:color-mix(in srgb,var(--tap) 10%,transparent)}
+
+.unread .rate{display:none}
+
+/* Segmented control (DESIGN.md). */
+.seg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border:2px solid var(--text);margin-top:24px}
+.seg button{all:unset;box-sizing:border-box;height:48px;display:flex;align-items:center;justify-content:center;border-left:2px solid var(--text);font-size:17px;text-transform:lowercase;cursor:pointer;color:var(--text)}
+.seg button:first-child{border-left:0}
+.seg button[aria-pressed="true"]{background:var(--fill);color:#FFFFFF}
+.line{margin:8px 0 0;font-size:13px;color:var(--muted)}
+.line u{color:var(--text);text-decoration-color:var(--accent);text-decoration-thickness:2px;text-underline-offset:3px}
+.rows{margin-top:24px;border-top:1px solid var(--border)}
+.rows div{height:58px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;font-size:20px;font-weight:300;text-transform:lowercase}
+.rows span{font-size:13px;font-weight:400;color:var(--muted);text-transform:none}
+</style>
+</head>
+<body>
+<main>
+<h1>Book detail header: tap areas</h1>
+<p class="lede">Story 11.4 asks the header's text column to end near the cover's foot for a three-line title on the phone. Once the Book is read the stars join the column, and three 44px phone tap heights (author, series, stars) push it well past the cover. The sheets are 390px wide with the real long title.</p>
+<p class="lede">Switch to <strong>read</strong> to see the problem, and <strong>show tap areas</strong> to see what a thumb can hit. The dashed coral line is the cover's foot; the figure under each sheet is measured live.</p>
+<div class="bar">
+  <button type="button" id="read" aria-pressed="true">read</button>
+  <button type="button" id="unread" aria-pressed="false">unread</button>
+  <button type="button" id="tap" aria-pressed="false">show tap areas</button>
+  <button type="button" id="theme" aria-pressed="false">dark</button>
+</div>
+<div class="opts" id="opts"></div>
+</main>
+<script>
+const OPTS=[
+ {k:'A',t:'44px in the layout (as built)',d:'Author, series and stars each take <strong>44px of height</strong>, so the gaps between lines are tap padding. Simple and robust; the column runs long once read.'},
+ {k:'B',t:'Tap areas outside the layout',d:'Lines are drawn at their <strong>text height</strong>; each control gets an invisible 44px tap area centred on it (as the compact Find button). A 23px gap above the stars keeps the series’ and the stars’ areas from overlapping. Author and series areas spill only onto plain text.'},
+ {k:'C',t:'Stars under the cover',d:'The text column stays text-height (as B, ends above the foot). The Rating moves <strong>out of the column</strong> to a full-width row under the cover, with full 44px stars. Departs from decision 2 (“the stars sit in the header”): they sit below it.'},
+];
+const star='<svg viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M11 2 13.35 8.76 20.51 8.91 14.8 13.24 16.88 20.09 11 16 5.12 20.09 7.2 13.24 1.49 8.91 8.65 8.76Z"/></svg>';
+const rating=()=>`<div class="rate"><div class="stars">${[1,2,3,4,5].map(n=>`<span class="star${n>4?' off':''}" role="button" aria-label="${n} stars">${star}</span>`).join('')}</div><span class="clear">Clear</span></div>`;
+const opts=document.getElementById('opts');
+for(const o of OPTS){
+  const inCol=o.k!=='C';
+  opts.insertAdjacentHTML('beforeend',`
+  <section class="opt ${o.k}">
+    <h3>${o.k}. ${o.t}</h3>
+    <p class="cap">${o.d}</p>
+    <div class="sheet">
+      <div class="grab"></div>
+      <span class="x" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 2l14 14M16 2L2 16"/></svg></span>
+      <div class="hd">
+        <div class="cv">Täällä Pohjan&shy;tähden alla 1</div>
+        <div class="col">
+          <h2 class="title">Täällä Pohjantähden alla 1</h2>
+          <p class="by"><span class="chip">Väinö Linna</span></p>
+          <p class="meta">476 pages · Finnish</p>
+          <p class="ser"><span class="chip">Täällä Pohjantähden alla</span> 1</p>
+          ${inCol?rating():''}
+        </div>
+        <div class="foot" style="top:180px"><span>cover foot</span></div>
+      </div>
+      ${inCol?'':`<div class="under">${rating()}</div>`}
+      <div class="seg" role="group" aria-label="Reading"><button type="button" aria-pressed="false">unread</button><button type="button" aria-pressed="false">reading</button><button type="button" aria-pressed="true">read</button></div>
+      <p class="line"><u>12 Sep 2026</u> – <u>30 Oct 2026</u> · 48 days</p>
+      <div class="rows"><div>your copies<span>Tampere</span></div><div>description &amp; details<span></span></div></div>
+    </div>
+    <p class="meas"></p>
+  </section>`);
+}
+const root=document.documentElement;
+function measure(){
+  for(const sec of document.querySelectorAll('.opt')){
+    const cv=sec.querySelector('.cv').getBoundingClientRect();
+    const col=sec.querySelector('.col').getBoundingClientRect();
+    const d=Math.round(col.bottom-cv.bottom);
+    const lines=Math.round(sec.querySelector('.title').getBoundingClientRect().height/(26*1.15));
+    sec.querySelector('.meas').innerHTML=`Title ${lines} lines · text column ends <b>${d>=0?d+'px past':(-d)+'px above'}</b> the cover’s foot`;
+  }
+}
+function setRead(read){
+  document.body.classList.toggle('unread',!read);
+  document.getElementById('read').setAttribute('aria-pressed',read);
+  document.getElementById('unread').setAttribute('aria-pressed',!read);
+  for(const seg of document.querySelectorAll('.seg')){
+    const b=seg.querySelectorAll('button');b[0].setAttribute('aria-pressed',!read);b[2].setAttribute('aria-pressed',read);
+  }
+  for(const l of document.querySelectorAll('.line')) l.style.visibility=read?'visible':'hidden';
+  measure();
+}
+document.getElementById('read').onclick=()=>setRead(true);
+document.getElementById('unread').onclick=()=>setRead(false);
+document.getElementById('tap').onclick=e=>{const on=document.body.classList.toggle('showtap');e.target.setAttribute('aria-pressed',on)};
+document.getElementById('theme').onclick=e=>{
+  const dark=root.dataset.theme!=='dark'&&!(root.dataset.theme!=='light'&&matchMedia('(prefers-color-scheme:dark)').matches);
+  root.dataset.theme=dark?'dark':'light';e.target.textContent=dark?'light':'dark';
+};
+document.fonts.ready.then(measure);window.addEventListener('resize',measure);
+setRead(true);
+</script>
+</body>
+</html>
