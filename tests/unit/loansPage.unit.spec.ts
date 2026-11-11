@@ -9,6 +9,7 @@ import type { CopyLine, Holdings } from '@/lib/books/holdings'
 import type { LocationOption } from '@/lib/copies/locations'
 import type { OpenLoan, ReturnedLoan } from '@/lib/loans/loans'
 
+import { openSections } from '../helpers/openSections'
 import { serverTree } from '../helpers/serverTree'
 
 // EXPERIENCE.md, Loans and States; FR-37: the open loans by person (groups
@@ -338,10 +339,10 @@ describe('LoansPage', () => {
       returnedLoan(3, 7, 'Leena', '2026-01-14', '2026-02-02'),
     ])
     await renderPage({ book: '7' })
-    const sheet = await screen.findByRole('dialog', { name: 'Puhdistus' })
-    const heading = within(sheet).getByRole('heading', { name: 'Lent before' })
+    const sheet = openSections(await screen.findByRole('dialog', { name: 'Puhdistus' }))
+    const row = within(sheet).getByRole('button', { name: /^Lent before/ })
     expect(
-      within(heading.parentElement!)
+      within(row.closest('[data-fold-item]') as HTMLElement)
         .getAllByRole('listitem')
         .map((item) => item.textContent),
     ).toEqual(['Antti · Mar 3, 2026 to Apr 20, 2026', 'Leena · Jan 14, 2026 to Feb 2, 2026'])
@@ -350,7 +351,7 @@ describe('LoansPage', () => {
     forBook(async () => [])
     await renderPage({ book: '7' })
     await screen.findByRole('dialog', { name: 'Puhdistus' })
-    expect(screen.queryByRole('heading', { name: 'Lent before' })).toBeNull()
+    expect(screen.queryByRole('button', { name: /^Lent before/ })).toBeNull()
     cleanup()
 
     forBook(async () => {
@@ -358,7 +359,7 @@ describe('LoansPage', () => {
     })
     await renderPage({ book: '7' })
     await screen.findByRole('dialog', { name: 'Puhdistus' })
-    expect(screen.queryByRole('heading', { name: 'Lent before' })).toBeNull()
+    expect(screen.queryByRole('button', { name: /^Lent before/ })).toBeNull()
     expect(logError).toHaveBeenCalledWith(
       expect.objectContaining({ err: expect.any(Error) }),
       'The loan history failed to load',

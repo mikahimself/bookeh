@@ -1,4 +1,6 @@
 import { cleanup, render, screen, within } from '@testing-library/react'
+
+import { openSections } from './openSections'
 import { createElement, type ComponentProps } from 'react'
 import { afterEach, beforeEach, vi } from 'vitest'
 
@@ -254,15 +256,20 @@ export const ENTRIES: EntryLine[] = [
   { entryId: 52, wishlist: { id: 7, name: 'Luettavat' }, forPerson: null },
 ]
 
-/** Book detail's On wishlists group, by its heading. */
+/** Book detail's On wishlists section, by its row. */
 export const onWishlists = (sheet: HTMLElement) =>
-  within(sheet).getByRole('heading', { name: 'On wishlists' }).closest('section') as HTMLElement
+  within(sheet)
+    .getByRole('button', { name: /^On wishlists/ })
+    .closest('[data-fold-item]') as HTMLElement
 
 export async function renderPage(params: Record<string, string> = {}) {
   return render(await page(params))
 }
 
-export const detail = (name: string) => screen.findByRole('dialog', { name })
+export { openSections } from './openSections'
+
+export const detail = async (name: string) =>
+  openSections(await screen.findByRole('dialog', { name }))
 
 export const countLine = () => screen.getByText(/\d+ books?/).closest('p') as HTMLElement
 

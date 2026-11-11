@@ -348,7 +348,15 @@
     "tag": "Tunniste"
   },
   "detail": {
-    "description": "Kuvaus",
+    "detailsAndDescription": "Kuvaus ja tiedot",
+    "classifications": "Lajit, teemat ja tagit",
+    "copiesCount": "{n, plural, one {# kappale} other {# kappaletta}}",
+    "ordered": "Tilattu",
+    "publisher": "Kustantaja",
+    "published": "Julkaistu",
+    "isbn": "ISBN",
+    "pages": "Sivuja",
+    "language": "Kieli",
     "yourCopies": "Kappaleesi",
     "lentBefore": "Lainassa aiemmin",
     "onWishlists": "Toivelistoilla",

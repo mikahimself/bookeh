@@ -18,6 +18,7 @@ import {
   linna,
   listLocations,
   moveCopiesAction,
+  openSections,
   onWishlists,
   page,
   removeCopiesAction,
@@ -38,7 +39,7 @@ describe('CollectionPage', () => {
 
   describe('Book detail', () => {
     it.each([false, true])(
-      'shows all classifications once before Description (wide: %s)',
+      'shows all classifications once, in their section (wide: %s)',
       async (wide) => {
         if (wide) setScreen((query) => !query.includes('1200px'))
         getShelfRows.mockResolvedValue({ rows: [row(11, linna)], total: 1, labels: {} })
@@ -61,18 +62,17 @@ describe('CollectionPage', () => {
         setSearchParams('q=linna&sort=title&dir=desc&genre=2&theme=Existing&tag=3&book=5')
         await renderPage({ book: '5' })
         const surface = wide
-          ? await screen.findByRole('complementary', { name: linna.title })
+          ? openSections(await screen.findByRole('complementary', { name: linna.title }))
           : await detail(linna.title)
         const headings = within(surface)
           .getAllByRole('heading', { level: 3 })
           .map(({ textContent }) => textContent)
-        expect(headings.slice(-6)).toEqual([
+        expect(headings.slice(-5)).toEqual([
           'Genres',
           'My genres',
           'Themes',
           'My themes',
           'My tags',
-          'Description',
         ])
         for (const [name, field, value] of [
           ['Sotaromaani', 'genre', '8'],
@@ -169,15 +169,14 @@ describe('CollectionPage', () => {
         await renderPage({ book: '5' })
 
         const sheet = await detail('Tuntematon sotilas')
-        const section = within(sheet)
-          .getByRole('heading', { name: 'Description' })
-          .closest('section')!
+        const detailsRow = within(sheet).getByRole('button', { name: 'Description & details' })
+        const section = detailsRow.closest('[data-fold-item]')!
         expect(section.querySelector('p')?.textContent).toBe(description)
         expect(section.querySelector('b, script')).toBeNull()
-        const genres = within(sheet).getByRole('heading', { name: 'Genres' })
+        const copies = within(sheet).getByRole('button', { name: /^Your copies/ })
         const edit = within(sheet).getByRole('link', { name: 'Edit' })
         expect(
-          genres.compareDocumentPosition(section) & Node.DOCUMENT_POSITION_FOLLOWING,
+          copies.compareDocumentPosition(detailsRow) & Node.DOCUMENT_POSITION_FOLLOWING,
         ).toBeTruthy()
         expect(
           section.compareDocumentPosition(edit) & Node.DOCUMENT_POSITION_FOLLOWING,
@@ -196,13 +195,17 @@ describe('CollectionPage', () => {
       await renderPage({ book: '5' })
 
       const sheet = await detail('Tuntematon sotilas')
-      expect(within(sheet).queryByRole('heading', { name: 'Description' })).toBeNull()
-      // With no description the picker opener follows classification.
+      // The Book has pages and a language, so only the description is missing.
+      const details = within(sheet)
+        .getByRole('button', { name: 'Description & details' })
+        .closest('[data-fold-item]')!
+      expect(details.querySelector('p')).toBeNull()
+      // The picker opener follows the sections.
       const classification = within(sheet)
-        .getByRole('heading', { name: 'Genres' })
-        .closest('section')!
+        .getByRole('button', { name: /^Genres, themes & tags/ })
+        .closest('[data-fold-item]')!
       expect(
-        classification.nextElementSibling?.contains(
+        classification.parentElement?.nextElementSibling?.contains(
           within(sheet).getByRole('button', { name: 'Add tag' }),
         ),
       ).toBe(true)
@@ -242,19 +245,24 @@ describe('CollectionPage', () => {
       // No locations: no Move.
       expect(within(sheet).queryByRole('button', { name: 'Move' })).toBeNull()
       // No entries: no On wishlists group.
-      expect(within(sheet).queryByRole('heading', { name: 'On wishlists' })).toBeNull()
+      expect(within(sheet).queryByRole('button', { name: /^On wishlists/ })).toBeNull()
     })
 
-    it('lists the open entries under On wishlists, after Your copies', async () => {
+    it('lists the open entries under On wishlists, the last row', async () => {
       getShelfRows.mockResolvedValue({ rows: [row(11, linna)], total: 1, labels: {} })
       holds(linna, [copy(21)], ENTRIES)
       await renderPage({ book: '5' })
 
       const sheet = await detail('Tuntematon sotilas')
-      const headings = within(sheet)
-        .getAllByRole('heading', { level: 3 })
-        .map(({ textContent }) => textContent)
-      expect(headings.indexOf('On wishlists')).toBe(headings.indexOf('Your copies') + 1)
+      const rows = [...sheet.querySelectorAll('[data-fold-row]')].map(
+        ({ textContent }) => textContent ?? '',
+      )
+      expect(rows.map((row) => row.replace(/\d.*$/, '').trim())).toEqual([
+        'Your copies',
+        'Description & details',
+        'Genres, themes & tags',
+        'On wishlists',
+      ])
       expect(
         within(onWishlists(sheet))
           .getAllByRole('listitem')
@@ -269,7 +277,7 @@ describe('CollectionPage', () => {
       await renderPage({ book: '5' })
 
       const sheet = await detail('Tuntematon sotilas')
-      expect(within(sheet).queryByRole('heading', { name: 'Your copies' })).toBeNull()
+      expect(within(sheet).queryByRole('button', { name: /^Your copies/ })).toBeNull()
       expect(within(onWishlists(sheet)).getByRole('listitem').textContent).toBe('Luettavat')
       within(sheet).getByRole('link', { name: 'Edit' })
       within(sheet).getByRole('button', { name: 'Add to wishlist' })
@@ -286,7 +294,7 @@ describe('CollectionPage', () => {
       requireUser.mockResolvedValue({ user: { roles: ['admin', 'user'] } })
       const { unmount } = await renderPage({ book: '5' })
       const sheet = await detail('Tuntematon sotilas')
-      const description = within(sheet).getByRole('heading', { name: 'Description' })
+      const description = within(sheet).getByRole('button', { name: 'Description & details' })
       const refetch = within(sheet).getByRole('button', { name: 'Re-fetch' })
       expect(
         description.compareDocumentPosition(refetch) & Node.DOCUMENT_POSITION_FOLLOWING,
@@ -474,7 +482,8 @@ describe('CollectionPage', () => {
 
     describe('beside the list at 1300px', () => {
       const sinuhe = book(6, 'Sinuhe')
-      const panel = (name: string) => screen.findByRole('complementary', { name })
+      const panel = async (name: string) =>
+        openSections(await screen.findByRole('complementary', { name }))
 
       beforeEach(() => {
         // Wide, with room for Filter and Book detail together.
@@ -498,7 +507,7 @@ describe('CollectionPage', () => {
 
         const aside = await panel('Tuntematon sotilas')
         within(aside).getByRole('heading', { name: 'Tuntematon sotilas' })
-        within(aside).getByRole('heading', { name: 'Your copies' })
+        within(aside).getByRole('button', { name: /^Your copies/ })
         within(aside).getByRole('link', { name: 'Edit' })
         expect(screen.queryByRole('dialog')).toBeNull()
         // Not hidden from assistive technology: the list stays operable.

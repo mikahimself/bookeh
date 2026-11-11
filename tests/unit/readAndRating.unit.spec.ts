@@ -76,19 +76,24 @@ vi.mock('@/app/(frontend)/components/ui/Picker', async () => {
   }
 })
 
-const { HeaderRating, ReadAndRating } = await import('@/app/(frontend)/(sections)/ReadAndRating')
+const { HeaderRating, ReadAndRating, ReadingRow } =
+  await import('@/app/(frontend)/(sections)/ReadAndRating')
 const { helsinkiToday } = await import('@/fields/readingDates')
 
 type Initial = ComponentProps<typeof ReadAndRating>['initial']
 const unread: Initial = { state: 'unread', readingSince: null, finishedAt: null, rating: null }
 const renderGroup = (initial: Initial = unread) =>
   render(
-    createElement(ReadAndRating, {
-      bookId: 7,
-      title: 'Kätilö',
-      initial,
-      header: createElement(HeaderRating),
-    }),
+    createElement(
+      ReadAndRating,
+      {
+        bookId: 7,
+        title: 'Kätilö',
+        initial,
+        header: createElement(HeaderRating),
+      },
+      createElement(ReadingRow),
+    ),
   )
 const stored = (values: Partial<Initial> & { read?: boolean }) => ({
   read: false,

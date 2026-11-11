@@ -348,7 +348,15 @@
     "tag": "Tag"
   },
   "detail": {
-    "description": "Description",
+    "detailsAndDescription": "Description & details",
+    "classifications": "Genres, themes & tags",
+    "copiesCount": "{n, plural, one {# copy} other {# copies}}",
+    "ordered": "Ordered",
+    "publisher": "Publisher",
+    "published": "Published",
+    "isbn": "ISBN",
+    "pages": "Pages",
+    "language": "Language",
     "yourCopies": "Your copies",
     "lentBefore": "Lent before",
     "onWishlists": "On wishlists",

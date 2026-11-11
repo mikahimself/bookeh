@@ -13,6 +13,7 @@ import { ActionLink } from '../components/Link'
 import { settleAction } from '../components/request'
 import { TextAreaField } from '../components/TextField'
 import { useToast } from '../components/toast/ToastProvider'
+import { focusSectionRow } from '../components/ui/Accordion'
 import { Dialog } from '../components/ui/Dialog'
 
 import { receiveCopyAction, removeCopiesAction, setNoteAction } from './actions'
@@ -81,7 +82,7 @@ export function CopyNote({ copyId, note }: { copyId: number; note: string }) {
  * ("Ordered {date}" on an ordered copy, "Add price" for no price). The date
  * and the price are Links opening one `PurchasePicker`. Its result goes to
  * `afterAction`, whose refresh re-renders the line; no toast, no Undo. Focus
- * goes to the copies' section once it settles, as `MoveCopy`'s.
+ * goes to the Your copies row once it settles, as `MoveCopy`'s.
  */
 export function CopyPurchase({
   copyId,
@@ -131,7 +132,7 @@ export function CopyPurchase({
         price={price}
         onSettled={(result) => {
           afterAction(result)
-          line.current?.closest('section')?.focus()
+          focusSectionRow(line.current)
         }}
       />
     </>
@@ -143,7 +144,7 @@ export function CopyPurchase({
  * picker (`MovePicker`) on the copy's location; disabled while its move
  * runs. `afterAction`'s refresh after `ok` or `NOT_FOUND` re-renders Book
  * detail, so the line shows its new location or goes. Focus goes to the
- * copies' section once the move settles: the disabled Link would drop it to
+ * Your copies row once the move settles: the disabled Link would drop it to
  * the body, outside the sheet. After the toast's Undo, the line returns to
  * its old location through `ReadAndRating`'s `onUndone` refresh, while Book
  * detail is mounted.
@@ -174,7 +175,7 @@ export function MoveCopy({
         value={location}
         copyIds={[copyId]}
         startTransition={startTransition}
-        onSettled={() => link.current?.closest('section')?.focus()}
+        onSettled={() => focusSectionRow(link.current)}
       />
     </>
   )
@@ -189,8 +190,8 @@ export function MoveCopy({
  * (no other copy, no open entry): `ok` then closes Book detail. Otherwise
  * `afterAction`'s refresh after `ok` or `NOT_FOUND` re-renders it (a Book
  * gone entirely then closes as "Not in library"), and focus goes to the
- * copies' section, or, with `focusAfter` (the only copy, entries remaining),
- * to that element, since the copies' section unmounts with the refresh.
+ * Your copies row, or, with `focusAfter` (the only copy, entries remaining),
+ * to that element, since a closed row stays and the copies' panel unmounts with the refresh.
  */
 export function RemoveCopy({
   copyId,
@@ -221,8 +222,8 @@ export function RemoveCopy({
       // The line goes with the refresh; focus would fall to the body, outside the sheet.
       if (!result.ok) return
       const after = focusAfter !== undefined && result.data.removed > 0
-      const target = after ? document.getElementById(focusAfter) : link.current?.closest('section')
-      target?.focus()
+      if (after) document.getElementById(focusAfter)?.focus()
+      else focusSectionRow(link.current)
     })
   }
 
@@ -286,7 +287,7 @@ export function ReceiveCopy({ copyId }: { copyId: number }) {
       }
       afterAction(result)
       // The line changes with the refresh; focus would fall to the body, outside the sheet.
-      if (result.ok || result.code === 'NOT_FOUND') link.current?.closest('section')?.focus()
+      if (result.ok || result.code === 'NOT_FOUND') focusSectionRow(link.current)
     })
   }
 
@@ -301,7 +302,7 @@ export function ReceiveCopy({ copyId }: { copyId: number }) {
  * FR-35, EXPERIENCE.md, Loans → Lend: an owned, unlent copy's Lend, a Link
  * before Move that opens the Lend picker (`LendPicker`); disabled while its
  * lend runs. `afterAction`'s refresh re-renders Book detail with the lent
- * line, so focus goes to the copies' section once the lend settles. The
+ * line, so focus goes to the Your copies row once the lend settles. The
  * toast's Undo is refreshed by `ReadAndRating`'s `onUndone` listener, and
  * on `/loans` by `RefreshOnUndo` too.
  */
@@ -332,7 +333,7 @@ export function LendCopy({
         copyId={copyId}
         startTransition={startTransition}
         pending={pending}
-        onSettled={() => link.current?.closest('section')?.focus()}
+        onSettled={() => focusSectionRow(link.current)}
       />
     </>
   )
@@ -342,7 +343,7 @@ export function LendCopy({
  * FR-36: a lent copy's Returned, a Link with no picker. It closes the loan
  * today with the toast "Returned" and Undo, which reopens it. Every result
  * goes to `afterAction`, whose refresh re-renders the line without this
- * Link, so focus moves first to its section (Your copies, or the Loans list).
+ * Link, so focus moves first to its section (the Your copies row, or the Loans list).
  */
 export function ReturnLoan({ loanId }: { loanId: number }) {
   const t = useTranslations()
@@ -363,7 +364,8 @@ export function ReturnLoan({ loanId }: { loanId: number }) {
         })
       }
       afterAction(result)
-      link.current?.closest('section')?.focus()
+      // The Loans list is a plain section, not a Folding section.
+      if (!focusSectionRow(link.current)) link.current?.closest('section')?.focus()
     })
   }
 

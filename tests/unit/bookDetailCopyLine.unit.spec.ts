@@ -13,7 +13,7 @@ import {
   lendCopyAction,
   lendingPeople,
   linna,
-  onWishlists,
+  openSections,
   receiveCopyAction,
   removeCopiesAction,
   renderPage,
@@ -187,7 +187,9 @@ describe('CollectionPage', () => {
             lendingPeople.mockResolvedValue([{ id: 40, name: 'Antti' }])
             lendCopyAction.mockResolvedValue(lent('Antti'))
             // Book detail is the panel from 900px.
-            const picker = await openPicker((name) => screen.findByRole('complementary', { name }))
+            const picker = await openPicker(async (name) =>
+              openSections(await screen.findByRole('complementary', { name })),
+            )
 
             const lend = within(picker).getByRole('button', { name: 'Lend' })
             const cancel = within(picker).getByRole('button', { name: 'Cancel' })
@@ -326,7 +328,11 @@ describe('CollectionPage', () => {
         await confirmRemove(sheet)
         await waitFor(() => expect(router.refresh).toHaveBeenCalledOnce())
         expect(removeCopiesAction).toHaveBeenCalledExactlyOnceWith([21])
-        await waitFor(() => expect(document.activeElement).toBe(onWishlists(sheet)))
+        await waitFor(() =>
+          expect(document.activeElement).toBe(
+            within(sheet).getByRole('button', { name: /^On wishlists/ }),
+          ),
+        )
         expect(router.replace).not.toHaveBeenCalled()
         expect(router.back).not.toHaveBeenCalled()
         expect(sheet.isConnected).toBe(true)

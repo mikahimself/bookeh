@@ -7,7 +7,6 @@ import {
   useContext,
   useEffect,
   useId,
-  useRef,
   useState,
   useTransition,
   type ReactNode,
@@ -26,7 +25,7 @@ import { useToast } from '../components/toast/ToastProvider'
 
 import { setRatingAction, setReadAction } from './actions'
 import { ReadingDatesPicker } from './ReadingDatesPicker'
-import { readingLine, type ReadingDates } from './readingLine'
+import { detailsRowId, readingLine, type ReadingDates, type ReadingLine } from './readingLine'
 import { useAfterAction, useClaimUndoRefresh } from './ShelfRows'
 
 type Props = {
@@ -36,6 +35,8 @@ type Props = {
   initial: Pick<UserBookState, 'state' | 'readingSince' | 'finishedAt' | 'rating'>
   /** Book detail's header, rendered above the switch; its `HeaderRating` follows the switch. */
   header: ReactNode
+  /** Book detail's folding sections, rendered after the reading control inside its context (`ReadingRow`). */
+  children?: ReactNode
 }
 
 type HeaderRatingState = {
@@ -43,15 +44,18 @@ type HeaderRatingState = {
   read: boolean
   rating: number | null
   setRating: (rating: number | null) => void
+  /** The dates line (FR-54) and the opener of its Picker, for `ReadingRow`. */
+  line: ReadingLine
+  openDates: () => void
 }
 
 const HeaderRatingContext = createContext<HeaderRatingState | null>(null)
 
 /**
  * EXPERIENCE.md, Book detail → Reading and rating: the `header`, then the
- * unread / reading / read Segmented control and the muted dates line under
- * it, with no heading. While the switch shows read, the Rating shows in the
- * header's text column (`HeaderRating`, through a context this group
+ * unread / reading / read Segmented control, with no heading; the dates
+ * line lives in Description & details (`ReadingRow`). While the switch
+ * shows read, the Rating shows in the header's text column (`HeaderRating`, through a context this group
  * provides, so it follows the switch live). Each change saves at once and
  * shows the tapped value, falling back to the stored one on failure
  * (`useSavedSwitch`). Every result goes to `afterAction`. Only Reading → Read,
@@ -89,13 +93,11 @@ export function ReadAndRating(props: Props) {
   return <Group key={generation} {...props} />
 }
 
-function Group({ bookId, title, initial, header }: Props) {
+function Group({ bookId, title, initial, header, children }: Props) {
   const t = useTranslations()
-  const format = useFormatter()
   const { show } = useToast()
   const afterAction = useAfterAction()
   const [picking, setPicking] = useState(false)
-  const group = useRef<HTMLDivElement>(null)
   // The line follows each stored result (the switch's or the Picker's), not the props.
   const [dates, setDates] = useState<ReadingDates>({
     state: initial.state,
@@ -147,60 +149,41 @@ function Group({ bookId, title, initial, header }: Props) {
       }
     }
     // The Link that opened the Picker can be gone ("Add dates" → "Started {date}").
-    group.current?.focus()
+    document.getElementById(detailsRowId(bookId))?.focus()
     afterAction(result)
   }
 
-  const day = (date: string) =>
-    format.dateTime(new Date(`${date}T12:00:00Z`), { dateStyle: 'medium' })
   const open = () => setPicking(true)
-  const link = (chunks: ReactNode) => <ActionLink onClick={open}>{chunks}</ActionLink>
   const line = readingLine(dates, helsinkiToday())
 
   return (
     <>
-      <HeaderRatingContext value={{ read: state === 'read', rating, setRating }}>
+      <HeaderRatingContext
+        value={{ read: state === 'read', rating, setRating, line, openDates: open }}
+      >
         {header}
+        <div className="flex flex-col gap-2">
+          <SegmentedControl
+            label={t('detail.reading')}
+            value={state}
+            options={[
+              { value: 'unread', label: t('collection.unread') },
+              { value: 'reading', label: t('collection.reading') },
+              { value: 'read', label: t('collection.read') },
+            ]}
+            onChange={setState}
+          />
+          <ReadingDatesPicker
+            open={picking}
+            onOpenChange={setPicking}
+            bookId={bookId}
+            title={title}
+            dates={dates}
+            onSettled={onDatesSaved}
+          />
+        </div>
+        {children}
       </HeaderRatingContext>
-      <div ref={group} tabIndex={-1} className="flex flex-col gap-2">
-        <SegmentedControl
-          label={t('detail.reading')}
-          value={state}
-          options={[
-            { value: 'unread', label: t('collection.unread') },
-            { value: 'reading', label: t('collection.reading') },
-            { value: 'read', label: t('collection.read') },
-          ]}
-          onChange={setState}
-        />
-        {line.kind !== 'none' && (
-          <p className="text-meta text-text-muted">
-            {line.kind === 'since' &&
-              t.rich('detail.readingSince', { date: day(line.start), n: line.days, link })}
-            {line.kind === 'range' &&
-              t.rich('detail.readingRange', {
-                start: day(line.start),
-                finish: day(line.finish),
-                n: line.days,
-                startLink: link,
-                finishLink: link,
-              })}
-            {line.kind === 'started' &&
-              t.rich('detail.readingStarted', { date: day(line.start), link })}
-            {line.kind === 'finished' &&
-              t.rich('detail.readingFinished', { date: day(line.finish), link })}
-            {line.kind === 'addDates' && link(t('detail.addDates'))}
-          </p>
-        )}
-        <ReadingDatesPicker
-          open={picking}
-          onOpenChange={setPicking}
-          bookId={bookId}
-          title={title}
-          dates={dates}
-          onSettled={onDatesSaved}
-        />
-      </div>
     </>
   )
 }
@@ -229,5 +212,44 @@ export function HeaderRating() {
         tapOutside
       />
     </>
+  )
+}
+
+/**
+ * Description & details' Reading row (FR-54): "Reading" at the left and the
+ * dates line at the right, its dates and "Add dates" opening the
+ * reading-dates Picker. Nothing outside `ReadAndRating`'s children or while
+ * the Book is unread.
+ */
+export function ReadingRow() {
+  const t = useTranslations()
+  const format = useFormatter()
+  const context = useContext(HeaderRatingContext)
+  if (!context || context.line.kind === 'none') return null
+  const { line, openDates } = context
+  const day = (date: string) =>
+    format.dateTime(new Date(`${date}T12:00:00Z`), { dateStyle: 'medium' })
+  const link = (chunks: ReactNode) => <ActionLink onClick={openDates}>{chunks}</ActionLink>
+  return (
+    <div className="flex items-baseline justify-between gap-4 text-body text-text-muted">
+      <dt>{t('detail.reading')}</dt>
+      <dd className="text-right">
+        {line.kind === 'since' &&
+          t.rich('detail.readingSince', { date: day(line.start), n: line.days, link })}
+        {line.kind === 'range' &&
+          t.rich('detail.readingRange', {
+            start: day(line.start),
+            finish: day(line.finish),
+            n: line.days,
+            startLink: link,
+            finishLink: link,
+          })}
+        {line.kind === 'started' &&
+          t.rich('detail.readingStarted', { date: day(line.start), link })}
+        {line.kind === 'finished' &&
+          t.rich('detail.readingFinished', { date: day(line.finish), link })}
+        {line.kind === 'addDates' && link(t('detail.addDates'))}
+      </dd>
+    </div>
   )
 }

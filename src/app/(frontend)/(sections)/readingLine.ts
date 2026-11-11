@@ -1,6 +1,11 @@
 import { finishedDays } from '@/fields/readingDates'
 import type { UserBookState } from '@/lib/books/effectiveBook'
 
+/** The id of Book detail's Description & details row; focus lands on it after the dates Picker. */
+export function detailsRowId(bookId: number): string {
+  return `details-${bookId}`
+}
+
 export type ReadingDates = Pick<UserBookState, 'state' | 'readingSince' | 'finishedAt'>
 
 /** FR-54: what the muted line under Book detail's reading switch says. */
