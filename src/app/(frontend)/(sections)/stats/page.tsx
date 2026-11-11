@@ -37,7 +37,7 @@ function yearParam(value: string | string[] | undefined): number | undefined {
 /** One Nerdy stats row: icon, then label, title and value lines (DESIGN.md, Stats facts). */
 function Fact({ kind, label, title, value }: FactRow) {
   return (
-    <li className="flex items-start gap-4 py-2">
+    <li className="flex items-center gap-4 py-2">
       <NerdyIcon kind={kind} />
       <div className="min-w-0">
         <p className="text-meta text-text-muted">{label}</p>
