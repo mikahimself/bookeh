@@ -4328,7 +4328,7 @@ So that the screen shows the book, not every list at once.
 **And** Description & details holds the description (when there is one) and value rows for Reading, Publisher, Published, ISBN, Pages and Language
 **And** the reading dates line leaves the reading group for Description & details' Reading row (Mika, 2026-11-10): the same text and Links, opening the reading-dates Picker as now (FR-54), absent while unread; with only "Add dates" on a read Book with none, Description & details is present; after the Picker saves, focus stays in the section
 **And** Your copies keeps each copy's location chip, status, acquired line with its Links, and note; Lend, Move, Remove, Returned and Received stay on the lines until 11.6 moves them
-**And** the sections are one Accordion wrapper in `components/ui` from Base UI; each row is a button with `aria-expanded`; focus targets that existing actions set on a copy's line or the wishlists group move to that section's row, which opens if a target inside it is needed
+**And** the sections are one Accordion wrapper in `components/ui` from Base UI, and the spine's UI primitives line names the accordion beside the toggle group (11.4 added the toggle group), not an overlay, in this story's commit; each row is a button with `aria-expanded`; focus targets that existing actions set on a copy's line or the wishlists group move to that section's row, which opens if a target inside it is needed
 **And** Add to wishlist becomes a full-width secondary button at the foot; Edit stays beside it until 11.6
 **And** no tests; an uncommitted phone and desktop walk covers every section open and closed, a Book with two copies, a Book only on a wishlist, and Remove of the last copy (focus lands on a section row)
 

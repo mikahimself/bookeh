@@ -15,6 +15,7 @@ colors:
   danger: '#9B1C31'
   shadow: '#1F293324'
   accent-fill: '#D1432F'
+  on-fill: '#FFFFFF'
   bar: '#1F2933'
   bar-ink: '#FFFFFF'
   bar-danger: '#E0566F'
@@ -29,6 +30,7 @@ colors:
   danger-dark: '#E0566F'
   shadow-dark: '#00000073'
   accent-fill-dark: '#D1432F'
+  on-fill-dark: '#FFFFFF'
   bar-dark: '#262E37'
   bar-ink-dark: '#E3E8EE'
   bar-danger-dark: '#E0566F'
@@ -249,17 +251,18 @@ components:
     label: '{typography.label}'
     transform: lowercase
   segmented-control:
+    height: 48px
     border: '{spacing.stroke-button} solid {colors.text}'
     divider: '{spacing.stroke-button} solid {colors.text}'
     typography: '{typography.control}'
     chosen-background: '{colors.accent-fill}'
-    chosen-foreground: '#FFFFFF'
+    chosen-foreground: '{colors.on-fill}'
     transform: lowercase
   icon-switch:
     size: 40px
     border: '{spacing.stroke-button} solid {colors.text}'
     chosen-background: '{colors.accent-fill}'
-    chosen-foreground: '#FFFFFF'
+    chosen-foreground: '{colors.on-fill}'
   folding-section:
     divider: '{spacing.stroke-hairline} solid {colors.border}'
     title: '{typography.heading-group}'
@@ -268,7 +271,7 @@ components:
     min-height: 58px
   stats-tile:
     background: '{colors.accent-fill}'
-    foreground: '#FFFFFF'
+    foreground: '{colors.on-fill}'
     gap: 8px
     number-steps: 64px, 54px, 44px, 36px
     label: '{typography.title}'
@@ -308,7 +311,8 @@ Every colour has a light and a dark value. Dark tokens carry the `-dark` suffix 
 | `border` | `#DDE2E7` | `#2C343D` | The detail panel's left border, the hairlines between Folding sections, and the empty-month dash in Stats by month. It is too faint to carry meaning. |
 | `accent` | `#F0604F` | `#FF8E7F` | Primary button outline and the App bar's primary ring, selection bar, link underline, lent and reading markers, the Stats month markers, progress line. |
 | `danger` | `#9B1C31` | `#E0566F` | Errors and destructive actions only: the destructive button's outline, the underline of a field with a mistake, the marker before an error message. |
-| `accent-fill` | `#D1432F` | `#D1432F` | The filled form of the accent: the chosen part of a Segmented control or Icon switch, and the Stats tiles. Always under white text. Nothing else. |
+| `accent-fill` | `#D1432F` | `#D1432F` | The filled form of the accent: the chosen part of a Segmented control or Icon switch, and the Stats tiles. Always under `on-fill` text. Nothing else. |
+| `on-fill` | `#FFFFFF` | `#FFFFFF` | White text and icons on `accent-fill`. Nothing else. |
 | `bar` | `#1F2933` | `#262E37` | The phone App bar's ground, and nothing else. |
 | `bar-ink` | `#FFFFFF` | `#E3E8EE` | Labels, icons and rings on the App bar. |
 | `bar-danger` | `#E0566F` | `#E0566F` | A destructive button's ring on the App bar. |

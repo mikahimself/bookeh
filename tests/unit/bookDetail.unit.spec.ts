@@ -229,7 +229,7 @@ describe('CollectionPage', () => {
       expect(chip('Tampere')).toBe('/?q=linna&location=3')
       within(sheet).getByRole('heading', { name: 'Genres' })
       expect(chip('Sotaromaani')).toBe('/?q=linna&genre=8')
-      within(sheet).getByText('WSOY · 1954 · 474 pages · Finnish')
+      within(sheet).getByText('474 pages · Finnish')
       expect(
         within(sheet)
           .getAllByRole('listitem')

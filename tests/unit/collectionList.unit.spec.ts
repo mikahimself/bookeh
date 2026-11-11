@@ -321,6 +321,7 @@ describe('CollectionList', () => {
             bookId: 1,
             title: 'Kätilö',
             initial: { state: 'unread', readingSince: null, finishedAt: null, rating: null },
+            header: null,
           }),
           createElement(
             ShelfRowsProvider,

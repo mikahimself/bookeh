@@ -32,7 +32,7 @@ import {
 import { FilterChip } from './FilterChip'
 import { DetailLookUpAgain } from './LookUpAgain'
 import { NotInLibrary } from './NotInLibrary'
-import { ReadAndRating } from './ReadAndRating'
+import { HeaderRating, ReadAndRating } from './ReadAndRating'
 import { DetailTags } from './DetailTags'
 import { Refetch } from './Refetch'
 
@@ -40,8 +40,9 @@ const DOT = ' · '
 
 /**
  * Book detail (EXPERIENCE.md, Book detail; DESIGN.md, Detail panel): the
- * header (`BookHeader`), the read switch and Rating (keyed
- * by the Book, so swapping it resets them), Your copies, one line per copy
+ * header (`BookHeader`, with the Rating once read) and the reading control
+ * under it (`ReadAndRating`, keyed by the Book, so swapping it resets them
+ * and the Rating), Your copies, one line per copy
  * with its location and status, the muted "Acquired {date} · €{price}"
  * line under it (`CopyPurchase`, FR-55) and the copy's note (`CopyLine`):
  * an owned copy's Lend, Move and Remove (Move only when the viewer has
@@ -129,8 +130,17 @@ export async function BookDetail({
   return (
     <BookDetailFrame label={book.title} back={back} openId={bookId}>
       <div className="flex flex-col gap-6">
-        <BookHeader book={book} />
-        <ReadAndRating key={bookId} bookId={bookId} title={book.title} initial={state} />
+        <ReadAndRating
+          key={bookId}
+          bookId={bookId}
+          title={book.title}
+          initial={state}
+          header={
+            <BookHeader book={book}>
+              <HeaderRating />
+            </BookHeader>
+          }
+        />
         {/* Focus lands here when a copy's line goes or changes (`RemoveCopy`, `ReceiveCopy`, `MoveCopy`, `LendCopy`, `ReturnLoan`, `CopyPurchase`). */}
         {copies.length > 0 && (
           <section tabIndex={-1} className="flex flex-col gap-2">

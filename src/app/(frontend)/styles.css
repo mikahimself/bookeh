@@ -44,8 +44,10 @@
   /* The fills (DESIGN.md, Fills, sparingly). `accent-fill`, the same in both
      themes, is the accent's filled form in three places only: the chosen part
      of a Segmented control or Icon switch, and the Stats tiles; always under
-     white text, never a line. `bar` is the phone App bar's ground. */
+     `on-fill` text, never a line. `bar` is the phone App bar's ground. */
   --color-accent-fill: #d1432f;
+  /* White text and icons on `accent-fill`, the same in both themes. Nothing else. */
+  --color-on-fill: #ffffff;
   --color-bar: #1f2933;
   /* The App bar's labels, icons and rings (`bar-ink`), and a destructive
      button's ring (`bar-danger`, the same in both themes). */
@@ -128,8 +130,14 @@
   /* The Filter panel left of the list on wide screens
      (mockups/key-collection-wide.html, `.fp`). */
   --spacing-filter-width: 220px;
-  /* The cover beside a Book's title, 72 × 108px at 2:3 (DESIGN.md, Detail panel). */
+  /* The cover beside a Book's title on the Answer and in Edit book, 72 × 108px
+     at 2:3 (DESIGN.md, Detail panel). */
   --spacing-cover-detail: 72px;
+  /* The cover in Book detail's header and the opened wishlist entry's,
+     120 × 180px at 2:3 (DESIGN.md, Detail panel). */
+  --spacing-cover-header: 120px;
+  /* A Segmented control's height (DESIGN.md, Segmented control). */
+  --spacing-segmented-height: 48px;
   /* The cover in a row at m, 32 × 48px (DESIGN.md, Rows). */
   --spacing-cover-row: 32px;
   /* The cover in a row at s, 16 × 24px, and at l, 44 × 66px (DESIGN.md,

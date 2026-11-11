@@ -20,15 +20,18 @@ import { addFilter, type ChipField, type ListedValue } from './filterToggle'
  * (`useSheetChip`). Off `/` (Book detail on `/loans`) it starts from the
  * empty shelf query instead, so the collection opens with only that filter
  * and without the Book, and lands there pushing at both widths: a section
- * change, so Back returns to the section.
+ * change, so Back returns to the section. `tapOutside` draws it at its
+ * line's height with the tap area outside the layout (Book detail's header).
  */
 export function FilterChip<F extends ChipField>({
   field,
   id,
+  tapOutside,
   children,
 }: {
   field: F
   id: ListedValue<F>
+  tapOutside?: boolean
   children: ReactNode
 }) {
   const address = parseShelfQuery(useSearchParams())
@@ -43,6 +46,7 @@ export function FilterChip<F extends ChipField>({
       <TextLink
         href={href}
         prefetch={false}
+        tapOutside={tapOutside}
         onClick={(event) => {
           event.preventDefault()
           sheetChip(href)
@@ -54,7 +58,7 @@ export function FilterChip<F extends ChipField>({
   }
   if (!onShelf) {
     return (
-      <TextLink href={shelfHref(next)} prefetch={false}>
+      <TextLink href={shelfHref(next)} prefetch={false} tapOutside={tapOutside}>
         {children}
       </TextLink>
     )
@@ -65,6 +69,7 @@ export function FilterChip<F extends ChipField>({
       replace
       scroll={false}
       prefetch={false}
+      tapOutside={tapOutside}
     >
       {children}
     </TextLink>
