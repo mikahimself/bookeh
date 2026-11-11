@@ -23,6 +23,7 @@ import { devicePrefs } from '../prefs'
 
 import { BookDetail } from './BookDetail'
 import { CollectionDisplayProvider } from './CollectionDisplay'
+import { CollectionDisplayControls } from './CollectionDisplayControls'
 import { CollectionList } from './CollectionList'
 import { CollectionTools } from './CollectionTools'
 import { FilterPanel, FilterPanelProvider } from './FilterPanel'
@@ -108,7 +109,12 @@ export default async function CollectionPage({
                       <CollectionList query={query} book={book} reading={reading} />
                     </ShelfRowsProvider>
                   ) : (
-                    <LoadFailed />
+                    <>
+                      <div className="flex justify-end pt-1 pb-2">
+                        <CollectionDisplayControls />
+                      </div>
+                      <LoadFailed />
+                    </>
                   )}
                 </div>
                 {book !== null && (

@@ -273,9 +273,12 @@ export const detail = async (name: string) =>
 
 export const countLine = () => screen.getByText(/\d+ books?/).closest('p') as HTMLElement
 
-export const pressed = (group: string) =>
-  within(screen.getByRole('group', { name: group })).getByRole('button', { pressed: true })
-    .textContent
+export const pressed = (group: string) => {
+  const button = within(screen.getByRole('group', { name: group })).getByRole('button', {
+    pressed: true,
+  })
+  return button.getAttribute('aria-label') ?? button.textContent
+}
 
 /** The Book of Book detail's cases. */
 export const linna = book(5, 'Tuntematon sotilas', {

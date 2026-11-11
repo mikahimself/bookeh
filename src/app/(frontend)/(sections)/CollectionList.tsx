@@ -15,6 +15,7 @@ import type { DevicePrefs } from '../prefs'
 
 import { BookRow } from './BookRow'
 import { useCollectionDisplay } from './CollectionDisplay'
+import { CollectionDisplayControls } from './CollectionDisplayControls'
 import { activeValues, clearHref, isNarrowed } from './countLine'
 import { CoverTile } from './CoverTile'
 import { toggleFilter } from './filterToggle'
@@ -139,14 +140,17 @@ export function CollectionList({
       {!selecting && !narrowed && reading.length > 0 && (
         <ReadingStrip reading={reading} query={query} open={book} />
       )}
-      <p aria-live="polite" className="pt-1 pb-2 text-meta text-text-muted">
-        {parts.map((part, i) => (
-          <Fragment key={i}>
-            {i > 0 && SEPARATOR}
-            {part}
-          </Fragment>
-        ))}
-      </p>
+      <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 pt-1 pb-2">
+        <p aria-live="polite" className="min-w-0 flex-auto wrap-anywhere text-meta text-text-muted">
+          {parts.map((part, i) => (
+            <Fragment key={i}>
+              {i > 0 && SEPARATOR}
+              {part}
+            </Fragment>
+          ))}
+        </p>
+        <CollectionDisplayControls />
+      </div>
       {shelf.total === 0 ? (
         <div className="flex flex-col items-start gap-2 py-6">
           <p className="text-heading-group">{t(narrowed ? 'noMatch' : 'empty')}</p>

@@ -140,6 +140,8 @@
   --spacing-segmented-height: 48px;
   /* A Folding section's row, at least 58px tall (DESIGN.md, Folding section). */
   --spacing-fold-row: 58px;
+  /* The drawn square of an Icon switch (DESIGN.md, Icon switch). */
+  --spacing-icon-switch: 40px;
   /* The cover in a row at m, 32 × 48px (DESIGN.md, Rows). */
   --spacing-cover-row: 32px;
   /* The cover in a row at s, 16 × 24px, and at l, 44 × 66px (DESIGN.md,
