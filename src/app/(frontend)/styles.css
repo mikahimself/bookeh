@@ -140,6 +140,33 @@
   --spacing-segmented-height: 48px;
   /* A Folding section's row, at least 58px tall (DESIGN.md, Folding section). */
   --spacing-fold-row: 58px;
+  /* Stats (DESIGN.md, Stats tiles, by month, facts). The four tile number
+     steps, picked on the server by `tileNumberStep`; the 38px number of Pages
+     a day and Days a book; the chart's 16px marker, 3px gap and 52px minimum
+     column; the nerdy rows' 26px icon. */
+  --text-tile-number-xl: 64px;
+  --text-tile-number-xl--line-height: 1;
+  --text-tile-number-xl--font-weight: 300;
+  --text-tile-number-xl--letter-spacing: -0.02em;
+  --text-tile-number-l: 54px;
+  --text-tile-number-l--line-height: 1;
+  --text-tile-number-l--font-weight: 300;
+  --text-tile-number-l--letter-spacing: -0.02em;
+  --text-tile-number-m: 44px;
+  --text-tile-number-m--line-height: 1;
+  --text-tile-number-m--font-weight: 300;
+  --text-tile-number-m--letter-spacing: -0.02em;
+  --text-tile-number-s: 36px;
+  --text-tile-number-s--line-height: 1;
+  --text-tile-number-s--font-weight: 300;
+  --text-tile-number-s--letter-spacing: -0.02em;
+  --text-stat-number: 38px;
+  --text-stat-number--line-height: 1.1;
+  --text-stat-number--font-weight: 300;
+  --spacing-chart-marker: 16px;
+  --spacing-chart-gap: 3px;
+  --spacing-chart-column: 52px;
+  --spacing-fact-icon: 26px;
   /* The drawn square of an Icon switch (DESIGN.md, Icon switch). */
   --spacing-icon-switch: 40px;
   /* The cover in a row at m, 32 × 48px (DESIGN.md, Rows). */

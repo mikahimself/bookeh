@@ -520,8 +520,6 @@
     "spent": "käytetty",
     "booksPerMonth": "kirjaa kuukaudessa",
     "byMonth": "Kuukausittain",
-    "monthLine": "{books, plural, one {# kirja} other {# kirjaa}} · {pages} s.",
-    "monthNone": "–",
     "nerdy": "Nörttitilastot",
     "pagesPerDay": "Sivuja päivässä",
     "daysPerBook": "Päiviä kirjaa kohden, keskimäärin",
@@ -532,16 +530,16 @@
     "mostExpensive": "Kallein",
     "bestMonth": "Paras kuukausi",
     "topAuthor": "Luetuin kirjailija",
-    "bookDays": "{title} · {n, plural, one {# päivä} other {# päivää}}",
-    "bookPages": "{title} · {pages} s.",
-    "bookPrice": "{title} · {price}",
-    "bookUnread": "{title} · lukematta {unit, select, years {{n, plural, one {# vuoden} other {# vuotta}}} months {{n, plural, one {# kuukauden} other {# kuukautta}}} other {{n, plural, one {# päivän} other {# päivää}}}}",
-    "monthBooks": "{month} · {n, plural, one {# kirja} other {# kirjaa}}",
-    "authorBooks": "{name} · {n}",
+    "bookDays": "{n, plural, one {# päivä} other {# päivää}}",
+    "bookPages": "{pages, plural, one {# sivu} other {# sivua}}",
+    "bookUnread": "lukematta {unit, select, years {{n, plural, one {# vuoden} other {# vuotta}}} months {{n, plural, one {# kuukauden} other {# kuukautta}}} other {{n, plural, one {# päivän} other {# päivää}}}}",
+    "monthBooks": "{n, plural, one {# kirja} other {# kirjaa}}",
+    "authorBooks": "{n, plural, one {# kirja} other {# kirjaa}}",
     "byYear": "Vuosittain",
     "yearLine": "{books, plural, one {# kirja} other {# kirjaa}} · {pages} s. · {spent}",
     "undated": "{n, plural, one {# luetulla kirjalla ei ole päivämääriä, eikä sitä lasketa.} other {# luetulla kirjalla ei ole päivämääriä, eikä niitä lasketa.}}",
     "nothingRead": "Ei vielä mitään luettua",
-    "nothingReadRemark": "Kirjat jaksavat odottaa. Ne ovat siinä hyviä."
+    "nothingReadRemark": "Kirjat jaksavat odottaa. Ne ovat siinä hyviä.",
+    "monthLabel": "{month}: {n, plural, one {# kirja} other {# kirjaa}}, {pages, plural, one {# sivu} other {# sivua}}"
   }
 }

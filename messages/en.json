@@ -520,8 +520,6 @@
     "spent": "spent",
     "booksPerMonth": "books a month",
     "byMonth": "By month",
-    "monthLine": "{books, plural, one {# book} other {# books}} · {pages} p",
-    "monthNone": "–",
     "nerdy": "Nerdy stats",
     "pagesPerDay": "Pages a day",
     "daysPerBook": "Days a book, on average",
@@ -532,16 +530,16 @@
     "mostExpensive": "Most expensive",
     "bestMonth": "Best month",
     "topAuthor": "Most-read author",
-    "bookDays": "{title} · {n, plural, one {# day} other {# days}}",
-    "bookPages": "{title} · {pages} p",
-    "bookPrice": "{title} · {price}",
-    "bookUnread": "{title} · unread for {unit, select, years {{n, plural, one {# year} other {# years}}} months {{n, plural, one {# month} other {# months}}} other {{n, plural, one {# day} other {# days}}}}",
-    "monthBooks": "{month} · {n, plural, one {# book} other {# books}}",
-    "authorBooks": "{name} · {n}",
+    "bookDays": "{n, plural, one {# day} other {# days}}",
+    "bookPages": "{pages, plural, one {# page} other {# pages}}",
+    "bookUnread": "unread for {unit, select, years {{n, plural, one {# year} other {# years}}} months {{n, plural, one {# month} other {# months}}} other {{n, plural, one {# day} other {# days}}}}",
+    "monthBooks": "{n, plural, one {# book} other {# books}}",
+    "authorBooks": "{n, plural, one {# book} other {# books}}",
     "byYear": "By year",
     "yearLine": "{books, plural, one {# book} other {# books}} · {pages} p · {spent}",
     "undated": "{n, plural, one {# read book has no dates and is not counted.} other {# read books have no dates and are not counted.}}",
     "nothingRead": "Nothing read yet",
-    "nothingReadRemark": "The books can wait. They are good at it."
+    "nothingReadRemark": "The books can wait. They are good at it.",
+    "monthLabel": "{month}: {n, plural, one {# book} other {# books}}, {pages, plural, one {# page} other {# pages}}"
   }
 }
