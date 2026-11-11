@@ -1,4 +1,6 @@
 import Link from 'next/link'
+
+import { BookOpen } from '../BookOpen'
 import type { ReactNode } from 'react'
 
 import type { EffectiveBook } from '@/lib/books/effectiveBook'
@@ -49,6 +51,14 @@ export function LoanRow({
           {authors && <p className="min-w-0 truncate text-meta text-text-muted">{authors}</p>}
           <p className="min-w-0 truncate text-meta text-text-muted">{line}</p>
         </div>
+        <BookOpen
+          seed={{
+            title: book.title,
+            authors: book.authors.map(({ name }) => ({ name })),
+            coverUrl: book.coverUrl,
+            language: book.language,
+          }}
+        />
       </Link>
       {action}
     </li>

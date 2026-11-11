@@ -22,6 +22,8 @@ import type { TagOptions } from '../components/TagPicker'
 import { devicePrefs } from '../prefs'
 
 import { BookDetail } from './BookDetail'
+import { BookDetailSlot } from './BookDetailSlot'
+import { detailResult } from './detailResult'
 import { CollectionDisplayProvider } from './CollectionDisplay'
 import { CollectionDisplayControls } from './CollectionDisplayControls'
 import { CollectionList } from './CollectionList'
@@ -94,6 +96,12 @@ export default async function CollectionPage({
     }),
   ])
 
+  const back = shelfHref(query)
+  const detail =
+    book === null
+      ? null
+      : await detailResult(() => BookDetail({ ctx, bookId: book, back, locations }))
+
   return (
     <div className="flex flex-1 flex-col px-page-margin-phone wide:px-page-margin">
       <CollectionDisplayProvider initial={{ layout, size }}>
@@ -117,14 +125,12 @@ export default async function CollectionPage({
                     </>
                   )}
                 </div>
-                {book !== null && (
-                  <BookDetail
-                    ctx={ctx}
-                    bookId={book}
-                    back={shelfHref(query)}
-                    locations={locations}
-                  />
-                )}
+                <BookDetailSlot
+                  pinnedActions
+                  address={book === null ? null : shelfHref(query, { book })}
+                  back={back}
+                  result={detail}
+                />
               </div>
               <SelectBar locations={locations} tagOptions={tagOptions} />
             </ShelfActionsProvider>

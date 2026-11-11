@@ -674,3 +674,13 @@ input[type='search']::-webkit-search-cancel-button {
   -webkit-appearance: none;
   appearance: none;
 }
+
+/* Loading feedback remains an opacity pulse when sheet movement is reduced. */
+@keyframes book-detail-pulse {
+  50% {
+    opacity: 0.4;
+  }
+}
+@utility book-detail-pulse {
+  animation: book-detail-pulse 1.8s ease-in-out infinite;
+}

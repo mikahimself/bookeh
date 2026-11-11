@@ -1,15 +1,7 @@
 'use client'
 
 import { useTranslations } from 'next-intl'
-import {
-  createContext,
-  useContext,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-  type ReactNode,
-} from 'react'
+import { useContext, useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 
 import { createPortal } from 'react-dom'
 
@@ -19,6 +11,7 @@ import { inDialog, useWide } from '../components/ui/overlay'
 
 import { BookDetailSheet } from './BookDetailSheet'
 import { DetailCloseContext } from './detailClose'
+import { FooterContext, HostedDetailContext } from './detailHost'
 
 type FrameProps = {
   /** The Book's title: names the sheet or the panel. */
@@ -32,15 +25,13 @@ type FrameProps = {
   pinnedActions?: boolean
 }
 
-/** Book detail's frame, also the opened wishlist entry's: the panel from 900px, the bottom sheet under it. */
-const FooterContext = createContext<HTMLElement | null>(null)
-
 /** Portals the detail bar into the phone frame's pinned footer. */
 export function BookDetailFooter({ children }: { children: ReactNode }) {
   const slot = useContext(FooterContext)
   return slot ? createPortal(children, slot) : null
 }
 
+/** Book detail's frame, also the opened wishlist entry's: the panel from 900px, hosted phone content or a standalone sheet. */
 export function BookDetailFrame({
   label,
   back,
@@ -49,7 +40,9 @@ export function BookDetailFrame({
   pinnedActions = false,
 }: FrameProps) {
   const wide = useWide()
+  const hosted = useContext(HostedDetailContext)
   const [footer, setFooter] = useState<HTMLElement | null>(null)
+  if (!wide && hosted) return children
   return wide ? (
     <BookDetailPanel label={label} back={back} openId={openId}>
       {children}

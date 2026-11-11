@@ -21,6 +21,7 @@ import { heldBook } from '../heldBook'
 import { isLent } from '../isLent'
 
 import { BookDetailFrame } from './BookDetailPanel'
+import type { DetailResult } from './BookDetailSlot'
 import { BookHeader, joined } from './BookHeader'
 import { CopyNote, CopyPurchase } from './CopyLine'
 import { BookDetailActions } from './BookDetailActions'
@@ -56,9 +57,9 @@ export async function BookDetail({
   bookId: number
   back: string
   locations: readonly LocationOption[]
-}) {
+}): Promise<DetailResult> {
   const book = await heldBook(ctx, bookId)
-  if (!book) return <NotInLibrary back={back} />
+  if (!book) return { kind: 'missing', content: <NotInLibrary back={back} /> }
   // Started now, awaited at the foot: it runs alongside the reads below.
   const wishlists = viewerWishlists(ctx)
   const { copies, entries } = (await getHoldings(ctx, [bookId])).get(bookId) ?? {
@@ -157,7 +158,8 @@ export async function BookDetail({
   const hasDescription = Boolean(book.description?.trim())
   const hasDetails = hasDescription || hasReading || detailRows.length > 0
 
-  return (
+  const header = await BookHeader({ book, children: <HeaderRating /> })
+  const content = (
     <BookDetailFrame pinnedActions label={book.title} back={back} openId={bookId}>
       <Accordion key={bookId} className="flex flex-col gap-6">
         <ReadAndRating
@@ -165,11 +167,7 @@ export async function BookDetail({
           bookId={bookId}
           title={book.title}
           initial={state}
-          header={
-            <BookHeader book={book}>
-              <HeaderRating />
-            </BookHeader>
-          }
+          header={header}
         >
           <div>
             {copies.length > 0 && (
@@ -352,4 +350,5 @@ export async function BookDetail({
       </Accordion>
     </BookDetailFrame>
   )
+  return { kind: 'ready', label: book.title, content }
 }

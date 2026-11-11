@@ -10,6 +10,8 @@ import { SectionNav } from '../components/SectionNav'
 import { SectionTransition } from '../components/SectionTransition'
 import { SectionSwipe } from '../components/swipe'
 
+import { BookOpenProvider } from './BookOpen'
+
 /**
  * The section shell (EXPERIENCE.md, Navigation): the headings row and Add
  * book, on every section. Add book is rendered once per width, the other
@@ -24,30 +26,32 @@ export default async function SectionsLayout({ children }: { children: ReactNode
 
   return (
     <AppBarProvider>
-      <div className="flex min-h-dvh flex-col">
-        <SectionTransition>
-          <div className="flex flex-1 flex-col">
-            <header className="flex items-center gap-6 px-page-margin-phone pt-page-margin-phone wide:px-page-margin wide:pt-page-margin">
-              <SectionNav />
-              <Link
-                data-scan-book
-                href="/scan"
-                transitionTypes={['task-open']}
-                className={`${buttonClass('primary')} hidden shrink-0 items-center justify-center wide:inline-flex`}
-              >
-                {t('open')}
-              </Link>
-            </header>
-            <div className="flex flex-1 flex-col">{children}</div>
-          </div>
-        </SectionTransition>
-        <SectionSwipe />
-        <AppBar>
-          <AppBarLink href="/scan" transitionTypes={['task-open']} icon="plus" primary>
-            {t('open')}
-          </AppBarLink>
-        </AppBar>
-      </div>
+      <BookOpenProvider>
+        <div className="flex min-h-dvh flex-col">
+          <SectionTransition>
+            <div className="flex flex-1 flex-col">
+              <header className="flex items-center gap-6 px-page-margin-phone pt-page-margin-phone wide:px-page-margin wide:pt-page-margin">
+                <SectionNav />
+                <Link
+                  data-scan-book
+                  href="/scan"
+                  transitionTypes={['task-open']}
+                  className={`${buttonClass('primary')} hidden shrink-0 items-center justify-center wide:inline-flex`}
+                >
+                  {t('open')}
+                </Link>
+              </header>
+              <div className="flex flex-1 flex-col">{children}</div>
+            </div>
+          </SectionTransition>
+          <SectionSwipe />
+          <AppBar>
+            <AppBarLink href="/scan" transitionTypes={['task-open']} icon="plus" primary>
+              {t('open')}
+            </AppBarLink>
+          </AppBar>
+        </div>
+      </BookOpenProvider>
     </AppBarProvider>
   )
 }

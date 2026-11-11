@@ -35,31 +35,46 @@ export function BookDetailSheet({
   back,
   children,
   footer,
+  cancelPending,
+  onPendingClosed,
 }: {
   label: string
   back: string
   children: ReactNode
   footer?: ReactNode
+  cancelPending?: () => boolean
+  onPendingClosed?: () => void
 }) {
   const [open, setOpen] = useState(false)
   const leave = useTaskBack(back, true)
-  /**
-   * Where a chip or `useCloseDetail(to)` asked the close to land; `undefined`
-   * for X, Esc, the scrim, a drag or `useCloseDetail()`.
-   */
+  const cancelled = useRef(false)
+  const dismiss = useCallback(
+    (next: boolean) => {
+      if (!next) cancelled.current = cancelPending?.() ?? false
+      setOpen(next)
+    },
+    [cancelPending],
+  )
+  /** Where a chip or action asked to land; undefined for an ordinary close. */
   const landing = useRef<string | undefined>(undefined)
-  const chip = useCallback((href: string) => {
-    landing.current = href
-    setOpen(false)
-  }, [])
+  const chip = useCallback(
+    (href: string) => {
+      landing.current = href
+      dismiss(false)
+    },
+    [dismiss],
+  )
   /**
    * `useCloseDetail()`: as X does, landing on the collection without `book`;
    * with `to`, as a chip does, landing on `to`.
    */
-  const close = useCallback((to?: string) => {
-    landing.current = to
-    setOpen(false)
-  }, [])
+  const close = useCallback(
+    (to?: string) => {
+      landing.current = to
+      dismiss(false)
+    },
+    [dismiss],
+  )
 
   // Mounted open, Base UI would show the sheet without sliding it up.
   useEffect(() => {
@@ -72,9 +87,9 @@ export function BookDetailSheet({
       addressed
       footer={footer}
       open={open}
-      onOpenChange={setOpen}
+      onOpenChange={dismiss}
       label={label}
-      onClosed={() => leave(landing.current)}
+      onClosed={() => (cancelled.current ? onPendingClosed?.() : leave(landing.current))}
     >
       <DetailCloseContext value={close}>
         <SheetChipContext value={chip}>{children}</SheetChipContext>

@@ -12,6 +12,8 @@ import { getWishlist, type ListEntry, type WishlistView } from '@/lib/wishlists/
 
 import { BackLink } from '../../../components/Link'
 import { LoadFailed } from '../../LoadFailed'
+import { BookDetailSlot } from '../../BookDetailSlot'
+import { detailResult } from '../../detailResult'
 import { RefreshOnUndo } from '../../RefreshOnUndo'
 
 import { EntryDetail } from './EntryDetail'
@@ -101,6 +103,22 @@ export default async function WishlistPage({
         })
     : []
 
+  const detail = opened
+    ? await detailResult(() =>
+        EntryDetail({
+          listId: id,
+          listName: loaded === 'failed' ? '' : loaded.list.name,
+          entry: opened.entry,
+          book: opened.book,
+          people,
+        }),
+      )
+    : opened === null
+      ? { kind: 'missing' as const, content: <NotOnList back={back} /> }
+      : loaded === 'failed'
+        ? { kind: 'failed' as const, content: null }
+        : null
+  const address = typeof entry === 'string' ? `${back}?entry=${entry}` : null
   const t = await getTranslations()
 
   return (
@@ -118,7 +136,10 @@ export default async function WishlistPage({
         </NextLink>
       </div>
       {loaded === 'failed' ? (
-        <LoadFailed />
+        <>
+          <LoadFailed />
+          <BookDetailSlot address={address} back={back} result={detail} />
+        </>
       ) : (
         <div className="wide:flex wide:flex-1 wide:gap-6">
           <RefreshOnUndo />
@@ -145,16 +166,7 @@ export default async function WishlistPage({
               </ul>
             )}
           </section>
-          {opened && (
-            <EntryDetail
-              listId={id}
-              listName={loaded.list.name}
-              entry={opened.entry}
-              book={opened.book}
-              people={people}
-            />
-          )}
-          {opened === null && <NotOnList back={back} />}
+          <BookDetailSlot address={address} back={back} result={detail} />
         </div>
       )}
     </div>

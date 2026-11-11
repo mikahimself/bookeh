@@ -1,5 +1,7 @@
 import Link from 'next/link'
 
+import { BookOpen } from '../../BookOpen'
+
 import type { EffectiveBook } from '@/lib/books/effectiveBook'
 
 import { Cover } from '../../../components/Cover'
@@ -47,6 +49,14 @@ export function EntryRow({
         {forLine !== null && (
           <p className="min-w-0 max-w-1/2 truncate text-meta text-text-muted">{forLine}</p>
         )}
+        <BookOpen
+          seed={{
+            title: book.title,
+            authors: book.authors.map(({ name }) => ({ name })),
+            coverUrl: book.coverUrl,
+            language: book.language,
+          }}
+        />
       </Link>
     </li>
   )

@@ -1,10 +1,11 @@
 import Link from 'next/link'
 
+import { BookOpen } from './BookOpen'
+
 import type { ShelfRow } from '@/lib/shelf/query'
 
 import { Checkbox } from '../components/Checkbox'
 import { Cover } from '../components/Cover'
-import { LinkProgress } from '../components/LinkProgress'
 import { markerSlotClass } from '../components/ui/classes'
 import { isLent } from '../isLent'
 import type { DevicePrefs } from '../prefs'
@@ -104,7 +105,14 @@ export function CoverTile({
         >
           {cover}
           {lines}
-          <LinkProgress />
+          <BookOpen
+            seed={{
+              title: book.title,
+              authors: book.authors.map(({ name }) => ({ name })),
+              coverUrl: book.coverUrl,
+              language: book.language,
+            }}
+          />
         </Link>
       )}
     </li>

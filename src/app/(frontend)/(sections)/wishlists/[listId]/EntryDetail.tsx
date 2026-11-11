@@ -5,6 +5,7 @@ import type { Named } from '@/lib/payload/ref'
 import type { ListEntry } from '@/lib/wishlists/wishlists'
 
 import { BookDetailFrame } from '../../BookDetailPanel'
+import type { DetailResult } from '../../BookDetailSlot'
 import { BookHeader } from '../../BookHeader'
 
 import { EntryActions } from './EntryActions'
@@ -31,15 +32,17 @@ export async function EntryDetail({
   entry: ListEntry
   book: EffectiveBook
   people: Named[]
-}) {
+}): Promise<DetailResult> {
   const t = await getTranslations('wishlists')
   const back = `/wishlists/${listId}`
-  return (
+  const header = await BookHeader({
+    book,
+    children: <p className="text-meta text-text-muted">{t('onList', { list: listName })}</p>,
+  })
+  const content = (
     <BookDetailFrame label={book.title} back={back} openId={entry.entryId}>
       <div className="flex flex-col gap-6">
-        <BookHeader book={book}>
-          <p className="text-meta text-text-muted">{t('onList', { list: listName })}</p>
-        </BookHeader>
+        {header}
         <EntryFor
           key={entry.entryId}
           entryId={entry.entryId}
@@ -50,4 +53,5 @@ export async function EntryDetail({
       </div>
     </BookDetailFrame>
   )
+  return { kind: 'ready', label: book.title, content }
 }

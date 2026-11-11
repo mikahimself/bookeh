@@ -12,6 +12,8 @@ import { parseShelfQuery } from '@/lib/shelf/query'
 
 import { devicePrefs } from '../../prefs'
 import { BookDetail } from '../BookDetail'
+import { BookDetailSlot } from '../BookDetailSlot'
+import { detailResult } from '../detailResult'
 import { ReturnLoan } from '../CopyLine'
 import { LoadFailed } from '../LoadFailed'
 import { RefreshOnUndo } from '../RefreshOnUndo'
@@ -120,6 +122,11 @@ export default async function LoansPage({
     </div>
   )
 
+  const detail =
+    book === null
+      ? null
+      : await detailResult(() => BookDetail({ ctx, bookId: book, back: '/loans', locations }))
+
   return (
     <div className="flex flex-1 flex-col px-page-margin-phone wide:px-page-margin">
       <ShelfActionsProvider>
@@ -176,9 +183,12 @@ export default async function LoansPage({
               </div>
             )}
           </section>
-          {book !== null && (
-            <BookDetail ctx={ctx} bookId={book} back="/loans" locations={locations} />
-          )}
+          <BookDetailSlot
+            pinnedActions
+            address={book === null ? null : `/loans?book=${book}`}
+            back="/loans"
+            result={detail}
+          />
         </div>
       </ShelfActionsProvider>
     </div>
