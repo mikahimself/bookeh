@@ -2,6 +2,7 @@
 
 import { useTranslations } from 'next-intl'
 
+import { AppBarButton, AppBarItems } from '../components/AppBar'
 import { ActionLink } from '../components/Link'
 import { TextSwitch } from '../components/TextSwitch'
 
@@ -12,9 +13,10 @@ import { useSelection } from './Selection'
 
 /**
  * The collection's tools row (EXPERIENCE.md, Collection controls): search,
- * Filter and Select, then the layout and size switches, on a second line on
- * the phone. Filter opens and closes the Filter panel. Select enters select
- * mode and is not shown while it lasts (`useSelection`). The switches change the list at once and save on
+ * Filter and Select (Links on wide, App bar buttons on the phone), then the
+ * layout and size switches, on a second line on the phone. Filter opens and
+ * closes the Filter panel. Select enters select mode and is not shown while
+ * it lasts (`useSelection`). The switches change the list at once and save on
  * this device (`CollectionDisplayProvider`). Their options are inline:
  * `prefs.ts` reads `next/headers`, which a client component cannot import.
  */
@@ -30,10 +32,23 @@ export function CollectionTools() {
         <div className="min-w-0 flex-1">
           <SearchField />
         </div>
-        <ActionLink aria-expanded={filter.open} onClick={filter.toggle}>
-          {t('filter')}
-        </ActionLink>
-        {!selecting && <ActionLink onClick={start}>{t('select')}</ActionLink>}
+        {/* Wide draws Filter and Select here, the phone in the App bar; each once. */}
+        <span className="contents max-wide:hidden">
+          <ActionLink aria-expanded={filter.open} onClick={filter.toggle}>
+            {t('filter')}
+          </ActionLink>
+          {!selecting && <ActionLink onClick={start}>{t('select')}</ActionLink>}
+        </span>
+        <AppBarItems>
+          <AppBarButton icon="filter" aria-expanded={filter.open} onClick={filter.toggle}>
+            {t('filter')}
+          </AppBarButton>
+          {!selecting && (
+            <AppBarButton icon="select" onClick={start}>
+              {t('select')}
+            </AppBarButton>
+          )}
+        </AppBarItems>
       </div>
       <div className="flex justify-between gap-6">
         <TextSwitch

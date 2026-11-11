@@ -161,9 +161,11 @@
   --spacing-star: 22px;
   /* Minimum control height on the phone (DESIGN.md, Tap area). */
   --spacing-tap: 44px;
-  /* The pinned bottom bar (Add book on the phone): a button-high control
-     with spacing-4 above and below, before the safe area. Select mode's
-     two-row bar raises it on the phone (below). */
+  /* The phone App bar's height before the safe area (DESIGN.md, App bar). */
+  --spacing-app-bar: 84px;
+  /* The pinned bottom bar the toast rises over: a button-high row with
+     spacing-4 above and below (Save on a task). The App bar (phone) and
+     select mode's Action bar raise it (below). */
   --spacing-pinned-bar: calc(var(--spacing-button-height) + 2 * var(--spacing-4));
   /* A full-screen task's column on wide screens: a large phone
      (EXPERIENCE.md, Responsive). */
@@ -607,19 +609,32 @@
   }
 }
 
+/* While the phone App bar shows, the toast lift (ToastProvider) is its height. */
+:root:has([data-app-bar]) {
+  @variant max-wide {
+    --spacing-pinned-bar: var(--spacing-app-bar);
+  }
+}
+
 /*
- * Select mode's action bar takes the place of the layout's pinned Add book
+ * Select mode's action bar takes the place of the layout's App bar
  * (EXPERIENCE.md, Action bar). The toast lift (ToastProvider) reads
- * `pinned-bar`: wide, the bar is one row and keeps it; on the phone it has
- * two button-high rows with spacing-4 above, between and below.
+ * `pinned-bar`, which includes the bar's 2px top edge: wide, the bar is one
+ * row; on the phone it has two button-high rows with spacing-4 above,
+ * between and below. Later than the rule above, so it wins.
  */
 :root:has([data-action-bar]) [data-pinned-bottom]:not([data-action-bar]) {
   display: none;
 }
 
 :root:has([data-action-bar]) {
+  --spacing-pinned-bar: calc(
+    var(--spacing-button-height) + 2 * var(--spacing-4) + var(--spacing-stroke-control)
+  );
   @variant max-wide {
-    --spacing-pinned-bar: calc(2 * var(--spacing-button-height) + 3 * var(--spacing-4));
+    --spacing-pinned-bar: calc(
+      2 * var(--spacing-button-height) + 3 * var(--spacing-4) + var(--spacing-stroke-control)
+    );
   }
 }
 

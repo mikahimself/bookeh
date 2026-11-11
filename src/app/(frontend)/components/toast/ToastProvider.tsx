@@ -112,7 +112,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
           Opening a modal remounts the region inside its host; closing returns
           it to the preceding host or root. The store survives those portal changes.
           A polite region announces inserted content; errors use role="alert".
-          Under 900px it rises above a bar pinned to the bottom (Add book):
+          Under 900px it rises above a bar pinned to the bottom (the App bar):
           the region follows the layout's `peer` <main>. From 900px it rises
           only above a bar pinned on every width (`data-pinned-wide`, Save on
           Edit book). `data-toast-region`
