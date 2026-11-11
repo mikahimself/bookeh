@@ -17,6 +17,7 @@ Give bookeh the bolder Metro look selected on 2026-11-10: larger section heading
 - Story 11.7: Copy picker
 - Story 11.8: Stats tiles, chart and nerdy rows
 - Story 11.9: Add book target and bar
+- Story 11.10: Book detail sheet opens at once
 
 ## Requirements & Constraints
 

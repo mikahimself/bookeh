@@ -4249,7 +4249,7 @@ So that I can see my reading year at a glance and find Add book where I expect i
 
 A bolder Metro look: 56px headings, a coral fill for selected states and the Stats tiles, heavier buttons, a phone app bar in place of the pinned Add book, and a quieter Book detail with folding sections and the copy actions in the bar (PRD FR-10, FR-57, Build Order; spine UI primitives and Styling conventions; DESIGN.md and EXPERIENCE.md as amended by `sprint-change-proposal-2026-11-10.md`). The look is the canvas copied to `ux-designs/ux-bookeh-2026-10-03/mockups/bold-metro/`; the spines win on conflict.
 
-**Order.** 11.1 first. Then 11.2, 11.4 and 11.8 in any order. 11.3 and 11.9 need 11.2. 11.5 needs 11.4. 11.6 needs 11.2 and 11.5. 11.7 needs 11.6. Book detail stories (11.4 → 11.7) touch the same files and run one at a time.
+**Order.** 11.1 first. Then 11.2, 11.4 and 11.8 in any order. 11.3 and 11.9 need 11.2. 11.5 needs 11.4. 11.6 needs 11.2 and 11.5. 11.7 needs 11.6. 11.10 stands alone, after 11.3 and 11.5 (it touches the same row, tile and Book detail sheet). Book detail stories (11.4 → 11.7) touch the same files and run one at a time.
 
 ### Story 11.1: Bold tokens, headings and buttons
 
@@ -4362,6 +4362,7 @@ So that Lend, Move and Remove still work on a Book I have twice.
 **Then** a Picker opens titled with the action and the Book's title, listing the eligible copies (location or "Ordered", status, acquired line), and a tap on one continues in the same sheet or dialog to that action's step: Lend's person and date, Move's locations, Returned and Received at once, Remove's confirm dialog naming the copy's location; overlays stay one level deep (EXPERIENCE.md → Copy picker)
 **And** Back from the action's step returns to the copy list; Cancel or X closes it all; with one eligible copy the list is skipped
 **And** the Picker wrapper gains the two-step mode once, reused by every action
+**And** a tap on a row or cover tile that opens a Book shows the Progress line at the top edge until the sheet or panel shows (option A of `.working/book-open-loading.html`, Mika, 2026-11-11): a small client component inside the `<Link>` renders the existing `ProgressLine` while `useLinkStatus()` is pending, so `BookRow` and `CoverTile` stay hook-free; no new tokens, no layout change, select mode rows untouched. Story 11.10 later replaces it on the phone with the sheet opening at once; the wide panel keeps it
 **And** no tests beyond 11.6's; an uncommitted phone and desktop walk covers each action on a Book with an owned, a lent and an ordered copy
 
 ### Story 11.8: Stats tiles, chart and nerdy rows
@@ -4396,3 +4397,21 @@ So that scanning in a dark shop and adding a book without a barcode are both one
 **And** torch shows only when the scanner's controls offer `switchTorch` (the camera reports torch support); it toggles the light, is pressed while on, and the light goes off when the task closes; with no camera, or no torch, it is absent
 **And** Playwright's scan-to-save and shop-check flows still pass, reaching Find by title / author and Add without ISBN through the bar on the phone viewport
 **And** strings in both languages; an uncommitted walk on an iPhone and an Android phone covers the torch (or its absence), both Links and a desktop with no camera
+
+### Story 11.10: Book detail sheet opens at once
+
+As Mika,
+I want the Book detail sheet to slide up the moment I tap a row,
+So that the pause before the details arrive never reads as a missed tap.
+
+**Acceptance Criteria:**
+
+**Given** the collection, a search, a wishlist or Loans on the phone (below 900px)
+**When** I tap a row or a cover tile (`?book=` is a server render, and the link is `prefetch={false}`)
+**Then** the sheet starts sliding up at once, showing the Book's title (`title`) and authors (`meta` muted) and its cover as the row has them, with the rest as placeholder bars (`border` colour, square, no shadow) that pulse gently (still under reduce motion), and the scrim dims the list (Mika, 2026-11-11: option D of `.working/book-open-loading.html`)
+**And** when the server render arrives the placeholders give way to the real content in the same sheet: the sheet does not close, re-slide or jump, and the cover, title and authors stay where they are
+**And** the row passes what it shows to the sheet through a small client boundary inside the `<Link>`; `BookRow` and `CoverTile` stay hook-free and server-renderable. The pending sheet and the real sheet are one `Sheet` (the `addressed` wrapper of `BookDetailSheet`), so X, Esc, the scrim and a drag down close it and leave the address as today, also while pending
+**And** if the render fails, the sheet closes and `LoadFailed` shows as it does now; closing while pending cancels the open and a later tap starts clean; a second tap while pending opens nothing twice
+**And** from 900px the panel behaves as today; select mode rows (labels, not links) are untouched
+**And** Back and Forward still add and remove `?book=` one entry per open, the spine's Book detail address rule holds, and the story updates ARCHITECTURE-SPINE.md in the same commit if the sheet's contract changes
+**And** no new tokens; no tests beyond a check that the pending sheet and the real one are the same mounted instance, only if it can be a pure helper; an uncommitted phone walk with the network throttled covers rows and covers at each size, a fast open (no flash), a slow open, a failed open, close while pending, and both themes

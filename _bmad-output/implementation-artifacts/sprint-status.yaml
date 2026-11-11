@@ -304,6 +304,7 @@ development_status:
   11-7-copy-picker: backlog
   11-8-stats-tiles-chart-and-nerdy-rows: backlog
   11-9-add-book-target-and-bar: backlog
+  11-10-book-detail-sheet-opens-at-once: backlog
   epic-11-retrospective: optional
 action_items:
   - id: 'epic-1-retro-item-1-fix-the-flash-toast-cookie-contract-doub'
