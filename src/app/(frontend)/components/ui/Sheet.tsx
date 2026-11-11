@@ -27,6 +27,8 @@ export type SheetProps = {
   label?: string
   labelledBy?: string
   children?: ReactNode
+  /** Pinned outside the scrolling content, including at the half-open snap point. */
+  footer?: ReactNode
   /**
    * Runs once per close: after the sheet's history entry is gone
    * (`useCloseOnBack`), or, `addressed`, after the close animation.
@@ -57,6 +59,7 @@ export function Sheet({
   label,
   labelledBy,
   children,
+  footer,
   onClosed,
   addressed,
   initialFocus,
@@ -92,6 +95,7 @@ export function Sheet({
         <Drawer.Backdrop className="fixed inset-0 bg-scrim overlay-fade" />
         <Drawer.Viewport className="fixed inset-0 flex touch-none items-end">
           <Drawer.Popup
+            data-pinned-footer={footer ? '' : undefined}
             aria-label={label}
             aria-labelledby={labelledBy}
             initialFocus={initialFocus}
@@ -115,6 +119,7 @@ export function Sheet({
             <Drawer.Content className="min-h-0 flex-1 touch-auto overflow-y-auto overscroll-contain px-page-margin-phone pb-[calc(var(--spacing-page-margin-phone)+env(safe-area-inset-bottom))]">
               {children}
             </Drawer.Content>
+            {footer && <div className="shrink-0">{footer}</div>}
           </Drawer.Popup>
         </Drawer.Viewport>
       </Drawer.Portal>

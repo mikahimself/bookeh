@@ -348,6 +348,9 @@
     "tag": "Tag"
   },
   "detail": {
+    "moreActions": "More",
+    "chooseCopy": "Choose a copy",
+    "addReadingDates": "Add reading dates",
     "detailsAndDescription": "Description & details",
     "classifications": "Genres, themes & tags",
     "copiesCount": "{n, plural, one {# copy} other {# copies}}",

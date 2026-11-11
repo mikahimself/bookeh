@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, it } from 'vitest'
 import {
   book,
   copy,
+  clickDetailAction,
   countLine,
   detail,
   ENTRIES,
@@ -295,17 +296,22 @@ describe('CollectionPage', () => {
       const { unmount } = await renderPage({ book: '5' })
       const sheet = await detail('Tuntematon sotilas')
       const description = within(sheet).getByRole('button', { name: 'Description & details' })
-      const refetch = within(sheet).getByRole('button', { name: 'Re-fetch' })
-      expect(
-        description.compareDocumentPosition(refetch) & Node.DOCUMENT_POSITION_FOLLOWING,
-      ).toBeTruthy()
+      fireEvent.click(within(sheet).getByRole('button', { name: 'More' }))
+      await screen.findByRole('menuitem', { name: 'Re-fetch' })
+      expect(description.isConnected).toBe(true)
+      fireEvent.keyDown(screen.getByRole('menu'), { key: 'Escape' })
+      await waitFor(() => expect(screen.queryByRole('menu')).toBeNull())
       unmount()
 
       requireUser.mockResolvedValue({ user: { roles: ['user'] } })
       await renderPage({ book: '5' })
-      expect(
-        within(await detail('Tuntematon sotilas')).queryByRole('button', { name: 'Re-fetch' }),
-      ).toBeNull()
+      const nonAdmin = await detail('Tuntematon sotilas')
+      const more = within(nonAdmin).queryByRole('button', { name: 'More' })
+      if (more) {
+        fireEvent.click(more)
+        await screen.findByRole('menu')
+      }
+      expect(screen.queryByRole('menuitem', { name: 'Re-fetch' })).toBeNull()
     })
 
     it('moves one copy from its line, with Undo', async () => {
@@ -335,10 +341,8 @@ describe('CollectionPage', () => {
       const { rerender } = await renderPage({ book: '5' })
 
       const sheet = await detail('Tuntematon sotilas')
-      // Only the owned line has Move.
-      const [move, ...others] = within(sheet).getAllByRole('button', { name: 'Move' })
-      expect(others).toHaveLength(0)
-      fireEvent.click(move!)
+      // Only the owned copy is eligible, so Move skips the target chooser.
+      await clickDetailAction(sheet, 'Move')
       const picker = await screen.findByRole('dialog', { name: 'Move to' })
       expect(within(picker).getByRole('button', { pressed: true }).textContent).toBe('Tampere')
       fireEvent.click(within(picker).getByRole('button', { name: 'Mökki' }))

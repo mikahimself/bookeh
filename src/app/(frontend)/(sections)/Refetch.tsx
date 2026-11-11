@@ -20,7 +20,7 @@ import { useAfterAction } from './ShelfRows'
  * answer. Every result goes to `afterAction`, whose refresh shows a fill in
  * Book detail.
  */
-export function Refetch({ bookId }: { bookId: number }) {
+export function useRefetch(bookId: number) {
   const t = useTranslations('detail')
   const sourceLabels = useTranslations('sources')
   const format = useFormatter()
@@ -56,10 +56,16 @@ export function Refetch({ bookId }: { bookId: number }) {
     })
   }
 
+  return { pending, run: refetch, label: pending ? t('refetching') : t('refetch') }
+}
+
+export function Refetch({ bookId }: { bookId: number }) {
+  const t = useTranslations('detail')
+  const { pending, run, label } = useRefetch(bookId)
   return (
     <div className="flex flex-col items-start gap-1">
-      <ActionLink disabled={pending} onClick={refetch}>
-        {pending ? t('refetching') : t('refetch')}
+      <ActionLink disabled={pending} onClick={run}>
+        {label}
       </ActionLink>
       <p className="text-meta text-text-muted">{t('refetchHint')}</p>
     </div>

@@ -122,7 +122,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
         data-toast-region
         className={
           host
-            ? 'absolute inset-x-4 bottom-[calc(max(0px,var(--sheet-offset,0px))+var(--spacing-4))] z-10'
+            ? 'absolute inset-x-4 bottom-[calc(max(0px,var(--sheet-offset,0px))+var(--spacing-4))] z-10 in-data-pinned-footer:bottom-[calc(max(0px,var(--sheet-offset,0px))+var(--spacing-app-bar)+var(--spacing-4)+env(safe-area-inset-bottom))]'
             : 'fixed inset-x-page-margin-phone bottom-4 z-10 max-wide:peer-has-data-pinned-bottom:bottom-[calc(var(--spacing-pinned-bar)+var(--spacing-4)+env(safe-area-inset-bottom))] wide:inset-x-page-margin wide:peer-has-data-pinned-wide:bottom-[calc(var(--spacing-pinned-bar)+var(--spacing-4)+env(safe-area-inset-bottom))]'
         }
       >

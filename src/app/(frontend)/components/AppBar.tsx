@@ -33,16 +33,34 @@ export function AppBarItems({ children }: { children: ReactNode }) {
   return slot ? createPortal(children, slot) : null
 }
 
-const circle = (primary: boolean) =>
+const circle = (primary: boolean, destructive = false) =>
   `flex size-tap items-center justify-center rounded-full border-(length:--spacing-stroke-control) ${
-    primary ? 'border-accent' : 'border-bar-ink'
+    destructive ? 'border-bar-danger' : primary ? 'border-accent' : 'border-bar-ink'
   }`
 const item = 'flex min-w-0 flex-col items-center gap-1 text-center text-label text-bar-ink ui-case'
 
-export type AppBarIcon = 'plus' | 'filter' | 'select' | 'up'
+export type AppBarIcon =
+  | 'plus'
+  | 'filter'
+  | 'select'
+  | 'up'
+  | 'edit'
+  | 'returned'
+  | 'received'
+  | 'lend'
+  | 'move'
+  | 'remove'
+  | 'more'
 
 const paths: Record<AppBarIcon, string> = {
   plus: 'M11 4 V18 M4 11 H18',
+  edit: 'M4 15 L14 5 L17 8 L7 18 H4 Z M12 7 L15 10',
+  returned: 'M8 5 L3 10 L8 15 M3 10 H13 A5 5 0 0 1 13 20',
+  received: 'M4 11 L9 16 L18 6',
+  lend: 'M3 11 H19 M13 5 L19 11 L13 17',
+  move: 'M3 11 H19 M7 7 L3 11 L7 15 M15 7 L19 11 L15 15',
+  remove: 'M4 6 H18 M8 6 V3 H14 V6 M6 6 L7 19 H15 L16 6 M10 9 V16 M13 9 V16',
+  more: 'M4 11 H6 M10 11 H12 M16 11 H18',
   filter: 'M3 5 H19 M6 11 H16 M9 17 H13',
   select: 'M4 4 H18 V18 H4 Z M7.5 11 L10 13.5 L14.5 8.5',
   up: 'M11 18 V4 M5 10 L11 4 L17 10',
@@ -77,11 +95,15 @@ export function AppBarLink({
 export function AppBarButton({
   icon,
   children,
+  destructive = false,
   ...props
-}: Omit<ComponentProps<'button'>, 'className' | 'type'> & { icon: AppBarIcon }) {
+}: Omit<ComponentProps<'button'>, 'className' | 'type'> & {
+  icon: AppBarIcon
+  destructive?: boolean
+}) {
   return (
-    <button {...props} type="button" className={item}>
-      <span className={circle(false)}>
+    <button {...props} type="button" className={`${item} disabled:opacity-50`}>
+      <span className={circle(false, destructive)}>
         <Icon name={icon} />
       </span>
       {children}
@@ -96,12 +118,19 @@ export function AppBarButton({
  * scrolled past two screens and leaves within one (so it does not flicker at
  * a single threshold). The jump is smooth, or instant under reduced motion.
  */
-export function AppBar({ children }: { children: ReactNode }) {
+export function AppBar({
+  children,
+  standalone = false,
+}: {
+  children: ReactNode
+  standalone?: boolean
+}) {
   const t = useTranslations('sections')
   const { setSlot } = useContext(SlotContext)
   const [top, setTop] = useState(false)
 
   useEffect(() => {
+    if (standalone) return
     const onScroll = () => {
       const { scrollY, innerHeight } = window
       setTop((was) => (was ? scrollY > innerHeight : scrollY > 2 * innerHeight))
@@ -114,17 +143,17 @@ export function AppBar({ children }: { children: ReactNode }) {
       window.removeEventListener('scroll', onScroll)
       window.removeEventListener('resize', onScroll)
     }
-  }, [])
+  }, [standalone])
 
   return (
     <div
       data-pinned-bottom
       data-app-bar
-      className="sticky bottom-0 flex items-start justify-center gap-5 bg-bar px-page-margin-phone pt-3 pb-[calc(var(--spacing-2)+env(safe-area-inset-bottom))] wide:hidden"
+      className={`sticky bottom-0 flex items-start justify-center ${standalone ? 'gap-3' : 'gap-5'} bg-bar px-page-margin-phone pt-3 pb-[calc(var(--spacing-2)+env(safe-area-inset-bottom))] wide:hidden`}
     >
       {children}
-      <div ref={setSlot} className="contents" />
-      {top && (
+      {!standalone && <div ref={setSlot} className="contents" />}
+      {!standalone && top && (
         <AppBarButton
           icon="up"
           onClick={() => {

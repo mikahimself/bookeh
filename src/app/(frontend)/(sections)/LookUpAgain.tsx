@@ -28,7 +28,7 @@ type Editions = Extract<LookUpAgainOutcome, { kind: 'editions' }>
  * found." or the sources that did not answer) and goes to `onSettled`, as
  * does a failure.
  */
-export function LookUpAgainLink({
+function useLookUpAgain({
   bookId,
   onSettled,
 }: {
@@ -81,28 +81,38 @@ export function LookUpAgainLink({
     })
   }
 
+  return {
+    pending,
+    run: () => run(),
+    label: pending ? t('detail.lookingUp') : t('detail.lookUpAgain'),
+    picker: editions && (
+      <Picker<number>
+        open={open}
+        onOpenChange={setOpen}
+        title={t('answer.editions')}
+        // No row is current: the Book shows its typed values, so every row is a choice.
+        value={null}
+        onChoose={(index) => {
+          const id = editions.ids[index]
+          if (id) run(id)
+        }}
+        options={editions.rows.map((row, index) => ({
+          value: index,
+          label: <EditionLabel {...row} />,
+        }))}
+      />
+    ),
+  }
+}
+
+export function LookUpAgainLink(props: Parameters<typeof useLookUpAgain>[0]) {
+  const { pending, run, label, picker } = useLookUpAgain(props)
   return (
     <>
-      <ActionLink disabled={pending} onClick={() => run()}>
-        {pending ? t('detail.lookingUp') : t('detail.lookUpAgain')}
+      <ActionLink disabled={pending} onClick={run}>
+        {label}
       </ActionLink>
-      {editions && (
-        <Picker<number>
-          open={open}
-          onOpenChange={setOpen}
-          title={t('answer.editions')}
-          // No row is current: the Book shows its typed values, so every row is a choice.
-          value={null}
-          onChoose={(index) => {
-            const id = editions.ids[index]
-            if (id) run(id)
-          }}
-          options={editions.rows.map((row, index) => ({
-            value: index,
-            label: <EditionLabel {...row} />,
-          }))}
-        />
-      )}
+      {picker}
     </>
   )
 }
@@ -112,21 +122,31 @@ export function LookUpAgainLink({
  * refresh shows a promote, or `NOT_FOUND`, in Book detail in place. A share
  * that merged into the shared Book replaces the address with that Book's.
  */
-export function DetailLookUpAgain({ bookId }: { bookId: number }) {
+export function useDetailLookUpAgain(bookId: number) {
   const router = useRouter()
   const afterAction = useAfterAction()
   const params = useSearchParams()
 
+  return useLookUpAgain({
+    bookId,
+    onSettled: (result) => {
+      afterAction(result)
+      if (result.ok && result.data.kind === 'shared' && result.data.bookId !== bookId) {
+        const book = result.data.bookId
+        router.replace(shelfHref(parseShelfQuery(params).query, { book }), { scroll: false })
+      }
+    },
+  })
+}
+
+export function DetailLookUpAgain({ bookId }: { bookId: number }) {
+  const { pending, run, label, picker } = useDetailLookUpAgain(bookId)
   return (
-    <LookUpAgainLink
-      bookId={bookId}
-      onSettled={(result) => {
-        afterAction(result)
-        if (result.ok && result.data.kind === 'shared' && result.data.bookId !== bookId) {
-          const book = result.data.bookId
-          router.replace(shelfHref(parseShelfQuery(params).query, { book }), { scroll: false })
-        }
-      }}
-    />
+    <>
+      <ActionLink disabled={pending} onClick={run}>
+        {label}
+      </ActionLink>
+      {picker}
+    </>
   )
 }

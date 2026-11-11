@@ -1,4 +1,3 @@
-import Link from 'next/link'
 import { getFormatter, getLocale, getTranslations } from 'next-intl/server'
 
 import { helsinkiToday } from '@/fields/readingDates'
@@ -10,11 +9,11 @@ import type { LocationOption } from '@/lib/copies/locations'
 import { logger } from '@/lib/errors'
 import { returnedLoans } from '@/lib/loans/loans'
 import type { Context } from '@/lib/payload/context'
+import { isPrivateBookCreator } from '@/lib/books/isPrivateBookCreator'
 import { languageName } from '@/lib/books/languageName'
 import { lendingPeople } from '@/lib/people/people'
 
 import { AddToWishlist } from '../components/AddToWishlist'
-import { buttonClass } from '../components/Button'
 import { Accordion, AccordionItem } from '../components/ui/Accordion'
 import { markerSlotClass } from '../components/ui/classes'
 import { viewerWishlists } from '../components/viewerWishlists'
@@ -23,80 +22,29 @@ import { isLent } from '../isLent'
 
 import { BookDetailFrame } from './BookDetailPanel'
 import { BookHeader, joined } from './BookHeader'
-import {
-  CopyNote,
-  CopyPurchase,
-  LendCopy,
-  MoveCopy,
-  ReceiveCopy,
-  RemoveCopy,
-  ReturnLoan,
-} from './CopyLine'
+import { CopyNote, CopyPurchase } from './CopyLine'
+import { BookDetailActions } from './BookDetailActions'
 import { FilterChip } from './FilterChip'
-import { DetailLookUpAgain } from './LookUpAgain'
 import { NotInLibrary } from './NotInLibrary'
 import { HeaderRating, ReadAndRating, ReadingRow } from './ReadAndRating'
 import { DetailTags } from './DetailTags'
 import { detailsRowId, readingLine } from './readingLine'
-import { Refetch } from './Refetch'
 
 const DOT = ' · '
 
 /**
- * Book detail (EXPERIENCE.md, Book detail; DESIGN.md, Detail panel and
- * Folding section): the header (`BookHeader`, with the Rating once read) and
- * the reading control under it (`ReadAndRating`, keyed by the Book, so
- * swapping it resets them and the Rating), then five Folding sections in an
- * `Accordion`, all closed on every open and nothing remembered, one absent
- * when empty. The Accordion sits above `ReadAndRating`'s group, so a toast
- * Undo's remount of the group keeps them open.
+ * Held Book detail, shared by Collection and Loans: a reading header, five
+ * independent Folding sections and the responsive action controller. Copy
+ * lines keep their status, purchase Links, loan text and note; all copy
+ * mutations live in BookDetailActions. Its phone bar portals into the sheet's
+ * pinned footer; wide controls sit after the utilities at the panel's foot.
  *
- * Your copies (summary: the one copy's location, "Ordered" or "Lent ·
- * {person}", else "{n} copies"): one line per copy with its location and
- * status, the muted "Acquired {date} · €{price}" line under it
- * (`CopyPurchase`, FR-55) and the copy's note (`CopyLine`): an owned copy's
- * Lend, Move and Remove (Move only when the viewer has locations, FR-32); a
- * lent one's marker with "Lent to {person} since {date}" under its line and
- * Returned only (FR-35, FR-36); an ordered copy's Received, whatever its
- * loans. Each copy's line settling focuses the section's row
- * (`focusSectionRow`). Description & details: a nonblank effective
- * Description in full as plain text with preserved line breaks, then value
- * rows (Reading, Publisher, Published, ISBN, Pages, Language), empty ones
- * left out; the Reading row (`ReadingRow`) is the dates line, present while
- * the Book is not unread, so a Book with only that has the section. Genres,
- * themes & tags: the nonempty system and private classification groups. Each
- * classification and each copy's location, like the header's authors and
- * series, is a Filter chip (`FilterChip`) that adds it to the current
- * filters; an ordered copy has no location and so no chip. Lent before
- * follows when the viewer's copies have returned loans
- * (`returnedLoans(ctx, bookId)`), newest first as "{person} · {from} to
- * {to}"; a failed read leaves it out. On wishlists follows (FR-26): the
- * viewer's open entries from the same holdings read, oldest first, each
- * "{list} · for {person}" or the list's name alone for the viewer's own, no
- * links or chips. A Book held only through entries has no Your copies
- * section. Remove's `last` counts entries: removing the only copy while
- * entries remain keeps Book detail open, with focus on the closed On
- * wishlists row (`focusAfter`). A Book the viewer does not hold is "Not in
- * library".
- *
- * Outside the Accordion, after it: `DetailTags` (at a fixed position, so its
- * open picker survives the refresh after each tag change), the admin's
- * Re-fetch on a shared Book (`Refetch`, `canEditShared`) or, in its place on
- * a private Book, Look it up again (`DetailLookUpAgain`; without an ISBN a
- * muted line pointing to Edit book), and the foot with Edit and Add to
- * wishlist, which takes the remaining width, both secondary, no primary
- * (`AddToWishlist`, staying open after the save; a failed read of the
- * viewer's wishlists leaves its picker with New list alone). The component
- * reads the Book, the viewer's copies and entries and their read flag,
- * rating and classifications, never the client rows, so it stays open when
- * its row leaves the list. `locations` are the page's, for Move; none when
- * that read failed. The viewer's People (`lendingPeople()`) are read only
- * when some copy can be lent; the picker reads today itself; a failed People
- * read leaves it with New person alone. The content is the same at every
- * width; only the frame differs: the bottom sheet on the phone, the panel
- * beside the list from 900px (`BookDetailFrame`). Opened on `/` or `/loans`:
- * `back` is that section's address without `book`, where closing it and
- * "Not in library" land.
+ * Undo reseeds reading values without remounting child controllers or open
+ * sections. Book-specific controller state is keyed by book id. Mutations
+ * focus the stable copies row, or On wishlists after the only copy goes;
+ * without entries that removal closes detail. Tag and wishlist Pickers stay
+ * open through their normal refresh. Reads use holdings and the effective
+ * Book, so detail remains open when its row leaves the current filtered list.
  */
 export async function BookDetail({
   ctx,
@@ -135,6 +83,10 @@ export async function BookDetail({
     return []
   })
 
+  // Admins can read another creator's private Book; lookup remains creator-only.
+  const ownPrivate =
+    book.visibility === 'private' && book.isbn13 ? await isPrivateBookCreator(ctx, bookId) : false
+
   const lists = await wishlists
 
   const t = await getTranslations()
@@ -145,8 +97,8 @@ export async function BookDetail({
   const locale = await getLocale()
 
   // Focus lands on these rows: Your copies after a copy's line goes or changes
-  // (`focusSectionRow`), On wishlists when the only copy goes while entries
-  // keep Book detail open (`RemoveCopy`'s `focusAfter`).
+  // (including while closed), On wishlists when the only copy goes while
+  // entries keep Book detail open.
   const onWishlistsId = `on-wishlists-${bookId}`
   const only = copies.length === 1 ? copies[0] : undefined
   const copiesSummary = only
@@ -206,7 +158,7 @@ export async function BookDetail({
   const hasDetails = hasDescription || hasReading || detailRows.length > 0
 
   return (
-    <BookDetailFrame label={book.title} back={back} openId={bookId}>
+    <BookDetailFrame pinnedActions label={book.title} back={back} openId={bookId}>
       <Accordion key={bookId} className="flex flex-col gap-6">
         <ReadAndRating
           key={bookId}
@@ -221,7 +173,12 @@ export async function BookDetail({
         >
           <div>
             {copies.length > 0 && (
-              <AccordionItem value="copies" title={t('detail.yourCopies')} summary={copiesSummary}>
+              <AccordionItem
+                value="copies"
+                title={t('detail.yourCopies')}
+                summary={copiesSummary}
+                rowId={`your-copies-${bookId}`}
+              >
                 <ul className="flex flex-col gap-4">
                   {copies.map((copy) => (
                     <li key={copy.copyId}>
@@ -243,34 +200,6 @@ export async function BookDetail({
                             )}
                             {t('answer.copy', { status: copy.status })}
                           </p>
-                          {isLent(copy) && <ReturnLoan loanId={copy.loan.loanId} />}
-                          {copy.status === 'owned' && !isLent(copy) && (
-                            <div className="flex shrink-0 gap-4">
-                              <LendCopy
-                                copyId={copy.copyId}
-                                context={
-                                  copy.location
-                                    ? `${book.title}${DOT}${copy.location.name}`
-                                    : book.title
-                                }
-                                people={people}
-                              />
-                              {locations.length > 0 && (
-                                <MoveCopy
-                                  copyId={copy.copyId}
-                                  location={copy.location?.id ?? null}
-                                  locations={locations}
-                                />
-                              )}
-                              <RemoveCopy
-                                copyId={copy.copyId}
-                                last={copies.length === 1 && entries.length === 0}
-                                {...(copies.length === 1 &&
-                                  entries.length > 0 && { focusAfter: onWishlistsId })}
-                              />
-                            </div>
-                          )}
-                          {copy.status === 'ordered' && <ReceiveCopy copyId={copy.copyId} />}
                         </div>
                         <CopyPurchase
                           copyId={copy.copyId}
@@ -391,36 +320,35 @@ export async function BookDetail({
               </AccordionItem>
             )}
           </div>
-        </ReadAndRating>
-        <DetailTags
-          key={`tags-${bookId}`}
-          bookId={bookId}
-          initial={state.tags}
-          options={tagOptions}
-        />
-        {book.visibility === 'shared' && book.isbn13 && canEditShared(ctx.user) && (
-          <Refetch bookId={bookId} />
-        )}
-        {book.visibility === 'private' &&
-          (book.isbn13 ? (
-            <div className="flex">
-              <DetailLookUpAgain bookId={bookId} />
-            </div>
-          ) : (
-            <p className="text-meta text-text-muted">{t('detail.lookUpNeedsIsbn')}</p>
-          ))}
-        <div className="flex gap-2">
-          <Link
-            href={`/books/${bookId}/edit`}
-            transitionTypes={['task-open']}
-            className={`${buttonClass('secondary')} inline-flex shrink-0 items-center justify-center`}
+          <DetailTags
+            key={`tags-${bookId}`}
+            bookId={bookId}
+            initial={state.tags}
+            options={tagOptions}
+          />
+          <BookDetailActions
+            key={`actions-${bookId}`}
+            bookId={bookId}
+            title={book.title}
+            copies={copies}
+            hasEntries={entries.length > 0}
+            locations={locations}
+            people={people}
+            utility={
+              book.visibility === 'shared'
+                ? book.isbn13 && canEditShared(ctx.user)
+                  ? 'refetch'
+                  : null
+                : book.isbn13
+                  ? ownPrivate
+                    ? 'lookup'
+                    : null
+                  : 'no-isbn'
+            }
           >
-            {t('detail.edit')}
-          </Link>
-          <div className="flex flex-1 flex-col [&>button]:w-full">
             <AddToWishlist lists={lists} title={book.title} target={{ bookId }} stay />
-          </div>
-        </div>
+          </BookDetailActions>
+        </ReadAndRating>
       </Accordion>
     </BookDetailFrame>
   )

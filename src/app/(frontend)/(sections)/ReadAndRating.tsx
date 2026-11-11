@@ -51,6 +51,12 @@ type HeaderRatingState = {
 
 const HeaderRatingContext = createContext<HeaderRatingState | null>(null)
 
+/** The shared dates Picker, available only while the live reading state needs dates. */
+export function useAddReadingDates() {
+  const context = useContext(HeaderRatingContext)
+  return context?.read && context.line.kind === 'addDates' ? context.openDates : null
+}
+
 /**
  * EXPERIENCE.md, Book detail → Reading and rating: the `header`, then the
  * unread / reading / read Segmented control, with no heading; the dates
@@ -64,9 +70,9 @@ const HeaderRatingContext = createContext<HeaderRatingState | null>(null)
  * line's dates and "Add dates" open the reading-dates Picker (FR-54).
  *
  * After a successful Undo from the toast the route is refreshed and the
- * group remounted in the same transition, so the switch and the Rating seed
- * from the restored values: a refresh can bring back the very values the
- * group was rendered with, so a prop-change key would not remount it. The refresh
+ * reading values reseeded in the same transition. A generation also resets
+ * values when the refresh brings back the original props. Children retain
+ * their identity so open Pickers and their history entries survive. The refresh
  * follows any toast Undo, so it refreshes Book detail after one from another
  * group too; `ReceiveCopy` relies on it. While mounted it claims that refresh
  * from the rows (`useClaimUndoRefresh`), so on `/` it runs once; on `/loans`
@@ -90,10 +96,17 @@ export function ReadAndRating(props: Props) {
     [onUndone, router],
   )
 
-  return <Group key={generation} {...props} />
+  return <Group generation={generation} {...props} />
 }
 
-function Group({ bookId, title, initial, header, children }: Props) {
+function Group({
+  bookId,
+  title,
+  initial,
+  header,
+  children,
+  generation,
+}: Props & { generation: number }) {
   const t = useTranslations()
   const { show } = useToast()
   const afterAction = useAfterAction()
@@ -123,12 +136,24 @@ function Group({ bookId, title, initial, header, children }: Props) {
     },
     afterAction,
   )
-  const [rating, setRating] = useSavedSwitch(
+  const [rating, setRating, storeRating] = useSavedSwitch(
     initial.rating,
     (next) => setRatingAction({ bookId, rating: next }),
     (data) => afterAction({ ok: true, data }),
     afterAction,
   )
+
+  const [seeded, setSeeded] = useState(generation)
+  if (seeded !== generation) {
+    setSeeded(generation)
+    storeState(initial.state)
+    storeRating(initial.rating)
+    setDates({
+      state: initial.state,
+      readingSince: initial.readingSince,
+      finishedAt: initial.finishedAt,
+    })
+  }
 
   const onDatesSaved = (result: ActionResult<UserBookState>) => {
     if (result.ok) {

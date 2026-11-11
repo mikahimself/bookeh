@@ -1,7 +1,17 @@
 'use client'
 
 import { useTranslations } from 'next-intl'
-import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
+import {
+  createContext,
+  useContext,
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type ReactNode,
+} from 'react'
+
+import { createPortal } from 'react-dom'
 
 import { CloseButton } from '../components/CloseButton'
 import { useTaskBack } from '../components/navigation'
@@ -18,19 +28,42 @@ type FrameProps = {
   /** The open Book's or entry's id: a new one swaps the content in place and scrolls it to the top. */
   openId: number
   children: ReactNode
+  /** Book detail alone supplies a pinned phone action bar. */
+  pinnedActions?: boolean
 }
 
 /** Book detail's frame, also the opened wishlist entry's: the panel from 900px, the bottom sheet under it. */
-export function BookDetailFrame({ label, back, openId, children }: FrameProps) {
+const FooterContext = createContext<HTMLElement | null>(null)
+
+/** Portals the detail bar into the phone frame's pinned footer. */
+export function BookDetailFooter({ children }: { children: ReactNode }) {
+  const slot = useContext(FooterContext)
+  return slot ? createPortal(children, slot) : null
+}
+
+export function BookDetailFrame({
+  label,
+  back,
+  openId,
+  children,
+  pinnedActions = false,
+}: FrameProps) {
   const wide = useWide()
+  const [footer, setFooter] = useState<HTMLElement | null>(null)
   return wide ? (
     <BookDetailPanel label={label} back={back} openId={openId}>
       {children}
     </BookDetailPanel>
   ) : (
-    <BookDetailSheet label={label} back={back}>
-      {children}
-    </BookDetailSheet>
+    <FooterContext value={footer}>
+      <BookDetailSheet
+        label={label}
+        back={back}
+        footer={pinnedActions ? <div ref={setFooter} /> : undefined}
+      >
+        {children}
+      </BookDetailSheet>
+    </FooterContext>
   )
 }
 
@@ -87,7 +120,7 @@ function BookDetailPanel({ label, back, openId, children }: FrameProps) {
         !event.defaultPrevented &&
         !inField(event.target) &&
         !inDialog(event.target, event.composedPath()) &&
-        document.querySelector('[role="dialog"], [role="alertdialog"]') === null
+        document.querySelector('[role="dialog"], [role="alertdialog"], [role="menu"]') === null
       ) {
         // Taken here: select mode's `Esc` stays for the next press.
         event.preventDefault()

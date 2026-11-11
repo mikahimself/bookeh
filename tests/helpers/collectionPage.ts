@@ -1,4 +1,4 @@
-import { cleanup, render, screen, within } from '@testing-library/react'
+import { cleanup, fireEvent, render, screen, within } from '@testing-library/react'
 
 import { openSections } from './openSections'
 import { createElement, type ComponentProps } from 'react'
@@ -264,6 +264,16 @@ export const onWishlists = (sheet: HTMLElement) =>
 
 export async function renderPage(params: Record<string, string> = {}) {
   return render(await page(params))
+}
+
+/** Activate a detail action at its responsive location. Menu dispatch waits for close. */
+export async function clickDetailAction(surface: HTMLElement, name: string) {
+  const button = within(surface).queryByRole('button', { name })
+  if (button) fireEvent.click(button)
+  else {
+    fireEvent.click(within(surface).getByRole('button', { name: 'More' }))
+    fireEvent.click(await screen.findByRole('menuitem', { name }))
+  }
 }
 
 export { openSections } from './openSections'

@@ -4,6 +4,7 @@ import { beforeEach, describe, expect, it } from 'vitest'
 
 import {
   copy,
+  clickDetailAction,
   detail,
   ENTRIES,
   fetchStub,
@@ -45,7 +46,10 @@ describe('CollectionPage', () => {
           json: async () => ({ ok: true, data: { rows: [], total: 0, labels: {} } }),
         })
       const confirmRemove = async (sheet: HTMLElement, line = 0) => {
-        fireEvent.click(within(sheet).getAllByRole('button', { name: 'Remove' })[line]!)
+        await clickDetailAction(sheet, 'Remove')
+        const chooser = screen.queryByRole('dialog', { name: 'Choose a copy' })
+        if (chooser)
+          fireEvent.click(within(chooser).getAllByRole('button', { pressed: false })[line]!)
         const dialog = await screen.findByRole('dialog', { name: 'Remove 1 book from library?' })
         expect(within(dialog).queryByText('Its loans go too.')).toBeNull()
         fireEvent.click(within(dialog).getByRole('button', { name: 'Remove' }))
@@ -109,9 +113,9 @@ describe('CollectionPage', () => {
         await renderPage({ book: '5' })
         const sheet = await detail('Tuntematon sotilas')
 
-        await confirmRemove(sheet)
+        await confirmRemove(sheet, 1)
         await waitFor(() => expect(router.refresh).toHaveBeenCalledOnce())
-        expect(removeCopiesAction).toHaveBeenCalledExactlyOnceWith([21])
+        expect(removeCopiesAction).toHaveBeenCalledExactlyOnceWith([22])
         expect(showToast).not.toHaveBeenCalled()
         await detail('Tuntematon sotilas')
         expect(router.replace).not.toHaveBeenCalled()

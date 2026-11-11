@@ -348,6 +348,9 @@
     "tag": "Tunniste"
   },
   "detail": {
+    "moreActions": "Lisää",
+    "chooseCopy": "Valitse kappale",
+    "addReadingDates": "Lisää lukupäivät",
     "detailsAndDescription": "Kuvaus ja tiedot",
     "classifications": "Lajit, teemat ja tagit",
     "copiesCount": "{n, plural, one {# kappale} other {# kappaletta}}",

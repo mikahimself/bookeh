@@ -34,10 +34,12 @@ export function BookDetailSheet({
   label,
   back,
   children,
+  footer,
 }: {
   label: string
   back: string
   children: ReactNode
+  footer?: ReactNode
 }) {
   const [open, setOpen] = useState(false)
   const leave = useTaskBack(back, true)
@@ -68,6 +70,7 @@ export function BookDetailSheet({
   return (
     <Sheet
       addressed
+      footer={footer}
       open={open}
       onOpenChange={setOpen}
       label={label}
