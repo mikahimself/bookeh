@@ -131,7 +131,10 @@
     "isbn": "Or type an ISBN",
     "noCamera": "No camera. Type the ISBN.",
     "addWithoutIsbn": "Add without ISBN",
-    "find": "Find"
+    "find": "Find",
+    "torch": "Torch",
+    "frameHint": "Hold the barcode inside the corners",
+    "findBar": "Find by title / author"
   },
   "answer": {
     "notInLibrary": "Not in library",

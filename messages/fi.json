@@ -131,7 +131,10 @@
     "isbn": "Tai kirjoita ISBN",
     "noCamera": "Ei kameraa. Kirjoita ISBN.",
     "addWithoutIsbn": "Lisää ilman ISBN:ää",
-    "find": "Hae"
+    "find": "Hae",
+    "torch": "Taskulamppu",
+    "frameHint": "Pidä viivakoodi kulmien sisällä",
+    "findBar": "Hae nimellä / tekijällä"
   },
   "answer": {
     "notInLibrary": "Ei kirjastossa",

@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { createElement, use, useEffect, useState } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -7,6 +7,8 @@ const push = vi.fn()
 const replace = vi.fn()
 const scan = vi.fn()
 const stop = vi.fn()
+const setTorch = vi.fn()
+let torchSupported = false
 const getUserMedia = vi.fn()
 
 /** What zxing hands the callback: a format number and the decoded text. */
@@ -25,6 +27,8 @@ vi.mock('@/app/(frontend)/scan/zxing', () => ({
     BarcodeFormat: { EAN_13, [EAN_13]: 'EAN_13', EAN_8, [EAN_8]: 'EAN_8' },
     DecodeHintType: { POSSIBLE_FORMATS: 2 },
     BrowserMultiFormatReader: class {
+      static mediaStreamIsTorchCompatibleTrack = () => torchSupported
+      static mediaStreamSetTorch = (_track: MediaStreamTrack, on: boolean) => setTorch(on)
       scan(element: HTMLVideoElement, callback: Callback) {
         scan(element, callback)
         return { stop }
@@ -121,6 +125,7 @@ describe('ScanScreen', () => {
     vi.spyOn(performance, 'now').mockImplementation(() => clock)
   })
   afterEach(() => {
+    torchSupported = false
     cleanup()
     vi.resetAllMocks()
   })
@@ -314,10 +319,60 @@ describe('ScanScreen', () => {
   it('links to Lookup and to the Not found Answer under the field', () => {
     getUserMedia.mockReturnValue(new Promise<MediaStream>(() => undefined))
     renderScan()
-    expect(screen.getAllByRole('link').map((link) => link.getAttribute('href'))).toEqual([
-      '/scan?title=',
-      '/scan/find',
-    ])
+    // Each shows twice: in the phone bar and under the field (wide screens).
+    const hrefs = screen.getAllByRole('link').map((link) => link.getAttribute('href'))
+    expect([...new Set(hrefs)]).toEqual(['/scan?title=', '/scan/find'])
+  })
+
+  it('offers the torch only when the camera reports it, and switches it off when the task closes', async () => {
+    setTorch.mockResolvedValue(undefined)
+    torchSupported = false
+    getUserMedia.mockResolvedValue(fakeStream().stream)
+    const plain = renderScan()
+    await decoder()
+    expect(screen.queryByRole('button', { name: 'scan.torch' })).toBeNull()
+    plain.unmount()
+
+    torchSupported = true
+    renderScan()
+    const button = await screen.findByRole('button', { name: 'scan.torch' })
+    expect(button.getAttribute('aria-pressed')).toBe('false')
+    fireEvent.click(button)
+    await waitFor(() => expect(button.getAttribute('aria-pressed')).toBe('true'))
+    expect(setTorch).toHaveBeenLastCalledWith(true)
+
+    fireEvent.click(button)
+    await waitFor(() => expect(button.getAttribute('aria-pressed')).toBe('false'))
+    expect(setTorch).toHaveBeenLastCalledWith(false)
+    fireEvent.click(button)
+    await waitFor(() => expect(button.getAttribute('aria-pressed')).toBe('true'))
+
+    cleanup()
+    expect(setTorch).toHaveBeenLastCalledWith(false)
+  })
+
+  it('leaves the torch unpressed when the switch is rejected, and does not switch off on close', async () => {
+    torchSupported = true
+    setTorch.mockRejectedValue(new Error('no'))
+    getUserMedia.mockResolvedValue(fakeStream().stream)
+    const view = renderScan()
+    const button = await screen.findByRole('button', { name: 'scan.torch' })
+    fireEvent.click(button)
+    await waitFor(() => expect(setTorch).toHaveBeenCalledWith(true))
+    expect(button.getAttribute('aria-pressed')).toBe('false')
+    view.unmount()
+    expect(setTorch).not.toHaveBeenCalledWith(false)
+  })
+
+  it('has no torch with the camera refused, but keeps the other two bar buttons', async () => {
+    torchSupported = true
+    getUserMedia.mockRejectedValue(new DOMException('denied', 'NotAllowedError'))
+    renderScan()
+    await screen.findAllByText('scan.noCamera')
+    expect(screen.queryByRole('button', { name: 'scan.torch' })).toBeNull()
+    const bar = within(document.querySelector<HTMLElement>('[data-app-bar]')!)
+    expect(bar.getByRole('link', { name: 'scan.addWithoutIsbn' })).toBeTruthy()
+    expect(bar.getByRole('link', { name: 'scan.findBar' })).toBeTruthy()
   })
 
   it('shows the no-camera message and focuses the field when the camera is refused', async () => {

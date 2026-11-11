@@ -3,8 +3,9 @@
 import type { IScannerControls } from '@zxing/browser'
 import { useTranslations } from 'next-intl'
 import { useRouter } from 'next/navigation'
-import { useEffect, useEffectEvent, useRef, useTransition, type FormEvent } from 'react'
+import { useEffect, useEffectEvent, useRef, useState, useTransition, type FormEvent } from 'react'
 
+import { AppBar, AppBarButton, AppBarLink } from '../components/AppBar'
 import { buttonClass } from '../components/Button'
 import { TextLink } from '../components/Link'
 import { ProgressLine } from '../components/ProgressLine'
@@ -49,6 +50,11 @@ export function ScanScreen({ isbn, error }: { isbn?: string; error?: string }) {
   // Set at once in `go()`: `pending` only commits a render later.
   const paused = useRef(false)
   const [pending, startTransition] = useTransition()
+  // Set while the camera's video track reports torch support.
+  const [torch, setTorch] = useState<{ set: (on: boolean) => Promise<void> } | null>(null)
+  const [lit, setLit] = useState(false)
+  const litNow = useRef(false)
+  const torchSet = useRef<((on: boolean) => Promise<void>) | null>(null)
 
   const go = (text: string) => {
     paused.current = true
@@ -92,6 +98,17 @@ export function ScanScreen({ isbn, error }: { isbn?: string; error?: string }) {
       const { BrowserMultiFormatReader, BarcodeFormat, DecodeHintType } = await loadZxing()
       if (cancelled) return
 
+      const track = stream
+        .getVideoTracks()
+        .find((candidate) =>
+          BrowserMultiFormatReader.mediaStreamIsTorchCompatibleTrack(candidate),
+        )
+      if (track) {
+        const set = (on: boolean) => BrowserMultiFormatReader.mediaStreamSetTorch(track, on)
+        torchSet.current = set
+        setTorch({ set })
+      }
+
       const hints = new Map([[DecodeHintType.POSSIBLE_FORMATS, [BarcodeFormat.EAN_13]]])
       const reader = new BrowserMultiFormatReader(hints, {
         delayBetweenScanAttempts: SCAN_ATTEMPT_MS,
@@ -121,8 +138,28 @@ export function ScanScreen({ isbn, error }: { isbn?: string; error?: string }) {
       document.removeEventListener('visibilitychange', onVisible)
       controls?.stop()
       element.srcObject = null
+      // The light goes off with the screen; a rejected switch-off is ignored.
+      if (litNow.current) {
+        litNow.current = false
+        void torchSet.current?.(false).catch(() => undefined)
+      }
+      torchSet.current = null
+      setTorch(null)
+      setLit(false)
     }
   }, [state, stream, gate])
+
+  const toggleTorch = async () => {
+    if (!torch) return
+    const next = !lit
+    try {
+      await torch.set(next)
+    } catch {
+      return
+    }
+    litNow.current = next
+    setLit(next)
+  }
 
   const submit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -139,22 +176,25 @@ export function ScanScreen({ isbn, error }: { isbn?: string; error?: string }) {
       {state !== 'on' ? (
         <p className="text-control text-text">{t('scan.noCamera')}</p>
       ) : (
-        <div className="flex flex-col gap-2">
-          <div className="relative aspect-[4/3] border-2 border-text">
-            <video
-              ref={video}
-              autoPlay
-              playsInline
-              muted
-              aria-label={t('scan.cameraHint')}
-              className="size-full object-cover"
-            />
-            <div
-              aria-hidden="true"
-              className="absolute inset-x-[14%] top-1/2 h-stroke-control -translate-y-1/2 bg-accent"
-            />
+        <div className="relative aspect-[4/3] bg-text">
+          <video
+            ref={video}
+            autoPlay
+            playsInline
+            muted
+            aria-label={t('scan.cameraHint')}
+            className="size-full object-cover"
+          />
+          <div aria-hidden="true" className="pointer-events-none absolute inset-0">
+            <div className="absolute top-6 left-6 size-[40px] border-t-4 border-l-4 border-bar-ink" />
+            <div className="absolute top-6 right-6 size-[40px] border-t-4 border-r-4 border-bar-ink" />
+            <div className="absolute bottom-6 left-6 size-[40px] border-b-4 border-l-4 border-bar-ink" />
+            <div className="absolute right-6 bottom-6 size-[40px] border-r-4 border-b-4 border-bar-ink" />
+            <div className="absolute inset-x-[14%] top-1/2 h-stroke-control -translate-y-1/2 bg-accent" />
+            <p className="absolute inset-x-0 bottom-4 text-center text-meta text-bar-ink">
+              {t('scan.frameHint')}
+            </p>
           </div>
-          <p className="text-meta text-text-muted">{t('scan.cameraHint')}</p>
         </div>
       )}
       <form action="/scan" onSubmit={submit}>
@@ -183,10 +223,23 @@ export function ScanScreen({ isbn, error }: { isbn?: string; error?: string }) {
         />
       </form>
       {/* A block around each Link, so it is only as wide as its text. */}
-      <div className="flex flex-col items-start gap-2">
+      <div className="hidden flex-col items-start gap-2 wide:flex">
         <TextLink href="/scan?title=">{t('scan.addWithoutIsbn')}</TextLink>
         <TextLink href="/scan/find">{t('lookup.open')}</TextLink>
       </div>
+      <AppBar standalone className="-mx-page-margin-phone mt-auto">
+        {torch && (
+          <AppBarButton icon="torch" aria-pressed={lit} onClick={() => void toggleTorch()}>
+            {t('scan.torch')}
+          </AppBarButton>
+        )}
+        <AppBarLink icon="noIsbn" href="/scan?title=">
+          {t('scan.addWithoutIsbn')}
+        </AppBarLink>
+        <AppBarLink icon="find" href="/scan/find">
+          {t('scan.findBar')}
+        </AppBarLink>
+      </AppBar>
     </>
   )
 }

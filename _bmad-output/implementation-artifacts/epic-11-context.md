@@ -4,7 +4,7 @@
 
 ## Goal
 
-Give bookeh the bolder Metro look selected on 2026-11-10: larger section headings, heavier outlines, selective coral fills, a phone App bar, calmer Book detail and more visual Stats. Preserve the existing catalogue, reading and copy behaviour. This is a frontend change without schema changes or migrations; camera torch support is the only small new capability.
+Give bookeh the bolder Metro look selected on 2026-11-10: larger section headings, heavier outlines, selective coral fills, a phone App bar, calmer Book detail and more visual Stats. Preserve the existing catalogue, reading and copy behaviour. This is a frontend change without schema changes or migrations; camera torch support is the only small new capability. Book detail also gets immediate-open feedback so a tap never reads as missed.
 
 ## Stories
 
@@ -12,7 +12,7 @@ Give bookeh the bolder Metro look selected on 2026-11-10: larger section heading
 - Story 11.2: Phone app bar
 - Story 11.3: Rows and covers as icon buttons
 - Story 11.4: Book detail header and reading control
-- Story 11.5: Folding sections on book detail
+- Story 11.5: Folding sections on Book detail
 - Story 11.6: Copy actions in the bar
 - Story 11.7: Copy picker
 - Story 11.8: Stats tiles, chart and nerdy rows
@@ -25,7 +25,7 @@ Give bookeh the bolder Metro look selected on 2026-11-10: larger section heading
 - Layout, size, theme and loans order remain device preferences in one cookie, read by the server so first paint is correct. Language belongs to the profile. Supply interface strings in English and Finnish.
 - Expose chosen switch buttons as pressed, independently of colour. Each icon-only button has an accessible name; App bar buttons use their visible labels. Preserve keyboard operation, reduced motion and safe areas.
 - Preserve Stats definitions and reading/copy action semantics. The monthly chart supplies month, books and pages through each column’s accessible name.
-- Keep automated tests minimal: only the named pure-helper behaviour tests for copy-action eligibility and tile-number sizing are new. Maintain scan-to-save and shop-check coverage. Visual changes are checked by uncommitted phone and desktop walks in both themes, against the fixture e2e server and test database.
+- Keep automated tests minimal: only the named pure-helper behaviour tests for copy-action eligibility and tile-number sizing are new (11.10 adds one only if the pending-sheet check can be a pure helper). Maintain scan-to-save and shop-check coverage. Visual changes are checked by uncommitted phone and desktop walks in both themes, against the fixture e2e server and test database.
 - Success means reproducing the selected phone screens in both themes while keeping wide layout intact. One button-stroke token controls all button outlines.
 
 ## Technical Decisions
@@ -36,6 +36,8 @@ Give bookeh the bolder Metro look selected on 2026-11-10: larger section heading
 - Button outlines, Segmented controls and Icon switches use `stroke-button`; field underlines and App bar rings use `stroke-control`. Hairlines separate folding sections. All corners remain square except App bar circles. Add no shadows or raised surfaces.
 - Base UI primitives are wrapped once under frontend `components/ui`; screens import wrappers only. Toggle groups and accordions are not overlays. Copy picking and action steps stay one overlay deep. Update the spine in the same commit when a story changes its primitive contract.
 - Keep present data ownership, access, transactions and Undo guarantees. This visual refresh adds no stored fields or cached statistics.
+
+- Book detail open feedback: a row or cover tap opens a Book through a server-rendered `?book=` address with a non-prefetching Link. Until the sheet or panel shows, a Progress line at the top edge appears (from a small client component inside the Link using link status, so row and cover tile components stay hook-free). On the phone, 11.10 replaces it: the sheet slides up at once with the row's cover, title and authors, and pulsing square placeholder bars (pulsing continues under reduced motion), then the real content swaps into the same mounted sheet with no close, re-slide or jump. Pending and real sheet are one sheet; close controls work while pending and cancel the open; a failed render closes the sheet and shows the load-failed state. Wide panel keeps the Progress line. Back/Forward still add/remove one entry per open; update the spine if the sheet contract changes.
 
 ## UX & Interaction Patterns
 
@@ -49,6 +51,6 @@ Give bookeh the bolder Metro look selected on 2026-11-10: larger section heading
 
 ## Cross-Story Dependencies
 
-- 11.1 precedes the rest. Then 11.2, 11.4 and 11.8 can proceed independently. 11.3 and 11.9 need 11.2; 11.5 needs 11.4; 11.6 needs 11.2 and 11.5; 11.7 needs 11.6.
-- Book detail stories 11.4 through 11.7 run sequentially because they share the same surface. The Toggle Group wrapper is shared by reading and collection layout; whichever story supplies it first is reused by the other. The accordion contract belongs to 11.5.
+- 11.1 precedes the rest. Then 11.2, 11.4 and 11.8 can proceed independently. 11.3 and 11.9 need 11.2; 11.5 needs 11.4; 11.6 needs 11.2 and 11.5; 11.7 needs 11.6; 11.10 stands alone but follows 11.3 and 11.5 (same row, tile and sheet files).
+- Book detail stories 11.4 through 11.7 (and 11.10) run sequentially because they share the same surface. The Toggle Group wrapper is shared by reading and collection layout; whichever story supplies it first is reused by the other. The accordion contract belongs to 11.5.
 - Between folding-section and action-bar changes, copy actions remain on their existing lines. The later action-bar change relocates them and supplies multiple-copy selection afterward.

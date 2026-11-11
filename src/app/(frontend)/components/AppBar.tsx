@@ -34,10 +34,10 @@ export function AppBarItems({ children }: { children: ReactNode }) {
 }
 
 const circle = (primary: boolean, destructive = false) =>
-  `flex size-tap items-center justify-center rounded-full border-(length:--spacing-stroke-control) ${
+  `flex size-tap items-center justify-center rounded-full border-(length:--spacing-stroke-control) group-aria-pressed:bg-bar-ink group-aria-pressed:text-bar ${
     destructive ? 'border-bar-danger' : primary ? 'border-accent' : 'border-bar-ink'
   }`
-const item = 'flex min-w-0 flex-col items-center gap-1 text-center text-label text-bar-ink ui-case'
+const item = 'group flex min-w-0 flex-col items-center gap-1 text-center text-label text-bar-ink ui-case'
 
 export type AppBarIcon =
   | 'plus'
@@ -51,6 +51,9 @@ export type AppBarIcon =
   | 'move'
   | 'remove'
   | 'more'
+  | 'torch'
+  | 'noIsbn'
+  | 'find'
 
 const paths: Record<AppBarIcon, string> = {
   plus: 'M11 4 V18 M4 11 H18',
@@ -63,6 +66,9 @@ const paths: Record<AppBarIcon, string> = {
   more: 'M4 11 H6 M10 11 H12 M16 11 H18',
   filter: 'M3 5 H19 M6 11 H16 M9 17 H13',
   select: 'M4 4 H18 V18 H4 Z M7.5 11 L10 13.5 L14.5 8.5',
+  torch: 'M7 3 H15 V7 L13 9 V19 H9 V9 L7 7 Z',
+  noIsbn: 'M4 5 V17 M8 5 V17 M12 5 V17 M16 5 V17 M3 3 L19 19',
+  find: 'M9.5 3 A6.5 6.5 0 1 1 9.5 16 A6.5 6.5 0 1 1 9.5 3 M14 14 L19 19',
   up: 'M11 18 V4 M5 10 L11 4 L17 10',
 }
 
@@ -121,9 +127,12 @@ export function AppBarButton({
 export function AppBar({
   children,
   standalone = false,
+  className = '',
 }: {
   children: ReactNode
   standalone?: boolean
+  /** Layout the host needs on the root (a task column's side padding to cancel, say). */
+  className?: string
 }) {
   const t = useTranslations('sections')
   const { setSlot } = useContext(SlotContext)
@@ -149,7 +158,7 @@ export function AppBar({
     <div
       data-pinned-bottom
       data-app-bar
-      className={`sticky bottom-0 flex items-start justify-center ${standalone ? 'gap-3' : 'gap-5'} bg-bar px-page-margin-phone pt-3 pb-[calc(var(--spacing-2)+env(safe-area-inset-bottom))] wide:hidden`}
+      className={`sticky bottom-0 flex items-start justify-center ${standalone ? 'gap-3' : 'gap-5'} bg-bar px-page-margin-phone pt-3 pb-[calc(var(--spacing-2)+env(safe-area-inset-bottom))] wide:hidden ${className}`}
     >
       {children}
       {!standalone && <div ref={setSlot} className="contents" />}
