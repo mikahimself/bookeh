@@ -250,6 +250,7 @@
   },
   "overlay": {
     "close": "Sulje",
+    "back": "Takaisin",
     "cancel": "Peruuta",
     "expand": "Avaa kokonaan"
   },
@@ -349,7 +350,6 @@
   },
   "detail": {
     "moreActions": "Lisää",
-    "chooseCopy": "Valitse kappale",
     "addReadingDates": "Lisää lukupäivät",
     "detailsAndDescription": "Kuvaus ja tiedot",
     "classifications": "Lajit, teemat ja tagit",

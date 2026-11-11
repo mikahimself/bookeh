@@ -250,6 +250,7 @@
   },
   "overlay": {
     "close": "Close",
+    "back": "Back",
     "cancel": "Cancel",
     "expand": "Open fully"
   },
@@ -349,7 +350,6 @@
   },
   "detail": {
     "moreActions": "More",
-    "chooseCopy": "Choose a copy",
     "addReadingDates": "Add reading dates",
     "detailsAndDescription": "Description & details",
     "classifications": "Genres, themes & tags",

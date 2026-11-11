@@ -16,7 +16,13 @@ import { useToast } from '../components/toast/ToastProvider'
 import { Dialog } from '../components/ui/Dialog'
 import { Menu, type MenuItem } from '../components/ui/Menu'
 import { useWide } from '../components/ui/overlay'
-import { Picker } from '../components/ui/Picker'
+import {
+  Picker,
+  PickerFrame,
+  PickerLeadContext,
+  PickerRows,
+  type PickerLead,
+} from '../components/ui/Picker'
 
 import { receiveCopyAction, removeCopiesAction } from './actions'
 import { BookDetailFooter } from './BookDetailPanel'
@@ -41,7 +47,12 @@ type Props = {
   children: ReactNode
 }
 
-type Step = { name: 'lend' | 'move' | 'remove'; copy: CopyLine }
+/** `copy` is `null` while the copy list (several eligible copies) is showing. */
+type Step = {
+  name: 'lend' | 'move' | 'remove'
+  copy: CopyLine | null
+  copies: readonly CopyLine[]
+}
 
 /** One controller owns mutations and overlays for both responsive surfaces. */
 export function BookDetailActions({
@@ -90,6 +101,13 @@ export function BookDetailActions({
     remove: t('collection.remove'),
   }
 
+  const copyOptions = (list: readonly CopyLine[]) =>
+    list.map((copy, index) => ({
+      value: copy.copyId,
+      label: `${index + 1}. ${copy.location ? `${copy.location.name} · ` : ''}${copy.status === 'owned' && copy.loan ? t('loans.lentMarker', { person: copy.loan.person.name }) : t('answer.copy', { status: copy.status })} · ${format.dateTime(new Date(`${copy.acquiredAt}T12:00:00Z`), { dateStyle: 'medium' })}`,
+    }))
+  const named = (copy: CopyLine) => (copy.location ? `${title} · ${copy.location.name}` : title)
+
   const run = (name: CopyActionName, copy: CopyLine) => {
     if (busy) return
     // Immediate actions can disable or remove their opener before the refresh.
@@ -111,17 +129,21 @@ export function BookDetailActions({
         focusCopies()
       })
     } else {
-      setStep({ name, copy })
+      setStep({ name, copy, copies: [copy] })
       setStepOpen(true)
     }
   }
   const choose = (action: CopyAction) => {
     if (busy) return
     if (action.copies.length === 1) run(action.name, action.copies[0])
-    else {
+    else if (action.name === 'returned' || action.name === 'received') {
       focusCopies()
       setChoosing(action)
       setChoosingOpen(true)
+    } else {
+      focusCopies()
+      setStep({ name: action.name, copy: null, copies: action.copies })
+      setStepOpen(true)
     }
   }
   const remove = () => {
@@ -138,6 +160,39 @@ export function BookDetailActions({
       } else focusCopies()
     })
   }
+
+  const lead: PickerLead | null =
+    step && step.copies.length > 1
+      ? {
+          title: labels[step.name],
+          description: <p className="text-meta text-text-muted">{title}</p>,
+          content: (
+            <PickerRows
+              options={copyOptions(step.copies)}
+              value={null}
+              onChoose={(copyId) => {
+                const copy = step.copies.find((copy) => copy.copyId === copyId)
+                if (copy) setStep({ ...step, copy })
+              }}
+            />
+          ),
+          chosen: step.copy !== null,
+          onBack: () => setStep({ ...step, copy: null }),
+        }
+      : null
+  const removeBody = step?.copy && <p className="text-meta text-text-muted">{named(step.copy)}</p>
+  const confirmRemove = (
+    <Button
+      variant="destructive"
+      onClick={() => {
+        if (!stepOpen || !step?.copy) return
+        confirmed.current = step.copy
+        setStepOpen(false)
+      }}
+    >
+      {t('collection.remove')}
+    </Button>
+  )
 
   const utilities: MenuItem[] = []
   if (utility === 'refetch')
@@ -240,64 +295,67 @@ export function BookDetailActions({
           </AppBar>
         </BookDetailFooter>
       )}
-      {/* 11.7 replaces this close-then-open choice with a shared two-step Picker and Back. */}
       <Picker<number>
         open={choosingOpen}
         onOpenChange={setChoosingOpen}
-        title={t('detail.chooseCopy')}
+        title={choosing ? labels[choosing.name] : ''}
         description={<p className="text-meta text-text-muted">{title}</p>}
         value={null}
-        options={(choosing?.copies ?? []).map((copy, index) => ({
-          value: copy.copyId,
-          label: `${index + 1}. ${copy.location ? `${copy.location.name} · ` : ''}${copy.status === 'owned' && copy.loan ? t('loans.lentMarker', { person: copy.loan.person.name }) : t('answer.copy', { status: copy.status })} · ${format.dateTime(new Date(`${copy.acquiredAt}T12:00:00Z`), { dateStyle: 'medium' })}`,
-        }))}
+        options={copyOptions(choosing?.copies ?? [])}
         onChoose={(copyId) => {
           const copy = choosing?.copies.find((copy) => copy.copyId === copyId)
           if (choosing && copy) run(choosing.name, copy)
         }}
       />
-      {step?.name === 'move' && (
-        <MovePicker
-          open={stepOpen}
-          onOpenChange={setStepOpen}
-          locations={locations}
-          value={step.copy.location?.id ?? null}
-          copyIds={[step.copy.copyId]}
-          startTransition={startTransition}
-          onSettled={focusCopies}
-        />
-      )}
-      {step?.name === 'lend' && (
-        <LendPicker
-          open={stepOpen}
-          onOpenChange={setStepOpen}
-          context={step.copy.location ? `${title} · ${step.copy.location.name}` : title}
-          people={people}
-          copyId={step.copy.copyId}
-          startTransition={startTransition}
-          pending={pending}
-          onSettled={focusCopies}
-        />
-      )}
-      {step?.name === 'remove' && (
-        <Dialog
-          open={stepOpen}
-          onOpenChange={setStepOpen}
-          onClosed={remove}
-          title={t('collection.removeTitle', { n: 1 })}
-          confirm={
-            <Button
-              variant="destructive"
-              onClick={() => {
-                if (!stepOpen) return
-                confirmed.current = step.copy
-                setStepOpen(false)
-              }}
-            >
-              {t('collection.remove')}
-            </Button>
-          }
-        />
+      {step && (
+        <PickerLeadContext.Provider value={lead}>
+          {step.name === 'move' && (
+            <MovePicker
+              open={stepOpen}
+              onOpenChange={setStepOpen}
+              locations={locations}
+              value={step.copy?.location?.id ?? null}
+              copyIds={step.copy ? [step.copy.copyId] : []}
+              startTransition={startTransition}
+              onSettled={focusCopies}
+            />
+          )}
+          {step.name === 'lend' && (
+            <LendPicker
+              open={stepOpen}
+              onOpenChange={setStepOpen}
+              context={step.copy ? named(step.copy) : title}
+              people={people}
+              // Never sent: the form is not shown until a copy is chosen.
+              copyId={step.copy?.copyId ?? 0}
+              startTransition={startTransition}
+              pending={pending}
+              onSettled={focusCopies}
+            />
+          )}
+          {step.name === 'remove' &&
+            (lead ? (
+              <PickerFrame
+                open={stepOpen}
+                onOpenChange={setStepOpen}
+                onClosed={remove}
+                title={t('collection.removeTitle', { n: 1 })}
+                confirm={confirmRemove}
+              >
+                {removeBody}
+              </PickerFrame>
+            ) : (
+              <Dialog
+                open={stepOpen}
+                onOpenChange={setStepOpen}
+                onClosed={remove}
+                title={t('collection.removeTitle', { n: 1 })}
+                confirm={confirmRemove}
+              >
+                {removeBody}
+              </Dialog>
+            ))}
+        </PickerLeadContext.Provider>
       )}
       {lookup.picker}
     </>

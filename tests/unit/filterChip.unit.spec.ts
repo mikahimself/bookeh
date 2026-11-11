@@ -15,6 +15,7 @@ vi.mock('next/navigation', () => ({
 vi.mock('@/app/(frontend)/(sections)/BookDetailSheet', () => ({ useSheetChip: () => sheetChip }))
 // Next's Link: navigates unless the click handler prevented it.
 vi.mock('next/link', () => ({
+  useLinkStatus: () => ({ pending: false }),
   default: ({
     href,
     replace,

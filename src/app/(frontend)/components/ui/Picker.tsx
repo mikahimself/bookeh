@@ -1,6 +1,16 @@
 'use client'
 
-import { useId, useRef, useState, type ReactNode, type RefObject } from 'react'
+import { useTranslations } from 'next-intl'
+import {
+  createContext,
+  useContext,
+  useEffect,
+  useId,
+  useRef,
+  useState,
+  type ReactNode,
+  type RefObject,
+} from 'react'
 
 import { Button } from '../Button'
 import { useSuspendSwipe } from '../swipe'
@@ -37,6 +47,22 @@ export type PickerProps<V extends string | number> = {
   }
 }
 
+/**
+ * The two-step mode: a copy list shown in the frame until a copy is chosen,
+ * then the caller's own step with a Back control first. Provided around the
+ * step's Picker or `PickerFrame`, which read it; they take no props for it.
+ */
+export type PickerLead = {
+  title: ReactNode
+  description?: ReactNode
+  /** The list, shown while `chosen` is false (`PickerRows`). */
+  content: ReactNode
+  chosen: boolean
+  onBack: () => void
+}
+
+export const PickerLeadContext = createContext<PickerLead | null>(null)
+
 export type PickerFrameProps = Pick<PickerProps<string>, 'open' | 'onOpenChange' | 'title'> & {
   description?: ReactNode
   /** Runs once per close, after the overlay's history entry is gone. */
@@ -70,6 +96,22 @@ export function PickerFrame({
   children,
 }: PickerFrameProps) {
   const wide = useWide()
+  const t = useTranslations('overlay')
+  const lead = useContext(PickerLeadContext)
+  const listed = lead !== null && !lead.chosen
+  const pane = useRef<HTMLDivElement>(null)
+  const stage = useRef(listed)
+  // Focus follows a stage change (choose, Back), not the first mount.
+  useEffect(() => {
+    if (stage.current === listed) return
+    stage.current = listed
+    const root = pane.current
+    if (!root) return
+    const control =
+      root.querySelector<HTMLElement>('input, button:not([data-picker-back]), a[href]') ??
+      root.querySelector<HTMLElement>('[data-picker-back]')
+    control?.focus()
+  }, [listed])
   const titleId = useId()
   const [heldWide, setHeldWide] = useState(wide)
   const [wasOpen, setWasOpen] = useState(open)
@@ -79,6 +121,26 @@ export function PickerFrame({
   }
   // The Sheet and Dialog suspend it too; held here as well, like every wrapper.
   useSuspendSwipe(open)
+
+  if (lead) {
+    if (listed) {
+      title = lead.title
+      description = lead.description
+      confirm = undefined
+    }
+    children = (
+      <div ref={pane} className="flex flex-col gap-4">
+        {!listed && (
+          <div>
+            <Button variant="secondary" data-picker-back="" onClick={lead.onBack}>
+              {t('back')}
+            </Button>
+          </div>
+        )}
+        {listed ? lead.content : children}
+      </div>
+    )
+  }
 
   return heldWide ? (
     <Dialog
@@ -117,6 +179,41 @@ export function PickerFrame({
         {confirm}
       </div>
     </Sheet>
+  )
+}
+
+/** The rows of a Picker: one button each, the chosen one with the 8px marker. */
+export function PickerRows<V extends string | number>({
+  options,
+  value,
+  onChoose,
+}: {
+  options: readonly PickerOption<V>[]
+  value: V | null
+  onChoose: (value: V) => void
+}) {
+  return (
+    <ul>
+      {options.map((option) => {
+        const chosen = option.value === value
+        return (
+          <li key={option.value}>
+            <button
+              type="button"
+              aria-pressed={chosen}
+              onClick={() => onChoose(option.value)}
+              className={pickerRowClass}
+            >
+              <span
+                aria-hidden="true"
+                className={chosen ? `${markerSlotClass} bg-accent` : markerSlotClass}
+              />
+              <span className="min-w-0 flex-1">{option.label}</span>
+            </button>
+          </li>
+        )
+      })}
+    </ul>
   )
 }
 
@@ -173,29 +270,7 @@ export function Picker<V extends string | number>({
     onOpenChange(false)
   }
 
-  const rows = (
-    <ul>
-      {options.map((option) => {
-        const chosen = option.value === value
-        return (
-          <li key={option.value}>
-            <button
-              type="button"
-              aria-pressed={chosen}
-              onClick={() => choose(option.value)}
-              className={pickerRowClass}
-            >
-              <span
-                aria-hidden="true"
-                className={chosen ? `${markerSlotClass} bg-accent` : markerSlotClass}
-              />
-              <span className="min-w-0 flex-1">{option.label}</span>
-            </button>
-          </li>
-        )
-      })}
-    </ul>
-  )
+  const rows = <PickerRows options={options} value={value} onChoose={choose} />
   const body = create ? (
     <div className="flex flex-col gap-4">
       {rows}

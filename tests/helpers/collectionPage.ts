@@ -124,6 +124,7 @@ vi.mock('@/app/(frontend)/components/toast/ToastProvider', () => ({
 }))
 // A link navigates through the router as Next's does: pushing, or replacing.
 vi.mock('next/link', () => ({
+  useLinkStatus: () => ({ pending: false }),
   default: ({
     href,
     replace,

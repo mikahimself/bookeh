@@ -63,6 +63,7 @@ vi.mock('next/navigation', async (importOriginal) => ({
   redirect,
 }))
 vi.mock('next/link', () => ({
+  useLinkStatus: () => ({ pending: false }),
   default: ({
     href,
     replace,

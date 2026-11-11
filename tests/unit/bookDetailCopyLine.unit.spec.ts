@@ -47,7 +47,7 @@ describe('CollectionPage', () => {
         })
       const confirmRemove = async (sheet: HTMLElement, line = 0) => {
         await clickDetailAction(sheet, 'Remove')
-        const chooser = screen.queryByRole('dialog', { name: 'Choose a copy' })
+        const chooser = screen.queryByRole('dialog', { name: 'Remove' })
         if (chooser)
           fireEvent.click(within(chooser).getAllByRole('button', { pressed: false })[line]!)
         const dialog = await screen.findByRole('dialog', { name: 'Remove 1 book from library?' })

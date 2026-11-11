@@ -49,6 +49,7 @@ vi.mock('next/navigation', async (importOriginal) => ({
   useSearchParams: () => new URLSearchParams(),
 }))
 vi.mock('next/link', () => ({
+  useLinkStatus: () => ({ pending: false }),
   default: ({
     href,
     replace,

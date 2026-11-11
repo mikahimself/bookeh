@@ -115,6 +115,7 @@ vi.mock('@/app/(frontend)/components/toast/ToastProvider', () => ({
   }),
 }))
 vi.mock('next/link', () => ({
+  useLinkStatus: () => ({ pending: false }),
   default: ({
     href,
     replace,
