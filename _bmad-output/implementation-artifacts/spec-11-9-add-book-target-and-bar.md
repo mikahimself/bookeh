@@ -139,3 +139,5 @@ Review: 21 findings, none high or medium; 2 entries patched (3 low: the missing 
 Verification: `npm run typecheck` clean; `npm run test:unit` 1407 pass; eslint clean on the touched files; scan-to-save and shop-check e2e pass; the walk passed (phone bar and hidden Links, wide Links and no bar).
 
 Residual risks: the Camera frame was never rendered (the e2e browser has no camera), nor were the torch, Finnish or the dark theme; the three new icon paths are unseen. Owner walk owed on an iPhone and an Android phone: frame look, hint legibility on a bright image, torch on and off, Back from an Answer.
+
+**Walkthrough (2026-11-14).** Mika confirms the Epic 11 phone checks are completed and OK. This closes this story's outstanding device checks recorded in Epic 11 retrospective action 1 (sprint item 86). Results are owner-reported; no additional device measurements are recorded.

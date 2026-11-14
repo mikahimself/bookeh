@@ -273,3 +273,5 @@ Walk `tests/e2e/bookHeader.walk.spec.ts` re-run after the review patches; passed
 - The Tab stop of the Segmented control starts on "unread", not on the chosen part (Base UI's composite root).
 - A toast Undo remounts the whole header, cover included.
 - Built beside the abandoned worktree `story/11-4-…`, which shares every file here. Mika chose this build, and the worktree is untouched.
+
+**Walkthrough (2026-11-14).** Mika confirms the Epic 11 phone checks are completed and OK. This closes this story's outstanding device checks recorded in Epic 11 retrospective action 1 (sprint item 86). Results are owner-reported; no additional device measurements are recorded.

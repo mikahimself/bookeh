@@ -145,3 +145,5 @@ Walk `tests/e2e/appBar.walk.spec.ts` (uncommitted, git-ignored), 390px in light 
 - The installed PWA's safe area was not walked on a device.
 - EXPERIENCE.md and DESIGN.md already say "about 84px"; unchanged.
 - Files shared with parallel stories: `styles.css` (11.8's tile tokens) and the section `layout.tsx`.
+
+**Walkthrough (2026-11-14).** Mika confirms the Epic 11 phone checks are completed and OK. This closes this story's outstanding device checks recorded in Epic 11 retrospective action 1 (sprint item 86). Results are owner-reported; no additional device measurements are recorded.

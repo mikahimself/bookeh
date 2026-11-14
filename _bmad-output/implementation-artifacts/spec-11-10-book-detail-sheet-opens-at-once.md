@@ -146,3 +146,5 @@ Record actual pass/fail counts and screen observations under Auto Run Result, in
 
 
 **Final parent verification after review fixes.** `npm run lint`: exit 0, 0 errors and the same 68 existing migration warnings. `npm run typecheck`: exit 0. `npm run test:unit`: 106 files / 1,404 tests passed. The required combined browser command passed 23/23 in 1.5 minutes: 21 ignored acceptance checks (including the two reproduced lifecycle regressions) plus scan-to-save and shop check. Fault/delay injection was restored, and no source injection, temporary seed or committed browser test remains. Source diff: 411 added / 93 removed lines, kept as one cohesive lifecycle story. Sprint and spec are done; committed on the isolated story branch without pushing or merging.
+
+**Walkthrough (2026-11-14).** Mika confirms the Epic 11 phone checks are completed and OK. This closes this story's outstanding device checks recorded in Epic 11 retrospective action 1 (sprint item 86). Results are owner-reported; no additional device measurements are recorded.

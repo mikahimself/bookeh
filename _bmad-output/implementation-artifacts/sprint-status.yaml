@@ -29,7 +29,7 @@
 # - Dev moves story to 'review', then runs code-review (fresh context, different LLM recommended)
 # - Retrospective appends its action items to action_items; the status view surfaces open ones
 generated: 10-06-2026 17:50
-last_updated: 11-11-2026 10:49
+last_updated: 11-14-2026 10:42
 project: bookeh
 project_key: NOKEY
 tracking_system: file-system
@@ -305,7 +305,7 @@ development_status:
   11-8-stats-tiles-chart-and-nerdy-rows: done
   11-9-add-book-target-and-bar: done
   11-10-book-detail-sheet-opens-at-once: done
-  epic-11-retrospective: optional
+  epic-11-retrospective: done
 action_items:
   - id: 'epic-1-retro-item-1-fix-the-flash-toast-cookie-contract-doub'
     epic: 1
@@ -1050,3 +1050,61 @@ action_items:
     owner: "Mika"
     status: done
     ref: "_bmad-output/implementation-artifacts/epic-9-retro-2026-11-05.md"
+  - id: "epic-11-retro-item-86-phone-session-recorded-in-the-specs-11-4"
+    epic: 11
+    action: "Phone session, recorded in the specs: 11.4 header tap areas, 11.10 rapid
+      close and reopen in Safari, 11.2 bar in the installed PWA safe area, 11.9 camera
+      frame, hint legibility, torch on and off and Back from an Answer on the iPhone;
+      torch on an Android phone (P1, P2)"
+    owner: "Mika"
+    status: done
+    resolution: "2026-11-14: Mika confirms the Epic 11 phone checks are completed
+      and passed. Recorded in specs 11.2, 11.4, 11.9 and 11.10."
+    ref: "_bmad-output/implementation-artifacts/epic-11-retro-2026-11-14.md"
+  - id: "epic-11-retro-item-87-decide-the-phone-book-detail-header-keep"
+    epic: 11
+    action: "Decide the phone Book detail header: keep 11.10 (title type, meta muted
+      authors) and update DESIGN.md 374 and 466, or restore 11.4 and make the pending
+      sheet match (S1)"
+    owner: "Mika"
+    status: open
+    ref: "_bmad-output/implementation-artifacts/epic-11-retro-2026-11-14.md"
+  - id: "epic-11-retro-item-88-get-main-green-re-run-ci-for-eaaed34-pla"
+    epic: 11
+    action: "Get main green: re-run CI for eaaed34 (Playwright install step failed)
+      and stop collectionSelection.unit.spec.ts tags-a-selection from timing out at
+      5000ms (P4)"
+    owner: "Mika"
+    status: done
+    resolution: "2026-11-14: GitHub Actions run 43046405208 for eaaed34 is completed
+      with conclusion success. Mika identifies the earlier failure as a pull error,
+      not a code defect. The older selection-test timeout remains a historical
+      observation; the full local suite passed and no timeout fix was applied.
+      Newer scan-fix run 43635508141 was in progress when checked."
+    ref: "_bmad-output/implementation-artifacts/epic-11-retro-2026-11-14.md"
+  - id: "epic-11-retro-item-89-one-clean-up-commit-eslint-ignores-tests"
+    epic: 11
+    action: "One clean-up commit: ESLint ignores tests/e2e/*.walk.spec.ts; Camera
+      frame brackets white and sized from the scale or a named token; book-open-loading.html
+      committed under ux-designs .working; 11.1 deferred entry closed; epics.md 11.9
+      torch wording; epic-9, epic-10 and epic-11 set to done (P6, P7, P9, S2, S3,
+      S4)"
+    owner: "Claude"
+    status: open
+    ref: "_bmad-output/implementation-artifacts/epic-11-retro-2026-11-14.md"
+  - id: "epic-11-retro-item-90-process-one-session-per-checkout-a-story"
+    epic: 11
+    action: "Process: one session per checkout; a story built beside another gets
+      its own worktree, Postgres container and port. Remove the 10 finished worktrees
+      and stop the four Epic 8 containers (P3, P9)"
+    owner: "Mika"
+    status: open
+    ref: "_bmad-output/implementation-artifacts/epic-11-retro-2026-11-14.md"
+  - id: "epic-11-retro-item-91-deferred-refactor-when-a-story-next-touc"
+    epic: 11
+    action: "Deferred refactor when a story next touches them (joins Epic 6 item 70
+      and Epic 7 item 76): one source for the phone header classes shared by BookHeader
+      and PendingDetail; one useLinkStatus stub in tests/helpers (A2)"
+    owner: "Mika"
+    status: open
+    ref: "_bmad-output/implementation-artifacts/epic-11-retro-2026-11-14.md"
