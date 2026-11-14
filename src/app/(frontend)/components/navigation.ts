@@ -237,6 +237,37 @@ export function useCloseTask(): (task: HTMLElement | null, to?: string) => void 
   )
 }
 
+/**
+ * The X on a screen opened from a task's first one (Lookup, Add without ISBN):
+ * history back to the task's first entry (`TaskBase`), however many entries
+ * the screen has pushed since (Lookup's searches), instead of leaving the
+ * task. When the task was opened on this screen there is no such entry, and
+ * `home` replaces it; so it does when the entry reached is on another
+ * pathname (a task opened on Lookup, then searched).
+ */
+export function useTaskHome(home: string): () => void {
+  const router = useRouter()
+  return useCallback(() => {
+    if (closing) return
+    const steps = taskBase === null ? 0 : depth - taskBase
+    if (steps <= 0) {
+      router.replace(home)
+      return
+    }
+    closing = true
+    traverseBack(
+      () => {
+        if (steps === 1) router.back()
+        else window.history.go(-steps)
+      },
+      () => {
+        const target = new URL(home, window.location.href)
+        if (target.pathname !== window.location.pathname) router.replace(home)
+      },
+    )
+  }, [router, home])
+}
+
 /** The current entry is on `href`'s pathname but not at `href`. */
 function staleBelow(href: string): boolean {
   const target = new URL(href, window.location.href)

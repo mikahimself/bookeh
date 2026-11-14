@@ -19,6 +19,7 @@ colors:
   bar: '#1F2933'
   bar-ink: '#FFFFFF'
   bar-danger: '#E0566F'
+  sheet-edge: '#1F2933'
   # Dark
   background-dark: '#14181D'
   text-dark: '#E3E8EE'
@@ -34,6 +35,7 @@ colors:
   bar-dark: '#262E37'
   bar-ink-dark: '#E3E8EE'
   bar-danger-dark: '#E0566F'
+  sheet-edge-dark: '#626B76'
   # Corner crop stage, the same in both themes
   crop-dim: '#00000099'
   crop-halo: '#0000008C'
@@ -316,6 +318,7 @@ Every colour has a light and a dark value. Dark tokens carry the `-dark` suffix 
 | `bar` | `#1F2933` | `#262E37` | The phone App bar's ground, and nothing else. |
 | `bar-ink` | `#FFFFFF` | `#E3E8EE` | Labels, icons and rings on the App bar. |
 | `bar-danger` | `#E0566F` | `#E0566F` | A destructive button's ring on the App bar. |
+| `sheet-edge` | `#1F2933` | `#626B76` | The bottom sheet's top edge: `text` in light, `text-dim` in dark, where a `text` line across the screen is too bright (Mika, 2026-11-14). |
 | `scrim` | `#00000033` | `#00000066` | Dims what is behind a bottom sheet or a dialog. |
 | `shadow` | `#1F293324` | `#00000073` | The detail panel's shadow, and nothing else. |
 | `crop-dim` | `#00000099` | `#00000099` | Dims the photo outside the four corners in the Corner crop, and nothing else. |
@@ -464,10 +467,10 @@ Visual specs. Behaviour lives in `EXPERIENCE.md` → Component Patterns.
 | Selection bar | A {spacing.stroke-selection} {colors.accent} bar on the left edge of the open row. The row is not tinted. |
 | Lent marker | An 8px {colors.accent} square, with the text "Lent · {person}" in {colors.text}. On a Cover tile the square sits before the title and the text after the authors. |
 | Detail panel | {spacing.panel-width} wide on the plain ground, with the left border and shadow described under Elevation & Depth. Header: the cover at 120 × 180px beside the {typography.heading-detail} title, the author, a {typography.meta} muted "{pages} pages · {language}" line, the series line and, once the Book is read, the Rating; the text column ends near the cover's foot. Below the reading control, groups are Folding sections. Values in rows with the label left and the value right in {colors.text-muted}. Buttons at the foot. The bottom sheet holds the same content. |
-| Bottom sheet | Full width, plain ground, {spacing.stroke-control} {colors.text} top edge, {colors.scrim} over the list above. A short {spacing.stroke-control} line at the top centre is the handle. |
+| Bottom sheet | Full width, plain ground, {spacing.stroke-control} {colors.sheet-edge} top edge, {colors.scrim} over the list above. A short {spacing.stroke-control} line at the top centre is the handle. |
 | Toast | An outlined box ({spacing.stroke-control} {colors.text}) above whatever is pinned to the bottom: message on the left, actions as Links and a Close (X) on the right. An error toast starts with an 8px {colors.danger} square. |
 | Action bar | Full width along the bottom edge on the plain ground, with a {spacing.stroke-control} {colors.text} top edge. The count on the left, buttons on the right; Remove is a destructive button and Done the primary. On the phone it is two rows and takes the App bar's place. |
-| App bar | The phone only. A {colors.bar} band along the bottom edge, above the safe area, about 84px before it. Its buttons sit centred, {spacing.5}–{spacing.7} apart: each a 44px circle with a {spacing.stroke-control} {colors.bar-ink} ring and a 20–22px inline line icon, over a {typography.label} lowercase label in {colors.bar-ink}; a label may wrap to two lines. The layer's primary has an {colors.accent} ring, a destructive button a {colors.bar-danger} ring. A ⋯ (three 4px dots) sits at the top right when the bar has a menu. The circles are the one rounded shape (Shapes). |
+| App bar | The phone only. A {colors.bar} band along the bottom edge, above the safe area, about 84px before it. Its buttons sit centred, {spacing.5}–{spacing.7} apart: each a 44px circle with a {spacing.stroke-control} {colors.bar-ink} ring and a 20–22px inline line icon, over a {typography.label} lowercase label in {colors.bar-ink}; a label is at most 80px wide and two lines, cut with an ellipsis beyond that. The layer's primary has an {colors.accent} ring, a destructive button a {colors.bar-danger} ring. A ⋯ (three 4px dots) sits at the top right when the bar has a menu. The circles are the one rounded shape (Shapes). |
 | Segmented control | Three equal parts in a {spacing.stroke-button} {colors.text} outline with {spacing.stroke-button} dividers, 48px tall, labels in {typography.control}, lowercase. The chosen part is filled {colors.accent-fill} with a white label; the others are on the plain ground. Used for reading status. |
 | Icon switch | Two 40px squares, {spacing.1}–6px apart, each a {spacing.stroke-button} {colors.text} outline around a line icon. The chosen one is filled {colors.accent-fill}, its outline the same colour, its icon white. Used for rows / covers, right of the size switch. |
 | Folding section | A full-width row at least 58px tall: the title in {typography.heading-group}, lowercase; a summary at the right in {typography.meta} {colors.text-muted}; then a chevron (2px strokes) that turns over when open. Rows are divided by {spacing.stroke-hairline} {colors.border} lines, one above the first. Open content sits under its row, {spacing.4} below. |

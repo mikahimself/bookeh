@@ -22,7 +22,7 @@ const queryOf = (value: string | string[] | undefined): string =>
  * Lookup by title or author (EXPERIENCE.md, Lookup; spine, Routes
  * `/scan/find`), a full-screen task inside the `/scan` segment, so the camera
  * session, the task base and the held-save toast are the same as Scan's. The
- * camera stays off: only Scan starts it.
+ * camera stays off: only Scan starts it. The X returns to Scan.
  *
  * `?q=` is the search, run here on the server with the text trimmed: the
  * viewer's own holdings first (`searchMine`, which counts nothing), then the
@@ -77,7 +77,7 @@ export default async function LookupPage({
 
   return (
     <ViewTransition enter="task-enter" exit="task-exit" default="none">
-      <FullScreenTask title={t('lookup.heading')}>
+      <FullScreenTask title={t('lookup.heading')} home="/scan">
         <LookupField q={text} />
         {groups !== null && groups.mine.length > 0 && group(t('lookup.mine'), groups.mine)}
         {groups !== null &&

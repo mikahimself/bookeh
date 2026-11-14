@@ -46,7 +46,7 @@ export type SheetProps = {
 }
 
 /**
- * DESIGN.md, Bottom sheet: full width, plain ground, a 2px `text` top edge,
+ * DESIGN.md, Bottom sheet: full width, plain ground, a 2px `sheet-edge` top edge,
  * the scrim over the list above, and a short line at the top centre as the
  * handle. EXPERIENCE.md: it slides up half open; dragging up or tapping the
  * handle opens it fully; a tap on the dimmed list, a drag down, X, Esc or
@@ -99,7 +99,7 @@ export function Sheet({
             aria-label={label}
             aria-labelledby={labelledBy}
             initialFocus={initialFocus}
-            className="relative flex h-sheet-height w-full touch-none flex-col border-t-2 border-text bg-background sheet-motion"
+            className="relative flex h-sheet-height w-full touch-none flex-col border-t-2 border-sheet-edge bg-background sheet-motion"
           >
             <ToastHost />
             <div className="relative flex shrink-0 justify-center">

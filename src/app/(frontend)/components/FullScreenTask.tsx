@@ -4,7 +4,7 @@ import { useTranslations } from 'next-intl'
 import { useRef, type ReactNode } from 'react'
 
 import { CloseButton } from './CloseButton'
-import { useCloseTask } from './navigation'
+import { useCloseTask, useTaskHome } from './navigation'
 import { useSuspendSwipe } from './swipe'
 
 /**
@@ -19,25 +19,30 @@ import { useSuspendSwipe } from './swipe'
  * content is short and sticks there, below the content, when it scrolls.
  * It carries `data-pinned-wide` too, so the toast rises above it on wide
  * screens as well. `onClose` intercepts the X: it receives the close the X would run, to call
- * now or after a confirmation.
+ * now or after a confirmation. With `home`, the X returns to the task's first
+ * screen at that address instead of leaving the task (Lookup and Add without
+ * ISBN, back to Scan).
  */
 export function FullScreenTask({
   title,
   children,
   foot,
   onClose,
+  home,
 }: {
   title: string
   children?: ReactNode
   foot?: ReactNode
   onClose?: (close: () => void) => void
+  home?: string
 }) {
   const t = useTranslations('task')
   const closeTask = useCloseTask()
   const frame = useRef<HTMLDivElement>(null)
   useSuspendSwipe()
 
-  const close = () => closeTask(frame.current)
+  const goHome = useTaskHome(home ?? '/')
+  const close = () => (home === undefined ? closeTask(frame.current) : goHome())
 
   return (
     <div ref={frame} className="fixed inset-0 overflow-y-auto bg-background">

@@ -48,6 +48,9 @@
   --color-accent-fill: #d1432f;
   /* White text and icons on `accent-fill`, the same in both themes. Nothing else. */
   --color-on-fill: #ffffff;
+  /* The bottom sheet's top edge: `text` in light, quieter in dark, where a
+     `text` line across the full width glares against the dimmed list. */
+  --color-sheet-edge: #1f2933;
   --color-bar: #1f2933;
   /* The App bar's labels, icons and rings (`bar-ink`), and a destructive
      button's ring (`bar-danger`, the same in both themes). */
@@ -246,6 +249,7 @@
     --color-danger: #e0566f;
     --color-shadow: #00000073;
     --color-cover-frame: #ffffff1f;
+    --color-sheet-edge: #626b76;
     --color-bar: #262e37;
     --color-bar-ink: #e3e8ee;
   }
@@ -263,6 +267,7 @@
       --color-danger: #e0566f;
       --color-shadow: #00000073;
       --color-cover-frame: #ffffff1f;
+      --color-sheet-edge: #626b76;
       --color-bar: #262e37;
       --color-bar-ink: #e3e8ee;
     }

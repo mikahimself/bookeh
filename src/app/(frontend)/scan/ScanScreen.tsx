@@ -36,7 +36,8 @@ const SCAN_SUCCESS_MS = 500
  * author opens Lookup (`/scan/find`) beside it.
  *
  * `isbn` is the text in the address, kept in the field; `error` the message
- * under it. Until the camera is on (permission pending, refused, or none)
+ * under it, until the field is edited or cleared: the message is about the
+ * text submitted, not the one being typed. The next submit shows it again. Until the camera is on (permission pending, refused, or none)
  * the frame gives way to the no-camera message; once the camera is refused
  * or lost, the field takes focus. zxing is imported lazily (`zxing.ts`), so
  * it is only loaded here.
@@ -54,12 +55,16 @@ export function ScanScreen({ isbn, error }: { isbn?: string; error?: string }) {
   const [torch, setTorch] = useState<{ set: (on: boolean) => Promise<void> } | null>(null)
   const [lit, setLit] = useState(false)
   const litNow = useRef(false)
+  // The field has changed since the address's text was refused.
+  const [edited, setEdited] = useState(false)
   const torchSet = useRef<((on: boolean) => Promise<void>) | null>(null)
 
   const go = (text: string) => {
     paused.current = true
     const href = `/scan?isbn=${encodeURIComponent(text)}`
     startTransition(() => {
+      // With the navigation, so a text refused again shows its message again.
+      setEdited(false)
       if (isbn !== undefined) router.replace(href)
       else router.push(href)
     })
@@ -205,7 +210,8 @@ export function ScanScreen({ isbn, error }: { isbn?: string; error?: string }) {
           name="isbn"
           label={t('scan.isbn')}
           defaultValue={isbn}
-          error={error}
+          error={edited ? undefined : error}
+          onChange={() => setEdited(true)}
           // The field is a new element after Go; keep the keyboard up to correct it.
           autoFocus={error !== undefined}
           enterKeyHint="go"

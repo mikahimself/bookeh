@@ -37,7 +37,10 @@ const circle = (primary: boolean, destructive = false) =>
   `flex size-tap items-center justify-center rounded-full border-(length:--spacing-stroke-control) group-aria-pressed:bg-bar-ink group-aria-pressed:text-bar ${
     destructive ? 'border-bar-danger' : primary ? 'border-accent' : 'border-bar-ink'
   }`
-const item = 'group flex min-w-0 flex-col items-center gap-1 text-center text-label text-bar-ink ui-case'
+const item =
+  'group flex max-w-[80px] min-w-0 flex-col items-center gap-1 text-center text-label text-bar-ink ui-case'
+/** The label: two lines at most, cut with an ellipsis; a long word breaks rather than overflows. */
+const label = 'line-clamp-2 max-w-full break-words'
 
 export type AppBarIcon =
   | 'plus'
@@ -92,7 +95,7 @@ export function AppBarLink({
       <span className={circle(primary)}>
         <Icon name={icon} />
       </span>
-      {children}
+      <span className={label}>{children}</span>
     </Link>
   )
 }
@@ -112,7 +115,7 @@ export function AppBarButton({
       <span className={circle(false, destructive)}>
         <Icon name={icon} />
       </span>
-      {children}
+      <span className={label}>{children}</span>
     </button>
   )
 }

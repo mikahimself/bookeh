@@ -39,7 +39,9 @@ import { UnavailableAnswer } from './UnavailableAnswer'
  * An `?isbn=` wins over it.
  *
  * `?title=` with no `isbn` or `book` is the Not found Answer with no
- * ISBN and the text in its Title field (`scanParams()`).
+ * ISBN and the text in its Title field (`scanParams()`). It is headed "Add
+ * by hand", since no lookup ran, and its X returns to Scan instead of
+ * leaving the task, as Lookup's does.
  *
  * `&pick=` is the edition picked (D-7); `lookupBook` falls back to the best
  * for one out of range.
@@ -76,6 +78,8 @@ export default async function ScanPage({
       ? await viewerWishlists(ctx)
       : []
   const others = await otherEditionsFor(ctx, outcome)
+  // The form with no ISBN: nothing was looked up, so nothing was "not found".
+  const byHand = outcome.kind === 'notFound' && outcome.isbn13 === null
 
   return (
     <ViewTransition enter="task-enter" exit="task-exit" default="none">
@@ -101,7 +105,12 @@ export default async function ScanPage({
         </FullScreenTask>
       ) : (
         <FullScreenTask
-          title={t(`answer.${outcome.kind === 'held' ? outcome.answer.heading : outcome.kind}`)}
+          title={
+            byHand
+              ? t('answer.addByHand')
+              : t(`answer.${outcome.kind === 'held' ? outcome.answer.heading : outcome.kind}`)
+          }
+          home={byHand ? '/scan' : undefined}
         >
           {outcome.kind === 'held' ? (
             <HeldAnswer answer={outcome.answer} others={others} />
